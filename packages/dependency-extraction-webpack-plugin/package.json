@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/dependency-extraction-webpack-plugin",
-	"version": "4.21.0",
+	"version": "6.48.0",
 	"description": "Extract WordPress script dependencies from webpack bundles.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,20 +20,36 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=14"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"files": [
 		"lib",
 		"build-types"
 	],
 	"main": "lib/index.js",
+	"exports": {
+		".": {
+			"types": "./lib/types.d.ts",
+			"default": "./lib/index.js"
+		},
+		"./lib/util": "./lib/util.js",
+		"./package.json": "./package.json"
+	},
 	"types": "lib/types.d.ts",
 	"dependencies": {
-		"json2php": "^0.0.7",
-		"webpack-sources": "^3.2.2"
+		"json2php": "^0.0.9"
+	},
+	"devDependencies": {
+		"atob": "^2.1.2",
+		"css-loader": "^6.2.0",
+		"glob": "^7.1.2",
+		"lodash": "^4.17.21",
+		"mini-css-extract-plugin": "^2.9.2",
+		"mkdirp": "^3.0.1"
 	},
 	"peerDependencies": {
-		"webpack": "^4.8.3 || ^5.0.0"
+		"webpack": "^5.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

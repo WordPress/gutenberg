@@ -14,7 +14,11 @@ import { useSelect } from '@wordpress/data';
 import { PRELOADED_NAVIGATION_MENUS_QUERY } from './constants';
 
 export default function useNavigationMenu( ref ) {
-	const permissions = useResourcePermissions( 'navigation', ref );
+	const permissions = useResourcePermissions( {
+		kind: 'postType',
+		name: 'wp_navigation',
+		id: ref,
+	} );
 
 	const {
 		navigationMenu,
@@ -27,8 +31,18 @@ export default function useNavigationMenu( ref ) {
 		[ ref ]
 	);
 
-	const { canCreate, canUpdate, canDelete, isResolving, hasResolved } =
-		permissions;
+	const {
+		// Can the user create navigation menus?
+		canCreate: canCreateNavigationMenus,
+
+		// Can the user update the specific navigation menu with the given post ID?
+		canUpdate: canUpdateNavigationMenu,
+
+		// Can the user delete the specific navigation menu with the given post ID?
+		canDelete: canDeleteNavigationMenu,
+		isResolving: isResolvingPermissions,
+		hasResolved: hasResolvedPermissions,
+	} = permissions;
 
 	const {
 		records: navigationMenus,
@@ -52,13 +66,17 @@ export default function useNavigationMenu( ref ) {
 		isResolvingNavigationMenus,
 		hasResolvedNavigationMenus,
 		canSwitchNavigationMenu,
-		canUserCreateNavigationMenu: canCreate,
-		isResolvingCanUserCreateNavigationMenu: isResolving,
-		hasResolvedCanUserCreateNavigationMenu: hasResolved,
-		canUserUpdateNavigationMenu: canUpdate,
-		hasResolvedCanUserUpdateNavigationMenu: ref ? hasResolved : undefined,
-		canUserDeleteNavigationMenu: canDelete,
-		hasResolvedCanUserDeleteNavigationMenu: ref ? hasResolved : undefined,
+		canUserCreateNavigationMenus: canCreateNavigationMenus,
+		isResolvingCanUserCreateNavigationMenus: isResolvingPermissions,
+		hasResolvedCanUserCreateNavigationMenus: hasResolvedPermissions,
+		canUserUpdateNavigationMenu: canUpdateNavigationMenu,
+		hasResolvedCanUserUpdateNavigationMenu: ref
+			? hasResolvedPermissions
+			: undefined,
+		canUserDeleteNavigationMenu: canDeleteNavigationMenu,
+		hasResolvedCanUserDeleteNavigationMenu: ref
+			? hasResolvedPermissions
+			: undefined,
 	};
 }
 

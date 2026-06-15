@@ -1,10 +1,12 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .interface-complementary-area {
 	background: $white;
 	color: $gray-900;
-
-	@include break-small() {
-		-webkit-overflow-scrolling: touch;
-	}
+	height: 100%;
+	overflow: auto;
 
 	@include break-medium() {
 		width: $sidebar-width;
@@ -14,29 +16,27 @@
 		border: none;
 		// Make a stacking context that keeps all descendents behind the sticky header
 		position: relative;
-		z-index: z-index(".interface-complementary-area .components-panel");
+		z-index: 0;
 	}
 
 	.components-panel__header {
 		position: sticky;
 		top: 0;
-		z-index: z-index(".interface-complementary-area .components-panel__header");
+		// Sit above the panel's scrolling content within the stacking context above.
+		z-index: 1;
 
-		&.edit-post-sidebar__panel-tabs {
-			top: $panel-header-height;
-
-			@include break-medium() {
-				top: 0;
-			}
+		&.editor-sidebar__panel-tabs {
+			top: 0;
 		}
 	}
 
-	p:not(.components-base-control__help) {
+	p:not(.components-base-control__help, .components-form-token-field__help) {
 		margin-top: 0;
 	}
 
 	h2 {
 		font-size: $default-font-size;
+		font-weight: $font-weight-medium;
 		color: $gray-900;
 		margin-bottom: 1.5em;
 	}
@@ -45,7 +45,7 @@
 	h3 {
 		font-size: 11px;
 		text-transform: uppercase;
-		font-weight: 500;
+		font-weight: $font-weight-medium;
 		color: $gray-900;
 		margin-bottom: 1.5em;
 	}
@@ -71,4 +71,8 @@
 		bottom: 10px;
 		left: auto;
 	}
+}
+
+.interface-complementary-area__fill {
+	height: 100%;
 }

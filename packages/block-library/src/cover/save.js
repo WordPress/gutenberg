@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -19,6 +19,7 @@ import {
 import {
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
+	EMBED_VIDEO_BACKGROUND_TYPE,
 	dimRatioToClass,
 	isContentPositionCenter,
 	getPositionClassName,
@@ -45,6 +46,8 @@ export default function save( { attributes } ) {
 		minHeight: minHeightProp,
 		minHeightUnit,
 		tagName: Tag,
+		sizeSlug,
+		poster,
 	} = attributes;
 	const overlayColorClass = getColorClassName(
 		'background-color',
@@ -58,6 +61,8 @@ export default function save( { attributes } ) {
 
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
+	const isEmbedVideoBackground =
+		EMBED_VIDEO_BACKGROUND_TYPE === backgroundType;
 
 	const isImgElement = ! ( hasParallax || isRepeated );
 
@@ -80,7 +85,7 @@ export default function save( { attributes } ) {
 
 	const backgroundPosition = mediaPosition( focalPoint );
 
-	const classes = classnames(
+	const classes = clsx(
 		{
 			'is-light': ! isDark,
 			'has-parallax': hasParallax,
@@ -91,10 +96,11 @@ export default function save( { attributes } ) {
 		getPositionClassName( contentPosition )
 	);
 
-	const imgClasses = classnames(
+	const imgClasses = clsx(
 		'wp-block-cover__image-background',
 		id ? `wp-image-${ id }` : null,
 		{
+			[ `size-${ sizeSlug }` ]: sizeSlug,
 			'has-parallax': hasParallax,
 			'is-repeated': isRepeated,
 		}
@@ -104,9 +110,64 @@ export default function save( { attributes } ) {
 
 	return (
 		<Tag { ...useBlockProps.save( { className: classes, style } ) }>
+			{ ! useFeaturedImage &&
+				isImageBackground &&
+				url &&
+				( isImgElement ? (
+					<img
+						className={ imgClasses }
+						alt={ alt }
+						src={ url }
+						style={ { objectPosition } }
+						data-object-fit="cover"
+						data-object-position={ objectPosition }
+					/>
+				) : (
+					<div
+						role={ alt ? 'img' : undefined }
+						aria-label={ alt ? alt : undefined }
+						className={ imgClasses }
+						style={ { backgroundPosition, backgroundImage } }
+					/>
+				) ) }
+			{ isVideoBackground && url && (
+				<video
+					className={ clsx(
+						'wp-block-cover__video-background',
+						'intrinsic-ignore'
+					) }
+					autoPlay
+					muted
+					loop
+					playsInline
+					src={ url }
+					poster={ poster }
+					style={ { objectPosition } }
+					data-object-fit="cover"
+					data-object-position={ objectPosition }
+				/>
+			) }
+			{ isEmbedVideoBackground && url && (
+				<figure
+					className={ clsx(
+						'wp-block-cover__video-background',
+						'wp-block-cover__embed-background',
+						'wp-block-embed'
+					) }
+				>
+					<div className="wp-block-embed__wrapper">{ url }</div>
+				</figure>
+			) }
+
+			{ /* The `wp-block-cover__background` needs to be immediately before
+			the `wp-block-cover__inner-container`, so the exclusion CSS selector
+			`.wp-block-cover__background + .wp-block-cover__inner-container`
+			works properly. If it needs to be changed in the future, the
+			selector for the backward compatibility for v14 deprecation also
+			needs change. */ }
 			<span
 				aria-hidden="true"
-				className={ classnames(
+				className={ clsx(
 					'wp-block-cover__background',
 					overlayColorClass,
 					dimRatioToClass( dimRatio ),
@@ -124,41 +185,6 @@ export default function save( { attributes } ) {
 				style={ bgStyle }
 			/>
 
-			{ ! useFeaturedImage &&
-				isImageBackground &&
-				url &&
-				( isImgElement ? (
-					<img
-						className={ imgClasses }
-						alt={ alt }
-						src={ url }
-						style={ { objectPosition } }
-						data-object-fit="cover"
-						data-object-position={ objectPosition }
-					/>
-				) : (
-					<div
-						role="img"
-						className={ imgClasses }
-						style={ { backgroundPosition, backgroundImage } }
-					/>
-				) ) }
-			{ isVideoBackground && url && (
-				<video
-					className={ classnames(
-						'wp-block-cover__video-background',
-						'intrinsic-ignore'
-					) }
-					autoPlay
-					muted
-					loop
-					playsInline
-					src={ url }
-					style={ { objectPosition } }
-					data-object-fit="cover"
-					data-object-position={ objectPosition }
-				/>
-			) }
 			<div
 				{ ...useInnerBlocksProps.save( {
 					className: 'wp-block-cover__inner-container',

@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import fastDeepEqual from 'fast-deep-equal/es6';
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 
 /**
  * WordPress dependencies
  */
 import { useRef, useLayoutEffect } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useRegistry } from '@wordpress/data';
 import { synchronizeBlocksWithTemplate } from '@wordpress/blocks';
 
 /**
@@ -40,26 +40,23 @@ export default function useInnerBlockTemplateSync(
 	templateLock,
 	templateInsertUpdatesSelection
 ) {
-	const {
-		getBlocks,
-		getSelectedBlocksInitialCaretPosition,
-		isBlockSelected,
-	} = useSelect( blockEditorStore );
-	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
-
-	const { innerBlocks } = useSelect(
-		( select ) => ( {
-			innerBlocks: select( blockEditorStore ).getBlocks( clientId ),
-		} ),
-		[ clientId ]
-	);
+	// Instead of adding a useSelect mapping here, please add to the useSelect
+	// mapping in InnerBlocks! Every subscription impacts performance.
+	const registry = useRegistry();
 
 	// Maintain a reference to the previous value so we can do a deep equality check.
-	const existingTemplate = useRef( null );
+	const existingTemplateRef = useRef( null );
 
 	useLayoutEffect( () => {
 		let isCancelled = false;
+
+		const {
+			getBlocks,
+			getSelectedBlocksInitialCaretPosition,
+			isBlockSelected,
+		} = registry.select( blockEditorStore );
+		const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
+			registry.dispatch( blockEditorStore );
 
 		// There's an implicit dependency between useInnerBlockTemplateSync and useNestedSettingsUpdate
 		// The former needs to happen after the latter and since the latter is using microtasks to batch updates (performance optimization),
@@ -80,21 +77,23 @@ export default function useInnerBlockTemplateSync(
 
 			const hasTemplateChanged = ! fastDeepEqual(
 				template,
-				existingTemplate.current
+				existingTemplateRef.current
 			);
 
 			if ( ! shouldApplyTemplate || ! hasTemplateChanged ) {
 				return;
 			}
 
-			existingTemplate.current = template;
+			existingTemplateRef.current = template;
 			const nextBlocks = synchronizeBlocksWithTemplate(
 				currentInnerBlocks,
 				template
 			);
 
 			if ( ! fastDeepEqual( nextBlocks, currentInnerBlocks ) ) {
-				__unstableMarkNextChangeAsNotPersistent();
+				__unstableMarkNextChangeAsNotPersistent( {
+					history: 'ignore',
+				} );
 				replaceInnerBlocks(
 					clientId,
 					nextBlocks,
@@ -114,5 +113,11 @@ export default function useInnerBlockTemplateSync(
 		return () => {
 			isCancelled = true;
 		};
-	}, [ innerBlocks, template, templateLock, clientId ] );
+	}, [
+		template,
+		templateLock,
+		clientId,
+		registry,
+		templateInsertUpdatesSelection,
+	] );
 }

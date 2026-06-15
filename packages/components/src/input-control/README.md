@@ -10,13 +10,14 @@ InputControl components let users enter and edit text. This is an experimental c
 
 ```js
 import { __experimentalInputControl as InputControl } from '@wordpress/components';
-import { useState } from '@wordpress/compose';
+import { useState } from 'react';
 
 const Example = () => {
 	const [ value, setValue ] = useState( '' );
 
 	return (
 		<InputControl
+			__next40pxDefaultSize
 			value={ value }
 			onChange={ ( nextValue ) => setValue( nextValue ?? '' ) }
 		/>
@@ -107,3 +108,11 @@ The current value of the input.
 
 -   Type: `String`
 -   Required: No
+
+### __next40pxDefaultSize
+
+Start opting into the larger default height that will become the default size in a future version.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`

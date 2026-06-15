@@ -1,8 +1,7 @@
 {
+	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"rootDir": "src",
-		"declarationDir": "build-types",
 		"types": [ "gutenberg-env" ],
 		"strictNullChecks": true
 	},
@@ -12,6 +11,7 @@
 		{ "path": "../autop" },
 		{ "path": "../blob" },
 		{ "path": "../block-editor" },
+		{ "path": "../blocks" },
 		{ "path": "../components" },
 		{ "path": "../compose" },
 		{ "path": "../core-data" },
@@ -26,11 +26,20 @@
 		{ "path": "../html-entities" },
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
+		{ "path": "../interactivity" },
+		{ "path": "../interactivity-router" },
+		{ "path": "../latex-to-mathml" },
 		{ "path": "../notices" },
 		{ "path": "../keycodes" },
+		{ "path": "../keyboard-shortcuts" },
 		{ "path": "../primitives" },
 		{ "path": "../rich-text" },
+		{ "path": "../server-side-render" },
+		{ "path": "../shortcode" },
+		{ "path": "../ui" },
+		{ "path": "../upload-media" },
 		{ "path": "../url" },
+		{ "path": "../viewport" },
 		{ "path": "../wordcount" }
 	],
 	"include": [ "src/**/*.ts", "src/**/*.tsx" ]

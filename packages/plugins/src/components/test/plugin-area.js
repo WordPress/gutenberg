@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+// eslint-disable-next-line testing-library/no-manual-cleanup
 import { act, render, cleanup } from '@testing-library/react';
 
 /**

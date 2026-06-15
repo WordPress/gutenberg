@@ -1,0 +1,82 @@
+.dataviews-view-config {
+	width: 320px;
+	/* stylelint-disable-next-line property-no-unknown -- the linter needs to be updated to accepted the container-type property */
+	container-type: inline-size;
+	font-size: var(--wpds-typography-font-size-md);
+	line-height: var(--wpds-typography-line-height-sm);
+}
+
+.dataviews-config__popover.is-expanded .dataviews-config__popover-content-wrapper {
+	overflow-y: scroll;
+	height: 100%;
+	.dataviews-view-config {
+		width: auto;
+	}
+}
+
+.dataviews-view-config__sort-direction .components-toggle-group-control-option-base {
+	text-transform: uppercase;
+}
+
+.dataviews-settings-section__title.dataviews-settings-section__title {
+	line-height: var(--wpds-typography-line-height-md);
+	font-size: 15px;
+}
+
+.dataviews-settings-section__sidebar {
+	grid-column: span 4;
+}
+
+.dataviews-settings-section__content,
+.dataviews-settings-section__content > * {
+	grid-column: span 8;
+}
+
+.dataviews-settings-section__content .is-divided-in-two {
+	display: contents;
+	& > * {
+		grid-column: span 4;
+	}
+}
+
+.dataviews-settings-section:has(.dataviews-settings-section__content:empty) {
+	display: none;
+}
+
+@container (max-width: 500px) {
+	.dataviews-settings-section.dataviews-settings-section {
+		grid-template-columns: repeat(2, 1fr);
+		.dataviews-settings-section__sidebar {
+			grid-column: span 2;
+		}
+
+		.dataviews-settings-section__content {
+			grid-column: span 2;
+		}
+	}
+}
+
+.dataviews-view-config__sort-controls > * {
+	flex: 1;
+}
+
+.dataviews-view-config__label {
+	text-wrap: nowrap;
+}
+
+.dataviews-view-config__toggle-wrapper {
+	position: relative;
+	display: inline-flex;
+}
+
+.dataviews-view-config__modified-indicator {
+	position: absolute;
+	top: var(--wpds-dimension-gap-xs);
+	right: var(--wpds-dimension-gap-xs);
+	width: var(--wpds-dimension-gap-xs);
+	height: var(--wpds-dimension-gap-xs);
+	background: var(--wpds-color-background-interactive-brand-strong);
+	border-radius: 50%;
+	pointer-events: none;
+}
+

@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { Button, Tooltip, VisuallyHidden } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
 import { _x, sprintf } from '@wordpress/i18n';
 import { Icon, plus } from '@wordpress/icons';
@@ -18,7 +18,7 @@ import deprecated from '@wordpress/deprecated';
 import Inserter from '../inserter';
 
 function ButtonBlockAppender(
-	{ rootClientId, className, onFocus, tabIndex },
+	{ rootClientId, className, onFocus, tabIndex, onSelect },
 	ref
 ) {
 	return (
@@ -26,19 +26,30 @@ function ButtonBlockAppender(
 			position="bottom center"
 			rootClientId={ rootClientId }
 			__experimentalIsQuick
+			onSelectOrClose={ ( ...args ) => {
+				if ( onSelect && typeof onSelect === 'function' ) {
+					onSelect( ...args );
+				}
+			} }
 			renderToggle={ ( {
 				onToggle,
 				disabled,
 				isOpen,
 				blockTitle,
 				hasSingleBlockType,
+				appenderLabel,
 			} ) => {
+				const isToggleButton = ! hasSingleBlockType;
+
 				let label;
-				if ( hasSingleBlockType ) {
+				if ( appenderLabel ) {
+					// Block returns the full label; use directly (consistent with getBlockLabel).
+					label = appenderLabel;
+				} else if ( hasSingleBlockType ) {
 					label = sprintf(
 						// translators: %s: the name of the block when there is only one
 						_x( 'Add %s', 'directly add the only allowed block' ),
-						blockTitle
+						blockTitle.toLowerCase()
 					);
 				} else {
 					label = _x(
@@ -46,14 +57,16 @@ function ButtonBlockAppender(
 						'Generic label for block inserter button'
 					);
 				}
-				const isToggleButton = ! hasSingleBlockType;
 
-				let inserterButton = (
+				return (
+					// Disable reason: There shouldn't be a case where this button is disabled but not visually hidden.
+					// eslint-disable-next-line @wordpress/components-no-unsafe-button-disabled
 					<Button
+						__next40pxDefaultSize
 						ref={ ref }
 						onFocus={ onFocus }
 						tabIndex={ tabIndex }
-						className={ classnames(
+						className={ clsx(
 							className,
 							'block-editor-button-block-appender'
 						) }
@@ -62,20 +75,11 @@ function ButtonBlockAppender(
 						aria-expanded={ isToggleButton ? isOpen : undefined }
 						disabled={ disabled }
 						label={ label }
+						showTooltip
 					>
-						{ ! hasSingleBlockType && (
-							<VisuallyHidden as="span">{ label }</VisuallyHidden>
-						) }
 						<Icon icon={ plus } />
 					</Button>
 				);
-
-				if ( isToggleButton || hasSingleBlockType ) {
-					inserterButton = (
-						<Tooltip text={ label }>{ inserterButton }</Tooltip>
-					);
-				}
-				return inserterButton;
 			} }
 			isAppender
 		/>

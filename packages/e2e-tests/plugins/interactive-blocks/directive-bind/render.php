@@ -4,9 +4,9 @@
  *
  * @package gutenberg-test-interactive-blocks
  */
-
 ?>
-<div data-wp-interactive>
+
+<div data-wp-interactive="directive-bind">
 	<a
 		data-wp-bind--href="state.url"
 		data-testid="add missing href at hydration"
@@ -56,4 +56,63 @@
 	>
 		Some Text
 	</p>
+
+	<?php
+	$hydration_cases = array(
+		'false'       => '{ "value": false }',
+		'true'        => '{ "value": true }',
+		'null'        => '{ "value": null }',
+		'undef'       => '{ "__any": "any" }',
+		'emptyString' => '{ "value": "" }',
+		'anyString'   => '{ "value": "any" }',
+		'number'      => '{ "value": 10 }',
+		'auto'        => '{ "value": "auto" }',
+		'manual'      => '{ "value": "manual" }',
+		'hint'        => '{ "value": "hint" }',
+	);
+	?>
+
+	<?php foreach ( $hydration_cases as $type => $context ) : ?>
+	<div
+		data-testid='hydrating <?php echo $type; ?>'
+		data-wp-context='<?php echo $context; ?>'
+	>
+		<img
+			alt="Red dot"
+			data-testid="image"
+			data-wp-bind--width="context.value"
+			src="data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAAUA
+			AAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO
+			9TXL0Y4OHwAAAABJRU5ErkJggg=="
+		>
+		<input
+			type="text"
+			data-testid="input"
+			data-wp-bind--name="context.value"
+			data-wp-bind--value="context.value"
+			data-wp-bind--disabled="context.value"
+			data-wp-bind--aria-disabled="context.value"
+		>
+		<div
+			data-testid="popover"
+			data-wp-bind--popover="context.value"
+		></div>
+		<button
+			data-testid="toggle value"
+			data-wp-on--click="actions.toggleValue"
+			data-wp-bind--data-toggle-count="context.count"
+		>Toggle</button>
+	</div>
+	<?php endforeach; ?>
+
+	<div data-wp-context='{"test": true}'>
+		<div
+			data-testid="without-unique-id"
+			data-wp-bind--data-test="context.test"
+		></div>
+		<div
+			data-testid="with-unique-id"
+			data-wp-bind--data-test---unique-id="context.test"
+		></div>
+	</div>
 </div>

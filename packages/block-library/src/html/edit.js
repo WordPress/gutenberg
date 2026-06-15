@@ -2,62 +2,94 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useContext, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import {
 	BlockControls,
-	PlainText,
+	BlockIcon,
+	InspectorControls,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { ToolbarButton, Disabled, ToolbarGroup } from '@wordpress/components';
+import {
+	ToolbarButton,
+	ToolbarGroup,
+	Placeholder,
+	Button,
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
+import { code } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import Preview from './preview';
+import HTMLEditModal from './modal';
 
 export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
-	const [ isPreview, setIsPreview ] = useState();
-	const isDisabled = useContext( Disabled.Context );
+	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const blockProps = useBlockProps( {
+		className: 'block-library-html__edit',
+	} );
 
-	function switchToPreview() {
-		setIsPreview( true );
-	}
-
-	function switchToHTML() {
-		setIsPreview( false );
+	// Show placeholder when content is empty
+	if ( ! attributes.content?.trim() ) {
+		return (
+			<div { ...blockProps }>
+				<Placeholder
+					icon={ <BlockIcon icon={ code } /> }
+					label={ __( 'Custom HTML' ) }
+					instructions={ __(
+						'Add custom HTML code and preview how it looks.'
+					) }
+				>
+					<Button
+						__next40pxDefaultSize
+						variant="primary"
+						onClick={ () => setIsModalOpen( true ) }
+					>
+						{ __( 'Edit HTML' ) }
+					</Button>
+				</Placeholder>
+				{ isModalOpen && (
+					<HTMLEditModal
+						onRequestClose={ () => setIsModalOpen( false ) }
+						content={ attributes.content }
+						setAttributes={ setAttributes }
+					/>
+				) }
+			</div>
+		);
 	}
 
 	return (
-		<div { ...useBlockProps( { className: 'block-library-html__edit' } ) }>
+		<div { ...blockProps }>
 			<BlockControls>
 				<ToolbarGroup>
-					<ToolbarButton
-						className="components-tab-button"
-						isPressed={ ! isPreview }
-						onClick={ switchToHTML }
-					>
-						HTML
-					</ToolbarButton>
-					<ToolbarButton
-						className="components-tab-button"
-						isPressed={ isPreview }
-						onClick={ switchToPreview }
-					>
-						{ __( 'Preview' ) }
+					<ToolbarButton onClick={ () => setIsModalOpen( true ) }>
+						{ __( 'Edit code' ) }
 					</ToolbarButton>
 				</ToolbarGroup>
 			</BlockControls>
-			{ isPreview || isDisabled ? (
-				<Preview
+			<InspectorControls>
+				<VStack
+					className="block-editor-block-inspector-edit-contents"
+					expanded
+				>
+					<Button
+						className="block-editor-block-inspector-edit-contents__button"
+						__next40pxDefaultSize
+						variant="secondary"
+						onClick={ () => setIsModalOpen( true ) }
+					>
+						{ __( 'Edit code' ) }
+					</Button>
+				</VStack>
+			</InspectorControls>
+			<Preview content={ attributes.content } isSelected={ isSelected } />
+			{ isModalOpen && (
+				<HTMLEditModal
+					onRequestClose={ () => setIsModalOpen( false ) }
 					content={ attributes.content }
-					isSelected={ isSelected }
-				/>
-			) : (
-				<PlainText
-					value={ attributes.content }
-					onChange={ ( content ) => setAttributes( { content } ) }
-					placeholder={ __( 'Write HTML…' ) }
-					aria-label={ __( 'HTML' ) }
+					setAttributes={ setAttributes }
 				/>
 			) }
 		</div>

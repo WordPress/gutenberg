@@ -2,6 +2,9 @@
 https://github.com/WordPress/gutenberg/blob/trunk/CONTRIBUTING.md -->
 
 ## What?
+<!-- Link this PR to its associated issue with an appropriate keyword: Closes, See, Follow up to, etc. -->
+Closes <!-- #ISSUE-NUMBER or URL -->
+
 <!-- In a few words, what is the PR actually doing? -->
 
 ## Why?
@@ -12,11 +15,23 @@ https://github.com/WordPress/gutenberg/blob/trunk/CONTRIBUTING.md -->
 
 ## Testing Instructions
 <!-- Please include step by step instructions on how to test this PR. -->
-<!-- 1. Open a Post or Page. -->
-<!-- 2. Insert a Heading Block. -->
+<!-- 1. Open a post or page. -->
+<!-- 2. Insert a heading block. -->
 <!-- 3. etc. -->
 
 ### Testing Instructions for Keyboard
 <!-- How can you test the changes by using the keyboard only? Please note, this is required for PRs that change the user interface (UI). This ensures the PR can be tested for any possible accessibility regressions. -->
 
 ## Screenshots or screencast <!-- if applicable -->
+
+<!-- If you would like to upload screenshots, feel free to use the table below when it is useful to show the difference between before and after the change. -->
+
+|Before|After|
+|-|-|
+|<!-- Before screenshot here -->|<!-- After screenshot here -->|
+
+## Use of AI Tools
+
+<!--
+You are free to use artificial intelligence (AI) tooling to contribute, but you must disclose what tooling you are using and to what extent a pull request has been authored by AI. It is your responsibility to review and take responsibility for what AI generates. See the WordPress AI Guidelines: <https://make.wordpress.org/ai/handbook/ai-guidelines/>.
+-->

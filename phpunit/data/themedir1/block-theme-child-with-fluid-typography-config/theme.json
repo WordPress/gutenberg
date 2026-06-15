@@ -1,5 +1,6 @@
 {
-	"version": 2,
+	"$schema": "../../../../schemas/json/theme.json",
+	"version": 3,
 	"settings": {
 		"appearanceTools": true,
 		"layout": {
@@ -7,7 +8,9 @@
 		},
 		"typography": {
 			"fluid": {
-				"minFontSize": "16px"
+				"minFontSize": "16px",
+				"maxViewportWidth": "1200px",
+				"minViewportWidth": "640px"
 			}
 		}
 	}

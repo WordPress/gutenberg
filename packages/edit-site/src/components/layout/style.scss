@@ -1,54 +1,17 @@
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
 .edit-site-layout {
 	height: 100%;
-	background: $gray-900;
-	color: $gray-400;
+	background: var(--wpds-color-background-surface-neutral-weak);
+	color: var(--wpds-color-foreground-content-neutral);
 	display: flex;
 	flex-direction: column;
-}
 
-.edit-site-layout__hub {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: calc(100vw - #{$canvas-padding * 2});
-	height: $header-height;
-	z-index: z-index(".edit-site-layout__hub");
-
-	.edit-site-layout.is-full-canvas.is-edit-mode & {
-		width: $header-height;
-		padding-right: 0;
-	}
-
-	@include break-medium {
-		width: calc(#{$nav-sidebar-width} - #{$canvas-padding});
-	}
-
-	.edit-site-layout.is-full-canvas & {
-		padding-right: $grid-unit-20;
-		border-radius: 0;
-		width: 100vw;
-		box-shadow: none;
-
-		@include break-medium {
-			width: auto;
-			padding-right: 0;
-		}
-	}
-}
-
-.edit-site-layout__header-container {
-	z-index: z-index(".edit-site-layout__header-container");
-}
-
-.edit-site-layout__header {
-	height: $header-height;
-	display: flex;
-	z-index: z-index(".edit-site-layout__header");
-
-	// This is only necessary for the exit animation
-	.edit-site-layout:not(.is-full-canvas) & {
-		position: fixed;
-		width: 100vw;
+	// Show a dark background in "frame" mode to avoid edge artifacts.
+	&:not(.is-full-canvas) .editor-visual-editor {
+		background: var(--wpds-color-background-surface-neutral-weak);
 	}
 }
 
@@ -58,8 +21,8 @@
 	display: flex;
 }
 
-.edit-site-layout__sidebar {
-	z-index: z-index(".edit-site-layout__sidebar");
+.edit-site-layout__sidebar-region {
+	z-index: 1;
 	width: 100vw;
 	flex-shrink: 0;
 
@@ -75,7 +38,7 @@
 		top: 0;
 	}
 
-	> div {
+	.edit-site-layout__sidebar {
 		display: flex;
 		flex-direction: column;
 		height: 100%;
@@ -93,22 +56,50 @@
 	flex-direction: column;
 }
 
+.edit-site-layout__mobile {
+	position: relative;
+	width: 100%;
+	z-index: 2;
+	display: flex;
+	flex-direction: column;
+
+	/*
+	 * The SiteHubMobile component is displayed
+	 * for pages that do not have a sidebar,
+	 * yet it needs the Sidebar component for the React context.
+	 *
+	 * This removes the padding in this scenario.
+	 * See https://github.com/WordPress/gutenberg/pull/63118
+	 */
+	.edit-site-sidebar__screen-wrapper {
+		padding: 0;
+	}
+
+	.edit-site-sidebar-navigation-screen__main {
+		padding: 0 $grid-unit-15;
+	}
+}
+
+.edit-site-layout__mobile-content {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+}
+
+// On mobile, the content surface lives on the scroll wrapper
+// (not the inner content element) so it also covers the wrapper's
+// reserved scrollbar gutter, preventing the theme background color from
+// bleeding through.
+.edit-site-sidebar__screen-wrapper:has(.edit-site-layout__mobile-content) {
+	background: var(--wpds-color-background-surface-neutral);
+}
+
 .edit-site-layout__canvas-container {
 	position: relative;
 	flex-grow: 1;
-	z-index: z-index(".edit-site-layout__canvas-container");
-
-	&.is-resizing::after {
-		// This covers the whole content which ensures mouse up triggers
-		// even if the content is "inert".
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		content: "";
-		z-index: z-index(".edit-site-layout__canvas-container.is-resizing::after");
-	}
+	z-index: 2;
+	// When animating the frame size can exceed its container size.
+	overflow: visible;
 }
 
 .edit-site-layout__canvas {
@@ -125,8 +116,8 @@
 		justify-content: flex-end;
 	}
 
-	& > div {
-		color: $gray-900;
+	.edit-site-resizable-frame__inner {
+		color: var(--wpds-color-foreground-content-neutral);
 	}
 
 	@include break-medium {
@@ -134,38 +125,68 @@
 		bottom: $canvas-padding;
 		width: calc(100% - #{$canvas-padding});
 
-		& > div {
-			border-radius: $radius-block-ui * 4;
-			// Not sure why this is necessary.
-			.edit-site-layout:not(.is-full-canvas) & .edit-site-visual-editor__editor-canvas,
-			.edit-site-layout:not(.is-full-canvas) & .interface-interface-skeleton__content {
-				border-radius: $radius-block-ui * 4;
+		.edit-site-resizable-frame__inner-content {
+			box-shadow: $elevation-x-small;
+			// This ensure the radius work properly.
+			overflow: hidden;
+
+			@media not (prefers-reduced-motion) {
+				transition: border-radius, box-shadow 0.4s;
+			}
+
+			.edit-site-layout:not(.is-full-canvas) & {
+				border-radius: var(--wpds-border-radius-xl);
+			}
+
+			&:hover {
+				box-shadow: $elevation-large;
 			}
 		}
-
 	}
 
 	.edit-site-layout.is-full-canvas & {
 		top: 0;
 		bottom: 0;
 		width: 100%;
-
-		& > div {
-			border-radius: 0;
-		}
 	}
 }
 
 // This shouldn't be necessary (we should have a way to say that a skeletton is relative
-.edit-site-layout__canvas .interface-interface-skeleton {
+.edit-site-layout__mobile .interface-interface-skeleton,
+.edit-site-layout__canvas .interface-interface-skeleton,
+.edit-site-template-pages-preview .interface-interface-skeleton {
 	position: relative !important;
 	min-height: 100% !important;
 }
 
+.edit-site-template-pages-preview {
+	height: 100%;
+}
+
+/* stylelint-disable -- Disable reason: View Transitions not supported properly by stylelint. */
+html.canvas-mode-edit-transition::view-transition-group(toggle) {
+	animation-delay: 255ms;
+}
+
+@media (prefers-reduced-motion) {
+	::view-transition-group(*),
+	::view-transition-old(*),
+	::view-transition-new(*) {
+		animation: none !important;
+	}
+}
+/* stylelint-enable  */
+
+.edit-site-layout.is-full-canvas .edit-site-layout__sidebar-region .edit-site-layout__view-mode-toggle {
+	display: none;
+}
+
 .edit-site-layout__view-mode-toggle.components-button {
+	/* stylelint-disable -- Disable reason: View Transitions not supported properly by stylelint. */
+	view-transition-name: toggle;
+	/* stylelint-enable  */
 	position: relative;
-	color: $white;
-	border-radius: 0;
+	color: var(--wpds-color-foreground-interactive-neutral);
 	height: $header-height;
 	width: $header-height;
 	overflow: hidden;
@@ -173,48 +194,41 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	border-bottom: 1px solid transparent;
-
-	.edit-site-layout.is-full-canvas.is-edit-mode & {
-		border-bottom-color: $gray-200;
-		transition: border-bottom-color 0.15s 0.4s ease-out;
-	}
+	background: var(--wpds-color-background-surface-neutral-weak);
+	border-radius: 0;
 
 	&:hover,
 	&:active {
-		color: $white;
+		color: var(--wpds-color-foreground-interactive-neutral-active);
 	}
 
+	&:focus-visible,
 	&:focus {
-		box-shadow: none;
+		box-shadow: 0 0 0 3px #1e1e1e, 0 0 0 6px var(--wp-admin-theme-color);
+		outline: 4px solid #0000;
+		outline-offset: 4px;
 	}
 
 	&::before {
-		transition: box-shadow 0.1s ease;
-		@include reduce-motion("transition");
 		content: "";
 		display: block;
 		position: absolute;
-		top: 9px;
-		right: 9px;
-		bottom: 9px;
-		left: 9px;
-		border-radius: $radius-block-ui + $border-width + $border-width;
+		top: $grid-unit-10 + $border-width;
+		right: $grid-unit-10 + $border-width;
+		bottom: $grid-unit-10 + $border-width;
+		left: $grid-unit-20 + $border-width;
+		border-radius: $radius-medium;
 		box-shadow: none;
-	}
 
-	// Lightened spot color focus.
-	&:focus::before {
-		box-shadow:
-			inset 0 0 0 var(--wp-admin-border-width-focus) rgba($white, 0.1),
-			inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		@media not (prefers-reduced-motion) {
+			transition: box-shadow 0.1s ease;
+		}
 	}
 
 	.edit-site-layout__view-mode-toggle-icon {
 		display: flex;
-		border-radius: $radius-block-ui;
-		height: $grid-unit-80;
-		width: $grid-unit-80;
+		height: $header-height;
+		width: $header-height;
 		justify-content: center;
 		align-items: center;
 	}
@@ -228,8 +242,8 @@
 	left: auto;
 	right: 0;
 	width: $sidebar-width;
-	color: $gray-900;
-	background: $white;
+	color: var(--wpds-color-foreground-content-neutral);
+	background: var(--wpds-color-background-surface-neutral-strong);
 
 	&:focus,
 	&:focus-within {
@@ -245,63 +259,23 @@
 	}
 
 	@include break-medium {
-		border-left: $border-width solid $gray-300;
+		border-left:
+			$border-width solid
+			var(--wpds-color-stroke-surface-neutral);
 	}
 }
 
-.edit-site-layout.has-fixed-toolbar {
-	// making the header be lower than the content
-	// so the fixed toolbar can be positioned on top of it
-	// but only on desktop
+.edit-site-layout__area {
+	flex-grow: 1;
+	margin: 0;
+	overflow: hidden;
+	box-shadow: $elevation-x-small;
 	@include break-medium() {
-		.edit-site-layout__canvas-container {
-			z-index: 5;
-		}
-		.edit-site-site-hub {
-			z-index: 4;
-		}
-		.edit-site-layout__header:focus-within {
-			z-index: 3;
-		}
+		border-radius: var(--wpds-border-radius-xl);
+		margin: $canvas-padding $canvas-padding $canvas-padding 0;
 	}
 }
 
-.is-edit-mode.is-distraction-free {
-
-	.edit-site-layout__header-container {
-		height: $header-height;
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		z-index: z-index(".edit-site-layout__header-container");
-		width: 100%;
-
-		// We need ! important because we override inline styles
-		// set by the motion component.
-		&:focus-within {
-			opacity: 1 !important;
-			div {
-				transform: translateX(0) translateY(0) translateZ(0) !important;
-			}
-
-			.edit-site-layout__header {
-				opacity: 1 !important;
-			}
-		}
-	}
-
-	.edit-site-site-hub,
-	.edit-site-layout__header {
-		position: absolute;
-		top: 0;
-		z-index: z-index(".edit-site-layout__header");
-	}
-	.edit-site-site-hub {
-		z-index: z-index(".edit-site-layout__hub");
-	}
-	.edit-site-layout__header {
-		width: 100%;
-	}
-
+.edit-site-layout__snackbar {
+	@include snackbar-container();
 }

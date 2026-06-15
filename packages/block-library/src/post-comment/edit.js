@@ -7,14 +7,6 @@ import { useState } from '@wordpress/element';
 import { blockDefault } from '@wordpress/icons';
 import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 
-const ALLOWED_BLOCKS = [
-	'core/avatar',
-	'core/comment-author-name',
-	'core/comment-content',
-	'core/comment-date',
-	'core/comment-edit-link',
-	'core/comment-reply-link',
-];
 const TEMPLATE = [
 	[ 'core/avatar' ],
 	[ 'core/comment-author-name' ],
@@ -29,7 +21,6 @@ export default function Edit( { attributes: { commentId }, setAttributes } ) {
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
-		allowedBlocks: ALLOWED_BLOCKS,
 	} );
 
 	if ( ! commentId ) {
@@ -43,7 +34,7 @@ export default function Edit( { attributes: { commentId }, setAttributes } ) {
 					) }
 				>
 					<TextControl
-						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						value={ commentId }
 						onChange={ ( val ) =>
 							setCommentIdInput( parseInt( val ) )
@@ -51,6 +42,7 @@ export default function Edit( { attributes: { commentId }, setAttributes } ) {
 					/>
 
 					<Button
+						__next40pxDefaultSize
 						variant="primary"
 						onClick={ () => {
 							setAttributes( { commentId: commentIdInput } );

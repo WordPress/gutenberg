@@ -1,46 +1,44 @@
 {
+	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"compilerOptions": {
 		"allowJs": true,
 		"checkJs": true,
 		"allowSyntheticDefaultImports": true,
 		"jsx": "preserve",
 		"target": "esnext",
-		"module": "esnext",
-		"lib": [ "dom", "esnext" ],
+		"module": "preserve",
+		"lib": [ "DOM", "DOM.Iterable", "ESNext" ],
 		"declaration": true,
 		"declarationMap": true,
 		"composite": true,
 		"emitDeclarationOnly": true,
 		"isolatedModules": true,
 
+		"skipLibCheck": true,
+
 		/* Strict Type-Checking Options */
 		"strict": true,
 
 		/* Additional Checks */
-		"noUnusedLocals": true,
-		"noUnusedParameters": true,
 		"noImplicitReturns": true,
 		"noFallthroughCasesInSwitch": true,
-		"importsNotUsedAsValues": "error",
 
 		/* Module Resolution Options */
-		"moduleResolution": "node",
+		"moduleResolution": "bundler",
 
-		/* This needs to be false so our types are possible to consume without setting this */
-		"esModuleInterop": false,
 		"resolveJsonModule": true,
 
 		"typeRoots": [ "./typings", "./node_modules/@types" ],
-		"types": []
+		"types": [],
+
+		"rootDir": "${configDir}/src",
+		"declarationDir": "${configDir}/build-types"
 	},
+	"include": [ "${configDir}/src" ],
 	"exclude": [
-		"**/*.android.js",
-		"**/*.ios.js",
-		"**/*.native.js",
 		"**/benchmark",
 		"packages/*/build-*/**",
 		"packages/*/build/**",
-		"**/test/**",
-		"packages/**/react-native-*/**"
+		"**/test/**"
 	]
 }

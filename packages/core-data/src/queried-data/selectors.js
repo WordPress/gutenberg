@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import createSelector from 'rememo';
 import EquivalentKeyMap from 'equivalent-key-map';
 
 /**
@@ -22,29 +21,46 @@ const queriedItemsCacheByState = new WeakMap();
 /**
  * Returns items for a given query, or null if the items are not known.
  *
- * @param {Object}  state State object.
- * @param {?Object} query Optional query.
+ * @param {Object}  state                      State object.
+ * @param {?Object} query                      Optional query.
+ * @param {?Object} options                    Optional pagination options.
+ * @param {boolean} options.supportsPagination Whether the entity supports pagination. Default true.
  *
  * @return {?Array} Query items.
  */
-function getQueriedItemsUncached( state, query ) {
-	const { stableKey, page, perPage, include, fields, context } =
-		getQueryParts( query );
-	let itemIds;
+function getQueriedItemsUncached( state, query, options = {} ) {
+	const { supportsPagination = true } = options;
+	const {
+		stableKey,
+		page,
+		perPage,
+		offset: queryOffset,
+		include,
+		fields,
+		context,
+	} = getQueryParts( query );
 
-	if ( state.queries?.[ context ]?.[ stableKey ] ) {
-		itemIds = state.queries[ context ][ stableKey ];
-	}
-
+	const itemIds = state.queries?.[ context ]?.[ stableKey ]?.itemIds;
 	if ( ! itemIds ) {
 		return null;
 	}
 
-	const startOffset = perPage === -1 ? 0 : ( page - 1 ) * perPage;
-	const endOffset =
-		perPage === -1
-			? itemIds.length
-			: Math.min( startOffset + perPage, itemIds.length );
+	const isPaginated = supportsPagination && perPage !== -1;
+	const startOffset = isPaginated ? queryOffset ?? ( page - 1 ) * perPage : 0;
+	const endOffset = isPaginated
+		? Math.min( startOffset + perPage, itemIds.length )
+		: itemIds.length;
+
+	// If the requested page range exceeds the stored itemIds, the data for
+	// this specific pagination window may not have been fetched yet. Return
+	// null unless totalItems confirms we already have all available items.
+	if ( isPaginated && itemIds.length < startOffset + perPage ) {
+		const totalItems =
+			state.queries[ context ][ stableKey ].meta?.totalItems;
+		if ( Number.isFinite( totalItems ) && itemIds.length < totalItems ) {
+			return null;
+		}
+	}
 
 	const items = [];
 	for ( let i = startOffset; i < endOffset; i++ ) {
@@ -52,7 +68,9 @@ function getQueriedItemsUncached( state, query ) {
 		if ( Array.isArray( include ) && ! include.includes( itemId ) ) {
 			continue;
 		}
-
+		if ( itemId === undefined ) {
+			continue;
+		}
 		// Having a target item ID doesn't guarantee that this object has been queried.
 		if ( ! state.items[ context ]?.hasOwnProperty( itemId ) ) {
 			return null;
@@ -68,7 +86,7 @@ function getQueriedItemsUncached( state, query ) {
 				const field = fields[ f ].split( '.' );
 				let value = item;
 				field.forEach( ( fieldName ) => {
-					value = value[ fieldName ];
+					value = value?.[ fieldName ];
 				} );
 
 				setNestedValue( filteredItem, field, value );
@@ -91,18 +109,18 @@ function getQueriedItemsUncached( state, query ) {
 
 /**
  * Returns items for a given query, or null if the items are not known. Caches
- * result both per state (by reference) and per query (by deep equality).
- * The caching approach is intended to be durable to query objects which are
- * deeply but not referentially equal, since otherwise:
+ * result per state (by reference) and per query (by deep equality), so that:
  *
- * `getQueriedItems( state, {} ) !== getQueriedItems( state, {} )`
+ * `getQueriedItems( state, {} ) === getQueriedItems( state, {} )`
  *
- * @param {Object}  state State object.
- * @param {?Object} query Optional query.
+ * @param {Object}  state                      State object.
+ * @param {?Object} query                      Optional query.
+ * @param {?Object} options                    Optional pagination options.
+ * @param {boolean} options.supportsPagination Whether the entity supports pagination. Default true.
  *
  * @return {?Array} Query items.
  */
-export const getQueriedItems = createSelector( ( state, query = {} ) => {
+export function getQueriedItems( state, query = {}, options = {} ) {
 	let queriedItemsCache = queriedItemsCacheByState.get( state );
 	if ( queriedItemsCache ) {
 		const queriedItems = queriedItemsCache.get( query );
@@ -114,7 +132,19 @@ export const getQueriedItems = createSelector( ( state, query = {} ) => {
 		queriedItemsCacheByState.set( state, queriedItemsCache );
 	}
 
-	const items = getQueriedItemsUncached( state, query );
+	const items = getQueriedItemsUncached( state, query, options );
 	queriedItemsCache.set( query, items );
 	return items;
-} );
+}
+
+export function getQueriedTotalItems( state, query = {} ) {
+	const { stableKey, context } = getQueryParts( query );
+
+	return state.queries?.[ context ]?.[ stableKey ]?.meta?.totalItems ?? null;
+}
+
+export function getQueriedTotalPages( state, query = {} ) {
+	const { stableKey, context } = getQueryParts( query );
+
+	return state.queries?.[ context ]?.[ stableKey ]?.meta?.totalPages ?? null;
+}

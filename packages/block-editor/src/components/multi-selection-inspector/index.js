@@ -2,10 +2,9 @@
  * WordPress dependencies
  */
 import { sprintf, _n } from '@wordpress/i18n';
-import { withSelect } from '@wordpress/data';
-import { serialize } from '@wordpress/blocks';
-import { count as wordCount } from '@wordpress/wordcount';
+import { useSelect } from '@wordpress/data';
 import { copy } from '@wordpress/icons';
+import { __experimentalHStack as HStack } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -13,35 +12,25 @@ import { copy } from '@wordpress/icons';
 import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
 
-function MultiSelectionInspector( { blocks } ) {
-	const words = wordCount( serialize( blocks ), 'words' );
-
+export default function MultiSelectionInspector() {
+	const selectedBlockCount = useSelect(
+		( select ) => select( blockEditorStore ).getSelectedBlockCount(),
+		[]
+	);
 	return (
-		<div className="block-editor-multi-selection-inspector__card">
+		<HStack
+			justify="flex-start"
+			spacing={ 2 }
+			className="block-editor-multi-selection-inspector__card"
+		>
 			<BlockIcon icon={ copy } showColors />
-			<div className="block-editor-multi-selection-inspector__card-content">
-				<div className="block-editor-multi-selection-inspector__card-title">
-					{ sprintf(
-						/* translators: %d: number of blocks */
-						_n( '%d Block', '%d Blocks', blocks.length ),
-						blocks.length
-					) }
-				</div>
-				<div className="block-editor-multi-selection-inspector__card-description">
-					{ sprintf(
-						/* translators: %d: number of words */
-						_n( '%d word selected.', '%d words selected.', words ),
-						words
-					) }
-				</div>
+			<div className="block-editor-multi-selection-inspector__card-title">
+				{ sprintf(
+					/* translators: %d: number of blocks */
+					_n( '%d Block', '%d Blocks', selectedBlockCount ),
+					selectedBlockCount
+				) }
 			</div>
-		</div>
+		</HStack>
 	);
 }
-
-export default withSelect( ( select ) => {
-	const { getMultiSelectedBlocks } = select( blockEditorStore );
-	return {
-		blocks: getMultiSelectedBlocks(),
-	};
-} )( MultiSelectionInspector );

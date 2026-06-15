@@ -13,11 +13,24 @@ async function activateTheme(
 	let response = await this.request.get( THEMES_URL );
 	const html = await response.text();
 	const optionalFolder = '([a-z0-9-]+%2F)?';
-	const matchGroup = html.match(
-		`action=activate&amp;stylesheet=${ optionalFolder }${ encodeURIComponent(
+
+	// The `optionalFolder` regex part matches paths with a folder,
+	// so it will return the first match, which might contain a folder.
+	// First try to honor the included theme slug, that is, without a folder.
+	let matchGroup = html.match(
+		`action=activate&amp;stylesheet=${ encodeURIComponent(
 			themeSlug
 		) }&amp;_wpnonce=[a-z0-9]+`
 	);
+
+	// If the theme is not found, try to match the theme slug with a folder.
+	if ( ! matchGroup ) {
+		matchGroup = html.match(
+			`action=activate&amp;stylesheet=${ optionalFolder }${ encodeURIComponent(
+				themeSlug
+			) }&amp;_wpnonce=[a-z0-9]+`
+		);
+	}
 
 	if ( ! matchGroup ) {
 		if ( html.includes( `data-slug="${ themeSlug }"` ) ) {
@@ -56,9 +69,16 @@ async function getCurrentThemeGlobalStylesPostId( this: RequestUtils ) {
 		const globalStylesURL =
 			currentTheme?._links?.[ 'wp:user-global-styles' ]?.[ 0 ]?.href;
 		if ( globalStylesURL ) {
-			themeGlobalStylesId = globalStylesURL?.split(
-				'rest_route=/wp/v2/global-styles/'
-			)[ 1 ];
+			// Extract the ID from the URL. The URL format depends on
+			// the permalink structure:
+			// - Plain: ?rest_route=/wp/v2/global-styles/123
+			// - Pretty: /wp-json/wp/v2/global-styles/123
+			const idMatch = globalStylesURL.match(
+				/\/wp\/v2\/global-styles\/(\d+)/
+			);
+			if ( idMatch ) {
+				themeGlobalStylesId = idMatch[ 1 ];
+			}
 		}
 	}
 	return themeGlobalStylesId;

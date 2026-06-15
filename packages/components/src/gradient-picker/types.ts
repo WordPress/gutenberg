@@ -36,13 +36,50 @@ type GradientPickerBaseProps = {
 	clearable?: boolean;
 	/**
 	 * The heading level. Only applies in cases where gradients are provided
-	 * from multiple origins (ie. when the array passed as the `gradients` prop
+	 * from multiple origins (i.e. when the array passed as the `gradients` prop
 	 * contains two or more items).
 	 *
 	 * @default 2
 	 */
 	headingLevel?: HeadingSize;
-};
+	/**
+	 * Whether the control should present as a set of buttons,
+	 * each with its own tab stop.
+	 *
+	 * @default false
+	 */
+	asButtons?: boolean;
+	/**
+	 * Prevents keyboard interaction from wrapping around.
+	 * Only used when `asButtons` is not true.
+	 *
+	 * @default true
+	 */
+	loop?: boolean;
+	/**
+	 * Whether to enable alpha transparency options in the picker.
+	 *
+	 * @default true
+	 */
+	enableAlpha?: boolean;
+} & (
+	| {
+			// TODO: [#54055] Either this or `aria-labelledby` should be required
+			/**
+			 * A label to identify the purpose of the control.
+			 */
+			'aria-label'?: string;
+			'aria-labelledby'?: never;
+	  }
+	| {
+			// TODO: [#54055] Either this or `aria-label` should be required
+			/**
+			 * An ID of an element to provide a label for the control.
+			 */
+			'aria-labelledby'?: string;
+			'aria-label'?: never;
+	  }
+);
 
 export type GradientPickerComponentProps = GradientPickerBaseProps & {
 	/**
@@ -60,6 +97,8 @@ export type GradientPickerComponentProps = GradientPickerBaseProps & {
 	 * can be safely removed once this happens.)
 	 *
 	 * @default false
+	 * @deprecated Default behavior since WP 6.5. Prop can be safely removed.
+	 * @ignore
 	 */
 	__nextHasNoMargin?: boolean;
 	/**

@@ -1,14 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { ButtonGroup, Button, Slot, Fill } from '@wordpress/components';
+import { MenuGroup, Button, Slot, Fill } from '@wordpress/components';
 import { Children } from '@wordpress/element';
 
 const noop = () => {};
 
 function ActionItemSlot( {
 	name,
-	as: Component = ButtonGroup,
+	as: Component = MenuGroup,
 	fillProps = {},
 	bubblesVirtually,
 	...props

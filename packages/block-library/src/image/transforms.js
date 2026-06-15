@@ -1,11 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { createBlobURL } from '@wordpress/blob';
+import { createBlobURL, isBlobURL } from '@wordpress/blob';
 import { createBlock, getBlockAttributes } from '@wordpress/blocks';
-import { dispatch } from '@wordpress/data';
-import { store as noticesStore } from '@wordpress/notices';
-import { __ } from '@wordpress/i18n';
 
 export function stripFirstImage( attributes, { shortcode } ) {
 	const { body } = document.implementation.createHTMLDocument( '' );
@@ -44,7 +41,7 @@ function getFirstAnchorAttributeFormHTML( html, attributeName ) {
 
 const imageSchema = {
 	img: {
-		attributes: [ 'src', 'alt', 'title' ],
+		attributes: [ 'src', 'alt', 'title', 'width', 'height' ],
 		classes: [
 			'alignleft',
 			'aligncenter',
@@ -55,6 +52,14 @@ const imageSchema = {
 	},
 };
 
+// Normalise an `<img>` pixel dimension attribute to the `<value>px` form the
+// Image block stores in its `width`/`height` attributes. Non-integer values
+// (e.g. `50%`) are dropped because the attribute round-trips through inline
+// styles that expect pixel units.
+function parsePixelDimension( value ) {
+	return value && /^\d+$/.test( value ) ? `${ value }px` : undefined;
+}
+
 const schema = ( { phrasingContentSchema } ) => ( {
 	figure: {
 		require: [ 'img' ],
@@ -62,6 +67,7 @@ const schema = ( { phrasingContentSchema } ) => ( {
 			...imageSchema,
 			a: {
 				attributes: [ 'href', 'rel', 'target' ],
+				classes: [ '*' ],
 				children: imageSchema,
 			},
 			figcaption: {
@@ -79,12 +85,10 @@ const transforms = {
 				node.nodeName === 'FIGURE' && !! node.querySelector( 'img' ),
 			schema,
 			transform: ( node ) => {
+				const img = node.querySelector( 'img' );
 				// Search both figure and image classes. Alignment could be
 				// set on either. ID is set on the image.
-				const className =
-					node.className +
-					' ' +
-					node.querySelector( 'img' ).className;
+				const className = node.className + ' ' + img.className;
 				const alignMatches =
 					/(?:^|\s)align(left|center|right)(?:$|\s)/.exec(
 						className
@@ -110,6 +114,39 @@ const transforms = {
 					anchorElement && anchorElement.className
 						? anchorElement.className
 						: undefined;
+				// Pin only one dimension and let the other follow the aspect
+				// ratio via `auto`. Pinning both as fixed pixels stretches the
+				// image when a theme caps the width while the height stays
+				// fixed. So width sources use `height: 'auto'`; height-only
+				// sources use `width: 'auto'`.
+				const widthValue = parsePixelDimension(
+					img.getAttribute( 'width' )
+				);
+				const heightValue = parsePixelDimension(
+					img.getAttribute( 'height' )
+				);
+				// When both dimensions are declared, preserve the source's
+				// shape via `aspectRatio` (mirroring the resize handle). CSS
+				// `aspect-ratio` needs no fixed dimensions, so the image keeps
+				// its proportions even when the `src` can't resolve to natural
+				// dimensions (e.g. an empty or blob `src`) — without it the
+				// `height: 'auto'` would collapse to `0`.
+				// `parseInt` is `NaN` for an absent dimension and `0` for a
+				// zero one (both falsy), so a bogus ratio is never stored.
+				const widthNumber = parseInt( widthValue, 10 );
+				const heightNumber = parseInt( heightValue, 10 );
+				const aspectRatio =
+					widthNumber && heightNumber
+						? String( widthNumber / heightNumber )
+						: undefined;
+				// A height-only source declares a single dimension, so it can't
+				// carry an aspect ratio: `width: 'auto'` is capped by
+				// `max-width: 100%` while the fixed height can still stretch a
+				// wide source. This is a known edge case (a panoramic image
+				// pinned by height only) left unsolved here.
+				const width =
+					widthValue || ( heightValue ? 'auto' : undefined );
+				const height = widthValue ? 'auto' : heightValue;
 				const attributes = getBlockAttributes(
 					'core/image',
 					node.outerHTML,
@@ -121,8 +158,17 @@ const transforms = {
 						rel,
 						linkClass,
 						anchor,
+						width,
+						height,
+						aspectRatio,
 					}
 				);
+
+				if ( isBlobURL( attributes.url ) ) {
+					attributes.blob = attributes.url;
+					delete attributes.url;
+				}
+
 				return createBlock( 'core/image', attributes );
 			},
 		},
@@ -132,26 +178,6 @@ const transforms = {
 			// creating a new gallery.
 			type: 'files',
 			isMatch( files ) {
-				// The following check is intended to catch non-image files when dropped together with images.
-				if (
-					files.some(
-						( file ) => file.type.indexOf( 'image/' ) === 0
-					) &&
-					files.some(
-						( file ) => file.type.indexOf( 'image/' ) !== 0
-					)
-				) {
-					const { createErrorNotice } = dispatch( noticesStore );
-					createErrorNotice(
-						__(
-							'If uploading to a gallery all files need to be image formats'
-						),
-						{
-							id: 'gallery-transform-invalid-file',
-							type: 'snackbar',
-						}
-					);
-				}
 				return files.every(
 					( file ) => file.type.indexOf( 'image/' ) === 0
 				);
@@ -159,7 +185,7 @@ const transforms = {
 			transform( files ) {
 				const blocks = files.map( ( file ) => {
 					return createBlock( 'core/image', {
-						url: createBlobURL( file ),
+						blob: createBlobURL( file ),
 					} );
 				} );
 				return blocks;

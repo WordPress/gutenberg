@@ -3,7 +3,6 @@
  */
 import {
 	extractColorNameFromCurrentValue,
-	showTransparentBackground,
 	normalizeColorValue,
 } from '../utils';
 
@@ -24,35 +23,58 @@ describe( 'ColorPalette: Utils', () => {
 			] );
 			expect( result ).toBe( 'Blue' );
 		} );
-	} );
-	describe( 'showTransparentBackground', () => {
-		test( 'should return true for undefined color values', () => {
-			expect( showTransparentBackground( undefined ) ).toBe( true );
-		} );
-		test( 'should return true for transparent colors', () => {
-			expect( showTransparentBackground( 'transparent' ) ).toBe( true );
-			expect( showTransparentBackground( '#75757500' ) ).toBe( true );
-		} );
-		test( 'should return false for non-transparent colors', () => {
-			expect( showTransparentBackground( '#FFF' ) ).toBe( false );
-			expect( showTransparentBackground( '#757575' ) ).toBe( false );
-			expect( showTransparentBackground( '#f5f5f524' ) ).toBe( false ); // 0.14 alpha.
+
+		test( 'should prefer selectedSlug over color matching when duplicate colors exist', () => {
+			const result = extractColorNameFromCurrentValue(
+				'#000',
+				[
+					{
+						name: 'Dark Background',
+						slug: 'dark-background',
+						color: '#000',
+					},
+					{ name: 'Dark Text', slug: 'dark-text', color: '#000' },
+				],
+				false,
+				'dark-text'
+			);
+
+			expect( result ).toBe( 'Dark Text' );
 		} );
 	} );
 
 	describe( 'normalizeColorValue', () => {
-		test( 'should return the value as is if the color value is not a CSS variable', () => {
+		test( 'should return the value if the value argument is not a CSS variable', () => {
 			const element = document.createElement( 'div' );
 			expect( normalizeColorValue( '#ff0000', element ) ).toBe(
 				'#ff0000'
 			);
 		} );
-		test( 'should return the background color computed from a element if the color value is a CSS variable', () => {
+		test( 'should return the background color computed from an element if the value argument is a CSS variable', () => {
 			const element = document.createElement( 'div' );
 			element.style.backgroundColor = '#ff0000';
 			expect( normalizeColorValue( 'var(--red)', element ) ).toBe(
 				'#ff0000'
 			);
+		} );
+		test( 'should return the background color computed from an element if the value argument is a color mix', () => {
+			const element = document.createElement( 'div' );
+			element.style.backgroundColor = '#ff0000';
+			expect(
+				normalizeColorValue(
+					'color-mix(in oklab, #a71e14, white)',
+					element
+				)
+			).toBe( '#ff0000' );
+		} );
+		test( 'should return the value if the value argument is undefined', () => {
+			const element = document.createElement( 'div' );
+			expect( normalizeColorValue( undefined, element ) ).toBe(
+				undefined
+			);
+		} );
+		test( 'should return the value if the element argument is null', () => {
+			expect( normalizeColorValue( '#ff0000', null ) ).toBe( '#ff0000' );
 		} );
 	} );
 } );

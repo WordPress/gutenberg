@@ -3,7 +3,7 @@
 /**
  * Test the block WP_Duotone_Gutenberg class.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 
 class WP_Duotone_Gutenberg_Test extends WP_UnitTestCase {
@@ -20,9 +20,10 @@ class WP_Duotone_Gutenberg_Test extends WP_UnitTestCase {
 			'blockName' => 'core/image',
 			'attrs'     => array( 'style' => array( 'color' => array( 'duotone' => 'var:preset|duotone|blue-orange' ) ) ),
 		);
+		$wp_block      = new WP_Block( $block );
 		$block_content = '<figure class="wp-block-image size-full"><img src="/my-image.jpg" /></figure>';
 		$expected      = '<figure class="wp-block-image size-full wp-duotone-blue-orange"><img src="/my-image.jpg" /></figure>';
-		$this->assertSame( $expected, WP_Duotone_Gutenberg::render_duotone_support( $block_content, $block ) );
+		$this->assertSame( $expected, WP_Duotone_Gutenberg::render_duotone_support( $block_content, $block, $wp_block ) );
 	}
 
 	public function test_gutenberg_render_duotone_support_css() {
@@ -30,9 +31,10 @@ class WP_Duotone_Gutenberg_Test extends WP_UnitTestCase {
 			'blockName' => 'core/image',
 			'attrs'     => array( 'style' => array( 'color' => array( 'duotone' => 'unset' ) ) ),
 		);
+		$wp_block      = new WP_Block( $block );
 		$block_content = '<figure class="wp-block-image size-full"><img src="/my-image.jpg" /></figure>';
 		$expected      = '/<figure class="wp-block-image size-full wp-duotone-unset-\d+"><img src="\\/my-image.jpg" \\/><\\/figure>/';
-		$this->assertMatchesRegularExpression( $expected, WP_Duotone_Gutenberg::render_duotone_support( $block_content, $block ) );
+		$this->assertMatchesRegularExpression( $expected, WP_Duotone_Gutenberg::render_duotone_support( $block_content, $block, $wp_block ) );
 	}
 
 	public function test_gutenberg_render_duotone_support_custom() {
@@ -40,9 +42,52 @@ class WP_Duotone_Gutenberg_Test extends WP_UnitTestCase {
 			'blockName' => 'core/image',
 			'attrs'     => array( 'style' => array( 'color' => array( 'duotone' => array( '#FFFFFF', '#000000' ) ) ) ),
 		);
+		$wp_block      = new WP_Block( $block );
 		$block_content = '<figure class="wp-block-image size-full"><img src="/my-image.jpg" /></figure>';
 		$expected      = '/<figure class="wp-block-image size-full wp-duotone-ffffff-000000-\d+"><img src="\\/my-image.jpg" \\/><\\/figure>/';
-		$this->assertMatchesRegularExpression( $expected, WP_Duotone_Gutenberg::render_duotone_support( $block_content, $block ) );
+		$this->assertMatchesRegularExpression( $expected, WP_Duotone_Gutenberg::render_duotone_support( $block_content, $block, $wp_block ) );
+	}
+
+
+	/**
+	 * Tests whether the CSS declarations are generated even if the block content is
+	 * empty. This is needed to make the CSS output stable across paginations for
+	 * features like the enhanced pagination of the Query block.
+	 *
+	 * @covers ::render_duotone_support
+	 */
+	public function test_gutenberg_css_declarations_are_generated_even_with_empty_block_content() {
+		$block    = array(
+			'blockName' => 'core/image',
+			'attrs'     => array( 'style' => array( 'color' => array( 'duotone' => 'var:preset|duotone|blue-orange' ) ) ),
+		);
+		$wp_block = new WP_Block( $block );
+
+		/*
+		 * Handling to access the static WP_Duotone::$block_css_declarations property.
+		 *
+		 * Why is an instance needed?
+		 * WP_Duotone is a static class by design, meaning it only contains static properties and methods.
+		 * In production, it should not be instantiated. However, as of PHP 8.3, ReflectionProperty::setValue()
+		 * needs an object.
+		 */
+		$wp_duotone                      = new WP_Duotone_Gutenberg();
+		$block_css_declarations_property = new ReflectionProperty( 'WP_Duotone_Gutenberg', 'block_css_declarations' );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$block_css_declarations_property->setAccessible( true );
+		}
+		$previous_value = $block_css_declarations_property->getValue();
+		$block_css_declarations_property->setValue( $wp_duotone, array() );
+		WP_Duotone_Gutenberg::render_duotone_support( '', $block, $wp_block );
+		$actual = $block_css_declarations_property->getValue();
+
+		// Reset the property.
+		$block_css_declarations_property->setValue( $wp_duotone, $previous_value );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$block_css_declarations_property->setAccessible( false );
+		}
+
+		$this->assertNotEmpty( $actual );
 	}
 
 	public function data_get_slug_from_attribute() {
@@ -56,6 +101,8 @@ class WP_Duotone_Gutenberg_Test extends WP_UnitTestCase {
 			'pipe-slug-no-value'              => array( 'var:preset|duotone|', '' ),
 			'css-var-spaces'                  => array( 'var(--wp--preset--duotone--    ', '' ),
 			'pipe-slug-spaces'                => array( 'var:preset|duotone|  ', '' ),
+			'array-of-colors'                 => array( array( '#000000', '#ffffff' ), '' ),
+			'empty-array'                     => array( array(), '' ),
 		);
 	}
 
@@ -77,6 +124,8 @@ class WP_Duotone_Gutenberg_Test extends WP_UnitTestCase {
 			'css-var-invalid-slug-chars'      => array( 'var(--wp--preset--duotone--.)', false ),
 			'css-var-missing-end-parenthesis' => array( 'var(--wp--preset--duotone--blue-orange', false ),
 			'invalid'                         => array( 'not a valid attribute', false ),
+			'array-of-colors'                 => array( array( '#000000', '#ffffff' ), false ),
+			'empty-array'                     => array( array(), false ),
 		);
 	}
 

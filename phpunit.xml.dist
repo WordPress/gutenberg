@@ -13,11 +13,14 @@
 	<testsuites>
 		<testsuite name="default">
 			<directory suffix="-test.php">./phpunit/</directory>
+			<directory suffix=".php">./phpunit/tests/</directory>
+			<directory suffix=".php">./phpunit/blocks/</directory>
 		</testsuite>
 	</testsuites>
 	<groups>
 		<exclude>
 			<group>ms-required</group>
+			<group>fontsapi</group>
 		</exclude>
 	</groups>
 </phpunit>

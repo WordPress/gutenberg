@@ -11,17 +11,14 @@ This feature is still experimental. “Experimental” means this is an early im
 `HStack` can render anything inside.
 
 ```jsx
-import {
-	__experimentalHStack as HStack,
-	__experimentalText as Text,
-} from '@wordpress/components';
+import { __experimentalHStack as HStack } from '@wordpress/components';
 
 function Example() {
 	return (
 		<HStack>
-			<Text>Code</Text>
-			<Text>is</Text>
-			<Text>Poetry</Text>
+			<span>Code</span>
+			<span>is</span>
+			<span>Poetry</span>
 		</HStack>
 	);
 }
@@ -29,7 +26,7 @@ function Example() {
 
 ## Props
 
-##### alignment
+### alignment
 
 **Type**: `HStackAlignment` | `CSS[ 'alignItems' ]`
 
@@ -47,33 +44,33 @@ Determines how the child elements are aligned.
 -   `edge`: Justifies content to be evenly spread out up to the main axis edges of the container.
 -   `stretch`: Stretches content to the cross axis edges of the container.
 
-##### direction
+### direction
 
 **Type**: `FlexDirection`
 
 The direction flow of the children content can be adjusted with `direction`. `column` will align children vertically and `row` will align children horizontally.
 
-##### expanded
+### expanded
 
 **Type**: `boolean`
 
 Expands to the maximum available width (if horizontal) or height (if vertical).
 
-##### justify
+### justify
 
 **Type**: `CSS['justifyContent']`
 
 Horizontally aligns content if the `direction` is `row`, or vertically aligns content if the `direction` is `column`.
 In the example below, `flex-start` will align the children content to the left.
 
-##### spacing
+### spacing
 
 **Type**: `CSS['width']`
 
 The amount of space between each child element. Spacing in between each child can be adjusted by using `spacing`.
 The value of `spacing` works as a multiplier to the library's grid system (base of `4px`).
 
-##### wrap
+### wrap
 
 **Type**: `boolean`
 
@@ -87,17 +84,16 @@ When a `Spacer` is used within an `HStack`, the `Spacer` adaptively expands to t
 import {
 	__experimentalHStack as HStack,
 	__experimentalSpacer as Spacer,
-	__experimentalText as Text,
 } from '@wordpress/components';
 
 function Example() {
 	return (
 		<HStack>
-			<Text>Code</Text>
+			<span>Code</span>
 			<Spacer>
-				<Text>is</Text>
+				<span>is</span>
 			</Spacer>
-			<Text>Poetry</Text>
+			<span>Poetry</span>
 		</HStack>
 	);
 }
@@ -109,16 +105,15 @@ function Example() {
 import {
 	__experimentalHStack as HStack,
 	__experimentalSpacer as Spacer,
-	__experimentalText as Text,
 } from '@wordpress/components';
 
 function Example() {
 	return (
 		<HStack>
-			<Text>Code</Text>
+			<span>Code</span>
 			<Spacer />
-			<Text>is</Text>
-			<Text>Poetry</Text>
+			<span>is</span>
+			<span>Poetry</span>
 		</HStack>
 	);
 }

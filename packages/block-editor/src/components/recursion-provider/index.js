@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { createContext, useContext, useMemo } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -9,6 +10,7 @@ import { createContext, useContext, useMemo } from '@wordpress/element';
 import { useBlockEditContext } from '../block-edit/context';
 
 const RenderedRefsContext = createContext( {} );
+RenderedRefsContext.displayName = 'RenderedRefsContext';
 
 /**
  * Immutably adds an unique identifier to a set scoped for a given block type.
@@ -38,12 +40,12 @@ function addToBlockType( renderedBlocks, blockName, uniqueId ) {
  * Wrap block content with this provider and provide the same `uniqueId` prop as used
  * with `useHasRecursion`.
  *
- * @param {Object}      props
- * @param {*}           props.uniqueId  Any value that acts as a unique identifier for a block instance.
- * @param {string}      props.blockName Optional block name.
- * @param {JSX.Element} props.children  React children.
+ * @param {Object}            props
+ * @param {*}                 props.uniqueId  Any value that acts as a unique identifier for a block instance.
+ * @param {string}            props.blockName Optional block name.
+ * @param {React.JSX.Element} props.children  React children.
  *
- * @return {JSX.Element} A React element.
+ * @return {React.JSX.Element} A React element.
  */
 export function RecursionProvider( { children, uniqueId, blockName = '' } ) {
 	const previouslyRenderedBlocks = useContext( RenderedRefsContext );
@@ -82,3 +84,19 @@ export function useHasRecursion( uniqueId, blockName = '' ) {
 	blockName = blockName || name;
 	return Boolean( previouslyRenderedBlocks[ blockName ]?.has( uniqueId ) );
 }
+
+export const DeprecatedExperimentalRecursionProvider = ( props ) => {
+	deprecated( 'wp.blockEditor.__experimentalRecursionProvider', {
+		since: '6.5',
+		alternative: 'wp.blockEditor.RecursionProvider',
+	} );
+	return <RecursionProvider { ...props } />;
+};
+
+export const DeprecatedExperimentalUseHasRecursion = ( ...args ) => {
+	deprecated( 'wp.blockEditor.__experimentalUseHasRecursion', {
+		since: '6.5',
+		alternative: 'wp.blockEditor.useHasRecursion',
+	} );
+	return useHasRecursion( ...args );
+};

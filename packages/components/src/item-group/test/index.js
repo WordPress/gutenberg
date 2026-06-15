@@ -29,7 +29,7 @@ describe( 'ItemGroup', () => {
 			);
 
 			const { container: withBorders } = render(
-				<ItemGroup isBordered={ true }>
+				<ItemGroup isBordered>
 					<Item>Code is poetry</Item>
 				</ItemGroup>
 			);
@@ -63,7 +63,7 @@ describe( 'ItemGroup', () => {
 			);
 
 			const { container: separatedItems } = render(
-				<ItemGroup isSeparated={ true }>
+				<ItemGroup isSeparated>
 					<Item>Code is poetry</Item>
 				</ItemGroup>
 			);

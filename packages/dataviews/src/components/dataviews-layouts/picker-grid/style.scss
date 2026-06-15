@@ -1,0 +1,182 @@
+@use "../utils/grid-items.scss" as *;
+
+.dataviews-view-picker-grid {
+	// When grouped, the density class is on the parent Composite,
+	// and the gap is on child .dataviews-view-grid-items elements.
+	&.has-compact-density .dataviews-view-grid-items {
+		gap: var(--wpds-dimension-gap-lg);
+	}
+
+	&.has-comfortable-density .dataviews-view-grid-items {
+		gap: var(--wpds-dimension-gap-2xl);
+	}
+
+	.dataviews-view-picker-grid__card {
+		height: 100%;
+		justify-content: flex-start;
+		position: relative;
+		isolation: isolate;
+
+		.dataviews-view-picker-grid__title-actions {
+			padding: var(--wpds-dimension-padding-sm) 0 var(--wpds-dimension-padding-xs);
+		}
+
+		.dataviews-view-picker-grid__title-field {
+			min-height: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available. Preserve layout when there is no ellipsis button
+			overflow: hidden;
+			align-content: center;
+			text-align: start;
+
+			&--clickable {
+				width: fit-content;
+			}
+		}
+
+
+		&.is-selected {
+			.dataviews-view-picker-grid__fields .dataviews-view-picker-grid__field .dataviews-view-picker-grid__field-value {
+				color: var(--wpds-color-foreground-content-neutral);
+			}
+		}
+		&.is-selected .dataviews-view-picker-grid__media::after {
+			box-shadow:
+				inset 0 0 0 var(--wpds-border-width-xs) var(--wpds-color-stroke-interactive-brand),
+				inset 0 0 0 var(--wpds-border-width-sm) var(--wpds-color-background-surface-neutral-strong);
+		}
+		.dataviews-view-picker-grid__media:focus::after {
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wpds-color-stroke-focus);
+		}
+	}
+
+	&:focus-visible {
+		// Only show one focus outline at a time. When focus is on a child element,
+		// hide the grid's own focus outline.
+		&[aria-activedescendant] {
+			outline: none;
+		}
+
+		[data-active-item="true"] {
+			outline: 2px solid var(--wpds-color-stroke-focus);
+		}
+	}
+
+	.dataviews-selection-checkbox {
+		// Always show the checkbox in picker mode.
+		top: var(--wpds-dimension-padding-sm) !important;
+
+		input {
+			// When the dataview is used as a picker, ensure the checkbox can't be clicked on.
+			// Only the item card itself is clickable.
+			pointer-events: none;
+		}
+	}
+
+	.dataviews-view-picker-grid__media {
+		width: 100%;
+		aspect-ratio: 1/1;
+		min-height: 0;
+		background-color: var(--wpds-color-background-surface-neutral-strong);
+		border-radius: var(--wpds-border-radius-md);
+		position: relative;
+
+		img {
+			object-fit: cover;
+			width: 100%;
+			height: 100%;
+		}
+
+		&::after {
+			content: "";
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			box-shadow: inset 0 0 0 var(--wpds-border-width-xs) rgba(0, 0, 0, 0.1);
+			border-radius: var(--wpds-border-radius-md);
+			pointer-events: none;
+		}
+	}
+
+	.dataviews-view-picker-grid__fields {
+		position: relative;
+		font-size: 12px;
+		line-height: 16px;
+
+		&:not(:empty) {
+			padding: 0 0 var(--wpds-dimension-padding-md);
+		}
+
+		.dataviews-view-picker-grid__field-value:not(:empty) {
+			min-height: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available
+			line-height: var(--wpds-typography-line-height-sm);
+			padding-top: calc(var(--wpds-dimension-base) / 2);
+		}
+
+		.dataviews-view-picker-grid__field {
+			min-height: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available
+			align-items: center;
+
+			.dataviews-view-picker-grid__field-name {
+				width: 35%;
+				color: var(--wpds-color-foreground-content-neutral-weak);
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			.dataviews-view-picker-grid__field-value {
+				width: 65%;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			&:not(:has(.dataviews-view-picker-grid__field-value:not(:empty))) {
+				display: none;
+			}
+		}
+	}
+
+	.dataviews-view-picker-grid__badge-fields {
+		&:not(:empty) {
+			padding-bottom: var(--wpds-dimension-padding-md);
+		}
+	}
+}
+
+.dataviews-view-picker-grid__field-value:empty,
+.dataviews-view-picker-grid__field:empty {
+	display: none;
+}
+
+.dataviews-view-picker-grid__card .dataviews-selection-checkbox {
+	position: absolute;
+	top: -9999em;
+	left: var(--wpds-dimension-padding-sm);
+	// Ensure selection checkbox stays above the preview field.
+	z-index: 1;
+
+	@media (hover: none) {
+		// Show checkboxes on devices that do not support hover.
+		top: var(--wpds-dimension-padding-sm);
+	}
+}
+
+.dataviews-view-picker-grid__card:hover .dataviews-selection-checkbox,
+.dataviews-view-picker-grid__card:focus-within .dataviews-selection-checkbox,
+.dataviews-view-picker-grid__card.is-selected .dataviews-selection-checkbox {
+	top: var(--wpds-dimension-padding-sm);
+}
+
+.dataviews-view-picker-grid__media--clickable {
+	cursor: var(--wpds-cursor-control);
+}
+
+.dataviews-view-picker-grid-group__header {
+	font-size: var(--wpds-typography-font-size-lg);
+	font-weight: var(--wpds-typography-font-weight-medium);
+	color: var(--wpds-color-foreground-content-neutral);
+	margin: 0 0 var(--wpds-dimension-gap-sm) 0;
+	padding: 0 calc(var(--wpds-dimension-base) * 12);
+}

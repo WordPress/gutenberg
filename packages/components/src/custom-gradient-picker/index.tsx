@@ -1,14 +1,13 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
-import type gradientParser from 'gradient-parser';
+import { type LinearGradientNode } from 'gradient-parser';
 
 /**
  * WordPress dependencies
  */
-import deprecated from '@wordpress/deprecated';
 import { __ } from '@wordpress/i18n';
+import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -27,8 +26,8 @@ import {
 import { serializeGradient } from './serializer';
 import {
 	DEFAULT_LINEAR_GRADIENT_ANGLE,
-	HORIZONTAL_GRADIENT_ORIENTATION,
 	GRADIENT_OPTIONS,
+	HORIZONTAL_GRADIENT_ORIENTATION,
 } from './constants';
 import {
 	AccessoryWrapper,
@@ -60,7 +59,6 @@ const GradientAnglePicker = ( {
 	};
 	return (
 		<AnglePickerControl
-			__nextHasNoMarginBottom
 			onChange={ onAngleChange }
 			value={ hasGradient ? angle : '' }
 		/>
@@ -73,16 +71,26 @@ const GradientTypePicker = ( {
 	onChange,
 }: GradientTypePickerProps ) => {
 	const { type } = gradientAST;
+	const lastLinearOrientationAngle = useRef(
+		Number( HORIZONTAL_GRADIENT_ORIENTATION.value )
+	);
+
+	if ( type === 'linear-gradient' && gradientAST.orientation ) {
+		lastLinearOrientationAngle.current = Number(
+			gradientAST.orientation.value
+		);
+	}
 
 	const onSetLinearGradient = () => {
 		onChange(
 			serializeGradient( {
 				...gradientAST,
-				orientation: gradientAST.orientation
-					? undefined
-					: HORIZONTAL_GRADIENT_ORIENTATION,
+				orientation: {
+					type: 'angular' as const,
+					value: `${ lastLinearOrientationAngle.current }`,
+				},
 				type: 'linear-gradient',
-			} as gradientParser.LinearGradientNode )
+			} satisfies LinearGradientNode )
 		);
 	};
 
@@ -107,7 +115,6 @@ const GradientTypePicker = ( {
 
 	return (
 		<SelectControl
-			__nextHasNoMarginBottom
 			className="components-custom-gradient-picker__type-picker"
 			label={ __( 'Type' ) }
 			labelPosition="top"
@@ -141,10 +148,9 @@ const GradientTypePicker = ( {
  * ```
  */
 export function CustomGradientPicker( {
-	/** Start opting into the new margin-free styles that will become the default in a future version. */
-	__nextHasNoMargin = false,
 	value,
 	onChange,
+	enableAlpha = true,
 	__experimentalIsRenderedInSidebar = false,
 }: CustomGradientPickerProps ) {
 	const { gradientAST, hasGradient } = getGradientAstWithDefault( value );
@@ -166,28 +172,13 @@ export function CustomGradientPicker( {
 		};
 	} );
 
-	if ( ! __nextHasNoMargin ) {
-		deprecated(
-			'Outer margin styles for wp.components.CustomGradientPicker',
-			{
-				since: '6.1',
-				version: '6.4',
-				hint: 'Set the `__nextHasNoMargin` prop to true to start opting into the new styles, which will become the default in a future version',
-			}
-		);
-	}
-
 	return (
-		<VStack
-			spacing={ 4 }
-			className={ classnames( 'components-custom-gradient-picker', {
-				'is-next-has-no-margin': __nextHasNoMargin,
-			} ) }
-		>
+		<VStack spacing={ 4 } className="components-custom-gradient-picker">
 			<CustomGradientBar
 				__experimentalIsRenderedInSidebar={
 					__experimentalIsRenderedInSidebar
 				}
+				disableAlpha={ ! enableAlpha }
 				background={ background }
 				hasGradient={ hasGradient }
 				value={ controlPoints }

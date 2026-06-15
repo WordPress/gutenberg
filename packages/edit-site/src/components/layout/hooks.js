@@ -2,66 +2,82 @@
  * WordPress dependencies
  */
 import { useEffect, useState } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { select, subscribe } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
-/**
- * Internal dependencies
- */
-import useEditedEntityRecord from '../use-edited-entity-record';
-
 const MAX_LOADING_TIME = 10000; // 10 seconds
+const MAX_PAUSE_TIME = 100;
 
-export function useIsSiteEditorLoading() {
-	const { isLoaded: hasLoadedPost } = useEditedEntityRecord();
-	const [ loaded, setLoaded ] = useState( false );
-	const inLoadingPause = useSelect(
-		( select ) => {
-			const hasResolvingSelectors =
-				select( coreStore ).hasResolvingSelectors();
-			return ! loaded && ! hasResolvingSelectors;
-		},
-		[ loaded ]
-	);
+/**
+ * Waits until the site editor has finished its initial loading.
+ *
+ * Resolves when there's a pause in resolving selectors (no active requests
+ * for at least MAX_PAUSE_TIME ms), or after MAX_LOADING_TIME as a fallback
+ * to prevent failed requests from blocking the editor indefinitely.
+ *
+ * @return {Promise<void>} Resolves when loading is considered complete.
+ */
+function waitWhileSiteEditorLoading() {
+	let pauseTimeout;
+
+	const { promise, resolve } = Promise.withResolvers();
+
+	function finish() {
+		unsubscribe();
+		clearTimeout( pauseTimeout );
+		clearTimeout( maxTimeout );
+		resolve();
+	}
 
 	/*
-	 * If the maximum expected loading time has passed, we're marking the
-	 * editor as loaded, in order to prevent any failed requests from blocking
+	 * If the maximum expected loading time has passed, we consider the
+	 * editor loaded, in order to prevent any failed requests from blocking
 	 * the editor canvas from appearing.
 	 */
-	useEffect( () => {
-		let timeout;
+	const maxTimeout = setTimeout( finish, MAX_LOADING_TIME );
 
-		if ( ! loaded ) {
-			timeout = setTimeout( () => {
-				setLoaded( true );
-			}, MAX_LOADING_TIME );
+	function checkResolving() {
+		const isResolving = select( coreStore ).hasResolvingSelectors();
+
+		if ( isResolving ) {
+			clearTimeout( pauseTimeout );
+			pauseTimeout = undefined;
+			return;
 		}
 
-		return () => {
-			clearTimeout( timeout );
-		};
-	}, [ loaded ] );
+		/*
+		 * We're using an arbitrary 100ms timeout here to catch brief
+		 * moments without any resolving selectors that would result in
+		 * displaying brief flickers of loading state and loaded state.
+		 *
+		 * It's worth experimenting with different values, since this also
+		 * adds 100ms of artificial delay after loading has finished.
+		 */
+		if ( ! pauseTimeout ) {
+			pauseTimeout = setTimeout( finish, MAX_PAUSE_TIME );
+		}
+	}
+
+	const unsubscribe = subscribe( checkResolving, coreStore );
+	checkResolving();
+
+	function cancel() {
+		unsubscribe();
+		clearTimeout( pauseTimeout );
+		clearTimeout( maxTimeout );
+	}
+
+	return [ promise, cancel ];
+}
+
+export function useIsSiteEditorLoading() {
+	const [ loaded, setLoaded ] = useState( false );
 
 	useEffect( () => {
-		if ( inLoadingPause ) {
-			/*
-			 * We're using an arbitrary 1s timeout here to catch brief moments
-			 * without any resolving selectors that would result in displaying
-			 * brief flickers of loading state and loaded state.
-			 *
-			 * It's worth experimenting with different values, since this also
-			 * adds 1s of artificial delay after loading has finished.
-			 */
-			const timeout = setTimeout( () => {
-				setLoaded( true );
-			}, 1000 );
+		const [ promise, cancel ] = waitWhileSiteEditorLoading();
+		promise.then( () => setLoaded( true ) );
+		return cancel;
+	}, [] );
 
-			return () => {
-				clearTimeout( timeout );
-			};
-		}
-	}, [ inLoadingPause ] );
-
-	return ! loaded || ! hasLoadedPost;
+	return ! loaded;
 }

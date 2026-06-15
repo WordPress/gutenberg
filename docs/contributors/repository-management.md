@@ -55,7 +55,7 @@ Here are some milestones you might see:
 -   [X.Y (Gutenberg)](https://github.com/WordPress/gutenberg/milestone/85): PRs targeted for the Gutenberg Plugin X.Y release.
 -   [Future](https://github.com/WordPress/gutenberg/milestone/35): this is something that is confirmed by everyone as a good thing but doesn’t fall into other criteria.
 
-### Triaging Issues
+### Triaging issues
 
 To keep the issue list healthy, it needs to be triaged regularly. _Triage_ is the practice of reviewing existing issues to make sure they’re relevant, actionable, and have all the information they need.
 
@@ -63,7 +63,7 @@ Anyone can help triage, although you’ll need contributor permission on the Gut
 
 See the [Triage Contributors guide](/docs/contributors/triage.md) for details.
 
-## Pull Requests
+## Pull requests
 
 Gutenberg follows a feature branch pull request workflow for all code and documentation changes. At a high-level, the process looks like this:
 
@@ -86,7 +86,7 @@ Along with this process, there are a few important points to mention:
 -   To make it far easier to merge your code, each pull request should only contain one conceptual change. Keeping contributions atomic keeps the pull request discussion focused on one topic and makes it possible to approve changes on a case-by-case basis.
 -   Separate pull requests can address different items or todos from their linked issue, there’s no need for a single pull request to cover a single issue if the issue is non-trivial.
 
-### Code Review
+### Code review
 
 Every pull request goes through a manual code review, in addition to automated tests. The objectives for the code review are best thought of as:
 
@@ -106,7 +106,7 @@ If you are not yet comfortable leaving a full review, try commenting on a PR. Qu
 
 If you struggle with getting a review, see: [How To Get Your Pull Request Reviewed?](/docs/contributors/code/how-to-get-your-pull-request-reviewed.md)
 
-### Design Review
+### Design review
 
 If your pull request impacts the design/UI, you need to label appropriately to alert design. To request a design review, add the [Needs Design Feedback](https://github.com/WordPress/gutenberg/labels/Needs%20Design%20Feedback) label to your PR. If there are any PRs that require an update to the design/UI, please use the [Figma Library Update](https://github.com/WordPress/gutenberg/labels/Figma%20Library%20Update) label.
 
@@ -116,7 +116,7 @@ As a guide, changes that should be reviewed:
 -   Anything that changes something visually.
 -   If you just want design feedback on an idea or exploration.
 
-### Merging Pull Requests
+### Merging pull requests
 
 A pull request can generally be merged once it is:
 
@@ -134,7 +134,7 @@ All members of the WordPress organization on GitHub have the ability to review a
 
 Most pull requests will be automatically assigned a release milestone, but please make sure your merged pull request was assigned one. Doing so creates the historical legacy of what code landed when, and makes it possible for all project contributors (even non-technical ones) to access this information.
 
-### Closing Pull Requests
+### Closing pull requests
 
 Sometimes, a pull request may not be mergeable, no matter how much additional effort is applied to it (e.g. out of scope). In these cases, it’s best to communicate with the contributor graciously while describing why the pull request was closed, this encourages productive future involvement.
 
@@ -156,18 +156,12 @@ If you’d like a template to follow:
 
 Two GitHub teams are used in the project.
 
--   [Gutenberg Core](https://github.com/orgs/WordPress/teams/gutenberg-core): A team composed of people that are actively involved in the project: attending meetings regularly, participating in triage sessions, performing reviews regularly, working on features and bug fixes and performing plugin and npm releases.
+-   Gutenberg Core: A team composed of people that are actively involved in the project: attending meetings regularly, participating in triage sessions, performing reviews regularly, working on features and bug fixes and performing plugin and npm releases.
 
--   [Gutenberg](https://github.com/orgs/WordPress/teams/gutenberg): A team composed of contributors with at least 2–3 meaningful contributions to the project.
+-   Gutenberg: A team composed of contributors with at least 2–3 meaningful contributions to the project.
 
 If you meet this criterion of several meaningful contributions having been accepted into the repository and would like to be added to the Gutenberg team, feel free to ask in the [#core-editor Slack channel](https://make.wordpress.org/chat/).
 
 ## Projects
 
 We use [GitHub projects](https://github.com/WordPress/gutenberg/projects) to keep track of details that aren't immediately actionable, but that we want to keep around for future reference.
-
-Some key projects include:
-
--   [Phase 2](https://github.com/WordPress/gutenberg/projects/13) - Development tasks needed for Phase 2 of Gutenberg.
--   [Phase 2 design](https://github.com/WordPress/gutenberg/projects/21) - Tasks for design in Phase 2. Note: specific projects may have their own boards.
--   [Ideas](https://github.com/WordPress/gutenberg/projects/8) - Project containing tickets that, while closed for the time being, can be revisited in the future.

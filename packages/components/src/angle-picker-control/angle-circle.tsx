@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { useEffect, useRef } from '@wordpress/element';
@@ -7,13 +12,9 @@ import { __experimentalUseDragging as useDragging } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import {
-	CircleRoot,
-	CircleIndicatorWrapper,
-	CircleIndicator,
-} from './styles/angle-picker-control-styles';
+import styles from './style.module.scss';
 
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import type { AngleCircleProps } from './types';
 
 type UseDraggingArgumentType = Parameters< typeof useDragging >[ 0 ];
@@ -25,11 +26,15 @@ type UseDraggingCallbackEvent =
 function AngleCircle( {
 	value,
 	onChange,
+	className,
 	...props
 }: WordPressComponentProps< AngleCircleProps, 'div' > ) {
-	const angleCircleRef = useRef< HTMLDivElement | null >( null );
-	const angleCircleCenter = useRef< { x: number; y: number } | undefined >();
-	const previousCursorValue = useRef< CSSStyleDeclaration[ 'cursor' ] >();
+	const angleCircleRef = useRef< HTMLDivElement >( null );
+	const angleCircleCenterRef = useRef< { x: number; y: number } >(
+		undefined
+	);
+	const previousCursorValueRef =
+		useRef< CSSStyleDeclaration[ 'cursor' ] >( undefined );
 
 	const setAngleCircleCenter = () => {
 		if ( angleCircleRef.current === null ) {
@@ -37,7 +42,7 @@ function AngleCircle( {
 		}
 
 		const rect = angleCircleRef.current.getBoundingClientRect();
-		angleCircleCenter.current = {
+		angleCircleCenterRef.current = {
 			x: rect.x + rect.width / 2,
 			y: rect.y + rect.height / 2,
 		};
@@ -55,10 +60,10 @@ function AngleCircle( {
 		( event.target as HTMLDivElement | null )?.focus();
 
 		if (
-			angleCircleCenter.current !== undefined &&
+			angleCircleCenterRef.current !== undefined &&
 			onChange !== undefined
 		) {
-			const { x: centerX, y: centerY } = angleCircleCenter.current;
+			const { x: centerX, y: centerY } = angleCircleCenterRef.current;
 			onChange(
 				getAngle( centerX, centerY, event.clientX, event.clientY )
 			);
@@ -76,33 +81,46 @@ function AngleCircle( {
 
 	useEffect( () => {
 		if ( isDragging ) {
-			if ( previousCursorValue.current === undefined ) {
-				previousCursorValue.current = document.body.style.cursor;
+			if ( previousCursorValueRef.current === undefined ) {
+				previousCursorValueRef.current = document.body.style.cursor;
 			}
 			document.body.style.cursor = 'grabbing';
 		} else {
-			document.body.style.cursor = previousCursorValue.current || '';
-			previousCursorValue.current = undefined;
+			document.body.style.cursor = previousCursorValueRef.current || '';
+			previousCursorValueRef.current = undefined;
 		}
 	}, [ isDragging ] );
 
 	return (
-		<CircleRoot
+		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
+		<div
 			ref={ angleCircleRef }
 			onMouseDown={ startDrag }
-			className="components-angle-picker-control__angle-circle"
+			className={ clsx(
+				'components-angle-picker-control__angle-circle',
+				styles[ 'circle-root' ],
+				className
+			) }
 			{ ...props }
 		>
-			<CircleIndicatorWrapper
+			<div
 				style={
 					value ? { transform: `rotate(${ value }deg)` } : undefined
 				}
-				className="components-angle-picker-control__angle-circle-indicator-wrapper"
+				className={ clsx(
+					'components-angle-picker-control__angle-circle-indicator-wrapper',
+					styles[ 'circle-indicator-wrapper' ]
+				) }
 				tabIndex={ -1 }
 			>
-				<CircleIndicator className="components-angle-picker-control__angle-circle-indicator" />
-			</CircleIndicatorWrapper>
-		</CircleRoot>
+				<div
+					className={ clsx(
+						'components-angle-picker-control__angle-circle-indicator',
+						styles[ 'circle-indicator' ]
+					) }
+				/>
+			</div>
+		</div>
 	);
 }
 

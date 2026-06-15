@@ -1,28 +1,31 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 	ToggleControl,
-	PanelBody,
+	SelectControl,
 } from '@wordpress/components';
 import {
 	InspectorControls,
 	RichText,
-	BlockControls,
-	AlignmentToolbar,
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { __, _x } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+
+/**
+ * Internal dependencies
+ */
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 export default function PostNavigationLinkEdit( {
-	attributes: { type, label, showTitle, textAlign, linkLabel, arrow },
+	context: { postType },
+	attributes: { type, label, showTitle, linkLabel, arrow, taxonomy },
 	setAttributes,
 } ) {
 	const isNext = type === 'next';
@@ -37,91 +40,163 @@ export default function PostNavigationLinkEdit( {
 	const displayArrow = arrowMap[ arrow ];
 
 	if ( showTitle ) {
-		/* translators: Label before for next and previous post. There is a space after the colon. */
-		placeholder = isNext ? __( 'Next: ' ) : __( 'Previous: ' );
+		placeholder = isNext
+			? /* translators: Label before for next and previous post. There is a space after the colon. */
+			  __( 'Next: ' ) // eslint-disable-line @wordpress/i18n-no-flanking-whitespace
+			: /* translators: Label before for next and previous post. There is a space after the colon. */
+			  __( 'Previous: ' ); // eslint-disable-line @wordpress/i18n-no-flanking-whitespace
 	}
 
 	const ariaLabel = isNext ? __( 'Next post' ) : __( 'Previous post' );
-	const blockProps = useBlockProps( {
-		className: classnames( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
-	} );
+	const blockProps = useBlockProps();
+	const taxonomies = useSelect(
+		( select ) => {
+			const { getTaxonomies } = select( coreStore );
+			const filteredTaxonomies = getTaxonomies( {
+				type: postType,
+				per_page: -1,
+			} );
+			return filteredTaxonomies;
+		},
+		[ postType ]
+	);
+	const getTaxonomyOptions = () => {
+		const selectOption = {
+			label: __( 'Unfiltered' ),
+			value: '',
+		};
+		const taxonomyOptions = ( taxonomies ?? [] )
+			.filter( ( { visibility } ) => !! visibility?.publicly_queryable )
+			.map( ( item ) => {
+				return {
+					value: item.slug,
+					label: item.name,
+				};
+			} );
+
+		return [ selectOption, ...taxonomyOptions ];
+	};
+
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody>
-					<ToggleControl
-						__nextHasNoMarginBottom
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () => {
+						setAttributes( {
+							showTitle: false,
+							linkLabel: false,
+							arrow: 'none',
+						} );
+					} }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<ToolsPanelItem
 						label={ __( 'Display the title as a link' ) }
-						help={ __(
-							'If you have entered a custom label, it will be prepended before the title.'
-						) }
-						checked={ !! showTitle }
-						onChange={ () =>
-							setAttributes( {
-								showTitle: ! showTitle,
-							} )
+						isShownByDefault
+						hasValue={ () => showTitle }
+						onDeselect={ () =>
+							setAttributes( { showTitle: false } )
 						}
-					/>
-					{ showTitle && (
+					>
 						<ToggleControl
-							__nextHasNoMarginBottom
-							label={ __(
-								'Include the label as part of the link'
+							label={ __( 'Display the title as a link' ) }
+							help={ __(
+								'If you have entered a custom label, it will be prepended before the title.'
 							) }
-							checked={ !! linkLabel }
+							checked={ !! showTitle }
 							onChange={ () =>
 								setAttributes( {
-									linkLabel: ! linkLabel,
+									showTitle: ! showTitle,
 								} )
 							}
 						/>
+					</ToolsPanelItem>
+					{ showTitle && (
+						<ToolsPanelItem
+							label={ __(
+								'Include the label as part of the link'
+							) }
+							isShownByDefault
+							hasValue={ () => !! linkLabel }
+							onDeselect={ () =>
+								setAttributes( { linkLabel: false } )
+							}
+						>
+							<ToggleControl
+								label={ __(
+									'Include the label as part of the link'
+								) }
+								checked={ !! linkLabel }
+								onChange={ () =>
+									setAttributes( {
+										linkLabel: ! linkLabel,
+									} )
+								}
+							/>
+						</ToolsPanelItem>
 					) }
-					<ToggleGroupControl
-						__nextHasNoMarginBottom
+					<ToolsPanelItem
 						label={ __( 'Arrow' ) }
-						value={ arrow }
-						onChange={ ( value ) => {
-							setAttributes( { arrow: value } );
-						} }
-						help={ __(
-							'A decorative arrow for the next and previous link.'
-						) }
-						isBlock
+						isShownByDefault
+						hasValue={ () => arrow !== 'none' }
+						onDeselect={ () => setAttributes( { arrow: 'none' } ) }
 					>
-						<ToggleGroupControlOption
-							value="none"
-							label={ _x(
-								'None',
-								'Arrow option for Next/Previous link'
+						<ToggleGroupControl
+							__next40pxDefaultSize
+							label={ __( 'Arrow' ) }
+							value={ arrow }
+							onChange={ ( value ) => {
+								setAttributes( { arrow: value } );
+							} }
+							help={ __(
+								'A decorative arrow for the next and previous link.'
 							) }
-						/>
-						<ToggleGroupControlOption
-							value="arrow"
-							label={ _x(
-								'Arrow',
-								'Arrow option for Next/Previous link'
-							) }
-						/>
-						<ToggleGroupControlOption
-							value="chevron"
-							label={ _x(
-								'Chevron',
-								'Arrow option for Next/Previous link'
-							) }
-						/>
-					</ToggleGroupControl>
-				</PanelBody>
+							isBlock
+						>
+							<ToggleGroupControlOption
+								value="none"
+								label={ _x(
+									'None',
+									'Arrow option for Next/Previous link'
+								) }
+							/>
+							<ToggleGroupControlOption
+								value="arrow"
+								label={ _x(
+									'Arrow',
+									'Arrow option for Next/Previous link'
+								) }
+							/>
+							<ToggleGroupControlOption
+								value="chevron"
+								label={ _x(
+									'Chevron',
+									'Arrow option for Next/Previous link'
+								) }
+							/>
+						</ToggleGroupControl>
+					</ToolsPanelItem>
+				</ToolsPanel>
 			</InspectorControls>
-			<BlockControls>
-				<AlignmentToolbar
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
+			<InspectorControls group="advanced">
+				<SelectControl
+					__next40pxDefaultSize
+					label={ __( 'Filter by taxonomy' ) }
+					value={ taxonomy }
+					options={ getTaxonomyOptions() }
+					onChange={ ( value ) =>
+						setAttributes( {
+							taxonomy: value,
+						} )
+					}
+					help={ __(
+						'Only link to posts that have the same taxonomy terms as the current post. For example the same tags or categories.'
+					) }
 				/>
-			</BlockControls>
+			</InspectorControls>
 			<div { ...blockProps }>
 				{ ! isNext && displayArrow && (
 					<span
@@ -132,10 +207,11 @@ export default function PostNavigationLinkEdit( {
 				) }
 				<RichText
 					tagName="a"
+					identifier="label"
 					aria-label={ ariaLabel }
 					placeholder={ placeholder }
 					value={ label }
-					allowedFormats={ [ 'core/bold', 'core/italic' ] }
+					withoutInteractiveFormatting
 					onChange={ ( newLabel ) =>
 						setAttributes( { label: newLabel } )
 					}
@@ -151,7 +227,7 @@ export default function PostNavigationLinkEdit( {
 				{ isNext && displayArrow && (
 					<span
 						className={ `wp-block-post-navigation-link__arrow-next is-arrow-${ arrow }` }
-						aria-hidden={ true }
+						aria-hidden
 					>
 						{ displayArrow }
 					</span>

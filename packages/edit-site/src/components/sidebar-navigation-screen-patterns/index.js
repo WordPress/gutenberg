@@ -4,123 +4,120 @@
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
-	Flex,
-	Icon,
-	Tooltip,
-	__experimentalHeading as Heading,
 } from '@wordpress/components';
-import { useViewportMatch } from '@wordpress/compose';
 import { getTemplatePartIcon } from '@wordpress/editor';
-import { __, sprintf } from '@wordpress/i18n';
-import { getQueryArgs } from '@wordpress/url';
-import { file, starFilled, lockSmall } from '@wordpress/icons';
+import { useMemo } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import { file } from '@wordpress/icons';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { useViewConfig } from '@wordpress/views';
 
 /**
  * Internal dependencies
  */
-import AddNewPattern from '../add-new-pattern';
-import SidebarNavigationItem from '../sidebar-navigation-item';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import CategoryItem from './category-item';
-import { DEFAULT_CATEGORY, DEFAULT_TYPE } from '../page-patterns/utils';
-import { useLink } from '../routes/link';
+import {
+	PATTERN_DEFAULT_CATEGORY,
+	PATTERN_TYPES,
+	TEMPLATE_PART_POST_TYPE,
+	TEMPLATE_PART_ALL_AREAS_CATEGORY,
+} from '../../utils/constants';
 import usePatternCategories from './use-pattern-categories';
-import useMyPatterns from './use-my-patterns';
 import useTemplatePartAreas from './use-template-part-areas';
+import { unlock } from '../../lock-unlock';
 
-function TemplatePartGroup( { areas, currentArea, currentType } ) {
+const { useLocation } = unlock( routerPrivateApis );
+
+function CategoriesGroup( {
+	templatePartViews,
+	patternViews,
+	templatePartCounts,
+	patternCounts,
+	currentCategory,
+	currentType,
+} ) {
 	return (
-		<>
-			<div className="edit-site-sidebar-navigation-screen-patterns__group-header">
-				<Heading level={ 2 }>{ __( 'Template parts' ) }</Heading>
-			</div>
-			<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
-				{ Object.entries( areas ).map(
-					( [ area, { label, templateParts } ] ) => (
-						<CategoryItem
-							key={ area }
-							count={ templateParts?.length }
-							icon={ getTemplatePartIcon( area ) }
-							label={ label }
-							id={ area }
-							type="wp_template_part"
-							isActive={
-								currentArea === area &&
-								currentType === 'wp_template_part'
-							}
-						/>
-					)
-				) }
-			</ItemGroup>
-		</>
-	);
-}
-
-function ThemePatternsGroup( { categories, currentCategory, currentType } ) {
-	return (
-		<>
-			<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
-				{ categories.map( ( category ) => (
-					<CategoryItem
-						key={ category.name }
-						count={ category.count }
-						label={
-							<Flex justify="left" align="center" gap={ 0 }>
-								{ category.label }
-								<Tooltip
-									position="top center"
-									text={ sprintf(
-										// translators: %s: The pattern category name.
-										'"%s" patterns cannot be edited.',
-										category.label
-									) }
-								>
-									<span className="edit-site-sidebar-navigation-screen-pattern__lock-icon">
-										<Icon icon={ lockSmall } size={ 24 } />
-									</span>
-								</Tooltip>
-							</Flex>
-						}
-						icon={ file }
-						id={ category.name }
-						type="pattern"
-						isActive={
-							currentCategory === `${ category.name }` &&
-							currentType === 'pattern'
-						}
-					/>
-				) ) }
-			</ItemGroup>
-		</>
-	);
-}
-
-export default function SidebarNavigationScreenPatterns() {
-	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const { categoryType, categoryId } = getQueryArgs( window.location.href );
-	const currentCategory = categoryId || DEFAULT_CATEGORY;
-	const currentType = categoryType || DEFAULT_TYPE;
-
-	const { templatePartAreas, hasTemplateParts, isLoading } =
-		useTemplatePartAreas();
-	const { patternCategories, hasPatterns } = usePatternCategories();
-	const { myPatterns } = useMyPatterns();
-
-	const templatePartsLink = useLink( { path: '/wp_template_part/all' } );
-	const footer = ! isMobileViewport ? (
-		<ItemGroup>
-			<SidebarNavigationItem
-				as="a"
-				href="edit.php?post_type=wp_block"
-				withChevron
-			>
-				{ __( 'Manage all of my patterns' ) }
-			</SidebarNavigationItem>
-			<SidebarNavigationItem withChevron { ...templatePartsLink }>
-				{ __( 'Manage all template parts' ) }
-			</SidebarNavigationItem>
+		<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
+			{ templatePartViews?.map( ( view ) => (
+				<CategoryItem
+					key={ view.slug }
+					count={ templatePartCounts[ view.slug ] }
+					icon={ getTemplatePartIcon(
+						view.slug === TEMPLATE_PART_ALL_AREAS_CATEGORY
+							? undefined
+							: view.slug
+					) }
+					label={ view.title }
+					id={ view.slug }
+					type={ TEMPLATE_PART_POST_TYPE }
+					isActive={
+						currentCategory === view.slug &&
+						currentType === TEMPLATE_PART_POST_TYPE
+					}
+				/>
+			) ) }
+			<div className="edit-site-sidebar-navigation-screen-patterns__divider" />
+			{ patternViews?.map( ( view ) => (
+				<CategoryItem
+					key={ view.slug }
+					count={ patternCounts[ view.slug ] }
+					label={ view.title }
+					icon={ file }
+					id={ view.slug }
+					type={ PATTERN_TYPES.user }
+					isActive={
+						currentCategory === `${ view.slug }` &&
+						currentType === PATTERN_TYPES.user
+					}
+				/>
+			) ) }
 		</ItemGroup>
-	) : undefined;
+	);
+}
+
+export default function SidebarNavigationScreenPatterns( { backPath } ) {
+	const {
+		query: { postType = 'wp_block', categoryId },
+	} = useLocation();
+	const currentCategory =
+		categoryId ||
+		( postType === PATTERN_TYPES.user
+			? PATTERN_DEFAULT_CATEGORY
+			: TEMPLATE_PART_ALL_AREAS_CATEGORY );
+
+	const { view_list: templatePartViews } = useViewConfig( {
+		kind: 'postType',
+		name: TEMPLATE_PART_POST_TYPE,
+	} );
+	const { view_list: patternViews } = useViewConfig( {
+		kind: 'postType',
+		name: PATTERN_TYPES.user,
+	} );
+
+	const { templatePartAreas, isLoading, hasTemplateParts } =
+		useTemplatePartAreas();
+	const templatePartCounts = useMemo( () => {
+		const counts = { [ TEMPLATE_PART_ALL_AREAS_CATEGORY ]: 0 };
+		Object.entries( templatePartAreas ).forEach(
+			( [ area, { templateParts } ] ) => {
+				const count = templateParts?.length || 0;
+				counts[ area ] = count;
+				counts[ TEMPLATE_PART_ALL_AREAS_CATEGORY ] += count;
+			}
+		);
+		return counts;
+	}, [ templatePartAreas ] );
+	const { patternCategories } = usePatternCategories();
+	const patternCounts = useMemo( () => {
+		const counts = {};
+		patternCategories.forEach( ( cat ) => {
+			counts[ cat.name ] = cat.count;
+		} );
+		return counts;
+	}, [ patternCategories ] );
+
+	const hasPatterns = patternCounts[ PATTERN_DEFAULT_CATEGORY ] > 0;
 
 	return (
 		<SidebarNavigationScreen
@@ -128,55 +125,26 @@ export default function SidebarNavigationScreenPatterns() {
 			description={ __(
 				'Manage what patterns are available when editing the site.'
 			) }
-			actions={ <AddNewPattern /> }
-			footer={ footer }
+			isRoot={ ! backPath }
+			backPath={ backPath }
 			content={
 				<>
-					{ isLoading && __( 'Loading patterns' ) }
+					{ isLoading && __( 'Loading items…' ) }
 					{ ! isLoading && (
 						<>
 							{ ! hasTemplateParts && ! hasPatterns && (
 								<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
-									<Item>
-										{ __(
-											'No template parts or patterns found'
-										) }
-									</Item>
+									<Item>{ __( 'No items found' ) }</Item>
 								</ItemGroup>
 							) }
-							<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
-								<CategoryItem
-									key={ myPatterns.name }
-									count={
-										! myPatterns.count
-											? '0'
-											: myPatterns.count
-									}
-									label={ myPatterns.label }
-									icon={ starFilled }
-									id={ myPatterns.name }
-									type="wp_block"
-									isActive={
-										currentCategory ===
-											`${ myPatterns.name }` &&
-										currentType === 'wp_block'
-									}
-								/>
-							</ItemGroup>
-							{ hasPatterns && (
-								<ThemePatternsGroup
-									categories={ patternCategories }
-									currentCategory={ currentCategory }
-									currentType={ currentType }
-								/>
-							) }
-							{ hasTemplateParts && (
-								<TemplatePartGroup
-									areas={ templatePartAreas }
-									currentArea={ currentCategory }
-									currentType={ currentType }
-								/>
-							) }
+							<CategoriesGroup
+								templatePartViews={ templatePartViews }
+								patternViews={ patternViews }
+								templatePartCounts={ templatePartCounts }
+								patternCounts={ patternCounts }
+								currentCategory={ currentCategory }
+								currentType={ postType }
+							/>
 						</>
 					) }
 				</>

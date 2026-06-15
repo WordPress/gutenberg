@@ -31,6 +31,7 @@ export type CategorySelectProps = Pick<
 	categoriesList: Category[];
 	onChange: ( newCategory: string ) => void;
 	selectedCategoryId?: Category[ 'id' ];
+	__next40pxDefaultSize: boolean;
 };
 
 export type AuthorSelectProps = Pick<
@@ -40,10 +41,22 @@ export type AuthorSelectProps = Pick<
 	authorList?: Author[];
 	onChange: ( newAuthor: string ) => void;
 	selectedAuthorId?: Author[ 'id' ];
+	__next40pxDefaultSize: boolean;
 };
 
 type Order = 'asc' | 'desc';
-type OrderBy = 'date' | 'title';
+type OrderBy = 'date' | 'title' | 'menu_order';
+
+export type OrderByOption = {
+	/**
+	 * The label to be shown to the user.
+	 */
+	label: string;
+	/**
+	 * Option value passed to `onChange` when the option is selected.
+	 */
+	value: `${ OrderBy }/${ Order }`;
+};
 
 type BaseQueryControlsProps = {
 	/**
@@ -98,9 +111,21 @@ type BaseQueryControlsProps = {
 	 */
 	orderBy?: OrderBy;
 	/**
+	 * List of available ordering options.
+	 */
+	orderByOptions?: OrderByOption[];
+	/**
 	 * The selected author ID.
 	 */
 	selectedAuthorId?: AuthorSelectProps[ 'selectedAuthorId' ];
+	/**
+	 * Start opting into the larger default height that will become the
+	 * default size in a future version.
+	 *
+	 * @deprecated Default behavior since WP 6.7. Prop can be safely removed.
+	 * @ignore
+	 */
+	__next40pxDefaultSize?: boolean;
 };
 
 export type QueryControlsWithSingleCategorySelectionProps =

@@ -11,7 +11,7 @@ So, for example, a user can add an image, write its caption, change its width an
 -   Users only need to learn one interface — the block — to add and edit everything on their site. Users shouldn’t have to write shortcodes, custom HTML, or understand hidden mechanisms to embed content.
 -   Gutenberg makes core features more discoverable, reducing hard-to-find “Mystery meat.” WordPress supports a large number of blocks and 30+ embeds. Let’s increase their visibility.
 
-## Building Blocks
+## Building blocks
 
 What does this mean for designers and developers? The block structure plus the principle of direct manipulation mean thinking differently about how to design and develop WordPress components. Let’s take another look at the architecture of a block:
 

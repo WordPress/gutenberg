@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { useViewportMatch, useMergeRefs } from '@wordpress/compose';
-import { forwardRef, useMemo } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
+import { forwardRef, useMemo, memo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
 	getBlockSupport,
@@ -29,9 +29,20 @@ import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
 import { store as blockEditorStore } from '../../store';
 import useBlockDropZone from '../use-block-drop-zone';
-import useSetting from '../use-setting';
+import { unlock } from '../../lock-unlock';
 
 const EMPTY_OBJECT = {};
+
+function BlockContext( { children, clientId } ) {
+	const context = useBlockContext( clientId );
+	return (
+		<BlockContextProvider value={ context }>
+			{ children }
+		</BlockContextProvider>
+	);
+}
+
+const BlockListItemsMemo = memo( BlockListItems );
 
 /**
  * InnerBlocks is a component which allows a single block to have multiple blocks
@@ -60,10 +71,15 @@ function UncontrolledInnerBlocks( props ) {
 		orientation,
 		placeholder,
 		layout,
+		name,
+		blockType,
+		parentLock,
+		defaultLayout,
 	} = props;
 
 	useNestedSettingsUpdate(
 		clientId,
+		parentLock,
 		allowedBlocks,
 		prioritizedInserterBlocks,
 		defaultBlock,
@@ -83,23 +99,12 @@ function UncontrolledInnerBlocks( props ) {
 		templateInsertUpdatesSelection
 	);
 
-	const context = useBlockContext( clientId );
-	const name = useSelect(
-		( select ) => {
-			return select( blockEditorStore ).getBlock( clientId )?.name;
-		},
-		[ clientId ]
-	);
-
 	const defaultLayoutBlockSupport =
 		getBlockSupport( name, 'layout' ) ||
 		getBlockSupport( name, '__experimentalLayout' ) ||
 		EMPTY_OBJECT;
 
 	const { allowSizingOnChildren = false } = defaultLayoutBlockSupport;
-
-	const defaultLayout = useSetting( 'layout' ) || EMPTY_OBJECT;
-
 	const usedLayout = layout || defaultLayoutBlockSupport;
 
 	const memoedLayout = useMemo(
@@ -114,20 +119,27 @@ function UncontrolledInnerBlocks( props ) {
 		[ defaultLayout, usedLayout, allowSizingOnChildren ]
 	);
 
-	// This component needs to always be synchronous as it's the one changing
-	// the async mode depending on the block selection.
-	return (
-		<BlockContextProvider value={ context }>
-			<BlockListItems
-				rootClientId={ clientId }
-				renderAppender={ renderAppender }
-				__experimentalAppenderTagName={ __experimentalAppenderTagName }
-				layout={ memoedLayout }
-				wrapperRef={ wrapperRef }
-				placeholder={ placeholder }
-			/>
-		</BlockContextProvider>
+	// For controlled inner blocks, we don't want a change in blocks to
+	// re-render the blocks list.
+	const items = (
+		<BlockListItemsMemo
+			rootClientId={ clientId }
+			renderAppender={ renderAppender }
+			__experimentalAppenderTagName={ __experimentalAppenderTagName }
+			layout={ memoedLayout }
+			wrapperRef={ wrapperRef }
+			placeholder={ placeholder }
+		/>
 	);
+
+	if (
+		! blockType?.providesContext ||
+		Object.keys( blockType.providesContext ).length === 0
+	) {
+		return items;
+	}
+
+	return <BlockContext clientId={ clientId }>{ items }</BlockContext>;
 }
 
 /**
@@ -162,66 +174,112 @@ const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
  * returns. Optionally, you can also pass any other props through this hook, and
  * they will be merged and returned.
  *
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md
+ *
  * @param {Object} props   Optional. Props to pass to the element. Must contain
  *                         the ref if one is defined.
  * @param {Object} options Optional. Inner blocks options.
- *
- * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md
  */
 export function useInnerBlocksProps( props = {}, options = {} ) {
-	const { __unstableDisableLayoutClassNames, __unstableDisableDropZone } =
-		options;
+	const {
+		__unstableDisableLayoutClassNames,
+		__unstableDisableDropZone,
+		dropZoneElement,
+	} = options;
 	const {
 		clientId,
 		layout = null,
 		__unstableLayoutClassNames: layoutClassNames = '',
 	} = useBlockEditContext();
-	const isSmallScreen = useViewportMatch( 'medium', '<' );
-	const { __experimentalCaptureToolbars, hasOverlay } = useSelect(
+	const selected = useSelect(
 		( select ) => {
-			if ( ! clientId ) {
-				return {};
-			}
-
 			const {
 				getBlockName,
-				isBlockSelected,
-				hasSelectedInnerBlock,
-				__unstableGetEditorMode,
-			} = select( blockEditorStore );
+				isZoomOut,
+				getTemplateLock,
+				getBlockRootClientId,
+				getBlockEditingMode,
+				getBlockSettings,
+				getSectionRootClientId,
+			} = unlock( select( blockEditorStore ) );
+
+			if ( ! clientId ) {
+				const sectionRootClientId = getSectionRootClientId();
+				// Disable the root drop zone when zoomed out and the section root client id
+				// is not the root block list (represented by an empty string).
+				// This avoids drag handling bugs caused by having two block lists acting as
+				// drop zones - the actual 'root' block list and the section root.
+				return {
+					isDropZoneDisabled:
+						isZoomOut() && sectionRootClientId !== '',
+				};
+			}
+
+			const { hasBlockSupport, getBlockType } = select( blocksStore );
 			const blockName = getBlockName( clientId );
-			const enableClickThrough =
-				__unstableGetEditorMode() === 'navigation' || isSmallScreen;
+			const blockEditingMode = getBlockEditingMode( clientId );
+			const parentClientId = getBlockRootClientId( clientId );
+			const [ defaultLayout ] = getBlockSettings( clientId, 'layout' );
+
+			let _isDropZoneDisabled = blockEditingMode === 'disabled';
+
+			if ( isZoomOut() ) {
+				// In zoom out mode, we want to disable the drop zone for the sections.
+				// The inner blocks belonging to the section drop zone is
+				// already disabled by the blocks themselves being disabled.
+				const sectionRootClientId = getSectionRootClientId();
+				_isDropZoneDisabled = clientId !== sectionRootClientId;
+			}
+
 			return {
-				__experimentalCaptureToolbars: select(
-					blocksStore
-				).hasBlockSupport(
+				__experimentalCaptureToolbars: hasBlockSupport(
 					blockName,
 					'__experimentalExposeControlsToChildren',
 					false
 				),
-				hasOverlay:
-					blockName !== 'core/template' &&
-					! isBlockSelected( clientId ) &&
-					! hasSelectedInnerBlock( clientId, true ) &&
-					enableClickThrough,
+				name: blockName,
+				blockType: getBlockType( blockName ),
+				parentLock: getTemplateLock( parentClientId ),
+				parentClientId,
+				isDropZoneDisabled: _isDropZoneDisabled,
+				defaultLayout,
 			};
 		},
-		[ clientId, isSmallScreen ]
+		[ clientId ]
 	);
+	const {
+		__experimentalCaptureToolbars,
+		name,
+		blockType,
+		parentLock,
+		parentClientId,
+		isDropZoneDisabled,
+		defaultLayout,
+	} = selected;
 
 	const blockDropZoneRef = useBlockDropZone( {
+		dropZoneElement,
 		rootClientId: clientId,
+		parentClientId,
 	} );
 
 	const ref = useMergeRefs( [
 		props.ref,
-		__unstableDisableDropZone ? null : blockDropZoneRef,
+		__unstableDisableDropZone ||
+		isDropZoneDisabled ||
+		( layout?.isManualPlacement &&
+			window.__experimentalEnableGridInteractivity )
+			? null
+			: blockDropZoneRef,
 	] );
 
 	const innerBlocksProps = {
 		__experimentalCaptureToolbars,
 		layout,
+		name,
+		blockType,
+		parentLock,
+		defaultLayout,
 		...options,
 	};
 	const InnerBlocks =
@@ -232,13 +290,10 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 	return {
 		...props,
 		ref,
-		className: classnames(
+		className: clsx(
 			props.className,
 			'block-editor-block-list__layout',
-			__unstableDisableLayoutClassNames ? '' : layoutClassNames,
-			{
-				'has-overlay': hasOverlay,
-			}
+			__unstableDisableLayoutClassNames ? '' : layoutClassNames
 		),
 		children: clientId ? (
 			<InnerBlocks { ...innerBlocksProps } clientId={ clientId } />

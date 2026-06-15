@@ -3,7 +3,7 @@
  */
 import { useMemo, useEffect } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { VisuallyHidden } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
 import { useDebounce, useAsyncList } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { useSelect } from '@wordpress/data';
@@ -38,6 +38,7 @@ function InserterSearchResults( {
 	filterValue,
 	onSelect,
 	onHover,
+	onHoverPattern,
 	rootClientId,
 	clientId,
 	isAppender,
@@ -49,6 +50,7 @@ function InserterSearchResults( {
 	shouldFocusBlock = true,
 	prioritizePatterns,
 	selectBlockOnInsert,
+	isQuick,
 } ) {
 	const debouncedSpeak = useDebounce( speak, 500 );
 
@@ -79,10 +81,12 @@ function InserterSearchResults( {
 		blockTypeCategories,
 		blockTypeCollections,
 		onSelectBlockType,
-	] = useBlockTypesState( destinationRootClientId, onInsertBlocks );
-	const [ patterns, , onSelectBlockPattern ] = usePatternsState(
+	] = useBlockTypesState( destinationRootClientId, onInsertBlocks, isQuick );
+	const [ patterns, , onClickPattern ] = usePatternsState(
 		onInsertBlocks,
-		destinationRootClientId
+		destinationRootClientId,
+		undefined,
+		isQuick
 	);
 
 	const filteredBlockPatterns = useMemo( () => {
@@ -104,8 +108,10 @@ function InserterSearchResults( {
 		if ( maxBlockTypesToShow === 0 ) {
 			return [];
 		}
-
-		let orderedItems = orderBy( blockTypes, 'frecency', 'desc' );
+		const nonPatternBlockTypes = blockTypes.filter(
+			( blockType ) => blockType.name !== 'core/block'
+		);
+		let orderedItems = orderBy( nonPatternBlockTypes, 'frecency', 'desc' );
 
 		if ( ! filterValue && prioritizedBlocks.length ) {
 			orderedItems = orderInserterBlockItems(
@@ -155,11 +161,6 @@ function InserterSearchResults( {
 	const currentShownBlockTypes = useAsyncList( filteredBlockTypes, {
 		step: INITIAL_INSERTER_RESULTS,
 	} );
-	const currentShownPatterns = useAsyncList(
-		currentShownBlockTypes.length === filteredBlockTypes.length
-			? filteredBlockPatterns
-			: EMPTY_ARRAY
-	);
 
 	const hasItems =
 		filteredBlockTypes.length > 0 || filteredBlockPatterns.length > 0;
@@ -180,16 +181,13 @@ function InserterSearchResults( {
 
 	const patternsUI = !! filteredBlockPatterns.length && (
 		<InserterPanel
-			title={
-				<VisuallyHidden>{ __( 'Block Patterns' ) }</VisuallyHidden>
-			}
+			title={ <VisuallyHidden>{ __( 'Patterns' ) }</VisuallyHidden> }
 		>
 			<div className="block-editor-inserter__quick-inserter-patterns">
 				<BlockPatternsList
-					shownPatterns={ currentShownPatterns }
 					blockPatterns={ filteredBlockPatterns }
-					onClickPattern={ onSelectBlockPattern }
-					onHover={ onHover }
+					onClickPattern={ onClickPattern }
+					onHover={ onHoverPattern }
 					isDraggable={ isDraggable }
 				/>
 			</div>

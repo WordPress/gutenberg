@@ -29,12 +29,17 @@ export default function useResizeCanvas( deviceType ) {
 	const getCanvasWidth = ( device ) => {
 		let deviceWidth;
 
+		/*
+		 * Matches the breakpoints in packages/base-styles/_breakpoints.scss,
+		 * and breakpoints in packages/compose/src/hooks/use-viewport-match/index.js.
+		 * minus 1 to trigger the media query for device preview.
+		 */
 		switch ( device ) {
 			case 'Tablet':
-				deviceWidth = 780;
+				deviceWidth = 782 - 1; // preview for useViewportMatch( 'medium', '<' )
 				break;
 			case 'Mobile':
-				deviceWidth = 360;
+				deviceWidth = 480 - 1; // preview for useViewportMatch( 'mobile', '<' )
 				break;
 			default:
 				return null;
@@ -43,11 +48,9 @@ export default function useResizeCanvas( deviceType ) {
 		return deviceWidth < actualWidth ? deviceWidth : actualWidth;
 	};
 
-	const marginValue = () => ( window.innerHeight < 800 ? 36 : 72 );
-
 	const contentInlineStyles = ( device ) => {
 		const height = device === 'Mobile' ? '768px' : '1024px';
-		const marginVertical = marginValue() + 'px';
+		const marginVertical = '40px';
 		const marginHorizontal = 'auto';
 
 		switch ( device ) {
@@ -62,12 +65,13 @@ export default function useResizeCanvas( deviceType ) {
 					marginLeft: marginHorizontal,
 					marginRight: marginHorizontal,
 					height,
-					borderRadius: '2px 2px 2px 2px',
-					border: '1px solid #ddd',
 					overflowY: 'auto',
 				};
 			default:
-				return null;
+				return {
+					marginLeft: marginHorizontal,
+					marginRight: marginHorizontal,
+				};
 		}
 	};
 

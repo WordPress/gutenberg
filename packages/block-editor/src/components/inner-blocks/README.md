@@ -125,7 +125,7 @@ Template locking of `InnerBlocks` is similar to [Custom Post Type templates lock
 Template locking allows locking the `InnerBlocks` area for the current template.
 _Options:_
 
--   `contentOnly` — prevents all operations. Additionally, the block types that don't have content are hidden from the list view and can't gain focus within the block list. Unlike the other lock types, this is not overrideable by children.
+-   `contentOnly` — prevents all operations. Additionally, the block types that don't have content are hidden from the list view and can't gain focus within the block list. Unlike the other lock types, this is not overridable by children.
 -   `'all'` — prevents all operations. It is not possible to insert new blocks. Move existing blocks or delete them.
 -   `'insert'` — prevents inserting or removing blocks, but allows moving existing ones.
 -   `false` — prevents locking from being applied to an `InnerBlocks` area even if a parent block contains locking. ( Boolean )
@@ -188,10 +188,25 @@ For example, a button block, deeply nested in several levels of block `X` that u
 
 ### `defaultBlock`
 
-- **Type:** `Array`
-- **Default:** - `undefined`. Determines which block type should be inserted by default and any attributes that should be set by default when the block is inserted. Takes an array in the form of `[ blockname, {blockAttributes} ]`.
+- **Type:** `Object`
+- **Default:** - `undefined`
+
+Determines which block type should be inserted by default and any attributes that should be set by default when the block is inserted. Takes an object in the form of `{ name: blockname, attributes: {blockAttributes} }`.
+
+```jsx
+const DEFAULT_BLOCK = { name: 'core/paragraph', attributes: { content: 'Lorem ipsum...' } };
+...
+<InnerBlocks
+    defaultBlock={ DEFAULT_BLOCK }
+    directInsert={ true }
+/>
+```
 
 ### `directInsert`
 
 - **Type:** `Boolean`
-- **Default:** - `undefined`. Determines whether the default block should be inserted directly into the InnerBlocks area by the block appender.
+- **Default:** `undefined`.
+
+When `true`, the appender inserts `defaultBlock` directly and skips the inserter dropdown, **including any registered inserter variations** of that block type. Use this to opt out of the variation picker; otherwise leave unset.
+
+Note: redundant when `allowedBlocks` resolves to a single block type with no variations, the appender already inserts directly.

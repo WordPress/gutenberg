@@ -4,20 +4,30 @@
 	"name": "core/image",
 	"title": "Image",
 	"category": "media",
-	"usesContext": [ "allowResize", "imageCrop", "fixedHeight" ],
+	"usesContext": [
+		"allowResize",
+		"imageCrop",
+		"fixedHeight",
+		"navigationButtonType",
+		"postId",
+		"postType",
+		"queryId",
+		"galleryId"
+	],
 	"description": "Insert an image to make a visual statement.",
 	"keywords": [ "img", "photo", "picture" ],
 	"textdomain": "default",
 	"attributes": {
-		"align": {
-			"type": "string"
+		"blob": {
+			"type": "string",
+			"role": "local"
 		},
 		"url": {
 			"type": "string",
 			"source": "attribute",
 			"selector": "img",
 			"attribute": "src",
-			"__experimentalRole": "content"
+			"role": "content"
 		},
 		"alt": {
 			"type": "string",
@@ -25,27 +35,33 @@
 			"selector": "img",
 			"attribute": "alt",
 			"default": "",
-			"__experimentalRole": "content"
+			"role": "content"
 		},
 		"caption": {
-			"type": "string",
-			"source": "html",
+			"type": "rich-text",
+			"source": "rich-text",
 			"selector": "figcaption",
-			"__experimentalRole": "content"
+			"role": "content"
+		},
+		"lightbox": {
+			"type": "object",
+			"enabled": {
+				"type": "boolean"
+			}
 		},
 		"title": {
 			"type": "string",
 			"source": "attribute",
 			"selector": "img",
 			"attribute": "title",
-			"__experimentalRole": "content"
+			"role": "content"
 		},
 		"href": {
 			"type": "string",
 			"source": "attribute",
 			"selector": "figure > a",
 			"attribute": "href",
-			"__experimentalRole": "content"
+			"role": "content"
 		},
 		"rel": {
 			"type": "string",
@@ -61,19 +77,22 @@
 		},
 		"id": {
 			"type": "number",
-			"__experimentalRole": "content"
+			"role": "content"
 		},
 		"width": {
-			"type": "number"
+			"type": "string"
 		},
 		"height": {
-			"type": "number"
+			"type": "string"
 		},
 		"aspectRatio": {
 			"type": "string"
 		},
 		"scale": {
 			"type": "string"
+		},
+		"focalPoint": {
+			"type": "object"
 		},
 		"sizeSlug": {
 			"type": "string"
@@ -86,19 +105,25 @@
 			"source": "attribute",
 			"selector": "figure > a",
 			"attribute": "target"
+		},
+		"isDecorative": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {
+		"interactivity": true,
+		"align": [ "left", "center", "right", "wide", "full" ],
 		"anchor": true,
-		"behaviors": {
-			"lightbox": true
-		},
 		"color": {
 			"text": false,
 			"background": false
 		},
 		"filter": {
 			"duotone": true
+		},
+		"spacing": {
+			"margin": true
 		},
 		"__experimentalBorder": {
 			"color": true,
@@ -110,10 +135,15 @@
 				"radius": true,
 				"width": true
 			}
+		},
+		"shadow": {
+			"__experimentalSkipSerialization": true
 		}
 	},
 	"selectors": {
+		"dimensions": ".wp-block-image img",
 		"border": ".wp-block-image img, .wp-block-image .wp-block-image__crop-area, .wp-block-image .components-placeholder",
+		"shadow": ".wp-block-image img, .wp-block-image .wp-block-image__crop-area, .wp-block-image .components-placeholder",
 		"filter": {
 			"duotone": ".wp-block-image img, .wp-block-image .components-placeholder"
 		}
@@ -127,6 +157,5 @@
 		{ "name": "rounded", "label": "Rounded" }
 	],
 	"editorStyle": "wp-block-image-editor",
-	"style": "wp-block-image",
-	"viewScript": "file:./view-interactivity.min.js"
+	"style": "wp-block-image"
 }

@@ -103,34 +103,31 @@ test.describe( 'Navigation block - List view editing', () => {
 		await expect(
 			listView
 				.getByRole( 'gridcell', {
-					name: 'Page Link',
+					name: 'Top Level Item 1',
 				} )
 				.filter( {
-					hasText: 'Block 1 of 2, Level 1', // proxy for filtering by description.
+					hasText: 'Block 1 of 2, Level 1.', // proxy for filtering by description.
 				} )
-				.getByText( 'Top Level Item 1' )
 		).toBeVisible();
 
 		await expect(
 			listView
 				.getByRole( 'gridcell', {
-					name: 'Submenu',
+					name: 'Top Level Item 2',
 				} )
 				.filter( {
-					hasText: 'Block 2 of 2, Level 1', // proxy for filtering by description.
+					hasText: 'Block 2 of 2, Level 1.', // proxy for filtering by description.
 				} )
-				.getByText( 'Top Level Item 2' )
 		).toBeVisible();
 
 		await expect(
 			listView
 				.getByRole( 'gridcell', {
-					name: 'Page Link',
+					name: 'Test Submenu Item',
 				} )
 				.filter( {
-					hasText: 'Block 1 of 1, Level 2', // proxy for filtering by description.
+					hasText: 'Block 1 of 1, Level 2.', // proxy for filtering by description.
 				} )
-				.getByText( 'Test Submenu Item' )
 		).toBeVisible();
 	} );
 
@@ -140,9 +137,8 @@ test.describe( 'Navigation block - List view editing', () => {
 		requestUtils,
 		linkControl,
 	} ) => {
-		const { id: menuId } = await requestUtils.createNavigationMenu(
-			navMenuBlocksFixture
-		);
+		const { id: menuId } =
+			await requestUtils.createNavigationMenu( navMenuBlocksFixture );
 
 		// Insert x2 blocks as a stress test as several bugs have been found with inserting
 		// blocks into the navigation block when there are multiple blocks referencing the
@@ -168,38 +164,15 @@ test.describe( 'Navigation block - List view editing', () => {
 		} );
 
 		const appender = listView.getByRole( 'button', {
-			name: 'Add block',
+			name: 'Add page',
 		} );
 
 		await expect( appender ).toBeVisible();
 
 		await appender.click();
 
-		// Expect to see the block inserter.
-		await expect(
-			page.getByRole( 'searchbox', {
-				name: 'Search for blocks and patterns',
-			} )
-		).toBeFocused();
-
-		const blockResults = page.getByRole( 'listbox', {
-			name: 'Blocks',
-		} );
-
-		await expect( blockResults ).toBeVisible();
-
-		const blockResultOptions = blockResults.getByRole( 'option' );
-
-		// Expect to see the Page Link and Custom Link blocks as the nth(0) and nth(1) results.
-		// This is important for usability as the Page Link block is the most likely to be used.
-		await expect( blockResultOptions.nth( 0 ) ).toHaveText( 'Page Link' );
-		await expect( blockResultOptions.nth( 1 ) ).toHaveText( 'Custom Link' );
-
-		// Select the Page Link option.
-		const pageLinkResult = blockResultOptions.nth( 0 );
-		await pageLinkResult.click();
-
-		// Expect to see the Link creation UI be focused.
+		// Expect a Navigation Link block to be inserted
+		// and immediately trigger its Link UI.
 		const linkUIInput = linkControl.getSearchInput();
 
 		// Coverage for bug whereby Link UI input would be incorrectly prepopulated.
@@ -210,12 +183,30 @@ test.describe( 'Navigation block - List view editing', () => {
 		await expect( linkUIInput ).toBeFocused();
 		await expect( linkUIInput ).toBeEmpty();
 
+		// Provides test coverage for feature whereby Custom Link type
+		// should default to `Pages` when displaying the "initial suggestions"
+		// in the Link UI.
+		// See https://github.com/WordPress/gutenberg/pull/54622.
 		const firstResult = await linkControl.getNthSearchResult( 0 );
+		const secondResult = await linkControl.getNthSearchResult( 1 );
+		const thirdResult = await linkControl.getNthSearchResult( 2 );
+
+		const firstResultType =
+			await linkControl.getSearchResultText( firstResult );
+
+		const secondResultType =
+			await linkControl.getSearchResultText( secondResult );
+
+		const thirdResultType =
+			await linkControl.getSearchResultText( thirdResult );
+
+		expect( firstResultType ).toContain( 'Page' );
+		expect( secondResultType ).toContain( 'Page' );
+		expect( thirdResultType ).toContain( 'Page' );
 
 		// Grab the text from the first result so we can check (later on) that it was inserted.
-		const firstResultText = await linkControl.getSearchResultText(
-			firstResult
-		);
+		const firstResultText =
+			await linkControl.getSearchResultText( firstResult );
 
 		// Create the link.
 		await firstResult.click();
@@ -224,12 +215,11 @@ test.describe( 'Navigation block - List view editing', () => {
 		await expect(
 			listView
 				.getByRole( 'gridcell', {
-					name: 'Page Link',
+					name: firstResultText,
 				} )
 				.filter( {
-					hasText: 'Block 3 of 3, Level 1', // proxy for filtering by description.
+					hasText: 'Block 3 of 3, Level 1.', // proxy for filtering by description.
 				} )
-				.getByText( firstResultText )
 		).toBeVisible();
 	} );
 
@@ -245,36 +235,46 @@ test.describe( 'Navigation block - List view editing', () => {
 			description: 'Structure for navigation menu: Test Menu',
 		} );
 
-		const submenuOptions = listView.getByRole( 'button', {
-			name: 'Options for Submenu',
-		} );
+		const subMenuItem = listView
+			.getByRole( 'gridcell', {
+				name: 'Top Level Item 2',
+			} )
+			.filter( {
+				hasText: 'Block 2 of 2, Level 1.', // proxy for filtering by description.
+			} );
 
-		// Open the options menu.
-		await submenuOptions.click();
+		// The options menu button is a sibling of the menu item gridcell.
+		const subMenuItemActions = subMenuItem
+			.locator( '..' ) // parent selector.
+			.getByRole( 'button', {
+				name: 'Options',
+			} );
+
+		// Open the actions menu.
+		await subMenuItemActions.click();
 
 		// usage of `page` is required because the options menu is rendered into a slot
 		// outside of the treegrid.
-		const removeBlockOption = page
+		const removeBlockAction = page
 			.getByRole( 'menu', {
-				name: 'Options for Submenu',
+				name: 'Options',
 			} )
 			.getByRole( 'menuitem', {
 				name: 'Remove Top Level Item 2',
 			} );
 
-		await removeBlockOption.click();
+		await removeBlockAction.click();
 
 		// Check the menu item was removed.
 		await expect(
 			listView
 				.getByRole( 'gridcell', {
-					name: 'Submenu',
+					name: 'Top Level Item 2',
 				} )
 				.filter( {
-					hasText: 'Block 2 of 2, Level 1', // proxy for filtering by description.
+					hasText: 'Block 2 of 2, Level 1.', // proxy for filtering by description.
 				} )
-				.getByText( 'Top Level Item 2' )
-		).not.toBeVisible();
+		).toBeHidden();
 	} );
 
 	test( `can edit menu items`, async ( { page, editor, requestUtils } ) => {
@@ -290,12 +290,9 @@ test.describe( 'Navigation block - List view editing', () => {
 		} );
 
 		// Click on the first menu item to open its settings.
-		const firstMenuItemAnchor = listView
-			.getByRole( 'link', {
-				name: 'Page',
-				includeHidden: true,
-			} )
-			.getByText( 'Top Level Item 1' );
+		const firstMenuItemAnchor = listView.getByRole( 'link', {
+			name: 'Top Level Item 1',
+		} );
 		await firstMenuItemAnchor.click();
 
 		// Get the settings panel.
@@ -313,7 +310,7 @@ test.describe( 'Navigation block - List view editing', () => {
 
 		await expect(
 			blockSettings.getByRole( 'tab', {
-				name: 'Settings',
+				name: 'Content',
 				selected: true,
 			} )
 		).toBeVisible();
@@ -321,7 +318,7 @@ test.describe( 'Navigation block - List view editing', () => {
 		await expect(
 			blockSettings
 				.getByRole( 'tabpanel', {
-					name: 'Settings',
+					name: 'Content',
 				} )
 				.getByRole( 'heading', {
 					name: 'Settings',
@@ -329,7 +326,7 @@ test.describe( 'Navigation block - List view editing', () => {
 		).toBeVisible();
 
 		const labelInput = blockSettings.getByRole( 'textbox', {
-			name: 'Label',
+			name: 'Text',
 		} );
 
 		await expect( labelInput ).toHaveValue( 'Top Level Item 1' );
@@ -341,7 +338,7 @@ test.describe( 'Navigation block - List view editing', () => {
 		// Click the back button to go back to the Nav block.
 		await blockSettings
 			.getByRole( 'button', {
-				name: 'Go to parent Navigation block',
+				name: 'Go to "Navigation" block',
 			} )
 			.click();
 
@@ -356,12 +353,11 @@ test.describe( 'Navigation block - List view editing', () => {
 		await expect(
 			listViewPanel
 				.getByRole( 'gridcell', {
-					name: 'Page Link',
+					name: 'Changed label', // new menu item text
 				} )
 				.filter( {
-					hasText: 'Block 1 of 2, Level 1', // proxy for filtering by description.
+					hasText: 'Block 1 of 2, Level 1.', // proxy for filtering by description.
 				} )
-				.getByText( 'Changed label' ) // new label text
 		).toBeVisible();
 	} );
 
@@ -385,34 +381,34 @@ test.describe( 'Navigation block - List view editing', () => {
 		// click on options menu for the first menu item and select remove.
 		const firstMenuItem = listView
 			.getByRole( 'gridcell', {
-				name: 'Page Link',
+				name: 'Top Level Item 1',
 			} )
 			.filter( {
-				hasText: 'Block 1 of 2, Level 1', // proxy for filtering by description.
+				hasText: 'Block 1 of 2, Level 1.', // proxy for filtering by description.
 			} );
 
 		// The options menu button is a sibling of the menu item gridcell.
-		const firstItemOptions = firstMenuItem
+		const firstItemActions = firstMenuItem
 			.locator( '..' ) // parent selector.
 			.getByRole( 'button', {
-				name: 'Options for Page Link',
+				name: 'Options',
 			} );
 
-		// Open the options menu.
-		await firstItemOptions.click();
+		// Open the actions menu.
+		await firstItemActions.click();
 
 		// Add the submenu.
 		// usage of `page` is required because the options menu is rendered into a slot
 		// outside of the treegrid.
-		const addSubmenuOption = page
+		const addSubmenuAction = page
 			.getByRole( 'menu', {
-				name: 'Options for Page Link',
+				name: 'Options',
 			} )
 			.getByRole( 'menuitem', {
 				name: 'Add submenu',
 			} );
 
-		await addSubmenuOption.click();
+		await addSubmenuAction.click();
 
 		await linkControl.searchFor( 'https://wordpress.org' );
 
@@ -422,12 +418,11 @@ test.describe( 'Navigation block - List view editing', () => {
 		await expect(
 			listView
 				.getByRole( 'gridcell', {
-					name: 'Custom Link',
+					name: 'wordpress.org',
 				} )
 				.filter( {
-					hasText: 'Block 1 of 1, Level 2', // proxy for filtering by description.
+					hasText: 'Block 1 of 1, Level 2.', // proxy for filtering by description.
 				} )
-				.getByText( 'wordpress.org' )
 		).toBeVisible();
 
 		// Check that the original item is still there but that it is now
@@ -435,12 +430,11 @@ test.describe( 'Navigation block - List view editing', () => {
 		await expect(
 			listView
 				.getByRole( 'gridcell', {
-					name: 'Submenu',
+					name: 'Top Level Item 1',
 				} )
 				.filter( {
-					hasText: 'Block 1 of 2, Level 1', // proxy for filtering by description.
+					hasText: 'Block 1 of 2, Level 1.', // proxy for filtering by description.
 				} )
-				.getByText( 'Top Level Item 1' )
 		).toBeVisible();
 	} );
 
@@ -454,9 +448,8 @@ test.describe( 'Navigation block - List view editing', () => {
 		// inserted block even if the block had been deselected and then reselected.
 		// See: https://github.com/WordPress/gutenberg/issues/50601
 
-		const { id: menuId } = await requestUtils.createNavigationMenu(
-			navMenuBlocksFixture
-		);
+		const { id: menuId } =
+			await requestUtils.createNavigationMenu( navMenuBlocksFixture );
 
 		// Insert x2 blocks as a stress test as several bugs have been found with inserting
 		// blocks into the navigation block when there are multiple blocks referencing the
@@ -483,20 +476,12 @@ test.describe( 'Navigation block - List view editing', () => {
 
 		await listView
 			.getByRole( 'button', {
-				name: 'Add block',
+				name: 'Add page',
 			} )
 			.click();
 
-		const blockResults = page.getByRole( 'listbox', {
-			name: 'Blocks',
-		} );
-
-		await expect( blockResults ).toBeVisible();
-
-		const blockResultOptions = blockResults.getByRole( 'option' );
-
-		// Select the Page Link option.
-		await blockResultOptions.nth( 0 ).click();
+		// Expect the Link UI to be focused.
+		await expect( linkControl.getSearchInput() ).toBeFocused();
 
 		// Immediately dismiss the Link UI thereby not populating the `url` attribute
 		// of the block.
@@ -525,7 +510,95 @@ test.describe( 'Navigation block - List view editing', () => {
 		// Check that despite being the last inserted block, the Link UI is not displayed
 		// in this scenario because it was not **just** inserted into the List View (i.e.
 		// we have unmounted the list view and then remounted it).
-		await expect( linkControl.getSearchInput() ).not.toBeVisible();
+		await expect( linkControl.getSearchInput() ).toBeHidden();
+	} );
+
+	test( `can create a new menu without losing focus`, async ( {
+		page,
+		editor,
+		requestUtils,
+	} ) => {
+		await requestUtils.createNavigationMenu( navMenuBlocksFixture );
+
+		await editor.insertBlock( { name: 'core/navigation' } );
+
+		await editor.openDocumentSettingsSidebar();
+
+		await page
+			.getByRole( 'tabpanel' )
+			.getByRole( 'button', { name: 'Test Menu' } )
+			.click();
+
+		await page.keyboard.press( 'ArrowUp' );
+
+		await expect(
+			page.getByRole( 'menuitem', { name: 'Create new Menu' } )
+		).toBeFocused();
+
+		await page.keyboard.press( 'Enter' );
+
+		await expect(
+			page.getByText( 'This Navigation Menu is empty.' )
+		).toBeVisible();
+
+		// Move focus to the appender
+		await page.keyboard.press( 'ArrowDown' );
+		await expect(
+			editor.canvas
+				.getByRole( 'document', {
+					name: 'Block: Navigation',
+				} )
+				.getByLabel( 'Add page' )
+		).toBeFocused();
+	} );
+
+	test( 'displays custom menu name in List View tab header in contentOnly mode', async ( {
+		page,
+		editor,
+		requestUtils,
+		pageUtils,
+	} ) => {
+		// Create a navigation menu with a custom name.
+		const headerMenu = await requestUtils.createNavigationMenu( {
+			title: 'Header Menu',
+			content: navMenuBlocksFixture.content,
+		} );
+
+		// Use the code editor to insert a contentOnly-locked group containing
+		// the navigation block. This triggers contentOnly mode where
+		// isSelectionWithinCurrentSection is true.
+		await pageUtils.pressKeys( 'secondary+M' );
+		await page
+			.getByPlaceholder( 'Start writing with text or HTML' )
+			.fill(
+				`<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->` +
+					`<div class="wp-block-group">` +
+					`<!-- wp:navigation {"ref":${ headerMenu.id }} /-->` +
+					`</div>` +
+					`<!-- /wp:group -->`
+			);
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		// Select the navigation block inside the contentOnly group.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Navigation' } )
+			.click();
+
+		await editor.openDocumentSettingsSidebar();
+
+		// Click the List View tab.
+		const listViewTab = page.getByRole( 'tab', { name: 'List View' } );
+		await listViewTab.click();
+
+		const listViewPanel = page.getByRole( 'tabpanel', {
+			name: 'List View',
+		} );
+
+		// In contentOnly mode, the PanelBody title should show the custom
+		// menu name as a collapsible panel button.
+		await expect(
+			listViewPanel.getByRole( 'button', { name: 'Header Menu' } )
+		).toBeVisible();
 	} );
 } );
 
@@ -536,7 +609,7 @@ class LinkControl {
 
 	getSearchInput() {
 		return this.page.getByRole( 'combobox', {
-			name: 'Link',
+			name: 'Search or type URL',
 		} );
 	}
 
@@ -573,9 +646,8 @@ class LinkControl {
 		await expect( result ).toBeVisible();
 
 		return result
-			.locator(
-				'.components-menu-item__info-wrapper .components-menu-item__item'
-			) // this is the only way to get the label text without the URL.
+			.locator( '.components-menu-item__item' ) // this is the only way to get the label text without the URL.
+			.last()
 			.innerText();
 	}
 }

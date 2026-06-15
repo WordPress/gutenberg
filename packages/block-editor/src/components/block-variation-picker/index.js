@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -13,12 +13,12 @@ import { layout } from '@wordpress/icons';
 function BlockVariationPicker( {
 	icon = layout,
 	label = __( 'Choose variation' ),
-	instructions = __( 'Select a variation to start with.' ),
+	instructions = __( 'Select a variation to start with:' ),
 	variations,
 	onSelect,
 	allowSkip,
 } ) {
-	const classes = classnames( 'block-editor-block-variation-picker', {
+	const classes = clsx( 'block-editor-block-variation-picker', {
 		'has-many-variations': variations.length > 4,
 	} );
 
@@ -42,7 +42,8 @@ function BlockVariationPicker( {
 				{ variations.map( ( variation ) => (
 					<li key={ variation.name }>
 						<Button
-							variant="secondary"
+							__next40pxDefaultSize
+							variant="tertiary"
 							icon={
 								variation.icon && variation.icon.src
 									? variation.icon.src
@@ -62,7 +63,11 @@ function BlockVariationPicker( {
 			{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 			{ allowSkip && (
 				<div className="block-editor-block-variation-picker__skip">
-					<Button variant="link" onClick={ () => onSelect() }>
+					<Button
+						__next40pxDefaultSize
+						variant="link"
+						onClick={ () => onSelect() }
+					>
 						{ __( 'Skip' ) }
 					</Button>
 				</div>

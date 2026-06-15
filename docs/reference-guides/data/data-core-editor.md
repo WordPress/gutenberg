@@ -218,7 +218,7 @@ _Parameters_
 
 _Returns_
 
--   `?number`: ID of current post.
+-   `?(number|string)`: The current post ID (number) or template slug (string).
 
 ### getCurrentPostLastRevisionId
 
@@ -248,6 +248,12 @@ _Returns_
 
 Returns the post type of the post currently being edited.
 
+_Usage_
+
+```js
+const currentPostType = wp.data.select( 'core/editor' ).getCurrentPostType();
+```
+
 _Parameters_
 
 -   _state_ `Object`: Global application state.
@@ -256,9 +262,55 @@ _Returns_
 
 -   `string`: Post type.
 
+### getCurrentTemplateId
+
+Returns the template ID currently being rendered/edited
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `?string`: Template ID.
+
+### getDeviceType
+
+Returns the current editing canvas device type.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `string`: Device type.
+
 ### getEditedPostAttribute
 
 Returns a single attribute of the post being edited, preferring the unsaved edit if one exists, but falling back to the attribute for the last known saved state of the post.
+
+_Usage_
+
+```js
+// Get specific media size based on the featured media ID
+// Note: change sizes?.large for any registered size
+const getFeaturedMediaUrl = useSelect( ( select ) => {
+	const getFeaturedMediaId =
+		select( 'core/editor' ).getEditedPostAttribute( 'featured_media' );
+	const media = select( 'core' ).getEntityRecord(
+		'postType',
+		'attachment',
+		getFeaturedMediaId
+	);
+
+	return (
+		media?.media_details?.sizes?.large?.source_url ||
+		media?.source_url ||
+		''
+	);
+}, [] );
+```
 
 _Parameters_
 
@@ -328,6 +380,18 @@ _Parameters_
 _Returns_
 
 -   `Array`: Block list.
+
+### getEditorMode
+
+Returns the current editing mode.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `string`: Editing mode.
 
 ### getEditorSelection
 
@@ -449,7 +513,7 @@ _Returns_
 
 ### getPermalinkParts
 
-Returns the permalink for a post, split into it's three parts: the prefix, the postName, and the suffix.
+Returns the permalink for a post, split into its three parts: the prefix, the postName, and the suffix.
 
 _Parameters_
 
@@ -501,6 +565,18 @@ _Related_
 
 -   getPreviousBlockClientId in core/block-editor store.
 
+### getRenderingMode
+
+Returns the post editor's rendering mode.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `string`: Rendering mode.
+
 ### getSelectedBlock
 
 _Related_
@@ -534,10 +610,6 @@ Returns state object prior to a specified optimist transaction ID, or `null` if 
 ### getSuggestedPostFormat
 
 Returns a suggested post format for the current post, inferred only if there is a single block within the post and it is of a type known to match a default post format. Returns null if the format cannot be determined.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
 
 _Returns_
 
@@ -718,7 +790,7 @@ Return true if the current post has already been published.
 _Parameters_
 
 -   _state_ `Object`: Global application state.
--   _currentPost_ `Object?`: Explicit current post for bypassing registry selector.
+-   _currentPost_ `[Object]`: Explicit current post for bypassing registry selector.
 
 _Returns_
 
@@ -847,11 +919,74 @@ _Returns_
 
 -   `boolean`: Whether the post can be saved.
 
+### isEditorPanelEnabled
+
+Returns true if the given panel is enabled, or false otherwise. Panels are enabled by default.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _panelName_ `string`: A string that identifies the panel.
+
+_Returns_
+
+-   `boolean`: Whether or not the panel is enabled.
+
+### isEditorPanelOpened
+
+Returns true if the given panel is open, or false otherwise. Panels are closed by default.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _panelName_ `string`: A string that identifies the panel.
+
+_Returns_
+
+-   `boolean`: Whether or not the panel is open.
+
+### isEditorPanelRemoved
+
+Returns true if the given panel was programmatically removed, or false otherwise. All panels are not removed by default.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _panelName_ `string`: A string that identifies the panel.
+
+_Returns_
+
+-   `boolean`: Whether or not the panel is removed.
+
 ### isFirstMultiSelectedBlock
 
 _Related_
 
 -   isFirstMultiSelectedBlock in core/block-editor store.
+
+### isInserterOpened
+
+Returns true if the inserter is opened.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: Whether the inserter is opened.
+
+### isListViewOpened
+
+Returns true if the list view is opened.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: Whether the list view is opened.
 
 ### isMultiSelecting
 
@@ -874,6 +1009,27 @@ _Returns_
 ### isPostAutosavingLocked
 
 Returns whether post autosaving is locked.
+
+_Usage_
+
+```jsx
+import { __ } from '@wordpress/i18n';
+import { store as editorStore } from '@wordpress/editor';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const isAutoSavingLocked = useSelect(
+		( select ) => select( editorStore ).isPostAutosavingLocked(),
+		[]
+	);
+
+	return isAutoSavingLocked ? (
+		<p>{ __( 'Post auto saving is locked' ) }</p>
+	) : (
+		<p>{ __( 'Post auto saving is not locked' ) }</p>
+	);
+};
+```
 
 _Parameters_
 
@@ -910,6 +1066,27 @@ _Returns_
 ### isPostSavingLocked
 
 Returns whether post saving is locked.
+
+_Usage_
+
+```jsx
+import { __ } from '@wordpress/i18n';
+import { store as editorStore } from '@wordpress/editor';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const isSavingLocked = useSelect(
+		( select ) => select( editorStore ).isPostSavingLocked(),
+		[]
+	);
+
+	return isSavingLocked ? (
+		<p>{ __( 'Post saving is locked' ) }</p>
+	) : (
+		<p>{ __( 'Post saving is not locked' ) }</p>
+	);
+};
+```
 
 _Parameters_
 
@@ -950,6 +1127,18 @@ Returns whether the pre-publish panel should be shown or skipped when the user c
 _Returns_
 
 -   `boolean`: Whether the pre-publish panel should be shown or not.
+
+### isPublishSidebarOpened
+
+Returns true if the publish sidebar is opened.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state
+
+_Returns_
+
+-   `boolean`: Whether the publish sidebar is open.
 
 ### isSavingNonPostEntityChanges
 
@@ -1005,13 +1194,22 @@ Action that autosaves the current post. This includes server-side autosaving (de
 
 _Parameters_
 
--   _options_ `Object?`: Extra flags to identify the autosave.
+-   _options_ `[Object]`: Extra flags to identify the autosave.
+-   _options.local_ `[boolean]`: Whether to perform a local autosave.
 
 ### clearSelectedBlock
 
 _Related_
 
 -   clearSelectedBlock in core/block-editor store.
+
+### closePublishSidebar
+
+Returns an action object used in signalling that the user closed the publish sidebar.
+
+_Returns_
+
+-   `Object`: Action object.
 
 ### createUndoLevel
 
@@ -1027,10 +1225,21 @@ Disables the publish sidebar.
 
 Returns an action object used in signalling that attributes of the post have been edited.
 
+_Usage_
+
+```js
+// Update the post title
+wp.data.dispatch( 'core/editor' ).editPost( { title: `${ newTitle }` } );
+```
+
 _Parameters_
 
 -   _edits_ `Object`: Post attributes to edit.
--   _options_ `Object`: Options for the edit.
+-   _options_ `[Object]`: Options for the edit.
+
+_Returns_
+
+-   `Object`: Action object
 
 ### enablePublishSidebar
 
@@ -1166,6 +1375,14 @@ _Related_
 
 -   multiSelect in core/block-editor store.
 
+### openPublishSidebar
+
+Returns an action object used in signalling that the user opened the publish sidebar.
+
+_Returns_
+
+-   `Object`: Action object
+
 ### receiveBlocks
 
 _Related_
@@ -1194,6 +1411,18 @@ _Related_
 
 -   removeBlocks in core/block-editor store.
 
+### removeEditorPanel
+
+Returns an action object used to remove a panel from the editor.
+
+_Parameters_
+
+-   _panelName_ `string`: A string that identifies the panel to remove.
+
+_Returns_
+
+-   `Object`: Action object.
+
 ### replaceBlock
 
 _Related_
@@ -1219,7 +1448,7 @@ Returns an action object used to signal that the blocks have been updated.
 _Parameters_
 
 -   _blocks_ `Array`: Block Array.
--   _options_ `?Object`: Optional options.
+-   _options_ `[Object]`: Optional options.
 
 ### resetPost
 
@@ -1233,13 +1462,79 @@ Action for saving the current post in the editor.
 
 _Parameters_
 
--   _options_ `Object`:
+-   _options_ `[Object]`:
 
 ### selectBlock
 
 _Related_
 
 -   selectBlock in core/block-editor store.
+
+### setDeviceType
+
+Action that changes the width of the editing canvas.
+
+_Parameters_
+
+-   _deviceType_ `string`:
+
+_Returns_
+
+-   `Object`: Action object.
+
+### setEditedPost
+
+Returns an action that sets the current post Type and post ID.
+
+_Parameters_
+
+-   _postType_ `string`: Post Type.
+-   _postId_ `string`: Post ID.
+
+_Returns_
+
+-   `Object`: Action object.
+
+### setIsInserterOpened
+
+Returns an action object used to open/close the inserter.
+
+_Parameters_
+
+-   _value_ `boolean|Object`: Whether the inserter should be opened (true) or closed (false). To specify an insertion point, use an object.
+-   _value.rootClientId_ `string`: The root client ID to insert at.
+-   _value.insertionIndex_ `number`: The index to insert at.
+-   _value.filterValue_ `string`: A query to filter the inserter results.
+-   _value.onSelect_ `Function`: A callback when an item is selected.
+-   _value.tab_ `string`: The tab to open in the inserter.
+-   _value.category_ `string`: The category to initialize in the inserter.
+
+_Returns_
+
+-   `Object`: Action object.
+
+### setIsListViewOpened
+
+Returns an action object used to open/close the list view.
+
+_Parameters_
+
+-   _isOpen_ `boolean`: A boolean representing whether the list view should be opened or closed.
+
+_Returns_
+
+-   `Object`: Action object.
+
+### setRenderingMode
+
+Returns an action used to set the rendering mode of the post editor. We support multiple rendering modes:
+
+-   `post-only`: This mode extracts the post blocks from the template and renders only those. The idea is to allow the user to edit the post/page in isolation without the wrapping template.
+-   `template-locked`: This mode renders both the template and the post blocks but the template blocks are locked and can't be edited. The post blocks are editable.
+
+_Parameters_
+
+-   _mode_ `string`: Mode (one of 'post-only' or 'template-locked').
 
 ### setTemplateValidity
 
@@ -1255,19 +1550,17 @@ _Parameters_
 
 -   _post_ `Object`: Post object.
 -   _edits_ `Object`: Initial edited attributes object.
--   _template_ `Array?`: Block Template.
+-   _template_ `[Array]`: Block Template.
 
 ### setupEditorState
 
-Returns an action object used to setup the editor state when first opening an editor.
+> **Deprecated**
+
+Setup the editor state.
 
 _Parameters_
 
 -   _post_ `Object`: Post object.
-
-_Returns_
-
--   `Object`: Action object.
 
 ### showInsertionPoint
 
@@ -1299,6 +1592,14 @@ _Related_
 
 -   stopTyping in core/block-editor store.
 
+### switchEditorMode
+
+Triggers an action used to switch editor mode.
+
+_Parameters_
+
+-   _mode_ `string`: The editor mode.
+
 ### synchronizeTemplate
 
 _Related_
@@ -1311,11 +1612,56 @@ _Related_
 
 -   toggleBlockMode in core/block-editor store.
 
+### toggleDistractionFree
+
+Action that toggles Distraction free mode. Distraction free mode expects there are no sidebars, as due to the z-index values set, you can't close sidebars.
+
+_Parameters_
+
+-   _options_ `[Object]`: Optional configuration object
+-   _options.createNotice_ `[boolean]`: Whether to create a notice
+
+### toggleEditorPanelEnabled
+
+Returns an action object used to enable or disable a panel in the editor.
+
+_Parameters_
+
+-   _panelName_ `string`: A string that identifies the panel to enable or disable.
+
+_Returns_
+
+-   `Object`: Action object.
+
+### toggleEditorPanelOpened
+
+Opens a closed panel and closes an open panel.
+
+_Parameters_
+
+-   _panelName_ `string`: A string that identifies the panel to open or close.
+
+### togglePublishSidebar
+
+Returns an action object used in signalling that the user toggles the publish sidebar.
+
+_Returns_
+
+-   `Object`: Action object
+
 ### toggleSelection
 
 _Related_
 
 -   toggleSelection in core/block-editor store.
+
+### toggleSpotlightMode
+
+Action that toggles the Spotlight Mode view option.
+
+### toggleTopToolbar
+
+Action that toggles the Top Toolbar view option.
 
 ### trashPost
 

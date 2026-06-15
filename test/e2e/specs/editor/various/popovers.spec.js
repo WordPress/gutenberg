@@ -14,14 +14,14 @@ test.describe( 'popovers', () => {
 			const moreMenuToggleButton = page.locator(
 				'role=button[name="Options"i]'
 			);
-			await expect( moreMenu ).not.toBeVisible();
+			await expect( moreMenu ).toBeHidden();
 			// Toggle opened.
 			await moreMenuToggleButton.click();
 			await expect( moreMenu ).toBeVisible();
 
 			// Toggle closed.
 			await moreMenuToggleButton.click();
-			await expect( moreMenu ).not.toBeVisible();
+			await expect( moreMenu ).toBeHidden();
 		} );
 	} );
 } );

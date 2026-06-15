@@ -1,5 +1,5 @@
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"color": {
 			"palette": [
@@ -12,6 +12,11 @@
 		}
 	},
 	"styles": {
+		"background": {
+			"backgroundImage": {
+				"url": "file:./img/1024x768_emptytheme_test_image.jpg"
+			}
+		},
 		"blocks": {
 			"core/post-title": {
 				"typography": {

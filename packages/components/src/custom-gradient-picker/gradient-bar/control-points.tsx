@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import { colord } from 'colord';
 
 /**
@@ -34,7 +34,7 @@ import {
 	MINIMUM_SIGNIFICANT_MOVE,
 	KEYBOARD_CONTROL_POINT_VARIATION,
 } from './constants';
-import type { WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
 import type {
 	ControlPointButtonProps,
 	ControlPointMoveState,
@@ -42,6 +42,7 @@ import type {
 	InsertPointProps,
 } from '../types';
 import type { CustomColorPickerDropdownProps } from '../../color-palette/types';
+import DropdownContentWrapper from '../../dropdown/dropdown-content-wrapper';
 
 function ControlPointButton( {
 	isOpen,
@@ -55,9 +56,9 @@ function ControlPointButton( {
 		<>
 			<Button
 				aria-label={ sprintf(
-					// translators: %1$s: gradient position e.g: 70, %2$s: gradient color code e.g: rgb(52,121,151).
+					// translators: 1: gradient position e.g: 70. 2: gradient color code e.g: rgb(52,121,151).
 					__(
-						'Gradient control point at position %1$s%% with color code %2$s.'
+						'Gradient control point at position %1$d%% with color code %2$s.'
 					),
 					position,
 					color
@@ -65,7 +66,8 @@ function ControlPointButton( {
 				aria-describedby={ descriptionId }
 				aria-haspopup="true"
 				aria-expanded={ isOpen }
-				className={ classnames(
+				__next40pxDefaultSize
+				className={ clsx(
 					'components-custom-gradient-picker__control-point-button',
 					{
 						'is-active': isOpen,
@@ -93,11 +95,15 @@ function GradientColorPickerDropdown( {
 			( {
 				placement: 'bottom',
 				offset: 8,
-			} as const ),
+				// Disabling resize as it would otherwise cause the popover to show
+				// scrollbars while dragging the color picker's handle close to the
+				// popover edge.
+				resize: false,
+			} ) as const,
 		[]
 	);
 
-	const mergedClassName = classnames(
+	const mergedClassName = clsx(
 		'components-custom-gradient-picker__control-point-dropdown',
 		className
 	);
@@ -123,11 +129,12 @@ function ControlPoints( {
 	onStopControlPointChange,
 	__experimentalIsRenderedInSidebar,
 }: ControlPointsProps ) {
-	const controlPointMoveState = useRef< ControlPointMoveState >();
+	const controlPointMoveStateRef =
+		useRef< ControlPointMoveState >( undefined );
 
 	const onMouseMove = ( event: MouseEvent ) => {
 		if (
-			controlPointMoveState.current === undefined ||
+			controlPointMoveStateRef.current === undefined ||
 			gradientPickerDomRef.current === null
 		) {
 			return;
@@ -139,14 +146,14 @@ function ControlPoints( {
 		);
 
 		const { initialPosition, index, significantMoveHappened } =
-			controlPointMoveState.current;
+			controlPointMoveStateRef.current;
 
 		if (
 			! significantMoveHappened &&
 			Math.abs( initialPosition - relativePosition ) >=
 				MINIMUM_SIGNIFICANT_MOVE
 		) {
-			controlPointMoveState.current.significantMoveHappened = true;
+			controlPointMoveStateRef.current.significantMoveHappened = true;
 		}
 
 		onChange(
@@ -158,20 +165,20 @@ function ControlPoints( {
 		if (
 			window &&
 			window.removeEventListener &&
-			controlPointMoveState.current &&
-			controlPointMoveState.current.listenersActivated
+			controlPointMoveStateRef.current &&
+			controlPointMoveStateRef.current.listenersActivated
 		) {
 			window.removeEventListener( 'mousemove', onMouseMove );
 			window.removeEventListener( 'mouseup', cleanEventListeners );
 			onStopControlPointChange();
-			controlPointMoveState.current.listenersActivated = false;
+			controlPointMoveStateRef.current.listenersActivated = false;
 		}
 	};
 
 	// Adding `cleanEventListeners` to the dependency array below requires the function itself to be wrapped in a `useCallback`
 	// This memoization would prevent the event listeners from being properly cleaned.
 	// Instead, we'll pass a ref to the function in our `useEffect` so `cleanEventListeners` itself is no longer a dependency.
-	const cleanEventListenersRef = useRef< () => void >();
+	const cleanEventListenersRef = useRef< () => void >( undefined );
 	cleanEventListenersRef.current = cleanEventListeners;
 
 	useEffect( () => {
@@ -197,8 +204,8 @@ function ControlPoints( {
 									key={ index }
 									onClick={ () => {
 										if (
-											controlPointMoveState.current &&
-											controlPointMoveState.current
+											controlPointMoveStateRef.current &&
+											controlPointMoveStateRef.current
 												.significantMoveHappened
 										) {
 											return;
@@ -215,7 +222,7 @@ function ControlPoints( {
 											window &&
 											window.addEventListener
 										) {
-											controlPointMoveState.current = {
+											controlPointMoveStateRef.current = {
 												initialPosition,
 												index,
 												significantMoveHappened: false,
@@ -271,7 +278,7 @@ function ControlPoints( {
 								/>
 							) }
 							renderContent={ ( { onClose } ) => (
-								<>
+								<DropdownContentWrapper paddingSize="none">
 									<ColorPicker
 										enableAlpha={ ! disableAlpha }
 										color={ point.color }
@@ -311,7 +318,7 @@ function ControlPoints( {
 												</Button>
 											</HStack>
 										) }
-								</>
+								</DropdownContentWrapper>
 							) }
 							style={ {
 								left: `${ point.position }%`,
@@ -344,6 +351,7 @@ function InsertPoint( {
 			} }
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Button
+					__next40pxDefaultSize
 					aria-expanded={ isOpen }
 					aria-haspopup="true"
 					onClick={ () => {
@@ -360,29 +368,31 @@ function InsertPoint( {
 				/>
 			) }
 			renderContent={ () => (
-				<ColorPicker
-					enableAlpha={ ! disableAlpha }
-					onChange={ ( color ) => {
-						if ( ! alreadyInsertedPoint ) {
-							onChange(
-								addControlPoint(
-									controlPoints,
-									insertPosition,
-									colord( color ).toRgbString()
-								)
-							);
-							setAlreadyInsertedPoint( true );
-						} else {
-							onChange(
-								updateControlPointColorByPosition(
-									controlPoints,
-									insertPosition,
-									colord( color ).toRgbString()
-								)
-							);
-						}
-					} }
-				/>
+				<DropdownContentWrapper paddingSize="none">
+					<ColorPicker
+						enableAlpha={ ! disableAlpha }
+						onChange={ ( color ) => {
+							if ( ! alreadyInsertedPoint ) {
+								onChange(
+									addControlPoint(
+										controlPoints,
+										insertPosition,
+										colord( color ).toRgbString()
+									)
+								);
+								setAlreadyInsertedPoint( true );
+							} else {
+								onChange(
+									updateControlPointColorByPosition(
+										controlPoints,
+										insertPosition,
+										colord( color ).toRgbString()
+									)
+								);
+							}
+						} }
+					/>
+				</DropdownContentWrapper>
 			) }
 			style={
 				insertPosition !== null

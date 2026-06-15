@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/style-engine",
-	"version": "1.21.0",
+	"version": "2.48.0",
 	"description": "A suite of parsers and compilers for WordPress styles.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -21,15 +21,50 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=12"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
-	"main": "build/index.js",
-	"module": "build-module/index.js",
-	"react-native": "src/index",
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"wpScript": true,
+	"wpCopyFiles": {
+		"files": [
+			"src/*.php"
+		],
+		"transforms": {
+			"php": {
+				"functionPrefix": "gutenberg_",
+				"classSuffix": "_Gutenberg",
+				"suffixClasses": [
+					"WP_Style_Engine_CSS_Declarations",
+					"WP_Style_Engine_CSS_Rules_Store",
+					"WP_Style_Engine_CSS_Rule",
+					"WP_Style_Engine_Processor",
+					"WP_Style_Engine"
+				],
+				"filenameSuffix": "-gutenberg"
+			}
+		}
+	},
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "^7.16.0",
+		"@types/react": "^18.3.27",
 		"change-case": "^4.1.2"
 	},
 	"publishConfig": {

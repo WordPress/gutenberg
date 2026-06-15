@@ -17,7 +17,10 @@ const { checkPort, checkVersion, checkString } = require( './validate-config' );
  *
  * @typedef WPEnvironmentVariableConfig
  * @property {?number}                  port             An override for the development environment's port.
+ * @property {?number}                  mysqlPort        An override for the development environment's MySQL port.
  * @property {?number}                  testsPort        An override for the testing environment's port.
+ * @property {?number}                  testsMysqlPort   An override for the testing environment's MySQL port.
+ * @property {?number}                  phpmyadminPort   An override for the development environment's phpMyAdmin port.
  * @property {?WPSource}                coreSource       An override for all environment's coreSource.
  * @property {?string}                  phpVersion       An override for all environment's PHP version.
  * @property {?Object.<string, string>} lifecycleScripts An override for various lifecycle scripts.
@@ -33,7 +36,17 @@ const { checkPort, checkVersion, checkString } = require( './validate-config' );
 module.exports = function getConfigFromEnvironmentVars( cacheDirectoryPath ) {
 	const environmentConfig = {
 		port: getPortFromEnvironmentVariable( 'WP_ENV_PORT' ),
+		mysqlPort: getPortFromEnvironmentVariable( 'WP_ENV_MYSQL_PORT' ),
 		testsPort: getPortFromEnvironmentVariable( 'WP_ENV_TESTS_PORT' ),
+		testsMysqlPort: getPortFromEnvironmentVariable(
+			'WP_ENV_TESTS_MYSQL_PORT'
+		),
+		phpmyadminPort: getPortFromEnvironmentVariable(
+			'WP_ENV_PHPMYADMIN_PORT'
+		),
+		testsPhpmyadminPort: getPortFromEnvironmentVariable(
+			'WP_ENV_TESTS_PHPMYADMIN_PORT'
+		),
 		lifecycleScripts: getLifecycleScriptOverrides(),
 	};
 
@@ -90,6 +103,8 @@ function getLifecycleScriptOverrides() {
 	const lifecycleEnvironmentVars = {
 		WP_ENV_LIFECYCLE_SCRIPT_AFTER_START: 'afterStart',
 		WP_ENV_LIFECYCLE_SCRIPT_AFTER_CLEAN: 'afterClean',
+		WP_ENV_LIFECYCLE_SCRIPT_AFTER_RESET: 'afterReset',
+		WP_ENV_LIFECYCLE_SCRIPT_AFTER_CLEANUP: 'afterCleanup',
 		WP_ENV_LIFECYCLE_SCRIPT_AFTER_DESTROY: 'afterDestroy',
 	};
 	for ( const envVar in lifecycleEnvironmentVars ) {

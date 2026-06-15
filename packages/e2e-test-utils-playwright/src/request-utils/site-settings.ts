@@ -19,6 +19,9 @@ type SiteSettings = {
 	posts_per_page: number;
 	default_ping_status: 'open' | 'closed';
 	default_comment_status: 'open' | 'closed';
+	show_on_front: 'posts' | 'page';
+	page_on_front: number;
+	page_for_posts: number;
 };
 
 /**

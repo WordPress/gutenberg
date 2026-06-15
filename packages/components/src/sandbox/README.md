@@ -54,3 +54,9 @@ The CSS class name to apply to the `<html>` and `<body>` elements of the iframe.
 
 -   Required: No
 -   Default: ""
+
+### `tabIndex`: `HTMLElement[ 'tabIndex' ]`
+
+The `tabindex` the iframe should receive.
+
+-   Required: No

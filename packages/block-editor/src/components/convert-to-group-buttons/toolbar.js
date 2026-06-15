@@ -4,7 +4,7 @@
 import { useDispatch, useSelect } from '@wordpress/data';
 import { switchToBlockType, store as blocksStore } from '@wordpress/blocks';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
-import { group, row, stack } from '@wordpress/icons';
+import { group, row, stack, grid } from '@wordpress/icons';
 import { _x } from '@wordpress/i18n';
 
 /**
@@ -17,6 +17,7 @@ const layouts = {
 	group: { type: 'constrained' },
 	row: { type: 'flex', flexWrap: 'nowrap' },
 	stack: { type: 'flex', orientation: 'vertical' },
+	grid: { type: 'grid' },
 };
 
 function BlockGroupToolbar() {
@@ -60,6 +61,7 @@ function BlockGroupToolbar() {
 
 	const onConvertToRow = () => onConvertToGroup( 'row' );
 	const onConvertToStack = () => onConvertToGroup( 'stack' );
+	const onConvertToGrid = () => onConvertToGroup( 'grid' );
 
 	// Don't render the button if the current selection cannot be grouped.
 	// A good example is selecting multiple button blocks within a Buttons block:
@@ -75,26 +77,36 @@ function BlockGroupToolbar() {
 	const canInsertStack = !! variations.find(
 		( { name } ) => name === 'group-stack'
 	);
+	const canInsertGrid = !! variations.find(
+		( { name } ) => name === 'group-grid'
+	);
 
 	return (
 		<ToolbarGroup>
 			<ToolbarButton
 				icon={ group }
-				label={ _x( 'Group', 'verb' ) }
+				label={ _x( 'Group', 'action: convert blocks to group' ) }
 				onClick={ onConvertToGroup }
 			/>
 			{ canInsertRow && (
 				<ToolbarButton
 					icon={ row }
-					label={ _x( 'Row', 'single horizontal line' ) }
+					label={ _x( 'Row', 'action: convert blocks to row' ) }
 					onClick={ onConvertToRow }
 				/>
 			) }
 			{ canInsertStack && (
 				<ToolbarButton
 					icon={ stack }
-					label={ _x( 'Stack', 'verb' ) }
+					label={ _x( 'Stack', 'action: convert blocks to stack' ) }
 					onClick={ onConvertToStack }
+				/>
+			) }
+			{ canInsertGrid && (
+				<ToolbarButton
+					icon={ grid }
+					label={ _x( 'Grid', 'action: convert blocks to grid' ) }
+					onClick={ onConvertToGrid }
 				/>
 			) }
 		</ToolbarGroup>

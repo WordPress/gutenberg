@@ -6,11 +6,11 @@ import { __ } from '@wordpress/i18n';
 import { navigation, Icon } from '@wordpress/icons';
 import { speak } from '@wordpress/a11y';
 import { useEffect } from '@wordpress/element';
+import { useEntityRecords } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
-import useNavigationEntities from '../../use-navigation-entities';
 import PlaceholderPreview from './placeholder-preview';
 import NavigationMenuSelector from '../navigation-menu-selector';
 
@@ -18,13 +18,14 @@ export default function NavigationPlaceholder( {
 	isSelected,
 	currentMenuId,
 	clientId,
-	canUserCreateNavigationMenu = false,
-	isResolvingCanUserCreateNavigationMenu,
+	canUserCreateNavigationMenus = false,
+	isResolvingCanUserCreateNavigationMenus,
 	onSelectNavigationMenu,
 	onSelectClassicMenu,
 	onCreateEmpty,
 } ) {
-	const { isResolvingMenus, hasResolvedMenus } = useNavigationEntities();
+	const { isResolving: isResolvingMenus, hasResolved: hasResolvedMenus } =
+		useEntityRecords( 'root', 'menu', { per_page: -1, context: 'view' } );
 
 	useEffect( () => {
 		if ( ! isSelected ) {
@@ -32,7 +33,7 @@ export default function NavigationPlaceholder( {
 		}
 
 		if ( isResolvingMenus ) {
-			speak( __( 'Loading Navigation block setup options.' ) );
+			speak( __( 'Loading navigation block setup options…' ) );
 		}
 
 		if ( hasResolvedMenus ) {
@@ -41,7 +42,7 @@ export default function NavigationPlaceholder( {
 	}, [ hasResolvedMenus, isResolvingMenus, isSelected ] );
 
 	const isResolvingActions =
-		isResolvingMenus && isResolvingCanUserCreateNavigationMenu;
+		isResolvingMenus && isResolvingCanUserCreateNavigationMenus;
 
 	return (
 		<>
@@ -74,8 +75,9 @@ export default function NavigationPlaceholder( {
 
 						<hr />
 
-						{ canUserCreateNavigationMenu && (
+						{ canUserCreateNavigationMenus && (
 							<Button
+								__next40pxDefaultSize
 								variant="tertiary"
 								onClick={ onCreateEmpty }
 							>

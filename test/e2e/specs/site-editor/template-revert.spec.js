@@ -14,16 +14,27 @@ test.describe( 'Template Revert', () => {
 		await requestUtils.activateTheme( 'emptytheme' );
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
+		// Document-Isolation-Policy places the editor in its own agent cluster.
+		// Template revert involves visitSiteEditor() page navigations to pages
+		// without the DIP header, creating an agent cluster mismatch that breaks
+		// cross-window communication.
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 	} );
+
+	test.beforeEach( async ( { admin, requestUtils } ) => {
+		await requestUtils.deleteAllTemplates( 'wp_template' );
+		await admin.visitSiteEditor( { canvas: 'edit' } );
+	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
 		await requestUtils.activateTheme( 'twentytwentyone' );
-	} );
-	test.beforeEach( async ( { admin, requestUtils, editor } ) => {
-		await requestUtils.deleteAllTemplates( 'wp_template' );
-		await admin.visitSiteEditor();
-		await editor.canvas.click( 'body' );
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 	} );
 
 	test( 'should delete the template after saving the reverted template', async ( {
@@ -35,9 +46,10 @@ test.describe( 'Template Revert', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Test' },
 		} );
-		await editor.saveSiteEditorEntities();
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty: true,
+		} );
 		await templateRevertUtils.revertTemplate();
-		await editor.saveSiteEditorEntities();
 
 		const isTemplateTabVisible = await page
 			.locator(
@@ -55,7 +67,7 @@ test.describe( 'Template Revert', () => {
 			page.locator(
 				'role=region[name="Editor settings"i] >> role=button[name="Actions"i]'
 			)
-		).not.toBeVisible();
+		).toBeDisabled();
 	} );
 
 	test( 'should show the original content after revert', async ( {
@@ -69,9 +81,10 @@ test.describe( 'Template Revert', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Test' },
 		} );
-		await editor.saveSiteEditorEntities();
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty: true,
+		} );
 		await templateRevertUtils.revertTemplate();
-		await editor.saveSiteEditorEntities();
 
 		const contentAfter =
 			await templateRevertUtils.getCurrentSiteEditorContent();
@@ -90,9 +103,10 @@ test.describe( 'Template Revert', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Test' },
 		} );
-		await editor.saveSiteEditorEntities();
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty: true,
+		} );
 		await templateRevertUtils.revertTemplate();
-		await editor.saveSiteEditorEntities();
 		await admin.visitSiteEditor();
 
 		const contentAfter =
@@ -109,13 +123,14 @@ test.describe( 'Template Revert', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Test' },
 		} );
-		await editor.saveSiteEditorEntities();
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty: true,
+		} );
 		const contentBefore =
 			await templateRevertUtils.getCurrentSiteEditorContent();
 
 		// Revert template and check state.
 		await templateRevertUtils.revertTemplate();
-		await editor.saveSiteEditorEntities();
 		const contentAfterSave =
 			await templateRevertUtils.getCurrentSiteEditorContent();
 		expect( contentAfterSave ).not.toEqual( contentBefore );
@@ -127,32 +142,6 @@ test.describe( 'Template Revert', () => {
 		const contentAfterUndo =
 			await templateRevertUtils.getCurrentSiteEditorContent();
 		expect( contentAfterUndo ).toEqual( contentBefore );
-	} );
-
-	test( 'should show the edited content after revert and clicking undo in the notice', async ( {
-		editor,
-		page,
-		templateRevertUtils,
-	} ) => {
-		await editor.insertBlock( {
-			name: 'core/paragraph',
-			attributes: { content: 'Test' },
-		} );
-		await editor.saveSiteEditorEntities();
-		const contentBefore =
-			await templateRevertUtils.getCurrentSiteEditorContent();
-
-		await templateRevertUtils.revertTemplate();
-		await editor.saveSiteEditorEntities();
-
-		// Click the snackbar "Undo" button.
-		await page.click(
-			'role=button[name="Dismiss this notice"i] >> role=button[name="Undo"i]'
-		);
-
-		const contentAfter =
-			await templateRevertUtils.getCurrentSiteEditorContent();
-		expect( contentAfter ).toEqual( contentBefore );
 	} );
 
 	test( 'should show the original content after revert, clicking undo then redo in the header toolbar', async ( {
@@ -167,9 +156,10 @@ test.describe( 'Template Revert', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Test' },
 		} );
-		await editor.saveSiteEditorEntities();
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty: true,
+		} );
 		await templateRevertUtils.revertTemplate();
-		await editor.saveSiteEditorEntities();
 		await page.click(
 			'role=region[name="Editor top bar"i] >> role=button[name="Undo"i]'
 		);
@@ -187,43 +177,6 @@ test.describe( 'Template Revert', () => {
 		expect( contentAfterRedo ).toEqual( contentBefore );
 	} );
 
-	test( 'should show the original content after revert, clicking undo in the notice then undo in the header toolbar', async ( {
-		editor,
-		page,
-		templateRevertUtils,
-	} ) => {
-		const contentBefore =
-			await templateRevertUtils.getCurrentSiteEditorContent();
-
-		await editor.insertBlock( {
-			name: 'core/paragraph',
-			attributes: { content: 'Test' },
-		} );
-		await editor.saveSiteEditorEntities();
-		await templateRevertUtils.revertTemplate();
-		await editor.saveSiteEditorEntities();
-
-		// Click undo in the snackbar. This reverts revert template action.
-		await page.click(
-			'role=button[name="Dismiss this notice"i] >> role=button[name="Undo"i]'
-		);
-
-		//Check we have dummy content.
-		const contentAfterFirstUndo =
-			await templateRevertUtils.getCurrentSiteEditorContent();
-		expect( contentAfterFirstUndo ).not.toEqual( contentBefore );
-
-		// Click undo again, this time in the header. Reverts initial dummy content.
-		await page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Undo"i]'
-		);
-
-		// Check dummy content is gone.
-		const contentAfterSecondUndo =
-			await templateRevertUtils.getCurrentSiteEditorContent();
-		expect( contentAfterSecondUndo ).toEqual( contentBefore );
-	} );
-
 	test( 'should show the edited content after revert, clicking undo in the header toolbar, save and reload', async ( {
 		admin,
 		editor,
@@ -234,50 +187,26 @@ test.describe( 'Template Revert', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Test' },
 		} );
-		await editor.saveSiteEditorEntities();
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty: true,
+		} );
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.getByText( /(updated|published)\./ )
+			.click();
 		const contentBefore =
 			await templateRevertUtils.getCurrentSiteEditorContent();
 
 		await templateRevertUtils.revertTemplate();
-		await editor.saveSiteEditorEntities();
 
 		await page.click(
 			'role=region[name="Editor top bar"i] >> role=button[name="Undo"i]'
 		);
-
-		await editor.saveSiteEditorEntities();
-
-		await admin.visitSiteEditor();
-
-		const contentAfter =
-			await templateRevertUtils.getCurrentSiteEditorContent();
-		expect( contentAfter ).toEqual( contentBefore );
-	} );
-
-	test( 'should show the edited content after revert, clicking undo in the notice and reload', async ( {
-		admin,
-		editor,
-		page,
-		templateRevertUtils,
-	} ) => {
-		await editor.insertBlock( {
-			name: 'core/paragraph',
-			attributes: { content: 'Test' },
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty: true,
 		} );
-		await editor.saveSiteEditorEntities();
-		const contentBefore =
-			await templateRevertUtils.getCurrentSiteEditorContent();
-
-		await templateRevertUtils.revertTemplate();
-		await editor.saveSiteEditorEntities();
-
-		await page.click(
-			'role=button[name="Dismiss this notice"i] >> role=button[name="Undo"i]'
-		);
-
-		await editor.saveSiteEditorEntities();
 		await admin.visitSiteEditor();
-		await editor.canvas.click( 'body' );
+
 		const contentAfter =
 			await templateRevertUtils.getCurrentSiteEditorContent();
 		expect( contentAfter ).toEqual( contentBefore );
@@ -294,46 +223,27 @@ class TemplateRevertUtils {
 		await this.editor.openDocumentSettingsSidebar();
 		const isTemplateTabVisible = await this.page
 			.locator(
-				'role=region[name="Editor settings"i] >> role=button[name="Template"i]'
+				'role=region[name="Editor settings"i] >> role=tab[name="Template"i]'
 			)
 			.isVisible();
 		if ( isTemplateTabVisible ) {
 			await this.page.click(
-				'role=region[name="Editor settings"i] >> role=button[name="Template"i]'
+				'role=region[name="Editor settings"i] >> role=tab[name="Template"i]'
 			);
 		}
 		await this.page.click(
 			'role=region[name="Editor settings"i] >> role=button[name="Actions"i]'
 		);
-		await this.page.click( 'role=menuitem[name=/Clear customizations/i]' );
+		await this.page.click( 'role=menuitem[name=/Reset/i]' );
+		await this.page.getByRole( 'button', { name: 'Reset' } ).click();
 		await this.page.waitForSelector(
-			'role=button[name="Dismiss this notice"i] >> text="Template reverted."'
+			'role=button[name="Dismiss this notice"i] >> text=/ reset./'
 		);
 	}
 
 	async getCurrentSiteEditorContent() {
-		return this.page.evaluate( () => {
-			const postId = window.wp.data
-				.select( 'core/edit-site' )
-				.getEditedPostId();
-			const postType = window.wp.data
-				.select( 'core/edit-site' )
-				.getEditedPostType();
-			const record = window.wp.data
-				.select( 'core' )
-				.getEditedEntityRecord( 'postType', postType, postId );
-			if ( record ) {
-				if ( typeof record.content === 'function' ) {
-					return record.content( record );
-				} else if ( record.blocks ) {
-					return window.wp.blocks.__unstableSerializeAndClean(
-						record.blocks
-					);
-				} else if ( record.content ) {
-					return record.content;
-				}
-			}
-			return '';
-		} );
+		return this.page.evaluate( () =>
+			window.wp.data.select( 'core/editor' ).getEditedPostContent()
+		);
 	}
 }

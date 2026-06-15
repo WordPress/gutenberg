@@ -8,7 +8,7 @@ import type { ReactNode } from 'react';
  */
 import type { Props as IconProps } from '../icon';
 import type { PopoverProps } from '../popover/types';
-import type { WordPressComponentProps } from '../ui/context/wordpress-component';
+import type { WordPressComponentProps } from '../context/wordpress-component';
 
 export type ButtonProps =
 	| WordPressComponentProps< ButtonAsButtonProps, 'button', false >
@@ -26,17 +26,26 @@ type BaseButtonProps = {
 	 */
 	__next40pxDefaultSize?: boolean;
 	/**
+	 * Whether to keep the button focusable when disabled.
+	 *
+	 * In most cases, it is recommended to set this to `true`. Disabling a control without maintaining focusability
+	 * can cause accessibility issues, by hiding their presence from screen reader users,
+	 * or by preventing focus from returning to a trigger element.
+	 *
+	 * Learn more about the [focusability of disabled controls](https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/#focusabilityofdisabledcontrols)
+	 * in the WAI-ARIA Authoring Practices Guide.
+	 *
+	 * @default false
+	 */
+	accessibleWhenDisabled?: boolean;
+	/**
 	 * The button's children.
 	 */
 	children?: ReactNode;
 	/**
-	 * An accessible description for the button.
+	 * A visually hidden accessible description for the button.
 	 */
-	describedBy?: string;
-	/**
-	 * Whether the button is focused.
-	 */
-	focus?: boolean;
+	description?: string;
 	/**
 	 * If provided, renders an Icon component inside the button.
 	 */
@@ -65,15 +74,6 @@ type BaseButtonProps = {
 	 * Renders a pressed button style.
 	 */
 	isPressed?: boolean;
-	// TODO: Deprecate officially (add console warning and move to DeprecatedButtonProps).
-	/**
-	 * Decreases the size of the button.
-	 *
-	 * Deprecated in favor of the `size` prop. If both props are defined, the `size` prop will take precedence.
-	 *
-	 * @deprecated Use the `'small'` value on the `size` prop instead.
-	 */
-	isSmall?: boolean;
 	/**
 	 * Sets the `aria-label` of the component, if none is provided.
 	 * Sets the Tooltip content if `showTooltip` is provided.
@@ -111,31 +111,33 @@ type BaseButtonProps = {
 	tooltipPosition?: PopoverProps[ 'position' ];
 	/**
 	 * Specifies the button's style.
+	 *
 	 * The accepted values are:
-	 * 'primary' (the primary button styles)
-	 * 'secondary' (the default button styles)
-	 * 'tertiary' (the text-based button styles)
-	 * 'link' (the link button styles)
+	 *
+	 * 1. `'primary'` (the primary button styles)
+	 * 2. `'secondary'` (the default button styles)
+	 * 3. `'tertiary'` (the text-based button styles)
+	 * 4. `'link'` (the link button styles)
 	 */
 	variant?: 'primary' | 'secondary' | 'tertiary' | 'link';
-	/**
-	 * Whether this is focusable.
-	 */
-	__experimentalIsFocusable?: boolean;
 };
 
 type _ButtonProps = {
 	/**
-	 * Whether the button is disabled.
-	 * If `true`, this will force a `button` element to be rendered.
+	 * Whether the button is disabled. If `true`, this will force a `button` element
+	 * to be rendered, even when an `href` is given.
+	 *
+	 * In most cases, it is recommended to also set the `accessibleWhenDisabled` prop to `true`.
 	 */
 	disabled?: boolean;
 };
 
 type AnchorProps = {
 	/**
-	 * Whether the button is disabled.
-	 * If `true`, this will force a `button` element to be rendered.
+	 * Whether the button is disabled. If `true`, this will force a `button` element
+	 * to be rendered, even when an `href` is given.
+	 *
+	 * In most cases, it is recommended to also set the `accessibleWhenDisabled` prop to `true`.
 	 */
 	disabled?: false;
 	/**
@@ -149,11 +151,63 @@ type AnchorProps = {
 };
 
 export type DeprecatedButtonProps = {
+	/**
+	 * Whether to keep the button focusable when disabled.
+	 *
+	 * @default false
+	 * @deprecated Use the `accessibleWhenDisabled` prop instead.
+	 * @ignore
+	 */
+	__experimentalIsFocusable?: boolean;
+	/**
+	 * Gives the button a default style.
+	 *
+	 * @deprecated Use the `'secondary'` value on the `variant` prop instead.
+	 * @ignore
+	 */
 	isDefault?: boolean;
+	/**
+	 * Gives the button a link style.
+	 *
+	 * @deprecated Use the `'link'` value on the `variant` prop instead.
+	 * @ignore
+	 */
 	isLink?: boolean;
+	/**
+	 * Gives the button a primary style.
+	 *
+	 * @deprecated Use the `'primary'` value on the `variant` prop instead.
+	 * @ignore
+	 */
 	isPrimary?: boolean;
+	/**
+	 * Gives the button a default style.
+	 *
+	 * @deprecated Use the `'secondary'` value on the `variant` prop instead.
+	 * @ignore
+	 */
 	isSecondary?: boolean;
+	/**
+	 * Gives the button a text-based style.
+	 *
+	 * @deprecated Use the `'tertiary'` value on the `variant` prop instead.
+	 * @ignore
+	 */
 	isTertiary?: boolean;
+	/**
+	 * Decreases the size of the button.
+	 *
+	 * @deprecated Use the `'small'` value on the `size` prop instead.
+	 * @ignore
+	 */
+	isSmall?: boolean;
+	/**
+	 * A visually hidden accessible description for the button.
+	 *
+	 * @deprecated Use the `description` prop instead.
+	 * @ignore
+	 */
+	describedBy?: string;
 };
 
 export type DeprecatedIconButtonProps = {

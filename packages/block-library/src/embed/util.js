@@ -1,19 +1,20 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames/dedupe';
+import clsx from 'clsx';
 import memoize from 'memize';
 
 /**
  * WordPress dependencies
  */
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { renderToString } from '@wordpress/element';
 import {
 	createBlock,
 	getBlockType,
 	getBlockVariations,
 } from '@wordpress/blocks';
+import { getAuthority } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -23,7 +24,7 @@ import { ASPECT_RATIOS, WP_EMBED_TYPE } from './constants';
 import { unlock } from '../lock-unlock';
 
 const { name: DEFAULT_EMBED_BLOCK } = metadata;
-const { kebabCase } = unlock( blockEditorPrivateApis );
+const { kebabCase } = unlock( componentsPrivateApis );
 
 /** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
 
@@ -42,7 +43,7 @@ export const getEmbedInfoByProvider = ( provider ) =>
  * Returns true if any of the regular expressions match the URL.
  *
  * @param {string} url      The URL to test.
- * @param {Array}  patterns The list of regular expressions to test agains.
+ * @param {Array}  patterns The list of regular expressions to test against.
  * @return {boolean} True if any of the regular expressions match the URL.
  */
 export const matchesPatterns = ( url, patterns = [] ) =>
@@ -59,6 +60,22 @@ export const findMoreSuitableBlock = ( url ) =>
 	getBlockVariations( DEFAULT_EMBED_BLOCK )?.find( ( { patterns } ) =>
 		matchesPatterns( url, patterns )
 	);
+
+/**
+ * Rewrites `x.com` URLs to `twitter.com` as a workaround while the
+ * WordPress oEmbed registry lacks an X provider. See: https://core.trac.wordpress.org/ticket/59142.
+ *
+ * @param {string} url The URL to rewrite.
+ * @return {string} The (possibly) rewritten URL.
+ */
+export function rewriteXToTwitter( url ) {
+	if ( ! url || getAuthority( url ) !== 'x.com' ) {
+		return url;
+	}
+	const rewritten = new URL( url );
+	rewritten.host = 'twitter.com';
+	return rewritten.toString();
+}
 
 export const isFromWordPress = ( html ) =>
 	html && html.includes( 'class="wp-embedded-content"' );
@@ -98,7 +115,9 @@ export const createUpgradedEmbedBlock = (
 	const { preview, attributes = {} } = props;
 	const { url, providerNameSlug, type, ...restAttributes } = attributes;
 
-	if ( ! url || ! getBlockType( DEFAULT_EMBED_BLOCK ) ) return;
+	if ( ! url || ! getBlockType( DEFAULT_EMBED_BLOCK ) ) {
+		return;
+	}
 
 	const matchedBlock = findMoreSuitableBlock( url );
 
@@ -176,18 +195,37 @@ export const removeAspectRatioClasses = ( existingClassNames ) => {
 	if ( ! existingClassNames ) {
 		// Avoids extraneous work and also, by returning the same value as
 		// received, ensures the post is not dirtied by a change of the block
-		// attribute from `undefined` to an emtpy string.
+		// attribute from `undefined` to an empty string.
 		return existingClassNames;
 	}
 	const aspectRatioClassNames = ASPECT_RATIOS.reduce(
 		( accumulator, { className } ) => {
-			accumulator[ className ] = false;
+			accumulator.push( className );
 			return accumulator;
 		},
-		{ 'wp-has-aspect-ratio': false }
+		[ 'wp-has-aspect-ratio' ]
 	);
-	return classnames( existingClassNames, aspectRatioClassNames );
+	let outputClassNames = existingClassNames;
+	for ( const className of aspectRatioClassNames ) {
+		outputClassNames = outputClassNames.replace( className, '' );
+	}
+	return outputClassNames.trim();
 };
+
+/**
+ * Checks if HTML already contains responsive aspect ratio styling.
+ * Some embed providers (like Flickr) include their own responsive wrapper
+ * with padding-bottom or padding-top percentages for aspect ratio.
+ *
+ * @param {string} html The embed HTML to check.
+ * @return {boolean} True if the HTML already has responsive styling.
+ */
+export function hasInlineResponsivePadding( html ) {
+	// Check for padding-bottom or padding-top with percentage values in style attributes
+	// This pattern matches: padding-bottom: 56.25%; or padding-top: 50%; etc.
+	const paddingPattern = /padding-(top|bottom)\s*:\s*[\d.]+%/i;
+	return paddingPattern.test( html );
+}
 
 /**
  * Returns class names with any relevant responsive aspect ratio names.
@@ -203,6 +241,12 @@ export function getClassNames(
 	allowResponsive = true
 ) {
 	if ( ! allowResponsive ) {
+		return removeAspectRatioClasses( existingClassNames );
+	}
+
+	// If the embed HTML already contains responsive wrapper styling (like Flickr),
+	// don't add our own aspect ratio classes to avoid double padding.
+	if ( hasInlineResponsivePadding( html ) ) {
 		return removeAspectRatioClasses( existingClassNames );
 	}
 
@@ -229,7 +273,7 @@ export function getClassNames(
 					return removeAspectRatioClasses( existingClassNames );
 				}
 				// Close aspect ratio match found.
-				return classnames(
+				return clsx(
 					removeAspectRatioClasses( existingClassNames ),
 					potentialRatio.className,
 					'wp-has-aspect-ratio'

@@ -8,8 +8,8 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import NumberControl from '../../number-control';
-import { COLORS, reduceMotion, rtl } from '../../utils';
-import { space } from '../../ui/utils/space';
+import { COLORS, rtl, CONFIG } from '../../utils';
+import { space } from '../../utils/space';
 
 import type {
 	RangeMarkProps,
@@ -50,14 +50,10 @@ export const Root = styled.div< RootProps >`
 const wrapperColor = ( { color = COLORS.ui.borderFocus }: WrapperProps ) =>
 	css( { color } );
 
-const wrapperMargin = ( { marks, __nextHasNoMarginBottom }: WrapperProps ) => {
-	if ( ! __nextHasNoMarginBottom ) {
-		return css( { marginBottom: marks ? 16 : undefined } );
-	}
-	return '';
-};
-
-export const Wrapper = styled.div< WrapperProps >`
+export const Wrapper = styled( 'div', {
+	shouldForwardProp: ( prop: string ) =>
+		! [ 'color', 'marks' ].includes( prop ),
+} )< WrapperProps >`
 	display: block;
 	flex: 1;
 	position: relative;
@@ -65,7 +61,6 @@ export const Wrapper = styled.div< WrapperProps >`
 
 	${ wrapperColor };
 	${ rangeHeight };
-	${ wrapperMargin };
 `;
 
 export const BeforeIconWrapper = styled.span`
@@ -83,17 +78,18 @@ export const AfterIconWrapper = styled.span`
 `;
 
 const railBackgroundColor = ( { disabled, railColor }: RailProps ) => {
-	let background = railColor || '';
+	return css`
+		background: ${ disabled
+			? COLORS.ui.backgroundDisabled
+			: railColor || COLORS.theme.gray[ 300 ] };
 
-	if ( disabled ) {
-		background = COLORS.ui.backgroundDisabled;
-	}
-
-	return css( { background } );
+		@media ( forced-colors: active ) {
+			background: GrayText;
+		}
+	`;
 };
 
 export const Rail = styled.span`
-	background-color: ${ COLORS.gray[ 300 ] };
 	left: 0;
 	pointer-events: none;
 	right: 0;
@@ -102,30 +98,37 @@ export const Rail = styled.span`
 	position: absolute;
 	margin-top: ${ ( rangeHeightValue - railHeight ) / 2 }px;
 	top: 0;
-	border-radius: ${ railHeight }px;
+	border-radius: ${ CONFIG.radiusFull };
 
 	${ railBackgroundColor };
 `;
 
 const trackBackgroundColor = ( { disabled, trackColor }: TrackProps ) => {
-	let background = trackColor || 'currentColor';
+	return css`
+		background: ${ disabled
+			? COLORS.theme.gray[ 400 ]
+			: trackColor || 'currentColor' };
 
-	if ( disabled ) {
-		background = COLORS.gray[ 400 ];
-	}
-
-	return css( { background } );
+		@media ( forced-colors: active ) {
+			background: ${ disabled ? 'GrayText' : 'CanvasText' };
+		}
+	`;
 };
 
 export const Track = styled.span`
-	background-color: currentColor;
-	border-radius: ${ railHeight }px;
+	border-radius: ${ CONFIG.radiusFull };
 	height: ${ railHeight }px;
 	pointer-events: none;
 	display: block;
 	position: absolute;
 	margin-top: ${ ( rangeHeightValue - railHeight ) / 2 }px;
 	top: 0;
+
+	.is-marked & {
+		@media not ( prefers-reduced-motion ) {
+			transition: width ease 0.1s;
+		}
+	}
 
 	${ trackBackgroundColor };
 `;
@@ -136,56 +139,53 @@ export const MarksWrapper = styled.span`
 	position: relative;
 	width: 100%;
 	user-select: none;
+	margin-top: 17px;
 `;
 
-const markFill = ( { disabled, isFilled }: RangeMarkProps ) => {
-	let backgroundColor = isFilled ? 'currentColor' : COLORS.gray[ 300 ];
-
-	if ( disabled ) {
-		backgroundColor = COLORS.gray[ 400 ];
-	}
-
-	return css( {
-		backgroundColor,
-	} );
-};
-
 export const Mark = styled.span`
-	height: ${ thumbSize }px;
-	left: 0;
 	position: absolute;
+	left: 0;
 	top: -4px;
-	width: 1px;
-
-	${ markFill };
+	height: 4px;
+	width: 2px;
+	transform: translateX( -50% );
+	background-color: ${ COLORS.ui.background };
+	z-index: 1;
 `;
 
 const markLabelFill = ( { isFilled }: RangeMarkProps ) => {
 	return css( {
-		color: isFilled ? COLORS.gray[ 700 ] : COLORS.gray[ 300 ],
+		color: isFilled ? COLORS.theme.gray[ 700 ] : COLORS.theme.gray[ 300 ],
 	} );
 };
 
 export const MarkLabel = styled.span`
-	color: ${ COLORS.gray[ 300 ] };
-	left: 0;
+	color: ${ COLORS.theme.gray[ 300 ] };
 	font-size: 11px;
 	position: absolute;
-	top: 12px;
-	transform: translateX( -50% );
+	top: 8px;
 	white-space: nowrap;
+
+	${ rtl( { left: 0 } ) };
+	${ rtl(
+		{ transform: 'translateX( -50% )' },
+		{ transform: 'translateX( 50% )' }
+	) };
 
 	${ markLabelFill };
 `;
 
-const thumbColor = ( { disabled }: ThumbProps ) =>
-	disabled
-		? css`
-				background-color: ${ COLORS.gray[ 400 ] };
-		  `
-		: css`
-				background-color: ${ COLORS.ui.theme };
-		  `;
+const thumbColor = ( { disabled }: ThumbProps ) => {
+	return css`
+		background: ${ disabled
+			? COLORS.theme.gray[ 400 ]
+			: COLORS.theme.accent };
+
+		@media ( forced-colors: active ) {
+			background: ${ disabled ? 'GrayText' : 'CanvasText' };
+		}
+	`;
+};
 
 export const ThumbWrapper = styled.span`
 	align-items: center;
@@ -199,7 +199,14 @@ export const ThumbWrapper = styled.span`
 	top: 0;
 	user-select: none;
 	width: ${ thumbSize }px;
-	border-radius: 50%;
+	border-radius: ${ CONFIG.radiusRound };
+	z-index: 3;
+
+	.is-marked & {
+		@media not ( prefers-reduced-motion ) {
+			transition: left ease 0.1s;
+		}
+	}
 
 	${ thumbColor };
 	${ rtl( { marginLeft: -10 } ) };
@@ -215,13 +222,17 @@ const thumbFocus = ( { isFocused }: ThumbProps ) => {
 				&::before {
 					content: ' ';
 					position: absolute;
-					background-color: ${ COLORS.ui.theme };
+					background-color: ${ COLORS.theme.accent };
 					opacity: 0.4;
-					border-radius: 50%;
+					border-radius: ${ CONFIG.radiusRound };
 					height: ${ thumbSize + 8 }px;
 					width: ${ thumbSize + 8 }px;
 					top: -4px;
 					left: -4px;
+
+					@media ( forced-colors: active ) {
+						background: GrayText;
+					}
 				}
 		  `
 		: '';
@@ -229,12 +240,13 @@ const thumbFocus = ( { isFocused }: ThumbProps ) => {
 
 export const Thumb = styled.span< ThumbProps >`
 	align-items: center;
-	border-radius: 50%;
+	border-radius: ${ CONFIG.radiusRound };
 	height: 100%;
 	outline: 0;
 	position: absolute;
 	user-select: none;
 	width: 100%;
+	box-shadow: ${ CONFIG.elevationXSmall };
 
 	${ thumbColor };
 	${ thumbFocus };
@@ -256,13 +268,24 @@ export const InputRange = styled.input`
 `;
 
 const tooltipShow = ( { show }: TooltipProps ) => {
-	return css( {
-		opacity: show ? 1 : 0,
-	} );
+	return css`
+		display: ${ show ? 'inline-block' : 'none' };
+		opacity: ${ show ? 1 : 0 };
+
+		@media not ( prefers-reduced-motion ) {
+			transition:
+				opacity 120ms ease,
+				display 120ms ease allow-discrete;
+		}
+
+		@starting-style {
+			opacity: 0;
+		}
+	`;
 };
 
-const tooltipPosition = ( { position }: TooltipProps ) => {
-	const isBottom = position === 'bottom';
+const tooltipPlacement = ( { placement }: TooltipProps ) => {
+	const isBottom = placement === 'bottom';
 
 	if ( isBottom ) {
 		return css`
@@ -277,31 +300,28 @@ const tooltipPosition = ( { position }: TooltipProps ) => {
 
 export const Tooltip = styled.span< TooltipProps >`
 	background: rgba( 0, 0, 0, 0.8 );
-	border-radius: 2px;
+	border-radius: ${ CONFIG.radiusSmall };
 	color: white;
-	display: inline-block;
 	font-size: 12px;
 	min-width: 32px;
-	opacity: 0;
 	padding: 4px 8px;
 	pointer-events: none;
 	position: absolute;
 	text-align: center;
-	transition: opacity 120ms ease;
 	user-select: none;
 	line-height: 1.4;
 
 	${ tooltipShow };
-	${ tooltipPosition };
-	${ reduceMotion( 'transition' ) };
+
+	${ tooltipPlacement };
 	${ rtl(
 		{ transform: 'translateX(-50%)' },
 		{ transform: 'translateX(50%)' }
 	) }
 `;
 
-// @todo: Refactor RangeControl with latest HStack configuration
-// @wordpress/components/ui/hstack.
+// @todo Refactor RangeControl with latest HStack configuration
+// @see: packages/components/src/h-stack
 export const InputNumber = styled( NumberControl )`
 	display: inline-block;
 	font-size: 13px;

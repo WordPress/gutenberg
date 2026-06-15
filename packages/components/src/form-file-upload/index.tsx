@@ -7,17 +7,19 @@ import { useRef } from '@wordpress/element';
  * Internal dependencies
  */
 import Button from '../button';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import type { FormFileUploadProps } from './types';
+import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
 
 /**
- * FormFileUpload is a component that allows users to select files from their local device.
+ * FormFileUpload allows users to select files from their local device.
  *
  * ```jsx
  * import { FormFileUpload } from '@wordpress/components';
  *
  * const MyFormFileUpload = () => (
  *   <FormFileUpload
+ *     __next40pxDefaultSize
  *     accept="image/*"
  *     onChange={ ( event ) => console.log( event.currentTarget.files ) }
  *   >
@@ -40,13 +42,30 @@ export function FormFileUpload( {
 		ref.current?.click();
 	};
 
+	if ( ! render ) {
+		maybeWarnDeprecated36pxSize( {
+			componentName: 'FormFileUpload',
+			__next40pxDefaultSize: props.__next40pxDefaultSize,
+			// @ts-expect-error - We don't "officially" support all Button props but this likely happens.
+			size: props.size,
+		} );
+	}
+
 	const ui = render ? (
 		render( { openFileDialog } )
 	) : (
+		// Disable reason: the parent component already takes care of the `__next40pxDefaultSize` prop.
+		// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop
 		<Button onClick={ openFileDialog } { ...props }>
 			{ children }
 		</Button>
 	);
+
+	// iOS browsers may not reliably handle 'audio/*' in the accept attribute.
+	// Adding explicit audio MIME types improves compatibility across all devices.
+	const compatAccept = accept?.includes( 'audio/*' )
+		? `${ accept }, audio/mp3, audio/x-m4a, audio/x-m4b, audio/x-m4p, audio/x-wav, audio/webm`
+		: accept;
 
 	return (
 		<div className="components-form-file-upload">
@@ -56,7 +75,7 @@ export function FormFileUpload( {
 				ref={ ref }
 				multiple={ multiple }
 				style={ { display: 'none' } }
-				accept={ accept }
+				accept={ compatAccept }
 				onChange={ onChange }
 				onClick={ onClick }
 				data-testid="form-file-upload-input"

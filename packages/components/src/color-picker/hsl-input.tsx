@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { colord } from 'colord';
+import type { HslaColor } from 'react-colorful';
 
 /**
  * Internal dependencies
@@ -9,8 +9,13 @@ import { colord } from 'colord';
 import { InputWithSlider } from './input-with-slider';
 import type { HslInputProps } from './types';
 
-export const HslInput = ( { color, onChange, enableAlpha }: HslInputProps ) => {
-	const { h, s, l, a } = color.toHsl();
+export const HslInput = ( { hsla, onChange, enableAlpha }: HslInputProps ) => {
+	const updateHSLAValue = ( partialNewValue: Partial< HslaColor > ) => {
+		onChange( {
+			...hsla,
+			...partialNewValue,
+		} );
+	};
 
 	return (
 		<>
@@ -19,9 +24,9 @@ export const HslInput = ( { color, onChange, enableAlpha }: HslInputProps ) => {
 				max={ 359 }
 				label="Hue"
 				abbreviation="H"
-				value={ h }
+				value={ hsla.h }
 				onChange={ ( nextH: number ) => {
-					onChange( colord( { h: nextH, s, l, a } ) );
+					updateHSLAValue( { h: nextH } );
 				} }
 			/>
 			<InputWithSlider
@@ -29,16 +34,9 @@ export const HslInput = ( { color, onChange, enableAlpha }: HslInputProps ) => {
 				max={ 100 }
 				label="Saturation"
 				abbreviation="S"
-				value={ s }
+				value={ hsla.s }
 				onChange={ ( nextS: number ) => {
-					onChange(
-						colord( {
-							h,
-							s: nextS,
-							l,
-							a,
-						} )
-					);
+					updateHSLAValue( { s: nextS } );
 				} }
 			/>
 			<InputWithSlider
@@ -46,16 +44,9 @@ export const HslInput = ( { color, onChange, enableAlpha }: HslInputProps ) => {
 				max={ 100 }
 				label="Lightness"
 				abbreviation="L"
-				value={ l }
+				value={ hsla.l }
 				onChange={ ( nextL: number ) => {
-					onChange(
-						colord( {
-							h,
-							s,
-							l: nextL,
-							a,
-						} )
-					);
+					updateHSLAValue( { l: nextL } );
 				} }
 			/>
 			{ enableAlpha && (
@@ -64,16 +55,9 @@ export const HslInput = ( { color, onChange, enableAlpha }: HslInputProps ) => {
 					max={ 100 }
 					label="Alpha"
 					abbreviation="A"
-					value={ Math.trunc( 100 * a ) }
+					value={ Math.trunc( 100 * hsla.a ) }
 					onChange={ ( nextA: number ) => {
-						onChange(
-							colord( {
-								h,
-								s,
-								l,
-								a: nextA / 100,
-							} )
-						);
+						updateHSLAValue( { a: nextA / 100 } );
 					} }
 				/>
 			) }

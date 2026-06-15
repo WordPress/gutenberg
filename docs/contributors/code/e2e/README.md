@@ -2,40 +2,35 @@
 
 This living document serves to prescribe instructions and best practices for writing end-to-end (E2E) tests with Playwright in the Gutenberg project.
 
-<div class="callout callout-info">
-
-See the dedicated guide if you're working with the previous Jest + Puppeteer framework. See the [migration guide](https://github.com/WordPress/gutenberg/tree/HEAD/docs/contributors/code/e2e/migration.md) if you're migrating tests from Jest + Puppeteer.
-</div>
-
-
 ## Running tests
 
 ```bash
 # Run all available tests.
-npm run test:e2e:playwright
+npm run test:e2e
 
 # Run in headed mode.
-npm run test:e2e:playwright -- --headed
+npm run test:e2e -- --headed
 
 # Run tests with specific browsers (`chromium`, `firefox`, or `webkit`).
-npm run test:e2e:playwright -- --project=webkit --project=firefox
+npm run test:e2e -- --project=webkit --project=firefox
 
 # Run a single test file.
-npm run test:e2e:playwright -- <path_to_test_file> # E.g., npm run test:e2e:playwright -- site-editor/title.spec.js
+npm run test:e2e -- <path_to_test_file> # E.g., npm run test:e2e -- site-editor/title.spec.js
 
 # Debugging.
-npm run test:e2e:playwright -- --debug
+npm run test:e2e -- --debug
 ```
 
 If you're developing in Linux, it currently requires testing Webkit browsers in headed mode. If you don't want to or can't run it with the GUI (e.g. if you don't have a graphic interface), prepend the command with [`xvfb-run`](https://manpages.ubuntu.com/manpages/xenial/man1/xvfb-run.1.html) to run it in a virtual environment.
 
 ```bash
 # Run all available tests.
-xvfb-run npm run test:e2e:playwright
+xvfb-run npm run test:e2e
 
 # Only run webkit tests.
-xvfb-run -- npm run test:e2e:playwright -- --project=webkit
+xvfb-run -- npm run test:e2e -- --project=webkit
 ```
+If you're already editing in VS Code, you may find the [Playwright extension](https://playwright.dev/docs/getting-started-vscode) helpful for running, writing and debugging tests.
 
 ## Best practices
 
@@ -68,13 +63,13 @@ See the [official documentation](https://playwright.dev/docs/locators) for more 
 
 To encourage better practices for querying elements, selectors are [strict](https://playwright.dev/docs/api/class-browser#browser-new-page-option-strict-selectors) by default, meaning that it will throw an error if the query returns more than one element.
 
-### Don't overload test-utils, inline simple utils
+### Inline simple utility helper function
 
-`e2e-test-utils` are too bloated with too many utils. Most of them are simple enough to be inlined directly in tests. With the help of accessible selectors, simple utils are easier to write now. For utils that only take place on a certain page, use Page Object Model instead (with an exception of clearing states with `requestUtils` which are better placed in `e2e-test-utils`). Otherwise, only create an util if the action is complex and repetitive enough.
+Most utility functions are simple enough to be inlined directly in tests. With the help of accessible selectors, simple utils are easier to write now. For utils that only take place on a certain page, use Page Object Model instead. Otherwise, only create an util if the action is complex and repetitive enough.
 
 ### Favor Page Object Model over utils
 
-As mentioned above, [Page Object Model](https://playwright.dev/docs/test-pom) is the preferred way to create reusable utility functions on a certain page.
+As mentioned above, [Page Object Model](https://playwright.dev/docs/pom) is the preferred way to create reusable utility functions on a certain page.
 
 The rationale behind using a POM is to group utils under namespaces to be easier to discover and use. In fact, `PageUtils` in the `e2e-test-utils-playwright` package is also a POM, which avoids the need for global variables, and utils can reference each other with `this`.
 
@@ -84,7 +79,9 @@ It's slow to set states manually before or after tests, especially when they're 
 
 ### Avoid global variables
 
-Previously in our Jest + Puppeteer E2E tests, `page` and `browser` are exposed as global variables. This makes it harder to work with when we have multiple pages/tabs in the same test, or if we want to run multiple tests in parallel. `@playwright/test` has the concept of [fixtures](https://playwright.dev/docs/test-fixtures) which allows us to inject `page`, `browser`, and other parameters into the tests.
+In the previous E2E setup, `page` and `browser` were global variables, which made working with multiple pages or parallel tests harder.
+
+`@playwright/test` uses fixtures to inject `page`, `browser`, and other parameters into tests.
 
 ### Make explicit assertions
 

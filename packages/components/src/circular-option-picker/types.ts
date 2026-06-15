@@ -13,9 +13,13 @@ import type { Icon } from '@wordpress/icons';
  */
 import type { ButtonAsButtonProps } from '../button/types';
 import type { DropdownProps } from '../dropdown/types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 
-export type CircularOptionPickerProps = {
+type CommonCircularOptionPickerProps = {
+	/**
+	 * An ID to apply to the component.
+	 */
+	id?: string;
 	/**
 	 * A CSS class to apply to the wrapper element.
 	 */
@@ -36,7 +40,56 @@ export type CircularOptionPickerProps = {
 	 * The child elements.
 	 */
 	children?: ReactNode;
+	/**
+	 * The ID reference list of one or more elements that label the wrapper
+	 * element.
+	 */
+	'aria-labelledby'?: string;
+	/**
+	 * The label for the wrapper element. Defaults to 'Custom color picker'. Not
+	 * used if an 'aria-labelledby' is provided.
+	 */
+	'aria-label'?: string;
 };
+
+type WithBaseId = {
+	baseId: string;
+};
+
+type FullListboxCircularOptionPickerProps = CommonCircularOptionPickerProps & {
+	/**
+	 * Whether the control should present as a set of buttons,
+	 * each with its own tab stop.
+	 */
+	asButtons?: false;
+	/**
+	 * Prevents keyboard interaction from wrapping around.
+	 * Only used when `asButtons` is not true.
+	 *
+	 * @default true
+	 */
+	loop?: boolean;
+};
+
+export type ListboxCircularOptionPickerProps = WithBaseId &
+	Omit< FullListboxCircularOptionPickerProps, 'asButtons' >;
+
+type FullButtonsCircularOptionPickerProps = CommonCircularOptionPickerProps & {
+	/**
+	 * Whether the control should present as a set of buttons,
+	 * each with its own tab stop.
+	 *
+	 * @default false
+	 */
+	asButtons: true;
+};
+
+export type ButtonsCircularOptionPickerProps = WithBaseId &
+	Omit< FullButtonsCircularOptionPickerProps, 'asButtons' >;
+
+export type CircularOptionPickerProps =
+	| FullListboxCircularOptionPickerProps
+	| FullButtonsCircularOptionPickerProps;
 
 export type DropdownLinkActionProps = {
 	buttonProps?: Omit<
@@ -46,6 +99,11 @@ export type DropdownLinkActionProps = {
 	linkText: string;
 	dropdownProps: Omit< DropdownProps, 'className' | 'renderToggle' >;
 	className?: string;
+};
+
+export type OptionGroupProps = {
+	className?: string;
+	options: ReactNode;
 };
 
 export type OptionProps = Omit<
@@ -63,4 +121,10 @@ export type OptionProps = Omit<
 		React.ComponentProps< typeof Icon >,
 		'icon' | 'size'
 	>;
+};
+
+export type CircularOptionPickerContextProps = {
+	baseId?: string;
+	activeId?: string | null | undefined;
+	setActiveId?: ( newId: string | null | undefined ) => void;
 };

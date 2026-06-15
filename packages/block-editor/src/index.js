@@ -6,12 +6,16 @@ export {
 	getBorderClassesAndStyles as __experimentalGetBorderClassesAndStyles,
 	useBorderProps as __experimentalUseBorderProps,
 	getColorClassesAndStyles as __experimentalGetColorClassesAndStyles,
+	getDimensionsClassesAndStyles,
 	getTypographyClassesAndStyles,
 	useColorProps as __experimentalUseColorProps,
 	useCustomSides as __experimentalUseCustomSides,
 	getSpacingClassesAndStyles as __experimentalGetSpacingClassesAndStyles,
+	getDimensionsClassesAndStyles as __experimentalGetDimensionsClassesAndStyles,
 	getGapCSSValue as __experimentalGetGapCSSValue,
+	getShadowClassesAndStyles as __experimentalGetShadowClassesAndStyles,
 	useCachedTruthy,
+	useStyleOverride,
 } from './hooks';
 export * from './components';
 export * from './elements';

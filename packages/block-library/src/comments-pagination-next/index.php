@@ -8,6 +8,8 @@
 /**
  * Renders the `core/comments-pagination-next` block on the server.
  *
+ * @since 6.0.0
+ *
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
  * @param WP_Block $block      Block instance.
@@ -26,7 +28,7 @@ function render_block_core_comments_pagination_next( $attributes, $content, $blo
 	$label            = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? $attributes['label'] : $default_label;
 	$pagination_arrow = get_comments_pagination_arrow( $block, 'next' );
 
-	$filter_link_attributes = static function() {
+	$filter_link_attributes = static function () {
 		return get_block_wrapper_attributes();
 	};
 	add_filter( 'next_comments_link_attributes', $filter_link_attributes );
@@ -35,7 +37,7 @@ function render_block_core_comments_pagination_next( $attributes, $content, $blo
 		$label .= $pagination_arrow;
 	}
 
-	$next_comments_link = get_next_comments_link( $label, $max_page );
+	$next_comments_link = get_next_comments_link( $label, $max_page, $comment_vars['paged'] ?? null );
 
 	remove_filter( 'next_posts_link_attributes', $filter_link_attributes );
 
@@ -48,6 +50,8 @@ function render_block_core_comments_pagination_next( $attributes, $content, $blo
 
 /**
  * Registers the `core/comments-pagination-next` block on the server.
+ *
+ * @since 6.0.0
  */
 function register_block_core_comments_pagination_next() {
 	register_block_type_from_metadata(

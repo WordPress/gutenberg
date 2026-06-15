@@ -12,8 +12,8 @@ import {
 	SelectControl,
 	Button,
 	Popover,
-	__experimentalHStack as HStack,
 } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { useState } from '@wordpress/element';
 import { applyFormat, removeFormat, useAnchor } from '@wordpress/rich-text';
 import { language as languageIcon } from '@wordpress/icons';
@@ -23,10 +23,14 @@ const title = __( 'Language' );
 
 export const language = {
 	name,
+	title,
 	tagName: 'bdo',
 	className: null,
+	attributes: {
+		lang: 'lang',
+		dir: 'dir',
+	},
 	edit: Edit,
-	title,
 };
 
 function Edit( { isActive, value, onChange, contentRef } ) {
@@ -76,10 +80,12 @@ function InlineLanguageUI( { value, contentRef, onChange, onClose } ) {
 		<Popover
 			className="block-editor-format-toolbar__language-popover"
 			anchor={ popoverAnchor }
-			placement="bottom"
 			onClose={ onClose }
 		>
-			<form
+			<Stack
+				render={ <form /> }
+				direction="column"
+				gap="lg"
 				className="block-editor-format-toolbar__language-container-content"
 				onSubmit={ ( event ) => {
 					event.preventDefault();
@@ -96,6 +102,7 @@ function InlineLanguageUI( { value, contentRef, onChange, onClose } ) {
 				} }
 			>
 				<TextControl
+					__next40pxDefaultSize
 					label={ title }
 					value={ lang }
 					onChange={ ( val ) => setLang( val ) }
@@ -104,6 +111,7 @@ function InlineLanguageUI( { value, contentRef, onChange, onClose } ) {
 					) }
 				/>
 				<SelectControl
+					__next40pxDefaultSize
 					label={ __( 'Text direction' ) }
 					value={ dir }
 					options={ [
@@ -118,14 +126,15 @@ function InlineLanguageUI( { value, contentRef, onChange, onClose } ) {
 					] }
 					onChange={ ( val ) => setDir( val ) }
 				/>
-				<HStack alignment="right">
+				<Stack justify="right">
 					<Button
+						__next40pxDefaultSize
 						variant="primary"
 						type="submit"
 						text={ __( 'Apply' ) }
 					/>
-				</HStack>
-			</form>
+				</Stack>
+			</Stack>
 		</Popover>
 	);
 }

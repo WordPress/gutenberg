@@ -1,46 +1,38 @@
 /**
  * WordPress dependencies
  */
-import { NoticeList } from '@wordpress/components';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
-import { store as noticesStore } from '@wordpress/notices';
+import deprecated from '@wordpress/deprecated';
+import { useSelect } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { InlineNotices } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
 import TemplateValidationNotice from '../template-validation-notice';
 
-export function EditorNotices( { notices, onRemove } ) {
-	const dismissibleNotices = notices.filter(
-		( { isDismissible, type } ) => isDismissible && type === 'default'
-	);
-	const nonDismissibleNotices = notices.filter(
-		( { isDismissible, type } ) => ! isDismissible && type === 'default'
-	);
+/**
+ * @deprecated since 7.0, use `wp.notices.InlineNotices` instead.
+ */
+export function EditorNotices() {
+	deprecated( 'wp.editor.EditorNotices', {
+		since: '7.0',
+		version: '7.2',
+		alternative: 'wp.notices.InlineNotices',
+	} );
+
+	const isValidTemplate = useSelect( ( select ) => {
+		return select( blockEditorStore ).isValidTemplate();
+	}, [] );
 
 	return (
-		<>
-			<NoticeList
-				notices={ nonDismissibleNotices }
-				className="components-editor-notices__pinned"
-			/>
-			<NoticeList
-				notices={ dismissibleNotices }
-				className="components-editor-notices__dismissible"
-				onRemove={ onRemove }
-			>
-				<TemplateValidationNotice />
-			</NoticeList>
-		</>
+		<InlineNotices
+			pinnedNoticesClassName="components-editor-notices__pinned"
+			dismissibleNoticesClassName="components-editor-notices__dismissible"
+		>
+			{ ! isValidTemplate && <TemplateValidationNotice /> }
+		</InlineNotices>
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => ( {
-		notices: select( noticesStore ).getNotices(),
-	} ) ),
-	withDispatch( ( dispatch ) => ( {
-		onRemove: dispatch( noticesStore ).removeNotice,
-	} ) ),
-] )( EditorNotices );
+export default EditorNotices;

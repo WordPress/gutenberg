@@ -1,12 +1,15 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .wp-block-legacy-widget__edit-form {
 	&:not([hidden]) {
 		display: flow-root;
 	}
 	background: $white;
-	border-radius: $radius-block-ui;
-	border: 1px solid $gray-900;
-	padding: $grid-unit-15 - 1px; // Subtract the border width.
-	max-height: calc(100vh - 2px); // Subtract the border width (both top and bottom).
+	border-radius: $radius-small;
+	border: $border-width solid $gray-900;
+	padding: $grid-unit-15 - $border-width;
+	max-height: calc(100vh - #{ $border-width } - #{ $border-width });
 	overflow-y: scroll;
 
 	.wp-block-legacy-widget__edit-form-title {
@@ -57,7 +60,7 @@
 			font-family: system-ui;
 			background-color: transparent;
 			box-sizing: border-box;
-			border: 1px solid $gray-700;
+			border: $border-width solid $gray-700;
 			border-radius: 3px;
 			box-shadow: none;
 			color: $black;
@@ -92,11 +95,11 @@
 
 .wp-block-legacy-widget__edit-preview,
 .wp-block-legacy-widget__edit-no-preview {
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 
 	&:hover::after {
-		border-radius: $radius-block-ui;
-		border: 1px solid $gray-600;
+		border-radius: $radius-small;
+		border: $border-width solid $gray-600;
 		bottom: 0;
 		content: "";
 		left: 0;
@@ -147,7 +150,7 @@
 
 .interface-complementary-area .wp-block-legacy-widget-inspector-card__name {
 	margin: 0 0 5px;
-	font-weight: 500;
+	font-weight: $font-weight-medium;
 }
 
 // When wide widget is selected it opens in a popover but its container should still have a bit of height.

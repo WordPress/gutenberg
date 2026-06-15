@@ -6,10 +6,6 @@ ContrastChecker also accounts for font sizes.
 
 A notice will be rendered if the color combination of text and background colors are low.
 
-## Table of contents
-
-1. [Development guidelines](#development-guidelines)
-
 ## Developer guidelines
 
 ### Usage

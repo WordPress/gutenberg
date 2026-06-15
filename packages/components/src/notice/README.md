@@ -4,12 +4,6 @@ Use Notices to communicate prominent messages to the user.
 
 ![Notice component](https://make.wordpress.org/design/files/2019/03/Notice-Screenshot-alt.png)
 
-## Table of contents
-
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
-3. [Related components](#related-components)
-
 ## Design guidelines
 
 A Notice displays a succinct message. It can also offer the user options, like viewing a published post or updating a setting, and requires a user action to be dismissed.
@@ -23,9 +17,8 @@ Notices display at the top of the screen, below any toolbars anchored to the top
 Notices are color-coded to indicate the type of message being communicated:
 
 - **Informational** notices are **blue** by default.
-- If there is a parent `Theme` component with an `accent` color prop, informational notices will take on that color instead.
 - **Success** notices are **green.**
-- **Warning** notices are **yellow\*\***.\*\*
+- **Warning** notices are **yellow.**
 - **Error** notices are **red.**
 
 If an icon is included in the Notice, it should be color-coded to match the Notice state.
@@ -67,7 +60,7 @@ If an icon is included in the Notice, it should be color-coded to match the Noti
 To display a plain notice, pass `Notice` a string:
 
 ```jsx
-import { Notice } from `@wordpress/components`;
+import { Notice } from '@wordpress/components';
 
 const MyNotice = () => (
 	<Notice status="error">An unknown error occurred.</Notice>
@@ -77,7 +70,7 @@ const MyNotice = () => (
 For more complex markup, you can pass any JSX element:
 
 ```jsx
-import { Notice } from `@wordpress/components`;
+import { Notice } from '@wordpress/components';
 
 const MyNotice = () => (
 	<Notice status="error">
@@ -107,7 +100,7 @@ Used to provide a custom spoken message in place of the `children` default.
 
 #### `status`: `'warning' | 'success' | 'error' | 'info'`
 
-Determines the color of the notice: `warning` (yellow), `success` (green), `error` (red), or `'info'`. By default `'info'` will be blue, but if there is a parent Theme component with an accent color prop, the notice will take on that color instead.
+Determines the color of the notice: `warning` (yellow), `success` (green), `error` (red), or `'info'`. By default `'info'` will be blue.
 
 - Required: No
 - Default: `info`
@@ -140,9 +133,9 @@ Whether the notice should be dismissible or not
 
 #### `onDismiss` : `() => void`
 
-A deprecated alternative to `onRemove`. This prop is kept for compatibilty reasons but should be avoided.
+A deprecated alternative to `onRemove`. This prop is kept for compatibility reasons but should be avoided.
 
-- Requiered: No
+- Required: No
 - Default: `noop`
 
 #### `actions`: `Array<NoticeAction>`.
@@ -150,14 +143,16 @@ A deprecated alternative to `onRemove`. This prop is kept for compatibilty reaso
 An array of notice actions. Each member object should contain:
 
 - `label`: `string` containing the text of the button/link
-- `url`: `string` OR `onClick`: `( event: SyntheticEvent ) => void` to specify what the action does.
+- `url`: `string` (optional) The href URL for the action button. If provided, the action will render as an anchor tag.
+- `onClick`: `( event: SyntheticEvent ) => void` (optional) Function to call when clicked. Can be used alongside `url`.
+- `disabled`: `boolean` (optional) Whether the action button is disabled.
 - `className`: `string` (optional) to add custom classes to the button styles.
 - `noDefaultClasses`: `boolean` (optional) A value of `true` will remove all default styling.
 - `variant`: `'primary' | 'secondary' | 'link'` (optional) You can denote a primary button action for a notice by passing a value of `primary`.
 
-The default appearance of an action button is inferred based on whether `url` or `onClick` are provided, rendering the button as a link if appropriate. If both props are provided, `url` takes precedence, and the action button will render as an anchor tag.
+The default `variant` of an action button is `'secondary'` if only `onClick` is provided, or `'link'` if `url` is provided.
 
 ## Related components
 
 - To create a more prominent message that requires action, use a Modal.
-- For low priority, non-interruptive messsages, use Snackbar.
+- For low priority, non-interruptive messages, use Snackbar.

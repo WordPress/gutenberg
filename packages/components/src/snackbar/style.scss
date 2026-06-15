@@ -1,15 +1,22 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+@use "../utils/theme-variables" as *;
+
 .components-snackbar {
 	font-family: $default-font;
 	font-size: $default-font-size;
-	background-color: $gray-900;
-	border-radius: $radius-block-ui;
-	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+	background: rgba($black, 0.85); // Emulates #1e1e1e closely.
+	backdrop-filter: blur($grid-unit-20) saturate(180%);
+	border-radius: $radius-medium;
+	box-shadow: $elevation-small;
 	color: $white;
-	padding: 16px 24px;
+	padding: $grid-unit-15 ($grid-unit-05 * 5);
 	width: 100%;
-	max-width: 600px;
+	max-width: var(--wpds-dimension-surface-width-lg);
 	box-sizing: border-box;
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 
 	// Re-enable pointer events, which are disabled by the
 	// .components-snackbar-list styles.
@@ -20,9 +27,7 @@
 	}
 
 	&:focus {
-		box-shadow:
-			0 0 0 1px $white,
-			0 0 0 3px $components-color-accent;
+		box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
 	}
 
 	&.components-snackbar-explicit-dismiss {
@@ -30,43 +35,36 @@
 	}
 
 	.components-snackbar__content-with-icon {
-		margin-left: 24px;
+		position: relative;
+		padding-left: $icon-size;
 	}
 
 	.components-snackbar__icon {
 		position: absolute;
-		top: 24px;
-		left: 28px;
+		left: $grid-unit-10 * -1;
+		top: calc((#{$icon-size - ($default-font-size * $default-line-height)}) / -2);
 	}
 
 	.components-snackbar__dismiss-button {
-		margin-left: 32px;
-		cursor: pointer;
+		margin-left: $grid-unit-30;
+		cursor: var(--wpds-cursor-control);
 	}
 }
 
-.components-snackbar__action.components-button {
+.components-snackbar__action.components-button,
+.components-snackbar__action.components-external-link {
 	margin-left: $grid-unit-40;
 	color: $white;
-	height: auto;
 	flex-shrink: 0;
-	line-height: $default-line-height;
-	padding: 0;
 
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary) {
-		text-decoration: underline;
-		background-color: transparent;
+	&:focus {
+		box-shadow: none;
+		outline: 1px dotted $white;
+	}
 
-		&:focus {
-			color: $white;
-			box-shadow: none;
-			outline: 1px dotted $white;
-		}
-
-		&:hover {
-			text-decoration: none;
-			color: $white;
-		}
+	&:hover {
+		text-decoration: none;
+		color: currentColor;
 	}
 }
 
@@ -91,5 +89,5 @@
 
 .components-snackbar-list__notice-container {
 	position: relative;
-	padding-top: 8px;
+	padding-top: $grid-unit-10;
 }

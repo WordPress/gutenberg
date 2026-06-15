@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { TAB } from '@wordpress/keycodes';
 import { focus } from '@wordpress/dom';
 
 /**
@@ -13,7 +12,7 @@ import useRefEffect from '../use-ref-effect';
  * In Dialogs/modals, the tabbing must be constrained to the content of
  * the wrapper element. This hook adds the behavior to the returned ref.
  *
- * @return {import('react').RefCallback<Element>} Element Ref.
+ * @return {React.RefCallback<Element>} Element Ref.
  *
  * @example
  * ```js
@@ -33,9 +32,9 @@ import useRefEffect from '../use-ref-effect';
 function useConstrainedTabbing() {
 	return useRefEffect( ( /** @type {HTMLElement} */ node ) => {
 		function onKeyDown( /** @type {KeyboardEvent} */ event ) {
-			const { keyCode, shiftKey, target } = event;
+			const { key, shiftKey, target } = event;
 
-			if ( keyCode !== TAB ) {
+			if ( key !== 'Tab' ) {
 				return;
 			}
 
@@ -55,7 +54,7 @@ function useConstrainedTabbing() {
 				/** @type {HTMLElement} */ ( target ).contains( nextElement )
 			) {
 				event.preventDefault();
-				/** @type {HTMLElement} */ ( nextElement )?.focus();
+				nextElement?.focus();
 				return;
 			}
 

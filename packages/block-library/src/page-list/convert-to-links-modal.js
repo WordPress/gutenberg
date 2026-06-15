@@ -2,10 +2,11 @@
  * WordPress dependencies
  */
 import { Button, Modal } from '@wordpress/components';
+import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
 export const convertDescription = __(
-	'This page list is synced with the published pages on your site. Detach the page list to add, delete, or reorder pages yourself.'
+	"This Navigation Menu displays your website's pages. Editing it will enable you to add, delete, or reorder pages. However, new pages will no longer be added automatically."
 );
 
 export function ConvertToLinksModal( { onClick, onClose, disabled } ) {
@@ -13,24 +14,38 @@ export function ConvertToLinksModal( { onClick, onClose, disabled } ) {
 		<Modal
 			onRequestClose={ onClose }
 			title={ __( 'Edit Page List' ) }
-			className={ 'wp-block-page-list-modal' }
+			className="wp-block-page-list-modal"
 			aria={ {
-				describedby: 'wp-block-page-list-modal__description',
+				describedby: useInstanceId(
+					ConvertToLinksModal,
+					'wp-block-page-list-modal__description'
+				),
 			} }
 		>
-			<p id={ 'wp-block-page-list-modal__description' }>
+			<p
+				id={ useInstanceId(
+					ConvertToLinksModal,
+					'wp-block-page-list-modal__description'
+				) }
+			>
 				{ convertDescription }
 			</p>
 			<div className="wp-block-page-list-modal-buttons">
-				<Button variant="tertiary" onClick={ onClose }>
+				<Button
+					__next40pxDefaultSize
+					variant="tertiary"
+					onClick={ onClose }
+				>
 					{ __( 'Cancel' ) }
 				</Button>
 				<Button
+					__next40pxDefaultSize
 					variant="primary"
+					accessibleWhenDisabled
 					disabled={ disabled }
 					onClick={ onClick }
 				>
-					{ __( 'Detach' ) }
+					{ __( 'Edit' ) }
 				</Button>
 			</div>
 		</Modal>

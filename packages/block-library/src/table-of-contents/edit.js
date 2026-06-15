@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import fastDeepEqual from 'fast-deep-equal/es6';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -15,24 +10,34 @@ import {
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import {
-	PanelBody,
 	Placeholder,
 	ToggleControl,
+	SelectControl,
 	ToolbarButton,
 	ToolbarGroup,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-import { renderToString, useEffect } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
-import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
+import { renderToString } from '@wordpress/element';
+import { __, isRTL } from '@wordpress/i18n';
+import { useInstanceId } from '@wordpress/compose';
+import { store as noticeStore } from '@wordpress/notices';
+import {
+	tableOfContents as icon,
+	formatListBullets,
+	formatListBulletsRTL,
+	formatListNumbered,
+	formatListNumberedRTL,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import icon from './icon';
 import TableOfContentsList from './list';
 import { linearToNestedHeadingList } from './utils';
+import { useObserveHeadings } from './hooks';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 /** @typedef {import('./utils').HeadingData} HeadingData */
 
@@ -41,19 +46,42 @@ import { linearToNestedHeadingList } from './utils';
  *
  * @param {Object}                       props                                   The props.
  * @param {Object}                       props.attributes                        The block attributes.
- * @param {HeadingData[]}                props.attributes.headings               A list of data for each heading in the post.
+ * @param {HeadingData[]}                props.attributes.headings               The list of data for each heading in the post.
  * @param {boolean}                      props.attributes.onlyIncludeCurrentPage Whether to only include headings from the current page (if the post is paginated).
- * @param {string}                       props.clientId
- * @param {(attributes: Object) => void} props.setAttributes
+ * @param {number|undefined}             props.attributes.maxLevel               The maximum heading level to include, or null to include all levels.
+ * @param {boolean}                      props.attributes.ordered                Whether to display as an ordered list (true) or unordered list (false).
+ * @param {string}                       props.clientId                          The client id.
+ * @param {(attributes: Object) => void} props.setAttributes                     The set attributes function.
  *
- * @return {WPComponent} The component.
+ * @return {Component} The component.
  */
 export default function TableOfContentsEdit( {
-	attributes: { headings = [], onlyIncludeCurrentPage },
+	attributes: {
+		headings = [],
+		onlyIncludeCurrentPage,
+		maxLevel,
+		ordered = true,
+	},
 	clientId,
 	setAttributes,
 } ) {
+	useObserveHeadings( clientId );
+
 	const blockProps = useBlockProps();
+	const instanceId = useInstanceId(
+		TableOfContentsEdit,
+		'table-of-contents'
+	);
+
+	// If a user clicks to a link prevent redirection and show a warning.
+	const { createWarningNotice } = useDispatch( noticeStore );
+	const showRedirectionPreventedNotice = ( event ) => {
+		event.preventDefault();
+		createWarningNotice( __( 'Links are disabled in the editor.' ), {
+			id: `block-library/core/table-of-contents/redirection-prevented/${ instanceId }`,
+			type: 'snackbar',
+		} );
+	};
 
 	const canInsertList = useSelect(
 		( select ) => {
@@ -66,208 +94,131 @@ export default function TableOfContentsEdit( {
 		[ clientId ]
 	);
 
-	const { __unstableMarkNextChangeAsNotPersistent, replaceBlocks } =
-		useDispatch( blockEditorStore );
-
-	/**
-	 * The latest heading data, or null if the new data deeply equals the saved
-	 * headings attribute.
-	 *
-	 * Since useSelect forces a re-render when its return value is shallowly
-	 * inequal to its prior call, we would be re-rendering this block every time
-	 * the stores change, even if the latest headings were deeply equal to the
-	 * ones saved in the block attributes.
-	 *
-	 * By returning null when they're equal, we reduce that to 2 renders: one
-	 * when there are new latest headings (and so it returns them), and one when
-	 * they haven't changed (so it returns null). As long as the latest heading
-	 * data remains the same, further calls of the useSelect callback will
-	 * continue to return null, thus preventing any forced re-renders.
-	 */
-	const latestHeadings = useSelect(
-		( select ) => {
-			const {
-				getBlockAttributes,
-				getBlockName,
-				getClientIdsWithDescendants,
-				__experimentalGetGlobalBlocksByName: getGlobalBlocksByName,
-			} = select( blockEditorStore );
-
-			// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
-			// Blocks can be loaded into a *non-post* block editor, so to avoid
-			// declaring @wordpress/editor as a dependency, we must access its
-			// store by string. When the store is not available, editorSelectors
-			// will be null, and the block's saved markup will lack permalinks.
-			// eslint-disable-next-line @wordpress/data-no-store-string-literals
-			const editorSelectors = select( 'core/editor' );
-
-			const pageBreakClientIds = getGlobalBlocksByName( 'core/nextpage' );
-
-			const isPaginated = pageBreakClientIds.length !== 0;
-
-			// Get the client ids of all blocks in the editor.
-			const allBlockClientIds = getClientIdsWithDescendants();
-
-			// If onlyIncludeCurrentPage is true, calculate the page (of a paginated post) this block is part of, so we know which headings to include; otherwise, skip the calculation.
-			let tocPage = 1;
-
-			if ( isPaginated && onlyIncludeCurrentPage ) {
-				// We can't use getBlockIndex because it only returns the index
-				// relative to sibling blocks.
-				const tocIndex = allBlockClientIds.indexOf( clientId );
-
-				for ( const [
-					blockIndex,
-					blockClientId,
-				] of allBlockClientIds.entries() ) {
-					// If we've reached blocks after the Table of Contents, we've
-					// finished calculating which page the block is on.
-					if ( blockIndex >= tocIndex ) {
-						break;
-					}
-					if ( getBlockName( blockClientId ) === 'core/nextpage' ) {
-						tocPage++;
-					}
-				}
-			}
-
-			const _latestHeadings = [];
-
-			/** The page (of a paginated post) a heading will be part of. */
-			let headingPage = 1;
-
-			/**
-			 * A permalink to the current post. If the core/editor store is
-			 * unavailable, this variable will be null.
-			 */
-			const permalink = editorSelectors?.getPermalink() ?? null;
-
-			let headingPageLink = null;
-
-			// If the core/editor store is available, we can add permalinks to the
-			// generated table of contents.
-			if ( typeof permalink === 'string' ) {
-				headingPageLink = isPaginated
-					? addQueryArgs( permalink, { page: headingPage } )
-					: permalink;
-			}
-
-			for ( const blockClientId of allBlockClientIds ) {
-				const blockName = getBlockName( blockClientId );
-				if ( blockName === 'core/nextpage' ) {
-					headingPage++;
-
-					// If we're only including headings from the current page (of
-					// a paginated post), then exit the loop if we've reached the
-					// pages after the one with the Table of Contents block.
-					if ( onlyIncludeCurrentPage && headingPage > tocPage ) {
-						break;
-					}
-
-					if ( typeof permalink === 'string' ) {
-						headingPageLink = addQueryArgs(
-							removeQueryArgs( permalink, [ 'page' ] ),
-							{ page: headingPage }
-						);
-					}
-				}
-				// If we're including all headings or we've reached headings on
-				// the same page as the Table of Contents block, add them to the
-				// list.
-				else if (
-					! onlyIncludeCurrentPage ||
-					headingPage === tocPage
-				) {
-					if ( blockName === 'core/heading' ) {
-						const headingAttributes =
-							getBlockAttributes( blockClientId );
-
-						const canBeLinked =
-							typeof headingPageLink === 'string' &&
-							typeof headingAttributes.anchor === 'string' &&
-							headingAttributes.anchor !== '';
-
-						_latestHeadings.push( {
-							// Convert line breaks to spaces, and get rid of HTML tags in the headings.
-							content: stripHTML(
-								headingAttributes.content.replace(
-									/(<br *\/?>)+/g,
-									' '
-								)
-							),
-							level: headingAttributes.level,
-							link: canBeLinked
-								? `${ headingPageLink }#${ headingAttributes.anchor }`
-								: null,
-						} );
-					}
-				}
-			}
-
-			if ( fastDeepEqual( headings, _latestHeadings ) ) {
-				return null;
-			}
-			return _latestHeadings;
-		},
-		[ clientId, onlyIncludeCurrentPage, headings ]
-	);
-
-	useEffect( () => {
-		if ( latestHeadings !== null ) {
-			// This is required to keep undo working and not create 2 undo steps
-			// for each heading change.
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { headings: latestHeadings } );
-		}
-	}, [ latestHeadings ] );
-
+	const { replaceBlocks } = useDispatch( blockEditorStore );
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const headingTree = linearToNestedHeadingList( headings );
 
-	const toolbarControls = canInsertList && (
+	const toolbarControls = (
 		<BlockControls>
 			<ToolbarGroup>
 				<ToolbarButton
-					onClick={ () =>
-						replaceBlocks(
-							clientId,
-							createBlock( 'core/list', {
-								ordered: true,
-								values: renderToString(
-									<TableOfContentsList
-										nestedHeadingList={ headingTree }
-									/>
-								),
-							} )
-						)
+					icon={ isRTL() ? formatListBulletsRTL : formatListBullets }
+					title={ __( 'Unordered' ) }
+					description={ __( 'Convert to unordered list' ) }
+					onClick={ () => setAttributes( { ordered: false } ) }
+					isActive={ ordered === false }
+				/>
+				<ToolbarButton
+					icon={
+						isRTL() ? formatListNumberedRTL : formatListNumbered
 					}
-				>
-					{ __( 'Convert to static list' ) }
-				</ToolbarButton>
+					title={ __( 'Ordered' ) }
+					description={ __( 'Convert to ordered list' ) }
+					onClick={ () => setAttributes( { ordered: true } ) }
+					isActive={ ordered === true }
+				/>
 			</ToolbarGroup>
+			{ canInsertList && (
+				<ToolbarGroup>
+					<ToolbarButton
+						onClick={ () =>
+							replaceBlocks(
+								clientId,
+								createBlock( 'core/list', {
+									ordered,
+									values: renderToString(
+										<TableOfContentsList
+											nestedHeadingList={ headingTree }
+											ordered={ ordered }
+										/>
+									),
+								} )
+							)
+						}
+					>
+						{ __( 'Convert to static list' ) }
+					</ToolbarButton>
+				</ToolbarGroup>
+			) }
 		</BlockControls>
 	);
 
 	const inspectorControls = (
 		<InspectorControls>
-			<PanelBody title={ __( 'Settings' ) }>
-				<ToggleControl
-					__nextHasNoMarginBottom
+			<ToolsPanel
+				label={ __( 'Settings' ) }
+				resetAll={ () => {
+					setAttributes( {
+						onlyIncludeCurrentPage: false,
+						maxLevel: undefined,
+						ordered: true,
+					} );
+				} }
+				dropdownMenuProps={ dropdownMenuProps }
+			>
+				<ToolsPanelItem
+					hasValue={ () => !! onlyIncludeCurrentPage }
 					label={ __( 'Only include current page' ) }
-					checked={ onlyIncludeCurrentPage }
-					onChange={ ( value ) =>
-						setAttributes( { onlyIncludeCurrentPage: value } )
+					onDeselect={ () =>
+						setAttributes( { onlyIncludeCurrentPage: false } )
 					}
-					help={
-						onlyIncludeCurrentPage
-							? __(
-									'Only including headings from the current page (if the post is paginated).'
-							  )
-							: __(
-									'Toggle to only include headings from the current page (if the post is paginated).'
-							  )
+					isShownByDefault
+				>
+					<ToggleControl
+						label={ __( 'Only include current page' ) }
+						checked={ onlyIncludeCurrentPage }
+						onChange={ ( value ) =>
+							setAttributes( { onlyIncludeCurrentPage: value } )
+						}
+						help={
+							onlyIncludeCurrentPage
+								? __(
+										'Only including headings from the current page (if the post is paginated).'
+								  )
+								: __(
+										'Include headings from all pages (if the post is paginated).'
+								  )
+						}
+					/>
+				</ToolsPanelItem>
+				<ToolsPanelItem
+					hasValue={ () => !! maxLevel }
+					label={ __( 'Limit heading levels' ) }
+					onDeselect={ () =>
+						setAttributes( { maxLevel: undefined } )
 					}
-				/>
-			</PanelBody>
+					isShownByDefault
+				>
+					<SelectControl
+						__next40pxDefaultSize
+						label={ __( 'Include headings down to level' ) }
+						value={ maxLevel || '' }
+						options={ [
+							{ value: '', label: __( 'All levels' ) },
+							{ value: '1', label: __( 'Heading 1' ) },
+							{ value: '2', label: __( 'Heading 2' ) },
+							{ value: '3', label: __( 'Heading 3' ) },
+							{ value: '4', label: __( 'Heading 4' ) },
+							{ value: '5', label: __( 'Heading 5' ) },
+							{ value: '6', label: __( 'Heading 6' ) },
+						] }
+						onChange={ ( value ) =>
+							setAttributes( {
+								maxLevel: value ? parseInt( value ) : undefined,
+							} )
+						}
+						help={
+							! maxLevel
+								? __(
+										'Including all heading levels in the table of contents.'
+								  )
+								: __(
+										'Only include headings up to and including this level.'
+								  )
+						}
+					/>
+				</ToolsPanelItem>
+			</ToolsPanel>
 		</InspectorControls>
 	);
 
@@ -291,12 +242,19 @@ export default function TableOfContentsEdit( {
 		);
 	}
 
+	const ListTag = ordered ? 'ol' : 'ul';
+
 	return (
 		<>
 			<nav { ...blockProps }>
-				<ol inert="true">
-					<TableOfContentsList nestedHeadingList={ headingTree } />
-				</ol>
+				<ListTag>
+					<TableOfContentsList
+						nestedHeadingList={ headingTree }
+						disableLinkActivation
+						onClick={ showRedirectionPreventedNotice }
+						ordered={ ordered }
+					/>
+				</ListTag>
 			</nav>
 			{ toolbarControls }
 			{ inspectorControls }

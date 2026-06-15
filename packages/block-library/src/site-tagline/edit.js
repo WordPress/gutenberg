@@ -1,43 +1,42 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
-	AlignmentControl,
 	useBlockProps,
 	BlockControls,
+	HeadingLevelDropdown,
 	RichText,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
+import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
-export default function SiteTaglineEdit( {
-	attributes,
-	setAttributes,
-	insertBlocksAfter,
-} ) {
-	const { textAlign } = attributes;
+export default function SiteTaglineEdit( props ) {
+	useDeprecatedTextAlign( props );
+
+	const { attributes, setAttributes, insertBlocksAfter } = props;
+	const { level, levelOptions } = attributes;
 	const { canUserEdit, tagline } = useSelect( ( select ) => {
 		const { canUser, getEntityRecord, getEditedEntityRecord } =
 			select( coreStore );
-		const canEdit = canUser( 'update', 'settings' );
+		const canEdit = canUser( 'update', {
+			kind: 'root',
+			name: 'site',
+		} );
 		const settings = canEdit ? getEditedEntityRecord( 'root', 'site' ) : {};
 		const readOnlySettings = getEntityRecord( 'root', '__unstableBase' );
 
 		return {
-			canUserEdit: canUser( 'update', 'settings' ),
+			canUserEdit: canEdit,
 			tagline: canEdit
 				? settings?.description
 				: readOnlySettings?.description,
 		};
 	}, [] );
 
+	const TagName = level === 0 ? 'p' : `h${ level }`;
 	const { editEntityRecord } = useDispatch( coreStore );
 
 	function setTagline( newTagline ) {
@@ -47,18 +46,17 @@ export default function SiteTaglineEdit( {
 	}
 
 	const blockProps = useBlockProps( {
-		className: classnames( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-			'wp-block-site-tagline__placeholder': ! canUserEdit && ! tagline,
-		} ),
+		className:
+			! canUserEdit && ! tagline && 'wp-block-site-tagline__placeholder',
 	} );
+
 	const siteTaglineContent = canUserEdit ? (
 		<RichText
 			allowedFormats={ [] }
 			onChange={ setTagline }
 			aria-label={ __( 'Site tagline text' ) }
 			placeholder={ __( 'Write site tagline…' ) }
-			tagName="p"
+			tagName={ TagName }
 			value={ tagline }
 			disableLineBreaks
 			__unstableOnSplitAtEnd={ () =>
@@ -67,16 +65,19 @@ export default function SiteTaglineEdit( {
 			{ ...blockProps }
 		/>
 	) : (
-		<p { ...blockProps }>{ tagline || __( 'Site Tagline placeholder' ) }</p>
+		<TagName { ...blockProps }>
+			{ tagline || __( 'Site Tagline placeholder' ) }
+		</TagName>
 	);
 	return (
 		<>
 			<BlockControls group="block">
-				<AlignmentControl
-					onChange={ ( newAlign ) =>
-						setAttributes( { textAlign: newAlign } )
+				<HeadingLevelDropdown
+					value={ level }
+					options={ levelOptions }
+					onChange={ ( newLevel ) =>
+						setAttributes( { level: newLevel } )
 					}
-					value={ textAlign }
 				/>
 			</BlockControls>
 			{ siteTaglineContent }

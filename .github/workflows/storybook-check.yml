@@ -1,0 +1,62 @@
+name: Storybook build and Smoke Tests
+
+on:
+    pull_request:
+    push:
+        branches:
+            - trunk
+
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name for pull requests
+    # or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+    cancel-in-progress: true
+
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
+jobs:
+    check:
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        timeout-minutes: 30
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+
+            - name: Build Storybook
+              env:
+                  NODE_OPTIONS: --max-old-space-size=8192
+                  NODE_ENV: test
+              run: npm run storybook:build
+
+            - name: Validate manifest matches design-system-mcp contract
+              run: node packages/design-system-mcp/scripts/validate-manifest.mjs
+
+            - name: Build E2E Storybook
+              env:
+                  NODE_ENV: test
+              run: npm run storybook:e2e:build
+
+            - name: Install test-runner and Playwright dependencies
+              run: |
+                  npm install --no-save @storybook/test-runner@0.24.2
+                  npx playwright install --with-deps
+
+            - name: Serve Storybook and run tests
+              run: |
+                  npx concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \
+                  "npx http-server ./storybook/build --port 50240 --silent" \
+                  "npx wait-on tcp:127.0.0.1:50240 && \
+                  npx test-storybook --url http://localhost:50240 --config-dir ./storybook"

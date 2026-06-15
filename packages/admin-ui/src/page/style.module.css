@@ -1,0 +1,72 @@
+.page {
+	display: flex;
+	height: 100%;
+	background-color: var(--wpds-color-background-surface-neutral);
+	color: var(--wpds-color-foreground-content-neutral);
+	position: relative;
+	z-index: 1;
+	flex-flow: column;
+	text-wrap: pretty;
+}
+
+.header {
+	padding: var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-2xl);
+	border-block-end: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+	background: var(--wpds-color-background-surface-neutral-strong);
+	position: sticky;
+	inset-block-start: 0;
+	z-index: 1;
+}
+
+.header-content {
+	/* @TODO: Replace with a `size` token once that category exists in the theme package. */
+	min-height: calc(var(--wpds-dimension-base) * 8);
+}
+
+.header-actions {
+	flex-shrink: 0;
+}
+
+/* @TODO: Remove truncation styles once `Text` supports truncation natively. See https://github.com/WordPress/gutenberg/issues/77391 */
+.header-title {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.header-visual {
+	display: grid;
+	grid-template-columns: 1fr;
+	grid-template-rows: 1fr;
+	flex-shrink: 0;
+	/* @TODO: Replace with a `size` token once that category exists in the theme package. */
+	width: calc(var(--wpds-dimension-base) * 6);
+	height: calc(var(--wpds-dimension-base) * 6);
+
+	> * {
+		grid-column: 1 / -1;
+		grid-row: 1 / -1;
+		max-width: 100%;
+		max-height: 100%;
+	}
+}
+
+.sidebar-toggle-slot:empty {
+	display: none;
+}
+
+.header-subtitle {
+	padding-block-end: var(--wpds-dimension-padding-xs);
+	color: var(--wpds-color-foreground-content-neutral-weak);
+}
+
+.content {
+	flex-grow: 1;
+	overflow: auto;
+	display: flex;
+	flex-direction: column;
+
+	&.has-padding {
+		padding: var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-2xl);
+	}
+}

@@ -1,43 +1,34 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useEffect, Platform } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import {
-	AlignmentControl,
-	BlockControls,
 	RichText,
 	useBlockProps,
 	store as blockEditorStore,
-	HeadingLevelDropdown,
 } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { generateAnchor, setAnchor } from './autogenerate-anchors';
+import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
-function HeadingEdit( {
-	attributes,
-	setAttributes,
-	mergeBlocks,
-	onReplace,
-	style,
-	clientId,
-} ) {
-	const { textAlign, content, level, placeholder, anchor } = attributes;
+function HeadingEdit( props ) {
+	const {
+		attributes,
+		setAttributes,
+		mergeBlocks,
+		onReplace,
+		style,
+		clientId,
+	} = props;
+	useDeprecatedTextAlign( props );
+	const { content, level, placeholder, anchor } = attributes;
 	const tagName = 'h' + level;
 	const blockProps = useBlockProps( {
-		className: classnames( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
 		style,
 	} );
 
@@ -90,52 +81,15 @@ function HeadingEdit( {
 
 	return (
 		<>
-			<BlockControls group="block">
-				<HeadingLevelDropdown
-					value={ level }
-					onChange={ ( newLevel ) =>
-						setAttributes( { level: newLevel } )
-					}
-				/>
-				<AlignmentControl
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
-				/>
-			</BlockControls>
 			<RichText
 				identifier="content"
 				tagName={ tagName }
 				value={ content }
 				onChange={ onContentChange }
 				onMerge={ mergeBlocks }
-				onSplit={ ( value, isOriginal ) => {
-					let block;
-
-					if ( isOriginal || value ) {
-						block = createBlock( 'core/heading', {
-							...attributes,
-							content: value,
-						} );
-					} else {
-						block = createBlock(
-							getDefaultBlockName() ?? 'core/heading'
-						);
-					}
-
-					if ( isOriginal ) {
-						block.clientId = clientId;
-					}
-
-					return block;
-				} }
 				onReplace={ onReplace }
 				onRemove={ () => onReplace( [] ) }
-				aria-label={ __( 'Heading text' ) }
 				placeholder={ placeholder || __( 'Heading' ) }
-				textAlign={ textAlign }
-				{ ...( Platform.isNative && { deleteEnter: true } ) } // setup RichText on native mobile to delete the "Enter" key as it's handled by the JS/RN side
 				{ ...blockProps }
 			/>
 		</>

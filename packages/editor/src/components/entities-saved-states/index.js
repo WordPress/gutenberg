@@ -1,64 +1,97 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { Button, Flex, FlexItem } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
+import {
+	useCallback,
+	useRef,
+	createInterpolateElement,
+} from '@wordpress/element';
+import {
+	__experimentalUseDialog as useDialog,
+	useInstanceId,
+} from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
-import { useCallback, useRef } from '@wordpress/element';
-import { store as coreStore } from '@wordpress/core-data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
-import { __experimentalUseDialog as useDialog } from '@wordpress/compose';
-import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
 import EntityTypeList from './entity-type-list';
 import { useIsDirty } from './hooks/use-is-dirty';
-
-const PUBLISH_ON_SAVE_ENTITIES = [
-	{
-		kind: 'postType',
-		name: 'wp_navigation',
-	},
-];
+import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 function identity( values ) {
 	return values;
 }
 
-export default function EntitiesSavedStates( { close } ) {
+/**
+ * Renders the component for managing saved states of entities.
+ *
+ * @param {Object}   props              The component props.
+ * @param {Function} props.close        The function to close the dialog.
+ * @param {boolean=} props.renderDialog Whether to render the component with modal dialog behavior.
+ * @param {string}   props.variant      Changes the layout of the component. When an `inline` value is provided, the action buttons are rendered at the end of the component instead of at the start.
+ *
+ * @return {React.ReactNode} The rendered component.
+ */
+export default function EntitiesSavedStates( {
+	close,
+	renderDialog,
+	variant,
+} ) {
 	const isDirtyProps = useIsDirty();
 	return (
-		<EntitiesSavedStatesExtensible close={ close } { ...isDirtyProps } />
+		<EntitiesSavedStatesExtensible
+			close={ close }
+			renderDialog={ renderDialog }
+			variant={ variant }
+			{ ...isDirtyProps }
+		/>
 	);
 }
 
+/**
+ * Renders a panel for saving entities with dirty records.
+ *
+ * @param {Object}   props                       The component props.
+ * @param {string}   props.additionalPrompt      Additional prompt to display.
+ * @param {Function} props.close                 Function to close the panel.
+ * @param {Function} props.onSave                Function to call when saving entities.
+ * @param {boolean}  props.saveEnabled           Flag indicating if save is enabled.
+ * @param {string}   props.saveLabel             Label for the save button.
+ * @param {boolean}  props.renderDialog          Whether to render the component with modal dialog behavior.
+ * @param {Array}    props.dirtyEntityRecords    Array of dirty entity records.
+ * @param {boolean}  props.isDirty               Flag indicating if there are dirty entities.
+ * @param {Function} props.setUnselectedEntities Function to set unselected entities.
+ * @param {Array}    props.unselectedEntities    Array of unselected entities.
+ * @param {string}   props.variant               Changes the layout of the component. When an `inline` value is provided, the action buttons are rendered at the end of the component instead of at the start.
+ * @param {string}   props.successNoticeContent  Optional custom success notice content.
+ *
+ * @return {React.ReactNode} The rendered component.
+ */
 export function EntitiesSavedStatesExtensible( {
 	additionalPrompt = undefined,
 	close,
 	onSave = identity,
 	saveEnabled: saveEnabledProp = undefined,
 	saveLabel = __( 'Save' ),
-
+	renderDialog,
 	dirtyEntityRecords,
 	isDirty,
 	setUnselectedEntities,
 	unselectedEntities,
+	variant = 'default',
+	successNoticeContent,
 } ) {
 	const saveButtonRef = useRef();
-	const {
-		editEntityRecord,
-		saveEditedEntityRecord,
-		__experimentalSaveSpecifiedEntityEdits: saveSpecifiedEntityEdits,
-	} = useDispatch( coreStore );
-
-	const { __unstableMarkLastChangeAsPersistent } =
-		useDispatch( blockEditorStore );
-
-	const { createSuccessNotice, createErrorNotice, removeNotice } =
-		useDispatch( noticesStore );
-
+	const { saveDirtyEntities } = unlock( useDispatch( editorStore ) );
 	// To group entities by type.
 	const partitionedSavables = dirtyEntityRecords.reduce( ( acc, record ) => {
 		const { name } = record;
@@ -84,79 +117,6 @@ export function EntitiesSavedStatesExtensible( {
 	].filter( Array.isArray );
 
 	const saveEnabled = saveEnabledProp ?? isDirty;
-
-	const saveCheckedEntities = () => {
-		const saveNoticeId = 'site-editor-save-success';
-		removeNotice( saveNoticeId );
-		const entitiesToSave = dirtyEntityRecords.filter(
-			( { kind, name, key, property } ) => {
-				return ! unselectedEntities.some(
-					( elt ) =>
-						elt.kind === kind &&
-						elt.name === name &&
-						elt.key === key &&
-						elt.property === property
-				);
-			}
-		);
-
-		close( entitiesToSave );
-
-		const siteItemsToSave = [];
-		const pendingSavedRecords = [];
-		entitiesToSave.forEach( ( { kind, name, key, property } ) => {
-			if ( 'root' === kind && 'site' === name ) {
-				siteItemsToSave.push( property );
-			} else {
-				if (
-					PUBLISH_ON_SAVE_ENTITIES.some(
-						( typeToPublish ) =>
-							typeToPublish.kind === kind &&
-							typeToPublish.name === name
-					)
-				) {
-					editEntityRecord( kind, name, key, { status: 'publish' } );
-				}
-
-				pendingSavedRecords.push(
-					saveEditedEntityRecord( kind, name, key )
-				);
-			}
-		} );
-		if ( siteItemsToSave.length ) {
-			pendingSavedRecords.push(
-				saveSpecifiedEntityEdits(
-					'root',
-					'site',
-					undefined,
-					siteItemsToSave
-				)
-			);
-		}
-
-		__unstableMarkLastChangeAsPersistent();
-
-		Promise.all( pendingSavedRecords )
-			.then( ( values ) => {
-				return onSave( values );
-			} )
-			.then( ( values ) => {
-				if (
-					values.some( ( value ) => typeof value === 'undefined' )
-				) {
-					createErrorNotice( __( 'Saving failed.' ) );
-				} else {
-					createSuccessNotice( __( 'Site updated.' ), {
-						type: 'snackbar',
-						id: saveNoticeId,
-					} );
-				}
-			} )
-			.catch( ( error ) =>
-				createErrorNotice( `${ __( 'Saving failed.' ) } ${ error }` )
-			);
-	};
-
 	// Explicitly define this with no argument passed.  Using `close` on
 	// its own will use the event object in place of the expected saved entities.
 	const dismissPanel = useCallback( () => close(), [ close ] );
@@ -164,45 +124,101 @@ export function EntitiesSavedStatesExtensible( {
 	const [ saveDialogRef, saveDialogProps ] = useDialog( {
 		onClose: () => dismissPanel(),
 	} );
+	const dialogLabelId = useInstanceId(
+		EntitiesSavedStatesExtensible,
+		'entities-saved-states__panel-label'
+	);
+	const dialogDescriptionId = useInstanceId(
+		EntitiesSavedStatesExtensible,
+		'entities-saved-states__panel-description'
+	);
+
+	const selectItemsToSaveDescription = !! dirtyEntityRecords.length
+		? __( 'Select the items you want to save.' )
+		: undefined;
+
+	const isInline = variant === 'inline';
+
+	const actionButtons = (
+		<>
+			<FlexItem
+				isBlock={ isInline ? false : true }
+				as={ Button }
+				variant={ isInline ? 'tertiary' : 'secondary' }
+				size={ isInline ? undefined : 'compact' }
+				onClick={ dismissPanel }
+			>
+				{ __( 'Cancel' ) }
+			</FlexItem>
+			<FlexItem
+				isBlock={ isInline ? false : true }
+				as={ Button }
+				ref={ saveButtonRef }
+				variant="primary"
+				size={ isInline ? undefined : 'compact' }
+				disabled={ ! saveEnabled }
+				accessibleWhenDisabled
+				onClick={ () =>
+					saveDirtyEntities( {
+						onSave,
+						dirtyEntityRecords,
+						entitiesToSkip: unselectedEntities,
+						close,
+						successNoticeContent,
+					} )
+				}
+				className="editor-entities-saved-states__save-button"
+			>
+				{ saveLabel }
+			</FlexItem>
+		</>
+	);
 
 	return (
 		<div
-			ref={ saveDialogRef }
-			{ ...saveDialogProps }
-			className="entities-saved-states__panel"
+			ref={ renderDialog ? saveDialogRef : undefined }
+			{ ...( renderDialog && saveDialogProps ) }
+			className={ clsx( 'entities-saved-states__panel', {
+				'is-inline': isInline,
+			} ) }
+			role={ renderDialog ? 'dialog' : undefined }
+			aria-labelledby={ renderDialog ? dialogLabelId : undefined }
+			aria-describedby={ renderDialog ? dialogDescriptionId : undefined }
 		>
-			<Flex className="entities-saved-states__panel-header" gap={ 2 }>
-				<FlexItem
-					isBlock
-					as={ Button }
-					ref={ saveButtonRef }
-					variant="primary"
-					disabled={ ! saveEnabled }
-					onClick={ saveCheckedEntities }
-					className="editor-entities-saved-states__save-button"
-				>
-					{ saveLabel }
-				</FlexItem>
-				<FlexItem
-					isBlock
-					as={ Button }
-					variant="secondary"
-					onClick={ dismissPanel }
-				>
-					{ __( 'Cancel' ) }
-				</FlexItem>
-			</Flex>
+			{ ! isInline && (
+				<Flex className="entities-saved-states__panel-header" gap={ 2 }>
+					{ actionButtons }
+				</Flex>
+			) }
 
 			<div className="entities-saved-states__text-prompt">
-				<strong>{ __( 'Are you ready to save?' ) }</strong>
-				{ additionalPrompt }
-				{ isDirty && (
-					<p>
-						{ __(
-							'The following changes have been made to your site, templates, and content.'
-						) }
+				<div className="entities-saved-states__text-prompt--header-wrapper">
+					<strong
+						id={ renderDialog ? dialogLabelId : undefined }
+						className="entities-saved-states__text-prompt--header"
+					>
+						{ __( 'Are you ready to save?' ) }
+					</strong>
+				</div>
+				<div id={ renderDialog ? dialogDescriptionId : undefined }>
+					{ additionalPrompt }
+					<p className="entities-saved-states__text-prompt--changes-count">
+						{ isDirty
+							? createInterpolateElement(
+									sprintf(
+										/* translators: %d: number of site changes waiting to be saved. */
+										_n(
+											'There is <strong>%d site change</strong> waiting to be saved.',
+											'There are <strong>%d site changes</strong> waiting to be saved.',
+											dirtyEntityRecords.length
+										),
+										dirtyEntityRecords.length
+									),
+									{ strong: <strong /> }
+							  )
+							: selectItemsToSaveDescription }
 					</p>
-				) }
+				</div>
 			</div>
 
 			{ sortedPartitionedSavables.map( ( list ) => {
@@ -215,6 +231,16 @@ export function EntitiesSavedStatesExtensible( {
 					/>
 				);
 			} ) }
+
+			{ isInline && (
+				<Flex
+					direction="row"
+					justify="flex-end"
+					className="entities-saved-states__panel-footer"
+				>
+					{ actionButtons }
+				</Flex>
+			) }
 		</div>
 	);
 }

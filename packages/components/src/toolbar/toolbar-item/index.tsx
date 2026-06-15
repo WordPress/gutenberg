@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { ToolbarItem as BaseToolbarItem } from '@ariakit/react/toolbar';
+import * as Ariakit from '@ariakit/react';
 import type { ForwardedRef } from 'react';
 
 /**
@@ -16,7 +16,7 @@ import warning from '@wordpress/warning';
 import ToolbarContext from '../toolbar-context';
 import type { ToolbarItemProps } from './types';
 
-function ToolbarItem(
+function UnforwardedToolbarItem(
 	{ children, as: Component, ...props }: ToolbarItemProps,
 	ref: ForwardedRef< any >
 ) {
@@ -43,10 +43,13 @@ function ToolbarItem(
 		return children( allProps );
 	}
 
-	const render = isRenderProp ? children : Component && <Component />;
+	const render = isRenderProp
+		? children
+		: Component && <Component>{ children }</Component>;
 
 	return (
-		<BaseToolbarItem
+		<Ariakit.ToolbarItem
+			accessibleWhenDisabled
 			{ ...allProps }
 			store={ accessibleToolbarStore }
 			render={ render }
@@ -54,4 +57,6 @@ function ToolbarItem(
 	);
 }
 
-export default forwardRef( ToolbarItem );
+export const ToolbarItem = forwardRef( UnforwardedToolbarItem );
+ToolbarItem.displayName = 'ToolbarItem';
+export default ToolbarItem;

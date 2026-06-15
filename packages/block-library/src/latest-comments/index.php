@@ -36,11 +36,20 @@ function wp_latest_comments_draft_or_post_title( $post = 0 ) {
 /**
  * Renders the `core/latest-comments` block on server.
  *
+ * @since 5.1.0
+ *
  * @param array $attributes The block attributes.
  *
  * @return string Returns the post content with latest comments added.
  */
-function render_block_core_latest_comments( $attributes = array() ) {
+function render_block_core_latest_comments( $attributes ) {
+	// Handle backward compatibility: check for old displayExcerpt attribute
+	if ( isset( $attributes['displayExcerpt'] ) ) {
+		$display_content = $attributes['displayExcerpt'] ? 'excerpt' : 'none';
+	} else {
+		$display_content = $attributes['displayContent'] ?? 'excerpt';
+	}
+
 	$comments = get_comments(
 		/** This filter is documented in wp-includes/widgets/class-wp-widget-recent-comments.php */
 		apply_filters(
@@ -110,7 +119,9 @@ function render_block_core_latest_comments( $attributes = array() ) {
 				);
 			}
 			$list_items_markup .= '</footer>';
-			if ( $attributes['displayExcerpt'] ) {
+			if ( 'full' === $display_content ) {
+				$list_items_markup .= '<div class="wp-block-latest-comments__comment-excerpt">' . wpautop( get_comment_text( $comment ) ) . '</div>';
+			} elseif ( 'excerpt' === $display_content ) {
 				$list_items_markup .= '<div class="wp-block-latest-comments__comment-excerpt">' . wpautop( get_comment_excerpt( $comment ) ) . '</div>';
 			}
 			$list_items_markup .= '</article></li>';
@@ -124,7 +135,7 @@ function render_block_core_latest_comments( $attributes = array() ) {
 	if ( $attributes['displayDate'] ) {
 		$classnames[] = 'has-dates';
 	}
-	if ( $attributes['displayExcerpt'] ) {
+	if ( 'none' !== $display_content ) {
 		$classnames[] = 'has-excerpts';
 	}
 	if ( empty( $comments ) ) {
@@ -145,6 +156,8 @@ function render_block_core_latest_comments( $attributes = array() ) {
 
 /**
  * Registers the `core/latest-comments` block.
+ *
+ * @since 5.3.0
  */
 function register_block_core_latest_comments() {
 	register_block_type_from_metadata(

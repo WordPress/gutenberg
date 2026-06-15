@@ -1,0 +1,37 @@
+.dataforms-layouts-regular__field {
+	width: 100%;
+	min-height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
+	justify-content: flex-start !important;
+	align-items: flex-start !important;
+
+	.components-base-control__label,
+	.components-input-control__label,
+	.components-form-token-field__label {
+		color: var(--wpds-color-foreground-content-neutral);
+	}
+}
+
+.dataforms-layouts-regular__field-label {
+	width: 38%;
+	flex-shrink: 0;
+	min-height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
+	display: flex;
+	align-items: center;
+	line-height: var(--wpds-typography-line-height-sm);
+	hyphens: auto;
+
+	&--label-position-side {
+		align-self: center;
+	}
+
+	.components-base-control__label {
+		margin-bottom: 0;
+	}
+}
+
+.dataforms-layouts-regular__field-control {
+	flex-grow: 1;
+	min-height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
+	display: flex;
+	align-items: center;
+}

@@ -23,7 +23,7 @@ The `I18nProvider` should be mounted above any localized components:
 _Usage_
 
 ```js
-import { createI18n } from '@wordpress/react-i18n';
+import { createI18n } from '@wordpress/i18n';
 import { I18nProvider } from '@wordpress/react-i18n';
 const i18n = createI18n();
 
@@ -44,7 +44,7 @@ _Parameters_
 
 _Returns_
 
--   `JSX.Element`: Children wrapped in the I18nProvider.
+-   Children wrapped in the I18nProvider.
 
 ### useI18n
 

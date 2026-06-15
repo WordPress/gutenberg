@@ -14,11 +14,7 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import PlaceholderPreview from './placeholder/placeholder-preview';
-import {
-	DEFAULT_BLOCK,
-	ALLOWED_BLOCKS,
-	PRIORITIZED_INSERTER_BLOCKS,
-} from '../constants';
+import { DEFAULT_BLOCK, PRIORITIZED_INSERTER_BLOCKS } from '../constants';
 
 export default function NavigationInnerBlocks( {
 	clientId,
@@ -30,6 +26,7 @@ export default function NavigationInnerBlocks( {
 		isImmediateParentOfSelectedBlock,
 		selectedBlockHasChildren,
 		isSelected,
+		hasSelectedDescendant,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -45,6 +42,7 @@ export default function NavigationInnerBlocks( {
 					false
 				),
 				selectedBlockHasChildren: !! getBlockCount( selectedBlockId ),
+				hasSelectedDescendant: hasSelectedInnerBlock( clientId, true ),
 
 				// This prop is already available but computing it here ensures it's
 				// fresh compared to isImmediateParentOfSelectedBlock.
@@ -57,17 +55,6 @@ export default function NavigationInnerBlocks( {
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		'wp_navigation'
-	);
-
-	const shouldDirectInsert = useMemo(
-		() =>
-			blocks.every(
-				( { name } ) =>
-					name === 'core/navigation-link' ||
-					name === 'core/navigation-submenu' ||
-					name === 'core/page-list'
-			),
-		[ blocks ]
 	);
 
 	// When the block is selected itself or has a top level item selected that
@@ -96,10 +83,9 @@ export default function NavigationInnerBlocks( {
 			value: blocks,
 			onInput,
 			onChange,
-			allowedBlocks: ALLOWED_BLOCKS,
 			prioritizedInserterBlocks: PRIORITIZED_INSERTER_BLOCKS,
 			defaultBlock: DEFAULT_BLOCK,
-			directInsert: shouldDirectInsert,
+			directInsert: true,
 			orientation,
 			templateLock,
 
@@ -112,11 +98,14 @@ export default function NavigationInnerBlocks( {
 				isSelected ||
 				( isImmediateParentOfSelectedBlock &&
 					! selectedBlockHasChildren ) ||
+				hasSelectedDescendant ||
 				// Show the appender while dragging to allow inserting element between item and the appender.
 				parentOrChildHasSelection
 					? InnerBlocks.ButtonBlockAppender
 					: false,
 			placeholder: showPlaceholder ? placeholder : undefined,
+			__experimentalCaptureToolbars: true,
+			__unstableDisableLayoutClassNames: true,
 		}
 	);
 

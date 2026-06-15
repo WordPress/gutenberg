@@ -4,7 +4,7 @@
 
 ## Usage
 
-`Flex` is used with any of it's two sub-components, `FlexItem` and `FlexBlock`.
+`Flex` is used with any of its two sub-components, `FlexItem` and `FlexBlock`.
 
 ```jsx
 import { Flex, FlexBlock, FlexItem } from '@wordpress/components';
@@ -53,14 +53,14 @@ Spacing in between each child can be adjusted by using `gap`. The value of `gap`
 -   Required: No
 -   Default: `2`
 
-##### `justify`: `CSSProperties['justifyContent']`
+### `justify`: `CSSProperties['justifyContent']`
 
 Horizontally aligns content if the `direction` is `row`, or vertically aligns content if the `direction` is `column`.
 
 -   Required: No
 -   Default: `space-between`
 
-##### `wrap`: `boolean`
+### `wrap`: `boolean`
 
 Determines if children should wrap.
 

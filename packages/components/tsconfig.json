@@ -1,21 +1,13 @@
 {
+	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"rootDir": "src",
-		"declarationDir": "build-types",
 		"types": [
 			"gutenberg-env",
 			"gutenberg-test-env",
-			"dom-scroll-into-view",
 			"jest",
-			"@testing-library/jest-dom",
-			"snapshot-diff",
-			"@wordpress/jest-console"
-		],
-		// TODO: Remove `skipLibCheck` after resolving duplicate declaration of the `process` variable
-		// between `@types/webpack-env` (from @storybook packages) and `gutenberg-env`.
-		"skipLibCheck": true,
-		"strictNullChecks": true
+			"style-imports"
+		]
 	},
 	"references": [
 		{ "path": "../a11y" },
@@ -35,15 +27,13 @@
 		{ "path": "../private-apis" },
 		{ "path": "../react-i18n" },
 		{ "path": "../rich-text" },
+		{ "path": "../style-runtime" },
+		{ "path": "../ui" },
 		{ "path": "../warning" }
 	],
-	"include": [ "src/**/*" ],
+	"files": [ "global.d.ts", "storybook.d.ts" ],
 	"exclude": [
-		"src/**/*.android.js",
-		"src/**/*.ios.js",
-		"src/**/*.native.js",
-		"src/**/react-native-*",
-		"src/**/stories/**/*.js", // only exclude js files, tsx files should be checked
+		"src/**/stories/**/*.jsx", // only exclude js files, tsx files should be checked
 		"src/**/test/**/*.js" // only exclude js files, ts{x} files should be checked
 	]
 }

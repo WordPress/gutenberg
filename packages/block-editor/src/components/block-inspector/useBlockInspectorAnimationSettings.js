@@ -8,10 +8,7 @@ import { useSelect } from '@wordpress/data';
  */
 import { store as blockEditorStore } from '../../store';
 
-export default function useBlockInspectorAnimationSettings(
-	blockType,
-	selectedBlockClientId
-) {
+export default function useBlockInspectorAnimationSettings( blockType ) {
 	return useSelect(
 		( select ) => {
 			if ( blockType ) {
@@ -48,6 +45,6 @@ export default function useBlockInspectorAnimationSettings(
 			}
 			return null;
 		},
-		[ selectedBlockClientId, blockType ]
+		[ blockType ]
 	);
 }

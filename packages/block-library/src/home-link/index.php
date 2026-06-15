@@ -9,6 +9,8 @@
  * Build an array with CSS classes and inline styles defining the colors
  * which will be applied to the home link markup in the front-end.
  *
+ * @since 6.0.0
+ *
  * @param  array $context home link block context.
  * @return array Colors CSS classes and inline styles.
  */
@@ -58,47 +60,20 @@ function block_core_home_link_build_css_colors( $context ) {
 }
 
 /**
- * Build an array with CSS classes and inline styles defining the font sizes
- * which will be applied to the home link markup in the front-end.
- *
- * @param  array $context Home link block context.
- * @return array Font size CSS classes and inline styles.
- */
-function block_core_home_link_build_css_font_sizes( $context ) {
-	// CSS classes.
-	$font_sizes = array(
-		'css_classes'   => array(),
-		'inline_styles' => '',
-	);
-
-	$has_named_font_size  = array_key_exists( 'fontSize', $context );
-	$has_custom_font_size = isset( $context['style']['typography']['fontSize'] );
-
-	if ( $has_named_font_size ) {
-		// Add the font size class.
-		$font_sizes['css_classes'][] = sprintf( 'has-%s-font-size', $context['fontSize'] );
-	} elseif ( $has_custom_font_size ) {
-		// Add the custom font size inline style.
-		$font_sizes['inline_styles'] = sprintf( 'font-size: %s;', $context['style']['typography']['fontSize'] );
-	}
-
-	return $font_sizes;
-}
-
-/**
  * Builds an array with classes and style for the li wrapper
+ *
+ * @since 6.0.0
  *
  * @param  array $context    Home link block context.
  * @return string The li wrapper attributes.
  */
 function block_core_home_link_build_li_wrapper_attributes( $context ) {
-	$colors          = block_core_home_link_build_css_colors( $context );
-	$font_sizes      = block_core_home_link_build_css_font_sizes( $context );
-	$classes         = array_merge(
-		$colors['css_classes'],
-		$font_sizes['css_classes']
+	$colors  = block_core_home_link_build_css_colors( $context );
+	$classes = array_merge(
+		$colors['css_classes']
 	);
-	$style_attribute = ( $colors['inline_styles'] . $font_sizes['inline_styles'] );
+
+	$style_attribute = ( $colors['inline_styles'] );
 	$classes[]       = 'wp-block-navigation-item';
 
 	if ( is_front_page() ) {
@@ -121,6 +96,8 @@ function block_core_home_link_build_li_wrapper_attributes( $context ) {
 /**
  * Renders the `core/home-link` block.
  *
+ * @since 6.0.0
+ *
  * @param array    $attributes The block attributes.
  * @param string   $content    The saved content.
  * @param WP_Block $block      The parsed block.
@@ -129,7 +106,7 @@ function block_core_home_link_build_li_wrapper_attributes( $context ) {
  */
 function render_block_core_home_link( $attributes, $content, $block ) {
 	if ( empty( $attributes['label'] ) ) {
-		return '';
+		$attributes['label'] = __( 'Home' );
 	}
 	$aria_current = '';
 
@@ -140,17 +117,31 @@ function render_block_core_home_link( $attributes, $content, $block ) {
 		$aria_current = ' aria-current="page"';
 	}
 
+	$target = '';
+	if ( isset( $attributes['opensInNewTab'] ) && true === $attributes['opensInNewTab'] ) {
+		$target = ' target="_blank"';
+	}
+
+	$description = '';
+	if ( ! empty( $attributes['description'] ) ) {
+		$description = '<span class="wp-block-navigation-item__description">' . wp_kses_post( $attributes['description'] ) . '</span>';
+	}
+
 	return sprintf(
-		'<li %1$s><a class="wp-block-home-link__content wp-block-navigation-item__content" href="%2$s" rel="home"%3$s>%4$s</a></li>',
+		'<li %1$s><a class="wp-block-home-link__content wp-block-navigation-item__content" href="%2$s" rel="home" %3$s%4$s>%5$s%6$s</a></li>',
 		block_core_home_link_build_li_wrapper_attributes( $block->context ),
 		esc_url( home_url() ),
+		$target,
 		$aria_current,
-		wp_kses_post( $attributes['label'] )
+		wp_kses_post( $attributes['label'] ),
+		$description
 	);
 }
 
 /**
  * Register the home block
+ *
+ * @since 6.0.0
  *
  * @uses render_block_core_home_link()
  * @throws WP_Error An WP_Error exception parsing the block definition.

@@ -17,6 +17,7 @@ import {
 
 describe( 'applyBlockDeprecatedVersions', () => {
 	const defaultBlockSettings = {
+		apiVersion: 3,
 		attributes: {
 			fruit: {
 				type: 'string',
@@ -275,7 +276,7 @@ describe( 'applyBlockDeprecatedVersions', () => {
 		};
 
 		// When the block was created, it was given the new default value for the fruit attribute of 'Oranges'.
-		// This is because unchanged default values are not saved to the comment delimeter attributes.
+		// This is because unchanged default values are not saved to the comment delimiter attributes.
 		// Validation failed because this block was saved when the old default was 'Bananas' as reflected by the originalContent.
 		const block = deepFreeze( {
 			name: 'core/test-block',

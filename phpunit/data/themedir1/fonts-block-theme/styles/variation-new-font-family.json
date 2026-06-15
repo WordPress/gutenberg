@@ -1,5 +1,5 @@
 {
-	"version": 2,
+	"version": 3,
 	"title": "Variation: new font family",
 	"settings": {
 		"typography": {
@@ -15,7 +15,7 @@
 							"fontStyle": "normal",
 							"fontWeight": "400",
 							"src": [
-								"file:./assets/fonts/open-sans/OpenSans-VariableFont_wdth,wght.tff"
+								"file:./assets/fonts/open-sans/OpenSans-VariableFont_wdth,wght.ttf"
 							]
 						},
 						{
@@ -24,7 +24,7 @@
 							"fontStyle": "italic",
 							"fontWeight": "400",
 							"src": [
-								"file:./assets/fonts/open-sans/OpenSans-Italic-VariableFont_wdth,wght.tff"
+								"file:./assets/fonts/open-sans/OpenSans-Italic-VariableFont_wdth,wght.ttf"
 							]
 						}
 					]

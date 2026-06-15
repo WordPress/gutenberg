@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/widgets",
-	"version": "3.15.0",
+	"version": "4.48.0",
 	"description": "Functionality used by the widgets block editor in the Widgets screen and the Customizer.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -16,12 +16,55 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
-	"main": "build/index.js",
-	"module": "build-module/index.js",
-	"react-native": "src/index",
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-style",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"wpScript": true,
+	"wpCopyFiles": {
+		"files": [
+			"src/blocks/**/*.php",
+			"src/blocks/*/block.json"
+		],
+		"transforms": {
+			"php": {
+				"functionPrefix": "gutenberg_",
+				"classSuffix": "_Gutenberg",
+				"prefixFunctions": [
+					"wp_apply_colors_support",
+					"wp_enqueue_block_support_styles",
+					"wp_get_typography_font_size_value",
+					"wp_style_engine_get_styles",
+					"wp_get_global_settings"
+				],
+				"suffixClasses": [
+					"WP_Navigation_Block_Renderer"
+				],
+				"addActionPriority": 20,
+				"flattenIndexFiles": true
+			}
+		}
+	},
 	"dependencies": {
-		"@babel/runtime": "^7.16.0",
 		"@wordpress/api-fetch": "file:../api-fetch",
+		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/components": "file:../components",
@@ -32,7 +75,7 @@
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/notices": "file:../notices",
-		"classnames": "^2.3.1"
+		"clsx": "^2.1.1"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",

@@ -1,51 +1,77 @@
 /**
  * WordPress dependencies
  */
-import { SlotFillProvider, Popover } from '@wordpress/components';
-import { UnsavedChangesWarning } from '@wordpress/editor';
-import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
-import { store as noticesStore } from '@wordpress/notices';
-import { useDispatch } from '@wordpress/data';
-import { __, sprintf } from '@wordpress/i18n';
-import { PluginArea } from '@wordpress/plugins';
+import { useSelect } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { useCallback, useMemo } from '@wordpress/element';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import Layout from '../layout';
-import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
 import { unlock } from '../../lock-unlock';
+import { store as editSiteStore } from '../../store';
+import { useCommonCommands } from '../../hooks/commands/use-common-commands';
+import useSetCommandContext from '../../hooks/commands/use-set-command-context';
+import { useRegisterSiteEditorRoutes } from '../site-editor-routes';
+import {
+	currentlyPreviewingTheme,
+	isPreviewingTheme,
+} from '../../utils/is-previewing-theme';
 
 const { RouterProvider } = unlock( routerPrivateApis );
 
-export default function App() {
-	const { createErrorNotice } = useDispatch( noticesStore );
+function AppLayout() {
+	useCommonCommands();
+	useSetCommandContext();
 
-	function onPluginAreaError( name ) {
-		createErrorNotice(
-			sprintf(
-				/* translators: %s: plugin name */
-				__(
-					'The "%s" plugin has encountered an error and cannot be rendered.'
-				),
-				name
-			)
-		);
-	}
+	return <Layout />;
+}
+
+export default function App() {
+	useRegisterSiteEditorRoutes();
+	const { routes, currentTheme, editorSettings } = useSelect( ( select ) => {
+		return {
+			routes: unlock( select( editSiteStore ) ).getRoutes(),
+			currentTheme: select( coreStore ).getCurrentTheme(),
+			// This is a temp solution until the has_theme_json value is available for the current theme.
+			editorSettings: select( editSiteStore ).getSettings(),
+		};
+	}, [] );
+
+	const beforeNavigate = useCallback( ( { path, query } ) => {
+		if ( ! isPreviewingTheme() ) {
+			return { path, query };
+		}
+
+		return {
+			path,
+			query: {
+				...query,
+				wp_theme_preview:
+					'wp_theme_preview' in query
+						? query.wp_theme_preview
+						: currentlyPreviewingTheme(),
+			},
+		};
+	}, [] );
+
+	const matchResolverArgsValue = useMemo(
+		() => ( {
+			siteData: { currentTheme, editorSettings },
+		} ),
+		[ currentTheme, editorSettings ]
+	);
 
 	return (
-		<ShortcutProvider style={ { height: '100%' } }>
-			<SlotFillProvider>
-				<GlobalStylesProvider>
-					<Popover.Slot />
-					<UnsavedChangesWarning />
-					<RouterProvider>
-						<Layout />
-						<PluginArea onError={ onPluginAreaError } />
-					</RouterProvider>
-				</GlobalStylesProvider>
-			</SlotFillProvider>
-		</ShortcutProvider>
+		<RouterProvider
+			routes={ routes }
+			pathArg="p"
+			beforeNavigate={ beforeNavigate }
+			matchResolverArgs={ matchResolverArgsValue }
+		>
+			<AppLayout />
+		</RouterProvider>
 	);
 }

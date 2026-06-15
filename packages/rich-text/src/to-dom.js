@@ -6,6 +6,13 @@ import { toTree } from './to-tree';
 import { createElement } from './create-element';
 import { isRangeEqual } from './is-range-equal';
 
+/**
+ * MathML namespace URI.
+ *
+ * @see https://www.w3.org/1998/Math/MathML/
+ */
+const MATHML_NAMESPACE = 'http://www.w3.org/1998/Math/MathML';
+
 /** @typedef {import('./types').RichTextValue} RichTextValue */
 
 /**
@@ -68,10 +75,39 @@ function append( element, child ) {
 	const { type, attributes } = child;
 
 	if ( type ) {
-		child = element.ownerDocument.createElement( type );
+		if ( type === '#comment' ) {
+			child = element.ownerDocument.createComment(
+				attributes[ 'data-rich-text-comment' ]
+			);
+		} else {
+			// Handle namespace-aware element creation
+			const parentNamespace = element.namespaceURI;
 
-		for ( const key in attributes ) {
-			child.setAttribute( key, attributes[ key ] );
+			if ( type === 'math' ) {
+				// Root math element always uses MathML namespace
+				child = element.ownerDocument.createElementNS(
+					MATHML_NAMESPACE,
+					type
+				);
+			} else if ( parentNamespace === MATHML_NAMESPACE ) {
+				if ( element.tagName === 'MTEXT' ) {
+					// mtext switches back to HTML namespace for phrasing content
+					child = element.ownerDocument.createElement( type );
+				} else {
+					// All other elements in MathML context use MathML namespace
+					child = element.ownerDocument.createElementNS(
+						MATHML_NAMESPACE,
+						type
+					);
+				}
+			} else {
+				// Default HTML element creation
+				child = element.ownerDocument.createElement( type );
+			}
+
+			for ( const key in attributes ) {
+				child.setAttribute( key, attributes[ key ] );
+			}
 		}
 	}
 
@@ -104,7 +140,6 @@ function remove( node ) {
 
 export function toDom( {
 	value,
-	multilineTag,
 	prepareEditableTree,
 	isEditableTree = true,
 	placeholder,
@@ -134,7 +169,6 @@ export function toDom( {
 
 	const tree = toTree( {
 		value,
-		multilineTag,
 		createEmpty,
 		append,
 		getLastChild,
@@ -165,13 +199,11 @@ export function toDom( {
 
 /**
  * Create an `Element` tree from a Rich Text value and applies the difference to
- * the `Element` tree contained by `current`. If a `multilineTag` is provided,
- * text separated by two new lines will be wrapped in an `Element` of that type.
+ * the `Element` tree contained by `current`.
  *
  * @param {Object}        $1                       Named arguments.
  * @param {RichTextValue} $1.value                 Value to apply.
  * @param {HTMLElement}   $1.current               The live root node to apply the element tree to.
- * @param {string}        [$1.multilineTag]        Multiline tag.
  * @param {Function}      [$1.prepareEditableTree] Function to filter editorable formats.
  * @param {boolean}       [$1.__unstableDomOnly]   Only apply elements, no selection.
  * @param {string}        [$1.placeholder]         Placeholder text.
@@ -179,7 +211,6 @@ export function toDom( {
 export function apply( {
 	value,
 	current,
-	multilineTag,
 	prepareEditableTree,
 	__unstableDomOnly,
 	placeholder,
@@ -187,7 +218,6 @@ export function apply( {
 	// Construct a new element tree in memory.
 	const { body, selection } = toDom( {
 		value,
-		multilineTag,
 		prepareEditableTree,
 		placeholder,
 		doc: current.ownerDocument,

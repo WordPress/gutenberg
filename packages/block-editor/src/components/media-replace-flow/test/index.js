@@ -8,7 +8,7 @@ import userEvent from '@testing-library/user-event';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-
+import { SlotFillProvider } from '@wordpress/components';
 /**
  * Internal dependencies
  */
@@ -19,27 +19,19 @@ const noop = () => {};
 function TestWrapper() {
 	const [ mediaURL, setMediaURL ] = useState( 'https://example.media' );
 	return (
-		<MediaReplaceFlow
-			mediaId={ 1 }
-			mediaURL={ mediaURL }
-			allowedTypes={ [ 'png' ] }
-			accept="image/*"
-			onSelect={ noop }
-			onSelectURL={ setMediaURL }
-			onError={ noop }
-			onCloseModal={ noop }
-		/>
+		<SlotFillProvider>
+			<MediaReplaceFlow
+				mediaId={ 1 }
+				mediaURL={ mediaURL }
+				allowedTypes={ [ 'png' ] }
+				accept="image/*"
+				onSelect={ noop }
+				onSelectURL={ setMediaURL }
+				onError={ noop }
+				onCloseModal={ noop }
+			/>
+		</SlotFillProvider>
 	);
-}
-
-/**
- * Returns the first found popover element up the DOM tree.
- *
- * @param {HTMLElement} element Element to start with.
- * @return {HTMLElement|null} Popover element, or `null` if not found.
- */
-function getWrappingPopoverElement( element ) {
-	return element.closest( '.components-popover' );
 }
 
 describe( 'General media replace flow', () => {
@@ -67,11 +59,7 @@ describe( 'General media replace flow', () => {
 		);
 		const uploadMenu = screen.getByRole( 'menu' );
 
-		await waitFor( () =>
-			expect(
-				getWrappingPopoverElement( uploadMenu )
-			).toBePositionedPopover()
-		);
+		await waitFor( () => expect( uploadMenu ).toBePositionedPopover() );
 
 		await waitFor( () => expect( uploadMenu ).toBeVisible() );
 	} );
@@ -92,9 +80,7 @@ describe( 'General media replace flow', () => {
 			name: 'example.media (opens in a new tab)',
 		} );
 
-		await waitFor( () =>
-			expect( getWrappingPopoverElement( link ) ).toBePositionedPopover()
-		);
+		await waitFor( () => expect( link ).toBePositionedPopover() );
 
 		expect( link ).toHaveAttribute( 'href', 'https://example.media' );
 	} );
@@ -113,22 +99,20 @@ describe( 'General media replace flow', () => {
 
 		await waitFor( () =>
 			expect(
-				getWrappingPopoverElement(
-					screen.getByRole( 'link', {
-						name: 'example.media (opens in a new tab)',
-					} )
-				)
+				screen.getByRole( 'link', {
+					name: 'example.media (opens in a new tab)',
+				} )
 			).toBePositionedPopover()
 		);
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Edit',
+				name: 'Edit link',
 			} )
 		);
 
 		const mediaURLInput = screen.getByRole( 'combobox', {
-			name: 'Link',
+			name: 'Paste or type URL',
 			expanded: false,
 		} );
 
@@ -137,7 +121,7 @@ describe( 'General media replace flow', () => {
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Save',
+				name: 'Apply',
 			} )
 		);
 

@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-const { command } = require( 'execa' );
-const glob = require( 'fast-glob' );
-const { resolve } = require( 'path' );
 const { existsSync } = require( 'fs' );
 const { mkdtemp, readFile } = require( 'fs' ).promises;
-const npmPackageArg = require( 'npm-package-arg' );
 const { tmpdir } = require( 'os' );
-const { join } = require( 'path' );
+const { join, resolve } = require( 'path' );
+const inquirer = require( '@inquirer/prompts' );
+const { command } = require( 'execa' );
+const glob = require( 'fast-glob' );
+const npmPackageArg = require( 'npm-package-arg' );
 const rimraf = require( 'rimraf' ).sync;
 
 /**
@@ -33,6 +33,7 @@ const predefinedPluginTemplates = {
 			editorScript: null,
 			editorStyle: null,
 			style: null,
+			viewStyle: null,
 			viewScript: 'file:./view.js',
 			example: {},
 		},
@@ -57,6 +58,12 @@ const predefinedPluginTemplates = {
 			},
 			viewScript: 'file:./view.js',
 			example: {},
+			folderName: './src/$slug',
+			npmDependencies: [
+				'@wordpress/block-editor',
+				'@wordpress/blocks',
+				'@wordpress/i18n',
+			],
 		},
 		variants: {
 			static: {},
@@ -111,7 +118,7 @@ const getOutputAssets = async ( outputAssetsPath ) => {
 const externalTemplateExists = async ( templateName ) => {
 	try {
 		await command( `npm view ${ templateName }` );
-	} catch ( error ) {
+	} catch {
 		return false;
 	}
 	return true;
@@ -145,6 +152,49 @@ const configToTemplate = async ( {
 			blockTemplatesPath || join( __dirname, 'templates', 'block' );
 	}
 
+	// Process variant-specific template paths
+	const variantTemplates = {};
+	for ( const [ variantName, variantConfig ] of Object.entries( variants ) ) {
+		if ( ! variantConfig ) {
+			continue;
+		}
+
+		const variantPluginTemplatesPath = variantConfig.pluginTemplatesPath;
+		const variantBlockTemplatesPath = variantConfig.blockTemplatesPath;
+		const variantAssetsPath = variantConfig.assetsPath;
+
+		let pluginOutputTemplates = null;
+		if ( variantPluginTemplatesPath === null ) {
+			pluginOutputTemplates = {};
+		} else if ( variantPluginTemplatesPath ) {
+			pluginOutputTemplates = await getOutputTemplates(
+				variantPluginTemplatesPath
+			);
+		}
+
+		let blockOutputTemplates = null;
+		if ( variantBlockTemplatesPath === null ) {
+			blockOutputTemplates = {};
+		} else if ( variantBlockTemplatesPath ) {
+			blockOutputTemplates = await getOutputTemplates(
+				variantBlockTemplatesPath
+			);
+		}
+
+		let outputAssets = null;
+		if ( variantAssetsPath === null ) {
+			outputAssets = {};
+		} else if ( variantAssetsPath ) {
+			outputAssets = await getOutputAssets( variantAssetsPath );
+		}
+
+		variantTemplates[ variantName ] = {
+			pluginOutputTemplates,
+			blockOutputTemplates,
+			outputAssets,
+		};
+	}
+
 	return {
 		blockOutputTemplates: blockTemplatesPath
 			? await getOutputTemplates( blockTemplatesPath )
@@ -153,10 +203,11 @@ const configToTemplate = async ( {
 		outputAssets: assetsPath ? await getOutputAssets( assetsPath ) : {},
 		defaultValues,
 		variants,
+		variantTemplates,
 	};
 };
 
-const getPluginTemplate = async ( templateName ) => {
+const getProjectTemplate = async ( templateName ) => {
 	if ( predefinedPluginTemplates[ templateName ] ) {
 		return await configToTemplate(
 			predefinedPluginTemplates[ templateName ]
@@ -202,9 +253,11 @@ const getPluginTemplate = async ( templateName ) => {
 
 		const { name } = npmPackageArg( templateName );
 		return await configToTemplate(
-			require( require.resolve( name, {
-				paths: [ tempCwd ],
-			} ) )
+			require(
+				require.resolve( name, {
+					paths: [ tempCwd ],
+				} )
+			)
 		);
 	} catch ( error ) {
 		if ( error instanceof CLIError ) {
@@ -221,16 +274,20 @@ const getPluginTemplate = async ( templateName ) => {
 	}
 };
 
-const getDefaultValues = ( pluginTemplate, variant ) => {
+const getDefaultValues = ( projectTemplate, variant ) => {
 	return {
 		$schema: 'https://schemas.wp.org/trunk/block.json',
 		apiVersion: 3,
 		namespace: 'create-block',
 		category: 'widgets',
+		textdomain: '',
 		author: 'The WordPress Contributors',
 		license: 'GPL-2.0-or-later',
 		licenseURI: 'https://www.gnu.org/licenses/gpl-2.0.html',
 		version: '0.1.0',
+		requiresAtLeast: '6.8',
+		requiresPHP: '7.4',
+		testedUpTo: '6.8',
 		wpScripts: true,
 		customScripts: {},
 		wpEnv: false,
@@ -239,20 +296,34 @@ const getDefaultValues = ( pluginTemplate, variant ) => {
 		editorScript: 'file:./index.js',
 		editorStyle: 'file:./index.css',
 		style: 'file:./style-index.css',
-		...pluginTemplate.defaultValues,
-		...pluginTemplate.variants?.[ variant ],
-		variantVars: getVariantVars( pluginTemplate.variants, variant ),
+		transformer: ( view ) => view,
+		...projectTemplate.defaultValues,
+		...projectTemplate.variants?.[ variant ],
+		variantVars: getVariantVars( projectTemplate.variants, variant ),
 	};
 };
 
-const getPrompts = ( pluginTemplate, keys, variant ) => {
-	const defaultValues = getDefaultValues( pluginTemplate, variant );
-	return keys.map( ( promptName ) => {
-		return {
-			...prompts[ promptName ],
+const runPrompts = async (
+	projectTemplate,
+	promptNames,
+	variant,
+	optionsValues
+) => {
+	const defaultValues = getDefaultValues( projectTemplate, variant );
+	const result = {};
+	for ( const promptName of promptNames ) {
+		if ( Object.keys( optionsValues ).includes( promptName ) ) {
+			continue;
+		}
+
+		const { type, ...config } = prompts[ promptName ];
+		result[ promptName ] = await inquirer[ type ]( {
+			...config,
 			default: defaultValues[ promptName ],
-		};
-	} );
+		} );
+	}
+
+	return result;
 };
 
 const getVariantVars = ( variants, variant ) => {
@@ -266,15 +337,16 @@ const getVariantVars = ( variants, variant ) => {
 	for ( const variantName of variantNames ) {
 		const key =
 			variantName.charAt( 0 ).toUpperCase() + variantName.slice( 1 );
-		variantVars[ `is${ key }Variant` ] =
-			currentVariant === variantName ?? false;
+		variantVars[ `is${ key }Variant` ] = currentVariant === variantName;
 	}
 
 	return variantVars;
 };
 
 module.exports = {
-	getPluginTemplate,
 	getDefaultValues,
-	getPrompts,
+	getProjectTemplate,
+	runPrompts,
+	getOutputTemplates,
+	getOutputAssets,
 };

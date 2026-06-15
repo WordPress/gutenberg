@@ -1,4 +1,9 @@
+@use "@wordpress/base-styles/colors" as *;
+
 .wp-block-file {
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
+
 	&:not(.wp-element-button) {
 		font-size: 0.8em;
 	}
@@ -32,8 +37,7 @@
 	padding: 0.5em 1em;
 	display: inline-block;
 
-	&:is(a) {
-
+	&:where(a) {
 		&:hover,
 		&:visited,
 		&:focus,

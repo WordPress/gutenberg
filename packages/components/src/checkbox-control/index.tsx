@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type { ChangeEvent } from 'react';
 
 /**
@@ -16,8 +16,9 @@ import { Icon, check, reset } from '@wordpress/icons';
  * Internal dependencies
  */
 import BaseControl from '../base-control';
+import { HStack } from '../h-stack';
 import type { CheckboxControlProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 
 /**
  * Checkboxes allow the user to select one or more items from a set.
@@ -43,7 +44,8 @@ export function CheckboxControl(
 	props: WordPressComponentProps< CheckboxControlProps, 'input', false >
 ) {
 	const {
-		__nextHasNoMarginBottom,
+		// Prevent passing this to `input`.
+		__nextHasNoMarginBottom: _,
 		label,
 		className,
 		heading,
@@ -52,6 +54,7 @@ export function CheckboxControl(
 		help,
 		id: idProp,
 		onChange,
+		onClick,
 		...additionalProps
 	} = props;
 
@@ -92,45 +95,60 @@ export function CheckboxControl(
 
 	return (
 		<BaseControl
-			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 			label={ heading }
 			id={ id }
-			help={ help }
-			className={ classnames( 'components-checkbox-control', className ) }
+			help={
+				help && (
+					<span className="components-checkbox-control__help">
+						{ help }
+					</span>
+				)
+			}
+			className={ clsx( 'components-checkbox-control', className ) }
 		>
-			<span className="components-checkbox-control__input-container">
-				<input
-					ref={ ref }
-					id={ id }
-					className="components-checkbox-control__input"
-					type="checkbox"
-					value="1"
-					onChange={ onChangeValue }
-					checked={ checked }
-					aria-describedby={ !! help ? id + '__help' : undefined }
-					{ ...additionalProps }
-				/>
-				{ showIndeterminateIcon ? (
-					<Icon
-						icon={ reset }
-						className="components-checkbox-control__indeterminate"
-						role="presentation"
+			<HStack spacing={ 0 } justify="start" alignment="top">
+				<span className="components-checkbox-control__input-container">
+					<input
+						ref={ ref }
+						id={ id }
+						className="components-checkbox-control__input"
+						type="checkbox"
+						value="1"
+						onChange={ onChangeValue }
+						checked={ checked }
+						aria-describedby={ !! help ? id + '__help' : undefined }
+						onClick={ ( event ) => {
+							// Compat code for Safari to ensure that the checkbox is focused when clicked.
+							event.currentTarget.focus();
+
+							onClick?.( event );
+						} }
+						{ ...additionalProps }
 					/>
-				) : null }
-				{ showCheckedIcon ? (
-					<Icon
-						icon={ check }
-						className="components-checkbox-control__checked"
-						role="presentation"
-					/>
-				) : null }
-			</span>
-			<label
-				className="components-checkbox-control__label"
-				htmlFor={ id }
-			>
-				{ label }
-			</label>
+					{ showIndeterminateIcon ? (
+						<Icon
+							icon={ reset }
+							className="components-checkbox-control__indeterminate"
+							role="presentation"
+						/>
+					) : null }
+					{ showCheckedIcon ? (
+						<Icon
+							icon={ check }
+							className="components-checkbox-control__checked"
+							role="presentation"
+						/>
+					) : null }
+				</span>
+				{ label && (
+					<label
+						className="components-checkbox-control__label"
+						htmlFor={ id }
+					>
+						{ label }
+					</label>
+				) }
+			</HStack>
 		</BaseControl>
 	);
 }

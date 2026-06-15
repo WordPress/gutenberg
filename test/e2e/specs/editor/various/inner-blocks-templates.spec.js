@@ -11,7 +11,9 @@ test.describe( 'Inner blocks templates', () => {
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
-		await admin.createNewPost();
+		await admin.createNewPost( {
+			postType: 'page',
+		} );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -28,11 +30,9 @@ test.describe( 'Inner blocks templates', () => {
 			name: 'test/test-inner-blocks-async-template',
 		} );
 
-		const blockWithTemplateContent = page
-			.frameLocator( '[name=editor-canvas]' )
-			.locator(
-				'role=document[name="Block: Test Inner Blocks Async Template"i] >> text=OneTwo'
-			);
+		const blockWithTemplateContent = editor.canvas.locator(
+			'role=document[name="Block: Test Inner Blocks Async Template"i] >> text=OneTwo'
+		);
 
 		// The block template content appears asynchronously, so wait for it.
 		await expect( blockWithTemplateContent ).toBeVisible();
@@ -50,7 +50,7 @@ test.describe( 'Inner blocks templates', () => {
 		);
 		const undoButton = editorTopBar.locator( 'role=button[name="Undo"i]' );
 		const updateButton = editorTopBar.locator(
-			'role=button[name="Update"i]'
+			'role=button[name="Save"i]'
 		);
 		await expect( undoButton ).toHaveAttribute( 'aria-disabled', 'true' );
 		await expect( updateButton ).toHaveAttribute( 'aria-disabled', 'true' );

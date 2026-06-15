@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -95,7 +95,7 @@ export default [
 
 			const textClass = getColorClassName( 'color', textColor );
 
-			const className = classnames( {
+			const className = clsx( {
 				'has-background': backgroundColor || customBackgroundColor,
 				'has-text-color': textColor || customTextColor,
 				[ backgroundClass ]: backgroundClass,
@@ -210,7 +210,7 @@ export default [
 		save( { attributes } ) {
 			const { verticalAlignment, columns } = attributes;
 
-			const wrapperClasses = classnames( `has-${ columns }-columns`, {
+			const wrapperClasses = clsx( `has-${ columns }-columns`, {
 				[ `are-vertically-aligned-${ verticalAlignment }` ]:
 					verticalAlignment,
 			} );

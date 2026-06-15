@@ -2,6 +2,164 @@
 
 ## Unreleased
 
+## 23.40.0 (2026-06-10)
+
+## 23.39.0 (2026-05-27)
+
+## 23.38.0 (2026-05-14)
+
+## 23.37.0 (2026-04-29)
+
+## 23.36.0 (2026-04-15)
+
+## 23.35.0 (2026-04-01)
+
+## 23.34.0 (2026-03-18)
+
+## 23.33.0 (2026-03-04)
+
+## 23.32.0 (2026-02-18)
+
+## 23.31.0 (2026-01-29)
+
+## 23.30.0 (2026-01-16)
+
+### New Features
+
+-   Added `plugin-wpds/no-unknown-ds-tokens` and `plugin-wpds/no-setting-wpds-custom-properties` rules from `@wordpress/theme` to catch design token misuse ([#74226](https://github.com/WordPress/gutenberg/pull/74226)).
+
+## 23.28.0 (2025-11-26)
+
+## 23.27.0 (2025-11-12)
+
+## 23.26.0 (2025-10-29)
+
+## 23.25.0 (2025-10-17)
+
+## 23.24.0 (2025-10-01)
+
+## 23.23.0 (2025-09-17)
+
+## 23.22.0 (2025-09-03)
+
+## 23.21.0 (2025-08-20)
+
+## 23.20.0 (2025-08-07)
+
+## 23.19.0 (2025-07-23)
+
+## 23.18.0 (2025-06-25)
+
+## 23.17.0 (2025-06-04)
+
+## 23.16.0 (2025-05-22)
+
+## 23.15.0 (2025-05-07)
+
+## 23.14.0 (2025-04-11)
+
+## 23.13.0 (2025-03-27)
+
+## 23.12.0 (2025-03-13)
+
+## 23.11.0 (2025-02-28)
+
+## 23.10.0 (2025-02-12)
+
+## 23.9.0 (2025-01-29)
+
+## 23.8.0 (2025-01-15)
+
+## 23.7.0 (2025-01-02)
+
+## 23.6.0 (2024-12-11)
+
+## 23.5.0 (2024-11-27)
+
+## 23.4.0 (2024-11-16)
+
+## 23.3.0 (2024-10-30)
+
+## 23.2.0 (2024-10-16)
+
+## 23.1.0 (2024-10-03)
+
+## 23.0.0 (2024-09-19)
+
+### Breaking Changes
+
+-   Updated `stylelint` peer dependency requirement to `^16.8.2` ([#64828](https://github.com/WordPress/gutenberg/pull/64828)).
+-   Updated `stylelint-config-recommended` to `^14.0.1` and disabled new rules ([#64828](https://github.com/WordPress/gutenberg/pull/64828)).
+-   Updated `stylelint-config-recommended-scss` to `^14.1.0` and disabled new rules ([#64828](https://github.com/WordPress/gutenberg/pull/64828)).
+-   Added `@stylistic/stylelint-plugin` dependency at `^3.0.1` ([#64828](https://github.com/WordPress/gutenberg/pull/64828)).
+-   Migrated stylelint's deprecated rules from v15 to use `@stylistic/stylelint-plugin` ([#64828](https://github.com/WordPress/gutenberg/pull/64828)). For more information, see the [stylelint migration guide](https://stylelint.io/migration-guide/to-15). To migrate your rule overrides, you just need to add `@stylistic/` in front of the rule names.
+-   Created new `stylistic` and `scss-stylistic` configs ([#64828](https://github.com/WordPress/gutenberg/pull/64828)). If you want to continue using the exact same rule set as before, you should use these, however if you currently use something like `stylelint-config-prettier` to disable formatting rules, you will want to use the non-stylistic configs (using the same names as before).
+-   `scss/at-import-partial-extension` has been renamed ([#64828](https://github.com/WordPress/gutenberg/pull/64828)). You must convert this rule to `scss/load-partial-extension` instead (name only change).
+
+### Bug Fixes
+
+-   Fixes `declaration-block-no-duplicate-properties` in the `scss` config to use the same value as the base config ([#64828](https://github.com/WordPress/gutenberg/pull/64828)).
+
+## 22.7.0 (2024-09-05)
+
+## 22.6.0 (2024-08-21)
+
+## 22.5.0 (2024-08-07)
+
+## 22.4.0 (2024-07-24)
+
+## 22.3.0 (2024-07-10)
+
+## 22.2.0 (2024-06-26)
+
+## 22.1.0 (2024-06-15)
+
+## 22.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 21.41.0 (2024-05-16)
+
+## 21.40.0 (2024-05-02)
+
+## 21.39.0 (2024-04-19)
+
+## 21.38.0 (2024-04-03)
+
+## 21.37.0 (2024-03-21)
+
+## 21.36.0 (2024-03-06)
+
+## 21.35.0 (2024-02-21)
+
+## 21.34.0 (2024-02-09)
+
+## 21.33.0 (2024-01-24)
+
+## 21.32.0 (2024-01-10)
+
+## 21.31.0 (2023-12-13)
+
+## 21.30.0 (2023-11-29)
+
+## 21.29.0 (2023-11-16)
+
+## 21.28.0 (2023-11-02)
+
+## 21.27.0 (2023-10-18)
+
+## 21.26.0 (2023-10-05)
+
+## 21.25.0 (2023-09-20)
+
+## 21.24.0 (2023-08-31)
+
+## 21.23.0 (2023-08-16)
+
+## 21.22.0 (2023-08-10)
+
 ## 21.21.0 (2023-07-20)
 
 ## 21.20.0 (2023-07-05)
@@ -46,19 +204,19 @@
 
 ## 21.0.0 (2022-08-24)
 
-### Breaking Change
+### Breaking Changes
 
 -   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
 
 ## 20.0.0 (2022-01-27)
 
-### Breaking Change
+### Breaking Changes
 
 -   Increased minimum peer dependency of `stylelint` to `14.2.0` ([#38091](https://github.com/WordPress/gutenberg/pull/38091)). See [official migration guide to v14](https://github.com/stylelint/stylelint/blob/14.0.0/docs/migration-guide/to-14.md) for details.
 
 ## 19.0.0 (2021-01-21)
 
-### Breaking Change
+### Breaking Changes
 
 -   Increase the minimum Node.js version to 12 ([#27934](https://github.com/WordPress/gutenberg/pull/27934)).
 -   Increased minimum peer dependency of `stylelint` to `13.7.0`.
@@ -69,7 +227,7 @@
 
 ## 18.0.0 (2021-01-05)
 
-### Breaking Change
+### Breaking Changes
 
 -   Increase the minimum Node.js version to 12 ([#27934](https://github.com/WordPress/gutenberg/pull/27934)).
 
@@ -223,7 +381,7 @@
 -   Added: `no-extra-semicolons` rule.
 -   Added: `selector-attribute-operator-space-after` rule.
 -   Added: `selector-attribute-operator-space-before` rule.
--   Added: `selector-max-empty-liness` rule.
+-   Added: `selector-max-empty-lines` rule.
 
 ## 5.0.0 (2016-04-24)
 

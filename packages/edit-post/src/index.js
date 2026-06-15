@@ -7,22 +7,34 @@ import {
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
 import deprecated from '@wordpress/deprecated';
-import { createRoot } from '@wordpress/element';
-import { dispatch, select } from '@wordpress/data';
-import { addFilter } from '@wordpress/hooks';
+import { createRoot, StrictMode } from '@wordpress/element';
+import { dispatch, resolveSelect, select } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	registerLegacyWidgetBlock,
 	registerWidgetGroupBlock,
 } from '@wordpress/widgets';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
+import { store as coreDataStore } from '@wordpress/core-data';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
  */
-import './hooks';
-import './plugins';
-import Editor from './editor';
-import { store as editPostStore } from './store';
+import Layout from './components/layout';
+import { unlock } from './lock-unlock';
+
+const {
+	BackButton: __experimentalMainDashboardButton,
+	registerCoreBlockBindingsSources,
+} = unlock( editorPrivateApis );
+
+const { enablePreloadMultiUse, clearPreloadedData } = unlock(
+	apiFetch.privateApis
+);
 
 /**
  * Initializes and returns an instance of Editor.
@@ -42,93 +54,63 @@ export function initializeEditor(
 	settings,
 	initialEdits
 ) {
+	const isMediumOrBigger = window.matchMedia( '(min-width: 782px)' ).matches;
 	const target = document.getElementById( id );
 	const root = createRoot( target );
 
 	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
-		editorMode: 'visual',
-		fixedToolbar: false,
 		fullscreenMode: true,
-		hiddenBlockTypes: [],
-		inactivePanels: [],
-		isPublishSidebarEnabled: true,
-		openPanels: [ 'post-status' ],
-		preferredStyleVariations: {},
-		showBlockBreadcrumbs: true,
-		showIconLabels: false,
-		showListViewByDefault: false,
 		themeStyles: true,
 		welcomeGuide: true,
 		welcomeGuideTemplate: true,
 	} );
 
-	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
+	dispatch( preferencesStore ).setDefaults( 'core', {
+		allowRightClickOverrides: true,
+		editorMode: 'visual',
+		editorTool: 'edit',
+		fixedToolbar: false,
+		hiddenBlockTypes: [],
+		inactivePanels: [],
+		openPanels: [ 'post-status' ],
+		showBlockBreadcrumbs: true,
+		showIconLabels: false,
+		showListViewByDefault: false,
+		enableChoosePatternModal: true,
+		isPublishSidebarEnabled: true,
+		showCollaborationCursor: false,
+		showCollaborationNotifications: true,
+	} );
+
+	if ( window.__clientSideMediaProcessing ) {
+		dispatch( preferencesStore ).setDefaults( 'core/media', {
+			requireApproval: true,
+			optimizeOnUpload: true,
+		} );
+	}
+
+	dispatch( blocksStore ).reapplyBlockTypeFilters();
 
 	// Check if the block list view should be open by default.
 	// If `distractionFree` mode is enabled, the block list view should not be open.
+	// This behavior is disabled for small viewports.
 	if (
-		select( editPostStore ).isFeatureActive( 'showListViewByDefault' ) &&
-		! select( editPostStore ).isFeatureActive( 'distractionFree' )
+		isMediumOrBigger &&
+		select( preferencesStore ).get( 'core', 'showListViewByDefault' ) &&
+		! select( preferencesStore ).get( 'core', 'distractionFree' )
 	) {
-		dispatch( editPostStore ).setIsListViewOpened( true );
+		dispatch( editorStore ).setIsListViewOpened( true );
 	}
 
 	registerCoreBlocks();
+	registerCoreBlockBindingsSources();
 	registerLegacyWidgetBlock( { inserter: false } );
 	registerWidgetGroupBlock( { inserter: false } );
-	if ( process.env.IS_GUTENBERG_PLUGIN ) {
+	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 		__experimentalRegisterExperimentalCoreBlocks( {
 			enableFSEBlocks: settings.__unstableEnableFullSiteEditingBlocks,
 		} );
 	}
-
-	/*
-	 * Prevent adding template part in the post editor.
-	 * Only add the filter when the post editor is initialized, not imported.
-	 * Also only add the filter(s) after registerCoreBlocks()
-	 * so that common filters in the block library are not overwritten.
-	 */
-	addFilter(
-		'blockEditor.__unstableCanInsertBlockType',
-		'removeTemplatePartsFromInserter',
-		( canInsert, blockType ) => {
-			if (
-				! select( editPostStore ).isEditingTemplate() &&
-				blockType.name === 'core/template-part'
-			) {
-				return false;
-			}
-			return canInsert;
-		}
-	);
-
-	/*
-	 * Prevent adding post content block (except in query block) in the post editor.
-	 * Only add the filter when the post editor is initialized, not imported.
-	 * Also only add the filter(s) after registerCoreBlocks()
-	 * so that common filters in the block library are not overwritten.
-	 */
-	addFilter(
-		'blockEditor.__unstableCanInsertBlockType',
-		'removePostContentFromInserter',
-		(
-			canInsert,
-			blockType,
-			rootClientId,
-			{ getBlockParentsByBlockName }
-		) => {
-			if (
-				! select( editPostStore ).isEditingTemplate() &&
-				blockType.name === 'core/post-content'
-			) {
-				return (
-					getBlockParentsByBlockName( rootClientId, 'core/query' )
-						.length > 0
-				);
-			}
-			return canInsert;
-		}
-	);
 
 	// Show a console log warning if the browser is not in Standards rendering mode.
 	const documentMode =
@@ -174,16 +156,156 @@ export function initializeEditor(
 	window.addEventListener( 'dragover', ( e ) => e.preventDefault(), false );
 	window.addEventListener( 'drop', ( e ) => e.preventDefault(), false );
 
-	root.render(
-		<Editor
-			settings={ settings }
-			postId={ postId }
-			postType={ postType }
-			initialEdits={ initialEdits }
-		/>
-	);
+	// Drive the resolvers whose data `createPreloadingMiddleware`
+	// already has cached so every metadata entry they touch is
+	// `finished` by the time React mounts — no `setTimeout(0)`
+	// resolution dance on first render. Multi-use lets a single
+	// preloaded URL back several selectors (e.g. /wp/v2/settings GET +
+	// OPTIONS serves `getEntitiesConfig`, `canUser`, `getEntityRecord`).
+	enablePreloadMultiUse();
+	const preloadedResolutions = preloadResolutions( postType, postId );
+
+	preloadedResolutions.finally( () => {
+		// Anything not consumed by the kickoff falls through to a real
+		// network request from here on. `clearPreloadedData` logs which
+		// preload entries (if any) were never served.
+		clearPreloadedData();
+		if ( postType && postId ) {
+			const post = select( coreDataStore ).getEntityRecord(
+				'postType',
+				postType,
+				postId
+			);
+			if ( post ) {
+				dispatch( editorStore ).setupEditor(
+					post,
+					initialEdits,
+					settings.template
+				);
+			}
+		}
+		root.render(
+			<StrictMode>
+				<Layout
+					settings={ settings }
+					postId={ postId }
+					postType={ postType }
+					initialEdits={ initialEdits }
+				/>
+			</StrictMode>
+		);
+	} );
 
 	return root;
+}
+
+/**
+ * Drive resolvers to completion against the preload cache before React
+ * mounts. Two phases: known-up-front args (post id + type), then args
+ * derived from phase-1 state (post slug → template, current global
+ * styles id → record + canUser).
+ *
+ * @param {string} postType Current post type.
+ * @param {number} postId   Current post id.
+ * @return {Promise<void>}  Resolves when the kickoff resolvers settle.
+ */
+async function preloadResolutions( postType, postId ) {
+	const core = resolveSelect( coreDataStore );
+	const coreSelect = select( coreDataStore );
+
+	try {
+		await Promise.all( [
+			core.getCurrentUser(),
+			core.getEntitiesConfig( 'postType' ),
+			core.getEntitiesConfig( 'taxonomy' ),
+			core.getEntitiesConfig( 'root' ),
+			core.getEntityRecords( 'root', 'taxonomy' ),
+			core.getCurrentTheme(),
+			// Forward-resolver alias of `getCurrentTheme` with its own
+			// resolution metadata, so it needs a separate kick.
+			core.getThemeSupports(),
+			core.getBlockPatternCategories(),
+			core.__experimentalGetCurrentGlobalStylesId(),
+			core.__experimentalGetCurrentThemeBaseGlobalStyles(),
+			core.__experimentalGetCurrentThemeGlobalStylesVariations(),
+			core.getEntityRecord( 'root', '__unstableBase' ),
+			core.getEntityRecord( 'root', 'site' ),
+			core.canUser( 'read', { kind: 'root', name: 'site' } ),
+			core.canUser( 'create', { kind: 'postType', name: 'attachment' } ),
+			core.canUser( 'create', { kind: 'postType', name: 'page' } ),
+			core.canUser( 'create', { kind: 'postType', name: 'wp_block' } ),
+			core.canUser( 'create', {
+				kind: 'postType',
+				name: 'wp_template',
+			} ),
+			// Per-post resolvers. `getPostType` and `getEditedEntityRecord`
+			// are shorthand/forward-resolver aliases with their own
+			// resolution metadata, so they need separate kicks.
+			...( postType && postId
+				? [
+						core.getPostType( postType ),
+						core.getEntityRecord( 'postType', postType, postId ),
+						core.getEditedEntityRecord(
+							'postType',
+							postType,
+							postId
+						),
+						core.getAutosaves( postType, postId ),
+						core.getDefaultTemplateId( { slug: 'front-page' } ),
+						core.canUser( 'create', {
+							kind: 'postType',
+							name: postType,
+						} ),
+				  ]
+				: [] ),
+		] );
+
+		// Phase 2: read derived data out of state.
+		const tasks = [];
+		const globalStylesId =
+			coreSelect.__experimentalGetCurrentGlobalStylesId();
+		if ( globalStylesId ) {
+			tasks.push(
+				core.getEntityRecord( 'root', 'globalStyles', globalStylesId ),
+				core.canUser( 'read', {
+					kind: 'root',
+					name: 'globalStyles',
+					id: globalStylesId,
+				} )
+			);
+		}
+
+		if ( postType && postId ) {
+			const post = coreSelect.getEntityRecord(
+				'postType',
+				postType,
+				postId
+			);
+			if ( post ) {
+				// Mirrors core-data's `getDefaultTemplate` slug formula.
+				let slug = 'page' === postType ? 'page' : 'single-' + postType;
+				if ( post.slug ) {
+					slug += '-' + post.slug;
+				}
+				tasks.push( core.getDefaultTemplateId( { slug } ) );
+
+				if ( post.author ) {
+					tasks.push(
+						core.getUser( post.author, {
+							context: 'view',
+							_fields: 'id,name',
+						} )
+					);
+				}
+			}
+		}
+
+		if ( tasks.length ) {
+			await Promise.all( tasks );
+		}
+	} catch {
+		// Resolver failures here would also surface on demand; don't block render.
+	}
 }
 
 /**
@@ -196,14 +318,7 @@ export function reinitializeEditor() {
 	} );
 }
 
-export { default as PluginBlockSettingsMenuItem } from './components/block-settings-menu/plugin-block-settings-menu-item';
-export { default as PluginDocumentSettingPanel } from './components/sidebar/plugin-document-setting-panel';
-export { default as PluginMoreMenuItem } from './components/header/plugin-more-menu-item';
-export { default as PluginPostPublishPanel } from './components/sidebar/plugin-post-publish-panel';
-export { default as PluginPostStatusInfo } from './components/sidebar/plugin-post-status-info';
-export { default as PluginPrePublishPanel } from './components/sidebar/plugin-pre-publish-panel';
-export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';
-export { default as PluginSidebarMoreMenuItem } from './components/header/plugin-sidebar-more-menu-item';
-export { default as __experimentalFullscreenModeClose } from './components/header/fullscreen-mode-close';
-export { default as __experimentalMainDashboardButton } from './components/header/main-dashboard-button';
+export { default as __experimentalFullscreenModeClose } from './components/back-button/fullscreen-mode-close';
+export { __experimentalMainDashboardButton };
 export { store } from './store';
+export * from './deprecated';

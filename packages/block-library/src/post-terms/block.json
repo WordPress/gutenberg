@@ -10,24 +10,27 @@
 		"term": {
 			"type": "string"
 		},
-		"textAlign": {
-			"type": "string"
-		},
 		"separator": {
 			"type": "string",
 			"default": ", "
 		},
 		"prefix": {
 			"type": "string",
-			"default": ""
+			"default": "",
+			"role": "content"
 		},
 		"suffix": {
 			"type": "string",
-			"default": ""
+			"default": "",
+			"role": "content"
 		}
 	},
 	"usesContext": [ "postId", "postType" ],
+	"example": {
+		"viewportWidth": 350
+	},
 	"supports": {
+		"anchor": true,
 		"html": false,
 		"color": {
 			"gradients": true,
@@ -45,6 +48,7 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,
@@ -53,6 +57,21 @@
 			"__experimentalLetterSpacing": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
+			}
+		},
+		"interactivity": {
+			"clientNavigation": true
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true,
+			"__experimentalDefaultControls": {
+				"radius": true,
+				"color": true,
+				"width": true,
+				"style": true
 			}
 		}
 	},

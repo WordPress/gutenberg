@@ -7,8 +7,7 @@ import {
 	FlexBlock,
 	__experimentalNumberControl as NumberControl,
 } from '@wordpress/components';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 
 /**
@@ -17,25 +16,35 @@ import { useState } from '@wordpress/element';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { store as editorStore } from '../../store';
 
-export const PageAttributesOrder = ( { onUpdateOrder, order = 0 } ) => {
+function PageAttributesOrder() {
+	const order = useSelect(
+		( select ) =>
+			select( editorStore ).getEditedPostAttribute( 'menu_order' ) ?? 0,
+		[]
+	);
+	const { editPost } = useDispatch( editorStore );
 	const [ orderInput, setOrderInput ] = useState( null );
 
 	const setUpdatedOrder = ( value ) => {
 		setOrderInput( value );
 		const newOrder = Number( value );
 		if ( Number.isInteger( newOrder ) && value.trim?.() !== '' ) {
-			onUpdateOrder( Number( value ) );
+			editPost( { menu_order: newOrder } );
 		}
 	};
-	const value = orderInput === null ? order : orderInput;
+
+	const value = orderInput ?? order;
+
 	return (
 		<Flex>
 			<FlexBlock>
 				<NumberControl
+					__next40pxDefaultSize
 					label={ __( 'Order' ) }
+					help={ __( 'Set the page order.' ) }
 					value={ value }
 					onChange={ setUpdatedOrder }
-					labelPosition="side"
+					hideLabelFromVision
 					onBlur={ () => {
 						setOrderInput( null );
 					} }
@@ -43,27 +52,19 @@ export const PageAttributesOrder = ( { onUpdateOrder, order = 0 } ) => {
 			</FlexBlock>
 		</Flex>
 	);
-};
+}
 
-function PageAttributesOrderWithChecks( props ) {
+/**
+ * Renders the Page Attributes Order component. A number input in an editor interface
+ * for setting the order of a given page.
+ * The component is now not used in core but was kept for backward compatibility.
+ *
+ * @return {React.ReactNode} The rendered component.
+ */
+export default function PageAttributesOrderWithChecks() {
 	return (
 		<PostTypeSupportCheck supportKeys="page-attributes">
-			<PageAttributesOrder { ...props } />
+			<PageAttributesOrder />
 		</PostTypeSupportCheck>
 	);
 }
-
-export default compose( [
-	withSelect( ( select ) => {
-		return {
-			order: select( editorStore ).getEditedPostAttribute( 'menu_order' ),
-		};
-	} ),
-	withDispatch( ( dispatch ) => ( {
-		onUpdateOrder( order ) {
-			dispatch( editorStore ).editPost( {
-				menu_order: order,
-			} );
-		},
-	} ) ),
-] )( PageAttributesOrderWithChecks );

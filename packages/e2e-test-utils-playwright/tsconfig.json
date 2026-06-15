@@ -1,25 +1,16 @@
 {
+	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"incremental": false,
 		"composite": false,
-		"module": "CommonJS",
-		"types": [ "node" ],
-		"rootDir": "src",
+		"module": "Node16",
+		"moduleResolution": "node16",
 		"noEmit": false,
 		"outDir": "build",
 		"sourceMap": true,
-		"declaration": true,
-		"declarationMap": true,
-		"declarationDir": "build-types",
 		"emitDeclarationOnly": false,
 		"allowJs": true,
 		"checkJs": false
-	},
-	"references": [
-		{ "path": "../api-fetch" },
-		{ "path": "../keycodes" },
-		{ "path": "../url" }
-	],
-	"include": [ "src/**/*" ]
+	}
 }

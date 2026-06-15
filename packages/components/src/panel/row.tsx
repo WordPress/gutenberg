@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -20,7 +20,7 @@ function UnforwardedPanelRow(
 ) {
 	return (
 		<div
-			className={ classnames( 'components-panel__row', className ) }
+			className={ clsx( 'components-panel__row', className ) }
 			ref={ ref }
 		>
 			{ children }
@@ -33,5 +33,6 @@ function UnforwardedPanelRow(
  * It is a flex container with a top margin for spacing.
  */
 export const PanelRow = forwardRef( UnforwardedPanelRow );
+PanelRow.displayName = 'PanelRow';
 
 export default PanelRow;

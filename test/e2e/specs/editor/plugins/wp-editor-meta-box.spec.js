@@ -17,34 +17,42 @@ test.describe( 'WP Editor Meta Boxes', () => {
 	} );
 
 	test( 'Should save the changes', async ( { admin, editor, page } ) => {
-		await admin.createNewPost( { legacyCanvas: true } );
+		await admin.createNewPost();
 
 		// Add title to enable valid non-empty post save.
-		await editor.canvas.type(
-			'role=textbox[name="Add title"i]',
-			'Hello Meta'
+		await editor.canvas
+			.locator( 'role=textbox[name="Add title"i]' )
+			.type( 'Hello Meta' );
+
+		// Open the meta box pane. The click isn’t in the center because that
+		// would hit the resize handle instead of the located element.
+		await page
+			.getByRole( 'button', { name: 'Meta Boxes' } )
+			.click( { position: { x: 0, y: 0 } } );
+
+		// Switch to Visual mode and wait for TinyMCE to fully initialize.
+		// This ensures getSelection() won't return null when TinyMCE tries
+		// to restore cursor position during subsequent mode switches.
+		await page.locator( 'role=button[name="Visual"i]' ).click();
+		await page.waitForFunction(
+			() => window.tinyMCE?.get( 'test_tinymce_id' )?.initialized
 		);
 
-		// Type something.
-		await page.click( 'role=button[name="Text"i]' );
-		await page.click( '#test_tinymce_id' );
-		await page.keyboard.type( 'Typing in a metabox' );
-		await page.type( '#test_tinymce_id-html', 'Typing in a metabox' );
-		await page.click( 'role=button[name="Visual"i]' );
+		// Switch to Code mode and type into the textarea.
+		await page.locator( 'role=button[name="Code"i]' ).click();
+		const metaBoxField = page.locator( '#test_tinymce_id' );
+		await metaBoxField.type( 'Typing in a metabox' );
+
+		// Switch back to Visual mode and wait for re-initialization.
+		await page.locator( 'role=button[name="Visual"i]' ).click();
+		await page.waitForFunction(
+			() => window.tinyMCE?.get( 'test_tinymce_id' )?.initialized
+		);
 
 		await editor.publishPost();
+		await page.reload();
 
-		// Close the publish panel so that it won't cover the tinymce editor.
-		await page.click(
-			'role=region[name="Editor publish"i] >> role=button[name="Close panel"i]'
-		);
-
-		await expect( page.locator( '.edit-post-layout' ) ).toBeVisible();
-
-		await page.click( 'role=button[name="Text"i]' );
-
-		// Expect the typed text on the tinymce editor
-		const content = page.locator( '#test_tinymce_id' );
-		await expect( content ).toHaveValue( 'Typing in a metabox' );
+		// Expect the typed text in the tinymce Text mode textarea.
+		await expect( metaBoxField ).toHaveValue( 'Typing in a metabox' );
 	} );
 } );

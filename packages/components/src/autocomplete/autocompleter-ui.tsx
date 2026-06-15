@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
+import { createPortal } from 'react-dom';
 
 /**
  * WordPress dependencies
@@ -24,163 +25,195 @@ import getDefaultUseItems from './get-default-use-items';
 import Button from '../button';
 import Popover from '../popover';
 import { VisuallyHidden } from '../visually-hidden';
-import { createPortal } from 'react-dom';
-import type { AutocompleterUIProps, KeyedOption, WPCompleter } from './types';
+import type { AutocompleterUIProps, KeyedOption } from './types';
 
-export function getAutoCompleterUI( autocompleter: WPCompleter ) {
-	const useItems = autocompleter.useItems
-		? autocompleter.useItems
-		: getDefaultUseItems( autocompleter );
+type ListBoxProps = {
+	items: KeyedOption[];
+	onSelect: ( option: KeyedOption ) => void;
+	selectedIndex: number;
+	instanceId: number;
+	listBoxId: string | undefined;
+	className?: string;
+	Component?: React.ElementType;
+};
 
-	function AutocompleterUI( {
-		filterValue,
-		instanceId,
-		listBoxId,
-		className,
-		selectedIndex,
-		onChangeOptions,
-		onSelect,
-		onReset,
-		reset,
-		contentRef,
-	}: AutocompleterUIProps ) {
-		const [ items ] = useItems( filterValue );
-		const popoverAnchor = useAnchor( {
-			editableContentElement: contentRef.current,
-		} );
-
-		const [ needsA11yCompat, setNeedsA11yCompat ] = useState( false );
-		const popoverRef = useRef< HTMLElement >( null );
-		const popoverRefs = useMergeRefs( [
-			popoverRef,
-			useRefEffect(
-				( node ) => {
-					if ( ! contentRef.current ) return;
-
-					// If the popover is rendered in a different document than
-					// the content, we need to duplicate the options list in the
-					// content document so that it's available to the screen
-					// readers, which check the DOM ID based aira-* attributes.
-					setNeedsA11yCompat(
-						node.ownerDocument !== contentRef.current.ownerDocument
-					);
-				},
-				[ contentRef ]
-			),
-		] );
-
-		useOnClickOutside( popoverRef, reset );
-
-		const debouncedSpeak = useDebounce( speak, 500 );
-
-		function announce( options: Array< KeyedOption > ) {
-			if ( ! debouncedSpeak ) {
-				return;
-			}
-			if ( !! options.length ) {
-				if ( filterValue ) {
-					debouncedSpeak(
-						sprintf(
-							/* translators: %d: number of results. */
-							_n(
-								'%d result found, use up and down arrow keys to navigate.',
-								'%d results found, use up and down arrow keys to navigate.',
-								options.length
-							),
-							options.length
-						),
-						'assertive'
-					);
-				} else {
-					debouncedSpeak(
-						sprintf(
-							/* translators: %d: number of results. */
-							_n(
-								'Initial %d result loaded. Type to filter all available results. Use up and down arrow keys to navigate.',
-								'Initial %d results loaded. Type to filter all available results. Use up and down arrow keys to navigate.',
-								options.length
-							),
-							options.length
-						),
-						'assertive'
-					);
-				}
-			} else {
-				debouncedSpeak( __( 'No results.' ), 'assertive' );
-			}
-		}
-
-		useLayoutEffect( () => {
-			onChangeOptions( items );
-			announce( items );
-			// Temporarily disabling exhaustive-deps to avoid introducing unexpected side effecst.
-			// See https://github.com/WordPress/gutenberg/pull/41820
-			// eslint-disable-next-line react-hooks/exhaustive-deps
-		}, [ items ] );
-
-		if ( items.length === 0 ) {
-			return null;
-		}
-
-		const ListBox = ( {
-			Component = 'div',
-		}: {
-			Component?: React.ElementType;
-		} ) => (
-			<Component
-				id={ listBoxId }
-				role="listbox"
-				className="components-autocomplete__results"
-			>
-				{ items.map( ( option, index ) => (
-					<Button
-						key={ option.key }
-						id={ `components-autocomplete-item-${ instanceId }-${ option.key }` }
-						role="option"
-						aria-selected={ index === selectedIndex }
-						disabled={ option.isDisabled }
-						className={ classnames(
-							'components-autocomplete__result',
-							className,
-							{
-								'is-selected': index === selectedIndex,
-							}
-						) }
-						onClick={ () => onSelect( option ) }
-					>
-						{ option.label }
-					</Button>
-				) ) }
-			</Component>
-		);
-
-		return (
-			<>
-				<Popover
-					focusOnMount={ false }
-					onClose={ onReset }
-					placement="top-start"
-					className="components-autocomplete__popover"
-					anchor={ popoverAnchor }
-					ref={ popoverRefs }
-				>
-					<ListBox />
-				</Popover>
-				{ contentRef.current &&
-					needsA11yCompat &&
-					createPortal(
-						<ListBox Component={ VisuallyHidden } />,
-						contentRef.current.ownerDocument.body
+function ListBox( {
+	items,
+	onSelect,
+	selectedIndex,
+	instanceId,
+	listBoxId,
+	className,
+	Component = 'div',
+}: ListBoxProps ) {
+	return (
+		<Component
+			id={ listBoxId }
+			role="listbox"
+			className="components-autocomplete__results"
+		>
+			{ items.map( ( option, index ) => (
+				<Button
+					key={ option.key }
+					id={ `components-autocomplete-item-${ instanceId }-${ option.key }` }
+					role="option"
+					__next40pxDefaultSize
+					aria-selected={ index === selectedIndex }
+					accessibleWhenDisabled
+					disabled={ option.isDisabled }
+					className={ clsx(
+						'components-autocomplete__result',
+						className,
+						{
+							// Unused, for backwards compatibility.
+							'is-selected': index === selectedIndex,
+						}
 					) }
-			</>
-		);
+					variant={ index === selectedIndex ? 'primary' : undefined }
+					onClick={ () => onSelect( option ) }
+				>
+					{ option.label }
+				</Button>
+			) ) }
+		</Component>
+	);
+}
+
+export function AutocompleterUI( {
+	autocompleter,
+	filterValue,
+	instanceId,
+	listBoxId,
+	className,
+	selectedIndex,
+	onChangeOptions,
+	onSelect,
+	reset,
+	contentRef,
+}: AutocompleterUIProps ) {
+	// The useItems hook is derived from the autocompleter prop. This is safe
+	// because the parent renders this component with key={autocompleter.name},
+	// ensuring a fresh mount (and stable hook identity) when the completer changes.
+	const useItems =
+		autocompleter.useItems ?? getDefaultUseItems( autocompleter );
+	const [ items ] = useItems( filterValue );
+	const popoverAnchor = useAnchor( {
+		editableContentElement: contentRef.current,
+	} );
+
+	const [ needsA11yCompat, setNeedsA11yCompat ] = useState( false );
+	const popoverRef = useRef< HTMLElement >( null );
+	const popoverRefs = useMergeRefs( [
+		popoverRef,
+		useRefEffect(
+			( node ) => {
+				if ( ! contentRef.current ) {
+					return;
+				}
+
+				// If the popover is rendered in a different document than
+				// the content, we need to duplicate the options list in the
+				// content document so that it's available to the screen
+				// readers, which check the DOM ID based aria-* attributes.
+				setNeedsA11yCompat(
+					node.ownerDocument !== contentRef.current.ownerDocument
+				);
+			},
+			[ contentRef ]
+		),
+	] );
+
+	useOnClickOutside( popoverRef, reset );
+
+	const debouncedSpeak = useDebounce( speak, 500 );
+
+	function announce( options: Array< KeyedOption > ) {
+		if ( ! debouncedSpeak ) {
+			return;
+		}
+		if ( !! options.length ) {
+			if ( filterValue ) {
+				debouncedSpeak(
+					sprintf(
+						/* translators: %d: number of results. */
+						_n(
+							'%d result found, use up and down arrow keys to navigate.',
+							'%d results found, use up and down arrow keys to navigate.',
+							options.length
+						),
+						options.length
+					),
+					'assertive'
+				);
+			} else {
+				debouncedSpeak(
+					sprintf(
+						/* translators: %d: number of results. */
+						_n(
+							'Initial %d result loaded. Type to filter all available results. Use up and down arrow keys to navigate.',
+							'Initial %d results loaded. Type to filter all available results. Use up and down arrow keys to navigate.',
+							options.length
+						),
+						options.length
+					),
+					'assertive'
+				);
+			}
+		} else {
+			debouncedSpeak( __( 'No results.' ), 'assertive' );
+		}
 	}
 
-	return AutocompleterUI;
+	useLayoutEffect( () => {
+		onChangeOptions( items );
+		announce( items );
+		// We want to avoid introducing unexpected side effects.
+		// See https://github.com/WordPress/gutenberg/pull/41820
+	}, [ items ] );
+
+	if ( items.length === 0 ) {
+		return null;
+	}
+
+	return (
+		<>
+			<Popover
+				offset={ 8 }
+				focusOnMount={ false }
+				placement="top-start"
+				className="components-autocomplete__popover"
+				anchor={ popoverAnchor }
+				ref={ popoverRefs }
+			>
+				<ListBox
+					items={ items }
+					onSelect={ onSelect }
+					selectedIndex={ selectedIndex }
+					instanceId={ instanceId }
+					listBoxId={ listBoxId }
+					className={ className }
+				/>
+			</Popover>
+			{ contentRef.current &&
+				needsA11yCompat &&
+				createPortal(
+					<ListBox
+						items={ items }
+						onSelect={ onSelect }
+						selectedIndex={ selectedIndex }
+						instanceId={ instanceId }
+						listBoxId={ listBoxId }
+						className={ className }
+						Component={ VisuallyHidden }
+					/>,
+					contentRef.current.ownerDocument.body
+				) }
+		</>
+	);
 }
 
 function useOnClickOutside(
-	ref: React.RefObject< HTMLElement >,
+	ref: React.RefObject< HTMLElement | null >,
 	handler: AutocompleterUIProps[ 'reset' ]
 ) {
 	useEffect( () => {
@@ -200,8 +233,5 @@ function useOnClickOutside(
 			document.removeEventListener( 'mousedown', listener );
 			document.removeEventListener( 'touchstart', listener );
 		};
-		// Disable reason: `ref` is a ref object and should not be included in a
-		// hook's dependency list.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ handler ] );
+	}, [ handler, ref ] );
 }

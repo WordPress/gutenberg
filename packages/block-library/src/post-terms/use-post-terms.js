@@ -4,16 +4,18 @@
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
+const EMPTY_ARRAY = [];
+
 export default function usePostTerms( { postId, term } ) {
 	const { slug } = term;
 
 	return useSelect(
 		( select ) => {
 			const visible = term?.visibility?.publicly_queryable;
-			if ( ! visible ) {
+			if ( ! visible || ! postId ) {
 				return {
-					postTerms: [],
-					_isLoading: false,
+					postTerms: EMPTY_ARRAY,
+					isLoading: false,
 					hasPostTerms: false,
 				};
 			}

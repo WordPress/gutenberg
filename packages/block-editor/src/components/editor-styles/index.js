@@ -9,17 +9,19 @@ import a11yPlugin from 'colord/plugins/a11y';
  * WordPress dependencies
  */
 import { SVG } from '@wordpress/components';
-import { useCallback, useMemo } from '@wordpress/element';
+import { useCallback, useMemo, memo } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import transformStyles from '../../utils/transform-styles';
+import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
-const EDITOR_STYLES_SELECTOR = '.editor-styles-wrapper';
 extend( [ namesPlugin, a11yPlugin ] );
 
-function useDarkThemeBodyClassName( styles ) {
+function useDarkThemeBodyClassName( styles, scope ) {
 	return useCallback(
 		( node ) => {
 			if ( ! node ) {
@@ -28,9 +30,7 @@ function useDarkThemeBodyClassName( styles ) {
 
 			const { ownerDocument } = node;
 			const { defaultView, body } = ownerDocument;
-			const canvas = ownerDocument.querySelector(
-				EDITOR_STYLES_SELECTOR
-			);
+			const canvas = scope ? ownerDocument.querySelector( scope ) : body;
 
 			let backgroundColor;
 
@@ -63,38 +63,48 @@ function useDarkThemeBodyClassName( styles ) {
 				body.classList.add( 'is-dark-theme' );
 			}
 		},
-		[ styles ]
+		[ styles, scope ]
 	);
 }
 
-export default function EditorStyles( { styles } ) {
-	const stylesArray = useMemo(
-		() => Object.values( styles ?? [] ),
-		[ styles ]
+function EditorStyles( { styles, scope, transformOptions } ) {
+	const overrides = useSelect(
+		( select ) => unlock( select( blockEditorStore ) ).getStyleOverrides(),
+		[]
 	);
-	const transformedStyles = useMemo(
-		() =>
-			transformStyles(
-				stylesArray.filter( ( style ) => style?.css ),
-				EDITOR_STYLES_SELECTOR
-			),
-		[ stylesArray ]
-	);
+	const [ transformedStyles, transformedSvgs ] = useMemo( () => {
+		const _styles = Object.values( styles ?? [] );
 
-	const transformedSvgs = useMemo(
-		() =>
-			stylesArray
+		for ( const [ id, override ] of overrides ) {
+			const index = _styles.findIndex( ( { id: _id } ) => id === _id );
+			const overrideWithId = { ...override, id };
+			if ( index === -1 ) {
+				_styles.push( overrideWithId );
+			} else {
+				_styles[ index ] = overrideWithId;
+			}
+		}
+
+		return [
+			transformStyles(
+				_styles.filter( ( style ) => style?.css ),
+				scope,
+				transformOptions
+			),
+			_styles
 				.filter( ( style ) => style.__unstableType === 'svgs' )
 				.map( ( style ) => style.assets )
 				.join( '' ),
-		[ stylesArray ]
-	);
+		];
+	}, [ styles, overrides, scope, transformOptions ] );
 
 	return (
 		<>
 			{ /* Use an empty style element to have a document reference,
 			     but this could be any element. */ }
-			<style ref={ useDarkThemeBodyClassName( stylesArray ) } />
+			<style
+				ref={ useDarkThemeBodyClassName( transformedStyles, scope ) }
+			/>
 			{ transformedStyles.map( ( css, index ) => (
 				<style key={ index }>{ css }</style>
 			) ) }
@@ -115,3 +125,5 @@ export default function EditorStyles( { styles } ) {
 		</>
 	);
 }
+
+export default memo( EditorStyles );

@@ -6,47 +6,67 @@ import {
 	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
 
-function PostSwitchToDraftButton( {
-	isSaving,
-	isPublished,
-	isScheduled,
-	onClick,
-} ) {
+/**
+ * Renders a button component that allows the user to switch a post to draft status.
+ *
+ * @return {React.ReactNode} The rendered component.
+ */
+export default function PostSwitchToDraftButton() {
+	deprecated( 'wp.editor.PostSwitchToDraftButton', {
+		since: '6.7',
+		version: '6.9',
+	} );
 	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
 
-	if ( ! isPublished && ! isScheduled ) {
-		return null;
-	}
+	const { editPost, savePost } = useDispatch( editorStore );
+	const { isSaving, isPublished, isScheduled } = useSelect( ( select ) => {
+		const { isSavingPost, isCurrentPostPublished, isCurrentPostScheduled } =
+			select( editorStore );
+		return {
+			isSaving: isSavingPost(),
+			isPublished: isCurrentPostPublished(),
+			isScheduled: isCurrentPostScheduled(),
+		};
+	}, [] );
+
+	const isDisabled = isSaving || ( ! isPublished && ! isScheduled );
 
 	let alertMessage;
+	let confirmButtonText;
 	if ( isPublished ) {
 		alertMessage = __( 'Are you sure you want to unpublish this post?' );
+		confirmButtonText = __( 'Unpublish' );
 	} else if ( isScheduled ) {
 		alertMessage = __( 'Are you sure you want to unschedule this post?' );
+		confirmButtonText = __( 'Unschedule' );
 	}
 
 	const handleConfirm = () => {
 		setShowConfirmDialog( false );
-		onClick();
+		editPost( { status: 'draft' } );
+		savePost();
 	};
 
 	return (
 		<>
 			<Button
+				__next40pxDefaultSize
 				className="editor-post-switch-to-draft"
 				onClick={ () => {
-					setShowConfirmDialog( true );
+					if ( ! isDisabled ) {
+						setShowConfirmDialog( true );
+					}
 				} }
-				disabled={ isSaving }
+				aria-disabled={ isDisabled }
 				variant="secondary"
 				style={ { flexGrow: '1', justifyContent: 'center' } }
 			>
@@ -56,30 +76,10 @@ function PostSwitchToDraftButton( {
 				isOpen={ showConfirmDialog }
 				onConfirm={ handleConfirm }
 				onCancel={ () => setShowConfirmDialog( false ) }
+				confirmButtonText={ confirmButtonText }
 			>
 				{ alertMessage }
 			</ConfirmDialog>
 		</>
 	);
 }
-
-export default compose( [
-	withSelect( ( select ) => {
-		const { isSavingPost, isCurrentPostPublished, isCurrentPostScheduled } =
-			select( editorStore );
-		return {
-			isSaving: isSavingPost(),
-			isPublished: isCurrentPostPublished(),
-			isScheduled: isCurrentPostScheduled(),
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const { editPost, savePost } = dispatch( editorStore );
-		return {
-			onClick: () => {
-				editPost( { status: 'draft' } );
-				savePost();
-			},
-		};
-	} ),
-] )( PostSwitchToDraftButton );

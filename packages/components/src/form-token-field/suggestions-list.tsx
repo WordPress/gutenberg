@@ -1,15 +1,14 @@
 /**
  * External dependencies
  */
-import scrollView from 'dom-scroll-into-view';
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type { MouseEventHandler, ReactNode } from 'react';
 
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -21,7 +20,9 @@ const handleMouseDown: MouseEventHandler = ( e ) => {
 	e.preventDefault();
 };
 
-export function SuggestionsList< T extends string | { value: string } >( {
+export function SuggestionsList<
+	T extends string | { value: string; disabled?: boolean },
+>( {
 	selectedIndex,
 	scrollIntoView,
 	match,
@@ -32,45 +33,28 @@ export function SuggestionsList< T extends string | { value: string } >( {
 	instanceId,
 	__experimentalRenderItem,
 }: SuggestionsListProps< T > ) {
-	const [ scrollingIntoView, setScrollingIntoView ] = useState( false );
-
 	const listRef = useRefEffect< HTMLUListElement >(
 		( listNode ) => {
 			// only have to worry about scrolling selected suggestion into view
 			// when already expanded.
-			let rafId: number | undefined;
 			if (
 				selectedIndex > -1 &&
 				scrollIntoView &&
 				listNode.children[ selectedIndex ]
 			) {
-				setScrollingIntoView( true );
-				scrollView(
-					listNode.children[ selectedIndex ] as HTMLLIElement,
-					listNode,
-					{
-						onlyScrollIfNeeded: true,
-					}
-				);
-				rafId = requestAnimationFrame( () => {
-					setScrollingIntoView( false );
+				listNode.children[ selectedIndex ].scrollIntoView( {
+					behavior: 'instant',
+					block: 'nearest',
+					inline: 'nearest',
 				} );
 			}
-
-			return () => {
-				if ( rafId !== undefined ) {
-					cancelAnimationFrame( rafId );
-				}
-			};
 		},
 		[ selectedIndex, scrollIntoView ]
 	);
 
 	const handleHover = ( suggestion: T ) => {
 		return () => {
-			if ( ! scrollingIntoView ) {
-				onHover?.( suggestion );
-			}
+			onHover?.( suggestion );
 		};
 	};
 
@@ -81,13 +65,16 @@ export function SuggestionsList< T extends string | { value: string } >( {
 	};
 
 	const computeSuggestionMatch = ( suggestion: T ) => {
-		const matchText = displayTransform( match ).toLocaleLowerCase();
+		const matchText = displayTransform( match )
+			.normalize( 'NFKC' )
+			.toLocaleLowerCase();
 		if ( matchText.length === 0 ) {
 			return null;
 		}
 
 		const transformedSuggestion = displayTransform( suggestion );
 		const indexOfMatch = transformedSuggestion
+			.normalize( 'NFKC' )
 			.toLocaleLowerCase()
 			.indexOf( matchText );
 
@@ -115,10 +102,18 @@ export function SuggestionsList< T extends string | { value: string } >( {
 		>
 			{ suggestions.map( ( suggestion, index ) => {
 				const matchText = computeSuggestionMatch( suggestion );
-				const className = classnames(
+				const isSelected = index === selectedIndex;
+				const isDisabled =
+					typeof suggestion === 'object' && suggestion?.disabled;
+				const key =
+					typeof suggestion === 'object' && 'value' in suggestion
+						? suggestion?.value
+						: displayTransform( suggestion );
+
+				const className = clsx(
 					'components-form-token-field__suggestion',
 					{
-						'is-selected': index === selectedIndex,
+						'is-selected': isSelected,
 					}
 				);
 
@@ -146,22 +141,23 @@ export function SuggestionsList< T extends string | { value: string } >( {
 						id={ `components-form-token-suggestions-${ instanceId }-${ index }` }
 						role="option"
 						className={ className }
-						key={
-							typeof suggestion === 'object' &&
-							'value' in suggestion
-								? suggestion?.value
-								: displayTransform( suggestion )
-						}
+						key={ key }
 						onMouseDown={ handleMouseDown }
 						onClick={ handleClick( suggestion ) }
 						onMouseEnter={ handleHover( suggestion ) }
 						aria-selected={ index === selectedIndex }
+						aria-disabled={ isDisabled }
 					>
 						{ output }
 					</li>
 				);
 				/* eslint-enable jsx-a11y/click-events-have-key-events */
 			} ) }
+			{ suggestions.length === 0 && (
+				<li className="components-form-token-field__suggestion is-empty">
+					{ __( 'No items found' ) }
+				</li>
+			) }
 		</ul>
 	);
 }

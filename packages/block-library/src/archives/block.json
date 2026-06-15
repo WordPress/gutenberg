@@ -25,7 +25,14 @@
 		}
 	},
 	"supports": {
+		"anchor": true,
 		"align": true,
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true
+		},
 		"html": false,
 		"spacing": {
 			"margin": true,
@@ -47,7 +54,18 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
+		},
+		"color": {
+			"gradients": true,
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true,
+				"link": true
+			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
-	},
-	"editorStyle": "wp-block-archives-editor"
+	}
 }

@@ -4,9 +4,9 @@
  *
  * @package gutenberg-test-interactive-blocks
  */
-
 ?>
-<div data-wp-interactive>
+
+<div data-wp-interactive='{"namespace": "directive-class"}'>
 	<button
 		data-wp-on--click="actions.toggleTrueValue"
 		data-testid="toggle trueValue"
@@ -59,17 +59,42 @@
 		data-testid="can toggle class when class attribute is missing"
 	></div>
 
-	<div data-wp-context='{ "falseValue": false }'>
+	<div data-wp-context='{ "value": false }'>
 		<div
 			class="foo"
-			data-wp-class--foo="context.falseValue"
+			data-wp-class--foo="context.value"
 			data-testid="can use context values"
 		></div>
 		<button
-			data-wp-on--click="actions.toggleContextFalseValue"
+			data-wp-on--click="actions.toggleContextValue"
 			data-testid="toggle context false value"
 		>
-			Toggle context falseValue
+			Toggle context value
+		</button>
+	</div>
+
+	<div
+		data-wp-class--block__element--modifier="state.trueValue"
+		data-testid="can use BEM notation classes"
+	></div>
+
+	<div
+		data-testid="can use classes with several dashes"
+		data-wp-class--main-bg--color="state.trueValue"
+		data-wp-class--main-bg---color="state.trueValue"
+		data-wp-class--main-bg----color="state.trueValue"
+	></div>
+
+	<div data-wp-context='{ "value": false }'>
+		<div
+			data-wp-class--default="context.value"
+			data-testid="class name default"
+		></div>
+		<button
+			data-wp-on--click="actions.toggleContextValue"
+			data-testid="toggle class name default"
+		>
+			Toggle context val
 		</button>
 	</div>
 </div>

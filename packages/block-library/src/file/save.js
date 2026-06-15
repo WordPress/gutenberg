@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -25,7 +25,11 @@ export default function save( { attributes } ) {
 		previewHeight,
 	} = attributes;
 
-	const pdfEmbedLabel = RichText.isEmpty( fileName ) ? 'PDF embed' : fileName;
+	const pdfEmbedLabel = RichText.isEmpty( fileName )
+		? 'PDF embed'
+		: // To do: use toPlainText, but we need ensure it's RichTextData. See
+		  // https://github.com/WordPress/gutenberg/pull/56710.
+		  fileName.toString();
 
 	const hasFilename = ! RichText.isEmpty( fileName );
 
@@ -65,11 +69,11 @@ export default function save( { attributes } ) {
 				{ showDownloadButton && (
 					<a
 						href={ href }
-						className={ classnames(
+						className={ clsx(
 							'wp-block-file__button',
 							__experimentalGetElementClassName( 'button' )
 						) }
-						download={ true }
+						download
 						aria-describedby={ describedById }
 					>
 						<RichText.Content value={ downloadButtonText } />

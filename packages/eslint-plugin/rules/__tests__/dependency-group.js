@@ -9,7 +9,7 @@ import { RuleTester } from 'eslint';
 import rule from '../dependency-group';
 
 const ruleTester = new RuleTester( {
-	parserOptions: {
+	languageOptions: {
 		sourceType: 'module',
 		ecmaVersion: 6,
 	},
@@ -23,7 +23,7 @@ ruleTester.run( 'dependency-group', rule, {
  * External dependencies
  */
 import { camelCase } from 'change-case';
-import classnames from 'classnames';
+import clsx from 'clsx';;
 
 /**
  * WordPress dependencies
@@ -41,7 +41,7 @@ import edit from './edit';`,
  * External dependencies
  */
 const { camelCase } = require( 'change-case' );
-const classnames = require( 'classnames' );
+const clsx = require( 'clsx' );
 
 /**
  * WordPress dependencies
@@ -52,13 +52,21 @@ const { Component } = require( '@wordpress/element' );
  * Internal dependencies
  */
 const edit = require( './edit' );`,
+		},
+		{
+			code: `
+import { camelCase } from 'change-case';
+import clsx from 'clsx';
+import { Component } from '@wordpress/element';
+import edit from './edit';`,
+			options: [ 'never' ],
 		},
 	],
 	invalid: [
 		{
 			code: `
 import { camelCase } from 'change-case';
-import classnames from 'classnames';
+import clsx from 'clsx';;
 /*
  * wordpress dependencies.
  */
@@ -83,7 +91,7 @@ import edit from './edit';`,
  * External dependencies
  */
 import { camelCase } from 'change-case';
-import classnames from 'classnames';
+import clsx from 'clsx';;
 /**
  * WordPress dependencies
  */
@@ -96,7 +104,7 @@ import edit from './edit';`,
 		{
 			code: `
 const { camelCase } = require( 'change-case' );
-const classnames = require( 'classnames' );
+const clsx = require( 'clsx' );
 /*
  * wordpress dependencies.
  */
@@ -121,7 +129,7 @@ const edit = require( './edit' );`,
  * External dependencies
  */
 const { camelCase } = require( 'change-case' );
-const classnames = require( 'classnames' );
+const clsx = require( 'clsx' );
 /**
  * WordPress dependencies
  */
@@ -130,6 +138,31 @@ const { Component } = require( '@wordpress/element' );
  * Internal dependencies
  */
 const edit = require( './edit' );`,
+		},
+		{
+			code: `
+/**
+ * External dependencies
+ */
+import { camelCase } from 'change-case';
+
+/**
+ * WordPress dependencies
+ */
+
+import { Component } from '@wordpress/element';`,
+			options: [ 'never' ],
+			errors: [
+				{
+					message: 'Unexpected dependency group comment block',
+				},
+				{
+					message: 'Unexpected dependency group comment block',
+				},
+			],
+			output: `
+import { camelCase } from 'change-case';
+import { Component } from '@wordpress/element';`,
 		},
 	],
 } );

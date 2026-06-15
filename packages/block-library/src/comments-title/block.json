@@ -5,13 +5,10 @@
 	"title": "Comments Title",
 	"category": "theme",
 	"ancestor": [ "core/comments" ],
-	"description": "Displays a title with the number of comments",
+	"description": "Displays a title with the number of comments.",
 	"textdomain": "default",
 	"usesContext": [ "postId", "postType" ],
 	"attributes": {
-		"textAlign": {
-			"type": "string"
-		},
 		"showPostTitle": {
 			"type": "boolean",
 			"default": true
@@ -23,10 +20,13 @@
 		"level": {
 			"type": "number",
 			"default": 2
+		},
+		"levelOptions": {
+			"type": "array"
 		}
 	},
 	"supports": {
-		"anchor": false,
+		"anchor": true,
 		"align": true,
 		"html": false,
 		"__experimentalBorder": {
@@ -49,6 +49,7 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,
@@ -61,6 +62,9 @@
 				"__experimentalFontStyle": true,
 				"__experimentalFontWeight": true
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	}
 }

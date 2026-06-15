@@ -1,0 +1,37 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer utilities {
+		.outset-ring--focus,
+		.outset-ring--focus-except-active,
+		.outset-ring--focus-visible,
+		.outset-ring--focus-within,
+		.outset-ring--focus-within-except-active,
+		.outset-ring--focus-within-visible,
+		.outset-ring--focus-parent-visible {
+			@media not ( prefers-reduced-motion ) {
+				--_gcd-a-transition: outline 0.1s ease-out;
+
+				transition: outline 0.1s ease-out;
+			}
+
+			/* Outline width must be kept at 0 even with a transparent color,
+			or else the outline will be visible in forced-colors mode. */
+			outline: 0 solid transparent;
+			outline-offset: 1px;
+		}
+
+		.outset-ring--focus:focus,
+		.outset-ring--focus-except-active:focus:not(:active),
+		.outset-ring--focus-visible:focus-visible,
+		.outset-ring--focus-within:focus-within,
+		.outset-ring--focus-within-except-active:focus-within:not(:has(:active)),
+		.outset-ring--focus-within-visible:focus-within:has(:focus-visible),
+		:focus-visible .outset-ring--focus-parent-visible {
+			--_gcd-a-outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
+			--_gcd-div-outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
+
+			outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
+		}
+	}
+}

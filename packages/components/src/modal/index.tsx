@@ -1,12 +1,4 @@
-/**
- * External dependencies
- */
-import classnames from 'classnames';
-import type { ForwardedRef, KeyboardEvent, UIEvent } from 'react';
-
-/**
- * WordPress dependencies
- */
+import clsx from 'clsx';
 import {
 	createPortal,
 	useCallback,
@@ -15,33 +7,33 @@ import {
 	useState,
 	forwardRef,
 	useLayoutEffect,
+	useContext,
 } from '@wordpress/element';
 import {
 	useInstanceId,
 	useFocusReturn,
 	useFocusOnMount,
-	__experimentalUseFocusOutside as useFocusOutside,
 	useConstrainedTabbing,
 	useMergeRefs,
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { close } from '@wordpress/icons';
 import { getScrollContainer } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import * as ariaHelper from './aria-helper';
 import Button from '../button';
 import StyleProvider from '../style-provider';
 import type { ModalProps } from './types';
+import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
+import { Spacer } from '../spacer';
+import { useModalExitAnimation } from './use-modal-exit-animation';
+import { ModalContext, type Dismissers } from './context';
 
-// Used to count the number of open modals.
-let openModalCount = 0;
+// Used to track body class names applied while modals are open.
+const bodyOpenClasses = new Map< string, number >();
 
 function UnforwardedModal(
 	props: ModalProps,
-	forwardedRef: ForwardedRef< HTMLDivElement >
+	forwardedRef: React.ForwardedRef< HTMLDivElement >
 ) {
 	const {
 		bodyOpenClassName = 'modal-open',
@@ -61,28 +53,48 @@ function UnforwardedModal(
 		closeButtonLabel,
 		children,
 		style,
-		overlayClassName,
+		overlayClassName: overlayClassnameProp,
 		className,
 		contentLabel,
 		onKeyDown,
 		isFullScreen = false,
+		size,
+		headerActions = null,
 		__experimentalHideHeader = false,
 	} = props;
 
-	const ref = useRef< HTMLDivElement >();
+	const ref = useRef< HTMLDivElement >( null );
+
 	const instanceId = useInstanceId( Modal );
 	const headingId = title
 		? `components-modal-header-${ instanceId }`
 		: aria.labelledby;
-	const focusOnMountRef = useFocusOnMount( focusOnMount );
+
+	// The focus hook does not support 'firstContentElement' but this is a valid
+	// value for the Modal's focusOnMount prop. The following code ensures the focus
+	// hook will focus the first focusable node within the element to which it is applied.
+	// When `firstContentElement` is passed as the value of the focusOnMount prop,
+	// the focus hook is applied to the Modal's content element.
+	// Otherwise, the focus hook is applied to the Modal's ref. This ensures that the
+	// focus hook will focus the first element in the Modal's **content** when
+	// `firstContentElement` is passed.
+	const focusOnMountRef = useFocusOnMount(
+		focusOnMount === 'firstContentElement' ? 'firstElement' : focusOnMount
+	);
 	const constrainedTabbingRef = useConstrainedTabbing();
 	const focusReturnRef = useFocusReturn();
-	const focusOutsideProps = useFocusOutside( onRequestClose );
 	const contentRef = useRef< HTMLDivElement >( null );
 	const childrenContainerRef = useRef< HTMLDivElement >( null );
 
 	const [ hasScrolledContent, setHasScrolledContent ] = useState( false );
 	const [ hasScrollableContent, setHasScrollableContent ] = useState( false );
+
+	let sizeClass;
+	if ( isFullScreen || size === 'fill' ) {
+		sizeClass = 'is-full-screen';
+	} else if ( size ) {
+		sizeClass = `has-size-${ size }`;
+	}
 
 	// Determines whether the Modal content is scrollable and updates the state.
 	const isContentScrollable = useCallback( () => {
@@ -99,23 +111,64 @@ function UnforwardedModal(
 		}
 	}, [ contentRef ] );
 
+	// Accessibly isolates/unisolates the modal.
 	useEffect( () => {
-		openModalCount++;
+		ariaHelper.modalize( ref.current! );
+		return () => ariaHelper.unmodalize();
+	}, [] );
 
-		if ( openModalCount === 1 ) {
-			ariaHelper.hideApp( ref.current );
-			document.body.classList.add( bodyOpenClassName );
+	// Keeps a fresh ref for the subsequent effect.
+	const onRequestCloseRef =
+		useRef< ModalProps[ 'onRequestClose' ] >( undefined );
+	useEffect( () => {
+		onRequestCloseRef.current = onRequestClose;
+	}, [ onRequestClose ] );
+
+	// The list of `onRequestClose` callbacks of open (non-nested) Modals. Only
+	// one should remain open at a time and the list enables closing prior ones.
+	const dismissers = useContext( ModalContext );
+	// Used for the tracking and dismissing any nested modals.
+	const [ nestedDismissers ] = useState< Dismissers >( () => new Set() );
+
+	// Updates the stack tracking open modals at this level and calls
+	// onRequestClose for any prior and/or nested modals as applicable.
+	useEffect( () => {
+		// add this modal instance to the dismissers set
+		dismissers.add( onRequestCloseRef );
+		// request that all the other modals close themselves
+		for ( const dismisser of dismissers ) {
+			if ( dismisser !== onRequestCloseRef ) {
+				dismisser.current?.();
+			}
 		}
-
 		return () => {
-			openModalCount--;
+			// request that all the nested modals close themselves
+			for ( const dismisser of nestedDismissers ) {
+				dismisser.current?.();
+			}
+			// remove this modal instance from the dismissers set
+			dismissers.delete( onRequestCloseRef );
+		};
+	}, [ dismissers, nestedDismissers ] );
 
-			if ( openModalCount === 0 ) {
-				document.body.classList.remove( bodyOpenClassName );
-				ariaHelper.showApp();
+	// Adds/removes the value of bodyOpenClassName to body element.
+	useEffect( () => {
+		const theClass = bodyOpenClassName;
+		const oneMore = 1 + ( bodyOpenClasses.get( theClass ) ?? 0 );
+		bodyOpenClasses.set( theClass, oneMore );
+		document.body.classList.add( bodyOpenClassName );
+		return () => {
+			const oneLess = bodyOpenClasses.get( theClass )! - 1;
+			if ( oneLess === 0 ) {
+				document.body.classList.remove( theClass );
+				bodyOpenClasses.delete( theClass );
+			} else {
+				bodyOpenClasses.set( theClass, oneLess );
 			}
 		};
 	}, [ bodyOpenClassName ] );
+
+	const { closeModal, frameRef, overlayClassname } = useModalExitAnimation();
 
 	// Calls the isContentScrollable callback when the Modal children container resizes.
 	useLayoutEffect( () => {
@@ -133,32 +186,21 @@ function UnforwardedModal(
 		};
 	}, [ isContentScrollable, childrenContainerRef ] );
 
-	function handleEscapeKeyDown( event: KeyboardEvent< HTMLDivElement > ) {
-		if (
-			// Ignore keydowns from IMEs
-			event.nativeEvent.isComposing ||
-			// Workaround for Mac Safari where the final Enter/Backspace of an IME composition
-			// is `isComposing=false`, even though it's technically still part of the composition.
-			// These can only be detected by keyCode.
-			event.keyCode === 229
-		) {
-			return;
-		}
-
+	function handleEscapeKeyDown(
+		event: React.KeyboardEvent< HTMLDivElement >
+	) {
 		if (
 			shouldCloseOnEsc &&
-			event.code === 'Escape' &&
+			( event.code === 'Escape' || event.key === 'Escape' ) &&
 			! event.defaultPrevented
 		) {
 			event.preventDefault();
-			if ( onRequestClose ) {
-				onRequestClose( event );
-			}
+			closeModal().then( () => onRequestClose( event ) );
 		}
 	}
 
 	const onContentContainerScroll = useCallback(
-		( e: UIEvent< HTMLDivElement > ) => {
+		( e: React.UIEvent< HTMLDivElement > ) => {
 			const scrollY = e?.currentTarget?.scrollTop ?? -1;
 
 			if ( ! hasScrolledContent && scrollY > 0 ) {
@@ -170,59 +212,70 @@ function UnforwardedModal(
 		[ hasScrolledContent ]
 	);
 
-	const onOverlayPress: React.PointerEventHandler< HTMLDivElement > = (
-		event
-	) => {
-		if ( event.target === event.currentTarget ) {
-			event.preventDefault();
-			onRequestClose( event );
-		}
+	let pressTarget: EventTarget | null = null;
+	const overlayPressHandlers: {
+		onPointerDown: React.PointerEventHandler< HTMLDivElement >;
+		onPointerUp: React.PointerEventHandler< HTMLDivElement >;
+	} = {
+		onPointerDown: ( event ) => {
+			if ( event.target === event.currentTarget ) {
+				pressTarget = event.target;
+				// Avoids focus changing so that focus return works as expected.
+				event.preventDefault();
+			}
+		},
+		// Closes the modal with two exceptions. 1. Opening the context menu on
+		// the overlay. 2. Pressing on the overlay then dragging the pointer
+		// over the modal and releasing. Due to the modal being a child of the
+		// overlay, such a gesture is a `click` on the overlay and cannot be
+		// excepted by a `click` handler. Thus the tactic of handling
+		// `pointerup` and comparing its target to that of the `pointerdown`.
+		onPointerUp: ( { target, button } ) => {
+			const isSameTarget = target === pressTarget;
+			pressTarget = null;
+			if ( button === 0 && isSameTarget ) {
+				closeModal().then( () => onRequestClose() );
+			}
+		},
 	};
 
-	return createPortal(
+	const modal = (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
 			ref={ useMergeRefs( [ ref, forwardedRef ] ) }
-			className={ classnames(
+			className={ clsx(
 				'components-modal__screen-overlay',
-				overlayClassName
+				overlayClassname,
+				overlayClassnameProp
 			) }
-			onKeyDown={ handleEscapeKeyDown }
-			// Avoids loss of focus from clicking the overlay and also obviates
-			// `useFocusOutside` aside from cases of focus programmatically
-			// moving outside. TODO ideally both the hook and this handler
-			// won't be needed and one can be removed.
-			onPointerDown={
-				shouldCloseOnClickOutside ? onOverlayPress : undefined
-			}
+			onKeyDown={ withIgnoreIMEEvents( handleEscapeKeyDown ) }
+			{ ...( shouldCloseOnClickOutside ? overlayPressHandlers : {} ) }
 		>
 			<StyleProvider document={ document }>
 				<div
-					className={ classnames(
+					className={ clsx(
 						'components-modal__frame',
-						className,
-						{
-							'is-full-screen': isFullScreen,
-						}
+						sizeClass,
+						className
 					) }
 					style={ style }
 					ref={ useMergeRefs( [
+						frameRef,
 						constrainedTabbingRef,
 						focusReturnRef,
-						focusOnMountRef,
+						focusOnMount !== 'firstContentElement'
+							? focusOnMountRef
+							: null,
 					] ) }
 					role={ role }
 					aria-label={ contentLabel }
 					aria-labelledby={ contentLabel ? undefined : headingId }
 					aria-describedby={ aria.describedby }
 					tabIndex={ -1 }
-					{ ...( shouldCloseOnClickOutside
-						? focusOutsideProps
-						: {} ) }
 					onKeyDown={ onKeyDown }
 				>
 					<div
-						className={ classnames( 'components-modal__content', {
+						className={ clsx( 'components-modal__content', {
 							'hide-header': __experimentalHideHeader,
 							'is-scrollable': hasScrollableContent,
 							'has-scrolled-content': hasScrolledContent,
@@ -257,22 +310,54 @@ function UnforwardedModal(
 										</h1>
 									) }
 								</div>
+								{ headerActions }
 								{ isDismissible && (
-									<Button
-										onClick={ onRequestClose }
-										icon={ close }
-										label={
-											closeButtonLabel || __( 'Close' )
-										}
-									/>
+									<>
+										<Spacer
+											marginBottom={ 0 }
+											marginLeft={ 2 }
+										/>
+										<Button
+											size="compact"
+											onClick={ (
+												event: React.MouseEvent< HTMLButtonElement >
+											) =>
+												closeModal().then( () =>
+													onRequestClose( event )
+												)
+											}
+											icon={ close }
+											label={
+												closeButtonLabel ||
+												__( 'Close' )
+											}
+										/>
+									</>
 								) }
 							</div>
 						) }
-						<div ref={ childrenContainerRef }>{ children }</div>
+
+						<div
+							ref={ useMergeRefs( [
+								childrenContainerRef,
+								focusOnMount === 'firstContentElement'
+									? focusOnMountRef
+									: null,
+							] ) }
+							className="components-modal__children-container"
+						>
+							{ children }
+						</div>
 					</div>
 				</div>
 			</StyleProvider>
-		</div>,
+		</div>
+	);
+
+	return createPortal(
+		<ModalContext.Provider value={ nestedDismissers }>
+			{ modal }
+		</ModalContext.Provider>,
 		document.body
 	);
 }
@@ -309,5 +394,6 @@ function UnforwardedModal(
  * ```
  */
 export const Modal = forwardRef( UnforwardedModal );
+Modal.displayName = 'Modal';
 
 export default Modal;

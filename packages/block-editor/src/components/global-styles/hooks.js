@@ -1,203 +1,15 @@
 /**
- * External dependencies
- */
-import fastDeepEqual from 'fast-deep-equal/es6';
-
-/**
  * WordPress dependencies
  */
-import { useContext, useCallback, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { store as blocksStore, hasBlockSupport } from '@wordpress/blocks';
+import { store as blocksStore } from '@wordpress/blocks';
 import { _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { getValueFromVariable, getPresetVariableFromValue } from './utils';
-import { getValueFromObjectPath, setImmutably } from '../../utils/object';
-import { GlobalStylesContext } from './context';
 import { unlock } from '../../lock-unlock';
-
-const EMPTY_CONFIG = { settings: {}, styles: {}, behaviors: {} };
-
-const VALID_SETTINGS = [
-	'appearanceTools',
-	'behaviors',
-	'useRootPaddingAwareAlignments',
-	'border.color',
-	'border.radius',
-	'border.style',
-	'border.width',
-	'shadow.presets',
-	'shadow.defaultPresets',
-	'color.background',
-	'color.button',
-	'color.caption',
-	'color.custom',
-	'color.customDuotone',
-	'color.customGradient',
-	'color.defaultDuotone',
-	'color.defaultGradients',
-	'color.defaultPalette',
-	'color.duotone',
-	'color.gradients',
-	'color.heading',
-	'color.link',
-	'color.palette',
-	'color.text',
-	'custom',
-	'dimensions.minHeight',
-	'layout.contentSize',
-	'layout.definitions',
-	'layout.wideSize',
-	'position.fixed',
-	'position.sticky',
-	'spacing.customSpacingSize',
-	'spacing.spacingSizes',
-	'spacing.spacingScale',
-	'spacing.blockGap',
-	'spacing.margin',
-	'spacing.padding',
-	'spacing.units',
-	'typography.fluid',
-	'typography.customFontSize',
-	'typography.dropCap',
-	'typography.fontFamilies',
-	'typography.fontSizes',
-	'typography.fontStyle',
-	'typography.fontWeight',
-	'typography.letterSpacing',
-	'typography.lineHeight',
-	'typography.textColumns',
-	'typography.textDecoration',
-	'typography.textTransform',
-	'typography.writingMode',
-];
-
-export const useGlobalStylesReset = () => {
-	const { user: config, setUserConfig } = useContext( GlobalStylesContext );
-	const canReset = !! config && ! fastDeepEqual( config, EMPTY_CONFIG );
-	return [
-		canReset,
-		useCallback(
-			() => setUserConfig( () => EMPTY_CONFIG ),
-			[ setUserConfig ]
-		),
-	];
-};
-
-export function useGlobalSetting( propertyPath, blockName, source = 'all' ) {
-	const { setUserConfig, ...configs } = useContext( GlobalStylesContext );
-	const appendedBlockPath = blockName ? '.blocks.' + blockName : '';
-	const appendedPropertyPath = propertyPath ? '.' + propertyPath : '';
-	const contextualPath = `settings${ appendedBlockPath }${ appendedPropertyPath }`;
-	const globalPath = `settings${ appendedPropertyPath }`;
-	const sourceKey = source === 'all' ? 'merged' : source;
-
-	const settingValue = useMemo( () => {
-		const configToUse = configs[ sourceKey ];
-		if ( ! configToUse ) {
-			throw 'Unsupported source';
-		}
-
-		if ( propertyPath ) {
-			return (
-				getValueFromObjectPath( configToUse, contextualPath ) ??
-				getValueFromObjectPath( configToUse, globalPath )
-			);
-		}
-
-		let result = {};
-		VALID_SETTINGS.forEach( ( setting ) => {
-			const value =
-				getValueFromObjectPath(
-					configToUse,
-					`settings${ appendedBlockPath }.${ setting }`
-				) ??
-				getValueFromObjectPath( configToUse, `settings.${ setting }` );
-			if ( value ) {
-				result = setImmutably( result, setting.split( '.' ), value );
-			}
-		} );
-		return result;
-	}, [
-		configs,
-		sourceKey,
-		propertyPath,
-		contextualPath,
-		globalPath,
-		appendedBlockPath,
-	] );
-
-	const setSetting = ( newValue ) => {
-		setUserConfig( ( currentConfig ) =>
-			setImmutably( currentConfig, contextualPath.split( '.' ), newValue )
-		);
-	};
-	return [ settingValue, setSetting ];
-}
-
-export function useGlobalStyle(
-	path,
-	blockName,
-	source = 'all',
-	{ shouldDecodeEncode = true } = {}
-) {
-	const {
-		merged: mergedConfig,
-		base: baseConfig,
-		user: userConfig,
-		setUserConfig,
-	} = useContext( GlobalStylesContext );
-	const appendedPath = path ? '.' + path : '';
-	const finalPath = ! blockName
-		? `styles${ appendedPath }`
-		: `styles.blocks.${ blockName }${ appendedPath }`;
-
-	const setStyle = ( newValue ) => {
-		setUserConfig( ( currentConfig ) =>
-			setImmutably(
-				currentConfig,
-				finalPath.split( '.' ),
-				shouldDecodeEncode
-					? getPresetVariableFromValue(
-							mergedConfig.settings,
-							blockName,
-							path,
-							newValue
-					  )
-					: newValue
-			)
-		);
-	};
-
-	let rawResult, result;
-	switch ( source ) {
-		case 'all':
-			rawResult = getValueFromObjectPath( mergedConfig, finalPath );
-			result = shouldDecodeEncode
-				? getValueFromVariable( mergedConfig, blockName, rawResult )
-				: rawResult;
-			break;
-		case 'user':
-			rawResult = getValueFromObjectPath( userConfig, finalPath );
-			result = shouldDecodeEncode
-				? getValueFromVariable( mergedConfig, blockName, rawResult )
-				: rawResult;
-			break;
-		case 'base':
-			rawResult = getValueFromObjectPath( baseConfig, finalPath );
-			result = shouldDecodeEncode
-				? getValueFromVariable( baseConfig, blockName, rawResult )
-				: rawResult;
-			break;
-		default:
-			throw 'Unsupported source';
-	}
-
-	return [ result, setStyle ];
-}
 
 /**
  * React hook that overrides a global settings object with block and element specific settings.
@@ -234,6 +46,7 @@ export function useSettingsForBlockElement(
 				...updatedSettings.typography,
 				fontSizes: {},
 				customFontSize: false,
+				defaultFontSizes: false,
 			};
 		}
 
@@ -268,7 +81,11 @@ export function useSettingsForBlockElement(
 		};
 
 		// Some blocks can enable background colors but disable gradients.
-		if ( ! supportedStyles.includes( 'background' ) ) {
+		// Preserve gradient settings when background.gradient is supported.
+		if (
+			! supportedStyles.includes( 'background' ) &&
+			! supportedStyles.includes( 'backgroundGradient' )
+		) {
 			updatedSettings.color.gradients = [];
 			updatedSettings.color.customGradient = false;
 		}
@@ -284,8 +101,10 @@ export function useSettingsForBlockElement(
 			'fontStyle',
 			'fontWeight',
 			'letterSpacing',
+			'textAlign',
 			'textTransform',
 			'textDecoration',
+			'textIndent',
 			'writingMode',
 		].forEach( ( key ) => {
 			if ( ! supportedStyles.includes( key ) ) {
@@ -295,6 +114,15 @@ export function useSettingsForBlockElement(
 				};
 			}
 		} );
+
+		// Text indent needs explicit handling since it may not be in parent settings.
+		if ( supportedStyles.includes( 'textIndent' ) ) {
+			updatedSettings.typography = {
+				...updatedSettings.typography,
+				textIndent:
+					updatedSettings.typography?.textIndent ?? 'subsequent',
+			};
+		}
 
 		// The column-count style is named text column to reduce confusion with
 		// the columns block and manage expectations from the support.
@@ -338,12 +166,16 @@ export function useSettingsForBlockElement(
 			}
 		} );
 
-		if ( ! supportedStyles.includes( 'minHeight' ) ) {
-			updatedSettings.dimensions = {
-				...updatedSettings.dimensions,
-				minHeight: false,
-			};
-		}
+		[ 'aspectRatio', 'height', 'minHeight', 'minWidth', 'width' ].forEach(
+			( key ) => {
+				if ( ! supportedStyles.includes( key ) ) {
+					updatedSettings.dimensions = {
+						...updatedSettings.dimensions,
+						[ key ]: false,
+					};
+				}
+			}
+		);
 
 		[ 'radius', 'color', 'style', 'width' ].forEach( ( key ) => {
 			if (
@@ -354,6 +186,19 @@ export function useSettingsForBlockElement(
 				updatedSettings.border = {
 					...updatedSettings.border,
 					[ key ]: false,
+				};
+			}
+		} );
+
+		[
+			[ 'backgroundImage', 'backgroundImage' ],
+			[ 'backgroundSize', 'backgroundSize' ],
+			[ 'backgroundGradient', 'gradient' ],
+		].forEach( ( [ styleKey, settingKey ] ) => {
+			if ( ! supportedStyles.includes( styleKey ) ) {
+				updatedSettings.background = {
+					...updatedSettings.background,
+					[ settingKey ]: false,
 				};
 			}
 		} );
@@ -460,113 +305,4 @@ export function useGradientsPerOrigin( settings ) {
 		defaultGradients,
 		shouldDisplayDefaultGradients,
 	] );
-}
-
-export function __experimentalUseGlobalBehaviors( blockName, source = 'all' ) {
-	const {
-		merged: mergedConfig,
-		base: baseConfig,
-		user: userConfig,
-		setUserConfig,
-	} = useContext( GlobalStylesContext );
-	const finalPath = ! blockName
-		? `behaviors`
-		: `behaviors.blocks.${ blockName }`;
-
-	let rawResult, result;
-	switch ( source ) {
-		case 'all':
-			rawResult = getValueFromObjectPath( mergedConfig, finalPath );
-			result = getValueFromVariable( mergedConfig, blockName, rawResult );
-			break;
-		case 'user':
-			rawResult = getValueFromObjectPath( userConfig, finalPath );
-			result = getValueFromVariable( mergedConfig, blockName, rawResult );
-			break;
-		case 'base':
-			rawResult = getValueFromObjectPath( baseConfig, finalPath );
-			result = getValueFromVariable( baseConfig, blockName, rawResult );
-			break;
-		default:
-			throw 'Unsupported source';
-	}
-
-	const animation = result?.lightbox?.animation || 'zoom';
-
-	const setBehavior = ( newValue ) => {
-		let newBehavior;
-		// The user saves with Apply Globally option.
-		if ( typeof newValue === 'object' ) {
-			newBehavior = newValue;
-		} else {
-			switch ( newValue ) {
-				case 'lightbox':
-					newBehavior = {
-						lightbox: {
-							enabled: true,
-							animation,
-						},
-					};
-					break;
-				case 'fade':
-					newBehavior = {
-						lightbox: {
-							enabled: true,
-							animation: 'fade',
-						},
-					};
-					break;
-				case 'zoom':
-					newBehavior = {
-						lightbox: {
-							enabled: true,
-							animation: 'zoom',
-						},
-					};
-					break;
-				case '':
-					newBehavior = {
-						lightbox: {
-							enabled: false,
-							animation,
-						},
-					};
-					break;
-				default:
-					break;
-			}
-		}
-		setUserConfig( ( currentConfig ) =>
-			setImmutably( currentConfig, finalPath.split( '.' ), newBehavior )
-		);
-	};
-	let behavior = '';
-	if ( result === undefined ) behavior = 'default';
-	if ( result?.lightbox.enabled ) behavior = 'lightbox';
-
-	return { behavior, inheritedBehaviors: result, setBehavior };
-}
-
-export function __experimentalUseHasBehaviorsPanel(
-	settings,
-	name,
-	{ blockSupportOnly = false } = {}
-) {
-	if ( ! settings?.behaviors ) {
-		return false;
-	}
-
-	// If every behavior is disabled on block supports, do not show the behaviors inspector control.
-	const hasSomeBlockSupport = Object.keys( settings?.behaviors ).some(
-		( key ) => hasBlockSupport( name, `behaviors.${ key }` )
-	);
-
-	if ( blockSupportOnly ) {
-		return hasSomeBlockSupport;
-	}
-
-	// If every behavior is disabled, do not show the behaviors inspector control.
-	return Object.values( settings?.behaviors ).some(
-		( value ) => value === true && hasSomeBlockSupport
-	);
 }

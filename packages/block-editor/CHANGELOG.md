@@ -2,6 +2,217 @@
 
 ## Unreleased
 
+## 15.21.0 (2026-06-10)
+
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+### Documentation
+
+-   Fix documentation typos and grammar ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
+
+### Internal
+
+-   `ListView`: Compute the block visibility label once in `ListViewBlock` and pass it down to `ListViewBlockSelectButton`, removing a duplicated `useSelect`/`getBlockVisibilityLabel` call and clarifying that the label is exposed to assistive technology through the row's `aria-describedby` ([#78640](https://github.com/WordPress/gutenberg/pull/78640)).
+-   Dependency updates ([#77954](https://github.com/WordPress/gutenberg/pull/77954)).
+
+## 15.20.0 (2026-05-27)
+
+### Bug Fixes
+
+-   `ColorPanel`: Theme CSS custom-property gradients are now decoded to their preset slug and persisted as a `gradient` block attribute rather than as a raw `style.color.gradient` value ([#78328](https://github.com/WordPress/gutenberg/pull/78328)).
+
+### Internal
+
+-   Remove legacy `Notice` overrides in block placeholder notices and media replace flow error UI ([#78231](https://github.com/WordPress/gutenberg/pull/78231)).
+-   Updated `diff` dependency from `^4.0.2` to `^8.0.3` ([#77992](https://github.com/WordPress/gutenberg/pull/77992)).
+
+## 15.19.0 (2026-05-14)
+
+### Enhancements
+
+-   `BlockManager`: Add stacking context isolation to category list ([#77759](https://github.com/WordPress/gutenberg/pull/77759)).
+
+### Bug Fixes
+
+-   `ColorPanel`: Fix incorrect color selection and text↔link sync with duplicate-value palette entries. Slug-based selection is now threaded through the color panel so that two palette entries sharing the same hex value but different slugs are treated as distinct choices. The text↔link sync condition now compares raw stored references instead of decoded hex values; the previous decoded comparison incorrectly conflated entries that shared a hex value ([#78048](https://github.com/WordPress/gutenberg/pull/78048)).
+
+## 15.18.0 (2026-04-29)
+
+### Enhancements
+
+-   Use `--wpds-cursor-control` for interactive cursor styling and replace all instances ([#77354](https://github.com/WordPress/gutenberg/pull/77354)).
+
+## 15.17.0 (2026-04-15)
+
+## 15.16.0 (2026-04-01)
+
+## 15.15.0 (2026-03-18)
+
+## 15.14.0 (2026-03-04)
+
+## 15.13.0 (2026-02-18)
+
+### Bug Fixes
+
+-   Store: `insertBlock` - the meta argument is now the 6th argument of the action, the 5th argument is `initialPosition` ([#75197](https://github.com/WordPress/gutenberg/pull/75197)).
+
+## 15.12.0 (2026-01-29)
+
+## 15.11.0 (2026-01-16)
+
+## 15.9.0 (2025-11-26)
+
+## 15.8.0 (2025-11-12)
+
+## 15.7.0 (2025-10-29)
+
+## 15.6.0 (2025-10-17)
+
+## 15.5.0 (2025-10-01)
+
+## 15.4.0 (2025-09-17)
+
+## 15.3.0 (2025-09-03)
+
+## 15.2.0 (2025-08-20)
+
+## 15.1.0 (2025-08-07)
+
+## 15.0.0 (2025-07-23)
+
+### Breaking Changes
+
+-   Store: Deprecate the block hovered global state and related action/selector ([#70731](https://github.com/WordPress/gutenberg/pull/70731))
+
+## 14.21.0 (2025-06-25)
+
+## 14.20.0 (2025-06-04)
+
+## 14.19.0 (2025-05-22)
+
+## 14.18.0 (2025-05-07)
+
+## 14.17.0 (2025-04-11)
+
+## 14.16.0 (2025-03-27)
+
+## 14.15.0 (2025-03-13)
+
+## 14.14.0 (2025-02-28)
+
+## 14.13.0 (2025-02-12)
+
+## 14.12.0 (2025-01-29)
+
+## 14.11.0 (2025-01-15)
+
+## 14.10.0 (2025-01-02)
+
+## 14.9.0 (2024-12-11)
+
+## 14.8.0 (2024-11-27)
+
+## 14.7.0 (2024-11-16)
+
+## 14.6.0 (2024-10-30)
+
+## 14.5.0 (2024-10-16)
+
+## 14.4.0 (2024-10-03)
+
+## 14.3.0 (2024-09-19)
+
+## 14.2.0 (2024-09-05)
+
+## 14.1.0 (2024-08-21)
+
+## 14.0.0 (2024-08-07)
+
+### Breaking Changes
+
+-   `URLInput`: Remove deprecated `__nextHasNoMarginBottom` prop and promote to default behavior ([#64282](https://github.com/WordPress/gutenberg/pull/64282)).
+-   `LineHeightControl`: Remove deprecated `__nextHasNoMarginBottom` prop and promote to default behavior ([#64281](https://github.com/WordPress/gutenberg/pull/64281)).
+
+### Enhancements
+
+-   `FontFamilyControl`: Add `__nextHasNoMarginBottom` prop for opting into the new margin-free styles ([#64280](https://github.com/WordPress/gutenberg/pull/64280)).
+
+## 13.4.0 (2024-07-24)
+
+## 13.3.0 (2024-07-10)
+
+## 13.2.0 (2024-06-26)
+
+## 13.1.0 (2024-06-15)
+
+## 13.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 12.26.0 (2024-05-16)
+
+### Internal
+
+-   Replaced `classnames` package with the faster and smaller `clsx` package ([#61138](https://github.com/WordPress/gutenberg/pull/61138)).
+
+## 12.25.0 (2024-05-02)
+
+## 12.24.0 (2024-04-19)
+
+## 12.23.0 (2024-04-03)
+
+## 12.22.0 (2024-03-21)
+
+## 12.21.0 (2024-03-06)
+
+## 12.20.0 (2024-02-21)
+
+## 12.19.0 (2024-02-09)
+
+-   `FontSizePicker`: Remove deprecated `__nextHasNoMarginBottom` prop and promote to default behavior ([#58702](https://github.com/WordPress/gutenberg/pull/58702)).
+
+## 12.18.0 (2024-01-24)
+
+-   Deprecated `__experimentalRecursionProvider` and `__experimentalUseHasRecursion` in favor of their new stable counterparts `RecursionProvider` and `useHasRecursion`.
+
+## 12.17.0 (2024-01-10)
+
+## 12.16.0 (2023-12-13)
+
+## 12.15.0 (2023-11-29)
+
+## 12.14.0 (2023-11-16)
+
+## 12.13.0 (2023-11-02)
+
+-   Deprecated the `useSetting` function in favor of new `useSettings` one that can retrieve multiple settings at once ([#55337](https://github.com/WordPress/gutenberg/pull/55337)).
+
+## 12.12.0 (2023-10-18)
+
+## 12.11.0 (2023-10-05)
+
+-   Deprecated `CopyHandler`, absorbed into `WritingFlow`.
+
+## 12.10.0 (2023-09-20)
+
+-   The Deprecated multiline prop on RichText will now fall back to using multiple
+    rich text instances instead of a single multiline instance. The prop remains
+    deprecated.
+
+## 12.9.0 (2023-08-31)
+
+### Enhancements
+
+-   Embed the `ObserveTyping` behavior within the `BlockList` component making to simplify instantiations of third-party block editors.
+
+## 12.8.0 (2023-08-16)
+
+## 12.7.0 (2023-08-10)
+
 ## 12.6.0 (2023-07-20)
 
 ## 12.5.0 (2023-07-05)
@@ -10,12 +221,11 @@
 
 ### Enhancements
 
-- Add `HeadingLevelDropdown` component for selecting H1-H6 and paragraph HTML tags from the block toolbar.
+-   Add `HeadingLevelDropdown` component for selecting H1-H6 and paragraph HTML tags from the block toolbar.
 
-### Bug Fix
+### Bug Fixes
 
 -   Fluid typography: custom font-sizes should use max viewport width ([#51516](https://github.com/WordPress/gutenberg/pull/51516)).
-
 
 ## 12.3.0 (2023-06-07)
 
@@ -29,10 +239,9 @@
 
 ### Breaking Changes
 
-- Renamed utility function `immutableSet` to `setImmutably` ([#50040](https://github.com/WordPress/gutenberg/pull/50040)).
+-   Renamed utility function `immutableSet` to `setImmutably` ([#50040](https://github.com/WordPress/gutenberg/pull/50040)).
 
 ## 11.8.0 (2023-04-12)
-
 
 ## 11.7.0 (2023-03-29)
 
@@ -42,13 +251,13 @@
 
 ## 11.5.0 (2023-03-01)
 
-### Bug Fix
+### Bug Fixes
 
 -   `SpacingSizesControl`: fix white dot on thumb ([#48574](https://github.com/WordPress/gutenberg/pull/48574)).
 
 ## 11.4.0 (2023-02-15)
 
-### Bug Fix
+### Bug Fixes
 
 -   `LinkControl`: fix scrollbar displayed on toggle link settings ([#47986](https://github.com/WordPress/gutenberg/pull/47986)).
 
@@ -56,7 +265,7 @@
 
 ## 11.2.0 (2023-01-11)
 
-### Bug Fix
+### Bug Fixes
 
 -   `BlockInspector`: Fix browser warning error when block is not selected ([#46875](https://github.com/WordPress/gutenberg/pull/46875)).
 -   Move component styles needed for iframes to content styles ([#47103](https://github.com/WordPress/gutenberg/pull/47103)).
@@ -77,33 +286,33 @@
 -   Fluid typography: add configurable fluid typography settings for minimum font size to theme.json ([#42489](https://github.com/WordPress/gutenberg/pull/42489)).
 -   `URLInput`: Add `__nextHasNoMarginBottom` prop for opting into the new margin-free styles ([46692](https://github.com/WordPress/gutenberg/pull/46692)).
 
-### Bug Fix
+### Bug Fixes
 
 -   `SpacingSizesControl`: Change ARIA role from `region` to `group` to avoid unwanted ARIA landmark regions ([#46530](https://github.com/WordPress/gutenberg/pull/46530)).
--   `FocalPointPicker`:  Fix layout misalignment when placed in the `BlockInspector` ([#46631](https://github.com/WordPress/gutenberg/pull/46631)).
+-   `FocalPointPicker`: Fix layout misalignment when placed in the `BlockInspector` ([#46631](https://github.com/WordPress/gutenberg/pull/46631)).
 
 ## 10.5.0 (2022-11-16)
 
-### Enhancement
+### Enhancements
 
 -   `BlockLockModal`: Move Icon component out of CheckboxControl label ([#45535](https://github.com/WordPress/gutenberg/pull/45535))
 -   Fluid typography: adjust font size min and max rules ([#45536](https://github.com/WordPress/gutenberg/pull/45536)).
 
 ## 10.4.0 (2022-11-02)
 
-### Bug Fix
+### Bug Fixes
 
 -   `InserterListItem`: Fix dragging and dropping in Firefox. ([#44631](https://github.com/WordPress/gutenberg/pull/44631))
 
 ## 10.3.0 (2022-10-19)
 
-### Bug Fix
+### Bug Fixes
 
 -   `FontSizePicker`: Update fluid utils so that only string, floats and integers are treated as valid font sizes for the purposes of fluid typography ([#44847](https://github.com/WordPress/gutenberg/pull/44847))
 -   `getTypographyClassesAndStyles()`: Ensure that font sizes are transformed into fluid values if fluid typography is activated ([#44852](https://github.com/WordPress/gutenberg/pull/44852))
 -   `BlockPopover`: Ensure that padding and margin visualizers display in correct position even when scrolling past block. ([#44998](https://github.com/WordPress/gutenberg/pull/44998))
 
-### New features
+### New Features
 
 -   You can now drop files/blocks/HTML on unmodified default blocks to transform them into corresponding blocks ([#44647](https://github.com/WordPress/gutenberg/pull/44647)).
 
@@ -113,7 +322,7 @@
 
 ## 10.0.0 (2022-09-13)
 
-### Breaking change
+### Breaking Changes
 
 -   `FontSizePicker`: Deprecate bottom margin style. Add a `__nextHasNoMarginBottom` prop to start opting into the margin-free styles that will become the default in a future version, currently scheduled to be WordPress 6.4 ([#43870](https://github.com/WordPress/gutenberg/pull/43870)).
 
@@ -129,7 +338,7 @@
 
 ## 9.3.0 (2022-06-15)
 
-### Bug fix
+### Bug Fixes
 
 -   Fix focus trap on certain `input` elements when navigating within a block with the left/right arrow keys ([#41538](https://github.com/WordPress/gutenberg/pull/41538)).
 
@@ -139,7 +348,7 @@
 
 ## 9.0.0 (2022-05-04)
 
-### Breaking change
+### Breaking Changes
 
 -   `BlockNavigationDropdown` is now deprecated. Use the `Dropdown` component from the `@wordpress/components` package and the `ListView` component from this package ([#40777](https://github.com/WordPress/gutenberg/pull/40777)).
 -   `ListView` no longer accepts the `__experimentalFeatures`, `__experimentalPersistentListViewFeatures`, `__experimentalHideContainerBlockActions`, and `showNestedBlocks` props. Passing additional undocumented props through to `ListView` is also now disallowed. ([#40777](https://github.com/WordPress/gutenberg/pull/40777)).
@@ -160,7 +369,7 @@
 
 ## 8.1.1 (2022-02-10)
 
-### Bug Fix
+### Bug Fixes
 
 -   Removed unused `@wordpress/block-serialization-default-parser`, `css-mediaquery`, `memize` and `redux-multi` dependencies ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
 
@@ -177,13 +386,13 @@
 -   Avoid re-rendering all List View items on block focus [#35706](https://github.com/WordPress/gutenberg/pull/35706). When List View is open Block focus time is 4 times faster in large posts.
 -   Render fixed number of items in List View [#35706](https://github.com/WordPress/gutenberg/pull/35230). Opening List View is 13 times faster in large posts.
 
-### Breaking change
+### Breaking Changes
 
 -   List View no longer supports the `showOnlyCurrentHierarchy` flag [#35706](https://github.com/WordPress/gutenberg/pull/35706). To display a subset of blocks, use the `blocks` parameter instead.
 
 ## 7.0.0 (2021-07-29)
 
-### Breaking Change
+### Breaking Changes
 
 -   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
 
@@ -199,8 +408,8 @@
 
 ### Breaking Changes
 
--   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/.
--   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at https://nodejs.org/en/about/releases/.
+-   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at <https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/>.
+-   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at <https://nodejs.org/en/about/releases/>.
 
 ## 5.3.0 (2021-03-17)
 
@@ -208,7 +417,7 @@
 
 ## 5.2.0 (2020-12-17)
 
-### New Feature
+### New Features
 
 -   Added a store definition `store` for the block editor namespace to use with `@wordpress/data` API ([#26655](https://github.com/WordPress/gutenberg/pull/26655)).
 
@@ -237,7 +446,7 @@
 
 -   Added a `label` prop to `URLInput`. This allows the label to be set without needing to wrap the `URLInput` in a `BaseControl`.
 
-### Deprecation
+### Deprecations
 
 -   `dropZoneUIOnly` prop in `MediaPlaceholder` component has been deprecated in favor of `disableMediaButtons` prop.
 

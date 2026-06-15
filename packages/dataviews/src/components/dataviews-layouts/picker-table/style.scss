@@ -1,0 +1,51 @@
+// Picker-specific table styles
+// The table picker mainly reuses the regular table styles from ../table/style.scss
+// Add any picker-specific overrides here if needed in the future.
+
+.dataviews-view-picker-table {
+	background-color: inherit;
+
+	// Constrain checkbox column to fixed width while other columns share remaining space.
+	.dataviews-view-table__checkbox-column {
+		width: calc(var(--wpds-dimension-base) * 12);
+	}
+
+	tbody:focus-visible {
+		// Only show one focus outline at a time. When focus is on a child element,
+		// hide the table's own focus outline.
+		&[aria-activedescendant] {
+			outline: none;
+		}
+
+		[data-active-item="true"] {
+			outline: 2px solid var(--wpds-color-stroke-focus);
+		}
+	}
+
+	.dataviews-selection-checkbox {
+		// Added specificity to override table styles.
+		.components-checkbox-control__input.components-checkbox-control__input {
+			// When the dataview is used as a picker, ensure the checkbox can't be clicked on.
+			// Only the row itself is clickable.
+			pointer-events: none;
+			opacity: 1;
+		}
+	}
+
+	// When used in picker context, ensure row selection works as expected
+	.dataviews-view-table__row {
+		cursor: var(--wpds-cursor-control);
+
+		&.is-selected {
+			background-color: var(--wpds-color-background-interactive-brand-weak-active);
+		}
+
+		&.is-hovered {
+			background-color: var(--wpds-color-background-interactive-brand-weak-active);
+		}
+
+		&.is-selected.is-hovered {
+			background-color: var(--wpds-color-background-interactive-brand-weak-active);
+		}
+	}
+}

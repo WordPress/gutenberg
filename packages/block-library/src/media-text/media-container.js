@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { ResizableBox, Spinner } from '@wordpress/components';
+import { ResizableBox, Spinner, Placeholder } from '@wordpress/components';
 import {
 	BlockControls,
 	BlockIcon,
@@ -18,28 +18,20 @@ import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
 import { forwardRef } from '@wordpress/element';
-import { isBlobURL } from '@wordpress/blob';
+import { createBlobURL, isBlobURL } from '@wordpress/blob';
 import { store as noticesStore } from '@wordpress/notices';
 import { media as icon } from '@wordpress/icons';
+
+/**
+ * Internal dependencies
+ */
+import { imageFillStyles } from './image-fill';
 
 /**
  * Constants
  */
 const ALLOWED_MEDIA_TYPES = [ 'image', 'video' ];
 const noop = () => {};
-
-export function imageFillStyles( url, focalPoint ) {
-	return url
-		? {
-				backgroundImage: `url(${ url })`,
-				backgroundPosition: focalPoint
-					? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round(
-							focalPoint.y * 100
-					  ) }%`
-					: `50% 50%`,
-		  }
-		: {};
-}
 
 const ResizableBoxContainer = forwardRef(
 	( { isSelected, isStackedOnMobile, ...props }, ref ) => {
@@ -56,25 +48,44 @@ const ResizableBoxContainer = forwardRef(
 	}
 );
 
-function ToolbarEditButton( { mediaId, mediaUrl, onSelectMedia } ) {
+function ToolbarEditButton( {
+	mediaId,
+	mediaUrl,
+	onSelectMedia,
+	toggleUseFeaturedImage,
+	useFeaturedImage,
+} ) {
 	return (
 		<BlockControls group="other">
 			<MediaReplaceFlow
 				mediaId={ mediaId }
 				mediaURL={ mediaUrl }
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
-				accept="image/*,video/*"
 				onSelect={ onSelectMedia }
+				onToggleFeaturedImage={ toggleUseFeaturedImage }
+				useFeaturedImage={ useFeaturedImage }
+				onReset={ () => onSelectMedia( undefined ) }
 			/>
 		</BlockControls>
 	);
 }
 
-function PlaceholderContainer( { className, mediaUrl, onSelectMedia } ) {
+function PlaceholderContainer( {
+	className,
+	mediaUrl,
+	onSelectMedia,
+	toggleUseFeaturedImage,
+} ) {
 	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const onUploadError = ( message ) => {
 		createErrorNotice( message, { type: 'snackbar' } );
+	};
+
+	const onFilesPreUpload = ( files ) => {
+		if ( files.length === 1 ) {
+			onSelectMedia( { url: createBlobURL( files[ 0 ] ) } );
+		}
 	};
 
 	return (
@@ -85,8 +96,9 @@ function PlaceholderContainer( { className, mediaUrl, onSelectMedia } ) {
 			} }
 			className={ className }
 			onSelect={ onSelectMedia }
-			accept="image/*,video/*"
+			onToggleFeaturedImage={ toggleUseFeaturedImage }
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
+			onFilesPreUpload={ onFilesPreUpload }
 			onError={ onUploadError }
 			disableMediaButtons={ mediaUrl }
 		/>
@@ -110,13 +122,18 @@ function MediaContainer( props, ref ) {
 		onSelectMedia,
 		onWidthChange,
 		enableResize,
+		toggleUseFeaturedImage,
+		useFeaturedImage,
+		featuredImageURL,
+		featuredImageAlt,
+		refMedia,
 	} = props;
 
 	const isTemporaryMedia = ! mediaId && isBlobURL( mediaUrl );
 
 	const { toggleSelection } = useDispatch( blockEditorStore );
 
-	if ( mediaUrl ) {
+	if ( mediaUrl || featuredImageURL || useFeaturedImage ) {
 		const onResizeStart = () => {
 			toggleSelection( false );
 		};
@@ -132,25 +149,41 @@ function MediaContainer( props, ref ) {
 			left: enableResize && mediaPosition === 'right',
 		};
 
-		const backgroundStyles =
+		const positionStyles =
 			mediaType === 'image' && imageFill
-				? imageFillStyles( mediaUrl, focalPoint )
+				? imageFillStyles( mediaUrl || featuredImageURL, focalPoint )
 				: {};
 
 		const mediaTypeRenderers = {
-			image: () => <img src={ mediaUrl } alt={ mediaAlt } />,
-			video: () => <video controls src={ mediaUrl } />,
+			image: () =>
+				useFeaturedImage && featuredImageURL ? (
+					<img
+						ref={ refMedia }
+						src={ featuredImageURL }
+						alt={ featuredImageAlt }
+						style={ positionStyles }
+					/>
+				) : (
+					mediaUrl && (
+						<img
+							ref={ refMedia }
+							src={ mediaUrl }
+							alt={ mediaAlt }
+							style={ positionStyles }
+						/>
+					)
+				),
+			video: () => <video controls ref={ refMedia } src={ mediaUrl } />,
 		};
 
 		return (
 			<ResizableBoxContainer
 				as="figure"
-				className={ classnames(
+				className={ clsx(
 					className,
 					'editor-media-container__resizer',
 					{ 'is-transient': isTemporaryMedia }
 				) }
-				style={ backgroundStyles }
 				size={ { width: mediaWidth + '%' } }
 				minWidth="10%"
 				maxWidth="100%"
@@ -165,12 +198,25 @@ function MediaContainer( props, ref ) {
 			>
 				<ToolbarEditButton
 					onSelectMedia={ onSelectMedia }
-					mediaUrl={ mediaUrl }
+					mediaUrl={
+						useFeaturedImage && featuredImageURL
+							? featuredImageURL
+							: mediaUrl
+					}
 					mediaId={ mediaId }
+					toggleUseFeaturedImage={ toggleUseFeaturedImage }
+					useFeaturedImage={ useFeaturedImage }
 				/>
 				{ ( mediaTypeRenderers[ mediaType ] || noop )() }
 				{ isTemporaryMedia && <Spinner /> }
-				<PlaceholderContainer { ...props } />
+				{ ! useFeaturedImage && <PlaceholderContainer { ...props } /> }
+				{ ! featuredImageURL && useFeaturedImage && (
+					<Placeholder
+						className="wp-block-media-text--placeholder-image"
+						style={ positionStyles }
+						withIllustration
+					/>
+				) }
 			</ResizableBoxContainer>
 		);
 	}

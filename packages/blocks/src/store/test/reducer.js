@@ -10,6 +10,7 @@ import {
 	addBlockVariations,
 	addBlockTypes,
 	removeBlockVariations,
+	addBlockStyles,
 } from '../actions';
 import {
 	unprocessedBlockTypes,
@@ -31,24 +32,25 @@ describe( 'unprocessedBlockTypes', () => {
 
 	it( 'should add a new block type', () => {
 		const original = deepFreeze( {
-			'core/paragraph': { name: 'core/paragraph' },
+			'core/paragraph': { title: 'Paragraph' },
 		} );
 
 		const state = unprocessedBlockTypes( original, {
 			type: 'ADD_UNPROCESSED_BLOCK_TYPE',
-			blockType: { name: 'core/code' },
+			name: 'core/code',
+			blockType: { title: 'Code' },
 		} );
 
 		expect( state ).toEqual( {
-			'core/paragraph': { name: 'core/paragraph' },
-			'core/code': { name: 'core/code' },
+			'core/paragraph': { title: 'Paragraph' },
+			'core/code': { title: 'Code' },
 		} );
 	} );
 
 	it( 'should remove unprocessed block types', () => {
 		const original = deepFreeze( {
-			'core/paragraph': { name: 'core/paragraph' },
-			'core/code': { name: 'core/code' },
+			'core/paragraph': { title: 'Paragraph' },
+			'core/code': { title: 'Code' },
 		} );
 
 		const state = blockTypes( original, {
@@ -57,7 +59,7 @@ describe( 'unprocessedBlockTypes', () => {
 		} );
 
 		expect( state ).toEqual( {
-			'core/paragraph': { name: 'core/paragraph' },
+			'core/paragraph': { title: 'Paragraph' },
 		} );
 	} );
 } );
@@ -107,27 +109,52 @@ describe( 'blockStyles', () => {
 		expect( blockStyles( undefined, {} ) ).toEqual( {} );
 	} );
 
-	it( 'should add a new block styles', () => {
+	it( 'should add new block styles for a single block type', () => {
 		const original = deepFreeze( {} );
 
-		let state = blockStyles( original, {
-			type: 'ADD_BLOCK_STYLES',
-			blockName,
-			styles: [ { name: 'fancy' } ],
-		} );
+		let state = blockStyles(
+			original,
+			addBlockStyles( blockName, [ { name: 'fancy' } ] )
+		);
 
 		expect( state ).toEqual( {
 			[ blockName ]: [ { name: 'fancy' } ],
 		} );
 
-		state = blockStyles( state, {
-			type: 'ADD_BLOCK_STYLES',
-			blockName,
-			styles: [ { name: 'lightbox' } ],
-		} );
+		state = blockStyles(
+			state,
+			addBlockStyles( blockName, [ { name: 'lightbox' } ] )
+		);
 
 		expect( state ).toEqual( {
 			[ blockName ]: [ { name: 'fancy' }, { name: 'lightbox' } ],
+		} );
+	} );
+
+	it( 'should add block styles for array of block types', () => {
+		const original = deepFreeze( {} );
+
+		let state = blockStyles(
+			original,
+			addBlockStyles(
+				[ 'core/group', 'core/columns' ],
+				[ { name: 'dark' } ]
+			)
+		);
+
+		expect( state ).toEqual( {
+			'core/group': [ { name: 'dark' } ],
+			'core/columns': [ { name: 'dark' } ],
+		} );
+
+		state = blockStyles(
+			state,
+			addBlockStyles( [ 'core/group' ], [ { name: 'light' } ] )
+		);
+
+		expect( state ).toEqual( {
+			'core/group': [ { name: 'dark' }, { name: 'light' } ],
+			'core/columns': [ { name: 'dark' } ],
 		} );
 	} );
 
@@ -391,6 +418,22 @@ describe( 'categories', () => {
 		} );
 
 		expect( state ).toEqual( [ { slug: 'wings', title: 'Wings' } ] );
+	} );
+
+	it( 'should ensure, that categories are unique by slug', () => {
+		const original = deepFreeze( [
+			{ slug: 'chicken', title: 'Chicken' },
+		] );
+
+		const state = categories( original, {
+			type: 'SET_CATEGORIES',
+			categories: [ { slug: 'chicken', title: 'Another chicken' } ],
+		} );
+
+		expect( state ).toEqual( [
+			{ slug: 'chicken', title: 'Another chicken' },
+		] );
+		expect( state.length ).toBe( 1 );
 	} );
 
 	it( 'should add the category icon', () => {

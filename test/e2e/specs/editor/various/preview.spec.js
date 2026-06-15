@@ -22,15 +22,9 @@ test.describe( 'Preview', () => {
 	} ) => {
 		const editorPage = page;
 
-		// Disabled until content present.
-		await expect(
-			editorPage.locator( 'role=button[name="Preview"i]' )
-		).toBeDisabled();
-
-		await editor.canvas.type(
-			'role=textbox[name="Add title"i]',
-			'Hello World'
-		);
+		await editor.canvas
+			.locator( 'role=textbox[name="Add title"i]' )
+			.type( 'Hello World' );
 
 		const previewPage = await editor.openPreviewPage( editorPage );
 		const previewTitle = previewPage.locator( 'role=heading[level=1]' );
@@ -48,7 +42,9 @@ test.describe( 'Preview', () => {
 
 		// Return to editor to change title.
 		await editorPage.bringToFront();
-		await editor.canvas.type( 'role=textbox[name="Add title"i]', '!' );
+		await editor.canvas
+			.locator( 'role=textbox[name="Add title"i]' )
+			.type( '!' );
 		await previewUtils.waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.
@@ -70,10 +66,9 @@ test.describe( 'Preview', () => {
 
 		// Return to editor to change title.
 		await editorPage.bringToFront();
-		await editor.canvas.fill(
-			'role=textbox[name="Add title"i]',
-			'Hello World! And more.'
-		);
+		await editor.canvas
+			.locator( 'role=textbox[name="Add title"i]' )
+			.fill( 'Hello World! And more.' );
 		await previewUtils.waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.
@@ -109,7 +104,9 @@ test.describe( 'Preview', () => {
 		const editorPage = page;
 
 		// Type aaaaa in the title field.
-		await editor.canvas.type( 'role=textbox[name="Add title"]', 'aaaaa' );
+		await editor.canvas
+			.locator( 'role=textbox[name="Add title"]' )
+			.type( 'aaaaa' );
 		await editorPage.keyboard.press( 'Tab' );
 
 		// Save the post as a draft.
@@ -129,10 +126,9 @@ test.describe( 'Preview', () => {
 		await editorPage.bringToFront();
 
 		// Append bbbbb to the title, and tab away from the title so blur event is triggered.
-		await editor.canvas.fill(
-			'role=textbox[name="Add title"i]',
-			'aaaaabbbbb'
-		);
+		await editor.canvas
+			.locator( 'role=textbox[name="Add title"i]' )
+			.fill( 'aaaaabbbbb' );
 		await editorPage.keyboard.press( 'Tab' );
 
 		// Save draft and open the preview page right after.
@@ -148,6 +144,48 @@ test.describe( 'Preview', () => {
 		await previewPage.close();
 	} );
 
+	// See: https://github.com/WordPress/gutenberg/issues/33758.
+	test( 'should not use stale autosave data after reverting title', async ( {
+		editor,
+		page,
+		previewUtils,
+	} ) => {
+		const editorPage = page;
+
+		// Create and publish a post.
+		await editor.canvas
+			.locator( 'role=textbox[name="Add title"i]' )
+			.fill( 'Sample Page' );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'original content' },
+		} );
+		await editor.publishPost();
+
+		// Close the panel.
+		await page.click( 'role=button[name="Close panel"i]' );
+
+		// Change the title and preview to trigger an autosave.
+		await editor.canvas
+			.locator( 'role=textbox[name="Add title"i]' )
+			.fill( 'Sample Page 2' );
+		const previewPage = await editor.openPreviewPage( editorPage );
+		const previewTitle = previewPage.locator( 'role=heading[level=1]' );
+		await expect( previewTitle ).toHaveText( 'Sample Page 2' );
+
+		// Return to editor, revert the title, and preview again.
+		await editorPage.bringToFront();
+		await editor.canvas
+			.locator( 'role=textbox[name="Add title"i]' )
+			.fill( 'Sample Page' );
+		await previewUtils.waitForPreviewNavigation( previewPage );
+
+		// Preview should show the reverted title, not the stale autosave.
+		await expect( previewTitle ).toHaveText( 'Sample Page' );
+
+		await previewPage.close();
+	} );
+
 	// Verify correct preview. See: https://github.com/WordPress/gutenberg/issues/33616
 	test( 'should display the correct preview when switching between published and draft statuses', async ( {
 		editor,
@@ -157,7 +195,10 @@ test.describe( 'Preview', () => {
 		const editorPage = page;
 
 		// Type Lorem in the title field.
-		await editor.canvas.type( 'role=textbox[name="Add title"i]', 'Lorem' );
+		await editor.canvas
+			.locator( 'role=textbox[name="Add title"i]' )
+			.type( 'Lorem' );
+		await editor.openDocumentSettingsSidebar();
 
 		// Open the preview page.
 		const previewPage = await editor.openPreviewPage( editorPage );
@@ -174,7 +215,9 @@ test.describe( 'Preview', () => {
 		await page.click( 'role=button[name="Close panel"i]' );
 
 		// Change the title and preview again.
-		await editor.canvas.type( 'role=textbox[name="Add title"i]', ' Ipsum' );
+		await editor.canvas
+			.locator( 'role=textbox[name="Add title"i]' )
+			.type( ' Ipsum' );
 		await previewUtils.waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.
@@ -182,12 +225,15 @@ test.describe( 'Preview', () => {
 
 		// Return to editor and switch to Draft.
 		await editorPage.bringToFront();
+		await page.getByRole( 'button', { name: 'Change status:' } ).click();
+		await page.getByRole( 'radio', { name: 'Draft' } ).click();
 		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Switch to draft' } )
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', {
+				name: 'Save',
+				exact: true,
+			} )
 			.click();
-		// FIXME: The confirmation dialog is not named yet.
-		await page.click( 'role=dialog >> role=button[name="OK"i]' );
 
 		// Wait for the status change.
 		// @see https://github.com/WordPress/gutenberg/pull/43933
@@ -196,7 +242,9 @@ test.describe( 'Preview', () => {
 		).toBeVisible();
 
 		// Change the title.
-		await editor.canvas.type( 'role=textbox[name="Add title"i]', ' Draft' );
+		await editor.canvas
+			.locator( 'role=textbox[name="Add title"i]' )
+			.type( ' Draft' );
 
 		// Open the preview page.
 		await previewUtils.waitForPreviewNavigation( previewPage );
@@ -209,6 +257,16 @@ test.describe( 'Preview', () => {
 } );
 
 test.describe( 'Preview with Custom Fields enabled', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		// Document-Isolation-Policy places the editor in its own agent cluster.
+		// Preview opens frontend pages without the DIP header, creating an
+		// agent cluster mismatch that breaks popup reuse and cross-window
+		// communication.
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
+	} );
+
 	test.beforeEach( async ( { admin, previewUtils } ) => {
 		await admin.createNewPost();
 		await previewUtils.toggleCustomFieldsOption( true );
@@ -216,6 +274,12 @@ test.describe( 'Preview with Custom Fields enabled', () => {
 
 	test.afterEach( async ( { previewUtils } ) => {
 		await previewUtils.toggleCustomFieldsOption( false );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 	} );
 
 	// Catch regressions of https://github.com/WordPress/gutenberg/issues/12617
@@ -227,10 +291,9 @@ test.describe( 'Preview with Custom Fields enabled', () => {
 		const editorPage = page;
 
 		// Add an initial title and content.
-		await editor.canvas.type(
-			'role=textbox[name="Add title"i]',
-			'title 1'
-		);
+		await editor.canvas
+			.locator( 'role=textbox[name="Add title"i]' )
+			.type( 'title 1' );
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'content 1' },
@@ -254,14 +317,12 @@ test.describe( 'Preview with Custom Fields enabled', () => {
 
 		// Return to editor and modify the title and content.
 		await editorPage.bringToFront();
-		await editor.canvas.fill(
-			'role=textbox[name="Add title"i]',
-			'title 2'
-		);
-		await editor.canvas.fill(
-			'role=document >> text="content 1"',
-			'content 2'
-		);
+		await editor.canvas
+			.locator( 'role=textbox[name="Add title"i]' )
+			.fill( 'title 2' );
+		await editor.canvas
+			.locator( 'role=document >> text="content 1"' )
+			.fill( 'content 2' );
 
 		// Open the preview page.
 		await previewUtils.waitForPreviewNavigation( previewPage );
@@ -290,14 +351,17 @@ test.describe( 'Preview with private custom post type', () => {
 		admin,
 		page,
 	} ) => {
-		await admin.createNewPost( { postType: 'not_public', title: 'aaaaa' } );
+		await admin.createNewPost( {
+			postType: 'not_public',
+			title: 'aaaaa',
+		} );
 
 		// Open the view menu.
-		await page.click( 'role=button[name="Preview"i]' );
+		await page.click( 'role=button[name="View"i]' );
 
 		await expect(
 			page.locator( 'role=menuitem[name="Preview in new tab"i]' )
-		).not.toBeVisible();
+		).toBeHidden();
 	} );
 } );
 
@@ -308,7 +372,7 @@ class PreviewUtils {
 
 	async waitForPreviewNavigation( previewPage ) {
 		const previewToggle = this.page.locator(
-			'role=button[name="Preview"i][expanded=false]'
+			'role=button[name="View"i][expanded=false]'
 		);
 		const isDropdownClosed = await previewToggle.isVisible();
 		if ( isDropdownClosed ) {
@@ -316,6 +380,7 @@ class PreviewUtils {
 		}
 
 		await this.page.click( 'role=menuitem[name="Preview in new tab"i]' );
+		// eslint-disable-next-line playwright/no-wait-for-navigation
 		return previewPage.waitForNavigation();
 	}
 
@@ -327,9 +392,9 @@ class PreviewUtils {
 		);
 		await this.page.click( 'role=menuitem[name="Preferences"i]' );
 
-		// Navigate to panels section.
+		// Navigate to general section.
 		await this.page.click(
-			'role=dialog[name="Preferences"i] >> role=tab[name="Panels"i]'
+			'role=dialog[name="Preferences"i] >> role=tab[name="General"i]'
 		);
 
 		// Find custom fields checkbox.
@@ -350,6 +415,7 @@ class PreviewUtils {
 
 		if ( isSaveVisible ) {
 			saveButton.click();
+			// eslint-disable-next-line playwright/no-wait-for-navigation
 			await this.page.waitForNavigation();
 			return;
 		}

@@ -9,6 +9,8 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import { SelectControl } from '../select-control';
 import type { TreeSelectProps, Tree, Truthy } from './types';
+import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
 
 function getSelectOptions(
 	tree: Tree[],
@@ -25,18 +27,18 @@ function getSelectOptions(
 }
 
 /**
- * TreeSelect component is used to generate select input fields.
+ * Generates a hierarchical select input.
  *
- * @example
  * ```jsx
+ * import { useState } from 'react';
  * import { TreeSelect } from '@wordpress/components';
- * import { useState } from '@wordpress/element';
  *
  * const MyTreeSelect = () => {
  * 	const [ page, setPage ] = useState( 'p21' );
  *
  * 	return (
  * 		<TreeSelect
+ * 			__next40pxDefaultSize
  * 			label="Parent page"
  * 			noOptionLabel="No parent page"
  * 			onChange={ ( newPage ) => setPage( newPage ) }
@@ -72,15 +74,17 @@ function getSelectOptions(
  * }
  * ```
  */
+export function TreeSelect( props: TreeSelectProps ) {
+	const {
+		__nextHasNoMarginBottom: _, // Prevent passing to internal component
+		label,
+		noOptionLabel,
+		onChange,
+		selectedId,
+		tree = [],
+		...restProps
+	} = useDeprecated36pxDefaultSizeProp( props );
 
-export function TreeSelect( {
-	label,
-	noOptionLabel,
-	onChange,
-	selectedId,
-	tree = [],
-	...props
-}: TreeSelectProps ) {
 	const options = useMemo( () => {
 		return [
 			noOptionLabel && { value: '', label: noOptionLabel },
@@ -88,11 +92,20 @@ export function TreeSelect( {
 		].filter( < T, >( option: T ): option is Truthy< T > => !! option );
 	}, [ noOptionLabel, tree ] );
 
+	maybeWarnDeprecated36pxSize( {
+		componentName: 'TreeSelect',
+		size: restProps.size,
+		__next40pxDefaultSize: restProps.__next40pxDefaultSize,
+	} );
+
 	return (
+		// Disable reason: the parent component already takes case of the `__next40pxDefaultSize` prop.
+		// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop
 		<SelectControl
+			__shouldNotWarnDeprecated36pxSize
 			{ ...{ label, options, onChange } }
 			value={ selectedId }
-			{ ...props }
+			{ ...restProps }
 		/>
 	);
 }

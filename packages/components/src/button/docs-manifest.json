@@ -1,0 +1,5 @@
+{
+	"$schema": "../../schemas/docs-manifest.json",
+	"displayName": "Button",
+	"filePath": "./index.tsx"
+}

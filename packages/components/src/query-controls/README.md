@@ -5,8 +5,8 @@
 ### Usage
 
 ```jsx
+import { useState } from 'react';
 import { QueryControls } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const QUERY_DEFAULTS = {
 	category: 1,
@@ -36,7 +36,7 @@ const QUERY_DEFAULTS = {
 
 const MyQueryControls = () => {
 	const [ query, setQuery ] = useState( QUERY_DEFAULTS );
-	const { category, categories, maxItems, minItems, numberOfItems, order, orderBy  } = query;
+	const { category, categories, maxItems, minItems, numberOfItems, order, orderBy } = query;
 
 	const updateQuery = ( newQuery ) => {
 		setQuery( { ...query, ...newQuery } );
@@ -213,7 +213,14 @@ The order in which to retrieve posts.
 -   Required: No
 -   Platform: Web
 
-#### `orderBy`: `'date' | 'title'`
+#### `orderBy`: `'date' | 'title' | 'menu_order'`
+
+The meta key by which to order posts.
+
+-   Required: No
+-   Platform: Web
+
+#### `orderByOptions`: `OrderByOption[]`
 
 The meta key by which to order posts.
 
@@ -240,3 +247,10 @@ The selected category for the `categoriesList` prop.
 
 -   Required: No
 -   Platform: Web
+
+#### `__next40pxDefaultSize`: `boolean`
+
+Start opting into the larger default height that will become the default size in a future version.
+
+- Required: No
+- Default: `false`

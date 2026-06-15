@@ -12,75 +12,111 @@
 		"parent": null
 	},
 	{
-		"title": "Development Environment",
+		"title": "Block Development Environment",
 		"slug": "devenv",
 		"markdown_source": "../docs/getting-started/devenv/README.md",
 		"parent": "getting-started"
 	},
 	{
-		"title": "How to setup local WordPress environment on Ubuntu",
-		"slug": "docker-ubuntu",
-		"markdown_source": "../docs/getting-started/devenv/docker-ubuntu.md",
+		"title": "Node.js development environment",
+		"slug": "nodejs-development-environment",
+		"markdown_source": "../docs/getting-started/devenv/nodejs-development-environment.md",
 		"parent": "devenv"
 	},
 	{
-		"title": "Create a Block Tutorial",
-		"slug": "create-block",
-		"markdown_source": "../docs/getting-started/create-block/README.md",
+		"title": "Get started with wp-env",
+		"slug": "get-started-with-wp-env",
+		"markdown_source": "../docs/getting-started/devenv/get-started-with-wp-env.md",
+		"parent": "devenv"
+	},
+	{
+		"title": "Get started with create-block",
+		"slug": "get-started-with-create-block",
+		"markdown_source": "../docs/getting-started/devenv/get-started-with-create-block.md",
+		"parent": "devenv"
+	},
+	{
+		"title": "Get started with wp-scripts",
+		"slug": "get-started-with-wp-scripts",
+		"markdown_source": "../docs/getting-started/devenv/get-started-with-wp-scripts.md",
+		"parent": "devenv"
+	},
+	{
+		"title": "Quick Start Guide",
+		"slug": "quick-start-guide",
+		"markdown_source": "../docs/getting-started/quick-start-guide.md",
 		"parent": "getting-started"
 	},
 	{
-		"title": "WordPress Plugin",
-		"slug": "wp-plugin",
-		"markdown_source": "../docs/getting-started/create-block/wp-plugin.md",
-		"parent": "create-block"
-	},
-	{
-		"title": "Anatomy of a Block",
-		"slug": "block-anatomy",
-		"markdown_source": "../docs/getting-started/create-block/block-anatomy.md",
-		"parent": "create-block"
-	},
-	{
-		"title": "Block Attributes",
-		"slug": "attributes",
-		"markdown_source": "../docs/getting-started/create-block/attributes.md",
-		"parent": "create-block"
-	},
-	{
-		"title": "Code Implementation",
-		"slug": "block-code",
-		"markdown_source": "../docs/getting-started/create-block/block-code.md",
-		"parent": "create-block"
-	},
-	{
-		"title": "Authoring Experience",
-		"slug": "author-experience",
-		"markdown_source": "../docs/getting-started/create-block/author-experience.md",
-		"parent": "create-block"
-	},
-	{
-		"title": "Finishing Touches",
-		"slug": "finishing",
-		"markdown_source": "../docs/getting-started/create-block/finishing.md",
-		"parent": "create-block"
-	},
-	{
-		"title": "Share your Block with the World",
-		"slug": "submitting-to-block-directory",
-		"markdown_source": "../docs/getting-started/create-block/submitting-to-block-directory.md",
-		"parent": "create-block"
-	},
-	{
-		"title": "Full Site Editing",
-		"slug": "full-site-editing",
-		"markdown_source": "../docs/getting-started/full-site-editing.md",
+		"title": "Tutorial: Build your first block",
+		"slug": "tutorial",
+		"markdown_source": "../docs/getting-started/tutorial.md",
 		"parent": "getting-started"
 	},
 	{
-		"title": "Outreach",
-		"slug": "outreach",
-		"markdown_source": "../docs/getting-started/outreach.md",
+		"title": "Fundamentals of Block Development",
+		"slug": "fundamentals",
+		"markdown_source": "../docs/getting-started/fundamentals/README.md",
+		"parent": "getting-started"
+	},
+	{
+		"title": "File structure of a block",
+		"slug": "file-structure-of-a-block",
+		"markdown_source": "../docs/getting-started/fundamentals/file-structure-of-a-block.md",
+		"parent": "fundamentals"
+	},
+	{
+		"title": "block.json",
+		"slug": "block-json",
+		"markdown_source": "../docs/getting-started/fundamentals/block-json.md",
+		"parent": "fundamentals"
+	},
+	{
+		"title": "Registration of a block",
+		"slug": "registration-of-a-block",
+		"markdown_source": "../docs/getting-started/fundamentals/registration-of-a-block.md",
+		"parent": "fundamentals"
+	},
+	{
+		"title": "The block wrapper",
+		"slug": "block-wrapper",
+		"markdown_source": "../docs/getting-started/fundamentals/block-wrapper.md",
+		"parent": "fundamentals"
+	},
+	{
+		"title": "The block in the Editor",
+		"slug": "block-in-the-editor",
+		"markdown_source": "../docs/getting-started/fundamentals/block-in-the-editor.md",
+		"parent": "fundamentals"
+	},
+	{
+		"title": "Markup representation of a block",
+		"slug": "markup-representation-block",
+		"markdown_source": "../docs/getting-started/fundamentals/markup-representation-block.md",
+		"parent": "fundamentals"
+	},
+	{
+		"title": "Static or Dynamic rendering of a block",
+		"slug": "static-dynamic-rendering",
+		"markdown_source": "../docs/getting-started/fundamentals/static-dynamic-rendering.md",
+		"parent": "fundamentals"
+	},
+	{
+		"title": "Working with JavaScript for the Block Editor",
+		"slug": "javascript-in-the-block-editor",
+		"markdown_source": "../docs/getting-started/fundamentals/javascript-in-the-block-editor.md",
+		"parent": "fundamentals"
+	},
+	{
+		"title": "Glossary",
+		"slug": "glossary",
+		"markdown_source": "../docs/getting-started/glossary.md",
+		"parent": "getting-started"
+	},
+	{
+		"title": "Frequently Asked Questions",
+		"slug": "faq",
+		"markdown_source": "../docs/getting-started/faq.md",
 		"parent": "getting-started"
 	},
 	{
@@ -102,51 +138,15 @@
 		"parent": "how-to-guides"
 	},
 	{
-		"title": "Create a basic block",
-		"slug": "writing-your-first-block-type",
-		"markdown_source": "../docs/how-to-guides/block-tutorial/writing-your-first-block-type.md",
-		"parent": "block-tutorial"
-	},
-	{
 		"title": "Use styles and stylesheets",
 		"slug": "applying-styles-with-stylesheets",
 		"markdown_source": "../docs/how-to-guides/block-tutorial/applying-styles-with-stylesheets.md",
 		"parent": "block-tutorial"
 	},
 	{
-		"title": "Introducing Attributes and Editable Fields",
-		"slug": "introducing-attributes-and-editable-fields",
-		"markdown_source": "../docs/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields.md",
-		"parent": "block-tutorial"
-	},
-	{
-		"title": "Block Controls: Block Toolbar and Settings Sidebar",
-		"slug": "block-controls-toolbar-and-sidebar",
-		"markdown_source": "../docs/how-to-guides/block-tutorial/block-controls-toolbar-and-sidebar.md",
-		"parent": "block-tutorial"
-	},
-	{
-		"title": "Block Supports",
-		"slug": "block-supports-in-static-blocks",
-		"markdown_source": "../docs/how-to-guides/block-tutorial/block-supports-in-static-blocks.md",
-		"parent": "block-tutorial"
-	},
-	{
 		"title": "Creating dynamic blocks",
 		"slug": "creating-dynamic-blocks",
 		"markdown_source": "../docs/how-to-guides/block-tutorial/creating-dynamic-blocks.md",
-		"parent": "block-tutorial"
-	},
-	{
-		"title": "Block Supports in dynamic blocks",
-		"slug": "block-supports-in-dynamic-blocks",
-		"markdown_source": "../docs/how-to-guides/block-tutorial/block-supports-in-dynamic-blocks.md",
-		"parent": "block-tutorial"
-	},
-	{
-		"title": "Generate Blocks with WP-CLI",
-		"slug": "generate-blocks-with-wp-cli",
-		"markdown_source": "../docs/how-to-guides/block-tutorial/generate-blocks-with-wp-cli.md",
 		"parent": "block-tutorial"
 	},
 	{
@@ -170,14 +170,8 @@
 	{
 		"title": "Building a custom block editor",
 		"slug": "custom-block-editor",
-		"markdown_source": "../docs/how-to-guides/platform/custom-block-editor/README.md",
+		"markdown_source": "../docs/how-to-guides/platform/custom-block-editor.md",
 		"parent": "platform"
-	},
-	{
-		"title": "Tutorial: building a custom block editor",
-		"slug": "tutorial",
-		"markdown_source": "../docs/how-to-guides/platform/custom-block-editor/tutorial.md",
-		"parent": "custom-block-editor"
 	},
 	{
 		"title": "Create your First App with Gutenberg Data",
@@ -204,7 +198,7 @@
 		"parent": "data-basics"
 	},
 	{
-		"title": "Part 4: Building a Create page form",
+		"title": "Building a Create page form",
 		"slug": "4-building-a-create-page-form",
 		"markdown_source": "../docs/how-to-guides/data-basics/4-building-a-create-page-form.md",
 		"parent": "data-basics"
@@ -218,7 +212,43 @@
 	{
 		"title": "Curating the Editor Experience",
 		"slug": "curating-the-editor-experience",
-		"markdown_source": "../docs/how-to-guides/curating-the-editor-experience.md",
+		"markdown_source": "../docs/how-to-guides/curating-the-editor-experience/README.md",
+		"parent": "how-to-guides"
+	},
+	{
+		"title": "Block Locking API",
+		"slug": "block-locking",
+		"markdown_source": "../docs/how-to-guides/curating-the-editor-experience/block-locking.md",
+		"parent": "curating-the-editor-experience"
+	},
+	{
+		"title": "Patterns",
+		"slug": "patterns",
+		"markdown_source": "../docs/how-to-guides/curating-the-editor-experience/patterns.md",
+		"parent": "curating-the-editor-experience"
+	},
+	{
+		"title": "theme.json",
+		"slug": "theme-json",
+		"markdown_source": "../docs/how-to-guides/curating-the-editor-experience/theme-json.md",
+		"parent": "curating-the-editor-experience"
+	},
+	{
+		"title": "Filters and hooks",
+		"slug": "filters-and-hooks",
+		"markdown_source": "../docs/how-to-guides/curating-the-editor-experience/filters-and-hooks.md",
+		"parent": "curating-the-editor-experience"
+	},
+	{
+		"title": "Disable Editor functionality",
+		"slug": "disable-editor-functionality",
+		"markdown_source": "../docs/how-to-guides/curating-the-editor-experience/disable-editor-functionality.md",
+		"parent": "curating-the-editor-experience"
+	},
+	{
+		"title": "Enqueueing assets in the Editor",
+		"slug": "enqueueing-assets-in-the-editor",
+		"markdown_source": "../docs/how-to-guides/enqueueing-assets-in-the-editor.md",
 		"parent": "how-to-guides"
 	},
 	{
@@ -232,60 +262,6 @@
 		"slug": "format-api",
 		"markdown_source": "../docs/how-to-guides/format-api.md",
 		"parent": "how-to-guides"
-	},
-	{
-		"title": "How to use JavaScript with the Block Editor",
-		"slug": "javascript",
-		"markdown_source": "../docs/how-to-guides/javascript/README.md",
-		"parent": "how-to-guides"
-	},
-	{
-		"title": "Plugins Background",
-		"slug": "plugins-background",
-		"markdown_source": "../docs/how-to-guides/javascript/plugins-background.md",
-		"parent": "javascript"
-	},
-	{
-		"title": "Loading JavaScript",
-		"slug": "loading-javascript",
-		"markdown_source": "../docs/how-to-guides/javascript/loading-javascript.md",
-		"parent": "javascript"
-	},
-	{
-		"title": "Extending the Block Editor",
-		"slug": "extending-the-block-editor",
-		"markdown_source": "../docs/how-to-guides/javascript/extending-the-block-editor.md",
-		"parent": "javascript"
-	},
-	{
-		"title": "Troubleshooting",
-		"slug": "troubleshooting",
-		"markdown_source": "../docs/how-to-guides/javascript/troubleshooting.md",
-		"parent": "javascript"
-	},
-	{
-		"title": "JavaScript Versions and Build Step",
-		"slug": "versions-and-building",
-		"markdown_source": "../docs/how-to-guides/javascript/versions-and-building.md",
-		"parent": "javascript"
-	},
-	{
-		"title": "Scope Your Code",
-		"slug": "scope-your-code",
-		"markdown_source": "../docs/how-to-guides/javascript/scope-your-code.md",
-		"parent": "javascript"
-	},
-	{
-		"title": "JavaScript Build Setup",
-		"slug": "js-build-setup",
-		"markdown_source": "../docs/how-to-guides/javascript/js-build-setup.md",
-		"parent": "javascript"
-	},
-	{
-		"title": "ESNext Syntax",
-		"slug": "esnext-js",
-		"markdown_source": "../docs/how-to-guides/javascript/esnext-js.md",
-		"parent": "javascript"
 	},
 	{
 		"title": "Internationalization",
@@ -324,15 +300,9 @@
 		"parent": "how-to-guides"
 	},
 	{
-		"title": "Block Theme",
-		"slug": "block-theme-overview",
-		"markdown_source": "../docs/how-to-guides/themes/block-theme-overview.md",
-		"parent": "themes"
-	},
-	{
 		"title": "Global Settings & Styles (theme.json)",
-		"slug": "theme-json",
-		"markdown_source": "../docs/how-to-guides/themes/theme-json.md",
+		"slug": "global-settings-and-styles",
+		"markdown_source": "../docs/how-to-guides/themes/global-settings-and-styles.md",
 		"parent": "themes"
 	},
 	{
@@ -392,13 +362,25 @@
 	{
 		"title": "API Versions",
 		"slug": "block-api-versions",
-		"markdown_source": "../docs/reference-guides/block-api/block-api-versions.md",
+		"markdown_source": "../docs/reference-guides/block-api/block-api-versions/README.md",
 		"parent": "block-api"
+	},
+	{
+		"title": "Migrating Blocks for iframe Editor Compatibility",
+		"slug": "block-migration-for-iframe-editor-compatibility",
+		"markdown_source": "../docs/reference-guides/block-api/block-api-versions/block-migration-for-iframe-editor-compatibility.md",
+		"parent": "block-api-versions"
 	},
 	{
 		"title": "Attributes",
 		"slug": "block-attributes",
 		"markdown_source": "../docs/reference-guides/block-api/block-attributes.md",
+		"parent": "block-api"
+	},
+	{
+		"title": "Bindings",
+		"slug": "block-bindings",
+		"markdown_source": "../docs/reference-guides/block-api/block-bindings.md",
 		"parent": "block-api"
 	},
 	{
@@ -476,8 +458,770 @@
 	{
 		"title": "Core Blocks Reference",
 		"slug": "core-blocks",
-		"markdown_source": "../docs/reference-guides/core-blocks.md",
+		"markdown_source": "../docs/reference-guides/core-blocks/README.md",
 		"parent": "reference-guides"
+	},
+	{
+		"title": "Design Blocks",
+		"slug": "core-blocks-design",
+		"markdown_source": "../docs/reference-guides/core-blocks/category-design.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Embed Blocks",
+		"slug": "core-blocks-embed",
+		"markdown_source": "../docs/reference-guides/core-blocks/category-embed.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Media Blocks",
+		"slug": "core-blocks-media",
+		"markdown_source": "../docs/reference-guides/core-blocks/category-media.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Reusable Blocks",
+		"slug": "core-blocks-reusable",
+		"markdown_source": "../docs/reference-guides/core-blocks/category-reusable.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Text Blocks",
+		"slug": "core-blocks-text",
+		"markdown_source": "../docs/reference-guides/core-blocks/category-text.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Theme Blocks",
+		"slug": "core-blocks-theme",
+		"markdown_source": "../docs/reference-guides/core-blocks/category-theme.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Widgets Blocks",
+		"slug": "core-blocks-widgets",
+		"markdown_source": "../docs/reference-guides/core-blocks/category-widgets.md",
+		"parent": "core-blocks"
+	},
+	{
+		"title": "Accordion Heading",
+		"slug": "core-block-accordion-heading",
+		"markdown_source": "../packages/block-library/src/accordion-heading/README.md",
+		"parent": "core-blocks-design"
+	},
+	{
+		"title": "Accordion Item",
+		"slug": "core-block-accordion-item",
+		"markdown_source": "../packages/block-library/src/accordion-item/README.md",
+		"parent": "core-blocks-design"
+	},
+	{
+		"title": "Accordion Panel",
+		"slug": "core-block-accordion-panel",
+		"markdown_source": "../packages/block-library/src/accordion-panel/README.md",
+		"parent": "core-blocks-design"
+	},
+	{
+		"title": "Accordion",
+		"slug": "core-block-accordion",
+		"markdown_source": "../packages/block-library/src/accordion/README.md",
+		"parent": "core-blocks-design"
+	},
+	{
+		"title": "Archives",
+		"slug": "core-block-archives",
+		"markdown_source": "../packages/block-library/src/archives/README.md",
+		"parent": "core-blocks-widgets"
+	},
+	{
+		"title": "Audio",
+		"slug": "core-block-audio",
+		"markdown_source": "../packages/block-library/src/audio/README.md",
+		"parent": "core-blocks-media"
+	},
+	{
+		"title": "Avatar",
+		"slug": "core-block-avatar",
+		"markdown_source": "../packages/block-library/src/avatar/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Pattern",
+		"slug": "core-block-block",
+		"markdown_source": "../packages/block-library/src/block/README.md",
+		"parent": "core-blocks-reusable"
+	},
+	{
+		"title": "Breadcrumbs",
+		"slug": "core-block-breadcrumbs",
+		"markdown_source": "../packages/block-library/src/breadcrumbs/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Button",
+		"slug": "core-block-button",
+		"markdown_source": "../packages/block-library/src/button/README.md",
+		"parent": "core-blocks-design"
+	},
+	{
+		"title": "Buttons",
+		"slug": "core-block-buttons",
+		"markdown_source": "../packages/block-library/src/buttons/README.md",
+		"parent": "core-blocks-design"
+	},
+	{
+		"title": "Calendar",
+		"slug": "core-block-calendar",
+		"markdown_source": "../packages/block-library/src/calendar/README.md",
+		"parent": "core-blocks-widgets"
+	},
+	{
+		"title": "Terms List",
+		"slug": "core-block-categories",
+		"markdown_source": "../packages/block-library/src/categories/README.md",
+		"parent": "core-blocks-widgets"
+	},
+	{
+		"title": "Code",
+		"slug": "core-block-code",
+		"markdown_source": "../packages/block-library/src/code/README.md",
+		"parent": "core-blocks-text"
+	},
+	{
+		"title": "Column",
+		"slug": "core-block-column",
+		"markdown_source": "../packages/block-library/src/column/README.md",
+		"parent": "core-blocks-design"
+	},
+	{
+		"title": "Columns",
+		"slug": "core-block-columns",
+		"markdown_source": "../packages/block-library/src/columns/README.md",
+		"parent": "core-blocks-design"
+	},
+	{
+		"title": "Comment Author Avatar (deprecated)",
+		"slug": "core-block-comment-author-avatar",
+		"markdown_source": "../packages/block-library/src/comment-author-avatar/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Comment Author Name",
+		"slug": "core-block-comment-author-name",
+		"markdown_source": "../packages/block-library/src/comment-author-name/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Comment Content",
+		"slug": "core-block-comment-content",
+		"markdown_source": "../packages/block-library/src/comment-content/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Comment Date",
+		"slug": "core-block-comment-date",
+		"markdown_source": "../packages/block-library/src/comment-date/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Comment Edit Link",
+		"slug": "core-block-comment-edit-link",
+		"markdown_source": "../packages/block-library/src/comment-edit-link/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Comment Reply Link",
+		"slug": "core-block-comment-reply-link",
+		"markdown_source": "../packages/block-library/src/comment-reply-link/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Comment Template",
+		"slug": "core-block-comment-template",
+		"markdown_source": "../packages/block-library/src/comment-template/README.md",
+		"parent": "core-blocks-design"
+	},
+	{
+		"title": "Comments Next Page",
+		"slug": "core-block-comments-pagination-next",
+		"markdown_source": "../packages/block-library/src/comments-pagination-next/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Comments Page Numbers",
+		"slug": "core-block-comments-pagination-numbers",
+		"markdown_source": "../packages/block-library/src/comments-pagination-numbers/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Comments Previous Page",
+		"slug": "core-block-comments-pagination-previous",
+		"markdown_source": "../packages/block-library/src/comments-pagination-previous/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Comments Pagination",
+		"slug": "core-block-comments-pagination",
+		"markdown_source": "../packages/block-library/src/comments-pagination/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Comments Title",
+		"slug": "core-block-comments-title",
+		"markdown_source": "../packages/block-library/src/comments-title/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Comments",
+		"slug": "core-block-comments",
+		"markdown_source": "../packages/block-library/src/comments/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Cover",
+		"slug": "core-block-cover",
+		"markdown_source": "../packages/block-library/src/cover/README.md",
+		"parent": "core-blocks-media"
+	},
+	{
+		"title": "Details",
+		"slug": "core-block-details",
+		"markdown_source": "../packages/block-library/src/details/README.md",
+		"parent": "core-blocks-text"
+	},
+	{
+		"title": "Embed",
+		"slug": "core-block-embed",
+		"markdown_source": "../packages/block-library/src/embed/README.md",
+		"parent": "core-blocks-embed"
+	},
+	{
+		"title": "File",
+		"slug": "core-block-file",
+		"markdown_source": "../packages/block-library/src/file/README.md",
+		"parent": "core-blocks-media"
+	},
+	{
+		"title": "Footnotes",
+		"slug": "core-block-footnotes",
+		"markdown_source": "../packages/block-library/src/footnotes/README.md",
+		"parent": "core-blocks-text"
+	},
+	{
+		"title": "Input Field",
+		"slug": "core-block-form-input",
+		"markdown_source": "../packages/block-library/src/form-input/README.md",
+		"parent": "core-blocks-widgets"
+	},
+	{
+		"title": "Form Submission Notification",
+		"slug": "core-block-form-submission-notification",
+		"markdown_source": "../packages/block-library/src/form-submission-notification/README.md",
+		"parent": "core-blocks-widgets"
+	},
+	{
+		"title": "Form Submit Button",
+		"slug": "core-block-form-submit-button",
+		"markdown_source": "../packages/block-library/src/form-submit-button/README.md",
+		"parent": "core-blocks-widgets"
+	},
+	{
+		"title": "Form",
+		"slug": "core-block-form",
+		"markdown_source": "../packages/block-library/src/form/README.md",
+		"parent": "core-blocks-widgets"
+	},
+	{
+		"title": "Classic",
+		"slug": "core-block-freeform",
+		"markdown_source": "../packages/block-library/src/freeform/README.md",
+		"parent": "core-blocks-text"
+	},
+	{
+		"title": "Gallery",
+		"slug": "core-block-gallery",
+		"markdown_source": "../packages/block-library/src/gallery/README.md",
+		"parent": "core-blocks-media"
+	},
+	{
+		"title": "Group",
+		"slug": "core-block-group",
+		"markdown_source": "../packages/block-library/src/group/README.md",
+		"parent": "core-blocks-design"
+	},
+	{
+		"title": "Heading",
+		"slug": "core-block-heading",
+		"markdown_source": "../packages/block-library/src/heading/README.md",
+		"parent": "core-blocks-text"
+	},
+	{
+		"title": "Home Link",
+		"slug": "core-block-home-link",
+		"markdown_source": "../packages/block-library/src/home-link/README.md",
+		"parent": "core-blocks-design"
+	},
+	{
+		"title": "Custom HTML",
+		"slug": "core-block-html",
+		"markdown_source": "../packages/block-library/src/html/README.md",
+		"parent": "core-blocks-widgets"
+	},
+	{
+		"title": "Icon",
+		"slug": "core-block-icon",
+		"markdown_source": "../packages/block-library/src/icon/README.md",
+		"parent": "core-blocks-media"
+	},
+	{
+		"title": "Image",
+		"slug": "core-block-image",
+		"markdown_source": "../packages/block-library/src/image/README.md",
+		"parent": "core-blocks-media"
+	},
+	{
+		"title": "Latest Comments",
+		"slug": "core-block-latest-comments",
+		"markdown_source": "../packages/block-library/src/latest-comments/README.md",
+		"parent": "core-blocks-widgets"
+	},
+	{
+		"title": "Latest Posts",
+		"slug": "core-block-latest-posts",
+		"markdown_source": "../packages/block-library/src/latest-posts/README.md",
+		"parent": "core-blocks-widgets"
+	},
+	{
+		"title": "List Item",
+		"slug": "core-block-list-item",
+		"markdown_source": "../packages/block-library/src/list-item/README.md",
+		"parent": "core-blocks-text"
+	},
+	{
+		"title": "List",
+		"slug": "core-block-list",
+		"markdown_source": "../packages/block-library/src/list/README.md",
+		"parent": "core-blocks-text"
+	},
+	{
+		"title": "Login/out",
+		"slug": "core-block-loginout",
+		"markdown_source": "../packages/block-library/src/loginout/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Math",
+		"slug": "core-block-math",
+		"markdown_source": "../packages/block-library/src/math/README.md",
+		"parent": "core-blocks-text"
+	},
+	{
+		"title": "Media & Text",
+		"slug": "core-block-media-text",
+		"markdown_source": "../packages/block-library/src/media-text/README.md",
+		"parent": "core-blocks-media"
+	},
+	{
+		"title": "Unsupported",
+		"slug": "core-block-missing",
+		"markdown_source": "../packages/block-library/src/missing/README.md",
+		"parent": "core-blocks-text"
+	},
+	{
+		"title": "More",
+		"slug": "core-block-more",
+		"markdown_source": "../packages/block-library/src/more/README.md",
+		"parent": "core-blocks-design"
+	},
+	{
+		"title": "Custom Link",
+		"slug": "core-block-navigation-link",
+		"markdown_source": "../packages/block-library/src/navigation-link/README.md",
+		"parent": "core-blocks-design"
+	},
+	{
+		"title": "Navigation Overlay Close",
+		"slug": "core-block-navigation-overlay-close",
+		"markdown_source": "../packages/block-library/src/navigation-overlay-close/README.md",
+		"parent": "core-blocks-design"
+	},
+	{
+		"title": "Submenu",
+		"slug": "core-block-navigation-submenu",
+		"markdown_source": "../packages/block-library/src/navigation-submenu/README.md",
+		"parent": "core-blocks-design"
+	},
+	{
+		"title": "Navigation",
+		"slug": "core-block-navigation",
+		"markdown_source": "../packages/block-library/src/navigation/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Page Break",
+		"slug": "core-block-nextpage",
+		"markdown_source": "../packages/block-library/src/nextpage/README.md",
+		"parent": "core-blocks-design"
+	},
+	{
+		"title": "Page List Item",
+		"slug": "core-block-page-list-item",
+		"markdown_source": "../packages/block-library/src/page-list-item/README.md",
+		"parent": "core-blocks-widgets"
+	},
+	{
+		"title": "Page List",
+		"slug": "core-block-page-list",
+		"markdown_source": "../packages/block-library/src/page-list/README.md",
+		"parent": "core-blocks-widgets"
+	},
+	{
+		"title": "Paragraph",
+		"slug": "core-block-paragraph",
+		"markdown_source": "../packages/block-library/src/paragraph/README.md",
+		"parent": "core-blocks-text"
+	},
+	{
+		"title": "Pattern Placeholder",
+		"slug": "core-block-pattern",
+		"markdown_source": "../packages/block-library/src/pattern/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Playlist track",
+		"slug": "core-block-playlist-track",
+		"markdown_source": "../packages/block-library/src/playlist-track/README.md",
+		"parent": "core-blocks-media"
+	},
+	{
+		"title": "Playlist",
+		"slug": "core-block-playlist",
+		"markdown_source": "../packages/block-library/src/playlist/README.md",
+		"parent": "core-blocks-media"
+	},
+	{
+		"title": "Author Biography",
+		"slug": "core-block-post-author-biography",
+		"markdown_source": "../packages/block-library/src/post-author-biography/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Author Name",
+		"slug": "core-block-post-author-name",
+		"markdown_source": "../packages/block-library/src/post-author-name/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Author (deprecated)",
+		"slug": "core-block-post-author",
+		"markdown_source": "../packages/block-library/src/post-author/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Comment (deprecated)",
+		"slug": "core-block-post-comment",
+		"markdown_source": "../packages/block-library/src/post-comment/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Comments Count",
+		"slug": "core-block-post-comments-count",
+		"markdown_source": "../packages/block-library/src/post-comments-count/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Comments Form",
+		"slug": "core-block-post-comments-form",
+		"markdown_source": "../packages/block-library/src/post-comments-form/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Comments Link",
+		"slug": "core-block-post-comments-link",
+		"markdown_source": "../packages/block-library/src/post-comments-link/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Content",
+		"slug": "core-block-post-content",
+		"markdown_source": "../packages/block-library/src/post-content/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Date",
+		"slug": "core-block-post-date",
+		"markdown_source": "../packages/block-library/src/post-date/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Excerpt",
+		"slug": "core-block-post-excerpt",
+		"markdown_source": "../packages/block-library/src/post-excerpt/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Featured Image",
+		"slug": "core-block-post-featured-image",
+		"markdown_source": "../packages/block-library/src/post-featured-image/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Post Navigation Link",
+		"slug": "core-block-post-navigation-link",
+		"markdown_source": "../packages/block-library/src/post-navigation-link/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Post Template",
+		"slug": "core-block-post-template",
+		"markdown_source": "../packages/block-library/src/post-template/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Post Terms",
+		"slug": "core-block-post-terms",
+		"markdown_source": "../packages/block-library/src/post-terms/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Time to Read",
+		"slug": "core-block-post-time-to-read",
+		"markdown_source": "../packages/block-library/src/post-time-to-read/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Title",
+		"slug": "core-block-post-title",
+		"markdown_source": "../packages/block-library/src/post-title/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Preformatted",
+		"slug": "core-block-preformatted",
+		"markdown_source": "../packages/block-library/src/preformatted/README.md",
+		"parent": "core-blocks-text"
+	},
+	{
+		"title": "Pullquote",
+		"slug": "core-block-pullquote",
+		"markdown_source": "../packages/block-library/src/pullquote/README.md",
+		"parent": "core-blocks-text"
+	},
+	{
+		"title": "No Results",
+		"slug": "core-block-query-no-results",
+		"markdown_source": "../packages/block-library/src/query-no-results/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Next Page",
+		"slug": "core-block-query-pagination-next",
+		"markdown_source": "../packages/block-library/src/query-pagination-next/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Page Numbers",
+		"slug": "core-block-query-pagination-numbers",
+		"markdown_source": "../packages/block-library/src/query-pagination-numbers/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Previous Page",
+		"slug": "core-block-query-pagination-previous",
+		"markdown_source": "../packages/block-library/src/query-pagination-previous/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Pagination",
+		"slug": "core-block-query-pagination",
+		"markdown_source": "../packages/block-library/src/query-pagination/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Query Title",
+		"slug": "core-block-query-title",
+		"markdown_source": "../packages/block-library/src/query-title/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Query Total",
+		"slug": "core-block-query-total",
+		"markdown_source": "../packages/block-library/src/query-total/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Query Loop",
+		"slug": "core-block-query",
+		"markdown_source": "../packages/block-library/src/query/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Quote",
+		"slug": "core-block-quote",
+		"markdown_source": "../packages/block-library/src/quote/README.md",
+		"parent": "core-blocks-text"
+	},
+	{
+		"title": "Read More",
+		"slug": "core-block-read-more",
+		"markdown_source": "../packages/block-library/src/read-more/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "RSS",
+		"slug": "core-block-rss",
+		"markdown_source": "../packages/block-library/src/rss/README.md",
+		"parent": "core-blocks-widgets"
+	},
+	{
+		"title": "Search",
+		"slug": "core-block-search",
+		"markdown_source": "../packages/block-library/src/search/README.md",
+		"parent": "core-blocks-widgets"
+	},
+	{
+		"title": "Separator",
+		"slug": "core-block-separator",
+		"markdown_source": "../packages/block-library/src/separator/README.md",
+		"parent": "core-blocks-design"
+	},
+	{
+		"title": "Shortcode",
+		"slug": "core-block-shortcode",
+		"markdown_source": "../packages/block-library/src/shortcode/README.md",
+		"parent": "core-blocks-widgets"
+	},
+	{
+		"title": "Site Logo",
+		"slug": "core-block-site-logo",
+		"markdown_source": "../packages/block-library/src/site-logo/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Site Tagline",
+		"slug": "core-block-site-tagline",
+		"markdown_source": "../packages/block-library/src/site-tagline/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Site Title",
+		"slug": "core-block-site-title",
+		"markdown_source": "../packages/block-library/src/site-title/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Social Icon",
+		"slug": "core-block-social-link",
+		"markdown_source": "../packages/block-library/src/social-link/README.md",
+		"parent": "core-blocks-widgets"
+	},
+	{
+		"title": "Social Icons",
+		"slug": "core-block-social-links",
+		"markdown_source": "../packages/block-library/src/social-links/README.md",
+		"parent": "core-blocks-widgets"
+	},
+	{
+		"title": "Spacer",
+		"slug": "core-block-spacer",
+		"markdown_source": "../packages/block-library/src/spacer/README.md",
+		"parent": "core-blocks-design"
+	},
+	{
+		"title": "Tab List",
+		"slug": "core-block-tab-list",
+		"markdown_source": "../packages/block-library/src/tab-list/README.md",
+		"parent": "core-blocks-design"
+	},
+	{
+		"title": "Tab Panel",
+		"slug": "core-block-tab-panel",
+		"markdown_source": "../packages/block-library/src/tab-panel/README.md",
+		"parent": "core-blocks-design"
+	},
+	{
+		"title": "Tab Panels",
+		"slug": "core-block-tab-panels",
+		"markdown_source": "../packages/block-library/src/tab-panels/README.md",
+		"parent": "core-blocks-design"
+	},
+	{
+		"title": "Table of Contents",
+		"slug": "core-block-table-of-contents",
+		"markdown_source": "../packages/block-library/src/table-of-contents/README.md",
+		"parent": "core-blocks-design"
+	},
+	{
+		"title": "Table",
+		"slug": "core-block-table",
+		"markdown_source": "../packages/block-library/src/table/README.md",
+		"parent": "core-blocks-text"
+	},
+	{
+		"title": "Tabs",
+		"slug": "core-block-tabs",
+		"markdown_source": "../packages/block-library/src/tabs/README.md",
+		"parent": "core-blocks-design"
+	},
+	{
+		"title": "Tag Cloud",
+		"slug": "core-block-tag-cloud",
+		"markdown_source": "../packages/block-library/src/tag-cloud/README.md",
+		"parent": "core-blocks-widgets"
+	},
+	{
+		"title": "Template Part",
+		"slug": "core-block-template-part",
+		"markdown_source": "../packages/block-library/src/template-part/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Term Count",
+		"slug": "core-block-term-count",
+		"markdown_source": "../packages/block-library/src/term-count/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Term Description",
+		"slug": "core-block-term-description",
+		"markdown_source": "../packages/block-library/src/term-description/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Term Name",
+		"slug": "core-block-term-name",
+		"markdown_source": "../packages/block-library/src/term-name/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Term Template",
+		"slug": "core-block-term-template",
+		"markdown_source": "../packages/block-library/src/term-template/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Terms Query",
+		"slug": "core-block-terms-query",
+		"markdown_source": "../packages/block-library/src/terms-query/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Text Columns (deprecated)",
+		"slug": "core-block-text-columns",
+		"markdown_source": "../packages/block-library/src/text-columns/README.md",
+		"parent": "core-blocks-design"
+	},
+	{
+		"title": "Poetry",
+		"slug": "core-block-verse",
+		"markdown_source": "../packages/block-library/src/verse/README.md",
+		"parent": "core-blocks-text"
+	},
+	{
+		"title": "Video",
+		"slug": "core-block-video",
+		"markdown_source": "../packages/block-library/src/video/README.md",
+		"parent": "core-blocks-media"
 	},
 	{
 		"title": "Hooks Reference",
@@ -486,7 +1230,7 @@
 		"parent": "reference-guides"
 	},
 	{
-		"title": "Block Hooks",
+		"title": "Block Filters",
 		"slug": "block-filters",
 		"markdown_source": "../docs/reference-guides/filters/block-filters.md",
 		"parent": "filters"
@@ -520,6 +1264,78 @@
 		"slug": "global-styles-filters",
 		"markdown_source": "../docs/reference-guides/filters/global-styles-filters.md",
 		"parent": "filters"
+	},
+	{
+		"title": "Interactivity API Reference",
+		"slug": "interactivity-api",
+		"markdown_source": "../docs/reference-guides/interactivity-api/README.md",
+		"parent": "reference-guides"
+	},
+	{
+		"title": "Core Concepts",
+		"slug": "core-concepts",
+		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/README.md",
+		"parent": "interactivity-api"
+	},
+	{
+		"title": "The Reactive and Declarative mindset",
+		"slug": "the-reactive-and-declarative-mindset",
+		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/the-reactive-and-declarative-mindset.md",
+		"parent": "core-concepts"
+	},
+	{
+		"title": "Understanding global state, local context, derived state and config",
+		"slug": "understanding-global-state-local-context-derived-state-and-config",
+		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/understanding-global-state-local-context-derived-state-and-config.md",
+		"parent": "core-concepts"
+	},
+	{
+		"title": "Server-side rendering: Processing directives on the server",
+		"slug": "server-side-rendering",
+		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/server-side-rendering.md",
+		"parent": "core-concepts"
+	},
+	{
+		"title": "Using TypeScript",
+		"slug": "using-typescript",
+		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/using-typescript.md",
+		"parent": "core-concepts"
+	},
+	{
+		"title": "Client-Side Navigation",
+		"slug": "client-side-navigation",
+		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md",
+		"parent": "core-concepts"
+	},
+	{
+		"title": "Client-Side Navigation Compatibility",
+		"slug": "client-side-navigation-compatibility",
+		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/client-side-navigation-compatibility.md",
+		"parent": "core-concepts"
+	},
+	{
+		"title": "Quick start guide",
+		"slug": "iapi-quick-start-guide",
+		"markdown_source": "../docs/reference-guides/interactivity-api/iapi-quick-start-guide.md",
+		"parent": "interactivity-api"
+	},
+	{
+		"title": "Directives and Store",
+		"slug": "directives-and-store",
+		"markdown_source": "../docs/reference-guides/interactivity-api/directives-and-store.md",
+		"parent": "interactivity-api"
+	},
+	{
+		"title": "About the Interactivity API",
+		"slug": "iapi-about",
+		"markdown_source": "../docs/reference-guides/interactivity-api/iapi-about.md",
+		"parent": "interactivity-api"
+	},
+	{
+		"title": "Frequently Asked Questions",
+		"slug": "iapi-faq",
+		"markdown_source": "../docs/reference-guides/interactivity-api/iapi-faq.md",
+		"parent": "interactivity-api"
 	},
 	{
 		"title": "SlotFills Reference",
@@ -594,7 +1410,7 @@
 		"parent": "reference-guides"
 	},
 	{
-		"title": "Theme.json Version 2",
+		"title": "Theme.json Version 3 Reference (latest)",
 		"slug": "theme-json-living",
 		"markdown_source": "../docs/reference-guides/theme-json-reference/theme-json-living.md",
 		"parent": "theme-json-reference"
@@ -606,7 +1422,13 @@
 		"parent": "theme-json-reference"
 	},
 	{
-		"title": "Migrating to Newer Versions",
+		"title": "Theme.json Version 2 Reference",
+		"slug": "theme-json-v2",
+		"markdown_source": "../docs/reference-guides/theme-json-reference/theme-json-v2.md",
+		"parent": "theme-json-reference"
+	},
+	{
+		"title": "Migrating Theme.json to Newer Versions",
 		"slug": "theme-json-migrations",
 		"markdown_source": "../docs/reference-guides/theme-json-reference/theme-json-migrations.md",
 		"parent": "theme-json-reference"
@@ -681,6 +1503,18 @@
 		"title": "Button",
 		"slug": "button",
 		"markdown_source": "../packages/components/src/button/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "DateCalendar",
+		"slug": "date-calendar",
+		"markdown_source": "../packages/components/src/calendar/date-calendar/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "DateRangeCalendar",
+		"slug": "date-range-calendar",
+		"markdown_source": "../packages/components/src/calendar/date-range-calendar/README.md",
 		"parent": "components"
 	},
 	{
@@ -762,6 +1596,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Composite",
+		"slug": "composite",
+		"markdown_source": "../packages/components/src/composite/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "ConfirmDialog",
 		"slug": "confirm-dialog",
 		"markdown_source": "../packages/components/src/confirm-dialog/README.md",
@@ -780,15 +1620,21 @@
 		"parent": "components"
 	},
 	{
+		"title": "DatePicker",
+		"slug": "date-picker",
+		"markdown_source": "../packages/components/src/date-time/date-picker/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "DateTime",
 		"slug": "date-time",
 		"markdown_source": "../packages/components/src/date-time/README.md",
 		"parent": "components"
 	},
 	{
-		"title": "DimensionControl",
-		"slug": "dimension-control",
-		"markdown_source": "../packages/components/src/dimension-control/README.md",
+		"title": "TimePicker",
+		"slug": "time-picker",
+		"markdown_source": "../packages/components/src/date-time/time-picker/README.md",
 		"parent": "components"
 	},
 	{
@@ -1050,39 +1896,9 @@
 		"parent": "components"
 	},
 	{
-		"title": "Navigation",
-		"slug": "navigation",
-		"markdown_source": "../packages/components/src/navigation/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "NavigatorBackButton",
-		"slug": "navigator-back-button",
-		"markdown_source": "../packages/components/src/navigator/navigator-back-button/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "NavigatorButton",
-		"slug": "navigator-button",
-		"markdown_source": "../packages/components/src/navigator/navigator-button/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "NavigatorProvider",
-		"slug": "navigator-provider",
-		"markdown_source": "../packages/components/src/navigator/navigator-provider/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "NavigatorScreen",
-		"slug": "navigator-screen",
-		"markdown_source": "../packages/components/src/navigator/navigator-screen/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "NavigatorToParentButton",
-		"slug": "navigator-to-parent-button",
-		"markdown_source": "../packages/components/src/navigator/navigator-to-parent-button/README.md",
+		"title": "Navigator",
+		"slug": "navigator",
+		"markdown_source": "../packages/components/src/navigator/README.md",
 		"parent": "components"
 	},
 	{
@@ -1113,6 +1929,12 @@
 		"title": "Popover",
 		"slug": "popover",
 		"markdown_source": "../packages/components/src/popover/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ProgressBar",
+		"slug": "progress-bar",
+		"markdown_source": "../packages/components/src/progress-bar/README.md",
 		"parent": "components"
 	},
 	{
@@ -1386,6 +2208,18 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/abilities",
+		"slug": "packages-abilities",
+		"markdown_source": "../packages/abilities/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/admin-ui",
+		"slug": "packages-admin-ui",
+		"markdown_source": "../packages/admin-ui/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/annotations",
 		"slug": "packages-annotations",
 		"markdown_source": "../packages/annotations/README.md",
@@ -1395,6 +2229,12 @@
 		"title": "@wordpress/api-fetch",
 		"slug": "packages-api-fetch",
 		"markdown_source": "../packages/api-fetch/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/asset-loader",
+		"slug": "packages-asset-loader",
+		"markdown_source": "../packages/asset-loader/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1470,6 +2310,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/boot",
+		"slug": "packages-boot",
+		"markdown_source": "../packages/boot/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/browserslist-config",
 		"slug": "packages-browserslist-config",
 		"markdown_source": "../packages/browserslist-config/README.md",
@@ -1491,6 +2337,12 @@
 		"title": "@wordpress/compose",
 		"slug": "packages-compose",
 		"markdown_source": "../packages/compose/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/core-abilities",
+		"slug": "packages-core-abilities",
+		"markdown_source": "../packages/core-abilities/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1548,6 +2400,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/dataviews",
+		"slug": "packages-dataviews",
+		"markdown_source": "../packages/dataviews/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/date",
 		"slug": "packages-date",
 		"markdown_source": "../packages/date/README.md",
@@ -1563,6 +2421,12 @@
 		"title": "@wordpress/deprecated",
 		"slug": "packages-deprecated",
 		"markdown_source": "../packages/deprecated/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/design-system-mcp",
+		"slug": "packages-design-system-mcp",
+		"markdown_source": "../packages/design-system-mcp/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1587,12 +2451,6 @@
 		"title": "@wordpress/e2e-test-utils-playwright",
 		"slug": "packages-e2e-test-utils-playwright",
 		"markdown_source": "../packages/e2e-test-utils-playwright/README.md",
-		"parent": "packages"
-	},
-	{
-		"title": "@wordpress/e2e-test-utils",
-		"slug": "packages-e2e-test-utils",
-		"markdown_source": "../packages/e2e-test-utils/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1650,9 +2508,27 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/fields",
+		"slug": "packages-fields",
+		"markdown_source": "../packages/fields/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/format-library",
 		"slug": "packages-format-library",
 		"markdown_source": "../packages/format-library/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/global-styles-engine",
+		"slug": "packages-global-styles-engine",
+		"markdown_source": "../packages/global-styles-engine/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/global-styles-ui",
+		"slug": "packages-global-styles-ui",
+		"markdown_source": "../packages/global-styles-ui/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1677,6 +2553,18 @@
 		"title": "@wordpress/icons",
 		"slug": "packages-icons",
 		"markdown_source": "../packages/icons/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/image-cropper",
+		"slug": "packages-image-cropper",
+		"markdown_source": "../packages/image-cropper/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/interactivity-router",
+		"slug": "packages-interactivity-router",
+		"markdown_source": "../packages/interactivity-router/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1728,6 +2616,18 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/latex-to-mathml",
+		"slug": "packages-latex-to-mathml",
+		"markdown_source": "../packages/latex-to-mathml/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/lazy-editor",
+		"slug": "packages-lazy-editor",
+		"markdown_source": "../packages/lazy-editor/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/lazy-import",
 		"slug": "packages-lazy-import",
 		"markdown_source": "../packages/lazy-import/README.md",
@@ -1737,6 +2637,18 @@
 		"title": "@wordpress/list-reusable-blocks",
 		"slug": "packages-list-reusable-blocks",
 		"markdown_source": "../packages/list-reusable-blocks/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/media-editor",
+		"slug": "packages-media-editor",
+		"markdown_source": "../packages/media-editor/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/media-fields",
+		"slug": "packages-media-fields",
+		"markdown_source": "../packages/media-fields/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1761,6 +2673,12 @@
 		"title": "@wordpress/nux",
 		"slug": "packages-nux",
 		"markdown_source": "../packages/nux/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/patterns",
+		"slug": "packages-patterns",
+		"markdown_source": "../packages/patterns/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1854,6 +2772,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/route",
+		"slug": "packages-route",
+		"markdown_source": "../packages/route/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/router",
 		"slug": "packages-router",
 		"markdown_source": "../packages/router/README.md",
@@ -1890,15 +2814,51 @@
 		"parent": "packages-style-engine"
 	},
 	{
+		"title": "@wordpress/style-runtime",
+		"slug": "packages-style-runtime",
+		"markdown_source": "../packages/style-runtime/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/stylelint-config",
 		"slug": "packages-stylelint-config",
 		"markdown_source": "../packages/stylelint-config/README.md",
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/sync",
+		"slug": "packages-sync",
+		"markdown_source": "../packages/sync/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/theme",
+		"slug": "packages-theme",
+		"markdown_source": "../packages/theme/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/token-list",
 		"slug": "packages-token-list",
 		"markdown_source": "../packages/token-list/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/ui",
+		"slug": "packages-ui",
+		"markdown_source": "../packages/ui/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/undo-manager",
+		"slug": "packages-undo-manager",
+		"markdown_source": "../packages/undo-manager/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/upload-media",
+		"slug": "packages-upload-media",
+		"markdown_source": "../packages/upload-media/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1911,6 +2871,18 @@
 		"title": "@wordpress/viewport",
 		"slug": "packages-viewport",
 		"markdown_source": "../packages/viewport/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/views",
+		"slug": "packages-views",
+		"markdown_source": "../packages/views/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/vips",
+		"slug": "packages-vips",
+		"markdown_source": "../packages/vips/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1929,6 +2901,18 @@
 		"title": "@wordpress/wordcount",
 		"slug": "packages-wordcount",
 		"markdown_source": "../packages/wordcount/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/worker-threads",
+		"slug": "packages-worker-threads",
+		"markdown_source": "../packages/worker-threads/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/build",
+		"slug": "packages-wp-build",
+		"markdown_source": "../packages/wp-build/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1965,6 +2949,12 @@
 		"title": "Block Types Data",
 		"slug": "data-core-blocks",
 		"markdown_source": "../docs/reference-guides/data/data-core-blocks.md",
+		"parent": "data"
+	},
+	{
+		"title": "The Commands Data",
+		"slug": "data-core-commands",
+		"markdown_source": "../docs/reference-guides/data/data-core-commands.md",
 		"parent": "data"
 	},
 	{
@@ -2007,12 +2997,6 @@
 		"title": "Notices Data",
 		"slug": "data-core-notices",
 		"markdown_source": "../docs/reference-guides/data/data-core-notices.md",
-		"parent": "data"
-	},
-	{
-		"title": "The NUX (New User Experience) Data",
-		"slug": "data-core-nux",
-		"markdown_source": "../docs/reference-guides/data/data-core-nux.md",
 		"parent": "data"
 	},
 	{
@@ -2064,7 +3048,7 @@
 		"parent": "architecture"
 	},
 	{
-		"title": "Entities and Undo/Redo.",
+		"title": "Entities and Undo/Redo",
 		"slug": "entities",
 		"markdown_source": "../docs/explanations/architecture/entities.md",
 		"parent": "architecture"
@@ -2094,7 +3078,7 @@
 		"parent": "architecture"
 	},
 	{
-		"title": "Styles",
+		"title": "Styles in the Editor",
 		"slug": "styles",
 		"markdown_source": "../docs/explanations/architecture/styles.md",
 		"parent": "architecture"
@@ -2122,18 +3106,6 @@
 		"slug": "design-resources",
 		"markdown_source": "../docs/explanations/user-interface/design-resources.md",
 		"parent": "user-interface"
-	},
-	{
-		"title": "Frequently Asked Questions",
-		"slug": "faq",
-		"markdown_source": "../docs/explanations/faq.md",
-		"parent": "explanations"
-	},
-	{
-		"title": "Glossary",
-		"slug": "glossary",
-		"markdown_source": "../docs/explanations/glossary.md",
-		"parent": "explanations"
 	},
 	{
 		"title": "History",
@@ -2184,12 +3156,6 @@
 		"parent": "testing-overview"
 	},
 	{
-		"title": "Migration guide",
-		"slug": "migration",
-		"markdown_source": "../docs/contributors/code/e2e/migration.md",
-		"parent": "e2e"
-	},
-	{
 		"title": "Overusing snapshots",
 		"slug": "overusing-snapshots",
 		"markdown_source": "../docs/contributors/code/e2e/overusing-snapshots.md",
@@ -2208,46 +3174,34 @@
 		"parent": "code"
 	},
 	{
+		"title": "Workspace Development",
+		"slug": "workspace-development",
+		"markdown_source": "../docs/contributors/code/workspace-development.md",
+		"parent": "code"
+	},
+	{
 		"title": "Gutenberg Release Process",
 		"slug": "release",
-		"markdown_source": "../docs/contributors/code/release.md",
+		"markdown_source": "../docs/contributors/code/release/README.md",
 		"parent": "code"
+	},
+	{
+		"title": "Gutenberg plugin releases",
+		"slug": "plugin-release",
+		"markdown_source": "../docs/contributors/code/release/plugin-release.md",
+		"parent": "release"
+	},
+	{
+		"title": "Packages releases to NPM and WordPress Core updates",
+		"slug": "package-release-and-core-updates",
+		"markdown_source": "../docs/contributors/code/release/package-release-and-core-updates.md",
+		"parent": "release"
 	},
 	{
 		"title": "Cherry-picking automation",
 		"slug": "auto-cherry-picking",
 		"markdown_source": "../docs/contributors/code/auto-cherry-picking.md",
 		"parent": "release"
-	},
-	{
-		"title": "React Native mobile editor",
-		"slug": "react-native",
-		"markdown_source": "../docs/contributors/code/react-native/README.md",
-		"parent": "code"
-	},
-	{
-		"title": "Getting Started for the React Native based Mobile Gutenberg",
-		"slug": "getting-started-react-native",
-		"markdown_source": "../docs/contributors/code/react-native/getting-started-react-native.md",
-		"parent": "react-native"
-	},
-	{
-		"title": "Setup guide for React Native development (macOS)",
-		"slug": "osx-setup-guide",
-		"markdown_source": "../docs/contributors/code/react-native/osx-setup-guide.md",
-		"parent": "react-native"
-	},
-	{
-		"title": "React Native Integration Test Guide",
-		"slug": "integration-test-guide",
-		"markdown_source": "../docs/contributors/code/react-native/integration-test-guide.md",
-		"parent": "react-native"
-	},
-	{
-		"title": "React Native Internationalization Guide",
-		"slug": "internationalization-guide",
-		"markdown_source": "../docs/contributors/code/react-native/internationalization-guide.md",
-		"parent": "react-native"
 	},
 	{
 		"title": "Backward Compatibility",
@@ -2277,12 +3231,6 @@
 		"title": "Blocks are the Interface",
 		"slug": "the-block",
 		"markdown_source": "../docs/contributors/design/the-block.md",
-		"parent": "design"
-	},
-	{
-		"title": "Reference",
-		"slug": "reference",
-		"markdown_source": "../docs/contributors/design/reference.md",
 		"parent": "design"
 	},
 	{
@@ -2328,7 +3276,7 @@
 		"parent": "contributors"
 	},
 	{
-		"title": "Versions in WordPress",
+		"title": "Gutenberg versions in WordPress",
 		"slug": "versions-in-wordpress",
 		"markdown_source": "../docs/contributors/versions-in-wordpress.md",
 		"parent": "contributors"

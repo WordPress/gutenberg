@@ -7,8 +7,9 @@ import {
 	Popover,
 	Button,
 	__experimentalNumberControl as NumberControl,
-	__experimentalHStack as HStack,
+	TextareaControl,
 } from '@wordpress/components';
+import { Link, Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { insertObject, useAnchor } from '@wordpress/rich-text';
@@ -17,12 +18,28 @@ import {
 	RichTextToolbarButton,
 	MediaUploadCheck,
 } from '@wordpress/block-editor';
-import { keyboardReturn } from '@wordpress/icons';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 const name = 'core/image';
 const title = __( 'Inline image' );
+
+/**
+ * Extracts the image ID from the className attribute.
+ *
+ * @param {Object} activeObjectAttributes The attributes of the active object.
+ * @return {number|undefined} The extracted image ID or undefined if not found.
+ */
+function getCurrentImageId( activeObjectAttributes ) {
+	if ( ! activeObjectAttributes?.className ) {
+		return undefined;
+	}
+
+	const [ , id ] =
+		activeObjectAttributes.className.match( /wp-image-(\d+)/ ) ?? [];
+
+	return id ? parseInt( id, 10 ) : undefined;
+}
 
 export const image = {
 	name,
@@ -41,8 +58,11 @@ export const image = {
 };
 
 function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
-	const { style } = activeObjectAttributes;
-	const [ width, setWidth ] = useState( style?.replace( /\D/g, '' ) );
+	const { style, alt } = activeObjectAttributes;
+	const width = style?.replace( /\D/g, '' );
+	const [ editedWidth, setEditedWidth ] = useState( width );
+	const [ editedAlt, setEditedAlt ] = useState( alt );
+	const hasChanged = editedWidth !== width || editedAlt !== alt;
 	const popoverAnchor = useAnchor( {
 		editableContentElement: contentRef.current,
 		settings: image,
@@ -50,7 +70,6 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 
 	return (
 		<Popover
-			placement="bottom"
 			focusOnMount={ false }
 			anchor={ popoverAnchor }
 			className="block-editor-format-toolbar__image-popover"
@@ -64,7 +83,10 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 						type: name,
 						attributes: {
 							...activeObjectAttributes,
-							style: width ? `width: ${ width }px;` : '',
+							style: editedWidth
+								? `width: ${ editedWidth }px;`
+								: '',
+							alt: editedAlt,
 						},
 					};
 
@@ -76,21 +98,54 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 					event.preventDefault();
 				} }
 			>
-				<HStack alignment="bottom" spacing="0">
+				<Stack direction="column" gap="lg">
 					<NumberControl
-						className="block-editor-format-toolbar__image-container-value"
+						__next40pxDefaultSize
 						label={ __( 'Width' ) }
-						value={ width }
+						value={ editedWidth }
 						min={ 1 }
-						onChange={ ( newWidth ) => setWidth( newWidth ) }
+						onChange={ ( newWidth ) => {
+							setEditedWidth( newWidth );
+						} }
 					/>
-					<Button
-						className="block-editor-format-toolbar__image-container-button"
-						icon={ keyboardReturn }
-						label={ __( 'Apply' ) }
-						type="submit"
+					<TextareaControl
+						label={ __( 'Alternative text' ) }
+						value={ editedAlt }
+						onChange={ ( newAlt ) => {
+							setEditedAlt( newAlt );
+						} }
+						help={
+							<>
+								<Link
+									openInNewTab
+									href={
+										// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
+										__(
+											'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+										)
+									}
+								>
+									{ __(
+										'Describe the purpose of the image.'
+									) }
+								</Link>
+								<br />
+								{ __( 'Leave empty if decorative.' ) }
+							</>
+						}
 					/>
-				</HStack>
+					<Stack justify="right">
+						<Button
+							disabled={ ! hasChanged }
+							accessibleWhenDisabled
+							variant="primary"
+							type="submit"
+							size="compact"
+						>
+							{ __( 'Apply' ) }
+						</Button>
+					</Stack>
+				</Stack>
 			</form>
 		</Popover>
 	);
@@ -104,56 +159,44 @@ function Edit( {
 	activeObjectAttributes,
 	contentRef,
 } ) {
-	const [ isModalOpen, setIsModalOpen ] = useState( false );
-
-	function openModal() {
-		setIsModalOpen( true );
-	}
-
-	function closeModal() {
-		setIsModalOpen( false );
-	}
-
 	return (
 		<MediaUploadCheck>
-			<RichTextToolbarButton
-				icon={
-					<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-						<Path d="M4 18.5h16V17H4v1.5zM16 13v1.5h4V13h-4zM5.1 15h7.8c.6 0 1.1-.5 1.1-1.1V6.1c0-.6-.5-1.1-1.1-1.1H5.1C4.5 5 4 5.5 4 6.1v7.8c0 .6.5 1.1 1.1 1.1zm.4-8.5h7V10l-1-1c-.3-.3-.8-.3-1 0l-1.6 1.5-1.2-.7c-.3-.2-.6-.2-.9 0l-1.3 1V6.5zm0 6.1l1.8-1.3 1.3.8c.3.2.7.2.9-.1l1.5-1.4 1.5 1.4v1.5h-7v-.9z" />
-					</SVG>
-				}
-				title={ title }
-				onClick={ openModal }
-				isActive={ isObjectActive }
+			<MediaUpload
+				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				value={ getCurrentImageId( activeObjectAttributes ) }
+				onSelect={ ( { id, url, alt, width: imgWidth } ) => {
+					onChange(
+						insertObject( value, {
+							type: name,
+							attributes: {
+								className: `wp-image-${ id }`,
+								style: `width: ${ Math.min(
+									imgWidth,
+									150
+								) }px;`,
+								url,
+								alt,
+							},
+						} )
+					);
+					onFocus();
+				} }
+				render={ ( { open } ) => (
+					<RichTextToolbarButton
+						icon={
+							<SVG
+								xmlns="http://www.w3.org/2000/svg"
+								viewBox="0 0 24 24"
+							>
+								<Path d="M4 18.5h16V17H4v1.5zM16 13v1.5h4V13h-4zM5.1 15h7.8c.6 0 1.1-.5 1.1-1.1V6.1c0-.6-.5-1.1-1.1-1.1H5.1C4.5 5 4 5.5 4 6.1v7.8c0 .6.5 1.1 1.1 1.1zm.4-8.5h7V10l-1-1c-.3-.3-.8-.3-1 0l-1.6 1.5-1.2-.7c-.3-.2-.6-.2-.9 0l-1.3 1V6.5zm0 6.1l1.8-1.3 1.3.8c.3.2.7.2.9-.1l1.5-1.4 1.5 1.4v1.5h-7v-.9z" />
+							</SVG>
+						}
+						title={ isObjectActive ? __( 'Replace image' ) : title }
+						onClick={ open }
+						isActive={ isObjectActive }
+					/>
+				) }
 			/>
-			{ isModalOpen && (
-				<MediaUpload
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					onSelect={ ( { id, url, alt, width: imgWidth } ) => {
-						closeModal();
-						onChange(
-							insertObject( value, {
-								type: name,
-								attributes: {
-									className: `wp-image-${ id }`,
-									style: `width: ${ Math.min(
-										imgWidth,
-										150
-									) }px;`,
-									url,
-									alt,
-								},
-							} )
-						);
-						onFocus();
-					} }
-					onClose={ closeModal }
-					render={ ( { open } ) => {
-						open();
-						return null;
-					} }
-				/>
-			) }
 			{ isObjectActive && (
 				<InlineUI
 					value={ value }

@@ -1,17 +1,9 @@
-/**
- * WordPress dependencies
- */
-import { createContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { disabledStyles } from './styles/disabled-styles';
 import type { DisabledProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import { useCx } from '../utils';
+import Context from './context';
 
-const Context = createContext< boolean >( false );
 const { Consumer, Provider } = Context;
 
 /**
@@ -31,7 +23,13 @@ const { Consumer, Provider } = Context;
  * const MyDisabled = () => {
  * 	const [ isDisabled, setIsDisabled ] = useState( true );
  *
- * 	let input = <TextControl label="Input" onChange={ () => {} } />;
+ *	let input = (
+ *		<TextControl
+ *			__next40pxDefaultSize
+ *			label="Input"
+ *			onChange={ () => {} }
+ *		/>
+ *	);
  * 	if ( isDisabled ) {
  * 		input = <Disabled>{ input }</Disabled>;
  * 	}

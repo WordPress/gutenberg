@@ -2,13 +2,9 @@
 
 Panels expand and collapse multiple sections of content.
 
+The `Panel` family is intended for the block inspector sidebar. For collapsible sections elsewhere, use the [`CollapsibleCard`](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-collapsiblecard--docs) component instead.
+
 ![](https://make.wordpress.org/design/files/2019/03/panel.png)
-
-## Table of contents
-
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
-3. [Related components](#related-components)
 
 ## Design guidelines
 
@@ -123,7 +119,7 @@ The CSS class to apply to the wrapper element.
 
 -   Required: No
 
-###### `icon`: `JSX.Element`
+###### `icon`: `React.JSX.Element`
 
 An icon to be shown next to the title.
 

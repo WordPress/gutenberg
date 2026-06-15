@@ -4,9 +4,15 @@
 import {
 	hideBlockInterface,
 	showBlockInterface,
-	setBlockEditingMode,
-	unsetBlockEditingMode,
+	expandBlock,
 	__experimentalUpdateSettings,
+	setInsertionPoint,
+	startDragging,
+	stopDragging,
+	showViewportModal,
+	hideViewportModal,
+	setSelectedBlockStyleState,
+	setSelectedBlockStyleStateCanvasPreview,
 } from '../private-actions';
 
 describe( 'private actions', () => {
@@ -22,32 +28,6 @@ describe( 'private actions', () => {
 		it( 'should return the SHOW_BLOCK_INTERFACE action', () => {
 			expect( showBlockInterface() ).toEqual( {
 				type: 'SHOW_BLOCK_INTERFACE',
-			} );
-		} );
-	} );
-
-	describe( 'setBlockEditingMode', () => {
-		it( 'should return the SET_BLOCK_EDITING_MODE action', () => {
-			expect(
-				setBlockEditingMode(
-					'14501cc2-90a6-4f52-aa36-ab6e896135d1',
-					'default'
-				)
-			).toEqual( {
-				type: 'SET_BLOCK_EDITING_MODE',
-				clientId: '14501cc2-90a6-4f52-aa36-ab6e896135d1',
-				mode: 'default',
-			} );
-		} );
-	} );
-
-	describe( 'unsetBlockEditingMode', () => {
-		it( 'should return the UNSET_BLOCK_EDITING_MODE action', () => {
-			expect(
-				unsetBlockEditingMode( '14501cc2-90a6-4f52-aa36-ab6e896135d1' )
-			).toEqual( {
-				type: 'UNSET_BLOCK_EDITING_MODE',
-				clientId: '14501cc2-90a6-4f52-aa36-ab6e896135d1',
 			} );
 		} );
 	} );
@@ -103,6 +83,87 @@ describe( 'private actions', () => {
 					baz: 'baz',
 				},
 				reset: false,
+			} );
+		} );
+	} );
+
+	describe( 'startDragging', () => {
+		it( 'should return the START_DRAGGING action', () => {
+			expect( startDragging() ).toEqual( {
+				type: 'START_DRAGGING',
+			} );
+		} );
+	} );
+
+	describe( 'stopDragging', () => {
+		it( 'should return the STOP_DRAGGING action', () => {
+			expect( stopDragging() ).toEqual( {
+				type: 'STOP_DRAGGING',
+			} );
+		} );
+	} );
+
+	describe( 'expandBlock', () => {
+		it( 'should return the SET_BLOCK_EXPANDED_IN_LIST_VIEW action', () => {
+			expect( expandBlock( 'block-1' ) ).toEqual( {
+				type: 'SET_BLOCK_EXPANDED_IN_LIST_VIEW',
+				clientId: 'block-1',
+			} );
+		} );
+	} );
+
+	describe( 'setInsertionPoint', () => {
+		it( 'should return the SET_INSERTION_POINT action', () => {
+			expect(
+				setInsertionPoint( {
+					rootClientId: '',
+					index: '123',
+				} )
+			).toEqual( {
+				type: 'SET_INSERTION_POINT',
+				value: { rootClientId: '', index: '123' },
+			} );
+		} );
+	} );
+
+	describe( 'showViewportModal', () => {
+		it( 'should return the SHOW_VIEWPORT_MODAL action with clientIds', () => {
+			const clientIds = [ 'client-1', 'client-2' ];
+			expect( showViewportModal( clientIds ) ).toEqual( {
+				type: 'SHOW_VIEWPORT_MODAL',
+				clientIds,
+			} );
+		} );
+	} );
+
+	describe( 'hideViewportModal', () => {
+		it( 'should return the HIDE_VIEWPORT_MODAL action', () => {
+			expect( hideViewportModal() ).toEqual( {
+				type: 'HIDE_VIEWPORT_MODAL',
+			} );
+		} );
+	} );
+
+	describe( 'setSelectedBlockStyleState', () => {
+		it( 'returns the SET_SELECTED_BLOCK_STYLE_STATE action', () => {
+			expect(
+				setSelectedBlockStyleState( 'client-1', { pseudo: ':hover' } )
+			).toEqual( {
+				type: 'SET_SELECTED_BLOCK_STYLE_STATE',
+				clientId: 'client-1',
+				value: { pseudo: ':hover' },
+			} );
+		} );
+	} );
+
+	describe( 'setSelectedBlockStyleStateCanvasPreview', () => {
+		it( 'returns the SET_SELECTED_BLOCK_STYLE_STATE_CANVAS_PREVIEW action', () => {
+			expect(
+				setSelectedBlockStyleStateCanvasPreview( 'client-1', false )
+			).toEqual( {
+				type: 'SET_SELECTED_BLOCK_STYLE_STATE_CANVAS_PREVIEW',
+				clientId: 'client-1',
+				value: false,
 			} );
 		} );
 	} );

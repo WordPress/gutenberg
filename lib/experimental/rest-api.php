@@ -10,26 +10,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Silence is golden.' );
 }
 
-if ( gutenberg_is_experiment_enabled( 'gutenberg-auto-inserting-blocks' ) ) {
-	/**
-	 * Registers the block patterns REST API routes.
-	 */
-	function gutenberg_register_rest_block_patterns() {
-		$block_patterns = new Gutenberg_REST_Block_Patterns_Controller();
-		$block_patterns->register_routes();
-	}
-	add_action( 'rest_api_init', 'gutenberg_register_rest_block_patterns' );
-}
-
-/**
- * Registers the customizer nonces REST API routes.
- */
-function gutenberg_register_rest_customizer_nonces() {
-	$customizer_nonces = new WP_Rest_Customizer_Nonces();
-	$customizer_nonces->register_routes();
-}
-add_action( 'rest_api_init', 'gutenberg_register_rest_customizer_nonces' );
-
 /**
  * Registers the Block editor settings REST API routes.
  */
@@ -49,7 +29,7 @@ add_action( 'rest_api_init', 'gutenberg_register_block_editor_settings' );
  *
  * This is a temporary fix until we can patch get_sample_permalink()
  *
- * @see https://core.trac.wordpress.org/ticket/46266
+ * @link https://core.trac.wordpress.org/ticket/46266
  *
  * @param array  $permalink Array containing the sample permalink with placeholder for the post name, and the post name.
  * @param int    $id        ID of the post.
@@ -112,25 +92,3 @@ function gutenberg_auto_draft_get_sample_permalink( $permalink, $id, $title, $na
 	return $permalink;
 }
 add_filter( 'get_sample_permalink', 'gutenberg_auto_draft_get_sample_permalink', 10, 5 );
-
-if ( ! function_exists( 'wp_api_template_revision_args' ) ) {
-	/**
-	 * Hook in to the template and template part post types and decorate
-	 * the rest endpoint with the revision count.
-	 *
-	 * When merging to core, this can be removed once Gutenberg_REST_Template_Revision_Count is
-	 * merged with WP_REST_Template_Controller.
-	 *
-	 * @param array  $args Current registered post type args.
-	 * @param string $post_type Name of post type.
-	 *
-	 * @return array
-	 */
-	function wp_api_template_revision_args( $args, $post_type ) {
-		if ( 'wp_template' === $post_type || 'wp_template_part' === $post_type ) {
-			$args['rest_controller_class'] = 'Gutenberg_REST_Template_Revision_Count';
-		}
-		return $args;
-	}
-}
-add_filter( 'register_post_type_args', 'wp_api_template_revision_args', 10, 2 );

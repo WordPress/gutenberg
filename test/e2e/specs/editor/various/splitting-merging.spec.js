@@ -3,9 +3,12 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-test.describe( 'splitting and merging blocks', () => {
-	test.beforeEach( async ( { admin } ) => {
+test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
+	test.beforeEach( async ( { admin, editor } ) => {
 		await admin.createNewPost();
+		await expect(
+			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
+		).toBeFocused();
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {
@@ -334,10 +337,17 @@ test.describe( 'splitting and merging blocks', () => {
 		await pageUtils.pressKeys( 'primary+z' );
 
 		// Check the content.
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: '12',
+				},
+			},
+		] );
 	} );
 
-	test( 'should not split with line break in front', async ( {
+	test( 'should not split with line break in front (-firefox)', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -363,7 +373,171 @@ test.describe( 'splitting and merging blocks', () => {
 		);
 	} );
 
+	// Fix for https://github.com/WordPress/gutenberg/issues/65174.
+	test( 'should handle unwrapping and merging blocks with empty contents', async ( {
+		editor,
+		page,
+	} ) => {
+		const emptyAlignedParagraph = {
+			name: 'core/paragraph',
+			attributes: {
+				content: '',
+				style: {
+					typography: { textAlign: 'center' },
+				},
+				dropCap: false,
+			},
+			innerBlocks: [],
+		};
+		const emptyAlignedHeading = {
+			name: 'core/heading',
+			attributes: {
+				content: '',
+				level: 2,
+				style: {
+					typography: { textAlign: 'center' },
+				},
+			},
+			innerBlocks: [],
+		};
+		const headingWithContent = {
+			name: 'core/heading',
+			attributes: { content: 'heading', level: 2 },
+			innerBlocks: [],
+		};
+		const paragraphWithContent = {
+			name: 'core/paragraph',
+			attributes: { content: 'heading', dropCap: false },
+			innerBlocks: [],
+		};
+		const placeholderBlock = { name: 'core/separator' };
+		await editor.insertBlock( {
+			name: 'core/group',
+			innerBlocks: [
+				emptyAlignedParagraph,
+				emptyAlignedHeading,
+				headingWithContent,
+				placeholderBlock,
+			],
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Empty block' } )
+			.focus();
+
+		// Remove the alignment.
+		await page.keyboard.press( 'Backspace' );
+		// Remove the empty paragraph block.
+		await page.keyboard.press( 'Backspace' );
+		await expect
+			.poll( editor.getBlocks, 'Remove the default empty block' )
+			.toEqual( [
+				{
+					name: 'core/group',
+					attributes: { tagName: 'div' },
+					innerBlocks: [
+						emptyAlignedHeading,
+						headingWithContent,
+						expect.objectContaining( placeholderBlock ),
+					],
+				},
+			] );
+
+		// Convert the heading to a default block.
+		await page.keyboard.press( 'Backspace' );
+		await expect
+			.poll(
+				editor.getBlocks,
+				'Convert the non-default empty block to a default block'
+			)
+			.toEqual( [
+				{
+					name: 'core/group',
+					attributes: { tagName: 'div' },
+					innerBlocks: [
+						emptyAlignedParagraph,
+						headingWithContent,
+						expect.objectContaining( placeholderBlock ),
+					],
+				},
+			] );
+		// Remove the alignment.
+		await page.keyboard.press( 'Backspace' );
+		// Remove the empty default block.
+		await page.keyboard.press( 'Backspace' );
+		await expect.poll( editor.getBlocks ).toEqual( [
+			{
+				name: 'core/group',
+				attributes: { tagName: 'div' },
+				innerBlocks: [
+					headingWithContent,
+					expect.objectContaining( placeholderBlock ),
+				],
+			},
+		] );
+
+		// Convert a non-empty non-default block to a default block.
+		await page.keyboard.press( 'Backspace' );
+		await expect
+			.poll( editor.getBlocks, 'Lift the non-empty non-default block' )
+			.toEqual( [
+				{
+					name: 'core/group',
+					attributes: { tagName: 'div' },
+					innerBlocks: [
+						paragraphWithContent,
+						expect.objectContaining( placeholderBlock ),
+					],
+				},
+			] );
+	} );
+
 	test.describe( 'test restore selection when merge produces more than one block', () => {
+		const snap1 = [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'hi',
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'item 1',
+				},
+			},
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: {
+							content: 'item 2',
+						},
+					},
+				],
+			},
+		];
+
+		const snap2 = [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'hi-item 1',
+				},
+			},
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: {
+							content: 'item 2',
+						},
+					},
+				],
+			},
+		];
+
 		test( 'on forward delete', async ( { editor, page, pageUtils } ) => {
 			await editor.insertBlock( { name: 'core/paragraph' } );
 			await page.keyboard.type( 'hi' );
@@ -371,17 +545,17 @@ test.describe( 'splitting and merging blocks', () => {
 			await page.keyboard.type( 'item 1' );
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( 'item 2' );
-			await pageUtils.pressKeys( 'ArrowUp', { times: 3 } );
+			await pageUtils.pressKeys( 'ArrowUp', { times: 2 } );
 			await page.keyboard.press( 'Delete' );
 
-			expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+			expect( await editor.getBlocks() ).toMatchObject( snap1 );
 
 			await page.keyboard.press( 'Delete' );
-			// Carret should be in the first block and at the proper position.
+			// Caret should be in the first block and at the proper position.
 			await page.keyboard.type( '-' );
 
 			// Check the content.
-			expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+			expect( await editor.getBlocks() ).toMatchObject( snap2 );
 		} );
 
 		test( 'on backspace', async ( { editor, page, pageUtils } ) => {
@@ -395,14 +569,105 @@ test.describe( 'splitting and merging blocks', () => {
 			await pageUtils.pressKeys( 'ArrowLeft', { times: 6 } );
 			await page.keyboard.press( 'Backspace' );
 
-			expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+			expect( await editor.getBlocks() ).toMatchObject( snap1 );
 
 			await page.keyboard.press( 'Backspace' );
-			// Carret should be in the first block and at the proper position.
+			// Caret should be in the first block and at the proper position.
 			await page.keyboard.type( '-' );
 
 			// Check the content.
-			expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+			expect( await editor.getBlocks() ).toMatchObject( snap2 );
 		} );
+	} );
+
+	test( 'should not split the parent block when the parent block type is not allowed at the grandparent level', async ( {
+		editor,
+		page,
+	} ) => {
+		// Set up a Group with allowedBlocks restricted to only paragraphs,
+		// containing an inner Group with 3 paragraphs.
+		// When pressing Enter twice on "Second" (creating an empty paragraph,
+		// then pressing Enter again), the inner Group should NOT be split
+		// because core/group is not in the outer Group's allowedBlocks.
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: {
+				allowedBlocks: [ 'core/paragraph' ],
+				layout: { type: 'constrained' },
+			},
+			innerBlocks: [
+				{
+					name: 'core/group',
+					attributes: {
+						layout: { type: 'constrained' },
+					},
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: 'First' },
+						},
+						{
+							name: 'core/paragraph',
+							attributes: { content: 'Second' },
+						},
+						{
+							name: 'core/paragraph',
+							attributes: { content: 'Third' },
+						},
+					],
+				},
+			],
+		} );
+
+		// Click at the end of the "Second" paragraph.
+		const secondParagraph = editor.canvas
+			.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} )
+			.filter( { hasText: 'Second' } );
+		await secondParagraph.click();
+		await page.keyboard.press( 'End' );
+
+		// First Enter: splits the paragraph, creating an empty one after "Second".
+		await page.keyboard.press( 'Enter' );
+		// Second Enter: on the now-empty paragraph, should NOT split the
+		// inner Group because core/group is not in the outer Group's allowedBlocks.
+		await page.keyboard.press( 'Enter' );
+
+		// The outer Group should still contain exactly one inner Group.
+		// The inner Group should have the original paragraphs plus the
+		// empty ones created by the Enter presses.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/group',
+				innerBlocks: [
+					{
+						name: 'core/group',
+						innerBlocks: [
+							{
+								name: 'core/paragraph',
+								attributes: { content: 'First' },
+							},
+							{
+								name: 'core/paragraph',
+								attributes: { content: 'Second' },
+							},
+							{
+								name: 'core/paragraph',
+								attributes: { content: '' },
+							},
+							{
+								name: 'core/paragraph',
+								attributes: { content: '' },
+							},
+							{
+								name: 'core/paragraph',
+								attributes: { content: 'Third' },
+							},
+						],
+					},
+				],
+			},
+		] );
 	} );
 } );

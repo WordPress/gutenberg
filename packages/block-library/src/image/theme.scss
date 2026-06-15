@@ -1,4 +1,6 @@
-.wp-block-image figcaption {
+@use "@wordpress/base-styles/mixins" as *;
+
+:root :where(.wp-block-image figcaption) {
 	@include caption-style-theme();
 }
 

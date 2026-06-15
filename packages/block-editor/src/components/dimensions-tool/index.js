@@ -47,7 +47,7 @@ import WidthHeightTool from './width-height-tool';
  *
  * @param {DimensionsControlsProps} props The component props.
  *
- * @return {WPElement} The dimensions controls.
+ * @return {Element} The dimensions controls.
  */
 function DimensionsTool( {
 	panelId,
@@ -56,8 +56,9 @@ function DimensionsTool( {
 	aspectRatioOptions, // Default options handled by AspectRatioTool.
 	defaultAspectRatio = 'auto', // Match CSS default value for aspect-ratio.
 	scaleOptions, // Default options handled by ScaleTool.
-	defaultScale = 'fill', // Match CSS default value for object-fit.
+	defaultScale = 'cover',
 	unitsOptions, // Default options handled by UnitControl.
+	tools = [ 'aspectRatio', 'widthHeight', 'scale' ],
 } ) {
 	// Coerce undefined and CSS default values to be null.
 	const width =
@@ -72,66 +73,120 @@ function DimensionsTool( {
 		value.aspectRatio === undefined || value.aspectRatio === 'auto'
 			? null
 			: value.aspectRatio;
-	const scale =
-		value.scale === undefined || value.scale === 'fill'
-			? null
-			: value.scale;
+	const scale = value.scale === undefined ? null : value.scale;
 
 	// Keep track of state internally, so when the value is cleared by means
 	// other than directly editing that field, it's easier to restore the
 	// previous value.
 	const [ lastScale, setLastScale ] = useState( scale );
 	const [ lastAspectRatio, setLastAspectRatio ] = useState( aspectRatio );
+	const hasCustomAspectRatio = !! ( width && height );
 
 	// 'custom' is not a valid value for CSS aspect-ratio, but it is used in the
 	// dropdown to indicate that setting both the width and height is the same
 	// as a custom aspect ratio.
-	const aspectRatioValue = width && height ? 'custom' : lastAspectRatio;
+	const aspectRatioValue = hasCustomAspectRatio ? 'custom' : aspectRatio;
 
 	const showScaleControl = aspectRatio || ( width && height );
 
 	return (
 		<>
-			<AspectRatioTool
-				panelId={ panelId }
-				options={ aspectRatioOptions }
-				defaultValue={ defaultAspectRatio }
-				value={ aspectRatioValue }
-				onChange={ ( nextAspectRatio ) => {
-					const nextValue = { ...value };
+			{ tools.includes( 'aspectRatio' ) && (
+				<AspectRatioTool
+					panelId={ panelId }
+					options={ aspectRatioOptions }
+					defaultValue={ defaultAspectRatio }
+					value={ aspectRatioValue }
+					onChange={ ( nextAspectRatio ) => {
+						const nextValue = { ...value };
 
-					// 'auto' is CSS default, so it gets treated as null.
-					nextAspectRatio =
-						nextAspectRatio === 'auto' ? null : nextAspectRatio;
+						// 'auto' is CSS default, so it gets treated as null.
+						nextAspectRatio =
+							nextAspectRatio === 'auto' ? null : nextAspectRatio;
 
-					setLastAspectRatio( nextAspectRatio );
+						setLastAspectRatio( nextAspectRatio );
 
-					// Update aspectRatio.
-					if ( ! nextAspectRatio ) {
-						delete nextValue.aspectRatio;
-					} else {
-						nextValue.aspectRatio = nextAspectRatio;
-					}
+						// Update aspectRatio.
+						if ( ! nextAspectRatio ) {
+							delete nextValue.aspectRatio;
+						} else {
+							nextValue.aspectRatio = nextAspectRatio;
+						}
 
-					// Auto-update scale.
-					if ( ! nextAspectRatio ) {
-						delete nextValue.scale;
-					} else if ( lastScale ) {
-						nextValue.scale = lastScale;
-					} else {
-						nextValue.scale = defaultScale;
-						setLastScale( defaultScale );
-					}
+						// Auto-update scale.
+						if ( ! nextAspectRatio ) {
+							delete nextValue.scale;
+						} else if ( lastScale ) {
+							nextValue.scale = lastScale;
+						} else {
+							nextValue.scale = defaultScale;
+							setLastScale( defaultScale );
+						}
 
-					// Auto-update width and height.
-					if ( nextAspectRatio && width && height ) {
-						delete nextValue.height;
-					}
+						// Auto-update width and height.
+						if ( 'custom' !== nextAspectRatio && width && height ) {
+							delete nextValue.height;
+						}
 
-					onChange( nextValue );
-				} }
-			/>
-			{ showScaleControl && (
+						onChange( nextValue );
+					} }
+				/>
+			) }
+			{ tools.includes( 'widthHeight' ) && (
+				<WidthHeightTool
+					panelId={ panelId }
+					units={ unitsOptions }
+					value={ { width, height } }
+					onChange={ ( { width: nextWidth, height: nextHeight } ) => {
+						const nextValue = { ...value };
+
+						// 'auto' is CSS default, so it gets treated as null.
+						nextWidth = nextWidth === 'auto' ? null : nextWidth;
+						nextHeight = nextHeight === 'auto' ? null : nextHeight;
+
+						// Update width.
+						if ( ! nextWidth ) {
+							delete nextValue.width;
+						} else {
+							nextValue.width = nextWidth;
+						}
+
+						// Update height.
+						if ( ! nextHeight ) {
+							delete nextValue.height;
+						} else {
+							nextValue.height = nextHeight;
+						}
+
+						// Auto-update aspectRatio.
+						if ( nextWidth && nextHeight ) {
+							delete nextValue.aspectRatio;
+						} else if ( lastAspectRatio ) {
+							nextValue.aspectRatio = lastAspectRatio;
+						} else {
+							// No setting defaultAspectRatio here, because
+							// aspectRatio is optional in this scenario,
+							// unlike scale.
+						}
+
+						// Auto-update scale.
+						if (
+							! lastAspectRatio &&
+							!! nextWidth !== !! nextHeight
+						) {
+							delete nextValue.scale;
+						} else if ( lastScale ) {
+							nextValue.scale = lastScale;
+						} else {
+							nextValue.scale = defaultScale;
+							setLastScale( defaultScale );
+						}
+
+						onChange( nextValue );
+					} }
+				/>
+			) }
+			{ tools.includes( 'scale' ) && showScaleControl && (
 				<ScaleTool
 					panelId={ panelId }
 					options={ scaleOptions }
@@ -139,9 +194,6 @@ function DimensionsTool( {
 					value={ lastScale }
 					onChange={ ( nextScale ) => {
 						const nextValue = { ...value };
-
-						// 'fill' is CSS default, so it gets treated as null.
-						nextScale = nextScale === 'fill' ? null : nextScale;
 
 						setLastScale( nextScale );
 
@@ -156,55 +208,6 @@ function DimensionsTool( {
 					} }
 				/>
 			) }
-			<WidthHeightTool
-				panelId={ panelId }
-				units={ unitsOptions }
-				value={ { width, height } }
-				onChange={ ( { width: nextWidth, height: nextHeight } ) => {
-					const nextValue = { ...value };
-
-					// 'auto' is CSS default, so it gets treated as null.
-					nextWidth = nextWidth === 'auto' ? null : nextWidth;
-					nextHeight = nextHeight === 'auto' ? null : nextHeight;
-
-					// Update width.
-					if ( ! nextWidth ) {
-						delete nextValue.width;
-					} else {
-						nextValue.width = nextWidth;
-					}
-
-					// Update height.
-					if ( ! nextHeight ) {
-						delete nextValue.height;
-					} else {
-						nextValue.height = nextHeight;
-					}
-
-					// Auto-update aspectRatio.
-					if ( nextWidth && nextHeight ) {
-						delete nextValue.aspectRatio;
-					} else if ( lastAspectRatio ) {
-						nextValue.aspectRatio = lastAspectRatio;
-					} else {
-						// No setting defaultAspectRatio here, because
-						// aspectRatio is optional in this scenario,
-						// unlike scale.
-					}
-
-					// Auto-update scale.
-					if ( ! lastAspectRatio && !! nextWidth !== !! nextHeight ) {
-						delete nextValue.scale;
-					} else if ( lastScale ) {
-						nextValue.scale = lastScale;
-					} else {
-						nextValue.scale = defaultScale;
-						setLastScale( defaultScale );
-					}
-
-					onChange( nextValue );
-				} }
-			/>
 		</>
 	);
 }

@@ -5,15 +5,14 @@ import {
 	MenuGroup,
 	MenuItem,
 	ToolbarDropdownMenu,
-	VisuallyHidden,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
-import { external } from '@wordpress/icons';
+import { external, moreVertical } from '@wordpress/icons';
 import { displayShortcut } from '@wordpress/keycodes';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
-import { MoreMenuDropdown } from '@wordpress/interface';
 import { PreferenceToggleMenuItem } from '@wordpress/preferences';
+import { VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -35,7 +34,18 @@ export default function MoreMenu() {
 
 	return (
 		<>
-			<MoreMenuDropdown as={ ToolbarDropdownMenu }>
+			<ToolbarDropdownMenu
+				icon={ moreVertical }
+				label={ __( 'Options' ) }
+				popoverProps={ {
+					placement: 'bottom-end',
+					className: 'more-menu-dropdown__content',
+				} }
+				toggleProps={ {
+					tooltipPosition: 'bottom',
+					size: 'compact',
+				} }
+			>
 				{ () => (
 					<>
 						<MenuGroup label={ _x( 'View', 'noun' ) }>
@@ -75,10 +85,10 @@ export default function MoreMenu() {
 									'https://wordpress.org/documentation/article/block-based-widgets-editor/'
 								) }
 								target="_blank"
-								rel="noopener noreferrer"
+								rel="noopener"
 							>
 								{ __( 'Help' ) }
-								<VisuallyHidden as="span">
+								<VisuallyHidden render={ <span /> }>
 									{
 										/* translators: accessibility text */
 										__( '(opens in a new tab)' )
@@ -106,7 +116,7 @@ export default function MoreMenu() {
 						</MenuGroup>
 					</>
 				) }
-			</MoreMenuDropdown>
+			</ToolbarDropdownMenu>
 			<KeyboardShortcutHelpModal
 				isModalActive={ isKeyboardShortcutsModalActive }
 				toggleModal={ toggleKeyboardShortcutsModal }

@@ -6,7 +6,7 @@ import { ResizableBox } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import BlockPopover from '../block-popover';
+import BlockPopoverCover from '../block-popover/cover';
 
 export default function ResizableBoxPopover( {
 	clientId,
@@ -14,14 +14,12 @@ export default function ResizableBoxPopover( {
 	...props
 } ) {
 	return (
-		<BlockPopover
+		<BlockPopoverCover
 			clientId={ clientId }
-			__unstableCoverTarget
 			__unstablePopoverSlot="block-toolbar"
-			shift={ false }
 			{ ...props }
 		>
 			<ResizableBox { ...resizableBoxProps } />
-		</BlockPopover>
+		</BlockPopoverCover>
 	);
 }

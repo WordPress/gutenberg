@@ -5,14 +5,17 @@
 		"attributes": {
 			"images": [],
 			"ids": [],
+			"navigationButtonType": "icon",
 			"shortCodeTransforms": [],
 			"columns": 1,
 			"caption": "",
 			"imageCrop": true,
+			"randomOrder": false,
 			"fixedHeight": true,
 			"linkTo": "none",
 			"sizeSlug": "large",
-			"allowResize": false
+			"allowResize": false,
+			"aspectRatio": "auto"
 		},
 		"innerBlocks": [
 			{
@@ -24,7 +27,8 @@
 					"caption": "",
 					"id": 1421,
 					"sizeSlug": "large",
-					"linkDestination": "none"
+					"linkDestination": "none",
+					"isDecorative": false
 				},
 				"innerBlocks": []
 			},
@@ -37,7 +41,8 @@
 					"caption": "",
 					"id": 1440,
 					"sizeSlug": "large",
-					"linkDestination": "none"
+					"linkDestination": "none",
+					"isDecorative": false
 				},
 				"innerBlocks": []
 			}

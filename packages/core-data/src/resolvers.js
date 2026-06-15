@@ -7,14 +7,29 @@ import { camelCase } from 'change-case';
  * WordPress dependencies
  */
 import { addQueryArgs } from '@wordpress/url';
+import { decodeEntities } from '@wordpress/html-entities';
 import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
  */
 import { STORE_NAME } from './name';
-import { getOrLoadEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
-import { forwardResolver, getNormalizedCommaSeparable } from './utils';
+import { additionalEntityConfigLoaders, DEFAULT_ENTITY_KEY } from './entities';
+import { getSyncManager } from './sync';
+import {
+	forwardResolver,
+	getNormalizedCommaSeparable,
+	getUserPermissionCacheKey,
+	getUserPermissionsFromAllowHeader,
+	ALLOWED_RESOURCE_ACTIONS,
+	RECEIVE_INTERMEDIATE_RESULTS,
+	isNumericID,
+	normalizeQueryForResolution,
+	saveCRDTDoc,
+} from './utils';
+import { fetchBlockPatterns } from './fetch';
+import { restoreSelection, getSelectionHistory } from './utils/crdt-selection';
+import { parsedBlocksCache, getCacheKey } from './parsed-blocks-cache';
 
 /**
  * Requests authors from the REST API.
@@ -55,12 +70,12 @@ export const getCurrentUser =
  */
 export const getEntityRecord =
 	( kind, name, key = '', query ) =>
-	async ( { select, dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+	async ( { select, dispatch, registry, resolveSelect } ) => {
+		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
 		);
-		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
+		if ( ! entityConfig ) {
 			return;
 		}
 
@@ -87,39 +102,245 @@ export const getEntityRecord =
 				};
 			}
 
-			// Disable reason: While true that an early return could leave `path`
-			// unused, it's important that path is derived using the query prior to
-			// additional query modifications in the condition below, since those
-			// modifications are relevant to how the data is tracked in state, and not
-			// for how the request is made to the REST API.
-
-			// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-			const path = addQueryArgs(
-				entityConfig.baseURL + ( key ? '/' + key : '' ),
-				{
-					...entityConfig.baseURLParams,
-					...query,
-				}
-			);
-
-			if ( query !== undefined ) {
-				query = { ...query, include: [ key ] };
-
+			if ( query !== undefined && query._fields ) {
 				// The resolution cache won't consider query as reusable based on the
 				// fields, so it's tested here, prior to initiating the REST request,
-				// and without causing `getEntityRecords` resolution to occur.
-				const hasRecords = select.hasEntityRecords( kind, name, query );
-				if ( hasRecords ) {
+				// and without causing `getEntityRecord` resolution to occur.
+				const hasRecord = select.hasEntityRecord(
+					kind,
+					name,
+					key,
+					query
+				);
+				if ( hasRecord ) {
 					return;
 				}
 			}
 
-			const record = await apiFetch( { path } );
-			dispatch.receiveEntityRecords( kind, name, record, query );
+			let { baseURL } = entityConfig;
+
+			// For "string" IDs, use the old templates endpoint.
+			if (
+				kind === 'postType' &&
+				name === 'wp_template' &&
+				( ( key && typeof key === 'string' && ! /^\d+$/.test( key ) ) ||
+					! window?.__experimentalTemplateActivate )
+			) {
+				baseURL =
+					baseURL.slice( 0, baseURL.lastIndexOf( '/' ) ) +
+					'/templates';
+			}
+
+			const path = addQueryArgs( baseURL + ( key ? '/' + key : '' ), {
+				...entityConfig.baseURLParams,
+				...query,
+			} );
+			const response = await apiFetch( { path, parse: false } );
+			const record = await response.json();
+			const permissions = getUserPermissionsFromAllowHeader(
+				response.headers?.get( 'allow' )
+			);
+
+			const canUserResolutionsArgs = [];
+			const receiveUserPermissionArgs = {};
+			for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
+				receiveUserPermissionArgs[
+					getUserPermissionCacheKey( action, {
+						kind,
+						name,
+						id: key,
+					} )
+				] = permissions[ action ];
+
+				canUserResolutionsArgs.push( [
+					action,
+					{ kind, name, id: key },
+				] );
+			}
+
+			// Entity supports syncing.
+			if ( entityConfig.syncConfig && isNumericID( key ) && ! query ) {
+				const objectType = `${ kind }/${ name }`;
+				const objectId = key;
+
+				// Use the new transient "read/write" config to compute transients for
+				// the sync manager. Otherwise these transients are not available
+				// if / until the record is edited. Use a copy of the record so that
+				// it does not change the behavior outside this experimental flag.
+				const recordWithTransients = { ...record };
+				Object.entries( entityConfig.transientEdits ?? {} )
+					.filter(
+						( [ propName, transientConfig ] ) =>
+							undefined === recordWithTransients[ propName ] &&
+							transientConfig &&
+							'object' === typeof transientConfig &&
+							'read' in transientConfig &&
+							'function' === typeof transientConfig.read
+					)
+					.forEach( ( [ propName, transientConfig ] ) => {
+						recordWithTransients[ propName ] =
+							transientConfig.read( recordWithTransients );
+					} );
+
+				// Share the parsed blocks with `useEntityBlockEditor` so the
+				// editor doesn't re-parse the same `content` string.
+				if (
+					recordWithTransients.blocks &&
+					typeof recordWithTransients.content?.raw === 'string'
+				) {
+					parsedBlocksCache.set( getCacheKey( kind, name, key ), {
+						content: recordWithTransients.content.raw,
+						blocks: recordWithTransients.blocks,
+					} );
+				}
+
+				// Load the entity record for syncing. Do not await promise.
+				void getSyncManager()?.load(
+					entityConfig.syncConfig,
+					objectType,
+					objectId,
+					recordWithTransients,
+					{
+						// Handle edits sourced from the sync manager.
+						editRecord: ( edits, options = {} ) => {
+							if ( ! Object.keys( edits ).length ) {
+								return;
+							}
+
+							dispatch( {
+								type: 'EDIT_ENTITY_RECORD',
+								kind,
+								name,
+								recordId: key,
+								edits,
+								meta: {
+									undo: undefined,
+								},
+								options,
+							} );
+						},
+						// Get the current entity record (with edits)
+						getEditedRecord: async () =>
+							await resolveSelect.getEditedEntityRecord(
+								kind,
+								name,
+								key
+							),
+						// Handle sync connection status changes.
+						onStatusChange: ( status ) => {
+							dispatch.setSyncConnectionStatus(
+								kind,
+								name,
+								key,
+								status
+							);
+						},
+						// Refetch the current entity record from the database.
+						refetchRecord: async () => {
+							dispatch.receiveEntityRecords(
+								kind,
+								name,
+								await apiFetch( { path, parse: true } ),
+								query
+							);
+						},
+						// Persist the CRDT document.
+						//
+						// TODO: Currently, persisted CRDT documents are stored in post meta.
+						// This effectively means that only post entities support CRDT
+						// persistence. As we add support for syncing additional entity,
+						// we'll need to revisit where persisted CRDT documents are stored.
+						persistCRDTDoc: () => {
+							if (
+								! entityConfig.syncConfig?.supportsPersistence
+							) {
+								return;
+							}
+
+							return resolveSelect
+								.getEditedEntityRecord( kind, name, key )
+								.then( async ( editedRecord ) => {
+									// Don't persist the CRDT document if the record is still an
+									// auto-draft or if the entity does not support meta.
+									const { meta, status } = editedRecord;
+									if ( 'auto-draft' === status || ! meta ) {
+										return;
+									}
+
+									const entityIdKey =
+										entityConfig.key || DEFAULT_ENTITY_KEY;
+									const entityId =
+										editedRecord[ entityIdKey ];
+
+									await saveCRDTDoc(
+										`${ kind }/${ name }`,
+										entityId
+									);
+								} );
+						},
+						addUndoMeta: ( ydoc, meta ) => {
+							const selectionHistory =
+								getSelectionHistory( ydoc );
+
+							if ( selectionHistory ) {
+								meta.set(
+									'selectionHistory',
+									selectionHistory
+								);
+							}
+						},
+						onUndoStackChange: ( undoState ) => {
+							dispatch.__unstableNotifySyncUndoManagerChange(
+								undoState
+							);
+						},
+						restoreUndoMeta: ( ydoc, meta ) => {
+							const selectionHistory =
+								meta.get( 'selectionHistory' );
+
+							if ( selectionHistory ) {
+								// Because Yjs initiates an undo, we need to
+								// wait until the content is restored before
+								// we can update the selection.
+								// Use setTimeout() to wait until content is
+								// finished updating, and then set the correct
+								// selection.
+								setTimeout( () => {
+									restoreSelection( selectionHistory, ydoc );
+								}, 0 );
+							}
+						},
+					}
+				);
+			}
+
+			registry.batch( () => {
+				dispatch.receiveEntityRecords( kind, name, record, query );
+				dispatch.receiveUserPermissions( receiveUserPermissionArgs );
+				dispatch.finishResolutions( 'canUser', canUserResolutionsArgs );
+			} );
 		} finally {
 			dispatch.__unstableReleaseStoreLock( lock );
 		}
 	};
+
+// Whenever a template is saved, the active templates might be updated, so
+// invalidate the site settings when a template is updated or deleted.
+getEntityRecord.shouldInvalidate = ( action, kind, name ) => {
+	return (
+		kind === 'root' &&
+		name === 'site' &&
+		( ( action.type === 'RECEIVE_ITEMS' &&
+			// Making sure persistedEdits is set seems to be the only way of
+			// knowing whether it's an update or fetch. Only an update would
+			// have persistedEdits.
+			action.persistedEdits &&
+			action.persistedEdits.status !== 'auto-draft' ) ||
+			action.type === 'REMOVE_ITEMS' ) &&
+		action.kind === 'postType' &&
+		action.name === 'wp_template'
+	);
+};
 
 /**
  * Requests an entity's record from the REST API.
@@ -136,17 +357,17 @@ export const getEditedEntityRecord = forwardResolver( 'getEntityRecord' );
  *
  * @param {string}  kind  Entity kind.
  * @param {string}  name  Entity name.
- * @param {Object?} query Query Object. If requesting specific fields, fields
+ * @param {?Object} query Query Object. If requesting specific fields, fields
  *                        must always include the ID.
  */
 export const getEntityRecords =
 	( kind, name, query = {} ) =>
-	async ( { dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+	async ( { dispatch, registry, resolveSelect } ) => {
+		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
 		);
-		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
+		if ( ! entityConfig ) {
 			return;
 		}
 
@@ -155,6 +376,25 @@ export const getEntityRecords =
 			[ 'entities', 'records', kind, name ],
 			{ exclusive: false }
 		);
+
+		// Keep a copy of the original query for later use in getResolutionsArgs.
+		// The query object may be modified below (for example, when _fields is
+		// specified), but we want to use the original query when marking
+		// resolutions as finished.
+		const rawQuery = { ...query };
+		const key = entityConfig.key || DEFAULT_ENTITY_KEY;
+
+		function getResolutionsArgs( records, recordsQuery ) {
+			const normalizedQuery = normalizeQueryForResolution( recordsQuery );
+			return records
+				.filter( ( record ) => record?.[ key ] )
+				.map( ( record ) => [
+					kind,
+					name,
+					record[ key ],
+					normalizedQuery,
+				] );
+		}
 
 		try {
 			if ( query._fields ) {
@@ -167,21 +407,131 @@ export const getEntityRecords =
 						...new Set( [
 							...( getNormalizedCommaSeparable( query._fields ) ||
 								[] ),
-							entityConfig.key || DEFAULT_ENTITY_KEY,
+							key,
 						] ),
 					].join(),
 				};
 			}
 
-			const path = addQueryArgs( entityConfig.baseURL, {
+			let { baseURL } = entityConfig;
+			// `combinedTemplates` means that we fetch templates from the "old"
+			// /templates endpoint, which combines active user templates with
+			// the registered templates and rewrites IDs in the form of
+			// `theme-slug/template-slug`. When turned off, we only fetch
+			// database templates (posts). To fetch registered templates without
+			// edits applied, use the `registeredTemplate` entity.
+			const { combinedTemplates = true } = query;
+
+			if (
+				kind === 'postType' &&
+				name === 'wp_template' &&
+				combinedTemplates
+			) {
+				baseURL =
+					baseURL.slice( 0, baseURL.lastIndexOf( '/' ) ) +
+					'/templates';
+			}
+
+			const path = addQueryArgs( baseURL, {
 				...entityConfig.baseURLParams,
 				...query,
 			} );
 
-			let records = Object.values( await apiFetch( { path } ) );
+			let records = [],
+				meta;
+			if ( entityConfig.supportsPagination && query.per_page !== -1 ) {
+				const response = await apiFetch( { path, parse: false } );
+				records = Object.values( await response.json() );
+				meta = {
+					totalItems: parseInt(
+						response.headers.get( 'X-WP-Total' )
+					),
+					totalPages: parseInt(
+						response.headers.get( 'X-WP-TotalPages' )
+					),
+				};
+			} else if (
+				query.per_page === -1 &&
+				query[ RECEIVE_INTERMEDIATE_RESULTS ] === true
+			) {
+				let page = 1;
+				let totalPages;
+
+				do {
+					const response = await apiFetch( {
+						path: addQueryArgs( path, { page, per_page: 100 } ),
+						parse: false,
+					} );
+					const pageRecords = Object.values( await response.json() );
+
+					totalPages = parseInt(
+						response.headers.get( 'X-WP-TotalPages' )
+					);
+
+					if ( ! meta ) {
+						meta = {
+							totalItems: parseInt(
+								response.headers.get( 'X-WP-Total' )
+							),
+							totalPages: 1,
+						};
+					}
+
+					records.push( ...pageRecords );
+					registry.batch( () => {
+						dispatch.receiveEntityRecords(
+							kind,
+							name,
+							records,
+							query,
+							false,
+							undefined,
+							meta
+						);
+						dispatch.finishResolutions(
+							'getEntityRecord',
+							getResolutionsArgs( pageRecords, rawQuery )
+						);
+					} );
+					page++;
+				} while ( page <= totalPages );
+			} else {
+				records = Object.values( await apiFetch( { path } ) );
+				meta = {
+					totalItems: records.length,
+					totalPages: 1,
+				};
+			}
+
+			if ( entityConfig.syncConfig && -1 === query.per_page ) {
+				const objectType = `${ kind }/${ name }`;
+				getSyncManager()?.loadCollection(
+					entityConfig.syncConfig,
+					objectType,
+					{
+						onStatusChange: ( status ) => {
+							dispatch.setSyncConnectionStatus(
+								kind,
+								name,
+								null,
+								status
+							);
+						},
+						refetchRecords: async () => {
+							dispatch.receiveEntityRecords(
+								kind,
+								name,
+								await apiFetch( { path, parse: true } ),
+								query
+							);
+						},
+					}
+				);
+			}
+
 			// If we request fields but the result doesn't contain the fields,
 			// explicitly set these fields as "undefined"
-			// that way we consider the query "fullfilled".
+			// that way we consider the query "fulfilled".
 			if ( query._fields ) {
 				records = records.map( ( record ) => {
 					query._fields.split( ',' ).forEach( ( field ) => {
@@ -194,29 +544,67 @@ export const getEntityRecords =
 				} );
 			}
 
-			dispatch.receiveEntityRecords( kind, name, records, query );
+			registry.batch( () => {
+				dispatch.receiveEntityRecords(
+					kind,
+					name,
+					records,
+					query,
+					false,
+					undefined,
+					meta
+				);
 
-			// When requesting all fields, the list of results can be used to
-			// resolve the `getEntityRecord` selector in addition to `getEntityRecords`.
-			// See https://github.com/WordPress/gutenberg/pull/26575
-			if ( ! query?._fields && ! query.context ) {
-				const key = entityConfig.key || DEFAULT_ENTITY_KEY;
-				const resolutionsArgs = records
-					.filter( ( record ) => record[ key ] )
-					.map( ( record ) => [ kind, name, record[ key ] ] );
+				const targetHints = records
+					.filter(
+						( record ) =>
+							!! record?.[ key ] &&
+							!! record?._links?.self?.[ 0 ]?.targetHints?.allow
+					)
+					.map( ( record ) => ( {
+						id: record[ key ],
+						permissions: getUserPermissionsFromAllowHeader(
+							record._links.self[ 0 ].targetHints.allow
+						),
+					} ) );
 
-				dispatch( {
-					type: 'START_RESOLUTIONS',
-					selectorName: 'getEntityRecord',
-					args: resolutionsArgs,
-				} );
-				dispatch( {
-					type: 'FINISH_RESOLUTIONS',
-					selectorName: 'getEntityRecord',
-					args: resolutionsArgs,
-				} );
-			}
-		} finally {
+				const canUserResolutionsArgs = [];
+				const receiveUserPermissionArgs = {};
+				for ( const targetHint of targetHints ) {
+					for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
+						canUserResolutionsArgs.push( [
+							action,
+							{ kind, name, id: targetHint.id },
+						] );
+
+						receiveUserPermissionArgs[
+							getUserPermissionCacheKey( action, {
+								kind,
+								name,
+								id: targetHint.id,
+							} )
+						] = targetHint.permissions[ action ];
+					}
+				}
+
+				if ( targetHints.length > 0 ) {
+					dispatch.receiveUserPermissions(
+						receiveUserPermissionArgs
+					);
+					dispatch.finishResolutions(
+						'canUser',
+						canUserResolutionsArgs
+					);
+				}
+
+				dispatch.finishResolutions(
+					'getEntityRecord',
+					getResolutionsArgs( records, rawQuery )
+				);
+
+				dispatch.__unstableReleaseStoreLock( lock );
+			} );
+		} catch {
 			dispatch.__unstableReleaseStoreLock( lock );
 		}
 	};
@@ -229,6 +617,16 @@ getEntityRecords.shouldInvalidate = ( action, kind, name ) => {
 		name === action.name
 	);
 };
+
+/**
+ * Requests the total number of entity records.
+ */
+export const getEntityRecordsTotalItems = forwardResolver( 'getEntityRecords' );
+
+/**
+ * Requests the number of available pages for the given query.
+ */
+export const getEntityRecordsTotalPages = forwardResolver( 'getEntityRecords' );
 
 /**
  * Requests the current theme.
@@ -251,7 +649,7 @@ export const getCurrentTheme =
 export const getThemeSupports = forwardResolver( 'getCurrentTheme' );
 
 /**
- * Requests a preview from the from the Embed API.
+ * Requests a preview from the Embed API.
  *
  * @param {string} url URL to get the preview for.
  */
@@ -263,7 +661,7 @@ export const getEmbedPreview =
 				path: addQueryArgs( '/oembed/1.0/proxy', { url } ),
 			} );
 			dispatch.receiveEmbedPreview( url, embedProxyResponse );
-		} catch ( error ) {
+		} catch {
 			// Embed API 404s if the URL cannot be embedded, so we have to catch the error from the apiRequest here.
 			dispatch.receiveEmbedPreview( url, false );
 		}
@@ -273,25 +671,23 @@ export const getEmbedPreview =
  * Checks whether the current user can perform the given action on the given
  * REST resource.
  *
- * @param {string}  requestedAction Action to check. One of: 'create', 'read', 'update',
- *                                  'delete'.
- * @param {string}  resource        REST resource to check, e.g. 'media' or 'posts'.
- * @param {?string} id              ID of the rest resource to check.
+ * @param {string}        requestedAction Action to check. One of: 'create', 'read', 'update',
+ *                                        'delete'.
+ * @param {string|Object} resource        Entity resource to check. Accepts entity object `{ kind: 'postType', name: 'attachment', id: 1 }`
+ *                                        or REST base as a string - `media`.
+ * @param {?string}       id              ID of the rest resource to check.
  */
 export const canUser =
 	( requestedAction, resource, id ) =>
-	async ( { dispatch, registry } ) => {
-		const { hasStartedResolution } = registry.select( STORE_NAME );
-
-		const resourcePath = id ? `${ resource }/${ id }` : resource;
-		const retrievedActions = [ 'create', 'read', 'update', 'delete' ];
-
-		if ( ! retrievedActions.includes( requestedAction ) ) {
+	async ( { dispatch, registry, resolveSelect } ) => {
+		if ( ! ALLOWED_RESOURCE_ACTIONS.includes( requestedAction ) ) {
 			throw new Error( `'${ requestedAction }' is not a valid action.` );
 		}
 
+		const { hasStartedResolution } = registry.select( STORE_NAME );
+
 		// Prevent resolving the same resource twice.
-		for ( const relatedAction of retrievedActions ) {
+		for ( const relatedAction of ALLOWED_RESOURCE_ACTIONS ) {
 			if ( relatedAction === requestedAction ) {
 				continue;
 			}
@@ -305,65 +701,79 @@ export const canUser =
 			}
 		}
 
+		let resourcePath = null;
+		if ( typeof resource === 'object' ) {
+			if ( ! resource.kind || ! resource.name ) {
+				throw new Error( 'The entity resource object is not valid.' );
+			}
+
+			const configs = await resolveSelect.getEntitiesConfig(
+				resource.kind
+			);
+			const entityConfig = configs.find(
+				( config ) =>
+					config.name === resource.name &&
+					config.kind === resource.kind
+			);
+			if ( ! entityConfig ) {
+				return;
+			}
+
+			resourcePath =
+				entityConfig.baseURL + ( resource.id ? '/' + resource.id : '' );
+		} else {
+			resourcePath = `/wp/v2/${ resource }` + ( id ? '/' + id : '' );
+		}
+
 		let response;
 		try {
 			response = await apiFetch( {
-				path: `/wp/v2/${ resourcePath }`,
+				path: resourcePath,
 				method: 'OPTIONS',
 				parse: false,
 			} );
-		} catch ( error ) {
+		} catch {
 			// Do nothing if our OPTIONS request comes back with an API error (4xx or
 			// 5xx). The previously determined isAllowed value will remain in the store.
 			return;
 		}
 
 		// Optional chaining operator is used here because the API requests don't
-		// return the expected result in the native version. Instead, API requests
+		// return the expected result in the React native version. Instead, API requests
 		// only return the result, without including response properties like the headers.
-		const allowHeader = response.headers?.get( 'allow' );
-		const allowedMethods = allowHeader?.allow || allowHeader || '';
+		const permissions = getUserPermissionsFromAllowHeader(
+			response.headers?.get( 'allow' )
+		);
+		const receiveUserPermissionArgs = {};
+		const canUserResolutionsArgs = [];
+		for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
+			receiveUserPermissionArgs[
+				getUserPermissionCacheKey( action, resource, id )
+			] = permissions[ action ];
 
-		const permissions = {};
-		const methods = {
-			create: 'POST',
-			read: 'GET',
-			update: 'PUT',
-			delete: 'DELETE',
-		};
-		for ( const [ actionName, methodName ] of Object.entries( methods ) ) {
-			permissions[ actionName ] = allowedMethods.includes( methodName );
+			// Mark related action resolutions as finished.
+			if ( action !== requestedAction ) {
+				canUserResolutionsArgs.push( [ action, resource, id ] );
+			}
 		}
-
-		for ( const action of retrievedActions ) {
-			dispatch.receiveUserPermission(
-				`${ action }/${ resourcePath }`,
-				permissions[ action ]
-			);
-		}
+		registry.batch( () => {
+			dispatch.receiveUserPermissions( receiveUserPermissionArgs );
+			dispatch.finishResolutions( 'canUser', canUserResolutionsArgs );
+		} );
 	};
 
 /**
  * Checks whether the current user can perform the given action on the given
  * REST resource.
  *
- * @param {string} kind     Entity kind.
- * @param {string} name     Entity name.
- * @param {string} recordId Record's id.
+ * @param {string}        kind     Entity kind.
+ * @param {string}        name     Entity name.
+ * @param {number|string} recordId Record's id.
  */
 export const canUserEditEntityRecord =
 	( kind, name, recordId ) =>
 	async ( { dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
-		const entityConfig = configs.find(
-			( config ) => config.name === name && config.kind === kind
-		);
-		if ( ! entityConfig ) {
-			return;
-		}
-
-		const resource = entityConfig.__unstable_rest_base;
-		await dispatch( canUser( 'update', resource, recordId ) );
+		await dispatch( canUser( 'update', { kind, name, id: recordId } ) );
 	};
 
 /**
@@ -375,8 +785,15 @@ export const canUserEditEntityRecord =
 export const getAutosaves =
 	( postType, postId ) =>
 	async ( { dispatch, resolveSelect } ) => {
-		const { rest_base: restBase, rest_namespace: restNamespace = 'wp/v2' } =
-			await resolveSelect.getPostType( postType );
+		const {
+			rest_base: restBase,
+			rest_namespace: restNamespace = 'wp/v2',
+			supports,
+		} = await resolveSelect.getPostType( postType );
+		if ( ! supports?.autosave ) {
+			return;
+		}
+
 		const autosaves = await apiFetch( {
 			path: `/${ restNamespace }/${ restBase }/${ postId }/autosaves?context=edit`,
 		} );
@@ -401,58 +818,6 @@ export const getAutosave =
 		await resolveSelect.getAutosaves( postType, postId );
 	};
 
-/**
- * Retrieve the frontend template used for a given link.
- *
- * @param {string} link Link.
- */
-export const __experimentalGetTemplateForLink =
-	( link ) =>
-	async ( { dispatch, resolveSelect } ) => {
-		let template;
-		try {
-			// This is NOT calling a REST endpoint but rather ends up with a response from
-			// an Ajax function which has a different shape from a WP_REST_Response.
-			template = await apiFetch( {
-				url: addQueryArgs( link, {
-					'_wp-find-template': true,
-				} ),
-			} ).then( ( { data } ) => data );
-		} catch ( e ) {
-			// For non-FSE themes, it is possible that this request returns an error.
-		}
-
-		if ( ! template ) {
-			return;
-		}
-
-		const record = await resolveSelect.getEntityRecord(
-			'postType',
-			'wp_template',
-			template.id
-		);
-
-		if ( record ) {
-			dispatch.receiveEntityRecords(
-				'postType',
-				'wp_template',
-				[ record ],
-				{
-					'find-template': link,
-				}
-			);
-		}
-	};
-
-__experimentalGetTemplateForLink.shouldInvalidate = ( action ) => {
-	return (
-		( action.type === 'RECEIVE_ITEMS' || action.type === 'REMOVE_ITEMS' ) &&
-		action.invalidateCache &&
-		action.kind === 'postType' &&
-		action.name === 'wp_template'
-	);
-};
-
 export const __experimentalGetCurrentGlobalStylesId =
 	() =>
 	async ( { dispatch, resolveSelect } ) => {
@@ -464,13 +829,17 @@ export const __experimentalGetCurrentGlobalStylesId =
 		const globalStylesURL =
 			activeThemes?.[ 0 ]?._links?.[ 'wp:user-global-styles' ]?.[ 0 ]
 				?.href;
-		if ( globalStylesURL ) {
-			const globalStylesObject = await apiFetch( {
-				url: globalStylesURL,
-			} );
-			dispatch.__experimentalReceiveCurrentGlobalStylesId(
-				globalStylesObject.id
-			);
+		if ( ! globalStylesURL ) {
+			return;
+		}
+
+		// Regex matches the ID at the end of a URL or immediately before
+		// the query string.
+		const matches = globalStylesURL.match( /\/(\d+)(?:\?|$)/ );
+		const id = matches ? Number( matches[ 1 ] ) : null;
+
+		if ( id ) {
+			dispatch.__experimentalReceiveCurrentGlobalStylesId( id );
 		}
 	};
 
@@ -478,8 +847,9 @@ export const __experimentalGetCurrentThemeBaseGlobalStyles =
 	() =>
 	async ( { resolveSelect, dispatch } ) => {
 		const currentTheme = await resolveSelect.getCurrentTheme();
+		// Please adjust the preloaded requests if this changes!
 		const themeGlobalStyles = await apiFetch( {
-			path: `/wp/v2/global-styles/themes/${ currentTheme.stylesheet }`,
+			path: `/wp/v2/global-styles/themes/${ currentTheme.stylesheet }?context=view`,
 		} );
 		dispatch.__experimentalReceiveThemeBaseGlobalStyles(
 			currentTheme.stylesheet,
@@ -491,8 +861,9 @@ export const __experimentalGetCurrentThemeGlobalStylesVariations =
 	() =>
 	async ( { resolveSelect, dispatch } ) => {
 		const currentTheme = await resolveSelect.getCurrentTheme();
+		// Please adjust the preloaded requests if this changes!
 		const variations = await apiFetch( {
-			path: `/wp/v2/global-styles/themes/${ currentTheme.stylesheet }/variations`,
+			path: `/wp/v2/global-styles/themes/${ currentTheme.stylesheet }/variations?context=view`,
 		} );
 		dispatch.__experimentalReceiveThemeGlobalStyleVariations(
 			currentTheme.stylesheet,
@@ -548,17 +919,7 @@ getCurrentThemeGlobalStylesRevisions.shouldInvalidate = ( action ) => {
 export const getBlockPatterns =
 	() =>
 	async ( { dispatch } ) => {
-		const restPatterns = await apiFetch( {
-			path: '/wp/v2/block-patterns/patterns',
-		} );
-		const patterns = restPatterns?.map( ( pattern ) =>
-			Object.fromEntries(
-				Object.entries( pattern ).map( ( [ key, value ] ) => [
-					camelCase( key ),
-					value,
-				] )
-			)
-		);
+		const patterns = await fetchBlockPatterns();
 		dispatch( { type: 'RECEIVE_BLOCK_PATTERNS', patterns } );
 	};
 
@@ -571,9 +932,35 @@ export const getBlockPatternCategories =
 		dispatch( { type: 'RECEIVE_BLOCK_PATTERN_CATEGORIES', categories } );
 	};
 
+export const getUserPatternCategories =
+	() =>
+	async ( { dispatch, resolveSelect } ) => {
+		const patternCategories = await resolveSelect.getEntityRecords(
+			'taxonomy',
+			'wp_pattern_category',
+			{
+				per_page: -1,
+				_fields: 'id,name,description,slug',
+				context: 'view',
+			}
+		);
+
+		const mappedPatternCategories =
+			patternCategories?.map( ( userCategory ) => ( {
+				...userCategory,
+				label: decodeEntities( userCategory.name ),
+				name: userCategory.slug,
+			} ) ) || [];
+
+		dispatch( {
+			type: 'RECEIVE_USER_PATTERN_CATEGORIES',
+			patternCategories: mappedPatternCategories,
+		} );
+	};
+
 export const getNavigationFallbackId =
 	() =>
-	async ( { dispatch, select } ) => {
+	async ( { dispatch, select, registry } ) => {
 		const fallback = await apiFetch( {
 			path: addQueryArgs( '/wp-block-editor/v1/navigation-fallback', {
 				_embed: true,
@@ -582,16 +969,20 @@ export const getNavigationFallbackId =
 
 		const record = fallback?._embedded?.self;
 
-		dispatch.receiveNavigationFallbackId( fallback?.id );
+		registry.batch( () => {
+			dispatch.receiveNavigationFallbackId( fallback?.id );
 
-		if ( record ) {
+			if ( ! record ) {
+				return;
+			}
+
 			// If the fallback is already in the store, don't invalidate navigation queries.
 			// Otherwise, invalidate the cache for the scenario where there were no Navigation
 			// posts in the state and the fallback created one.
 			const existingFallbackEntityRecord = select.getEntityRecord(
 				'postType',
 				'wp_navigation',
-				fallback?.id
+				fallback.id
 			);
 			const invalidateNavigationQueries = ! existingFallbackEntityRecord;
 			dispatch.receiveEntityRecords(
@@ -606,7 +997,372 @@ export const getNavigationFallbackId =
 			dispatch.finishResolution( 'getEntityRecord', [
 				'postType',
 				'wp_navigation',
-				fallback?.id,
+				fallback.id,
 			] );
+		} );
+	};
+
+export const getDefaultTemplateId =
+	( query ) =>
+	async ( { dispatch, registry, resolveSelect } ) => {
+		const template = await apiFetch( {
+			path: addQueryArgs( '/wp/v2/templates/lookup', query ),
+		} );
+		// Wait for the the entities config to be loaded, otherwise receiving
+		// the template as an entity will not work.
+		await resolveSelect.getEntitiesConfig( 'postType' );
+		// When active_templates experiment is enabled, use numeric wp_id if it
+		// exists, otherwise fall back to string ID format (theme//slug) as the
+		// frontend expects string IDs for templates.
+		const id = window?.__experimentalTemplateActivate
+			? template?.wp_id || template?.id
+			: template?.id;
+
+		registry.batch( () => {
+			dispatch.receiveDefaultTemplateId( query, id || '' );
+			// Endpoint may return an empty object if no template is found.
+			if ( id ) {
+				template.id = id;
+				dispatch.receiveEntityRecords(
+					'postType',
+					template.type,
+					template
+				);
+				// Avoid further network requests.
+				dispatch.finishResolution( 'getEntityRecord', [
+					'postType',
+					template.type,
+					id,
+				] );
+			}
+		} );
+	};
+
+getDefaultTemplateId.shouldInvalidate = ( action ) => {
+	// Only invalidate on real saves; `persistedEdits` is absent on
+	// initial fetches so the kickoff's own site read doesn't wipe
+	// the just-resolved template id.
+	return (
+		action.type === 'RECEIVE_ITEMS' &&
+		action.kind === 'root' &&
+		action.name === 'site' &&
+		!! action.persistedEdits
+	);
+};
+
+/**
+ * Requests an entity's revisions from the REST API.
+ *
+ * @param {string}           kind      Entity kind.
+ * @param {string}           name      Entity name.
+ * @param {number|string}    recordKey The key of the entity record whose revisions you want to fetch.
+ * @param {Object|undefined} query     Optional object of query parameters to
+ *                                     include with request. If requesting specific
+ *                                     fields, fields must always include the ID.
+ */
+export const getRevisions =
+	( kind, name, recordKey, query = {} ) =>
+	async ( { dispatch, registry, resolveSelect } ) => {
+		const configs = await resolveSelect.getEntitiesConfig( kind );
+		const entityConfig = configs.find(
+			( config ) => config.name === name && config.kind === kind
+		);
+
+		if ( ! entityConfig ) {
+			return;
 		}
+
+		const rawQuery = { ...query };
+		const lock = await dispatch.__unstableAcquireStoreLock(
+			STORE_NAME,
+			[ 'entities', 'records', kind, name, recordKey, 'revisions' ],
+			{ exclusive: false }
+		);
+
+		try {
+			if ( query._fields ) {
+				// If requesting specific fields, items and query association to said
+				// records are stored by ID reference. Thus, fields must always include
+				// the ID.
+				query = {
+					...query,
+					_fields: [
+						...new Set( [
+							...( getNormalizedCommaSeparable( query._fields ) ||
+								[] ),
+							entityConfig.revisionKey || DEFAULT_ENTITY_KEY,
+						] ),
+					].join(),
+				};
+			}
+
+			const path = addQueryArgs(
+				entityConfig.getRevisionsUrl( recordKey ),
+				query
+			);
+
+			let records, response;
+			const meta = {};
+			const isPaginated =
+				entityConfig.supportsPagination && query.per_page !== -1;
+			try {
+				response = await apiFetch( { path, parse: ! isPaginated } );
+			} catch {
+				// Do nothing if our request comes back with an API error.
+				return;
+			}
+
+			if ( response ) {
+				if ( isPaginated ) {
+					records = Object.values( await response.json() );
+					meta.totalItems = parseInt(
+						response.headers.get( 'X-WP-Total' )
+					);
+				} else {
+					records = Object.values( response );
+				}
+
+				// If we request fields but the result doesn't contain the fields,
+				// explicitly set these fields as "undefined"
+				// that way we consider the query "fulfilled".
+				if ( query._fields ) {
+					records = records.map( ( record ) => {
+						query._fields.split( ',' ).forEach( ( field ) => {
+							if ( ! record.hasOwnProperty( field ) ) {
+								record[ field ] = undefined;
+							}
+						} );
+
+						return record;
+					} );
+				}
+
+				registry.batch( () => {
+					dispatch.receiveRevisions(
+						kind,
+						name,
+						recordKey,
+						records,
+						query,
+						false,
+						meta
+					);
+
+					// Mark individual getRevision resolutions as done so that
+					// subsequent getRevision calls skip redundant API fetches.
+					const key = entityConfig.revisionKey || DEFAULT_ENTITY_KEY;
+					const normalizedQuery =
+						normalizeQueryForResolution( rawQuery );
+					const resolutionsArgs = records
+						.filter( ( record ) => record[ key ] )
+						.map( ( record ) => [
+							kind,
+							name,
+							recordKey,
+							record[ key ],
+							normalizedQuery,
+						] );
+
+					dispatch.finishResolutions(
+						'getRevision',
+						resolutionsArgs
+					);
+				} );
+			}
+		} finally {
+			dispatch.__unstableReleaseStoreLock( lock );
+		}
+	};
+
+// Invalidate cache when a new revision is created.
+getRevisions.shouldInvalidate = ( action, kind, name, recordKey ) =>
+	action.type === 'SAVE_ENTITY_RECORD_FINISH' &&
+	name === action.name &&
+	kind === action.kind &&
+	! action.error &&
+	recordKey === action.recordId;
+
+/**
+ * Requests a specific Entity revision from the REST API.
+ *
+ * @param {string}           kind        Entity kind.
+ * @param {string}           name        Entity name.
+ * @param {number|string}    recordKey   The key of the entity record whose revisions you want to fetch.
+ * @param {number|string}    revisionKey The revision's key.
+ * @param {Object|undefined} query       Optional object of query parameters to
+ *                                       include with request. If requesting specific
+ *                                       fields, fields must always include the ID.
+ */
+export const getRevision =
+	( kind, name, recordKey, revisionKey, query ) =>
+	async ( { select, dispatch, resolveSelect } ) => {
+		const configs = await resolveSelect.getEntitiesConfig( kind );
+		const entityConfig = configs.find(
+			( config ) => config.name === name && config.kind === kind
+		);
+
+		if ( ! entityConfig ) {
+			return;
+		}
+
+		if ( query !== undefined && query._fields ) {
+			// If requesting specific fields, items and query association to said
+			// records are stored by ID reference. Thus, fields must always include
+			// the ID.
+			query = {
+				...query,
+				_fields: [
+					...new Set( [
+						...( getNormalizedCommaSeparable( query._fields ) ||
+							[] ),
+						entityConfig.revisionKey || DEFAULT_ENTITY_KEY,
+					] ),
+				].join(),
+			};
+		}
+
+		const lock = await dispatch.__unstableAcquireStoreLock(
+			STORE_NAME,
+			[
+				'entities',
+				'records',
+				kind,
+				name,
+				recordKey,
+				'revisions',
+				revisionKey,
+			],
+			{ exclusive: false }
+		);
+
+		try {
+			if (
+				select.hasRevision( kind, name, recordKey, revisionKey, query )
+			) {
+				return;
+			}
+
+			const path = addQueryArgs(
+				entityConfig.getRevisionsUrl( recordKey, revisionKey ),
+				query
+			);
+
+			let record;
+			try {
+				record = await apiFetch( { path } );
+			} catch {
+				// Do nothing if our request comes back with an API error.
+				return;
+			}
+
+			if ( record ) {
+				dispatch.receiveRevisions(
+					kind,
+					name,
+					recordKey,
+					record,
+					query
+				);
+			}
+		} finally {
+			dispatch.__unstableReleaseStoreLock( lock );
+		}
+	};
+
+/**
+ * Requests a specific post type options from the REST API.
+ *
+ * @param {string} postType Post type slug.
+ */
+export const getRegisteredPostMeta =
+	( postType ) =>
+	async ( { dispatch, resolveSelect } ) => {
+		let options;
+		try {
+			const {
+				rest_namespace: restNamespace = 'wp/v2',
+				rest_base: restBase,
+			} = ( await resolveSelect.getPostType( postType ) ) || {};
+			options = await apiFetch( {
+				path: `${ restNamespace }/${ restBase }/?context=edit`,
+				method: 'OPTIONS',
+			} );
+		} catch {
+			// Do nothing if the request comes back with an API error.
+			return;
+		}
+
+		if ( options ) {
+			dispatch.receiveRegisteredPostMeta(
+				postType,
+				options?.schema?.properties?.meta?.properties
+			);
+		}
+	};
+
+/**
+ * Requests entity configs for the given kind from the REST API.
+ *
+ * @param {string} kind Entity kind.
+ */
+export const getEntitiesConfig =
+	( kind ) =>
+	async ( { dispatch } ) => {
+		const loader = additionalEntityConfigLoaders.find(
+			( l ) => l.kind === kind
+		);
+
+		if ( ! loader ) {
+			return;
+		}
+
+		try {
+			const configs = await loader.loadEntities();
+			if ( ! configs.length ) {
+				return;
+			}
+
+			dispatch.addEntities( configs );
+		} catch {
+			// Do nothing if the request comes back with an API error.
+		}
+	};
+
+/**
+ * Requests editor settings from the REST API.
+ */
+export const getEditorSettings =
+	() =>
+	async ( { dispatch } ) => {
+		const settings = await apiFetch( {
+			path: '/wp-block-editor/v1/settings',
+		} );
+		dispatch.receiveEditorSettings( settings );
+	};
+
+/**
+ * Requests editor assets from the REST API.
+ */
+export const getEditorAssets =
+	() =>
+	async ( { dispatch } ) => {
+		const assets = await apiFetch( {
+			path: '/wp-block-editor/v1/assets',
+		} );
+		dispatch.receiveEditorAssets( assets );
+	};
+
+/**
+ * Requests view config for a given entity type from the REST API.
+ *
+ * @param {string} kind Entity kind.
+ * @param {string} name Entity name.
+ */
+export const getViewConfig =
+	( kind, name ) =>
+	async ( { dispatch } ) => {
+		const config = await apiFetch( {
+			path: addQueryArgs( '/wp/v2/view-config', { kind, name } ),
+		} );
+		dispatch.receiveViewConfig( kind, name, config );
 	};

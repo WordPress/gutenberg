@@ -17,9 +17,13 @@ import useRefEffect from '../use-ref-effect';
 export default function useFocusableIframe(): RefCallback< HTMLIFrameElement > {
 	return useRefEffect( ( element ) => {
 		const { ownerDocument } = element;
-		if ( ! ownerDocument ) return;
+		if ( ! ownerDocument ) {
+			return;
+		}
 		const { defaultView } = ownerDocument;
-		if ( ! defaultView ) return;
+		if ( ! defaultView ) {
+			return;
+		}
 
 		/**
 		 * Checks whether the iframe is the activeElement, inferring that it has

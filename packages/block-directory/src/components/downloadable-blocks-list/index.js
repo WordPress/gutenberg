@@ -2,10 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	__unstableComposite as Composite,
-	__unstableUseCompositeState as useCompositeState,
-} from '@wordpress/components';
+import { Composite } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import { useDispatch } from '@wordpress/data';
 
@@ -18,7 +15,6 @@ import { store as blockDirectoryStore } from '../../store';
 const noop = () => {};
 
 function DownloadableBlocksList( { items, onHover = noop, onSelect } ) {
-	const composite = useCompositeState();
 	const { installBlockType } = useDispatch( blockDirectoryStore );
 
 	if ( ! items.length ) {
@@ -27,7 +23,6 @@ function DownloadableBlocksList( { items, onHover = noop, onSelect } ) {
 
 	return (
 		<Composite
-			{ ...composite }
 			role="listbox"
 			className="block-directory-downloadable-blocks-list"
 			aria-label={ __( 'Blocks available for install' ) }
@@ -36,7 +31,6 @@ function DownloadableBlocksList( { items, onHover = noop, onSelect } ) {
 				return (
 					<DownloadableBlockListItem
 						key={ item.id }
-						composite={ composite }
 						onClick={ () => {
 							// Check if the block is registered (`getBlockType`
 							// will return an object). If so, insert the block.

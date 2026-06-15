@@ -10,6 +10,24 @@ npm install @wordpress/components --save
 
 _This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
 
+## Setup
+
+Many components require the package's CSS stylesheet to be loaded.
+
+### Within WordPress
+
+To ensure proper load order, add the `wp-components` stylesheet as a dependency of your plugin's stylesheet. See [wp_enqueue_style documentation](https://developer.wordpress.org/reference/functions/wp_enqueue_style/#parameters) for how to specify dependencies.
+
+### Outside WordPress
+
+Load the stylesheet in your application:
+
+```js
+import '@wordpress/components/build-style/style.css';
+```
+
+The RTL version of the stylesheet is available at `@wordpress/components/build-style/style-rtl.css`.
+
 ## Usage
 
 Within Gutenberg, these components can be accessed by importing from the `components` root directory:
@@ -25,25 +43,11 @@ export default function MyButton() {
 }
 ```
 
-Many components include CSS to add styles, which you will need to load in order for them to appear correctly. Within WordPress, add the `wp-components` stylesheet as a dependency of your plugin's stylesheet. See [wp_enqueue_style documentation](https://developer.wordpress.org/reference/functions/wp_enqueue_style/#parameters) for how to specify dependencies.
+### Popovers
 
-In non-WordPress projects, link to the `build-style/style.css` file directly, it is located at `node_modules/@wordpress/components/build-style/style.css`.
+By default, the `Popover` component will render within an extra element appended to the body of the document.
 
-### Popovers and Tooltips
-
-_If you're using [`Popover`](/packages/components/src/popover/README.md) or [`Tooltip`](/packages/components/src/tooltip/README.md) components outside of the editor, make sure they are rendered within a `SlotFillProvider` and with a `Popover.Slot` somewhere up the element tree._
-
-By default, the `Popover` component will render inline i.e. within its
-parent to which it should anchor. Depending upon the context in which the
-`Popover` is being consumed, this might lead to incorrect positioning. For
-example, when being nested within another popover.
-
-This issue can be solved by rendering popovers to a specific location in the DOM via the
-`Popover.Slot`. For this to work, you will need your use of the `Popover`
-component and its `Slot` to be wrapped in a [`SlotFill`](/packages/components/src/slot-fill/README.md) provider.
-
-A `Popover` is also used as the underlying mechanism to display `Tooltip` components.
-So the same considerations should be applied to them.
+If you want to precisely control where the popovers render, you will need to use the `Popover.Slot` component.
 
 The following example illustrates how you can wrap a component using a
 `Popover` and have those popovers render to a single location in the DOM.
@@ -63,8 +67,21 @@ const Example = () => {
 	<SlotFillProvider>
 		<MyComponentWithPopover />
 		<Popover.Slot />
-	</SlotFillProvider>
+	</SlotFillProvider>;
 };
+```
+
+### TypeScript
+
+This package exposes its own types for the components it exports, however it doesn't export its own types for component props. If you need to extract the props type, please use `React.ComponentProps` to get the types from the element.
+
+```tsx
+import type { ComponentProps } from 'react';
+import { Button } from '@wordpress/components';
+
+export default function MyButton( props: ComponentProps< typeof Button > ) {
+	return <Button { ...props }>Click Me!</Button>;
+}
 ```
 
 ## Docs & examples

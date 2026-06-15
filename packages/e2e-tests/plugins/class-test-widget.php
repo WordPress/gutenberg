@@ -48,7 +48,7 @@ class Test_Widget extends WP_Widget {
 		?>
 		<p>
 			<label for="<?php echo $this->get_field_id( 'title' ); ?>">Title:</label>
-			<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( isset( $instance['title'] ) ? $instance['title'] : '' ); ?>" />
+			<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $instance['title'] ?? '' ); ?>" />
 		</p>
 		<?php
 	}
@@ -56,12 +56,13 @@ class Test_Widget extends WP_Widget {
 	/**
 	 * Handles updating settings for the current widget instance.
 	 *
+	 * @since 4.8.1
+	 *
 	 * @param array $new_instance New settings for this instance as input by the user via
 	 *                            WP_Widget::form().
 	 * @param array $old_instance Old settings for this instance.
 	 *
 	 * @return array Settings to save or bool false to cancel saving.
-	 * @since 4.8.1
 	 */
 	// @codingStandardsIgnoreStart – to prevent phpcs from complaining about unused function argument.
 	public function update( $new_instance, $old_instance ) {

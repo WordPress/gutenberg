@@ -1,6 +1,7 @@
-.document-outline {
-	margin: 20px 0;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
 
+.document-outline {
 	ul {
 		margin: 0;
 		padding: 0;
@@ -42,7 +43,7 @@
 }
 
 .document-outline__button {
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 	background: none;
 	border: none;
 	display: flex;
@@ -51,10 +52,12 @@
 	padding: 2px 5px 2px 1px;
 	color: $gray-900;
 	text-align: left;
-	border-radius: $radius-block-ui;
+	border-radius: $radius-small;
 
+	&[aria-disabled="true"],
 	&:disabled {
 		cursor: default;
+		color: $gray-700;
 	}
 
 	&:focus {
@@ -80,4 +83,16 @@
 
 .document-outline__item-content {
 	padding: 1px 0;
+}
+
+.editor-document-outline.has-no-headings {
+	& > svg {
+		margin-top: $grid-unit-30 + $grid-unit-05;
+	}
+	& > p {
+		padding-left: $grid-unit-40;
+		padding-right: $grid-unit-40;
+	}
+	text-align: center;
+	color: $gray-700;
 }

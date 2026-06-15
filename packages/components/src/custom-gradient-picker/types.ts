@@ -10,6 +10,8 @@ export type CustomGradientPickerProps = {
 	 * can be safely removed once this happens.)
 	 *
 	 * @default false
+	 * @deprecated Default behavior since WP 6.5. Prop can be safely removed.
+	 * @ignore
 	 */
 	__nextHasNoMargin?: boolean;
 	/**
@@ -24,6 +26,12 @@ export type CustomGradientPickerProps = {
 	 * the `currentGradient` as an argument.
 	 */
 	onChange: ( currentGradient: string ) => void;
+	/**
+	 * Whether to enable alpha transparency options in the picker.
+	 *
+	 * @default true
+	 */
+	enableAlpha?: boolean;
 	/**
 	 * Whether this is rendered in the sidebar.
 	 *
@@ -92,7 +100,7 @@ export type ControlPointButtonProps = {
 export type ControlPointsProps = {
 	disableRemove: boolean;
 	disableAlpha: boolean;
-	gradientPickerDomRef: React.RefObject< HTMLDivElement >;
+	gradientPickerDomRef: React.RefObject< HTMLDivElement | null >;
 	ignoreMarkerPosition?: number;
 	value: ControlPoint[];
 	onChange: ( controlPoints: ControlPoint[] ) => void;

@@ -1,48 +1,60 @@
 /**
- * WordPress dependencies
+ * External dependencies
  */
-import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
+import { useDrag } from '@use-gesture/react';
 
 /**
  * Internal dependencies
  */
-import { default as CustomSelectControl } from './custom-select-control';
 import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from './popover/utils';
-import { createPrivateSlotFill } from './slot-fill';
-import {
-	DropdownMenu as DropdownMenuV2,
-	DropdownMenuCheckboxItem as DropdownMenuCheckboxItemV2,
-	DropdownMenuGroup as DropdownMenuGroupV2,
-	DropdownMenuItem as DropdownMenuItemV2,
-	DropdownMenuLabel as DropdownMenuLabelV2,
-	DropdownMenuRadioGroup as DropdownMenuRadioGroupV2,
-	DropdownMenuRadioItem as DropdownMenuRadioItemV2,
-	DropdownMenuSeparator as DropdownMenuSeparatorV2,
-	DropdownSubMenu as DropdownSubMenuV2,
-	DropdownSubMenuTrigger as DropdownSubMenuTriggerV2,
-} from './dropdown-menu-v2';
-import { ComponentsContext } from './ui/context/context-system-provider';
+import { Menu } from './menu';
+import { ComponentsContext } from './context/context-system-provider';
+import Theme from './theme';
+import { Tabs } from './tabs';
+import { kebabCase, normalizeTextString } from './utils/strings';
+import { withIgnoreIMEEvents } from './utils/with-ignore-ime-events';
+import { lock } from './lock-unlock';
+import Badge from './badge';
 
-export const { lock, unlock } =
-	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
-		'I know using unstable features means my plugin or theme will inevitably break on the next WordPress release.',
-		'@wordpress/components'
-	);
+import { DateCalendar, DateRangeCalendar, TZDate } from './calendar';
+import {
+	ValidatedCheckboxControl,
+	ValidatedComboboxControl,
+	ValidatedInputControl,
+	ValidatedNumberControl,
+	ValidatedSelectControl,
+	ValidatedRadioControl,
+	ValidatedTextControl,
+	ValidatedTextareaControl,
+	ValidatedToggleControl,
+	ValidatedToggleGroupControl,
+} from './validated-form-controls';
+import { ValidatedFormTokenField } from './validated-form-controls/components/form-token-field';
 
 export const privateApis = {};
 lock( privateApis, {
-	CustomSelectControl,
 	__experimentalPopoverLegacyPositionToPlacement,
-	createPrivateSlotFill,
 	ComponentsContext,
-	DropdownMenuV2,
-	DropdownMenuCheckboxItemV2,
-	DropdownMenuGroupV2,
-	DropdownMenuItemV2,
-	DropdownMenuLabelV2,
-	DropdownMenuRadioGroupV2,
-	DropdownMenuRadioItemV2,
-	DropdownMenuSeparatorV2,
-	DropdownSubMenuV2,
-	DropdownSubMenuTriggerV2,
+	Tabs,
+	Theme,
+	Menu,
+	kebabCase,
+	withIgnoreIMEEvents,
+	Badge,
+	normalizeTextString,
+	DateCalendar,
+	DateRangeCalendar,
+	TZDate,
+	useDrag,
+	ValidatedInputControl,
+	ValidatedCheckboxControl,
+	ValidatedComboboxControl,
+	ValidatedNumberControl,
+	ValidatedSelectControl,
+	ValidatedRadioControl,
+	ValidatedTextControl,
+	ValidatedTextareaControl,
+	ValidatedToggleControl,
+	ValidatedToggleGroupControl,
+	ValidatedFormTokenField,
 } );

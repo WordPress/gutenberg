@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+const { join } = require( 'path' );
 const { pascalCase, snakeCase } = require( 'change-case' );
 
 /**
@@ -12,9 +13,15 @@ const initWPScripts = require( './init-wp-scripts' );
 const initWPEnv = require( './init-wp-env' );
 const { code, info, success, error } = require( './log' );
 const { writeOutputAsset, writeOutputTemplate } = require( './output' );
+const { getOutputTemplates, getOutputAssets } = require( './templates' );
 
 module.exports = async (
-	{ blockOutputTemplates, pluginOutputTemplates, outputAssets },
+	{
+		blockOutputTemplates,
+		pluginOutputTemplates,
+		outputAssets,
+		variantTemplates,
+	},
 	{
 		$schema,
 		apiVersion,
@@ -25,6 +32,7 @@ module.exports = async (
 		description,
 		dashicon,
 		category,
+		textdomain,
 		attributes,
 		supports,
 		author,
@@ -34,83 +42,150 @@ module.exports = async (
 		domainPath,
 		updateURI,
 		version,
+		requiresAtLeast,
+		requiresPHP,
+		testedUpTo,
 		wpScripts,
 		wpEnv,
 		npmDependencies,
 		npmDevDependencies,
 		customScripts,
 		folderName,
+		targetDir,
 		editorScript,
 		editorStyle,
 		style,
+		viewStyle,
 		render,
+		viewScriptModule,
 		viewScript,
 		variantVars,
 		customPackageJSON,
 		customBlockJSON,
 		example,
+		transformer,
+		variant,
+		pluginTemplatesPath: variantPluginTemplatesPath,
+		blockTemplatesPath: variantBlockTemplatesPath,
+		assetsPath: variantAssetsPath,
 	}
 ) => {
 	slug = slug.toLowerCase();
-	namespace = namespace.toLowerCase();
-	/**
-	 * --no-plugin relies on the used template supporting the [blockTemplatesPath property](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/#blocktemplatespath).
-	 * If the blockOutputTemplates object has no properties, we can assume that there was a custom --template passed that
-	 * doesn't support it.
-	 */
-	if ( ! plugin && Object.keys( blockOutputTemplates ) < 1 ) {
-		error(
-			'No block files found in the template. Please ensure that the template supports the blockTemplatesPath property.'
-		);
-		return;
-	}
-
-	info( '' );
-	info(
-		plugin
-			? `Creating a new WordPress plugin in the ${ slug } directory.`
-			: `Creating a new block in the ${ slug } directory.`
-	);
-
-	const view = {
+	const rootDirectory = join( process.cwd(), targetDir || slug );
+	const transformedValues = transformer( {
 		$schema,
 		apiVersion,
 		plugin,
-		namespace,
-		namespaceSnakeCase: snakeCase( namespace ),
+		namespace: namespace.toLowerCase(),
 		slug,
-		slugSnakeCase: snakeCase( slug ),
-		slugPascalCase: pascalCase( slug ),
 		title,
 		description,
 		dashicon,
 		category,
 		attributes,
 		supports,
-		version,
 		author,
 		pluginURI,
 		license,
 		licenseURI,
-		textdomain: slug,
 		domainPath,
 		updateURI,
+		version,
+		requiresAtLeast,
+		requiresPHP,
+		testedUpTo,
 		wpScripts,
 		wpEnv,
 		npmDependencies,
 		npmDevDependencies,
 		customScripts,
-		folderName,
+		folderName: folderName.replace( /\$slug/g, slug ),
 		editorScript,
 		editorStyle,
 		style,
+		viewStyle,
 		render,
+		viewScriptModule,
 		viewScript,
+		variantVars,
 		customPackageJSON,
 		customBlockJSON,
 		example,
+		textdomain: textdomain || slug,
+		rootDirectory,
+	} );
+
+	const view = {
+		...transformedValues,
+		namespaceSnakeCase: snakeCase( transformedValues.namespace ),
+		namespacePascalCase: pascalCase( transformedValues.namespace ),
+		slugSnakeCase: snakeCase( transformedValues.slug ),
+		slugPascalCase: pascalCase( transformedValues.slug ),
 		...variantVars,
 	};
+
+	// Check for variant-specific templates
+	// If the variant has pre-processed templates, use them; otherwise fall back to path-based loading
+	if ( variant && variantTemplates && variantTemplates[ variant ] ) {
+		const variantTemplate = variantTemplates[ variant ];
+
+		// null = use default from main template, {} or object = use variant's templates
+		if ( variantTemplate.pluginOutputTemplates !== null ) {
+			pluginOutputTemplates = variantTemplate.pluginOutputTemplates;
+		}
+
+		if ( variantTemplate.blockOutputTemplates !== null ) {
+			blockOutputTemplates = variantTemplate.blockOutputTemplates;
+		}
+
+		if ( variantTemplate.outputAssets !== null ) {
+			outputAssets = variantTemplate.outputAssets;
+		}
+	} else {
+		// Fallback: legacy path-based loading for backward compatibility
+		// Check for the pluginTemplates path in the variant
+		if ( variantPluginTemplatesPath === null ) {
+			pluginOutputTemplates = {};
+		} else if ( variantPluginTemplatesPath ) {
+			pluginOutputTemplates = await getOutputTemplates(
+				variantPluginTemplatesPath
+			);
+		}
+
+		// Check for the blockTemplatesPath path in the variant
+		if ( variantBlockTemplatesPath === null ) {
+			blockOutputTemplates = {};
+		} else if ( variantBlockTemplatesPath ) {
+			blockOutputTemplates = await getOutputTemplates(
+				variantBlockTemplatesPath
+			);
+		}
+
+		// Check for the assetsPath
+		if ( variantAssetsPath === null ) {
+			outputAssets = {};
+		} else if ( variantAssetsPath ) {
+			outputAssets = await getOutputAssets( variantAssetsPath );
+		}
+	}
+
+	if ( ! plugin && Object.keys( blockOutputTemplates ) < 1 ) {
+		/**
+		 * --no-plugin relies on the used template supporting the [blockTemplatesPath property](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/#blocktemplatespath).
+		 * If the blockOutputTemplates object has no properties, we can assume that there was a custom --template passed that
+		 * doesn't support it.
+		 */
+		error(
+			'No block files found in the template. Please ensure that the template supports the blockTemplatesPath property.'
+		);
+		return;
+	}
+
+	const projectType = plugin ? 'plugin' : 'block';
+	info( '' );
+	info(
+		`Creating a new WordPress ${ projectType } in the ${ rootDirectory } directory.`
+	);
 
 	if ( plugin ) {
 		await Promise.all(
@@ -152,9 +227,7 @@ module.exports = async (
 	info( '' );
 
 	success(
-		plugin
-			? `Done: WordPress plugin ${ title } bootstrapped in the ${ slug } directory.`
-			: `Done: Block "${ title }" bootstrapped in the ${ slug } directory.`
+		`Done: WordPress ${ projectType } ${ title } bootstrapped in the ${ rootDirectory } directory.`
 	);
 
 	if ( plugin && wpScripts ) {

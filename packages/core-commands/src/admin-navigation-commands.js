@@ -1,80 +1,72 @@
 /**
  * WordPress dependencies
  */
-import { useCommand } from '@wordpress/commands';
-import { __ } from '@wordpress/i18n';
-import { external, plus, symbol } from '@wordpress/icons';
-import { useSelect } from '@wordpress/data';
+import { useCommandLoader, useCommands } from '@wordpress/commands';
+import { __, sprintf } from '@wordpress/i18n';
+import { external } from '@wordpress/icons';
+import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
-import { addQueryArgs, getPath } from '@wordpress/url';
-import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { useSelect } from '@wordpress/data';
 
-/**
- * Internal dependencies
- */
-import { unlock } from './lock-unlock';
+const getViewSiteCommand = () =>
+	function useViewSiteCommand() {
+		const homeUrl = useSelect( ( select ) => {
+			// Site index.
+			return select( coreStore ).getEntityRecord(
+				'root',
+				'__unstableBase'
+			)?.home;
+		}, [] );
 
-const { useHistory } = unlock( routerPrivateApis );
-
-export function useAdminNavigationCommands() {
-	const history = useHistory();
-
-	const { isBlockTheme, canAccessSiteEditor } = useSelect( ( select ) => {
-		return {
-			isBlockTheme:
-				// To avoid making core-commands dependent on block-editor using store string literal name.
-				// eslint-disable-next-line @wordpress/data-no-store-string-literals
-				select( 'core/block-editor' )?.getSettings()
-					.__unstableIsBlockBasedTheme,
-			canAccessSiteEditor: select( coreStore ).canUser(
-				'read',
-				'templates'
-			),
-		};
-	}, [] );
-
-	const isSiteEditor = getPath( window.location.href )?.includes(
-		'site-editor.php'
-	);
-
-	useCommand( {
-		name: 'core/add-new-post',
-		label: __( 'Add new post' ),
-		icon: plus,
-		callback: () => {
-			document.location.href = 'post-new.php';
-		},
-	} );
-	useCommand( {
-		name: 'core/add-new-page',
-		label: __( 'Add new page' ),
-		icon: plus,
-		callback: () => {
-			document.location.href = 'post-new.php?post_type=page';
-		},
-	} );
-	useCommand( {
-		name: 'core/manage-reusable-blocks',
-		label: __( 'Open patterns' ),
-		callback: ( { close } ) => {
-			if (
-				( ! isSiteEditor && ! isBlockTheme ) ||
-				! canAccessSiteEditor
-			) {
-				document.location.href = 'edit.php?post_type=wp_block';
-			} else {
-				const args = {
-					path: '/patterns',
-				};
-				const targetUrl = addQueryArgs( 'site-editor.php', args );
-				if ( isSiteEditor ) {
-					history.push( args );
-				} else {
-					document.location = targetUrl;
-				}
-				close();
+		const commands = useMemo( () => {
+			if ( ! homeUrl ) {
+				return [];
 			}
-		},
-		icon: isSiteEditor ? symbol : external,
+
+			return [
+				{
+					name: 'core/view-site',
+					label: __( 'View site' ),
+					icon: external,
+					category: 'view',
+					callback: ( { close } ) => {
+						close();
+						window.open( homeUrl, '_blank' );
+					},
+				},
+			];
+		}, [ homeUrl ] );
+
+		return {
+			isLoading: false,
+			commands,
+		};
+	};
+
+export function useAdminNavigationCommands( menuCommands ) {
+	const commands = useMemo( () => {
+		return ( menuCommands ?? [] ).map( ( menuCommand ) => {
+			const label = sprintf(
+				/* translators: %s: menu label */
+				__( 'Go to: %s' ),
+				menuCommand.label
+			);
+			return {
+				name: menuCommand.name,
+				label,
+				searchLabel: label,
+				category: 'view',
+				callback: ( { close } ) => {
+					document.location = menuCommand.url;
+					close();
+				},
+			};
+		} );
+	}, [ menuCommands ] );
+	useCommands( commands );
+
+	useCommandLoader( {
+		name: 'core/view-site',
+		hook: getViewSiteCommand(),
 	} );
 }

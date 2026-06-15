@@ -7,7 +7,7 @@ import { css } from '@emotion/react';
  * Internal dependencies
  */
 import { COLORS, CONFIG, boxSizingReset, rtl } from '../utils';
-import { space } from '../ui/utils/space';
+import { space } from '../utils/space';
 import { StyledLabel } from '../base-control/styles/base-control-styles';
 import {
 	ValueInput as UnitControlWrapper,
@@ -16,12 +16,8 @@ import {
 
 import type { Border } from './types';
 
-const labelStyles = css`
-	font-weight: 500;
-`;
-
 const focusBoxShadow = css`
-	box-shadow: inset 0 0 0 ${ CONFIG.borderWidth } ${ COLORS.ui.borderFocus };
+	box-shadow: inset ${ CONFIG.controlBoxShadowFocus };
 `;
 
 export const borderControl = css`
@@ -59,18 +55,11 @@ export const wrapperHeight = ( size?: 'default' | '__unstable-large' ) => {
 	`;
 };
 
-export const borderControlDropdown = (
-	size?: 'default' | '__unstable-large'
-) => css`
+export const borderControlDropdown = css`
 	background: #fff;
 
 	&& > button {
-		/*
-		 * Override button component styles to fit within BorderControl
-		 * regardless of size.
-		 */
-		height: ${ size === '__unstable-large' ? '40px' : '30px' };
-		width: ${ size === '__unstable-large' ? '40px' : '30px' };
+		aspect-ratio: 1;
 		padding: 0;
 		display: flex;
 		align-items: center;
@@ -110,7 +99,7 @@ export const colorIndicatorWrapper = (
 	const { style } = border || {};
 
 	return css`
-		border-radius: 9999px;
+		border-radius: ${ CONFIG.radiusFull };
 		border: 2px solid transparent;
 		${ style ? colorIndicatorBorder( border ) : undefined }
 		width: ${ size === '__unstable-large' ? '24px' : '22px' };
@@ -147,7 +136,6 @@ export const borderControlPopoverControls = css`
 
 	> div:first-of-type > ${ StyledLabel } {
 		margin-bottom: 0;
-		${ labelStyles }
 	}
 
 	&& ${ StyledLabel } + button:not( .has-text ) {
@@ -159,32 +147,10 @@ export const borderControlPopoverControls = css`
 export const borderControlPopoverContent = css``;
 export const borderColorIndicator = css``;
 
-export const resetButton = css`
-	justify-content: center;
-	width: 100%;
-
-	/* Override button component styling */
-	&& {
-		border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 200 ] };
-		border-top-left-radius: 0;
-		border-top-right-radius: 0;
-		height: 46px;
-	}
-`;
-
-export const borderControlStylePicker = css`
-	${ StyledLabel } {
-		${ labelStyles }
-	}
-`;
-
-export const borderStyleButton = css`
-	&&&&& {
-		min-width: 30px;
-		width: 30px;
-		height: 30px;
-		padding: 3px;
-	}
+export const resetButtonWrapper = css`
+	display: flex;
+	justify-content: flex-end;
+	margin-top: 12px;
 `;
 
 export const borderSlider = () => css`

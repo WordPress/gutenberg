@@ -15,69 +15,34 @@ concurrency:
     group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
     cancel-in-progress: true
 
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
 jobs:
-    e2e-puppeteer:
-        name: Puppeteer - ${{ matrix.part }}
-        runs-on: ubuntu-latest
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
-        strategy:
-            fail-fast: false
-            matrix:
-                part: [1, 2, 3]
-                totalParts: [3]
-
-        steps:
-            - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
-
-            - name: Setup Node.js and install dependencies
-              uses: ./.github/setup-node
-
-            - name: Npm build
-              run: npm run build
-
-            - name: Install WordPress
-              run: |
-                  npm run wp-env start
-
-            - name: Running the tests
-              run: |
-                  $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
-                  $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % ${{ matrix.totalParts }} == ${{ matrix.part }} - 1' < ~/.jest-e2e-tests )
-
-            - name: Archive debug artifacts (screenshots, HTML snapshots)
-              uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
-              if: always()
-              with:
-                  name: failures-artifacts
-                  path: artifacts
-                  if-no-files-found: ignore
-
-            - name: Archive flaky tests report
-              uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
-              if: always()
-              with:
-                  name: flaky-tests-report
-                  path: flaky-tests
-                  if-no-files-found: ignore
-
     e2e-playwright:
         name: Playwright - ${{ matrix.part }}
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
             matrix:
-                part: [1, 2, 3, 4]
-                totalParts: [4]
+                part: [1, 2, 3, 4, 5, 6, 7, 8]
+                totalParts: [8]
 
         steps:
-            - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+            - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
 
             - name: Npm build
-              run: npm run build
+              run: npm run build -- --skip-types
 
             - name: Install Playwright dependencies
               run: |
@@ -85,42 +50,103 @@ jobs:
 
             - name: Install WordPress and start the server
               run: |
-                  npm run wp-env start
+                  npm run wp-env-test start
 
             - name: Run the tests
+              env:
+                  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
               run: |
-                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run test:e2e:playwright -- --shard=${{ matrix.part }}/${{ matrix.totalParts }}
+                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run --workspace @wordpress/e2e-tests-playwright test:e2e -- --shard=${{ matrix.part }}/${{ matrix.totalParts }}
 
-            - name: Archive debug artifacts (screenshots, traces)
-              uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
-              if: always()
+            - name: Archive blob reports (HTML)
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              if: ${{ !cancelled() }}
               with:
-                  name: failures-artifacts
-                  path: artifacts/test-results
+                  name: blob-reports--${{ matrix.part }}
+                  path: test/e2e/blob-report
                   if-no-files-found: ignore
 
             - name: Archive flaky tests report
-              uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
-              if: always()
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              if: ${{ !cancelled() }}
+              with:
+                  name: flaky-tests-report--${{ matrix.part }}
+                  path: test/e2e/flaky-tests
+                  if-no-files-found: ignore
+
+    merge-artifacts:
+        name: Merge Artifacts
+        if: ${{ !cancelled() }}
+        needs: [e2e-playwright]
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
+        outputs:
+            has-flaky-test-report: ${{ !!steps.merge-flaky-tests-reports.outputs.artifact-id }}
+        steps:
+            - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+
+            - name: Merge flaky tests reports
+              id: merge-flaky-tests-reports
+              uses: actions/upload-artifact/merge@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              continue-on-error: true
               with:
                   name: flaky-tests-report
-                  path: flaky-tests
+                  pattern: flaky-tests-report*
+                  delete-merged: true
+
+            - name: Merge blob reports
+              uses: actions/upload-artifact/merge@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              continue-on-error: true
+              with:
+                  name: blob-reports-merged
+                  pattern: blob-reports--*
+                  delete-merged: true
+
+            - name: Download merged blob reports
+              uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+              continue-on-error: true
+              with:
+                  name: blob-reports-merged
+                  path: all-blob-reports
+
+            - name: Merge blob reports into HTML report
+              run: npx playwright merge-reports --reporter html ./all-blob-reports
+              continue-on-error: true
+
+            - name: Upload merged HTML report
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              continue-on-error: true
+              with:
+                  name: html-report--attempt-${{ github.run_attempt }}
+                  path: playwright-report
                   if-no-files-found: ignore
 
     report-to-issues:
         name: Report to GitHub
-        needs: [e2e-puppeteer, e2e-playwright]
-        if: ${{ always() }}
-        runs-on: ubuntu-latest
+        needs: [merge-artifacts]
+        if: ${{ needs.merge-artifacts.outputs.has-flaky-test-report == 'true' }}
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
+            issues: write
+            pull-requests: write
         steps:
             # Checkout defaults to using the branch which triggered the event, which
             # isn't necessarily `trunk` (e.g. in the case of a merge).
-            - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+            - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
               with:
                   ref: trunk
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
 
-            - uses: actions/download-artifact@v3
-              id: download_artifact
+            - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
               # Don't fail the job if there isn't any flaky tests report.
               continue-on-error: true
               with:
@@ -128,16 +154,12 @@ jobs:
                   path: flaky-tests
 
             - name: Setup Node.js and install dependencies
-              if: ${{ steps.download_artifact.outcome == 'success' }}
               uses: ./.github/setup-node
 
             - name: Npm build
-              if: ${{ steps.download_artifact.outcome == 'success' }}
-              # TODO: We don't have to build the entire project, just the action itself.
-              run: npm run build:packages
+              run: npm run build -- --skip-types
 
             - name: Report flaky tests
-              if: ${{ steps.download_artifact.outcome == 'success' }}
               uses: ./packages/report-flaky-tests
               with:
                   repo-token: '${{ secrets.GITHUB_TOKEN }}'

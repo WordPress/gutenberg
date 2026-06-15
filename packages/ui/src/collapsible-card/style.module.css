@@ -1,0 +1,116 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer components {
+		/*
+		 * Style overrides for the outer wrapper rendered by `CollapsibleCard.Header`
+		 * (defaults to `<div>`, but consumers can opt into a heading level via
+		 * `render={ <h2 /> }` etc.). Combined with `defenseStyles.heading` so that,
+		 * when the wrapper renders as an h1–h6, the unlayered defense class beats
+		 * wp-admin's bare `h2`/`h3`/etc. selectors. Keeps the wrapper visually
+		 * transparent so UA and host stylesheets don't bleed into the inner
+		 * trigger.
+		 */
+		.heading-wrapper {
+			--_gcd-heading-color: inherit;
+			--_gcd-heading-font-size: inherit;
+			--_gcd-heading-font-weight: inherit;
+			--_gcd-heading-margin: 0;
+
+			/* Properties not covered by the defense file. */
+			font-family: inherit;
+			line-height: inherit;
+		}
+
+		.header-content {
+			flex: 1;
+			min-width: 0;
+		}
+
+		.header-trigger-positioner {
+			flex-shrink: 0;
+			align-self: center;
+			/* Prevent the trigger from making the header taller than its content,
+			   preserving the same metrics between `Card` and `CollapsibleCard`. */
+			max-height: 0;
+			overflow: visible;
+		}
+
+		.header-trigger-wrapper {
+			display: flex;
+
+			/* Offset by half the button's own height so it visually centers
+			   at the wrapper's midpoint (which `align-self: center` places at
+			   the vertical center of the header). */
+			translate: 0 -50%;
+
+			/* For an outline that looks like `IconButton`'s */
+			border-radius: var(--wpds-border-radius-sm);
+		}
+
+		.header-trigger {
+			@media not ( prefers-reduced-motion ) {
+				transition: rotate 0.15s ease-out;
+			}
+		}
+
+		.header[data-panel-open] .header-trigger {
+			rotate: 180deg;
+		}
+
+		/* Simulate disabled button styles */
+		.header[data-disabled] .header-trigger {
+			color: var(--wpds-color-foreground-interactive-neutral-disabled);
+		}
+
+		.content {
+			height: var(--collapsible-panel-height);
+			margin-block-start: var(--wp-ui-card-header-content-margin);
+
+			/* Clip while collapsed or transitioning so the panel collapses
+			   cleanly. The `overflowVisible` class is set once the open
+			   transition has settled, dropping the clip so descendant
+			   focus rings aren't cut off. */
+			overflow: hidden;
+
+			&.overflowVisible {
+				overflow: visible;
+			}
+
+			&[hidden]:not([hidden="until-found"]) {
+				display: none;
+			}
+
+			&[data-starting-style],
+			&[data-ending-style] {
+				height: 0;
+			}
+
+			@media not ( prefers-reduced-motion ) {
+				transition: all 150ms ease-out;
+			}
+		}
+	}
+
+	@layer compositions {
+		.content-inner {
+			/* Card.Content's `.header + .content` selector doesn't match here
+			   because Collapsible.Panel sits between Card.Header and Card.Content.
+			   Re-apply the zero top padding manually so the header/content gap
+			   matches Card. */
+			padding-block-start: 0;
+		}
+
+		.header {
+			display: flex;
+			flex-direction: row;
+			align-items: stretch;
+			gap: var(--wpds-dimension-gap-sm);
+			outline: none;
+
+			&:not([data-disabled]) {
+				cursor: var(--wpds-cursor-control);
+			}
+		}
+	}
+}

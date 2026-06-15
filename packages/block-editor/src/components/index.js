@@ -5,18 +5,23 @@
 export * from './colors';
 export * from './gradients';
 export * from './font-sizes';
-export * from './duotone';
 export { AlignmentControl, AlignmentToolbar } from './alignment-control';
 export { default as Autocomplete } from './autocomplete';
 export {
 	BlockAlignmentControl,
 	BlockAlignmentToolbar,
 } from './block-alignment-control';
+export {
+	BlockBindingsAttributeControl,
+	BlockBindingsSourceFieldsList,
+	useBlockBindingsUtils,
+} from './block-bindings';
 export { default as __experimentalBlockFullHeightAligmentControl } from './block-full-height-alignment-control';
 export { default as __experimentalBlockAlignmentMatrixControl } from './block-alignment-matrix-control';
 export { default as BlockBreadcrumb } from './block-breadcrumb';
 export { default as __experimentalUseBlockOverlayActive } from './block-content-overlay';
 export { BlockContextProvider } from './block-context';
+export { default as BlockCanvas } from './block-canvas';
 export {
 	default as BlockControls,
 	BlockFormatControls,
@@ -55,6 +60,7 @@ export { default as __experimentalColorGradientControl } from './colors-gradient
 export { default as __experimentalColorGradientSettingsDropdown } from './colors-gradients/dropdown';
 export { default as __experimentalPanelColorGradientSettings } from './colors-gradients/panel-color-gradient-settings';
 export { default as __experimentalUseMultipleOriginColorsAndGradients } from './colors-gradients/use-multiple-origin-colors-and-gradients';
+export { default as DimensionControl } from './dimension-control';
 export { default as HeightControl } from './height-control';
 export { default as __experimentalImageEditor } from './image-editor';
 export { default as __experimentalImageSizeControl } from './image-size-control';
@@ -67,10 +73,13 @@ export {
 	JustifyToolbar,
 	JustifyContentControl,
 } from './justify-content-control';
-export { default as __experimentalLinkControl } from './link-control';
-export { default as __experimentalLinkControlSearchInput } from './link-control/search-input';
-export { default as __experimentalLinkControlSearchResults } from './link-control/search-results';
-export { default as __experimentalLinkControlSearchItem } from './link-control/search-item';
+export {
+	default as LinkControl,
+	DeprecatedExperimentalLinkControl as __experimentalLinkControl,
+} from './link-control';
+export { __experimentalLinkControlSearchInput } from './link-control/search-input';
+export { __experimentalLinkControlSearchResults } from './link-control/search-results';
+export { __experimentalLinkControlSearchItem } from './link-control/search-item';
 export { default as LineHeightControl } from './line-height-control';
 export { default as __experimentalListView } from './list-view';
 export { default as MediaReplaceFlow } from './media-replace-flow';
@@ -86,7 +95,6 @@ export {
 	RichTextToolbarButton,
 	__unstableRichTextInputEvent,
 } from './rich-text';
-export { default as ToolSelector } from './tool-selector';
 export { default as __experimentalUnitControl } from './unit-control';
 export { default as URLInput } from './url-input';
 export { default as URLInputButton } from './url-input/button';
@@ -105,7 +113,6 @@ export {
 
 export { default as __unstableBlockSettingsMenuFirstItem } from './block-settings-menu/block-settings-menu-first-item';
 export { default as __unstableBlockToolbarLastItem } from './block-toolbar/block-toolbar-last-item';
-export { default as __unstableBlockNameContext } from './block-toolbar/block-name-context';
 export { default as __unstableInserterMenuExtension } from './inserter-menu-extension';
 export { default as __experimentalPreviewOptions } from './preview-options';
 export { default as __experimentalUseResizeCanvas } from './use-resize-canvas';
@@ -128,7 +135,7 @@ export { default as BlockToolbar } from './block-toolbar';
 export { default as BlockTools } from './block-tools';
 export {
 	default as CopyHandler,
-	useClipboardHandler as __unstableUseClipboardHandler,
+	__unstableUseClipboardHandler,
 } from './copy-handler';
 export { default as DefaultBlockAppender } from './default-block-appender';
 export { default as __unstableEditorStyles } from './editor-styles';
@@ -152,16 +159,25 @@ export { default as WritingFlow } from './writing-flow';
 export { default as useBlockDisplayInformation } from './use-block-display-information';
 export { default as __unstableIframe } from './iframe';
 export {
-	RecursionProvider as __experimentalRecursionProvider,
-	useHasRecursion as __experimentalUseHasRecursion,
+	RecursionProvider,
+	DeprecatedExperimentalRecursionProvider as __experimentalRecursionProvider,
+	useHasRecursion,
+	DeprecatedExperimentalUseHasRecursion as __experimentalUseHasRecursion,
 } from './recursion-provider';
 export { default as __experimentalBlockPatternsList } from './block-patterns-list';
 export { default as __experimentalPublishDateTimePicker } from './publish-date-time-picker';
 export { default as __experimentalInspectorPopoverHeader } from './inspector-popover-header';
+export { default as BlockPopover } from './block-popover';
+export { useBlockEditingMode } from './block-editing-mode';
 
 /*
  * State Related Components
  */
 
 export { default as BlockEditorProvider } from './provider';
-export { default as useSetting } from './use-setting';
+export { useSettings, useSetting } from './use-settings';
+export { useBlockCommands } from './use-block-commands';
+
+// This component is no longer used in Gutenberg,
+// but kept for backwards compatibility.
+export { default as ToolSelector } from './tool-selector';

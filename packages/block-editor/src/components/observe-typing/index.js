@@ -111,26 +111,19 @@ export function useMouseMoveTypingReset() {
  * Sets and removes the `isTyping` flag based on user actions:
  *
  * - Sets the flag if the user types within the given element.
- * - Removes the flag when the user selects some text, focusses a non-text
+ * - Removes the flag when the user selects some text, focuses a non-text
  *   field, presses ESC or TAB, or moves the mouse in the document.
  */
 export function useTypingObserver() {
-	const { isTyping, hasInlineToolbar } = useSelect( ( select ) => {
-		const { isTyping: _isTyping, getSettings } = select( blockEditorStore );
-		return {
-			isTyping: _isTyping(),
-			hasInlineToolbar: getSettings().hasInlineToolbar,
-		};
-	}, [] );
+	const isTyping = useSelect(
+		( select ) => select( blockEditorStore ).isTyping(),
+		[]
+	);
 	const { startTyping, stopTyping } = useDispatch( blockEditorStore );
 
 	const ref1 = useMouseMoveTypingReset();
 	const ref2 = useRefEffect(
 		( node ) => {
-			const { ownerDocument } = node;
-			const { defaultView } = ownerDocument;
-			const selection = defaultView.getSelection();
-
 			// Listeners to stop typing should only be added when typing.
 			// Listeners to start typing should only be added when not typing.
 			if ( isTyping ) {
@@ -148,7 +141,7 @@ export function useTypingObserver() {
 					// before the keydown event, wait until after current stack
 					// before evaluating whether typing is to be stopped. Otherwise,
 					// typing will re-start.
-					timerId = defaultView.setTimeout( () => {
+					timerId = node.ownerDocument.defaultView.setTimeout( () => {
 						if ( ! isTextField( target ) ) {
 							stopTyping();
 						}
@@ -175,6 +168,8 @@ export function useTypingObserver() {
 				 * uncollapsed (shift) selection.
 				 */
 				function stopTypingOnSelectionUncollapse() {
+					const selection =
+						node.ownerDocument.defaultView.getSelection();
 					if ( ! selection.isCollapsed ) {
 						stopTyping();
 					}
@@ -183,15 +178,13 @@ export function useTypingObserver() {
 				node.addEventListener( 'focus', stopTypingOnNonTextField );
 				node.addEventListener( 'keydown', stopTypingOnEscapeKey );
 
-				if ( ! hasInlineToolbar ) {
-					ownerDocument.addEventListener(
-						'selectionchange',
-						stopTypingOnSelectionUncollapse
-					);
-				}
+				node.ownerDocument.addEventListener(
+					'selectionchange',
+					stopTypingOnSelectionUncollapse
+				);
 
 				return () => {
-					defaultView.clearTimeout( timerId );
+					node.ownerDocument.defaultView.clearTimeout( timerId );
 					node.removeEventListener(
 						'focus',
 						stopTypingOnNonTextField
@@ -200,7 +193,7 @@ export function useTypingObserver() {
 						'keydown',
 						stopTypingOnEscapeKey
 					);
-					ownerDocument.removeEventListener(
+					node.ownerDocument.removeEventListener(
 						'selectionchange',
 						stopTypingOnSelectionUncollapse
 					);
@@ -245,7 +238,7 @@ export function useTypingObserver() {
 				node.removeEventListener( 'keydown', startTypingInTextField );
 			};
 		},
-		[ isTyping, hasInlineToolbar, startTyping, stopTyping ]
+		[ isTyping, startTyping, stopTyping ]
 	);
 
 	return useMergeRefs( [ ref1, ref2 ] );

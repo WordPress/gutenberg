@@ -1,28 +1,21 @@
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
-import { withSelect } from '@wordpress/data';
+import { useEffect } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { store as editorStore } from '@wordpress/editor';
 
-/**
- * Internal dependencies
- */
-import { store as editPostStore } from '../../store';
+export default function MetaBoxVisibility( { id } ) {
+	const isVisible = useSelect(
+		( select ) => {
+			return select( editorStore ).isEditorPanelEnabled(
+				`meta-box-${ id }`
+			);
+		},
+		[ id ]
+	);
 
-class MetaBoxVisibility extends Component {
-	componentDidMount() {
-		this.updateDOM();
-	}
-
-	componentDidUpdate( prevProps ) {
-		if ( this.props.isVisible !== prevProps.isVisible ) {
-			this.updateDOM();
-		}
-	}
-
-	updateDOM() {
-		const { id, isVisible } = this.props;
-
+	useEffect( () => {
 		const element = document.getElementById( id );
 		if ( ! element ) {
 			return;
@@ -33,15 +26,7 @@ class MetaBoxVisibility extends Component {
 		} else {
 			element.classList.add( 'is-hidden' );
 		}
-	}
+	}, [ id, isVisible ] );
 
-	render() {
-		return null;
-	}
+	return null;
 }
-
-export default withSelect( ( select, { id } ) => ( {
-	isVisible: select( editPostStore ).isEditorPanelEnabled(
-		`meta-box-${ id }`
-	),
-} ) )( MetaBoxVisibility );

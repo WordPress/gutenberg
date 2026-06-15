@@ -12,6 +12,7 @@ import type { HeadingSize } from '../heading/types';
 export type ColorObject = {
 	name: string;
 	color: NonNullable< CSSProperties[ 'color' ] >;
+	slug?: string;
 };
 
 export type PaletteObject = {
@@ -24,9 +25,22 @@ type PaletteProps = {
 	clearColor: () => void;
 	/**
 	 * Callback called when a color is selected.
+	 * The third argument is the slug of the selected palette entry, when available.
 	 */
-	onChange: ( newColor?: string, index?: number ) => void;
+	onChange: ( newColor?: string, index?: number, slug?: string ) => void;
 	value?: string;
+	/**
+	 * The slug of the currently selected palette entry.
+	 *
+	 * When set to a non-empty string, selection is determined by slug rather
+	 * than by color value — this correctly handles palettes where two entries
+	 * share the same color. Palette entries without a slug will not appear
+	 * selected in this mode, even if their color value matches `value`.
+	 *
+	 * An empty string is treated the same as `undefined`: selection falls
+	 * back to matching by color value.
+	 */
+	selectedSlug?: string;
 	actions?: ReactNode;
 	headingLevel?: HeadingSize;
 };
@@ -43,7 +57,10 @@ export type CustomColorPickerDropdownProps = DropdownProps & {
 	isRenderedInSidebar: boolean;
 };
 
-export type ColorPaletteProps = Pick< PaletteProps, 'onChange' > & {
+export type ColorPaletteProps = Pick<
+	PaletteProps,
+	'onChange' | 'selectedSlug'
+> & {
 	/**
 	 * Whether the palette should have a clearing button.
 	 *
@@ -83,9 +100,42 @@ export type ColorPaletteProps = Pick< PaletteProps, 'onChange' > & {
 	 */
 	value?: string;
 	/**
+	 * Whether the control should present as a set of buttons,
+	 * each with its own tab stop.
+	 *
+	 * @default false
+	 */
+	asButtons?: boolean;
+	/**
+	 * Prevents keyboard interaction from wrapping around.
+	 * Only used when `asButtons` is not true.
+	 *
+	 * @default true
+	 */
+	loop?: boolean;
+	/**
 	 * Whether this is rendered in the sidebar.
 	 *
 	 * @default false
 	 */
 	__experimentalIsRenderedInSidebar?: boolean;
-};
+} & (
+		| {
+				/**
+				 * A label to identify the purpose of the control.
+				 *
+				 * @todo [#54055] Either this or `aria-labelledby` should be required
+				 */
+				'aria-label'?: string;
+				'aria-labelledby'?: never;
+		  }
+		| {
+				/**
+				 * An ID of an element to provide a label for the control.
+				 *
+				 * @todo [#54055] Either this or `aria-label` should be required
+				 */
+				'aria-labelledby'?: string;
+				'aria-label'?: never;
+		  }
+	);

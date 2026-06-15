@@ -13,11 +13,7 @@ import {
 	LINK_DESTINATION_NONE,
 	LINK_DESTINATION_MEDIA,
 } from './constants';
-import {
-	LINK_DESTINATION_ATTACHMENT as DEPRECATED_LINK_DESTINATION_ATTACHMENT,
-	LINK_DESTINATION_MEDIA as DEPRECATED_LINK_DESTINATION_MEDIA,
-} from './v1/constants';
-import { pickRelevantMediaFiles, isGalleryV2Enabled } from './shared';
+import { defaultColumnsNumber } from './shared';
 
 const parseShortcodeIds = ( ids ) => {
 	if ( ! ids ) {
@@ -27,10 +23,19 @@ const parseShortcodeIds = ( ids ) => {
 	return ids.split( ',' ).map( ( id ) => parseInt( id, 10 ) );
 };
 
+const cloneInnerBlocks = ( innerBlocks ) =>
+	innerBlocks.map( ( innerBlock ) =>
+		createBlock(
+			innerBlock.name,
+			innerBlock.attributes,
+			cloneInnerBlocks( innerBlock.innerBlocks || [] )
+		)
+	);
+
 /**
  * Third party block plugins don't have an easy way to detect if the
  * innerBlocks version of the Gallery is running when they run a
- * 3rdPartyBlock -> GalleryBlock transform so this tranform filter
+ * 3rdPartyBlock -> GalleryBlock transform so this transform filter
  * will handle this. Once the innerBlocks version is the default
  * in a core release, this could be deprecated and removed after
  * plugin authors have been given time to update transforms.
@@ -43,7 +48,6 @@ const parseShortcodeIds = ( ids ) => {
  */
 function updateThirdPartyTransformToGallery( block ) {
 	if (
-		isGalleryV2Enabled() &&
 		block.name === 'core/gallery' &&
 		block.attributes?.images.length > 0
 	) {
@@ -141,93 +145,27 @@ const transforms = {
 
 				const validImages = attributes.filter( ( { url } ) => url );
 
-				if ( isGalleryV2Enabled() ) {
-					const innerBlocks = validImages.map( ( image ) => {
-						// Gallery images can't currently be resized so make sure height and width are undefined.
-						image.width = undefined;
-						image.height = undefined;
-						return createBlock( 'core/image', image );
-					} );
-
-					return createBlock(
-						'core/gallery',
-						{
-							align,
-							sizeSlug,
-						},
-						innerBlocks
-					);
-				}
-
-				return createBlock( 'core/gallery', {
-					images: validImages.map(
-						( { id, url, alt, caption } ) => ( {
-							id: id.toString(),
-							url,
-							alt,
-							caption,
-						} )
-					),
-					ids: validImages.map( ( { id } ) => parseInt( id, 10 ) ),
-					align,
-					sizeSlug,
+				const innerBlocks = validImages.map( ( image ) => {
+					// Gallery images can't currently be resized so make sure height and width are undefined.
+					image.width = undefined;
+					image.height = undefined;
+					return createBlock( 'core/image', image );
 				} );
+
+				return createBlock(
+					'core/gallery',
+					{
+						align,
+						sizeSlug,
+					},
+					innerBlocks
+				);
 			},
 		},
 		{
 			type: 'shortcode',
 			tag: 'gallery',
-
-			attributes: {
-				images: {
-					type: 'array',
-					shortcode: ( { named: { ids } } ) => {
-						if ( ! isGalleryV2Enabled() ) {
-							return parseShortcodeIds( ids ).map( ( id ) => ( {
-								id: id.toString(),
-							} ) );
-						}
-					},
-				},
-				ids: {
-					type: 'array',
-					shortcode: ( { named: { ids } } ) => {
-						if ( ! isGalleryV2Enabled() ) {
-							return parseShortcodeIds( ids );
-						}
-					},
-				},
-				columns: {
-					type: 'number',
-					shortcode: ( { named: { columns = '3' } } ) => {
-						return parseInt( columns, 10 );
-					},
-				},
-				linkTo: {
-					type: 'string',
-					shortcode: ( { named: { link } } ) => {
-						if ( ! isGalleryV2Enabled() ) {
-							switch ( link ) {
-								case 'post':
-									return DEPRECATED_LINK_DESTINATION_ATTACHMENT;
-								case 'file':
-									return DEPRECATED_LINK_DESTINATION_MEDIA;
-								default:
-									return DEPRECATED_LINK_DESTINATION_ATTACHMENT;
-							}
-						}
-						switch ( link ) {
-							case 'post':
-								return LINK_DESTINATION_ATTACHMENT;
-							case 'file':
-								return LINK_DESTINATION_MEDIA;
-							default:
-								return LINK_DESTINATION_NONE;
-						}
-					},
-				},
-			},
-			transform( { named: { ids, columns = 3, link } } ) {
+			transform( { named: { ids, columns = 3, link, orderby, size } } ) {
 				const imageIds = parseShortcodeIds( ids ).map( ( id ) =>
 					parseInt( id, 10 )
 				);
@@ -244,9 +182,14 @@ const transforms = {
 					{
 						columns: parseInt( columns, 10 ),
 						linkTo,
+						randomOrder: orderby === 'rand',
+						...( size && { sizeSlug: size } ),
 					},
 					imageIds.map( ( imageId ) =>
-						createBlock( 'core/image', { id: imageId } )
+						createBlock( 'core/image', {
+							id: imageId,
+							...( size && { sizeSlug: size } ),
+						} )
 					)
 				);
 
@@ -260,7 +203,7 @@ const transforms = {
 			// When created by drag and dropping multiple files on an insertion point. Because multiple
 			// files must not be transformed to a gallery when dropped within a gallery there is another transform
 			// within the image block to handle that case. Therefore this transform has to have priority 1
-			// set so that it overrrides the image block transformation when mulitple images are dropped outside
+			// set so that it overrides the image block transformation when multiple images are dropped outside
 			// of a gallery block.
 			type: 'files',
 			priority: 1,
@@ -273,23 +216,13 @@ const transforms = {
 				);
 			},
 			transform( files ) {
-				if ( isGalleryV2Enabled() ) {
-					const innerBlocks = files.map( ( file ) =>
-						createBlock( 'core/image', {
-							url: createBlobURL( file ),
-						} )
-					);
+				const innerBlocks = files.map( ( file ) =>
+					createBlock( 'core/image', {
+						blob: createBlobURL( file ),
+					} )
+				);
 
-					return createBlock( 'core/gallery', {}, innerBlocks );
-				}
-				const block = createBlock( 'core/gallery', {
-					images: files.map( ( file ) =>
-						pickRelevantMediaFiles( {
-							url: createBlobURL( file ),
-						} )
-					),
-				} );
-				return block;
+				return createBlock( 'core/gallery', {}, innerBlocks );
 			},
 		},
 	],
@@ -297,60 +230,82 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/image' ],
-			transform: ( { align, images, ids, sizeSlug }, innerBlocks ) => {
-				if ( isGalleryV2Enabled() ) {
-					if ( innerBlocks.length > 0 ) {
-						return innerBlocks.map(
-							( {
-								attributes: {
-									url,
-									alt,
-									caption,
-									title,
-									href,
-									rel,
-									linkClass,
-									id,
-									sizeSlug: imageSizeSlug,
-									linkDestination,
-									linkTarget,
-									anchor,
-									className,
-								},
-							} ) =>
-								createBlock( 'core/image', {
-									align,
-									url,
-									alt,
-									caption,
-									title,
-									href,
-									rel,
-									linkClass,
-									id,
-									sizeSlug: imageSizeSlug,
-									linkDestination,
-									linkTarget,
-									anchor,
-									className,
-								} )
-						);
-					}
-					return createBlock( 'core/image', { align } );
-				}
-				if ( images.length > 0 ) {
-					return images.map( ( { url, alt, caption }, index ) =>
-						createBlock( 'core/image', {
-							id: ids[ index ],
-							url,
-							alt,
-							caption,
-							align,
-							sizeSlug,
-						} )
+			transform: ( { align }, innerBlocks ) => {
+				if ( innerBlocks.length > 0 ) {
+					return innerBlocks.map(
+						( {
+							attributes: {
+								url,
+								alt,
+								caption,
+								title,
+								href,
+								rel,
+								linkClass,
+								id,
+								sizeSlug: imageSizeSlug,
+								linkDestination,
+								linkTarget,
+								anchor,
+								className,
+							},
+						} ) =>
+							createBlock( 'core/image', {
+								align,
+								url,
+								alt,
+								caption,
+								title,
+								href,
+								rel,
+								linkClass,
+								id,
+								sizeSlug: imageSizeSlug,
+								linkDestination,
+								linkTarget,
+								anchor,
+								className,
+							} )
 					);
 				}
 				return createBlock( 'core/image', { align } );
+			},
+		},
+		{
+			type: 'block',
+			blocks: [ 'core/group' ],
+			variationName: 'group-grid',
+			transform: ( attributes, innerBlocks ) => {
+				const {
+					allowResize,
+					aspectRatio,
+					caption,
+					columns,
+					fixedHeight,
+					ids,
+					imageCrop,
+					images,
+					linkTarget,
+					linkTo,
+					navigationButtonType,
+					randomOrder,
+					shortCodeTransforms,
+					sizeSlug,
+					...rest
+				} = attributes;
+				return createBlock(
+					'core/group',
+					{
+						...rest,
+						layout: {
+							type: 'grid',
+							columnCount:
+								columns ??
+								defaultColumnsNumber( innerBlocks.length ),
+						},
+					},
+					cloneInnerBlocks( innerBlocks )
+				);
 			},
 		},
 	],

@@ -35,7 +35,7 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 		);
 		await toolbarUtils.moveToToolbarShortcut();
 		await expect( toolbarUtils.blockToolbarParagraphButton ).toBeFocused();
-		await expect( toolbarUtils.documentToolbarTooltip ).not.toBeVisible();
+		await expect( toolbarUtils.documentToolbarTooltip ).toBeHidden();
 
 		// Test: Focus block toolbar from block content when block toolbar is visible
 		await editor.insertBlock( { name: 'core/paragraph' } );
@@ -47,33 +47,7 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 		await editor.showBlockToolbar();
 		await toolbarUtils.moveToToolbarShortcut();
 		await expect( toolbarUtils.blockToolbarParagraphButton ).toBeFocused();
-		await expect( toolbarUtils.documentToolbarTooltip ).not.toBeVisible();
-	} );
-
-	test( 'Focuses correct toolbar in default view options in select mode', async ( {
-		editor,
-		page,
-		toolbarUtils,
-	} ) => {
-		// Test: Focus the document toolbar from title
-		await toolbarUtils.useSelectMode();
-		await toolbarUtils.moveToToolbarShortcut();
-		await expect( toolbarUtils.documentToolbarButton ).toBeFocused();
-
-		// Test: Focus the top level toolbar from empty block
-		await editor.insertBlock( { name: 'core/paragraph' } );
-		await toolbarUtils.useSelectMode();
-		await toolbarUtils.moveToToolbarShortcut();
-		await expect( toolbarUtils.documentToolbarButton ).toBeFocused();
-
-		// Test: Focus the top level toolbar from paragraph block
-		await editor.insertBlock( { name: 'core/paragraph' } );
-		await page.keyboard.type(
-			'Focus top level toolbar from paragraph block in select mode.'
-		);
-		await toolbarUtils.useSelectMode();
-		await toolbarUtils.moveToToolbarShortcut();
-		await expect( toolbarUtils.documentToolbarButton ).toBeFocused();
+		await expect( toolbarUtils.documentToolbarTooltip ).toBeHidden();
 	} );
 
 	test.describe( 'In Top Toolbar option:', () => {
@@ -98,6 +72,10 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 
 			// Test: Focus the block toolbar from empty block
 			await editor.insertBlock( { name: 'core/paragraph' } );
+			// This fails if we don't wait for the block toolbar to show.
+			await expect(
+				toolbarUtils.blockToolbarParagraphButton
+			).toBeVisible();
 			await toolbarUtils.moveToToolbarShortcut();
 			await expect(
 				toolbarUtils.blockToolbarParagraphButton
@@ -169,9 +147,7 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 			await expect(
 				toolbarUtils.blockToolbarParagraphButton
 			).toBeFocused();
-			await expect(
-				toolbarUtils.documentToolbarTooltip
-			).not.toBeVisible();
+			await expect( toolbarUtils.documentToolbarTooltip ).toBeHidden();
 
 			// Test: Focus the block toolbar from paragraph block with content
 			await editor.insertBlock( { name: 'core/paragraph' } );
@@ -182,9 +158,7 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 			await expect(
 				toolbarUtils.blockToolbarParagraphButton
 			).toBeFocused();
-			await expect(
-				toolbarUtils.documentToolbarTooltip
-			).not.toBeVisible();
+			await expect( toolbarUtils.documentToolbarTooltip ).toBeHidden();
 		} );
 
 		test( 'Focuses the correct toolbar in select mode', async ( {
@@ -204,9 +178,7 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 			await expect(
 				toolbarUtils.blockToolbarParagraphButton
 			).toBeFocused();
-			await expect(
-				toolbarUtils.documentToolbarTooltip
-			).not.toBeVisible();
+			await expect( toolbarUtils.documentToolbarTooltip ).toBeHidden();
 
 			// Test: Focus the block toolbar from paragraph in select mode
 			await editor.insertBlock( { name: 'core/paragraph' } );
@@ -218,9 +190,7 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 			await expect(
 				toolbarUtils.blockToolbarParagraphButton
 			).toBeFocused();
-			await expect(
-				toolbarUtils.documentToolbarTooltip
-			).not.toBeVisible();
+			await expect( toolbarUtils.documentToolbarTooltip ).toBeHidden();
 		} );
 	} );
 } );
@@ -231,11 +201,11 @@ class ToolbarUtils {
 		this.pageUtils = pageUtils;
 
 		this.documentToolbarButton = this.page.getByRole( 'button', {
-			name: 'Toggle block inserter',
+			name: 'Block Inserter',
 			exact: true,
 		} );
 		this.documentToolbarTooltip = this.page.locator(
-			'text=Toggle block inserter'
+			'text=Block Inserter'
 		);
 		this.blockToolbarParagraphButton = this.page.getByRole( 'button', {
 			name: 'Paragraph',

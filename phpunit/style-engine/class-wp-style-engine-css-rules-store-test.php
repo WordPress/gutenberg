@@ -170,4 +170,20 @@ class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
 
 		$this->assertSame( $expected, $new_pizza_store->get_all_rules(), 'Return value for get_all_rules() does not match expectations after adding new rules to store.' );
 	}
+
+	/**
+	 * Tests adding rules group keys to store.
+	 *
+	 * @covers ::add_rule
+	 */
+	public function test_should_store_as_concatenated_rules_groups_and_selector() {
+		$store_one      = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( 'one' );
+		$store_one_rule = $store_one->add_rule( '.tony', '.one' );
+
+		$this->assertSame(
+			'.one .tony',
+			"{$store_one_rule->get_rules_group()} {$store_one_rule->get_selector()}",
+			'add_rule() does not concatenate rules group and selector.'
+		);
+	}
 }

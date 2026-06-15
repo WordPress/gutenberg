@@ -284,6 +284,47 @@ describe( 'Intermediate Representation', () => {
 					} ),
 				] ) );
 
+			it( 'named identifier with RestElements', () => {
+				expect(
+					parse( `
+						/**
+						 * RestElement example.
+						 */
+						const { someKey, ...someApi } = { someKey: 2, restOne: 1, restTwo: 2 };
+
+						export {someApi};
+					` )
+				).toEqual( [
+					{
+						description: 'RestElement example.',
+						lineEnd: 6,
+						lineStart: 6,
+						name: 'someApi',
+						path: 'test-code.ts',
+						tags: [],
+					},
+				] );
+			} );
+
+			it( 'named identifier with undocumented RestElement', () => {
+				expect(
+					parse( `
+						const { someKey, ...otherKeys } = { someKey: 2, restOne: 1, restTwo: 2 };
+
+						export const someApi = {};
+					` )
+				).toEqual( [
+					{
+						description: 'Undocumented declaration.',
+						lineEnd: 3,
+						lineStart: 3,
+						name: 'someApi',
+						path: 'test-code.ts',
+						tags: [],
+					},
+				] );
+			} );
+
 			it( 'named identifier with destructuring', () =>
 				expect(
 					parse( `
@@ -619,6 +660,64 @@ describe( 'Intermediate Representation', () => {
 					} ),
 				] ) );
 		} );
+	} );
+
+	describe( 'TypeScript function overloads', () => {
+		it( 'extracts description from first overload signature and infers types from the implementation', () =>
+			expect(
+				parse( `
+					/**
+					 * Registers a new block.
+					 * @param blockNameOrMetadata Block type name or its metadata.
+					 * @param settings Block settings.
+					 * @return The block, if registered; otherwise undefined.
+					 */
+					export function registerBlockType( blockNameOrMetadata: object, settings?: object ): object | undefined;
+					export function registerBlockType( blockNameOrMetadata: string, settings: object ): object | undefined;
+					export function registerBlockType( blockNameOrMetadata: string | object, settings?: object ): object | undefined {
+						return undefined;
+					}
+				` )
+			).toEqual( [
+				expect.objectContaining( {
+					description: 'Registers a new block.',
+					name: 'registerBlockType',
+					tags: expect.arrayContaining( [
+						expect.objectContaining( {
+							tag: 'param',
+							name: 'blockNameOrMetadata',
+							type: 'string | object',
+						} ),
+						expect.objectContaining( {
+							tag: 'return',
+							type: 'object | undefined',
+						} ),
+					] ),
+				} ),
+			] ) );
+
+		it( 'extracts JSDoc from non-exported overload signatures exported via export { }', () =>
+			expect(
+				parse( `
+					/**
+					 * My overloaded function.
+					 * @param a The argument.
+					 * @return The result.
+					 */
+					function myDeclaration( a: string ): string;
+					function myDeclaration( a: number ): number;
+					function myDeclaration( a: string | number ): string | number {
+						return a;
+					}
+
+					export { myDeclaration };
+				` )
+			).toEqual( [
+				expect.objectContaining( {
+					description: 'My overloaded function.',
+					name: 'myDeclaration',
+				} ),
+			] ) );
 	} );
 
 	describe( 'JSDoc in module dependency through import', () => {

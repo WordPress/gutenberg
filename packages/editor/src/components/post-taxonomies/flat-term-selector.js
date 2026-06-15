@@ -4,10 +4,12 @@
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { FormTokenField, withFilters } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDebounce } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -25,9 +27,12 @@ import MostUsedTerms from './most-used-terms';
 const EMPTY_ARRAY = [];
 
 /**
- * Module constants
+ * How the max suggestions limit was chosen:
+ *  - Matches the `per_page` range set by the REST API.
+ *  - Can't use "unbound" query. The `FormTokenField` needs a fixed number.
+ *  - Matches default for `FormTokenField`.
  */
-const MAX_TERMS_SUGGESTIONS = 20;
+const MAX_TERMS_SUGGESTIONS = 100;
 const DEFAULT_QUERY = {
 	per_page: MAX_TERMS_SUGGESTIONS,
 	_fields: 'id,name',
@@ -39,12 +44,23 @@ const isSameTermName = ( termA, termB ) =>
 	unescapeString( termB ).toLowerCase();
 
 const termNamesToIds = ( names, terms ) => {
-	return names.map(
-		( termName ) =>
-			terms.find( ( term ) => isSameTermName( term.name, termName ) ).id
-	);
+	return names
+		.map(
+			( termName ) =>
+				terms.find( ( term ) => isSameTermName( term.name, termName ) )
+					?.id
+		)
+		.filter( ( id ) => id !== undefined );
 };
 
+/**
+ * Renders a flat term selector component.
+ *
+ * @param {Object} props      The component props.
+ * @param {string} props.slug The slug of the taxonomy.
+ *
+ * @return {React.ReactNode} The rendered flat term selector component.
+ */
 export function FlatTermSelector( { slug } ) {
 	const [ values, setValues ] = useState( [] );
 	const [ search, setSearch ] = useState( '' );
@@ -61,17 +77,17 @@ export function FlatTermSelector( { slug } ) {
 		( select ) => {
 			const { getCurrentPost, getEditedPostAttribute } =
 				select( editorStore );
-			const { getEntityRecords, getTaxonomy, hasFinishedResolution } =
+			const { getEntityRecords, getEntityRecord, hasFinishedResolution } =
 				select( coreStore );
 			const post = getCurrentPost();
-			const _taxonomy = getTaxonomy( slug );
+			const _taxonomy = getEntityRecord( 'root', 'taxonomy', slug );
 			const _termIds = _taxonomy
 				? getEditedPostAttribute( _taxonomy.rest_base )
 				: EMPTY_ARRAY;
 
 			const query = {
 				...DEFAULT_QUERY,
-				include: _termIds.join( ',' ),
+				include: _termIds?.join( ',' ),
 				per_page: -1,
 			};
 
@@ -88,7 +104,7 @@ export function FlatTermSelector( { slug } ) {
 					: false,
 				taxonomy: _taxonomy,
 				termIds: _termIds,
-				terms: _termIds.length
+				terms: _termIds?.length
 					? getEntityRecords( 'taxonomy', slug, query )
 					: EMPTY_ARRAY,
 				hasResolvedTerms: hasFinishedResolution( 'getEntityRecords', [
@@ -138,6 +154,7 @@ export function FlatTermSelector( { slug } ) {
 
 	const { editPost } = useDispatch( editorStore );
 	const { saveEntityRecord } = useDispatch( coreStore );
+	const { createErrorNotice } = useDispatch( noticesStore );
 
 	if ( ! hasAssignAction ) {
 		return null;
@@ -191,9 +208,8 @@ export function FlatTermSelector( { slug } ) {
 		setValues( uniqueTerms );
 
 		if ( newTermNames.length === 0 ) {
-			return onUpdateTerms(
-				termNamesToIds( uniqueTerms, availableTerms )
-			);
+			onUpdateTerms( termNamesToIds( uniqueTerms, availableTerms ) );
+			return;
 		}
 
 		if ( ! hasCreateAction ) {
@@ -204,12 +220,21 @@ export function FlatTermSelector( { slug } ) {
 			newTermNames.map( ( termName ) =>
 				findOrCreateTerm( { name: termName } )
 			)
-		).then( ( newTerms ) => {
-			const newAvailableTerms = availableTerms.concat( newTerms );
-			return onUpdateTerms(
-				termNamesToIds( uniqueTerms, newAvailableTerms )
-			);
-		} );
+		)
+			.then( ( newTerms ) => {
+				const newAvailableTerms = availableTerms.concat( newTerms );
+				onUpdateTerms(
+					termNamesToIds( uniqueTerms, newAvailableTerms )
+				);
+			} )
+			.catch( ( error ) => {
+				createErrorNotice( error.message, {
+					type: 'snackbar',
+				} );
+				// In case of a failure, try assigning available terms.
+				// This will invalidate the optimistic update.
+				onUpdateTerms( termNamesToIds( uniqueTerms, availableTerms ) );
+			} );
 	}
 
 	function appendTerm( newTerm ) {
@@ -231,7 +256,7 @@ export function FlatTermSelector( { slug } ) {
 
 	const newTermLabel =
 		taxonomy?.labels?.add_new_item ??
-		( slug === 'post_tag' ? __( 'Add new tag' ) : __( 'Add new Term' ) );
+		( slug === 'post_tag' ? __( 'Add Tag' ) : __( 'Add Term' ) );
 	const singularName =
 		taxonomy?.labels?.singular_name ??
 		( slug === 'post_tag' ? __( 'Tag' ) : __( 'Term' ) );
@@ -252,8 +277,9 @@ export function FlatTermSelector( { slug } ) {
 	);
 
 	return (
-		<>
+		<Stack direction="column" gap="lg">
 			<FormTokenField
+				__next40pxDefaultSize
 				value={ values }
 				suggestions={ suggestions }
 				onChange={ onChange }
@@ -267,7 +293,7 @@ export function FlatTermSelector( { slug } ) {
 				} }
 			/>
 			<MostUsedTerms taxonomy={ taxonomy } onSelect={ appendTerm } />
-		</>
+		</Stack>
 	);
 }
 

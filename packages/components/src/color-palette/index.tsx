@@ -5,11 +5,12 @@ import type { ForwardedRef } from 'react';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
+import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useMemo, useState, forwardRef } from '@wordpress/element';
 
@@ -18,7 +19,9 @@ import { useCallback, useMemo, useState, forwardRef } from '@wordpress/element';
  */
 import Dropdown from '../dropdown';
 import { ColorPicker } from '../color-picker';
-import CircularOptionPicker from '../circular-option-picker';
+import CircularOptionPicker, {
+	getComputeCircularOptionPickerCommonProps,
+} from '../circular-option-picker';
 import { VStack } from '../v-stack';
 import { Truncate } from '../truncate';
 import { ColorHeading } from './styles';
@@ -31,7 +34,7 @@ import type {
 	PaletteObject,
 	SinglePaletteProps,
 } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import type { DropdownProps } from '../dropdown/types';
 import {
 	extractColorNameFromCurrentValue,
@@ -47,16 +50,25 @@ function SinglePalette( {
 	colors,
 	onChange,
 	value,
-	actions,
+	selectedSlug,
+	...additionalProps
 }: SinglePaletteProps ) {
 	const colorOptions = useMemo( () => {
-		return colors.map( ( { color, name }, index ) => {
+		return colors.map( ( { color, name, slug }, index ) => {
 			const colordColor = colord( color );
-			const isSelected = value === color;
+			// When a non-empty selectedSlug is provided, selection is decided
+			// strictly by slug — entries without a slug or with a different slug
+			// are not selected, even when their color value matches `value`.
+			// This correctly handles mixed palettes where some entries have slugs
+			// and others don't. Fall back to color value matching otherwise
+			// (including when selectedSlug is an empty string).
+			const isSelected = selectedSlug
+				? slug === selectedSlug
+				: value === color;
 
 			return (
 				<CircularOptionPicker.Option
-					key={ `${ color }-${ index }` }
+					key={ slug ?? `${ color }-${ index }` }
 					isSelected={ isSelected }
 					selectedIconProps={
 						isSelected
@@ -76,25 +88,20 @@ function SinglePalette( {
 					}
 					style={ { backgroundColor: color, color } }
 					onClick={
-						isSelected ? clearColor : () => onChange( color, index )
-					}
-					aria-label={
-						name
-							? // translators: %s: The name of the color e.g: "vivid red".
-							  sprintf( __( 'Color: %s' ), name )
-							: // translators: %s: color hex code e.g: "#f00".
-							  sprintf( __( 'Color code: %s' ), color )
+						isSelected
+							? clearColor
+							: () => onChange( color, index, slug )
 					}
 				/>
 			);
 		} );
-	}, [ colors, value, onChange, clearColor ] );
+	}, [ colors, value, selectedSlug, onChange, clearColor ] );
 
 	return (
-		<CircularOptionPicker
+		<CircularOptionPicker.OptionGroup
 			className={ className }
 			options={ colorOptions }
-			actions={ actions }
+			{ ...additionalProps }
 		/>
 	);
 }
@@ -105,9 +112,11 @@ function MultiplePalettes( {
 	colors,
 	onChange,
 	value,
-	actions,
+	selectedSlug,
 	headingLevel,
 }: MultiplePalettesProps ) {
+	const instanceId = useInstanceId( MultiplePalettes, 'color-palette' );
+
 	if ( colors.length === 0 ) {
 		return null;
 	}
@@ -115,21 +124,21 @@ function MultiplePalettes( {
 	return (
 		<VStack spacing={ 3 } className={ className }>
 			{ colors.map( ( { name, colors: colorPalette }, index ) => {
+				const id = `${ instanceId }-${ index }`;
 				return (
 					<VStack spacing={ 2 } key={ index }>
-						<ColorHeading level={ headingLevel }>
+						<ColorHeading id={ id } level={ headingLevel }>
 							{ name }
 						</ColorHeading>
 						<SinglePalette
 							clearColor={ clearColor }
 							colors={ colorPalette }
-							onChange={ ( newColor ) =>
-								onChange( newColor, index )
+							onChange={ ( newColor, _colorIndex, slug ) =>
+								onChange( newColor, index, slug )
 							}
 							value={ value }
-							actions={
-								colors.length === index + 1 ? actions : null
-							}
+							selectedSlug={ selectedSlug }
+							aria-labelledby={ id }
 						/>
 					</VStack>
 				);
@@ -146,6 +155,10 @@ export function CustomColorPickerDropdown( {
 	const popoverProps = useMemo< DropdownProps[ 'popoverProps' ] >(
 		() => ( {
 			shift: true,
+			// Disabling resize as it would otherwise cause the popover to show
+			// scrollbars while dragging the color picker's handle close to the
+			// popover edge.
+			resize: false,
 			...( isRenderedInSidebar
 				? {
 						// When in the sidebar: open to the left (stacking),
@@ -177,15 +190,20 @@ function UnforwardedColorPalette(
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {
+		asButtons,
+		loop,
 		clearable = true,
 		colors = [],
 		disableCustomColors = false,
 		enableAlpha = false,
 		onChange,
 		value,
+		selectedSlug,
 		__experimentalIsRenderedInSidebar = false,
 		headingLevel = 2,
-		...otherProps
+		'aria-label': ariaLabel,
+		'aria-labelledby': ariaLabelledby,
+		...additionalProps
 	} = props;
 	const [ normalizedColorValue, setNormalizedColorValue ] = useState( value );
 
@@ -204,9 +222,10 @@ function UnforwardedColorPalette(
 			extractColorNameFromCurrentValue(
 				value,
 				colors,
-				hasMultipleColorOrigins
+				hasMultipleColorOrigins,
+				selectedSlug
 			),
-		[ value, colors, hasMultipleColorOrigins ]
+		[ value, colors, hasMultipleColorOrigins, selectedSlug ]
 	);
 
 	const renderCustomColorPicker = () => (
@@ -224,30 +243,46 @@ function UnforwardedColorPalette(
 	const displayValue = value?.replace( /^var\((.+)\)$/, '$1' );
 	const customColorAccessibleLabel = !! displayValue
 		? sprintf(
-				// translators: %1$s: The name of the color e.g: "vivid red". %2$s: The color's hex code e.g: "#f00".
+				// translators: 1: The name of the color e.g: "vivid red". 2: The color's hex code e.g: "#f00".
 				__(
 					'Custom color picker. The currently selected color is called "%1$s" and has a value of "%2$s".'
 				),
 				buttonLabelName,
 				displayValue
 		  )
-		: __( 'Custom color picker.' );
+		: __( 'Custom color picker' );
 
 	const paletteCommonProps = {
-		clearable,
 		clearColor,
 		onChange,
 		value,
-		actions: !! clearable && (
-			<CircularOptionPicker.ButtonAction onClick={ clearColor }>
-				{ __( 'Clear' ) }
-			</CircularOptionPicker.ButtonAction>
-		),
-		headingLevel,
+		selectedSlug,
 	};
 
+	const actions = !! clearable && (
+		<CircularOptionPicker.ButtonAction
+			onClick={ clearColor }
+			accessibleWhenDisabled
+			disabled={ ! value }
+		>
+			{ __( 'Clear' ) }
+		</CircularOptionPicker.ButtonAction>
+	);
+
+	const { metaProps, labelProps } = getComputeCircularOptionPickerCommonProps(
+		asButtons,
+		loop,
+		ariaLabel,
+		ariaLabelledby
+	);
+
+	// If disableCustomColors is true and colors.length is 0, return null to avoid rendering an empty palette wrapper.
+	if ( disableCustomColors && colors.length === 0 && ! actions ) {
+		return null;
+	}
+
 	return (
-		<VStack spacing={ 3 } ref={ forwardedRef } { ...otherProps }>
+		<VStack spacing={ 3 } ref={ forwardedRef } { ...additionalProps }>
 			{ ! disableCustomColors && (
 				<CustomColorPickerDropdown
 					isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
@@ -267,6 +302,7 @@ function UnforwardedColorPalette(
 								style={ {
 									background: value,
 								} }
+								type="button"
 							/>
 							<VStack
 								className="components-color-palette__custom-color-text-wrapper"
@@ -275,7 +311,7 @@ function UnforwardedColorPalette(
 								<Truncate className="components-color-palette__custom-color-name">
 									{ value
 										? buttonLabelName
-										: 'No color selected' }
+										: __( 'No color selected' ) }
 								</Truncate>
 								{ /*
 								This `Truncate` is always rendered, even if
@@ -283,7 +319,7 @@ function UnforwardedColorPalette(
 								does not shift
 								*/ }
 								<Truncate
-									className={ classnames(
+									className={ clsx(
 										'components-color-palette__custom-color-value',
 										{
 											'components-color-palette__custom-color-value--is-hex':
@@ -298,15 +334,27 @@ function UnforwardedColorPalette(
 					) }
 				/>
 			) }
-			{ hasMultipleColorOrigins ? (
-				<MultiplePalettes
-					{ ...paletteCommonProps }
-					colors={ colors as PaletteObject[] }
-				/>
-			) : (
-				<SinglePalette
-					{ ...paletteCommonProps }
-					colors={ colors as ColorObject[] }
+			{ ( colors.length > 0 || actions ) && (
+				<CircularOptionPicker
+					{ ...metaProps }
+					{ ...labelProps }
+					actions={ actions }
+					options={
+						hasMultipleColorOrigins ? (
+							<MultiplePalettes
+								{ ...paletteCommonProps }
+								headingLevel={ headingLevel }
+								colors={ colors as PaletteObject[] }
+								value={ value }
+							/>
+						) : (
+							<SinglePalette
+								{ ...paletteCommonProps }
+								colors={ colors as ColorObject[] }
+								value={ value }
+							/>
+						)
+					}
 				/>
 			) }
 		</VStack>
@@ -338,5 +386,6 @@ function UnforwardedColorPalette(
  * ```
  */
 export const ColorPalette = forwardRef( UnforwardedColorPalette );
+ColorPalette.displayName = 'ColorPalette';
 
 export default ColorPalette;

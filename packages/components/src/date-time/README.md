@@ -15,8 +15,8 @@ Date pickers should:
 Render a DateTimePicker.
 
 ```jsx
+import { useState } from 'react';
 import { DateTimePicker } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MyDateTimePicker = () => {
 	const [ date, setDate ] = useState( new Date() );
@@ -56,13 +56,21 @@ Whether we use a 12-hour clock. With a 12-hour clock, an AM/PM widget is display
 -   Required: No
 -   Default: false
 
+### `dateOrder`: `'dmy' | 'mdy' | 'ymd'`
+
+The order of day, month, and year. This prop overrides the time format determined by `is12Hour` prop.
+
+-   Type: `string`
+-   Required: No
+-   Default: `'dmy'`
+
 ### `isInvalidDate`: `( date: Date ) => boolean`
 
 A callback function which receives a Date object representing a day as an argument, and should return a Boolean to signify if the day is valid or not.
 
 -   Required: No
 
-### `onMonthPreviewed`: `( date: Date ) => void`
+### `onMonthPreviewed`: `( date: string ) => void`
 
 A callback invoked when selecting the previous/next month in the date picker. The callback receives the new month date in the ISO format as an argument.
 
@@ -79,5 +87,5 @@ List of events to show in the date picker. Each event will appear as a dot on th
 
 The day that the week should start on. 0 for Sunday, 1 for Monday, etc.
 
-- Required: No
-- Default: 0
+-   Required: No
+-   Default: 0

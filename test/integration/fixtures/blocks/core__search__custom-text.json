@@ -9,9 +9,7 @@
 			"buttonText": "Custom button text",
 			"buttonPosition": "button-outside",
 			"buttonUseIcon": false,
-			"query": {},
-			"buttonBehavior": "expand-searchfield",
-			"isSearchFieldHidden": false
+			"query": {}
 		},
 		"innerBlocks": []
 	}

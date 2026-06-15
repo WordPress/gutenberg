@@ -1,7 +1,7 @@
 .wp-block-read-more {
 	display: block;
 	width: fit-content;
-	&:not([style*="text-decoration"]) {
+	&:where(:not([style*="text-decoration"])) {
 		text-decoration: none;
 
 		&:focus,

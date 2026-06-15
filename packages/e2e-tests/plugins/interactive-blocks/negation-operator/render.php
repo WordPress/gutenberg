@@ -4,9 +4,9 @@
  *
  * @package gutenberg-test-interactive-blocks
  */
-
 ?>
-<div data-wp-interactive>
+
+<div data-wp-interactive="negation-operator">
 	<button
 		data-wp-on--click="actions.toggle"
 		data-testid="toggle active value"
@@ -20,7 +20,7 @@
 	></div>
 
 	<div
-		data-wp-bind--hidden="!selectors.active"
+		data-wp-bind--hidden="!state.isActive"
 		data-testid="add hidden attribute if selector is not active"
 	></div>
 </div>

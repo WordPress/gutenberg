@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type { ChangeEvent, ForwardedRef } from 'react';
 
 /**
@@ -12,7 +12,7 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import { UnitSelect, UnitLabel } from './styles/unit-control-styles';
 import { CSS_UNITS, hasUnits } from './utils';
 import type { UnitSelectControlProps } from './types';
@@ -47,7 +47,7 @@ function UnitSelectControl(
 		onChange?.( unitValue, { event, data } );
 	};
 
-	const classes = classnames( 'components-unit-control__select', className );
+	const classes = clsx( 'components-unit-control__select', className );
 
 	return (
 		<UnitSelect

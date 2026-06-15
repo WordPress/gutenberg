@@ -1,112 +1,125 @@
-.edit-post-layout__metaboxes {
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.edit-post-meta-boxes-main {
+	filter: drop-shadow(0 -1px rgba($color: #000, $alpha: 0.133)); // 0.133 = $gray-200 but with alpha.
+	// Windows High Contrast mode will show this outline, but not the shadow.
+	outline: 1px solid transparent;
+	background-color: $white;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+}
+
+.edit-post-meta-boxes-main__presenter {
 	flex-shrink: 0;
+	display: flex;
+	justify-content: center;
+	box-shadow: 0 $border-width $gray-300;
+	// Windows High Contrast mode will show this outline, but not the shadow.
+	outline: 1px solid transparent;
+	position: relative;
+	z-index: 1;
+	height: $button-size-compact;
+	// Enlarge the toggle/resizable hit area on touch devices.
+	@media (pointer: coarse) {
+		height: $button-size;
+	}
+
+	// Style reset for both toggle and separator buttons.
+	> button {
+		appearance: none;
+		padding: 0;
+		border: none;
+		outline: none;
+		background-color: transparent;
+		// Ensure the drag gesture behaves as expected for touch input.
+		touch-action: none;
+	}
+
+	> button[aria-expanded] {
+		cursor: var(--wpds-cursor-control);
+		width: 100%;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding-inline: $grid-unit-30 $grid-unit-15;
+
+		&:is(:hover, :focus-visible) {
+			color: var(--wp-admin-theme-color);
+		}
+		&:focus-visible::after {
+			content: "";
+			position: absolute;
+			inset: var(--wp-admin-border-width-focus);
+			@include button-style__focus();
+		}
+		> svg {
+			fill: currentColor;
+		}
+	}
+
+	// This button is only present when resizable.
+	> button[role="separator"] {
+		cursor: row-resize;
+		position: absolute;
+		width: $grid-unit-80;
+		height: inherit;
+
+		&::before {
+			content: "";
+			background-color: $gray-300;
+			// Windows High Contrast mode will show this outline, but not the background-color.
+			outline: 2px solid transparent;
+			outline-offset: -2px;
+			position: absolute;
+			inset-block: calc(50% - #{$grid-unit-05} / 2) auto;
+			transform: translateX(-50%);
+			width: inherit;
+			height: $grid-unit-05;
+			border-radius: $radius-small;
+			@media not (prefers-reduced-motion) {
+				transition: width 0.3s ease-out;
+			}
+		}
+
+		&:is(:hover, :focus)::before {
+			background-color: var(--wp-admin-theme-color);
+			width: $grid-unit-80 + $grid-unit-20;
+		}
+	}
+}
+
+.edit-post-meta-boxes-main__liner {
+	// Enable scrolling only for the split view.
+	.edit-post-meta-boxes-main & {
+		overflow: auto;
+	}
+	// Keep the contents behind the resize handle.
+	isolation: isolate;
+
+	// While resizing override hidden attribute in case starting from closed state.
+	.is-resizing.edit-post-meta-boxes-main & {
+		display: unset;
+	}
+}
+
+// In case the canvas is not iframe’d.
+.edit-post-layout__metaboxes {
 	clear: both;
 }
 
-// Adjust the position of the notices
-.edit-post-layout .components-editor-notices__snackbar {
-	position: fixed;
-	right: 0;
-	bottom: 40px;
-	padding-left: 16px;
-	padding-right: 16px;
+// Only when the split view is active the visual editor should allow shrinking,
+// its main size should be zero, and overflow should be hidden so that the inner
+// container provides the scrollable viewport.
+.has-metaboxes .interface-interface-skeleton__content:has(.edit-post-meta-boxes-main) .editor-visual-editor {
+	flex-shrink: 1;
+	flex-basis: 0%;
+	overflow: hidden;
+	isolation: isolate;
 }
 
-.is-distraction-free {
-	.components-editor-notices__snackbar {
-		bottom: 20px;
-	}
-}
-
-@include editor-left(".edit-post-layout .components-editor-notices__snackbar");
-
-.edit-post-layout .editor-post-publish-panel {
-	position: fixed;
-	z-index: z-index(".edit-post-layout .edit-post-post-publish-panel");
-	top: $admin-bar-height-big;
-	bottom: 0;
-	right: 0;
-	left: 0;
-	overflow: auto;
-
-	@include break-medium() {
-		z-index: z-index(".edit-post-layout .edit-post-post-publish-panel {greater than small}");
-		top: $admin-bar-height;
-		left: auto;
-		width: $sidebar-width + $border-width;
-		border-left: $border-width solid $gray-300;
-		transform: translateX(+100%);
-		animation: edit-post-post-publish-panel__slide-in-animation 0.1s forwards;
-		@include reduce-motion("animation");
-
-		body.is-fullscreen-mode & {
-			top: 0;
-		}
-
-		// Keep it open on focus to avoid conflict with navigate-regions animation.
-		[role="region"]:focus & {
-			transform: translateX(0%);
-		}
-	}
-}
-
-@keyframes edit-post-post-publish-panel__slide-in-animation {
-	100% {
-		transform: translateX(0%);
-	}
-}
-
-.edit-post-layout .editor-post-publish-panel__header-publish-button {
-	justify-content: center;
-}
-
-.edit-post-layout__toggle-publish-panel,
-.edit-post-layout__toggle-sidebar-panel,
-.edit-post-layout__toggle-entities-saved-states-panel {
-	z-index: z-index(".edit-post-layout__toggle-sidebar-panel");
-	position: fixed !important; // Need to override the default relative positionning
-	top: -9999em;
-	bottom: auto;
-	left: auto;
-	right: 0;
-	box-sizing: border-box;
-	width: $sidebar-width;
-	background-color: $white;
-	border: 1px dotted $gray-300;
-	height: auto !important; // Need to override the default sidebar positionnings
-	padding: $grid-unit-30;
-	display: flex;
-	justify-content: center;
-}
-
-.edit-post-layout__toggle-sidebar-panel {
-	.interface-interface-skeleton__sidebar:focus &,
-	.interface-interface-skeleton__sidebar:focus-within & {
-		top: auto;
-		bottom: 0;
-	}
-}
-
-.edit-post-layout__toggle-entities-saved-states-panel,
-.edit-post-layout__toggle-publish-panel {
-	.interface-interface-skeleton__actions:focus &,
-	.interface-interface-skeleton__actions:focus-within & {
-		top: auto;
-		bottom: 0;
-	}
-}
-
-.edit-post-layout .entities-saved-states__panel-header {
-	height: $header-height + $border-width;
-}
-
-.edit-post-layout.has-fixed-toolbar {
-	// making the header be lower than the content
-	// so the fixed toolbar can be positioned on top of it
-	// but only on desktop
-	@include break-medium() {
-		.interface-interface-skeleton__header:not(:focus-within) {
-			z-index: 19;
-		}
-	}
+.edit-post-layout__snackbar {
+	@include snackbar-container();
 }

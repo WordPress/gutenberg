@@ -4,8 +4,9 @@
 import { __unsafe_useEmotionCache as useEmotionCache } from '@emotion/react';
 import type { SerializedStyles } from '@emotion/serialize';
 import { insertStyles } from '@emotion/utils';
+import type { ClassNamesArg } from '@emotion/css/create-instance';
 // eslint-disable-next-line no-restricted-imports
-import { cx as innerCx, ClassNamesArg } from '@emotion/css';
+import { cx as innerCx } from '@emotion/css';
 
 /**
  * WordPress dependencies
@@ -23,7 +24,7 @@ const isSerializedStyles = ( o: any ): o is SerializedStyles =>
  * `cx` normally knows how to handle. It also hooks into the Emotion
  * Cache, allowing `css` calls to work inside iframes.
  *
- * @example
+ * ```jsx
  * import { css } from '@emotion/react';
  *
  * const styles = css`
@@ -37,6 +38,7 @@ const isSerializedStyles = ( o: any ): o is SerializedStyles =>
  *
  * 	return <span className={classes} {...props} />;
  * }
+ * ```
  */
 export const useCx = () => {
 	const cache = useEmotionCache();

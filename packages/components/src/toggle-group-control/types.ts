@@ -1,14 +1,13 @@
 /**
  * External dependencies
  */
-import type { MutableRefObject, ReactNode, ReactText } from 'react';
-// eslint-disable-next-line no-restricted-imports
-import type { RadioStateReturn } from 'reakit';
+import type { ReactNode } from 'react';
 
 /**
  * Internal dependencies
  */
 import type { BaseControlProps } from '../base-control/types';
+import type { TooltipProps } from '../tooltip/types';
 
 export type ToggleGroupControlOptionBaseProps = {
 	children: ReactNode;
@@ -18,7 +17,7 @@ export type ToggleGroupControlOptionBaseProps = {
 	 * @default false
 	 */
 	isIcon?: boolean;
-	value: ReactText;
+	value: string | number;
 	/**
 	 * Whether to display a Tooltip for the control option. If set to `true`, the tooltip will
 	 * show the aria-label or the label prop text.
@@ -36,7 +35,7 @@ export type ToggleGroupControlOptionIconProps = Pick<
 	 * Icon displayed as the content of the option. Usually one of the icons from
 	 * the `@wordpress/icons` package, or a custom React `<svg>` icon.
 	 */
-	icon: JSX.Element;
+	icon: React.JSX.Element;
 	/**
 	 * The text to accessibly label the icon option. Will also be shown in a tooltip.
 	 */
@@ -58,7 +57,7 @@ export type WithToolTipProps = {
 	/**
 	 * React children
 	 */
-	children: ReactNode;
+	children: TooltipProps[ 'children' ];
 	/**
 	 * Label for the Tooltip component.
 	 */
@@ -73,7 +72,7 @@ export type WithToolTipProps = {
 
 export type ToggleGroupControlProps = Pick<
 	BaseControlProps,
-	'help' | '__nextHasNoMarginBottom'
+	'__nextHasNoMarginBottom' | 'help'
 > & {
 	/**
 	 * Label for the control.
@@ -107,11 +106,11 @@ export type ToggleGroupControlProps = Pick<
 	/**
 	 * Callback when a segment is selected.
 	 */
-	onChange?: ( value: ReactText | undefined ) => void;
+	onChange?: ( value: string | number | undefined ) => void;
 	/**
 	 * The selected value.
 	 */
-	value?: ReactText;
+	value?: string | number;
 	/**
 	 * The options to render in the `ToggleGroupControl`, using either the `ToggleGroupControlOption` or
 	 * `ToggleGroupControlOptionIcon` components.
@@ -123,35 +122,34 @@ export type ToggleGroupControlProps = Pick<
 	 * @default 'default'
 	 */
 	size?: 'default' | '__unstable-large';
+	/**
+	 * Start opting into the larger default height that will become the default size in a future version.
+	 *
+	 * @default false
+	 */
+	__next40pxDefaultSize?: boolean;
+	/**
+	 * Do not throw a warning for the deprecated 36px default size.
+	 * For internal components of other components that already throw the warning.
+	 *
+	 * @ignore
+	 */
+	__shouldNotWarnDeprecated36pxSize?: boolean;
 };
 
-type ToggleGroupControlAsRadioContext = {
-	isDeselectable?: false;
-} & RadioStateReturn;
-
-type ToggleGroupControlAsButtonContext = { isDeselectable: true } & Pick<
-	RadioStateReturn,
-	'state' | 'setState'
->;
-
-export type ToggleGroupControlContextProps = Pick<
-	ToggleGroupControlProps,
-	'isBlock' | 'size'
-> & {
+export type ToggleGroupControlContextProps = {
+	activeItemIsNotFirstItem?: () => boolean;
+	isDeselectable?: boolean;
 	baseId: string;
-} & ( ToggleGroupControlAsRadioContext | ToggleGroupControlAsButtonContext );
-
-export type ToggleGroupControlBackdropProps = {
-	containerRef: MutableRefObject< HTMLElement | undefined >;
-	containerWidth?: number | null;
-	isAdaptiveWidth?: boolean;
-	state?: any;
+	isBlock: ToggleGroupControlProps[ 'isBlock' ];
+	size: ToggleGroupControlProps[ 'size' ];
+	value: ToggleGroupControlProps[ 'value' ];
+	setValue: ( newValue: string | number | undefined ) => void;
+	setSelectedElement: ( element: HTMLElement | undefined ) => void;
 };
 
 export type ToggleGroupControlMainControlProps = Pick<
 	ToggleGroupControlProps,
-	'children' | 'isAdaptiveWidth' | 'label' | 'size'
-> & {
-	onChange: ( value: ReactText | undefined ) => void;
-	value?: ReactText;
-};
+	'children' | 'isAdaptiveWidth' | 'label' | 'size' | 'onChange' | 'value'
+> &
+	Pick< ToggleGroupControlContextProps, 'setSelectedElement' >;

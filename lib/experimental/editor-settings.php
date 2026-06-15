@@ -6,90 +6,66 @@
  */
 
 /**
- * Initialize a block-based editor.
- *
- * @param string $editor_name          Editor name.
- * @param string $editor_script_handle Editor script handle.
- * @param array  $settings {
- *      Elements to initialize a block-based editor.
- *
- *      @type array  $preload_paths        Array of paths to preload.
- *      @type string $initializer_name     Editor initialization function name.
- *      @type array  $editor_settings      Editor settings.
- * }
- * @return void
- */
-function gutenberg_initialize_editor( $editor_name, $editor_script_handle, $settings ) {
-
-	$defaults = array(
-		'preload_paths'    => array(),
-		'initializer_name' => 'initialize',
-		'editor_settings'  => array(),
-	);
-
-	$settings = wp_parse_args( $settings, $defaults );
-
-	/**
-	 * Preload common data by specifying an array of REST API paths that will be preloaded.
-	 *
-	 * Filters the array of paths that will be preloaded.
-	 *
-	 * @param string[] $preload_paths Array of paths to preload.
-	 */
-	$preload_paths = apply_filters( "{$editor_name}_preload_paths", $settings['preload_paths'] );
-
-	$preload_data = array_reduce(
-		$preload_paths,
-		'rest_preload_api_request',
-		array()
-	);
-
-	wp_add_inline_script(
-		'wp-api-fetch',
-		sprintf(
-			'wp.apiFetch.use( wp.apiFetch.createPreloadingMiddleware( %s ) );',
-			wp_json_encode( $preload_data )
-		),
-		'after'
-	);
-	wp_add_inline_script(
-		"wp-{$editor_script_handle}",
-		sprintf(
-			'wp.domReady( function() {
-				wp.%s.%s( "%s", %s );
-			} );',
-			lcfirst( str_replace( '-', '', ucwords( $editor_script_handle, '-' ) ) ),
-			$settings['initializer_name'],
-			str_replace( '_', '-', $editor_name ),
-			wp_json_encode( $settings['editor_settings'] )
-		)
-	);
-
-	// Preload server-registered block schemas.
-	wp_add_inline_script(
-		'wp-blocks',
-		'wp.blocks.unstable__bootstrapServerSideBlockDefinitions(' . wp_json_encode( get_block_editor_server_block_settings() ) . ');'
-	);
-}
-
-/**
  * Sets a global JS variable used to trigger the availability of each Gutenberg Experiment.
  */
 function gutenberg_enable_experiments() {
-	$gutenberg_experiments = get_option( 'gutenberg-experiments' );
-	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-zoomed-out-view', $gutenberg_experiments ) ) {
-		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableZoomedOutView = true', 'before' );
-	}
-	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-color-randomizer', $gutenberg_experiments ) ) {
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-color-randomizer' ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableColorRandomizer = true', 'before' );
 	}
-	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-group-grid-variation', $gutenberg_experiments ) ) {
-		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableGroupGridVariation = true', 'before' );
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-grid-interactivity' ) ) {
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableGridInteractivity = true', 'before' );
 	}
-
-	if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
-		wp_add_inline_script( 'wp-block-library', 'window.__experimentalDisableTinymce = true', 'before' );
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-dataviews-media-modal' ) ) {
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalDataViewsMediaModal = true', 'before' );
+	}
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-content-only-inspector-fields' ) ) {
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalContentOnlyInspectorFields = true', 'before' );
+	}
+	if ( gutenberg_is_experiment_enabled( 'active_templates' ) ) {
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalTemplateActivate = true', 'before' );
+	}
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-extensible-site-editor' ) ) {
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalExtensibleSiteEditor = true', 'before' );
+	}
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-dataform-inspector' ) ) {
+		wp_add_inline_script( 'wp-editor', 'window.__experimentalDataFormInspector = true', 'before' );
+	}
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-media-editor' ) ) {
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalMediaEditor = true', 'before' );
+	}
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-dashboard-widgets' ) ) {
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalDashboardWidgets = true', 'before' );
+	}
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-classic-block-deprecation' ) ) {
+		wp_add_inline_script( 'wp-block-library', 'window.__experimentalClassicBlockDeprecation = true', 'before' );
 	}
 }
 
 add_action( 'admin_init', 'gutenberg_enable_experiments' );
+add_action( 'site-editor-v2_init', 'gutenberg_enable_experiments' );
+
+/**
+ * Sets a global JS variable used to trigger the availability of form & input blocks.
+ *
+ * @deprecated 19.0.0 Use gutenberg_enable_block_experiments().
+ */
+function gutenberg_enable_form_input_blocks() {
+	_deprecated_function( __FUNCTION__, 'Gutenberg 19.0.0', 'gutenberg_enable_block_experiments' );
+}
+
+/**
+ * Sets global JS variables used to enable various block experiments.
+ */
+function gutenberg_enable_block_experiments() {
+	// Experimental form blocks.
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-form-blocks' ) ) {
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableFormBlocks = true', 'before' );
+	}
+
+	// General experimental blocks that are not in the default block library.
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-block-experiments' ) ) {
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableBlockExperiments = true', 'before' );
+	}
+}
+
+add_action( 'admin_init', 'gutenberg_enable_block_experiments' );

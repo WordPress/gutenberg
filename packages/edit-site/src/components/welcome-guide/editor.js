@@ -6,6 +6,7 @@ import { Guide } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { createInterpolateElement } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -15,16 +16,18 @@ import WelcomeGuideImage from './image';
 export default function WelcomeGuideEditor() {
 	const { toggle } = useDispatch( preferencesStore );
 
-	const isActive = useSelect(
-		( select ) =>
-			!! select( preferencesStore ).get(
+	const { isActive, isBlockBasedTheme } = useSelect( ( select ) => {
+		return {
+			isActive: !! select( preferencesStore ).get(
 				'core/edit-site',
 				'welcomeGuide'
 			),
-		[]
-	);
+			isBlockBasedTheme:
+				select( coreStore ).getCurrentTheme()?.is_block_theme,
+		};
+	}, [] );
 
-	if ( ! isActive ) {
+	if ( ! isActive || ! isBlockBasedTheme ) {
 		return null;
 	}
 

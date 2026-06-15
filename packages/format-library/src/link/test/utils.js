@@ -17,61 +17,61 @@ describe( 'isValidHref', () => {
 	describe( 'URLs beginning with a protocol', () => {
 		it( 'returns true for valid URLs', () => {
 			expect( isValidHref( 'tel:+123456789' ) ).toBe( true );
-			expect( isValidHref( 'mailto:test@somewhere.com' ) ).toBe( true );
+			expect( isValidHref( 'mailto:test@example.org' ) ).toBe( true );
 			expect( isValidHref( 'file:///c:/WINDOWS/winamp.exe' ) ).toBe(
 				true
 			);
-			expect( isValidHref( 'http://test.com' ) ).toBe( true );
-			expect( isValidHref( 'https://test.com' ) ).toBe( true );
-			expect( isValidHref( 'http://test-with-hyphen.com' ) ).toBe( true );
-			expect( isValidHref( 'http://test.com/' ) ).toBe( true );
-			expect( isValidHref( 'http://test.com#fragment' ) ).toBe( true );
-			expect( isValidHref( 'http://test.com/path#fragment' ) ).toBe(
+			expect( isValidHref( 'http://example.org' ) ).toBe( true );
+			expect( isValidHref( 'https://example.org' ) ).toBe( true );
+			expect( isValidHref( 'http://test-with-hyphen.local' ) ).toBe(
+				true
+			);
+			expect( isValidHref( 'http://example.org/' ) ).toBe( true );
+			expect( isValidHref( 'http://example.org#fragment' ) ).toBe( true );
+			expect( isValidHref( 'http://example.org/path#fragment' ) ).toBe(
 				true
 			);
 			expect(
-				isValidHref( 'http://test.com/with/path/separators' )
+				isValidHref( 'http://example.org/with/path/separators' )
 			).toBe( true );
 			expect(
-				isValidHref( 'http://test.com/with?query=string&params' )
+				isValidHref( 'http://example.org/with?query=string&params' )
 			).toBe( true );
 		} );
 
 		it( 'returns false for invalid urls', () => {
 			expect( isValidHref( 'tel:+12 345 6789' ) ).toBe( false );
-			expect( isValidHref( 'mailto:test @ somewhere.com' ) ).toBe(
-				false
-			);
-			expect( isValidHref( 'mailto: test@somewhere.com' ) ).toBe( false );
+			expect( isValidHref( 'mailto:test @ example.org' ) ).toBe( false );
+			expect( isValidHref( 'mailto: test@example.org' ) ).toBe( false );
 			expect( isValidHref( 'ht#tp://this/is/invalid' ) ).toBe( false );
 			expect( isValidHref( 'ht#tp://th&is/is/invalid' ) ).toBe( false );
-			expect( isValidHref( 'http:/test.com' ) ).toBe( false );
-			expect( isValidHref( 'http://?test.com' ) ).toBe( false );
-			expect( isValidHref( 'http://#test.com' ) ).toBe( false );
-			expect( isValidHref( 'http://test.com?double?params' ) ).toBe(
+			expect( isValidHref( 'http:/example.org' ) ).toBe( false );
+			expect( isValidHref( 'http://?example.org' ) ).toBe( false );
+			expect( isValidHref( 'http://#example.org' ) ).toBe( false );
+			expect( isValidHref( 'http://example.org?double?params' ) ).toBe(
 				false
 			);
-			expect( isValidHref( 'http://test.com#double#anchor' ) ).toBe(
+			expect( isValidHref( 'http://example.org#double#anchor' ) ).toBe(
 				false
 			);
-			expect( isValidHref( 'http://test.com?path/after/params' ) ).toBe(
-				false
-			);
-			expect( isValidHref( 'http://test.com#path/after/fragment' ) ).toBe(
-				false
-			);
+			expect(
+				isValidHref( 'http://example.org?path/after/params' )
+			).toBe( false );
+			expect(
+				isValidHref( 'http://example.org#path/after/fragment' )
+			).toBe( false );
 		} );
 
 		it( 'returns false if the URL has whitespace', () => {
-			expect( isValidHref( 'http:/ /test.com' ) ).toBe( false );
-			expect( isValidHref( 'http://te st.com' ) ).toBe( false );
-			expect( isValidHref( 'http:// test.com' ) ).toBe( false );
-			expect( isValidHref( 'http://test.c om' ) ).toBe( false );
-			expect( isValidHref( 'http://test.com/ee ee/' ) ).toBe( false );
-			expect( isValidHref( 'http://test.com/eeee?qwd qwdw' ) ).toBe(
+			expect( isValidHref( 'http:/ /example.org' ) ).toBe( false );
+			expect( isValidHref( 'http://exam ple.org' ) ).toBe( false );
+			expect( isValidHref( 'http:// example.org' ) ).toBe( false );
+			expect( isValidHref( 'http://example.o rg' ) ).toBe( false );
+			expect( isValidHref( 'http://example.org/ee ee/' ) ).toBe( false );
+			expect( isValidHref( 'http://example.org/eeee?qwd qwdw' ) ).toBe(
 				false
 			);
-			expect( isValidHref( 'http://test.com/eeee#qwd qwdw' ) ).toBe(
+			expect( isValidHref( 'http://example.org/eeee#qwd qwdw' ) ).toBe(
 				false
 			);
 			expect( isValidHref( 'this: is invalid' ) ).toBe( false );
@@ -127,8 +127,8 @@ describe( 'getFormatBoundary', () => {
 			expect(
 				getFormatBoundary( record, { type: 'core/link' } )
 			).toEqual( {
-				start: null,
-				end: null,
+				start: undefined,
+				end: undefined,
 			} );
 		} );
 
@@ -168,8 +168,8 @@ describe( 'getFormatBoundary', () => {
 				expect(
 					getFormatBoundary( record, { type: 'core/link' } )
 				).toEqual( {
-					start: null,
-					end: null,
+					start: undefined,
+					end: undefined,
 				} );
 			}
 		);
@@ -213,8 +213,8 @@ describe( 'getFormatBoundary', () => {
 				expect(
 					getFormatBoundary( record, { type: 'core/link' } )
 				).toEqual( {
-					start: null,
-					end: null,
+					start: undefined,
+					end: undefined,
 				} );
 			}
 		);
@@ -254,7 +254,7 @@ describe( 'getFormatBoundary', () => {
 					getFormatBoundary( record, { type: 'core/link' } )
 				).toEqual( {
 					start: 6,
-					end: 10,
+					end: 11,
 				} );
 			}
 		);
@@ -289,7 +289,7 @@ describe( 'getFormatBoundary', () => {
 				getFormatBoundary( record, { type: 'core/link' } )
 			).toEqual( {
 				start: 6,
-				end: 10,
+				end: 11,
 			} );
 		} );
 	} );
@@ -332,7 +332,7 @@ describe( 'getFormatBoundary', () => {
 					getFormatBoundary( record, { type: 'core/link' } )
 				).toEqual( {
 					start: 6,
-					end: 10,
+					end: 11,
 				} );
 			}
 		);
@@ -381,7 +381,7 @@ describe( 'getFormatBoundary', () => {
 
 		expect( getFormatBoundary( record, { type: 'core/link' } ) ).toEqual( {
 			start: 0,
-			end: 5,
+			end: 6,
 		} );
 	} );
 
@@ -417,7 +417,7 @@ describe( 'getFormatBoundary', () => {
 				getFormatBoundary( record, { type: 'core/bold' } )
 			).toEqual( {
 				start: 4,
-				end: 6,
+				end: 7,
 			} );
 		} );
 	} );
@@ -453,7 +453,7 @@ describe( 'getFormatBoundary', () => {
 			)
 		).toEqual( {
 			start: 0,
-			end: 4,
+			end: 5,
 		} );
 	} );
 } );

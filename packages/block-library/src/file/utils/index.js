@@ -5,12 +5,17 @@
  * @return {boolean} Whether or not the browser supports inline PDFs.
  */
 export const browserSupportsPdfs = () => {
+	// Use native feature detection if available.
+	if ( window.navigator.pdfViewerEnabled ) {
+		return true;
+	}
+
 	// Most mobile devices include "Mobi" in their UA.
 	if ( window.navigator.userAgent.indexOf( 'Mobi' ) > -1 ) {
 		return false;
 	}
 
-	// Android tablets are the noteable exception.
+	// Android tablets are the notable exception.
 	if ( window.navigator.userAgent.indexOf( 'Android' ) > -1 ) {
 		return false;
 	}
@@ -49,23 +54,8 @@ const createActiveXObject = ( type ) => {
 	let ax;
 	try {
 		ax = new window.ActiveXObject( type );
-	} catch ( e ) {
+	} catch {
 		ax = undefined;
 	}
 	return ax;
-};
-
-/**
- * Hides all .wp-block-file__embed elements on the document. This function is only intended
- * to be run on the front-end, it may have weird side effects running in the block editor.
- */
-export const hidePdfEmbedsOnUnsupportedBrowsers = () => {
-	if ( ! browserSupportsPdfs() ) {
-		const embeds = document.getElementsByClassName(
-			'wp-block-file__embed'
-		);
-		Array.from( embeds ).forEach( ( embed ) => {
-			embed.style.display = 'none';
-		} );
-	}
 };

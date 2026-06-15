@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { useMemo, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
@@ -40,13 +40,9 @@ export default function ResizableCoverPopover( {
 	...props
 } ) {
 	const [ isResizing, setIsResizing ] = useState( false );
-	const dimensions = useMemo(
-		() => ( { height, minHeight, width } ),
-		[ minHeight, height, width ]
-	);
 
 	const resizableBoxProps = {
-		className: classnames( className, { 'is-resizing': isResizing } ),
+		className: clsx( className, { 'is-resizing': isResizing } ),
 		enable: RESIZABLE_BOX_ENABLE_OPTION,
 		onResizeStart: ( _event, _direction, elt ) => {
 			onResizeStart( elt.clientHeight );
@@ -75,7 +71,6 @@ export default function ResizableCoverPopover( {
 	return (
 		<ResizableBoxPopover
 			className="block-library-cover__resizable-box-popover"
-			__unstableRefreshSize={ dimensions }
 			resizableBoxProps={ resizableBoxProps }
 			{ ...props }
 		/>

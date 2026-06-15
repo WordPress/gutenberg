@@ -4,13 +4,11 @@
 // See https://babeljs.io/docs/en/babel-types.
 const { types: babelTypes } = require( '@babel/core' );
 
-/* eslint-disable jsdoc/valid-types */
 /** @typedef {ReturnType<import('comment-parser').parse>[0]} CommentBlock */
 /** @typedef {CommentBlock['tags'][0]} CommentTag */
 /** @typedef {babelTypes.TSType} TypeAnnotation */
 /** @typedef {babelTypes.TSCallSignatureDeclaration | babelTypes.TSFunctionType | babelTypes.TSConstructSignatureDeclaration} ExtendedTypeAnnotation */
 /** @typedef {import('@babel/core').Node} ASTNode */
-/* eslint-enable jsdoc/valid-types */
 
 /**
  * @param {ExtendedTypeAnnotation} typeAnnotation
@@ -237,16 +235,20 @@ function getMappedTypeAnnotation( typeAnnotation ) {
  * @param {babelTypes.TSTypeReference} typeAnnotation
  */
 function getTypeReferenceTypeAnnotation( typeAnnotation ) {
-	if ( ! typeAnnotation.typeParameters ) {
-		if ( babelTypes.isTSQualifiedName( typeAnnotation.typeName ) ) {
-			return unifyQualifiedName( typeAnnotation.typeName );
-		}
-		return typeAnnotation.typeName.name;
+	let typeName;
+	if ( babelTypes.isTSQualifiedName( typeAnnotation.typeName ) ) {
+		typeName = unifyQualifiedName( typeAnnotation.typeName );
+	} else {
+		typeName = typeAnnotation.typeName.name;
 	}
-	const typeParams = typeAnnotation.typeParameters.params
-		.map( getTypeAnnotation )
-		.join( ', ' );
-	return `${ typeAnnotation.typeName.name }< ${ typeParams } >`;
+
+	if ( typeAnnotation.typeParameters ) {
+		const typeParams = typeAnnotation.typeParameters.params
+			.map( getTypeAnnotation )
+			.join( ', ' );
+		typeName = `${ typeName }< ${ typeParams } >`;
+	}
+	return typeName;
 }
 
 /**
@@ -390,14 +392,22 @@ function getTypeAnnotation( typeAnnotation ) {
  * with their descriptions in the JSDoc comments.
  *
  * If we find more wrapper functions on selectors we should add them below following the
- * example of `createSelector` and `createRegsitrySelector`.
+ * example of `createSelector` and `createRegistrySelector`.
  *
  * @param {ASTNode} token Contains either a function or a call to a function-wrapper.
  *
  *                        TODO: Remove the special-casing here once we're able to infer the types from TypeScript itself.
  */
 function unwrapWrappedSelectors( token ) {
+	if ( babelTypes.isTSDeclareFunction( token ) ) {
+		return token;
+	}
+
 	if ( babelTypes.isFunctionDeclaration( token ) ) {
+		return token;
+	}
+
+	if ( babelTypes.isFunctionExpression( token ) ) {
 		return token;
 	}
 
@@ -429,7 +439,7 @@ function unwrapWrappedSelectors( token ) {
 
 /**
  * @param {ASTNode} token
- * @return {babelTypes.ArrowFunctionExpression | babelTypes.FunctionDeclaration} The function token.
+ * @return {babelTypes.ArrowFunctionExpression | babelTypes.FunctionDeclaration | babelTypes.FunctionExpression} The function token.
  */
 function getFunctionToken( token ) {
 	let resolvedToken = token;
@@ -513,8 +523,7 @@ function getQualifiedObjectPatternTypeAnnotation( tag, paramType ) {
 function getParamTypeAnnotation( tag, declarationToken, paramIndex ) {
 	const functionToken = getFunctionToken( declarationToken );
 
-	// Otherwise find the corresponding parameter token for the documented parameter.
-	let paramToken = functionToken.params[ paramIndex ];
+	let paramToken = functionToken?.params[ paramIndex ];
 
 	// This shouldn't happen due to our ESLint enforcing correctly documented parameter names but just in case
 	// we'll give a descriptive error so that it's easy to diagnose the issue.
@@ -589,7 +598,7 @@ function getVariableTypeAnnotation( declarationToken ) {
 
 	try {
 		return getTypeAnnotation( resolvedToken.typeAnnotation.typeAnnotation );
-	} catch ( e ) {
+	} catch {
 		// Assume it's a fully undocumented variable, there's nothing we can do about that but fail silently.
 	}
 }

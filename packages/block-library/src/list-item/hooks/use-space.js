@@ -1,8 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { useRefEffect } from '@wordpress/compose';
-import { SPACE } from '@wordpress/keycodes';
+import {
+	useRefEffect,
+	privateApis as composePrivateApis,
+} from '@wordpress/compose';
+import { SPACE, TAB } from '@wordpress/keycodes';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 
@@ -10,11 +13,16 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import useIndentListItem from './use-indent-list-item';
+import useOutdentListItem from './use-outdent-list-item';
+import { unlock } from '../../lock-unlock';
+
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 export default function useSpace( clientId ) {
-	const { getSelectionStart, getSelectionEnd } =
+	const { getSelectionStart, getSelectionEnd, getBlockIndex } =
 		useSelect( blockEditorStore );
-	const [ canIndent, indentListItem ] = useIndentListItem( clientId );
+	const indentListItem = useIndentListItem( clientId );
+	const outdentListItem = useOutdentListItem();
 
 	return useRefEffect(
 		( element ) => {
@@ -23,10 +31,8 @@ export default function useSpace( clientId ) {
 
 				if (
 					event.defaultPrevented ||
-					! canIndent ||
-					keyCode !== SPACE ||
+					( keyCode !== SPACE && keyCode !== TAB ) ||
 					// Only override when no modifiers are pressed.
-					shiftKey ||
 					altKey ||
 					metaKey ||
 					ctrlKey
@@ -40,16 +46,30 @@ export default function useSpace( clientId ) {
 					selectionStart.offset === 0 &&
 					selectionEnd.offset === 0
 				) {
-					event.preventDefault();
-					indentListItem();
+					if ( shiftKey ) {
+						// Note that backspace behaviour in defined in onMerge.
+						if ( keyCode === TAB ) {
+							if ( outdentListItem() ) {
+								event.preventDefault();
+							}
+						}
+					} else if ( getBlockIndex( clientId ) !== 0 ) {
+						if ( indentListItem() ) {
+							event.preventDefault();
+						}
+					}
 				}
 			}
 
-			element.addEventListener( 'keydown', onKeyDown );
-			return () => {
-				element.removeEventListener( 'keydown', onKeyDown );
-			};
+			// Capture phase so we run before writing-flow's ancestor-bubble
+			// keydown handlers that gate on `event.defaultPrevented`.
+			return subscribeDelegatedListener(
+				element,
+				'keydown',
+				onKeyDown,
+				true
+			);
 		},
-		[ canIndent, indentListItem ]
+		[ clientId, indentListItem ]
 	);
 }

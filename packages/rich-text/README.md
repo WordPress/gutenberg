@@ -151,7 +151,7 @@ _Returns_
 
 ### create
 
-Create a RichText value from an `Element` tree (DOM), an HTML string or a plain text string, with optionally a `Range` object to set the selection. If called without any input, an empty value will be created. If `multilineTag` is provided, any content of direct children whose type matches `multilineTag` will be separated by two newlines. The optional functions can be used to filter out content.
+Create a RichText value from an `Element` tree (DOM), an HTML string or a plain text string, with optionally a `Range` object to set the selection. If called without any input, an empty value will be created. The optional functions can be used to filter out content.
 
 A value will have the following shape, which you are strongly encouraged not to modify without the use of helper functions:
 
@@ -174,9 +174,6 @@ _Parameters_
 -   _$1.text_ `[string]`: Text to create value from.
 -   _$1.html_ `[string]`: HTML to create value from.
 -   _$1.range_ `[Range]`: Range to create value from.
--   _$1.multilineTag_ `[string]`: Multiline tag if the structure is multiline.
--   _$1.multilineWrapperTags_ `[Array]`: Tags where lines can be found if nesting is possible.
--   _$1.preserveWhiteSpace_ `[boolean]`: Whether or not to collapse white space characters.
 -   _$1.\_\_unstableIsEditableTree_ `[boolean]`:
 
 _Returns_
@@ -302,6 +299,10 @@ _Returns_
 
 -   `RichTextValue`: A new combined value.
 
+### privateApis
+
+Private @wordpress/rich-text APIs.
+
 ### registerFormatType
 
 Registers a new format provided a unique name and an object defining its behavior.
@@ -357,6 +358,19 @@ _Parameters_
 _Returns_
 
 -   `RichTextValue`: A new value with replacements applied.
+
+### RichTextData
+
+The RichTextData class is used to instantiate a wrapper around rich text values, with methods that can be used to transform or manipulate the data.
+
+-   Create an empty instance: `new RichTextData()`.
+-   Create one from an HTML string: `RichTextData.fromHTMLString(
+'<em>hello</em>' )`.
+-   Create one from a wrapper HTMLElement: `RichTextData.fromHTMLElement(
+document.querySelector( 'p' ) )`.
+-   Create one from plain text: `RichTextData.fromPlainText( '1\n2' )`.
+-   Create one from a rich text value: `new RichTextData( { text: '...',
+formats: [ ... ] } )`.
 
 ### RichTextValue
 
@@ -416,14 +430,13 @@ _Returns_
 
 ### toHTMLString
 
-Create an HTML string from a Rich Text value. If a `multilineTag` is provided, text separated by a line separator will be wrapped in it.
+Create an HTML string from a Rich Text value.
 
 _Parameters_
 
--   _$1_ `Object`: Named argements.
+-   _$1_ `Object`: Named arguments.
 -   _$1.value_ `RichTextValue`: Rich text value.
--   _$1.multilineTag_ `[string]`: Multiline tag.
--   _$1.preserveWhiteSpace_ `[boolean]`: Whether or not to use newline characters for line breaks.
+-   _$1.preserveWhiteSpace_ `[boolean]`: Preserves newlines if true.
 
 _Returns_
 
@@ -447,13 +460,13 @@ This hook, to be used in a format type's Edit component, returns the active elem
 
 _Parameters_
 
--   _$1_ `Object`: Named parameters.
--   _$1.editableContentElement_ `HTMLElement|null`: The element containing the editable content.
--   _$1.settings_ `WPFormat=`: The format type's settings.
+-   _obj_ `{ editableContentElement: HTMLElement | null; settings?: WPFormat; }`: Named parameters.
+-   _obj.editableContentElement_ `HTMLElement | null`: The element containing the editable content.
+-   _obj.settings_ `WPFormat`: The format type's settings.
 
 _Returns_
 
--   `Element|VirtualAnchorElement|undefined|null`: The active element or selection range.
+-   `Element | VirtualAnchorElement | undefined | null`: The active element or selection range.
 
 ### useAnchorRef
 

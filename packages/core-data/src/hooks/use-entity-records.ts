@@ -3,6 +3,8 @@
  */
 import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
+import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -11,9 +13,11 @@ import useQuerySelect from './use-query-select';
 import { store as coreStore } from '../';
 import type { Options } from './use-entity-record';
 import type { Status } from './constants';
+import { unlock } from '../lock-unlock';
+import { getNormalizedCommaSeparable } from '../utils';
 
 interface EntityRecordsResolution< RecordType > {
-	/** The requested entity record */
+	/** The requested entity records */
 	records: RecordType[] | null;
 
 	/**
@@ -28,6 +32,26 @@ interface EntityRecordsResolution< RecordType > {
 
 	/** Resolution status */
 	status: Status;
+
+	/**
+	 * The total number of available items (if not paginated).
+	 */
+	totalItems: number | null;
+
+	/**
+	 * The total number of pages.
+	 */
+	totalPages: number | null;
+}
+
+export type WithPermissions< RecordType > = RecordType & {
+	permissions: { delete: boolean; update: boolean };
+};
+
+interface EntityRecordsWithPermissionsResolution< RecordType >
+	extends Omit< EntityRecordsResolution< RecordType >, 'records' > {
+	/** The requested entity records with permissions */
+	records: WithPermissions< RecordType >[] | null;
 }
 
 const EMPTY_ARRAY = [];
@@ -97,13 +121,39 @@ export default function useEntityRecords< RecordType >(
 		[ kind, name, queryAsString, options.enabled ]
 	);
 
+	const { totalItems, totalPages } = useSelect(
+		( select ) => {
+			if ( ! options.enabled ) {
+				return {
+					totalItems: null,
+					totalPages: null,
+				};
+			}
+			return {
+				totalItems: select( coreStore ).getEntityRecordsTotalItems(
+					kind,
+					name,
+					queryArgs
+				),
+				totalPages: select( coreStore ).getEntityRecordsTotalPages(
+					kind,
+					name,
+					queryArgs
+				),
+			};
+		},
+		[ kind, name, queryAsString, options.enabled ]
+	);
+
 	return {
 		records,
+		totalItems,
+		totalPages,
 		...rest,
 	};
 }
 
-export function __experimentalUseEntityRecords(
+export function useDeprecatedEntityRecords(
 	kind: string,
 	name: string,
 	queryArgs: any,
@@ -114,4 +164,67 @@ export function __experimentalUseEntityRecords(
 		since: '6.1',
 	} );
 	return useEntityRecords( kind, name, queryArgs, options );
+}
+
+export function useEntityRecordsWithPermissions< RecordType >(
+	kind: string,
+	name: string,
+	queryArgs: Record< string, unknown > = {},
+	options: Options = { enabled: true }
+): EntityRecordsWithPermissionsResolution< RecordType > {
+	const entityConfig = useSelect(
+		( select ) => select( coreStore ).getEntityConfig( kind, name ),
+		[ kind, name ]
+	);
+	const { records: data, ...ret } = useEntityRecords(
+		kind,
+		name,
+		{
+			...queryArgs,
+			// If _fields is provided, we need to include _links in the request for permission caching to work.
+			...( queryArgs._fields
+				? {
+						_fields: [
+							...new Set( [
+								...( getNormalizedCommaSeparable(
+									queryArgs._fields
+								) || [] ),
+								'_links',
+							] ),
+						].join(),
+				  }
+				: {} ),
+		},
+		options
+	);
+	const ids = useMemo(
+		() =>
+			data?.map(
+				// @ts-ignore
+				( record: RecordType ) => record[ entityConfig?.key ?? 'id' ]
+			) ?? [],
+		[ data, entityConfig?.key ]
+	);
+
+	const permissions = useSelect(
+		( select ) => {
+			const { getEntityRecordsPermissions } = unlock(
+				select( coreStore )
+			);
+			return getEntityRecordsPermissions( kind, name, ids );
+		},
+		[ ids, kind, name ]
+	);
+
+	const dataWithPermissions = useMemo(
+		() =>
+			data?.map( ( record, index ) => ( {
+				// @ts-ignore
+				...record,
+				permissions: permissions[ index ],
+			} ) ) ?? [],
+		[ data, permissions ]
+	);
+
+	return { records: dataWithPermissions, ...ret };
 }

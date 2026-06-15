@@ -39,6 +39,7 @@ function buildSelector( sequential ) {
 		'iframe:not([tabindex^="-"])',
 		'object',
 		'embed',
+		'summary',
 		'area[href]',
 		'[contenteditable]:not([contenteditable=false])',
 	].join( ',' );
@@ -98,13 +99,16 @@ function isValidFocusableArea( element ) {
  * @return {HTMLElement[]} Focusable elements.
  */
 export function find( context, { sequential = false } = {} ) {
-	/* eslint-disable jsdoc/no-undefined-types */
 	/** @type {NodeListOf<HTMLElement>} */
-	/* eslint-enable jsdoc/no-undefined-types */
 	const elements = context.querySelectorAll( buildSelector( sequential ) );
 
 	return Array.from( elements ).filter( ( element ) => {
 		if ( ! isVisible( element ) ) {
+			return false;
+		}
+
+		// Elements inside an inert subtree are not focusable.
+		if ( element.closest( '[inert]' ) ) {
 			return false;
 		}
 

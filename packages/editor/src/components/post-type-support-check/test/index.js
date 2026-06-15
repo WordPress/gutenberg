@@ -4,27 +4,49 @@
 import { render } from '@testing-library/react';
 
 /**
+ * WordPress dependencies
+ */
+import { useSelect } from '@wordpress/data';
+
+/**
  * Internal dependencies
  */
-import { PostTypeSupportCheck } from '../';
+import PostTypeSupportCheck from '../';
+
+jest.mock( '@wordpress/data/src/components/use-select', () => {
+	// This allows us to tweak the returned value on each test.
+	const mock = jest.fn();
+	return mock;
+} );
+
+function setupUseSelectMock( postType ) {
+	useSelect.mockImplementation( ( cb ) => {
+		return cb( () => ( {
+			getPostType: () => postType,
+			getEditedPostAttribute: () => 'post',
+		} ) );
+	} );
+}
 
 describe( 'PostTypeSupportCheck', () => {
-	it( 'renders its children when post type is not known', () => {
+	it( 'does not render its children when post type is not known', () => {
+		setupUseSelectMock( undefined );
+
 		const { container } = render(
-			<PostTypeSupportCheck postType={ undefined } supportKeys="title">
+			<PostTypeSupportCheck supportKeys="title">
 				Supported
 			</PostTypeSupportCheck>
 		);
 
-		expect( container ).toHaveTextContent( 'Supported' );
+		expect( container ).not.toHaveTextContent( 'Supported' );
 	} );
 
 	it( 'does not render its children when post type is known and not supports', () => {
-		const postType = {
+		setupUseSelectMock( {
 			supports: {},
-		};
+		} );
 		const { container } = render(
-			<PostTypeSupportCheck postType={ postType } supportKeys="title">
+			<PostTypeSupportCheck supportKeys="title">
 				Supported
 			</PostTypeSupportCheck>
 		);
@@ -33,13 +55,13 @@ describe( 'PostTypeSupportCheck', () => {
 	} );
 
 	it( 'renders its children when post type is known and supports', () => {
-		const postType = {
+		setupUseSelectMock( {
 			supports: {
 				title: true,
 			},
-		};
+		} );
 		const { container } = render(
-			<PostTypeSupportCheck postType={ postType } supportKeys="title">
+			<PostTypeSupportCheck supportKeys="title">
 				Supported
 			</PostTypeSupportCheck>
 		);
@@ -48,16 +70,13 @@ describe( 'PostTypeSupportCheck', () => {
 	} );
 
 	it( 'renders its children if some of keys supported', () => {
-		const postType = {
+		setupUseSelectMock( {
 			supports: {
 				title: true,
 			},
-		};
+		} );
 		const { container } = render(
-			<PostTypeSupportCheck
-				postType={ postType }
-				supportKeys={ [ 'title', 'thumbnail' ] }
-			>
+			<PostTypeSupportCheck supportKeys={ [ 'title', 'thumbnail' ] }>
 				Supported
 			</PostTypeSupportCheck>
 		);
@@ -66,18 +85,52 @@ describe( 'PostTypeSupportCheck', () => {
 	} );
 
 	it( 'does not render its children if none of keys supported', () => {
-		const postType = {
+		setupUseSelectMock( {
 			supports: {},
-		};
+		} );
 		const { container } = render(
-			<PostTypeSupportCheck
-				postType={ postType }
-				supportKeys={ [ 'title', 'thumbnail' ] }
-			>
+			<PostTypeSupportCheck supportKeys={ [ 'title', 'thumbnail' ] }>
 				Supported
 			</PostTypeSupportCheck>
 		);
 
 		expect( container ).not.toHaveTextContent( 'Supported' );
+	} );
+
+	it( 'renders its children when post type supports a sub-feature', () => {
+		setupUseSelectMock( {
+			supports: {
+				editor: [ [ 'block-comments' ] ],
+			},
+		} );
+		const { container } = render(
+			<PostTypeSupportCheck supportKeys="editor.block-comments">
+				Supported
+			</PostTypeSupportCheck>
+		);
+
+		expect( container ).toHaveTextContent( 'Supported' );
+	} );
+
+	it( 'renders its children when post type supports some of the sub-features', () => {
+		setupUseSelectMock( {
+			supports: {
+				editor: [ [ 'block-comments' ] ],
+				test: [
+					{
+						example: false,
+					},
+				],
+			},
+		} );
+		const { container } = render(
+			<PostTypeSupportCheck
+				supportKeys={ [ 'editor.block-comments', 'test.example' ] }
+			>
+				Supported
+			</PostTypeSupportCheck>
+		);
+
+		expect( container ).toHaveTextContent( 'Supported' );
 	} );
 } );

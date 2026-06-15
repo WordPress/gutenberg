@@ -2,6 +2,162 @@
 
 ## Unreleased
 
+## 5.48.0 (2026-06-10)
+
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+## 5.47.0 (2026-05-27)
+
+### Enhancements
+
+-   `InlineNotices`: Wrap pinned and dismissible lists in a `notices-inline-notices-wrapper` container with spacing between lists. Add optional `className` prop for the wrapper.
+
+### Internal
+
+-   `InlineNotices`: Remove package-level `Notice` style overrides; `Notice` from `@wordpress/components` owns layout and chrome ([#78231](https://github.com/WordPress/gutenberg/pull/78231)).
+
+## 5.46.0 (2026-05-14)
+
+## 5.45.0 (2026-04-29)
+
+## 5.44.0 (2026-04-15)
+
+## 5.43.0 (2026-04-01)
+
+## 5.42.0 (2026-03-18)
+
+## 5.41.0 (2026-03-04)
+
+## 5.40.0 (2026-02-18)
+
+## 5.39.0 (2026-01-29)
+
+## 5.38.0 (2026-01-16)
+
+### Enhancements
+
+-   Improved TypeScript definitions ([#67565](https://github.com/WordPress/gutenberg/pull/67565)).
+
+## 5.36.0 (2025-11-26)
+
+## 5.35.0 (2025-11-12)
+
+## 5.34.0 (2025-10-29)
+
+## 5.33.0 (2025-10-17)
+
+## 5.32.0 (2025-10-01)
+
+## 5.31.0 (2025-09-17)
+
+## 5.30.0 (2025-09-03)
+
+## 5.29.0 (2025-08-20)
+
+## 5.28.0 (2025-08-07)
+
+## 5.27.0 (2025-07-23)
+
+## 5.26.0 (2025-06-25)
+
+## 5.25.0 (2025-06-04)
+
+## 5.24.0 (2025-05-22)
+
+## 5.23.0 (2025-05-07)
+
+## 5.22.0 (2025-04-11)
+
+## 5.21.0 (2025-03-27)
+
+## 5.20.0 (2025-03-13)
+
+## 5.19.0 (2025-02-28)
+
+## 5.18.0 (2025-02-12)
+
+## 5.17.0 (2025-01-29)
+
+## 5.16.0 (2025-01-15)
+
+## 5.15.0 (2025-01-02)
+
+## 5.14.0 (2024-12-11)
+
+## 5.13.0 (2024-11-27)
+
+## 5.12.0 (2024-11-16)
+
+## 5.11.0 (2024-10-30)
+
+## 5.10.0 (2024-10-16)
+
+## 5.9.0 (2024-10-03)
+
+## 5.8.0 (2024-09-19)
+
+## 5.7.0 (2024-09-05)
+
+## 5.6.0 (2024-08-21)
+
+## 5.5.0 (2024-08-07)
+
+## 5.4.0 (2024-07-24)
+
+## 5.3.0 (2024-07-10)
+
+## 5.2.0 (2024-06-26)
+
+## 5.1.0 (2024-06-15)
+
+## 5.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 4.26.0 (2024-05-16)
+
+## 4.25.0 (2024-05-02)
+
+## 4.24.0 (2024-04-19)
+
+## 4.23.0 (2024-04-03)
+
+## 4.22.0 (2024-03-21)
+
+## 4.21.0 (2024-03-06)
+
+## 4.20.0 (2024-02-21)
+
+## 4.19.0 (2024-02-09)
+
+## 4.18.0 (2024-01-24)
+
+## 4.17.0 (2024-01-10)
+
+## 4.16.0 (2023-12-13)
+
+## 4.15.0 (2023-11-29)
+
+## 4.14.0 (2023-11-16)
+
+## 4.13.0 (2023-11-02)
+
+## 4.12.0 (2023-10-18)
+
+## 4.11.0 (2023-10-05)
+
+## 4.10.0 (2023-09-20)
+
+## 4.9.0 (2023-08-31)
+
+## 4.8.0 (2023-08-16)
+
+## 4.7.0 (2023-08-10)
+
 ## 4.6.0 (2023-07-20)
 
 ## 4.5.0 (2023-07-05)
@@ -10,7 +166,7 @@
 
 ## 4.3.0 (2023-06-07)
 
-### New Feature
+### New Features
 
 -   Add a new action `removeNotices` which allows bulk removal of notices by their IDs. ([#39940](https://github.com/WordPress/gutenberg/pull/39940))
 -   Add a new action `removeAllNotices` which removes all notices from a given context. ([#44059](https://github.com/WordPress/gutenberg/pull/44059))
@@ -21,7 +177,7 @@
 
 ## 4.0.0 (2023-04-26)
 
-### Breaking Change
+### Breaking Changes
 
 -   Publish Typescript build types to npm. ([#49650](https://github.com/WordPress/gutenberg/pull/49650))
 
@@ -98,13 +254,13 @@
 
 ## 2.12.0 (2020-12-17)
 
-### New Feature
+### New Features
 
 -   Added a store definition `store` for the notices namespace to use with `@wordpress/data` API ([#26655](https://github.com/WordPress/gutenberg/pull/26655)).
 
 ## 2.0.0 (2020-02-10)
 
-### Breaking Change
+### Breaking Changes
 
 -   A notices message is no longer spoken as a result of notice creation, but rather by its display in the interface by its corresponding [`Notice` component](https://github.com/WordPress/gutenberg/tree/HEAD/packages/components/src/notice).
 
@@ -120,7 +276,7 @@
 
 ## 1.1.0 (2018-11-20)
 
-### New Feature
+### New Features
 
 -   New option `speak` enables control as to whether the notice content is announced to screen readers (defaults to `true`)
 

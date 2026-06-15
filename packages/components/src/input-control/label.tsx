@@ -6,7 +6,7 @@ import {
 	Label as BaseLabel,
 	LabelWrapper,
 } from './styles/input-control-styles';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import type { InputControlLabelProps } from './types';
 
 export default function Label( {
@@ -15,7 +15,9 @@ export default function Label( {
 	htmlFor,
 	...props
 }: WordPressComponentProps< InputControlLabelProps, 'label', false > ) {
-	if ( ! children ) return null;
+	if ( ! children ) {
+		return null;
+	}
 
 	if ( hideLabelFromVision ) {
 		return (

@@ -8,14 +8,15 @@ import styled from '@emotion/styled';
  */
 import BaseControl from '../base-control';
 import Button from '../button';
+import CustomSelectControl from '../custom-select-control';
 import { HStack } from '../h-stack';
-import { space } from '../ui/utils/space';
-import { COLORS } from '../utils';
+import { space } from '../utils/space';
 
 export const Container = styled.fieldset`
 	border: 0;
 	margin: 0;
 	padding: 0;
+	display: contents;
 `;
 
 export const Header = styled( HStack )`
@@ -33,13 +34,10 @@ export const HeaderLabel = styled( BaseControl.VisualLabel )`
 	margin-bottom: 0;
 `;
 
-export const HeaderHint = styled.span`
-	color: ${ COLORS.gray[ 700 ] };
-`;
-
-export const Controls = styled.div< {
-	__nextHasNoMarginBottom: boolean;
-} >`
-	${ ( props ) =>
-		! props.__nextHasNoMarginBottom && `margin-bottom: ${ space( 6 ) };` }
+// Custom styled component to force line break between name and hint while keeping checkmark on the right
+export const StyledCustomSelectControl = styled( CustomSelectControl )`
+	.components-custom-select-control__item
+		.components-custom-select-control__item-hint {
+		width: 100%;
+	}
 `;

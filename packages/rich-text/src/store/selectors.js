@@ -1,7 +1,7 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import createSelector from 'rememo';
+import { createSelector } from '@wordpress/data';
 
 /**
  * Returns all the available format types.
@@ -75,7 +75,7 @@ export const getFormatTypes = createSelector(
  * };
  * ```
  *
- * @return {Object?} Format type.
+ * @return {?Object} Format type.
  */
 export function getFormatType( state, name ) {
 	return state.formatTypes[ name ];

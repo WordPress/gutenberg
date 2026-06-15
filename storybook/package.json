@@ -1,0 +1,56 @@
+{
+	"name": "@wordpress/storybook",
+	"version": "0.0.0",
+	"description": "Storybook for WordPress Gutenberg components.",
+	"private": true,
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"storybook"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/storybook/README.md",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/WordPress/gutenberg.git",
+		"directory": "storybook"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"exports": {
+		"./main": "./main.ts",
+		"./preview": "./preview.jsx"
+	},
+	"devDependencies": {
+		"@emotion/is-prop-valid": "^1.4.0",
+		"@emotion/react": "^11.14.0",
+		"@emotion/styled": "^11.14.1",
+		"@storybook/addon-a11y": "^10.2.8",
+		"@storybook/addon-docs": "^10.2.8",
+		"@storybook/icons": "^2.0.1",
+		"@storybook/react-vite": "^10.2.8",
+		"@types/react": "^18.3.27",
+		"@vitejs/plugin-react": "^5.1.2",
+		"@wordpress/admin-ui": "file:../packages/admin-ui",
+		"@wordpress/element": "file:../packages/element",
+		"@wordpress/icons": "file:../packages/icons",
+		"@wordpress/private-apis": "file:../packages/private-apis",
+		"@wordpress/route": "file:../packages/route",
+		"@wordpress/theme": "file:../packages/theme",
+		"@wordpress/ui": "file:../packages/ui",
+		"react-docgen-typescript": "^2.2.2",
+		"storybook": "^10.2.8",
+		"storybook-addon-tag-badges": "^3.0.4",
+		"terser": "^5.37.0",
+		"vite": "^7.3.2"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"storybook:build": "NODE_OPTIONS=--max-old-space-size=8192 storybook build -c . -o ./build",
+		"storybook:dev": "storybook dev -c . -p 50240"
+	}
+}

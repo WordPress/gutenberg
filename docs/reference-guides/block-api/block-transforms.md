@@ -22,7 +22,7 @@ export const settings = {
 };
 ```
 
-## Transformations Types
+## Transformations types
 
 This section goes through the existing types of transformations blocks support:
 
@@ -42,9 +42,10 @@ A transformation of type `block` is an object that takes the following parameter
 -   **type** _(string)_: the value `block`.
 -   **blocks** _(array)_: a list of known block types. It also accepts the wildcard value (`"*"`), meaning that the transform is available to _all_ block types (eg: all blocks can transform into `core/group`).
 -   **transform** _(function)_: a callback that receives the attributes and inner blocks of the block being processed. It should return a block object or an array of block objects.
+-   **variationName** _(string, optional)_: the name of the target block variation when the transform creates a variation of the transformed block type. This lets the transform UI show the variation title and icon instead of the base block type.
 -   **isMatch** _(function, optional)_: a callback that receives the block attributes as the first argument and the block object as the second argument and should return a boolean. Returning `false` from this function will prevent the transform from being available and displayed as an option to the user.
 -   **isMultiBlock** _(boolean, optional)_: whether the transformation can be applied when multiple blocks are selected. If true, the `transform` function's first parameter will be an array containing each selected block's attributes, and the second an array of each selected block's inner blocks. False by default.
--   **priority** _(number, optional)_: controls the priority with which a transformation is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
+-   **priority** _(number, optional)_: controls the priority with which a transformation is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://developer.wordpress.org/reference/#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
 **Example: from Paragraph block to Heading block**
 
@@ -96,12 +97,12 @@ A transformation of type `enter` is an object that takes the following parameter
 
 -   **type** _(string)_: the value `enter`.
 -   **regExp** _(RegExp)_: the Regular Expression to use as a matcher. If the value matches, the transformation will be applied.
--   **transform** _(function)_: a callback that receives the value that has been entered. It should return a block object or an array of block objects.
--   **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
+-   **transform** _(function)_: a callback that receives an object with a `content` field containing the value that has been entered. It should return a block object or an array of block objects.
+-   **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://developer.wordpress.org/reference/#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
 **Example: from --- to Separator block**
 
-To create a separator block when the user types the hypen three times and then hits the ENTER key we can use the following code:
+To create a separator block when the user types the hyphen three times and then hits the ENTER key we can use the following code:
 
 ```js
 transforms = {
@@ -124,7 +125,7 @@ A transformation of type `files` is an object that takes the following parameter
 -   **type** _(string)_: the value `files`.
 -   **transform** _(function)_: a callback that receives the array of files being processed. It should return a block object or an array of block objects.
 -   **isMatch** _(function, optional)_: a callback that receives the array of files being processed and should return a boolean. Returning `false` from this function will prevent the transform from being applied.
--   **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
+-   **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://developer.wordpress.org/reference/#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
 **Example: from file to File block**
 
@@ -151,7 +152,7 @@ transforms: {
 				} );
 			},
 		},
-	];
+	],
 }
 ```
 
@@ -162,9 +163,9 @@ This type of transformations support the _from_ direction, allowing blocks to be
 A transformation of type `prefix` is an object that takes the following parameters:
 
 -   **type** _(string)_: the value `prefix`.
--   **prefix** _(string)_: the character or sequence of characters that match this transfrom.
+-   **prefix** _(string)_: the character or sequence of characters that match this transform.
 -   **transform** _(function)_: a callback that receives the content introduced. It should return a block object or an array of block objects.
--   **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
+-   **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://developer.wordpress.org/reference/#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
 **Example: from text to custom block**
 
@@ -182,13 +183,13 @@ transforms: {
 				} );
 			},
 		},
-	];
+	],
 }
 ```
 
 ### Raw
 
-This type of transformations support the _from_ direction, allowing blocks to be created from raw HTML nodes. They're applied when the user executes the "Convert to Blocks" action from within the block setting UI menu, as well as when some content is pasted or dropped into the editor.
+This type of transformation supports the _from_ direction, allowing blocks to be created from raw HTML nodes. They're applied when the user executes the "Convert to Blocks" action from within the block setting UI menu, as well as when some content is pasted or dropped into the editor.
 
 A transformation of type `raw` is an object that takes the following parameters:
 
@@ -197,7 +198,7 @@ A transformation of type `raw` is an object that takes the following parameters:
 -   **schema** _(object|function, optional)_: defines an [HTML content model](https://html.spec.whatwg.org/multipage/dom.html#content-models) used to detect and process pasted contents. See [below](#schemas-and-content-models).
 -   **selector** _(string, optional)_: a CSS selector string to determine whether the element matches according to the [element.matches](https://developer.mozilla.org/en-US/docs/Web/API/Element/matches) method. The transform won't be executed if the element doesn't match. This is a shorthand and alternative to using `isMatch`, which, if present, will take precedence.
 -   **isMatch** _(function, optional)_: a callback that receives the node being processed and should return a boolean. Returning `false` from this function will prevent the transform from being applied.
--   **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
+-   **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://developer.wordpress.org/reference/#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
 **Example: from URLs to Embed block**
 
@@ -246,7 +247,7 @@ We want to tell the editor to allow the inner `h2` and `p` elements. We do this 
 a `<RichText />` component is a good place to allow phrasing content otherwise we'll lose all text formatting on conversion.
 
 ```js
-schema = ({ phrasingContentSchema }) => {
+schema = ({ phrasingContentSchema }) => ({
     div: {
         required: true,
         attributes: [ 'data-post-id' ],
@@ -255,12 +256,12 @@ schema = ({ phrasingContentSchema }) => {
             p: { children: phrasingContentSchema }
         }
     }
-}
+})
 ```
 
 When we successfully match this content every HTML attribute will be stripped away except for `data-post-id` and if we have other arrangements of HTML inside of a given `div` then it won't match our transformer. Likewise we'd fail to match if we found an `<h3>` in there instead of an `<h2>`.
 
-Schemas are most-important when wanting to match HTML snippets containing non-phrasing content, such as `<details>` with a `<summary>`. Without declaring the custom schema the editor will skip over these other contructions before attempting to run them through any block transforms.
+Schemas are most-important when wanting to match HTML snippets containing non-phrasing content, such as `<details>` with a `<summary>`. Without declaring the custom schema the editor will skip over these other constructions before attempting to run them through any block transforms.
 
 ### Shortcode
 
@@ -271,9 +272,9 @@ A transformation of type `shortcode` is an object that takes the following param
 -   **type** _(string)_: the value `shortcode`.
 -   **tag** _(string|array)_: the shortcode tag or list of shortcode aliases this transform can work with.
 -   **transform** _(function, optional)_: a callback that receives the shortcode attributes as the first argument and the [WPShortcodeMatch](/packages/shortcode/README.md#next) as the second. It should return a block object or an array of block objects. When this parameter is defined, it will take precedence over the `attributes` parameter.
--   **attributes** _(object, optional)_: object representing where the block attributes should be sourced from, according to the attributes shape defined by the [block configuration object](./block-registration.md). If a particular attribute contains a `shortcode` key, it should be a function that receives the shortcode attributes as the first arguments and the [WPShortcodeMatch](/packages/shortcode/README.md#next) as second, and returns a value for the attribute that will be sourced in the block's comment.
+-   **attributes** _(object, optional)_: object representing where the block attributes should be sourced from, according to the attributes shape defined by the [block configuration object](/docs/reference-guides/block-api/block-registration.md). If a particular attribute contains a `shortcode` key, it should be a function that receives the shortcode attributes as the first arguments and the [WPShortcodeMatch](/packages/shortcode/README.md#next) as second, and returns a value for the attribute that will be sourced in the block's comment.
 -   **isMatch** _(function, optional)_: a callback that receives the shortcode attributes per the [Shortcode API](https://codex.wordpress.org/Shortcode_API) and should return a boolean. Returning `false` from this function will prevent the shortcode to be transformed into this block.
--   **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
+-   **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://developer.wordpress.org/reference/#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
 **Example: from shortcode to block using `transform`**
 
@@ -336,6 +337,33 @@ transforms: {
     ]
 },
 ```
+
+**Example: shortcode with wrapped content to block with InnerBlocks**
+
+Shortcodes that wrap inner content (e.g. `[example]<p>Inner.</p>[/example]`) can be transformed into a block with InnerBlocks by passing `match.shortcode.content` through [`rawHandler`](/packages/blocks/README.md#rawHandler) inside `transform`.
+
+```js
+transforms: {
+    from: [
+        {
+            type: 'shortcode',
+            tag: 'example',
+            transform( attrs, match ) {
+                const innerBlocks = rawHandler( {
+                    HTML: match.shortcode.content || '',
+                } );
+                return createBlock(
+                    'myplugin/example',
+                    { att1: attrs.named.att1 || '' },
+                    innerBlocks
+                );
+            },
+        },
+    ],
+},
+```
+
+`rawHandler` recurses into the content, so nested shortcodes and HTML are converted to blocks the same way pasted content is.
 
 ## `ungroup` blocks
 

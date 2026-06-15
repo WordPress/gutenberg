@@ -15,21 +15,27 @@ import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import { useListViewContext } from './context';
 import Inserter from '../inserter';
 import AriaReferencedText from './aria-referenced-text';
+import { unlock } from '../../lock-unlock';
 
 export const Appender = forwardRef(
 	( { nestingLevel, blockCount, clientId, ...props }, ref ) => {
 		const { insertedBlock, setInsertedBlock } = useListViewContext();
 
 		const instanceId = useInstanceId( Appender );
-		const hideInserter = useSelect(
+		const { directInsert, hideInserter } = useSelect(
 			( select ) => {
-				const { getTemplateLock, __unstableGetEditorMode } =
-					select( blockEditorStore );
+				const { getBlockListSettings, getTemplateLock, isZoomOut } =
+					unlock( select( blockEditorStore ) );
 
-				return (
-					!! getTemplateLock( clientId ) ||
-					__unstableGetEditorMode() === 'zoom-out'
-				);
+				const settings = getBlockListSettings( clientId );
+				const directInsertValue = settings?.directInsert || false;
+				const hideInserterValue =
+					!! getTemplateLock( clientId ) || isZoomOut();
+
+				return {
+					directInsert: directInsertValue,
+					hideInserter: hideInserterValue,
+				};
 			},
 			[ clientId ]
 		);
@@ -80,7 +86,7 @@ export const Appender = forwardRef(
 					position="bottom right"
 					isAppender
 					selectBlockOnInsert={ false }
-					shouldDirectInsert={ false }
+					shouldDirectInsert={ directInsert }
 					__experimentalIsQuick
 					{ ...props }
 					toggleProps={ { 'aria-describedby': descriptionId } }

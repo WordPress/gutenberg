@@ -18,8 +18,8 @@ export const test = base.extend< Fixtures >( {
 		async ( { requestUtils }, use ) => {
 			await use( new InteractivityUtils( { requestUtils } ) );
 		},
-		// @ts-ignore: The required type is 'test', but can be 'worker' too. See
+		// This is a hack, 'worker' is a valid value but the type is wrong.
 		// https://playwright.dev/docs/test-fixtures#worker-scoped-fixtures
-		{ scope: 'worker' },
+		{ scope: 'worker' as 'test' },
 	],
 } );

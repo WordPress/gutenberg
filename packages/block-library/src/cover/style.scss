@@ -1,12 +1,15 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .wp-block-cover-image,
 .wp-block-cover {
+	min-height: 430px;
+	padding: 1em;
 	position: relative;
 	background-position: center center;
-	min-height: 430px;
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	padding: 1em;
 	// Prevent the `wp-block-cover__background` span from overflowing the container when border-radius is applied.
 	// `overflow: hidden` is provided as a fallback for browsers that don't support `overflow: clip`.
 	overflow: hidden;
@@ -54,7 +57,6 @@
 		left: 0;
 		bottom: 0;
 		right: 0;
-		z-index: z-index(".wp-block-cover.has-background-dim::before");
 		opacity: 0.5;
 	}
 
@@ -87,20 +89,6 @@
 		width: 100%;
 	}
 
-	// Using flexbox without an assigned height property breaks vertical center alignment in IE11.
-	// Appending an empty ::after element tricks IE11 into giving the cover image an implicit height, which sidesteps this issue.
-	&::after {
-		display: block;
-		content: "";
-		font-size: 0;
-		min-height: inherit;
-
-		// IE doesn't support flex so omit that.
-		@supports (position: sticky) {
-			content: none;
-		}
-	}
-
 	// Aligned cover blocks should not use our global alignment rules
 	&.aligncenter,
 	&.alignleft,
@@ -109,23 +97,11 @@
 	}
 
 	.wp-block-cover__inner-container {
+		position: relative; // Needed for the inner container to be positioned above other elements with absolute positioning.
 		width: 100%;
-		z-index: z-index(".wp-block-cover__inner-container");
 		color: inherit;
 		// Reset the fixed LTR direction at the root of the block in RTL languages.
 		/*rtl:raw: direction: rtl; */
-	}
-
-	p,
-	h1,
-	h2,
-	h3,
-	h4,
-	h5,
-	h6 {
-		&:not(.has-text-color) {
-			color: inherit;
-		}
 	}
 
 	// Position: Top
@@ -171,8 +147,19 @@
 	&.has-custom-content-position.has-custom-content-position {
 		.wp-block-cover__inner-container {
 			margin: 0;
-			width: auto;
 		}
+		&.is-position-top-left,
+		&.is-position-top-right,
+		&.is-position-center-left,
+		&.is-position-center-right,
+		&.is-position-bottom-left,
+		&.is-position-bottom-right {
+			.wp-block-cover__inner-container {
+				margin: 0;
+				width: auto;
+			}
+		}
+
 	}
 
 	// Extra specificity for in edit mode where other styles would override it otherwise.
@@ -193,6 +180,49 @@
 		outline: none;
 		border: none;
 		box-shadow: none;
+	}
+
+	.wp-block-cover__embed-background {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		margin: 0;
+		padding: 0;
+		width: 100%;
+		height: 100%;
+		max-width: none;
+		max-height: none;
+		outline: none;
+		border: none;
+		box-shadow: none;
+		pointer-events: none; // Prevent interaction with the iframe
+
+		.wp-block-embed__wrapper {
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			margin: 0;
+			padding: 0;
+			width: 100%;
+			height: 100%;
+		}
+
+		iframe,
+		.wp-block-embed__wrapper iframe {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: 100vw;
+			height: 100vh;
+			min-width: 100%;
+			min-height: 100%;
+			transform: translate(-50%, -50%);
+			pointer-events: none; // Prevent interaction with the iframe
+		}
 	}
 }
 
@@ -222,14 +252,6 @@ video.wp-block-cover__video-background {
 		background-repeat: repeat;
 		background-size: auto;
 	}
-}
-
-.wp-block-cover__video-background {
-	z-index: z-index(".wp-block-cover__video-background");
-}
-
-.wp-block-cover__image-background {
-	z-index: z-index(".wp-block-cover__image-background");
 }
 
 // Styles below only exist to support older versions of the block.
@@ -298,4 +320,64 @@ section.wp-block-cover-image > h2,
 :where(.wp-block-cover.is-light:not(.has-text-color)),
 :where(.wp-block-cover-image.is-light:not(.has-text-color)) {
 	color: $black;
+}
+
+:root {
+	:where(.wp-block-cover p:not(.has-text-color)),
+	:where(.wp-block-cover h1:not(.has-text-color)),
+	:where(.wp-block-cover h2:not(.has-text-color)),
+	:where(.wp-block-cover h3:not(.has-text-color)),
+	:where(.wp-block-cover h4:not(.has-text-color)),
+	:where(.wp-block-cover h5:not(.has-text-color)),
+	:where(.wp-block-cover h6:not(.has-text-color)) {
+		color: inherit;
+	}
+}
+
+// Backward compatibility for v14 deprecation. Only applied to the frontend.
+// Regarding the `.wp-block-cover__background + .wp-block-cover__inner-container`
+// selector: When the `.wp-block-cover__inner-container` comes right after the
+// `.wp-block-cover__background` , it means that it's using the new HTML
+// structure or that it's using the color background or gradient (even in
+// the deprecated version). In the color background or gradient option we don't
+// need the z-index because the elements are in the expected order.
+body:not(.editor-styles-wrapper) .wp-block-cover:not(
+.wp-block-cover:has(
+	.wp-block-cover__background + .wp-block-cover__inner-container
+)
+) {
+	.wp-block-cover__video-background {
+		// Background media sits at the base of the stack.
+		z-index: 0;
+	}
+
+	.wp-block-cover__embed-background {
+		// Shares the same base layer as the video background.
+		z-index: 0;
+	}
+
+	.wp-block-cover__image-background {
+		// Background media sits at the base of the stack.
+		z-index: 0;
+	}
+
+	// The first selector is required for old Cover markup/
+	// Keep .wp-block-cover__gradient-background for v8 deprecation.
+	&.has-background-dim:not(.has-background-gradient)::before,
+	.wp-block-cover__background,
+	.wp-block-cover__gradient-background {
+		// Sit above the video/image/embed background media.
+		z-index: 1;
+	}
+
+	.wp-block-cover__inner-container {
+		// Lift the inner blocks above the background media and overlay.
+		z-index: 1;
+
+		// Reset the z-index to auto when the body has a modal open. So when the
+		// modal is inside the cover, it doesn't create a stacking context.
+		@at-root .has-modal-open & {
+			z-index: auto;
+		}
+	}
 }

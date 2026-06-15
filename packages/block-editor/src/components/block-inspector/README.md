@@ -4,11 +4,6 @@ The Block inspector is one of the panels that is displayed in the editor; it is 
 
 ![Paragraph block inspector](https://make.wordpress.org/core/files/2020/08/paragraph-block-inspector.png)
 
-## Table of contents
-
-1. [Development guidelines](#development-guidelines)
-2. [Related components](#related-components)
-
 ## Development guidelines
 
 ### Usage

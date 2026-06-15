@@ -7,9 +7,13 @@
 {{#description}}
  * Description:       {{description}}
 {{/description}}
- * Requires at least: 6.1
- * Requires PHP:      7.0
  * Version:           {{version}}
+{{#requiresAtLeast}}
+ * Requires at least: {{requiresAtLeast}}
+{{/requiresAtLeast}}
+{{#requiresPHP}}
+ * Requires PHP:      {{requiresPHP}}
+{{/requiresPHP}}
 {{#author}}
  * Author:            {{author}}
 {{/author}}
@@ -29,6 +33,10 @@
  *
  * @package           {{namespace}}
  */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
 
 /**
  * Registers all block assets so that they can be enqueued through the block editor

@@ -9,12 +9,12 @@ test.describe( 'Using Hooks API', () => {
 		await requestUtils.activatePlugin( 'gutenberg-test-hooks-api' );
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.deactivatePlugin( 'gutenberg-test-hooks-api' );
-	} );
-
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin( 'gutenberg-test-hooks-api' );
 	} );
 
 	test( 'Should contain a reset block button on the sidebar', async ( {
@@ -22,7 +22,9 @@ test.describe( 'Using Hooks API', () => {
 		editor,
 	} ) => {
 		await editor.openDocumentSettingsSidebar();
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'First paragraph' );
 		await page.click(
 			`role=region[name="Editor settings"i] >> role=tab[name="Settings"i]`
@@ -37,11 +39,13 @@ test.describe( 'Using Hooks API', () => {
 		page,
 	} ) => {
 		await editor.openDocumentSettingsSidebar();
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'First paragraph' );
 
 		const paragraphBlock = editor.canvas.locator(
-			'role=document[name="Paragraph block"i]'
+			'role=document[name="Block: Paragraph"i]'
 		);
 		await expect( paragraphBlock ).toHaveText( 'First paragraph' );
 		await page.click(

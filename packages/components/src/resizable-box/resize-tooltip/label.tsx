@@ -12,7 +12,8 @@ import { isRTL } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { Position, POSITIONS } from './utils';
+import type { Position } from './utils';
+import { POSITIONS } from './utils';
 import {
 	TooltipWrapper,
 	Tooltip,
@@ -34,13 +35,15 @@ type LabelProps = React.DetailedHTMLProps<
 function Label(
 	{ label, position = POSITIONS.corner, zIndex = 1000, ...props }: LabelProps,
 	ref: ForwardedRef< HTMLDivElement >
-): JSX.Element | null {
+) {
 	const showLabel = !! label;
 
 	const isBottom = position === POSITIONS.bottom;
 	const isCorner = position === POSITIONS.corner;
 
-	if ( ! showLabel ) return null;
+	if ( ! showLabel ) {
+		return null;
+	}
 
 	let style: React.CSSProperties = {
 		opacity: showLabel ? 1 : undefined,

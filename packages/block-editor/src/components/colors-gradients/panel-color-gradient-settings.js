@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -61,7 +61,7 @@ export const PanelColorGradientSettingsInner = ( {
 
 	return (
 		<ToolsPanel
-			className={ classnames(
+			className={ clsx(
 				'block-editor-panel-color-gradient-settings',
 				className
 			) }

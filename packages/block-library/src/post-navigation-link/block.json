@@ -7,15 +7,13 @@
 	"description": "Displays the next or previous post link that is adjacent to the current post.",
 	"textdomain": "default",
 	"attributes": {
-		"textAlign": {
-			"type": "string"
-		},
 		"type": {
 			"type": "string",
 			"default": "next"
 		},
 		"label": {
-			"type": "string"
+			"type": "string",
+			"role": "content"
 		},
 		"showTitle": {
 			"type": "boolean",
@@ -28,9 +26,15 @@
 		"arrow": {
 			"type": "string",
 			"default": "none"
+		},
+		"taxonomy": {
+			"type": "string",
+			"default": ""
 		}
 	},
+	"usesContext": [ "postType" ],
 	"supports": {
+		"anchor": true,
 		"reusable": false,
 		"html": false,
 		"color": {
@@ -39,6 +43,7 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,
@@ -49,6 +54,9 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"style": "wp-block-post-navigation-link"

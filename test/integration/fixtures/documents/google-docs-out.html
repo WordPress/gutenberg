@@ -11,13 +11,13 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>A</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
 <li>Bulleted<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>Indented</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list --></li>
@@ -29,7 +29,7 @@
 <!-- /wp:list -->
 
 <!-- wp:list {"ordered":true} -->
-<ol><!-- wp:list-item -->
+<ol class="wp-block-list"><!-- wp:list-item -->
 <li>One</li>
 <!-- /wp:list-item -->
 
@@ -43,7 +43,7 @@
 <!-- /wp:list -->
 
 <!-- wp:table -->
-<figure class="wp-block-table"><table><tbody><tr><td>One</td><td>Two</td><td>Three</td></tr><tr><td>1</td><td>2</td><td>3</td></tr><tr><td>I</td><td>II</td><td>III</td></tr></tbody></table></figure>
+<figure class="wp-block-table"><table class="has-fixed-layout"><tbody><tr><td>One</td><td>Two</td><td>Three</td></tr><tr><td>1</td><td>2</td><td>3</td></tr><tr><td>I</td><td>II</td><td>III</td></tr></tbody></table></figure>
 <!-- /wp:table -->
 
 <!-- wp:separator -->
@@ -54,6 +54,6 @@
 <p>An image:</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:image -->
-<figure class="wp-block-image"><img src="https://lh4.googleusercontent.com/ID" alt=""/></figure>
+<!-- wp:image {"width":"544px","height":"auto","aspectRatio":"2.9565217391304346"} -->
+<figure class="wp-block-image is-resized"><img src="https://lh4.googleusercontent.com/ID" alt="" style="aspect-ratio:2.9565217391304346;width:544px;height:auto"/></figure>
 <!-- /wp:image -->

@@ -6,18 +6,6 @@
  */
 
 /**
- * Get the class name used on block level presets.
- *
- * @access private
- *
- * @param array $block Block object.
- * @return string      The unique class name.
- */
-function _gutenberg_get_presets_class_name( $block ) {
-	return 'wp-settings-' . md5( serialize( $block ) );
-}
-
-/**
  * Update the block content with block level presets class name.
  *
  * @access private
@@ -38,7 +26,7 @@ function _gutenberg_add_block_level_presets_class( $block_content, $block ) {
 	}
 
 	// return early if no settings are found on the block attributes.
-	$block_settings = _wp_array_get( $block, array( 'attrs', 'settings' ), null );
+	$block_settings = $block['attrs']['settings'] ?? null;
 	if ( empty( $block_settings ) ) {
 		return $block_content;
 	}
@@ -47,7 +35,7 @@ function _gutenberg_add_block_level_presets_class( $block_content, $block ) {
 	// Add the class name to the first element, presuming it's the wrapper, if it exists.
 	$tags = new WP_HTML_Tag_Processor( $block_content );
 	if ( $tags->next_tag() ) {
-		$tags->add_class( _gutenberg_get_presets_class_name( $block ) );
+		$tags->add_class( _wp_get_presets_class_name( $block ) );
 	}
 
 	return $tags->get_updated_html();
@@ -71,12 +59,12 @@ function _gutenberg_add_block_level_preset_styles( $pre_render, $block ) {
 	}
 
 	// return early if no settings are found on the block attributes.
-	$block_settings = _wp_array_get( $block, array( 'attrs', 'settings' ), null );
+	$block_settings = $block['attrs']['settings'] ?? null;
 	if ( empty( $block_settings ) ) {
 		return null;
 	}
 
-	$class_name = '.' . _gutenberg_get_presets_class_name( $block );
+	$class_name = '.' . _wp_get_presets_class_name( $block );
 
 	// the root selector for preset variables needs to target every possible block selector
 	// in order for the general setting to override any bock specific setting of a parent block or
@@ -129,13 +117,18 @@ function _gutenberg_add_block_level_preset_styles( $pre_render, $block ) {
 	);
 
 	if ( ! empty( $styles ) ) {
-		gutenberg_enqueue_block_support_styles( $styles );
+		/*
+		 * This method is deprecated since WordPress 6.2.
+		 * We could enqueue these styles separately,
+		 * or print them out with other settings presets.
+		 */
+		wp_enqueue_block_support_styles( $styles );
 	}
 
 	return null;
 }
 // Remove WordPress core filter to avoid rendering duplicate settings style blocks.
-remove_filter( 'render_block', '_wp_add_block_level_presets_class', 10, 2 );
-remove_filter( 'pre_render_block', '_wp_add_block_level_preset_styles', 10, 2 );
+remove_filter( 'render_block', '_wp_add_block_level_presets_class', 10 );
+remove_filter( 'pre_render_block', '_wp_add_block_level_preset_styles', 10 );
 add_filter( 'render_block', '_gutenberg_add_block_level_presets_class', 10, 2 );
 add_filter( 'pre_render_block', '_gutenberg_add_block_level_preset_styles', 10, 2 );

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -14,12 +14,6 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { select } from '@wordpress/data';
-import {
-	create,
-	replace,
-	toHTMLString,
-	__UNSTABLE_LINE_SEPARATOR,
-} from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -64,15 +58,17 @@ function parseBorderColor( styleString ) {
 }
 
 function multilineToInline( value ) {
-	return toHTMLString( {
-		value: replace(
-			create( { html: value, multilineTag: 'p' } ),
-			new RegExp( __UNSTABLE_LINE_SEPARATOR, 'g' ),
-			'\n'
-		),
-	} );
+	value = value || `<p></p>`;
+	const padded = `</p>${ value }<p>`;
+	const values = padded.split( `</p><p>` );
+
+	values.shift();
+	values.pop();
+
+	return values.join( '<br>' );
 }
 
+// Version 5 created in #43210 / c4b2ca7f3f. Supports match block.json at the time.
 const v5 = {
 	attributes: {
 		value: {
@@ -80,17 +76,62 @@ const v5 = {
 			source: 'html',
 			selector: 'blockquote',
 			multiline: 'p',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		citation: {
 			type: 'string',
 			source: 'html',
 			selector: 'cite',
 			default: '',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		textAlign: {
 			type: 'string',
+		},
+	},
+	supports: {
+		anchor: true,
+		align: [ 'left', 'right', 'wide', 'full' ],
+		color: {
+			gradients: true,
+			background: true,
+			link: true,
+			__experimentalDefaultControls: {
+				background: true,
+				text: true,
+			},
+		},
+		typography: {
+			fontSize: true,
+			lineHeight: true,
+			__experimentalFontFamily: true,
+			__experimentalFontWeight: true,
+			__experimentalFontStyle: true,
+			__experimentalTextTransform: true,
+			__experimentalTextDecoration: true,
+			__experimentalLetterSpacing: true,
+			__experimentalDefaultControls: {
+				fontSize: true,
+				fontAppearance: true,
+			},
+		},
+		__experimentalBorder: {
+			color: true,
+			radius: true,
+			style: true,
+			width: true,
+			__experimentalDefaultControls: {
+				color: true,
+				radius: true,
+				style: true,
+				width: true,
+			},
+		},
+		__experimentalStyle: {
+			typography: {
+				fontSize: '1.5em',
+				lineHeight: '1.6',
+			},
 		},
 	},
 	save( { attributes } ) {
@@ -100,7 +141,7 @@ const v5 = {
 		return (
 			<figure
 				{ ...useBlockProps.save( {
-					className: classnames( {
+					className: clsx( {
 						[ `has-text-align-${ textAlign }` ]: textAlign,
 					} ),
 				} ) }
@@ -124,9 +165,25 @@ const v5 = {
 
 // TODO: this is ripe for a bit of a clean up according to the example in https://developer.wordpress.org/block-editor/reference-guides/block-api/block-deprecation/#example
 
+// Version 4 created in #30951 / 92d36a4ea1. Supports match block.json at the time.
 const v4 = {
 	attributes: {
 		...blockAttributes,
+	},
+	supports: {
+		anchor: true,
+		align: [ 'left', 'right', 'wide', 'full' ],
+		color: {
+			gradients: true,
+			background: true,
+			link: true,
+		},
+		__experimentalBorder: {
+			color: true,
+			radius: true,
+			style: true,
+			width: true,
+		},
 	},
 	save( { attributes } ) {
 		const {
@@ -150,7 +207,7 @@ const v4 = {
 				mainColor
 			);
 
-			figureClasses = classnames( {
+			figureClasses = clsx( {
 				'has-background': backgroundClass || customMainColor,
 				[ backgroundClass ]: backgroundClass,
 			} );
@@ -169,7 +226,7 @@ const v4 = {
 			'color',
 			textColor
 		);
-		const blockquoteClasses = classnames( {
+		const blockquoteClasses = clsx( {
 			'has-text-color': textColor || customTextColor,
 			[ blockquoteTextColorClass ]: blockquoteTextColorClass,
 		} );
@@ -240,8 +297,8 @@ const v4 = {
 			backgroundColor: isSolidColorStyle ? mainColor : undefined,
 			borderColor: isSolidColorStyle ? undefined : mainColor,
 			textAlign: isSolidColorStyle ? 'left' : undefined,
-			style,
 			...attributes,
+			style,
 		};
 	},
 };
@@ -280,7 +337,7 @@ const v3 = {
 				mainColor
 			);
 
-			figureClasses = classnames( {
+			figureClasses = clsx( {
 				'has-background': backgroundClass || customMainColor,
 				[ backgroundClass ]: backgroundClass,
 			} );
@@ -313,7 +370,7 @@ const v3 = {
 		);
 		const blockquoteClasses =
 			( textColor || customTextColor ) &&
-			classnames( 'has-text-color', {
+			clsx( 'has-text-color', {
 				[ blockquoteTextColorClass ]: blockquoteTextColorClass,
 			} );
 
@@ -397,8 +454,8 @@ const v3 = {
 			backgroundColor: isSolidColorStyle ? mainColor : undefined,
 			borderColor: isSolidColorStyle ? undefined : mainColor,
 			textAlign: isSolidColorStyle ? 'left' : undefined,
-			style,
 			...attributes,
+			style,
 		};
 	},
 };
@@ -451,7 +508,7 @@ const v2 = {
 		);
 		const blockquoteClasses =
 			textColor || customTextColor
-				? classnames( 'has-text-color', {
+				? clsx( 'has-text-color', {
 						[ blockquoteTextColorClass ]: blockquoteTextColorClass,
 				  } )
 				: undefined;
@@ -515,8 +572,8 @@ const v2 = {
 			backgroundColor: isSolidColorStyle ? mainColor : undefined,
 			borderColor: isSolidColorStyle ? undefined : mainColor,
 			textAlign: isSolidColorStyle ? 'left' : undefined,
-			style,
 			...attributes,
+			style,
 		};
 	},
 };

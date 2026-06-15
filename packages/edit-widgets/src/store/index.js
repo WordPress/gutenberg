@@ -11,7 +11,9 @@ import reducer from './reducer';
 import * as resolvers from './resolvers';
 import * as selectors from './selectors';
 import * as actions from './actions';
+import * as privateSelectors from './private-selectors';
 import { STORE_NAME } from './constants';
+import { unlock } from '../lock-unlock';
 
 /**
  * Block editor data store configuration.
@@ -47,3 +49,5 @@ apiFetch.use( function ( options, next ) {
 
 	return next( options );
 } );
+
+unlock( store ).registerPrivateSelectors( privateSelectors );

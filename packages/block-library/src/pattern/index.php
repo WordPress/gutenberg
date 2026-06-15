@@ -8,7 +8,7 @@
 /**
  *  Registers the `core/pattern` block on the server.
  *
- * @return void
+ * @since 5.9.0
  */
 function register_block_core_pattern() {
 	register_block_type_from_metadata(
@@ -24,11 +24,15 @@ function register_block_core_pattern() {
  *
  * @since 6.3.0 Backwards compatibility: blocks with no `syncStatus` attribute do not receive block wrapper.
  *
+ * @global WP_Embed $wp_embed Used to process embedded content within patterns
+ *
  * @param array $attributes Block attributes.
  *
  * @return string Returns the output of the pattern.
  */
 function render_block_core_pattern( $attributes ) {
+	static $seen_refs = array();
+
 	if ( empty( $attributes['slug'] ) ) {
 		return '';
 	}
@@ -40,18 +44,29 @@ function render_block_core_pattern( $attributes ) {
 		return '';
 	}
 
+	if ( isset( $seen_refs[ $attributes['slug'] ] ) ) {
+		// WP_DEBUG_DISPLAY must only be honored when WP_DEBUG. This precedent
+		// is set in `wp_debug_mode()`.
+		$is_debug = WP_DEBUG && WP_DEBUG_DISPLAY;
+
+		return $is_debug ?
+			// translators: Visible only in the front end, this warning takes the place of a faulty block. %s represents a pattern's slug.
+			sprintf( __( '[block rendering halted for pattern "%s"]' ), $slug ) :
+			'';
+	}
+
 	$pattern = $registry->get_registered( $slug );
 	$content = $pattern['content'];
 
-	$gutenberg_experiments = get_option( 'gutenberg-experiments' );
-	if ( $gutenberg_experiments && ! empty( $gutenberg_experiments['gutenberg-auto-inserting-blocks'] ) ) {
-		// TODO: In the long run, we'd likely want to have a filter in the `WP_Block_Patterns_Registry` class
-		// instead to allow us plugging in code like this.
-		$blocks  = parse_blocks( $content );
-		$content = gutenberg_serialize_blocks( $blocks );
-	}
+	$seen_refs[ $attributes['slug'] ] = true;
 
-	return do_blocks( $content );
+	$content = do_blocks( $content );
+
+	global $wp_embed;
+	$content = $wp_embed->autoembed( $content );
+
+	unset( $seen_refs[ $attributes['slug'] ] );
+	return $content;
 }
 
 add_action( 'init', 'register_block_core_pattern' );

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/notices",
-	"version": "4.6.0",
+	"version": "5.48.0",
 	"description": "State management for notices.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,16 +19,48 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=12"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
-	"main": "build/index.js",
-	"module": "build-module/index.js",
-	"react-native": "src/index",
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-style",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
+		},
+		"./package.json": "./package.json",
+		"./build-style/": "./build-style/"
+	},
+	"wpScript": true,
 	"types": "build-types",
+	"sideEffects": [
+		"build-style/**",
+		"src/**/*.scss"
+	],
 	"dependencies": {
-		"@babel/runtime": "^7.16.0",
+		"@types/react": "^18.3.27",
 		"@wordpress/a11y": "file:../a11y",
-		"@wordpress/data": "file:../data"
+		"@wordpress/components": "file:../components",
+		"@wordpress/data": "file:../data",
+		"clsx": "^2.1.1"
+	},
+	"devDependencies": {
+		"@testing-library/dom": "^10.4.1",
+		"@testing-library/react": "^16.3.2",
+		"deep-freeze": "^0.0.1"
+	},
+	"peerDependencies": {
+		"react": "^18.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

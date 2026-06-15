@@ -8,6 +8,8 @@
 /**
  * Renders the `core/read-more` block on the server.
  *
+ * @since 6.0.0
+ *
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
  * @param WP_Block $block      Block instance.
@@ -36,9 +38,9 @@ function render_block_core_read_more( $attributes, $content, $block ) {
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $justify_class_name ) );
 	$more_text          = ! empty( $attributes['content'] ) ? wp_kses_post( $attributes['content'] ) : __( 'Read more' );
 	return sprintf(
-		'<a %1s href="%2s" target="%3s">%4s<span class="screen-reader-text">%5s</span></a>',
+		'<a %1$s href="%2$s" target="%3$s">%4$s<span class="screen-reader-text">%5$s</span></a>',
 		$wrapper_attributes,
-		get_the_permalink( $post_ID ),
+		esc_url( get_the_permalink( $post_ID ) ),
 		esc_attr( $attributes['linkTarget'] ),
 		$more_text,
 		$screen_reader_text
@@ -47,6 +49,8 @@ function render_block_core_read_more( $attributes, $content, $block ) {
 
 /**
  * Registers the `core/read-more` block on the server.
+ *
+ * @since 6.0.0
  */
 function register_block_core_read_more() {
 	register_block_type_from_metadata(

@@ -1,12 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	Modal,
 	Button,
+	CheckboxControl,
 	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -17,9 +19,9 @@ import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 export function BlockRemovalWarningModal( { rules } ) {
-	const { clientIds, selectPrevious, blockNamesForPrompt } = useSelect(
-		( select ) =>
-			unlock( select( blockEditorStore ) ).getRemovalPromptData()
+	const [ confirmed, setConfirmed ] = useState( false );
+	const { clientIds, selectPrevious, message } = useSelect( ( select ) =>
+		unlock( select( blockEditorStore ) ).getRemovalPromptData()
 	);
 
 	const {
@@ -37,9 +39,19 @@ export function BlockRemovalWarningModal( { rules } ) {
 		};
 	}, [ rules, setBlockRemovalRules ] );
 
-	if ( ! blockNamesForPrompt ) {
+	// Reset confirmed state when modal opens with new content.
+	useEffect( () => {
+		setConfirmed( false );
+	}, [ clientIds ] );
+
+	if ( ! message ) {
 		return;
 	}
+
+	const isStructured = typeof message === 'object' && message !== null;
+	const description = isStructured ? message.description : message;
+	const requireConfirmation = isStructured && message.requireConfirmation;
+	const isRemoveDisabled = requireConfirmation && ! confirmed;
 
 	const onConfirmRemoval = () => {
 		privateRemoveBlocks( clientIds, selectPrevious, /* force */ true );
@@ -48,31 +60,50 @@ export function BlockRemovalWarningModal( { rules } ) {
 
 	return (
 		<Modal
-			title={ __( 'Are you sure?' ) }
+			title={ __( 'Confirm deletion' ) }
 			onRequestClose={ clearBlockRemovalPrompt }
+			size="medium"
 		>
-			{ blockNamesForPrompt.length === 1 ? (
-				<p>{ rules[ blockNamesForPrompt[ 0 ] ] }</p>
-			) : (
-				<ul style={ { listStyleType: 'disc', paddingLeft: '1rem' } }>
-					{ blockNamesForPrompt.map( ( name ) => (
-						<li key={ name }>{ rules[ name ] }</li>
-					) ) }
-				</ul>
-			) }
-			<p>
-				{ blockNamesForPrompt.length > 1
-					? __( 'Removing these blocks is not advised.' )
-					: __( 'Removing this block is not advised.' ) }
-			</p>
-			<HStack justify="right">
-				<Button variant="tertiary" onClick={ clearBlockRemovalPrompt }>
-					{ __( 'Cancel' ) }
-				</Button>
-				<Button variant="primary" onClick={ onConfirmRemoval }>
-					{ __( 'Delete' ) }
-				</Button>
-			</HStack>
+			<VStack spacing={ 4 }>
+				<div>
+					<p>{ description }</p>
+					{ isStructured &&
+						( message.warning || message.subtext ) && (
+							<p>
+								{ message.warning && (
+									<strong>{ message.warning }</strong>
+								) }
+								{ message.warning && message.subtext && ' ' }
+								{ message.subtext }
+							</p>
+						) }
+				</div>
+				{ requireConfirmation && (
+					<CheckboxControl
+						label={ __( 'I understand the consequences' ) }
+						checked={ confirmed }
+						onChange={ setConfirmed }
+					/>
+				) }
+				<HStack justify="right">
+					<Button
+						variant="tertiary"
+						onClick={ clearBlockRemovalPrompt }
+						__next40pxDefaultSize
+					>
+						{ __( 'Cancel' ) }
+					</Button>
+					<Button
+						variant="primary"
+						onClick={ onConfirmRemoval }
+						disabled={ isRemoveDisabled }
+						accessibleWhenDisabled
+						__next40pxDefaultSize
+					>
+						{ __( 'Delete' ) }
+					</Button>
+				</HStack>
+			</VStack>
 		</Modal>
 	);
 }

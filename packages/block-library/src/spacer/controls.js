@@ -4,16 +4,17 @@
 import { __ } from '@wordpress/i18n';
 import {
 	InspectorControls,
-	useSetting,
+	useSettings,
 	__experimentalSpacingSizesControl as SpacingSizesControl,
 	isValueSpacingPreset,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
-	BaseControl,
-	PanelBody,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalUnitControl as UnitControl,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { View } from '@wordpress/primitives';
@@ -21,32 +22,27 @@ import { View } from '@wordpress/primitives';
 /**
  * Internal dependencies
  */
+import { unlock } from '../lock-unlock';
 import { MIN_SPACER_SIZE } from './constants';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+
+const { useSpacingSizes } = unlock( blockEditorPrivateApis );
 
 function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 	const inputId = useInstanceId( UnitControl, 'block-spacer-height-input' );
-	const spacingSizes = useSetting( 'spacing.spacingSizes' );
+	const spacingSizes = useSpacingSizes();
+	const [ spacingUnits ] = useSettings( 'spacing.units' );
 	// In most contexts the spacer size cannot meaningfully be set to a
 	// percentage, since this is relative to the parent container. This
 	// unit is disabled from the UI.
-	const availableUnitSettings = (
-		useSetting( 'spacing.units' ) || undefined
-	)?.filter( ( availableUnit ) => availableUnit !== '%' );
+	const availableUnits = spacingUnits
+		? spacingUnits.filter( ( unit ) => unit !== '%' )
+		: [ 'px', 'em', 'rem', 'vw', 'vh' ];
 
 	const units = useCustomUnits( {
-		availableUnits: availableUnitSettings || [
-			'px',
-			'em',
-			'rem',
-			'vw',
-			'vh',
-		],
+		availableUnits,
 		defaultValues: { px: 100, em: 10, rem: 10, vw: 10, vh: 25 },
 	} );
-
-	const handleOnChange = ( unprocessedValue ) => {
-		onChange( unprocessedValue.all );
-	};
 
 	// Force the unit to update to `px` when the Spacer is being resized.
 	const [ parsedQuantity, parsedUnit ] =
@@ -57,25 +53,24 @@ function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 
 	return (
 		<>
-			{ ( ! spacingSizes || spacingSizes?.length === 0 ) && (
-				<BaseControl label={ label } id={ inputId }>
-					<UnitControl
-						id={ inputId }
-						isResetValueOnUnitChange
-						min={ MIN_SPACER_SIZE }
-						onChange={ handleOnChange }
-						style={ { maxWidth: 80 } }
-						value={ computedValue }
-						units={ units }
-					/>
-				</BaseControl>
-			) }
-
-			{ spacingSizes?.length > 0 && (
+			{ spacingSizes?.length < 2 ? (
+				<UnitControl
+					id={ inputId }
+					isResetValueOnUnitChange
+					min={ MIN_SPACER_SIZE }
+					onChange={ onChange }
+					value={ computedValue }
+					units={ units }
+					label={ label }
+					__next40pxDefaultSize
+				/>
+			) : (
 				<View className="tools-panel-item-spacing">
 					<SpacingSizesControl
 						values={ { all: computedValue } }
-						onChange={ handleOnChange }
+						onChange={ ( { all } ) => {
+							onChange( all );
+						} }
 						label={ label }
 						sides={ [ 'all' ] }
 						units={ units }
@@ -96,30 +91,59 @@ export default function SpacerControls( {
 	width,
 	isResizing,
 } ) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
 	return (
 		<InspectorControls>
-			<PanelBody title={ __( 'Settings' ) }>
+			<ToolsPanel
+				label={ __( 'Settings' ) }
+				resetAll={ () => {
+					setAttributes( {
+						width: undefined,
+						height: '100px',
+					} );
+				} }
+				dropdownMenuProps={ dropdownMenuProps }
+			>
 				{ orientation === 'horizontal' && (
-					<DimensionInput
+					<ToolsPanelItem
 						label={ __( 'Width' ) }
-						value={ width }
-						onChange={ ( nextWidth ) =>
-							setAttributes( { width: nextWidth } )
+						isShownByDefault
+						hasValue={ () => width !== undefined }
+						onDeselect={ () =>
+							setAttributes( { width: undefined } )
 						}
-						isResizing={ isResizing }
-					/>
+					>
+						<DimensionInput
+							label={ __( 'Width' ) }
+							value={ width }
+							onChange={ ( nextWidth ) =>
+								setAttributes( { width: nextWidth } )
+							}
+							isResizing={ isResizing }
+						/>
+					</ToolsPanelItem>
 				) }
 				{ orientation !== 'horizontal' && (
-					<DimensionInput
+					<ToolsPanelItem
 						label={ __( 'Height' ) }
-						value={ height }
-						onChange={ ( nextHeight ) =>
-							setAttributes( { height: nextHeight } )
+						isShownByDefault
+						hasValue={ () => height !== '100px' }
+						onDeselect={ () =>
+							setAttributes( { height: '100px' } )
 						}
-						isResizing={ isResizing }
-					/>
+					>
+						<DimensionInput
+							label={ __( 'Height' ) }
+							value={ height }
+							onChange={ ( nextHeight ) =>
+								setAttributes( { height: nextHeight } )
+							}
+							isResizing={ isResizing }
+						/>
+					</ToolsPanelItem>
 				) }
-			</PanelBody>
+			</ToolsPanel>
 		</InspectorControls>
 	);
 }

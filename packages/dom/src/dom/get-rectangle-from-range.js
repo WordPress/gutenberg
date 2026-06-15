@@ -5,7 +5,8 @@ import { assertIsDefined } from '../utils/assert-is-defined';
 
 /**
  * Get the rectangle of a given Range. Returns `null` if no suitable rectangle
- * can be found.
+ * can be found. Use instead of `Range.getBoundingClientRect()`, which is often
+ * broken, especially for collapsed ranges.
  *
  * @param {Range} range The range.
  *
@@ -43,10 +44,18 @@ export default function getRectangleFromRange( range ) {
 		} = filteredRects[ 0 ];
 
 		for ( const { top, bottom, left, right } of filteredRects ) {
-			if ( top < furthestTop ) furthestTop = top;
-			if ( bottom > furthestBottom ) furthestBottom = bottom;
-			if ( left < furthestLeft ) furthestLeft = left;
-			if ( right > furthestRight ) furthestRight = right;
+			if ( top < furthestTop ) {
+				furthestTop = top;
+			}
+			if ( bottom > furthestBottom ) {
+				furthestBottom = bottom;
+			}
+			if ( left < furthestLeft ) {
+				furthestLeft = left;
+			}
+			if ( right > furthestRight ) {
+				furthestRight = right;
+			}
 		}
 
 		return new window.DOMRect(

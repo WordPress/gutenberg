@@ -2,19 +2,32 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useRef, useState } from '@wordpress/element';
+import {
+	useRef,
+	useEffect,
+	useState,
+	createInterpolateElement,
+} from '@wordpress/element';
+import { focus } from '@wordpress/dom';
 import {
 	ToolbarButton,
-	Button,
 	NavigableMenu,
+	Button,
 	MenuItem,
 	ToggleControl,
 	TextControl,
-	SVG,
-	Path,
 	__experimentalVStack as VStack,
+	ExternalLink,
 } from '@wordpress/components';
-import { link as linkIcon, close } from '@wordpress/icons';
+import {
+	Icon,
+	link as linkIcon,
+	image,
+	page,
+	fullscreen,
+	linkOff,
+} from '@wordpress/icons';
+import { prependHTTPS } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -25,15 +38,7 @@ const LINK_DESTINATION_NONE = 'none';
 const LINK_DESTINATION_CUSTOM = 'custom';
 const LINK_DESTINATION_MEDIA = 'media';
 const LINK_DESTINATION_ATTACHMENT = 'attachment';
-const NEW_TAB_REL = [ 'noreferrer', 'noopener' ];
-
-const icon = (
-	<SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-		<Path d="M0,0h24v24H0V0z" fill="none" />
-		<Path d="m19 5v14h-14v-14h14m0-2h-14c-1.1 0-2 0.9-2 2v14c0 1.1 0.9 2 2 2h14c1.1 0 2-0.9 2-2v-14c0-1.1-0.9-2-2-2z" />
-		<Path d="m14.14 11.86l-3 3.87-2.14-2.59-3 3.86h12l-3.86-5.14z" />
-	</SVG>
-);
+const NEW_TAB_REL = [ 'noopener' ];
 
 const ImageURLInputUI = ( {
 	linkDestination,
@@ -45,6 +50,10 @@ const ImageURLInputUI = ( {
 	linkTarget,
 	linkClass,
 	rel,
+	showLightboxSetting,
+	lightboxEnabled,
+	onSetLightbox,
+	resetLightbox,
 } ) => {
 	const [ isOpen, setIsOpen ] = useState( false );
 	// Use internal state instead of a ref to make sure that the component
@@ -58,6 +67,17 @@ const ImageURLInputUI = ( {
 	const [ urlInput, setUrlInput ] = useState( null );
 
 	const autocompleteRef = useRef( null );
+	const wrapperRef = useRef();
+
+	useEffect( () => {
+		if ( ! wrapperRef.current ) {
+			return;
+		}
+		const nextFocusTarget =
+			focus.focusable.find( wrapperRef.current )[ 0 ] ||
+			wrapperRef.current;
+		nextFocusTarget.focus();
+	}, [ isEditingLink, url, lightboxEnabled ] );
 
 	const startEditLink = () => {
 		if (
@@ -136,8 +156,9 @@ const ImageURLInputUI = ( {
 					)?.linkDestination || LINK_DESTINATION_CUSTOM;
 
 				onChangeUrl( {
-					href: urlInput,
+					href: prependHTTPS( urlInput ),
 					linkDestination: selectedDestination,
+					lightbox: { enabled: false },
 				} );
 			}
 			stopEditLink();
@@ -157,22 +178,17 @@ const ImageURLInputUI = ( {
 		const linkDestinations = [
 			{
 				linkDestination: LINK_DESTINATION_MEDIA,
-				title: __( 'Media File' ),
+				title: __( 'Link to image file' ),
 				url: mediaType === 'image' ? mediaUrl : undefined,
-				icon,
+				icon: image,
 			},
 		];
 		if ( mediaType === 'image' && mediaLink ) {
 			linkDestinations.push( {
 				linkDestination: LINK_DESTINATION_ATTACHMENT,
-				title: __( 'Attachment Page' ),
+				title: __( 'Link to attachment page' ),
 				url: mediaType === 'image' ? mediaLink : undefined,
-				icon: (
-					<SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-						<Path d="M0 0h24v24H0V0z" fill="none" />
-						<Path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6z" />
-					</SVG>
-				),
+				icon: page,
 			} );
 		}
 		return linkDestinations;
@@ -212,20 +228,29 @@ const ImageURLInputUI = ( {
 	const advancedOptions = (
 		<VStack spacing="3">
 			<ToggleControl
-				__nextHasNoMarginBottom
 				label={ __( 'Open in new tab' ) }
 				onChange={ onSetNewTab }
 				checked={ linkTarget === '_blank' }
 			/>
 			<TextControl
-				__nextHasNoMarginBottom
-				label={ __( 'Link rel' ) }
+				__next40pxDefaultSize
+				label={ __( 'Link relation' ) }
 				value={ rel ?? '' }
 				onChange={ onSetLinkRel }
+				help={ createInterpolateElement(
+					__(
+						'The <a>Link Relation</a> attribute defines the relationship between a linked resource and the current document.'
+					),
+					{
+						a: (
+							<ExternalLink href="https://developer.mozilla.org/docs/Web/HTML/Attributes/rel" />
+						),
+					}
+				) }
 			/>
 			<TextControl
-				__nextHasNoMarginBottom
-				label={ __( 'Link CSS Class' ) }
+				__next40pxDefaultSize
+				label={ __( 'Link CSS class' ) }
 				value={ linkClass || '' }
 				onChange={ onSetLinkClass }
 			/>
@@ -233,6 +258,9 @@ const ImageURLInputUI = ( {
 	);
 
 	const linkEditorValue = urlInput !== null ? urlInput : url;
+	const hideLightboxPanel =
+		! lightboxEnabled || ( lightboxEnabled && ! showLightboxSetting );
+	const showLinkEditor = ! linkEditorValue && hideLightboxPanel;
 
 	const urlLabel = (
 		getLinkDestinations().find(
@@ -240,29 +268,95 @@ const ImageURLInputUI = ( {
 		) || {}
 	).title;
 
+	const PopoverChildren = () => {
+		if (
+			lightboxEnabled &&
+			showLightboxSetting &&
+			! url &&
+			! isEditingLink
+		) {
+			return (
+				<div className="block-editor-url-popover__expand-on-click">
+					<Icon icon={ fullscreen } />
+					<div className="text">
+						<p>{ __( 'Enlarge on click' ) }</p>
+						<p className="description">
+							{ __( 'Scales the image with a lightbox effect' ) }
+						</p>
+					</div>
+					<Button
+						icon={ linkOff }
+						label={ __( 'Disable enlarge on click' ) }
+						onClick={ () => {
+							onSetLightbox?.( false );
+						} }
+						size="compact"
+					/>
+				</div>
+			);
+		} else if ( ! url || isEditingLink ) {
+			return (
+				<URLPopover.LinkEditor
+					className="block-editor-format-toolbar__link-container-content"
+					value={ linkEditorValue }
+					onChangeInputValue={ setUrlInput }
+					onSubmit={ onSubmitLinkChange() }
+					autocompleteRef={ autocompleteRef }
+				/>
+			);
+		} else if ( url && ! isEditingLink ) {
+			return (
+				<>
+					<URLPopover.LinkViewer
+						className="block-editor-format-toolbar__link-container-content"
+						url={ url }
+						onEditLinkClick={ startEditLink }
+						urlLabel={ urlLabel }
+					/>
+					<Button
+						icon={ linkOff }
+						label={ __( 'Remove link' ) }
+						onClick={ () => {
+							onLinkRemove();
+							resetLightbox?.();
+						} }
+						size="compact"
+					/>
+				</>
+			);
+		}
+	};
+
 	return (
 		<>
 			<ToolbarButton
 				icon={ linkIcon }
 				className="components-toolbar__control"
-				label={ url ? __( 'Edit link' ) : __( 'Insert link' ) }
+				label={ __( 'Link' ) }
 				aria-expanded={ isOpen }
 				onClick={ openLinkUI }
 				ref={ setPopoverAnchor }
+				isActive={
+					!! url || ( lightboxEnabled && showLightboxSetting )
+				}
 			/>
 			{ isOpen && (
 				<URLPopover
+					ref={ wrapperRef }
 					anchor={ popoverAnchor }
 					onFocusOutside={ onFocusOutside() }
 					onClose={ closeLinkUI }
-					renderSettings={ () => advancedOptions }
+					renderSettings={
+						hideLightboxPanel ? () => advancedOptions : null
+					}
 					additionalControls={
-						! linkEditorValue && (
+						showLinkEditor && (
 							<NavigableMenu>
 								{ getLinkDestinations().map( ( link ) => (
 									<MenuItem
 										key={ link.linkDestination }
 										icon={ link.icon }
+										iconPosition="left"
 										onClick={ () => {
 											setUrlInput( null );
 											onSetHref( link.url );
@@ -272,34 +366,35 @@ const ImageURLInputUI = ( {
 										{ link.title }
 									</MenuItem>
 								) ) }
+								{ showLightboxSetting && (
+									<MenuItem
+										key="expand-on-click"
+										className="block-editor-url-popover__expand-on-click"
+										icon={ fullscreen }
+										info={ __(
+											'Scale the image with a lightbox effect.'
+										) }
+										iconPosition="left"
+										onClick={ () => {
+											setUrlInput( null );
+											onChangeUrl( {
+												linkDestination:
+													LINK_DESTINATION_NONE,
+												href: '',
+											} );
+											onSetLightbox?.( true );
+											stopEditLink();
+										} }
+									>
+										{ __( 'Enlarge on click' ) }
+									</MenuItem>
+								) }
 							</NavigableMenu>
 						)
 					}
+					offset={ 13 }
 				>
-					{ ( ! url || isEditingLink ) && (
-						<URLPopover.LinkEditor
-							className="block-editor-format-toolbar__link-container-content"
-							value={ linkEditorValue }
-							onChangeInputValue={ setUrlInput }
-							onSubmit={ onSubmitLinkChange() }
-							autocompleteRef={ autocompleteRef }
-						/>
-					) }
-					{ url && ! isEditingLink && (
-						<>
-							<URLPopover.LinkViewer
-								className="block-editor-format-toolbar__link-container-content"
-								url={ url }
-								onEditLinkClick={ startEditLink }
-								urlLabel={ urlLabel }
-							/>
-							<Button
-								icon={ close }
-								label={ __( 'Remove link' ) }
-								onClick={ onLinkRemove }
-							/>
-						</>
-					) }
+					{ PopoverChildren() }
 				</URLPopover>
 			) }
 		</>

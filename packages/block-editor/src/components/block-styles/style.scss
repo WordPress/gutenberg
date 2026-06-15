@@ -1,12 +1,10 @@
-.block-editor-block-styles + .default-style-picker__default-switcher {
-	margin-top: $grid-unit-20;
-}
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/z-index" as *;
 
 .block-editor-block-styles__preview-panel {
 	display: none;
-	position: absolute;
-	right: $grid-unit-20;
-	left: auto;
 	// Same layer as the sidebar from which it's triggered.
 	z-index: z-index(".interface-interface-skeleton__sidebar {greater than small}");
 
@@ -15,20 +13,13 @@
 		display: block;
 	}
 
-	// Overrides for InserterPreviewPanel.
-	.block-editor-inserter__preview-container {
-		left: auto;
-		right: auto;
-		top: auto;
-		position: static;
-	}
-
-	.block-editor-block-card__title.block-editor-block-card__title {
-		margin: 0;
-	}
 	.block-editor-block-icon {
 		display: none;
 	}
+}
+
+.block-editor-block-styles {
+	grid-column: 1 / -1;
 }
 
 .block-editor-block-styles__variants {
@@ -39,13 +30,13 @@
 
 	button.components-button.block-editor-block-styles__item {
 		color: $gray-900;
-		box-shadow: inset 0 0 0 1px $gray-400;
+		box-shadow: inset 0 0 0 $border-width $gray-300;
 		display: inline-block;
 		width: calc(50% - #{$grid-unit-05});
 
 		&:hover {
 			color: var(--wp-admin-theme-color);
-			box-shadow: inset 0 0 0 1px $gray-400;
+			box-shadow: inset 0 0 0 $border-width $gray-300;
 		}
 
 		&.is-active,
@@ -61,7 +52,7 @@
 
 		&:focus,
 		&.is-active:focus {
-			@include button-style__focus();
+			@include block-toolbar-button-style__focus();
 		}
 	}
 
@@ -76,10 +67,3 @@
 	}
 }
 
-// To prevent overflow in the preview container,
-// ensure that block contents' margin and padding
-// do not add to the block container's width.
-.block-editor-block-styles__block-preview-container,
-.block-editor-block-styles__block-preview-container * {
-	box-sizing: border-box !important;
-}

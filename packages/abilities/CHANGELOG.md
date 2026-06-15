@@ -1,0 +1,33 @@
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
+
+## Unreleased
+
+## 0.14.0 (2026-06-10)
+
+## 0.13.0 (2026-05-27)
+
+## 0.12.0 (2026-05-14)
+
+## 0.11.0 (2026-04-29)
+
+## 0.10.0 (2026-04-15)
+
+## 0.9.0 (2026-04-01)
+
+## 0.8.0 (2026-03-18)
+
+## 0.7.0 (2026-03-04)
+
+## 0.6.0 (2026-02-18)
+
+## 0.5.0 (2026-01-29)
+
+## 0.4.0 (2026-01-16)
+
+## 0.2.0 (2025-11-26)
+
+## 0.1.0 (Unreleased)
+
+### New Features
+
+-   Initial release of the WordPress Abilities API client library.

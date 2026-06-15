@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __experimentalUseSlotFills as useSlotFills } from '@wordpress/components';
+import { forwardRef } from '@wordpress/element';
 import warning from '@wordpress/warning';
 import deprecated from '@wordpress/deprecated';
 
@@ -12,12 +13,10 @@ import BlockSupportToolsPanel from './block-support-tools-panel';
 import BlockSupportSlotContainer from './block-support-slot-container';
 import groups from './groups';
 
-export default function InspectorControlsSlot( {
-	__experimentalGroup,
-	group = 'default',
-	label,
-	...props
-} ) {
+function InspectorControlsSlot(
+	{ __experimentalGroup, group = 'default', label, fillProps, ...props },
+	ref
+) {
 	if ( __experimentalGroup ) {
 		deprecated(
 			'`__experimentalGroup` property in `InspectorControlsSlot`',
@@ -29,9 +28,10 @@ export default function InspectorControlsSlot( {
 		);
 		group = __experimentalGroup;
 	}
-	const Slot = groups[ group ]?.Slot;
-	const fills = useSlotFills( Slot?.__unstableName );
-	if ( ! Slot ) {
+	const slotFill = groups[ group ];
+	const fills = useSlotFills( slotFill?.name );
+
+	if ( ! slotFill ) {
 		warning( `Unknown InspectorControls group "${ group }" provided.` );
 		return null;
 	}
@@ -40,13 +40,28 @@ export default function InspectorControlsSlot( {
 		return null;
 	}
 
+	const { Slot } = slotFill;
+
 	if ( label ) {
 		return (
 			<BlockSupportToolsPanel group={ group } label={ label }>
-				<BlockSupportSlotContainer { ...props } Slot={ Slot } />
+				<BlockSupportSlotContainer
+					{ ...props }
+					fillProps={ fillProps }
+					Slot={ Slot }
+				/>
 			</BlockSupportToolsPanel>
 		);
 	}
 
-	return <Slot { ...props } bubblesVirtually />;
+	return (
+		<Slot
+			{ ...props }
+			ref={ ref }
+			fillProps={ fillProps }
+			bubblesVirtually
+		/>
+	);
 }
+
+export default forwardRef( InspectorControlsSlot );

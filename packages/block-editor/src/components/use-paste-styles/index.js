@@ -15,6 +15,7 @@ import {
 	hasAlignSupport,
 	hasBorderSupport,
 	hasBackgroundColorSupport,
+	hasTextAlignSupport,
 	hasTextColorSupport,
 	hasGradientSupport,
 	hasCustomClassNameSupport,
@@ -43,7 +44,7 @@ function hasSerializedBlocks( text ) {
 			return false;
 		}
 		return true;
-	} catch ( err ) {
+	} catch {
 		// Parsing error, the text is not serialized blocks.
 		// (Even though that it technically won't happen)
 		return false;
@@ -59,6 +60,7 @@ const STYLE_ATTRIBUTES = {
 	align: hasAlignSupport,
 	borderColor: ( nameOrType ) => hasBorderSupport( nameOrType, 'color' ),
 	backgroundColor: hasBackgroundColorSupport,
+	textAlign: hasTextAlignSupport,
 	textColor: hasTextColorSupport,
 	gradient: hasGradientSupport,
 	className: hasCustomClassNameSupport,
@@ -151,7 +153,7 @@ export default function usePasteStyles() {
 				}
 
 				html = await window.navigator.clipboard.readText();
-			} catch ( error ) {
+			} catch {
 				// Possibly the permission is denied.
 				createErrorNotice(
 					__(
@@ -202,7 +204,7 @@ export default function usePasteStyles() {
 				const title = getBlockType( targetBlocks[ 0 ].name )?.title;
 				createSuccessNotice(
 					sprintf(
-						// Translators: Name of the block being pasted, e.g. "Paragraph".
+						// Translators: %s: Name of the block being pasted, e.g. "Paragraph".
 						__( 'Pasted styles to %s.' ),
 						title
 					),
@@ -211,7 +213,7 @@ export default function usePasteStyles() {
 			} else {
 				createSuccessNotice(
 					sprintf(
-						// Translators: The number of the blocks.
+						// Translators: %d: The number of the blocks.
 						__( 'Pasted styles to %d blocks.' ),
 						targetBlocks.length
 					),

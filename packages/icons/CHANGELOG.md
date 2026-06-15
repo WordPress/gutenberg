@@ -2,6 +2,227 @@
 
 ## Unreleased
 
+## 14.0.0 (2026-06-10)
+
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+### Breaking Changes
+
+-   Rename `timeToRead` icon to `time`. ([#78804](https://github.com/WordPress/gutenberg/pull/78804))
+-   Remove `tab` icon. ([#77439](https://github.com/WordPress/gutenberg/pull/77439))
+
+## 13.2.0 (2026-05-27)
+
+## 13.1.0 (2026-05-14)
+
+## 13.0.0 (2026-04-29)
+
+### Breaking Changes
+
+- Rename Tabs-related icons: `tabs-menu` to `tab-list`, `tabs-menu-item` to `tab`, and `tab` to `tab-panel`. ([#77418](https://github.com/WordPress/gutenberg/pull/77418))
+
+## 12.2.0 (2026-04-15)
+
+## 12.1.0 (2026-04-01)
+
+## 12.0.0 (2026-03-18)
+
+### Breaking Changes
+
+-   Rename `formatLtr` icon to `formatLTR`. ([#76074](https://github.com/WordPress/gutenberg/pull/76074))
+
+## 11.8.0 (2026-03-04)
+
+## 11.7.0 (2026-02-18)
+
+### Enhancements
+
+-   Add new `navigation-overlay` icon. ([#75249](https://github.com/WordPress/gutenberg/issues/75249))
+
+## 11.6.0 (2026-01-29)
+
+## 11.5.0 (2026-01-16)
+
+## 11.3.0 (2025-11-26)
+
+### Enhancements
+
+-   Add new `cart` icon. ([#73509](https://github.com/WordPress/gutenberg/pull/73509))
+
+## 11.2.0 (2025-11-12)
+
+## 11.1.0 (2025-10-29)
+
+## 11.0.0 (2025-10-17)
+
+### Breaking Changes
+
+-   Remove `edit` and `warning` icons, which were aliases to `pencil` and `cautionFilled`, respectively. Switch to SVG icons as canonical source format, letting the system auto-generate the React elements and index. ([#71878](https://github.com/WordPress/gutenberg/pull/71878)).
+-   Ensure both SVG and generated TSX code in `src/` are included in the published package. ([#72299](https://github.com/WordPress/gutenberg/pull/72299))
+
+### Enhancements
+
+-   Update `check` to be more optically balanced. ([#72101](https://github.com/WordPress/gutenberg/pull/72101))
+-   Add new `timeToRead` and `wordCount` icons. ([#72240](https://github.com/WordPress/gutenberg/pull/72240))
+
+## 10.32.0 (2025-10-01)
+
+## 10.31.0 (2025-09-17)
+
+## 10.30.0 (2025-09-03)
+
+## 10.29.0 (2025-08-20)
+
+-   Breaking change: deprecate `moreHorizontalMobile` icon. This was added in error, and `moreHorizontal` should be used instead. ([#71172](https://github.com/WordPress/gutenberg/pull/71172))
+
+## 10.28.0 (2025-08-07)
+
+-   Add new `dashboard` icon ([#70300](https://github.com/WordPress/gutenberg/pull/70300)).
+
+## 10.27.0 (2025-07-23)
+
+-   Update `cancelCircleFilled`, `currencyDollar`, `currencyPound`, `currencyEuro`, `globe`, `helpFilled`, `siteLogo`, `swatch`, to have unified circular size footprints. ([https://github.com/WordPress/gutenberg/pull/70581](#70581)).
+-   Update `help`, `plusCircle`, and `typography` icons to have a unified circular footprint that matches other circle icons. ([#70299](https://github.com/WordPress/gutenberg/pull/70299)).
+-   Update `plusCircleFilled` to have unified circular size footprints. ([https://github.com/WordPress/gutenberg/pull/70650](#70650)).
+
+## 10.26.0 (2025-06-25)
+
+## 10.25.0 (2025-06-04)
+
+## 10.24.0 (2025-05-22)
+
+## 10.23.0 (2025-05-07)
+
+## 10.22.0 (2025-04-11)
+
+## 10.21.0 (2025-03-27)
+
+## 10.20.0 (2025-03-13)
+
+## 10.19.0 (2025-02-28)
+
+## 10.18.0 (2025-02-12)
+
+## 10.17.0 (2025-01-29)
+
+## 10.16.0 (2025-01-15)
+
+## 10.15.0 (2025-01-02)
+
+-   Add new `caution` icon ([#66555](https://github.com/WordPress/gutenberg/pull/66555)).
+-   Add new `error` icon ([#66555](https://github.com/WordPress/gutenberg/pull/66555)).
+-   Deprecate `warning` icon and rename to `cautionFilled` ([#67895](https://github.com/WordPress/gutenberg/pull/67895)).
+
+## 10.14.0 (2024-12-11)
+
+## 10.13.0 (2024-11-27)
+
+## 10.12.0 (2024-11-16)
+
+## 10.11.0 (2024-10-30)
+
+## 10.10.0 (2024-10-16)
+
+### Enhancements
+
+-   Update `cloudUpload` icon to improve visibility of the up arrow.
+
+### New Features
+
+-   Add new `cloudDownload` icon.
+-   Update `unseen` icon to be a strike-through eye, rather than a closed eye, to match provide consistency. ([#65914](https://github.com/WordPress/gutenberg/pull/65914)).
+
+## 10.9.0 (2024-10-03)
+
+## 10.8.0 (2024-09-19)
+
+### New Features
+
+-   Add new `envelope` icon.
+
+-   Add new `bell` and `bell-unread` icons.
+-   Add new `arrowUpLeft` and `arrowDownRight` icons.
+
+## 10.7.0 (2024-09-05)
+
+## 10.6.0 (2024-08-21)
+
+## 10.5.0 (2024-08-07)
+
+### New Features
+
+-   Add new `send` icon.
+
+## 10.4.0 (2024-07-24)
+
+## 10.3.0 (2024-07-10)
+
+## 10.2.0 (2024-06-26)
+
+## 10.1.0 (2024-06-15)
+
+## 10.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 9.49.0 (2024-05-16)
+
+## 9.48.0 (2024-05-02)
+
+## 9.47.0 (2024-04-19)
+
+## 9.46.0 (2024-04-03)
+
+-   Add new `chevronDownSmall` icon.
+
+## 9.45.0 (2024-03-21)
+
+## 9.44.0 (2024-03-06)
+
+## 9.43.0 (2024-02-21)
+
+## 9.42.0 (2024-02-09)
+
+## 9.41.0 (2024-01-24)
+
+## 9.40.0 (2024-01-10)
+
+## 9.39.0 (2023-12-13)
+
+## 9.38.0 (2023-11-29)
+
+## 9.37.0 (2023-11-16)
+
+### New Features
+
+-   Add new `funnel` icon.
+
+## 9.36.0 (2023-11-02)
+
+## 9.35.0 (2023-10-18)
+
+## 9.34.0 (2023-10-05)
+
+## 9.33.0 (2023-09-20)
+
+### Enhancements
+
+-   `<Icon>` now forwards ref to the underlying child component ([#54492](https://github.com/WordPress/gutenberg/pull/54492)).
+
+## 9.32.0 (2023-08-31)
+
+### Bug Fixes
+
+-   Fixed invalid XML namespace on `alignJustify`, `customLink`, `mapMarker`, `postContent` and `title` ([#53955](https://github.com/WordPress/gutenberg/pull/53955)).
+
+## 9.31.0 (2023-08-16)
+
+## 9.30.0 (2023-08-10)
+
 ## 9.29.0 (2023-07-20)
 
 ## 9.28.0 (2023-07-05)
@@ -22,7 +243,7 @@
 
 ## 9.22.0 (2023-04-12)
 
-### New features
+### New Features
 
 ## 9.21.0 (2023-03-29)
 
@@ -69,14 +290,17 @@
 ## 9.0.0 (2022-05-18)
 
 ### Breaking Changes
+
 -   Removed icons no longer used by the UI: `commentTitle`, `postTitle`, `queryTitle`, `archiveTitle`.
 
-### Enhancement
+### Enhancements
+
 -   Update the `title` icon to match g2 design language. ([#40596](https://github.com/WordPress/gutenberg/pull/40596))
 
 ## 8.4.0 (2022-05-04)
 
 ## 8.3.0 (2022-04-21)
+
 ### New Features
 
 -   Add new `filter` icon. ([#40435](https://github.com/WordPress/gutenberg/pull/40435))
@@ -125,13 +349,13 @@
 
 ## 6.0.0 (2021-10-12)
 
-### Breaking Change
+### Breaking Changes
 
 -   Removed the `minus` icon, which was only used once in the block editor, in favor of the new `reset` icon which offers a more refined vector.
 
 ## 5.0.0 (2021-07-29)
 
-### Breaking Change
+### Breaking Changes
 
 -   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
 
@@ -154,17 +378,17 @@
 
 ## 2.0.0 (2020-05-14)
 
-### Breaking change
+### Breaking Changes
 
 -   `star` icon removed as it is duplicative of `star-filled`. ([#21825](https://github.com/WordPress/gutenberg/pull/21825))
 
-### New Feature
+### New Features
 
 -   Include TypeScript type declarations ([#21781](https://github.com/WordPress/gutenberg/pull/21781))
 
 ## 1.3.1 (2020-04-15)
 
-### Bug Fix
+### Bug Fixes
 
 -   Hide TypeScript type declarations ([#21613](https://github.com/WordPress/gutenberg/pull/21613))
     after they were found to conflict with DefinitelyTyped provided declarations.

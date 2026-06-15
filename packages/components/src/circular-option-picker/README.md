@@ -9,8 +9,8 @@ This component is not exported, and therefore can only be used internally to the
 ## Usage
 
 ```jsx
+import { useState } from 'react';
 import { CircularOptionPicker } from '../circular-option-picker';
-import { useState } from '@wordpress/element';
 
 const Example = () => {
 	const [ currentColor, setCurrentColor ] = useState();
@@ -29,7 +29,6 @@ const Example = () => {
 						style={ { backgroundColor: color, color } }
 						isSelected={ index === currentColor }
 						onClick={ () => setCurrentColor( index ) }
-						aria-label={ name }
 					/>
 				);
 			} ) }
@@ -79,6 +78,33 @@ Usually a `CircularOptionPicker.Option` component.
 The child elements.
 
 - Required: No
+
+### `asButtons`: `boolean`
+
+Whether the control should present as a set of buttons, each with its own tab stop.
+
+- Required: No
+- Default: `false`
+
+### `loop`: `boolean`
+
+Prevents keyboard interaction from wrapping around. Only used when `asButtons` is not true.
+
+- Required: No
+- Default: `true`
+
+### `aria-labelledby`: `string`
+
+The ID reference list of one or more elements that label the wrapper element.
+
+- Required: No
+
+### `aria-label`: `string`
+
+The label for the wrapper element. Not used if an 'aria-labelledby' is provided.
+
+- Required: No
+- Default: `Custom color picker`
 
 ## Subcomponents
 
@@ -136,6 +162,6 @@ Inherits all of the [`Dropdown` props](/packages/components/src/dropdown/README.
 
 Props for the underlying `Button` component.
 
-Inherits all of the [`Button` props](/packages/components/src/button/README.md#props), except for `href`, `target`, and `children`. 
+Inherits all of the [`Button` props](/packages/components/src/button/README.md#props), except for `href`, `target`, and `children`.
 
 - Required: No

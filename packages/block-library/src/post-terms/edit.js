@@ -1,15 +1,8 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import {
-	AlignmentToolbar,
 	InspectorControls,
-	BlockControls,
 	useBlockProps,
 	useBlockDisplayInformation,
 	RichText,
@@ -44,12 +37,14 @@ export default function PostTermsEdit( {
 	setAttributes,
 	insertBlocksAfter,
 } ) {
-	const { term, textAlign, separator, prefix, suffix } = attributes;
+	const { term, separator, prefix, suffix } = attributes;
 	const { postId, postType } = context;
 
 	const selectedTerm = useSelect(
 		( select ) => {
-			if ( ! term ) return {};
+			if ( ! term ) {
+				return {};
+			}
 			const { getTaxonomy } = select( coreStore );
 			const taxonomy = getTaxonomy( term );
 			return taxonomy?.visibility?.publicly_queryable ? taxonomy : {};
@@ -63,25 +58,14 @@ export default function PostTermsEdit( {
 	const hasPost = postId && postType;
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const blockProps = useBlockProps( {
-		className: classnames( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-			[ `taxonomy-${ term }` ]: term,
-		} ),
+		className: term && `taxonomy-${ term }`,
 	} );
 
 	return (
 		<>
-			<BlockControls>
-				<AlignmentToolbar
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
-				/>
-			</BlockControls>
 			<InspectorControls group="advanced">
 				<TextControl
-					__nextHasNoMarginBottom
+					__next40pxDefaultSize
 					autoComplete="off"
 					label={ __( 'Separator' ) }
 					value={ separator || '' }
@@ -93,11 +77,11 @@ export default function PostTermsEdit( {
 			</InspectorControls>
 			<div { ...blockProps }>
 				{ isLoading && hasPost && <Spinner /> }
-				{ ! isLoading && hasPostTerms && ( isSelected || prefix ) && (
+				{ ! isLoading && ( isSelected || prefix ) && (
 					<RichText
+						identifier="prefix"
 						allowedFormats={ ALLOWED_FORMATS }
 						className="wp-block-post-terms__prefix"
-						multiline={ false }
 						aria-label={ __( 'Prefix' ) }
 						placeholder={ __( 'Prefix' ) + ' ' }
 						value={ prefix }
@@ -119,6 +103,7 @@ export default function PostTermsEdit( {
 								key={ postTerm.id }
 								href={ postTerm.link }
 								onClick={ ( event ) => event.preventDefault() }
+								rel="tag"
 							>
 								{ decodeEntities( postTerm.name ) }
 							</a>
@@ -137,11 +122,11 @@ export default function PostTermsEdit( {
 					! hasPostTerms &&
 					( selectedTerm?.labels?.no_terms ||
 						__( 'Term items not found.' ) ) }
-				{ ! isLoading && hasPostTerms && ( isSelected || suffix ) && (
+				{ ! isLoading && ( isSelected || suffix ) && (
 					<RichText
+						identifier="suffix"
 						allowedFormats={ ALLOWED_FORMATS }
 						className="wp-block-post-terms__suffix"
-						multiline={ false }
 						aria-label={ __( 'Suffix' ) }
 						placeholder={ ' ' + __( 'Suffix' ) }
 						value={ suffix }

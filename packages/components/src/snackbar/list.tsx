@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -18,7 +18,7 @@ import {
 	__unstableAnimatePresence as AnimatePresence,
 } from '../animation';
 import type { SnackbarListProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 
 const SNACKBAR_VARIANTS = {
 	init: {
@@ -29,13 +29,21 @@ const SNACKBAR_VARIANTS = {
 		height: 'auto',
 		opacity: 1,
 		transition: {
-			height: { stiffness: 1000, velocity: -100 },
+			height: { type: 'tween', duration: 0.3, ease: [ 0, 0, 0.2, 1 ] },
+			opacity: {
+				type: 'tween',
+				duration: 0.25,
+				delay: 0.05,
+				ease: [ 0, 0, 0.2, 1 ],
+			},
 		},
 	},
 	exit: {
 		opacity: 0,
 		transition: {
-			duration: 0.5,
+			type: 'tween',
+			duration: 0.1,
+			ease: [ 0, 0, 0.2, 1 ],
 		},
 	},
 };
@@ -58,14 +66,19 @@ export function SnackbarList( {
 	children,
 	onRemove,
 }: WordPressComponentProps< SnackbarListProps, 'div' > ) {
-	const listRef = useRef< HTMLDivElement | null >( null );
+	const listRef = useRef< HTMLDivElement >( null );
 	const isReducedMotion = useReducedMotion();
-	className = classnames( 'components-snackbar-list', className );
+	className = clsx( 'components-snackbar-list', className );
 	const removeNotice =
 		( notice: SnackbarListProps[ 'notices' ][ number ] ) => () =>
 			onRemove?.( notice.id );
 	return (
-		<div className={ className } tabIndex={ -1 } ref={ listRef }>
+		<div
+			className={ className }
+			tabIndex={ -1 }
+			ref={ listRef }
+			data-testid="snackbar-list"
+		>
 			{ children }
 			<AnimatePresence>
 				{ notices.map( ( notice ) => {
@@ -73,10 +86,15 @@ export function SnackbarList( {
 
 					return (
 						<motion.div
-							layout={ ! isReducedMotion } // See https://www.framer.com/docs/animation/#layout-animations
-							initial={ 'init' }
-							animate={ 'open' }
-							exit={ 'exit' }
+							layout={ isReducedMotion ? false : 'position' } // See https://www.framer.com/docs/animation/#layout-animations
+							// Ensures a stable full-width bounding box so that
+							// `layout="position"` only ever detects vertical
+							// shifts, preventing horizontal animation when
+							// notice text changes in place.
+							style={ { width: '100%' } }
+							initial="init"
+							animate="open"
+							exit="exit"
 							key={ notice.id }
 							variants={
 								isReducedMotion ? undefined : SNACKBAR_VARIANTS

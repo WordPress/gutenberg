@@ -12,8 +12,15 @@
 			"type": "string"
 		}
 	},
-	"usesContext": [ "queryId", "query", "paginationArrow", "showLabel" ],
+	"usesContext": [
+		"queryId",
+		"query",
+		"paginationArrow",
+		"showLabel",
+		"enhancedPagination"
+	],
 	"supports": {
+		"anchor": true,
 		"reusable": false,
 		"html": false,
 		"color": {
@@ -35,6 +42,9 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	}
 }

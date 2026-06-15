@@ -1,36 +1,29 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	PanelBody,
-	TextControl,
-	TextareaControl,
-	ToolbarButton,
-	ToolbarGroup,
-} from '@wordpress/components';
+import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 import {
 	BlockControls,
 	InnerBlocks,
-	useInnerBlocksProps,
 	InspectorControls,
+	useInnerBlocksProps,
 	RichText,
 	useBlockProps,
+	useBlockEditingMode,
 	store as blockEditorStore,
 	getColorClassName,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
 import { useState, useEffect, useRef } from '@wordpress/element';
-import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { link as linkIcon, removeSubmenu } from '@wordpress/icons';
-import { useResourcePermissions } from '@wordpress/core-data';
 import { speak } from '@wordpress/a11y';
 import { createBlock } from '@wordpress/blocks';
 import { useMergeRefs, usePrevious } from '@wordpress/compose';
@@ -39,74 +32,29 @@ import { useMergeRefs, usePrevious } from '@wordpress/compose';
  * Internal dependencies
  */
 import { ItemSubmenuIcon } from './icons';
-import { name } from './block.json';
-import { LinkUI } from '../navigation-link/link-ui';
-import { updateAttributes } from '../navigation-link/update-attributes';
+import {
+	Controls,
+	LinkUI,
+	useEntityBinding,
+	useHandleLinkChange,
+	useIsInvalidLink,
+	InvalidDraftDisplay,
+	useEnableLinkStatusValidation,
+	useIsDraggingWithin,
+	selectLabelText,
+} from '../navigation-link/shared';
 import {
 	getColors,
 	getNavigationChildBlockProps,
 } from '../navigation/edit/utils';
+import { DEFAULT_BLOCK } from '../navigation/constants';
 
 const ALLOWED_BLOCKS = [
 	'core/navigation-link',
 	'core/navigation-submenu',
 	'core/page-list',
+	'core/loginout',
 ];
-
-const DEFAULT_BLOCK = {
-	name: 'core/navigation-link',
-};
-
-/**
- * A React hook to determine if it's dragging within the target element.
- *
- * @typedef {import('@wordpress/element').RefObject} RefObject
- *
- * @param {RefObject<HTMLElement>} elementRef The target elementRef object.
- *
- * @return {boolean} Is dragging within the target element.
- */
-const useIsDraggingWithin = ( elementRef ) => {
-	const [ isDraggingWithin, setIsDraggingWithin ] = useState( false );
-
-	useEffect( () => {
-		const { ownerDocument } = elementRef.current;
-
-		function handleDragStart( event ) {
-			// Check the first time when the dragging starts.
-			handleDragEnter( event );
-		}
-
-		// Set to false whenever the user cancel the drag event by either releasing the mouse or press Escape.
-		function handleDragEnd() {
-			setIsDraggingWithin( false );
-		}
-
-		function handleDragEnter( event ) {
-			// Check if the current target is inside the item element.
-			if ( elementRef.current.contains( event.target ) ) {
-				setIsDraggingWithin( true );
-			} else {
-				setIsDraggingWithin( false );
-			}
-		}
-
-		// Bind these events to the document to catch all drag events.
-		// Ideally, we can also use `event.relatedTarget`, but sadly that
-		// doesn't work in Safari.
-		ownerDocument.addEventListener( 'dragstart', handleDragStart );
-		ownerDocument.addEventListener( 'dragend', handleDragEnd );
-		ownerDocument.addEventListener( 'dragenter', handleDragEnter );
-
-		return () => {
-			ownerDocument.removeEventListener( 'dragstart', handleDragStart );
-			ownerDocument.removeEventListener( 'dragend', handleDragEnd );
-			ownerDocument.removeEventListener( 'dragenter', handleDragEnter );
-		};
-	}, [] );
-
-	return isDraggingWithin;
-};
 
 /**
  * @typedef {'post-type'|'custom'|'taxonomy'|'post-type-archive'} WPNavigationLinkKind
@@ -124,7 +72,6 @@ const useIsDraggingWithin = ( elementRef ) => {
  * @property {number}               [id]            A post or term id.
  * @property {boolean}              [opensInNewTab] Sets link target to _blank when true.
  * @property {string}               [url]           Link href.
- * @property {string}               [title]         Link title attribute.
  */
 
 export default function NavigationSubmenuEdit( {
@@ -136,9 +83,28 @@ export default function NavigationSubmenuEdit( {
 	context,
 	clientId,
 } ) {
-	const { label, type, url, description, rel, title } = attributes;
+	const { label, url, description, kind, type, id } = attributes;
 
-	const { showSubmenuIcon, maxNestingLevel, openSubmenusOnClick } = context;
+	const { showSubmenuIcon, maxNestingLevel, submenuVisibility } = context;
+	const blockEditingMode = useBlockEditingMode();
+
+	// Force click-only behavior in contentOnly mode to prevent hover dropdowns
+	const openSubmenusOnClick =
+		blockEditingMode !== 'default' ? true : submenuVisibility === 'click';
+
+	// URL binding logic
+	const { hasUrlBinding, isBoundEntityAvailable, entityRecord } =
+		useEntityBinding( {
+			clientId,
+			attributes,
+		} );
+
+	const handleLinkChange = useHandleLinkChange( {
+		clientId,
+		attributes,
+		setAttributes,
+		allowTextUpdate: true,
+	} );
 
 	const { __unstableMarkNextChangeAsNotPersistent, replaceBlock } =
 		useDispatch( blockEditorStore );
@@ -151,12 +117,8 @@ export default function NavigationSubmenuEdit( {
 	const itemLabelPlaceholder = __( 'Add text…' );
 	const ref = useRef();
 
-	const pagesPermissions = useResourcePermissions( 'pages' );
-	const postsPermissions = useResourcePermissions( 'posts' );
-
 	const {
-		isAtMaxNesting,
-		isTopLevelItem,
+		parentCount,
 		isParentOfSelectedBlock,
 		isImmediateParentOfSelectedBlock,
 		hasChildren,
@@ -191,11 +153,10 @@ export default function NavigationSubmenuEdit( {
 			}
 
 			return {
-				isAtMaxNesting:
-					getBlockParentsByBlockName( clientId, name ).length >=
-					maxNestingLevel,
-				isTopLevelItem:
-					getBlockParentsByBlockName( clientId, name ).length === 0,
+				parentCount: getBlockParentsByBlockName(
+					clientId,
+					'core/navigation-submenu'
+				).length,
 				isParentOfSelectedBlock: hasSelectedInnerBlock(
 					clientId,
 					true
@@ -212,7 +173,17 @@ export default function NavigationSubmenuEdit( {
 		[ clientId ]
 	);
 
+	const validateLinkStatus = useEnableLinkStatusValidation( clientId );
+
 	const prevHasChildren = usePrevious( hasChildren );
+
+	// Check if the submenu's parent link is invalid or draft
+	const [ isInvalid, isDraft ] = useIsInvalidLink(
+		kind,
+		type,
+		id,
+		validateLinkStatus
+	);
 
 	// Show the LinkControl on mount if the URL is empty
 	// ( When adding a new menu item)
@@ -243,52 +214,33 @@ export default function NavigationSubmenuEdit( {
 				/^.+\.[a-z]+/.test( label )
 			) {
 				// Focus and select the label text.
-				selectLabelText();
-			} else {
-				// Focus it (but do not select).
-				placeCaretAtHorizontalEdge( ref.current, true );
+				selectLabelText( ref );
 			}
 		}
 	}, [ url ] );
-
-	/**
-	 * Focus the Link label text and select it.
-	 */
-	function selectLabelText() {
-		ref.current.focus();
-		const { ownerDocument } = ref.current;
-		const { defaultView } = ownerDocument;
-		const selection = defaultView.getSelection();
-		const range = ownerDocument.createRange();
-		// Get the range of the current ref contents so we can add this range to the selection.
-		range.selectNodeContents( ref.current );
-		selection.removeAllRanges();
-		selection.addRange( range );
-	}
-
-	let userCanCreate = false;
-	if ( ! type || type === 'page' ) {
-		userCanCreate = pagesPermissions.canCreate;
-	} else if ( type === 'post' ) {
-		userCanCreate = postsPermissions.canCreate;
-	}
 
 	const {
 		textColor,
 		customTextColor,
 		backgroundColor,
 		customBackgroundColor,
-	} = getColors( context, ! isTopLevelItem );
+	} = getColors( context, parentCount > 0 );
 
 	function onKeyDown( event ) {
 		if ( isKeyboardEvent.primary( event, 'k' ) ) {
+			// Required to prevent the command center from opening,
+			// as it shares the CMD+K shortcut.
+			// See https://github.com/WordPress/gutenberg/pull/59845.
+			event.preventDefault();
+			// If we don't stop propagation, this event bubbles up to the parent submenu item
+			event.stopPropagation();
 			setIsLinkOpen( true );
 		}
 	}
 
 	const blockProps = useBlockProps( {
 		ref: useMergeRefs( [ setPopoverAnchor, listItemRef ] ),
-		className: classnames( 'wp-block-navigation-item', {
+		className: clsx( 'wp-block-navigation-item', {
 			'is-editing': isSelected || isParentOfSelectedBlock,
 			'is-dragging-within': isDraggingWithin,
 			'has-link': !! url,
@@ -299,6 +251,7 @@ export default function NavigationSubmenuEdit( {
 			[ getColorClassName( 'background-color', backgroundColor ) ]:
 				!! backgroundColor,
 			'open-on-click': openSubmenusOnClick,
+			'open-always': submenuVisibility === 'always',
 		} ),
 		style: {
 			color: ! textColor && customTextColor,
@@ -310,11 +263,12 @@ export default function NavigationSubmenuEdit( {
 	// Always use overlay colors for submenus.
 	const innerBlocksColors = getColors( context, true );
 
-	const allowedBlocks = isAtMaxNesting
-		? ALLOWED_BLOCKS.filter(
-				( blockName ) => blockName !== 'core/navigation-submenu'
-		  )
-		: ALLOWED_BLOCKS;
+	const allowedBlocks =
+		parentCount >= maxNestingLevel
+			? ALLOWED_BLOCKS.filter(
+					( blockName ) => blockName !== 'core/navigation-submenu'
+			  )
+			: ALLOWED_BLOCKS;
 
 	const navigationChildBlockProps =
 		getNavigationChildBlockProps( innerBlocksColors );
@@ -368,7 +322,9 @@ export default function NavigationSubmenuEdit( {
 							icon={ linkIcon }
 							title={ __( 'Link' ) }
 							shortcut={ displayShortcut.primary( 'k' ) }
-							onClick={ () => setIsLinkOpen( true ) }
+							onClick={ () => {
+								setIsLinkOpen( true );
+							} }
 						/>
 					) }
 
@@ -378,120 +334,74 @@ export default function NavigationSubmenuEdit( {
 						title={ __( 'Convert to Link' ) }
 						onClick={ transformToLink }
 						className="wp-block-navigation__submenu__revert"
-						isDisabled={ ! canConvertToLink }
+						disabled={ ! canConvertToLink }
 					/>
 				</ToolbarGroup>
 			</BlockControls>
-			{ /* Warning, this duplicated in packages/block-library/src/navigation-link/edit.js */ }
-			<InspectorControls>
-				<PanelBody title={ __( 'Settings' ) }>
-					<TextControl
-						__nextHasNoMarginBottom
-						value={ label || '' }
-						onChange={ ( labelValue ) => {
-							setAttributes( { label: labelValue } );
-						} }
-						label={ __( 'Label' ) }
-						autoComplete="off"
-					/>
-					<TextControl
-						__nextHasNoMarginBottom
-						value={ url || '' }
-						onChange={ ( urlValue ) => {
-							setAttributes( { url: urlValue } );
-						} }
-						label={ __( 'URL' ) }
-						autoComplete="off"
-					/>
-					<TextareaControl
-						__nextHasNoMarginBottom
-						value={ description || '' }
-						onChange={ ( descriptionValue ) => {
-							setAttributes( {
-								description: descriptionValue,
-							} );
-						} }
-						label={ __( 'Description' ) }
-						help={ __(
-							'The description will be displayed in the menu if the current theme supports it.'
-						) }
-					/>
-					<TextControl
-						__nextHasNoMarginBottom
-						value={ title || '' }
-						onChange={ ( titleValue ) => {
-							setAttributes( { title: titleValue } );
-						} }
-						label={ __( 'Title attribute' ) }
-						autoComplete="off"
-						help={ __(
-							'Additional information to help clarify the purpose of the link.'
-						) }
-					/>
-					<TextControl
-						__nextHasNoMarginBottom
-						value={ rel || '' }
-						onChange={ ( relValue ) => {
-							setAttributes( { rel: relValue } );
-						} }
-						label={ __( 'Rel attribute' ) }
-						autoComplete="off"
-						help={ __(
-							'The relationship of the linked URL as space-separated link types.'
-						) }
-					/>
-				</PanelBody>
+			<InspectorControls group="content">
+				<Controls
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					clientId={ clientId }
+					isLinkEditable={ ! openSubmenusOnClick }
+				/>
 			</InspectorControls>
 			<div { ...blockProps }>
-				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
 				<ParentElement className="wp-block-navigation-item__content">
-					{ /* eslint-enable */ }
-					{
-						<RichText
-							ref={ ref }
-							identifier="label"
-							className="wp-block-navigation-item__label"
-							value={ label }
-							onChange={ ( labelValue ) =>
-								setAttributes( { label: labelValue } )
-							}
-							onMerge={ mergeBlocks }
-							onReplace={ onReplace }
-							aria-label={ __( 'Navigation link text' ) }
-							placeholder={ itemLabelPlaceholder }
-							withoutInteractiveFormatting
-							allowedFormats={ [
-								'core/bold',
-								'core/italic',
-								'core/image',
-								'core/strikethrough',
-							] }
-							onClick={ () => {
-								if ( ! openSubmenusOnClick && ! url ) {
-									setIsLinkOpen( true );
+					{ ! isInvalid && ! isDraft && (
+						<>
+							<RichText
+								ref={ ref }
+								identifier="label"
+								className="wp-block-navigation-item__label"
+								value={ label }
+								onChange={ ( labelValue ) =>
+									setAttributes( { label: labelValue } )
 								}
-							} }
+								onMerge={ mergeBlocks }
+								onReplace={ onReplace }
+								aria-label={ __( 'Navigation link text' ) }
+								placeholder={ itemLabelPlaceholder }
+								withoutInteractiveFormatting
+								onClick={ () => {
+									if ( ! openSubmenusOnClick && ! url ) {
+										setIsLinkOpen( true );
+									}
+								} }
+							/>
+							{ description && (
+								<span className="wp-block-navigation-item__description">
+									{ description }
+								</span>
+							) }
+						</>
+					) }
+					{ ( isInvalid || isDraft ) && (
+						<InvalidDraftDisplay
+							label={ label }
+							isInvalid={ isInvalid }
+							isDraft={ isDraft }
+							className="wp-block-navigation-item__label"
 						/>
-					}
+					) }
 					{ ! openSubmenusOnClick && isLinkOpen && (
 						<LinkUI
-							className="wp-block-navigation-link__inline-link-input"
 							clientId={ clientId }
 							link={ attributes }
-							onClose={ () => setIsLinkOpen( false ) }
+							entity={ {
+								entityRecord,
+								hasBinding: hasUrlBinding,
+								isEntityAvailable: isBoundEntityAvailable,
+							} }
+							onClose={ () => {
+								setIsLinkOpen( false );
+							} }
 							anchor={ popoverAnchor }
-							hasCreateSuggestion={ userCanCreate }
 							onRemove={ () => {
 								setAttributes( { url: '' } );
 								speak( __( 'Link removed.' ), 'assertive' );
 							} }
-							onChange={ ( updatedValue ) => {
-								updateAttributes(
-									updatedValue,
-									setAttributes,
-									attributes
-								);
-							} }
+							onChange={ handleLinkChange }
 						/>
 					) }
 				</ParentElement>

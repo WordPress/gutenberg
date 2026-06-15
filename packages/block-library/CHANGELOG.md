@@ -2,6 +2,180 @@
 
 ## Unreleased
 
+## 9.48.0 (2026-06-10)
+
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+-   Page List: derive `isNested` from a new `core/isInsideSubmenu` block context provided by Navigation Submenu, replacing the self-setting attribute pattern that was dirtying related entities ([#79015](https://github.com/WordPress/gutenberg/issues/79015)).
+
+## 9.47.0 (2026-05-27)
+
+### Internal
+
+-   Gallery editor: remove `Notice` positioning overrides that conflicted with the updated `Notice` layout ([#78231](https://github.com/WordPress/gutenberg/pull/78231)).
+
+## 9.46.0 (2026-05-14)
+
+## 9.45.0 (2026-04-29)
+
+## 9.44.0 (2026-04-15)
+
+## 9.43.0 (2026-04-01)
+
+## 9.42.0 (2026-03-18)
+
+## 9.41.0 (2026-03-04)
+
+## 9.40.0 (2026-02-18)
+
+## 9.39.0 (2026-01-29)
+
+## 9.38.0 (2026-01-16)
+
+-   Post Date Block: Improve semantic HTML to add `<time>` inside link element.
+
+## 9.37.0 (2025-12-23)
+
+## 9.36.0 (2025-11-26)
+
+## 9.35.0 (2025-11-12)
+
+## 9.34.0 (2025-10-29)
+
+## 9.33.0 (2025-10-17)
+
+### Enhancements
+
+-   Enable the Query Loop "Force Page Reload" setting to be false when the Post Content block is used. ([#72160](https://github.com/WordPress/gutenberg/pull/72160))
+
+## 9.32.0 (2025-10-01)
+
+## 9.31.0 (2025-09-17)
+
+## 9.30.0 (2025-09-03)
+
+## 9.29.0 (2025-08-20)
+
+## 9.28.0 (2025-08-07)
+
+## 9.27.0 (2025-07-23)
+
+## 9.26.0 (2025-06-25)
+
+## 9.25.0 (2025-06-04)
+
+## 9.24.0 (2025-05-22)
+
+## 9.23.0 (2025-05-07)
+
+## 9.22.0 (2025-04-11)
+
+## 9.21.0 (2025-03-27)
+
+## 9.20.0 (2025-03-13)
+
+### Enhancements
+
+-   Query Loop Block: Enable custom order or `menu_order` ordering option for post types that support it. ([#68781](https://github.com/WordPress/gutenberg/pull/68781))
+
+## 9.19.0 (2025-02-28)
+
+## 9.18.0 (2025-02-12)
+
+## 9.17.0 (2025-01-29)
+
+## 9.16.0 (2025-01-15)
+
+## 9.15.0 (2025-01-02)
+
+## 9.14.0 (2024-12-11)
+
+## 9.13.0 (2024-11-27)
+
+## 9.12.0 (2024-11-16)
+
+## 9.11.0 (2024-10-30)
+
+## 9.10.0 (2024-10-16)
+
+## 9.9.0 (2024-10-03)
+
+## 9.8.0 (2024-09-19)
+
+## 9.7.0 (2024-09-05)
+
+## 9.6.0 (2024-08-21)
+
+## 9.5.0 (2024-08-07)
+
+### New Feature
+
+-   Query Loop Block: Moves per page, offset, and pages controls into Inspector Controls. ([#58207](https://github.com/WordPress/gutenberg/pull/58207))
+
+## 9.4.0 (2024-07-24)
+
+## 9.3.0 (2024-07-10)
+
+## 9.2.0 (2024-06-26)
+
+## 9.1.0 (2024-06-15)
+
+## 9.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Variables like `process.env.IS_GUTENBERG_PLUGIN` have been replaced by `globalThis.IS_GUTENBERG_PLUGIN`. Build systems using `process.env` should be updated ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 8.35.0 (2024-05-16)
+
+### Internal
+
+-   Replaced `classnames` package with the faster and smaller `clsx` package ([#61138](https://github.com/WordPress/gutenberg/pull/61138)).
+
+## 8.34.0 (2024-05-02)
+
+## 8.33.0 (2024-04-19)
+
+## 8.32.0 (2024-04-03)
+
+## 8.31.0 (2024-03-21)
+
+## 8.30.0 (2024-03-06)
+
+## 8.29.0 (2024-02-21)
+
+## 8.28.0 (2024-02-09)
+
+## 8.27.0 (2024-01-24)
+
+## 8.26.0 (2024-01-10)
+
+## 8.25.0 (2023-12-13)
+
+## 8.24.0 (2023-11-29)
+
+## 8.23.0 (2023-11-16)
+
+## 8.22.0 (2023-11-02)
+
+## 8.21.0 (2023-10-18)
+
+### Bug Fixes
+
+-   Fix Image block lightbox missing alt attribute and improve accessibility. ([#54608](https://github.com/WordPress/gutenberg/pull/55010))
+
+## 8.20.0 (2023-10-05)
+
+## 8.19.0 (2023-09-20)
+
+## 8.18.0 (2023-08-31)
+
+## 8.17.0 (2023-08-16)
+
+## 8.16.0 (2023-08-10)
+
 ## 8.15.0 (2023-07-20)
 
 ## 8.14.0 (2023-07-05)
@@ -36,7 +210,7 @@
 
 ### Breaking Changes
 
--   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
+-   Updated dependencies to require React 18 ([#45235](https://github.com/WordPress/gutenberg/pull/45235))
 
 ## 7.19.0 (2022-11-16)
 
@@ -50,13 +224,13 @@
 
 ## 7.14.0 (2022-09-13)
 
-### New Feature
+### New Features
 
 -   Made it possible to import individual blocks ([#42258](https://github.com/WordPress/gutenberg/pull/42258)). Check [README](./README.md#loading-individual-blocks) for more information.
 
 ## 7.13.0 (2022-08-24)
 
-### Bug Fix
+### Bug Fixes
 
 -   Ensure all dependencies allow version ranges ([#43355](https://github.com/WordPress/gutenberg/pull/43355)).
 
@@ -74,7 +248,7 @@
 
 ## 7.6.0 (2022-05-18)
 
-### Enhancement
+### Enhancements
 
 -   Declare blocks as \_\_experimental in block.json to automate syncing Gutenberg packages to WordPress ([#40655](https://github.com/WordPress/gutenberg/pull/40655)).
 
@@ -86,11 +260,11 @@
 
 ## 7.2.0 (2022-03-23)
 
-### Bug Fix
+### Bug Fixes
 
 -   Table block: Fix deprecation eligibility to prevent loss of named (color palette) background color ([#39445](https://github.com/WordPress/gutenberg/pull/39445)).
 
-### Enhancement
+### Enhancements
 
 -   Social Icons: Avoid loss of previously selected background color when switching back from "Logos Only" style ([#39276](https://github.com/WordPress/gutenberg/pull/39276)).
 
@@ -98,11 +272,11 @@
 
 ## 7.0.0 (2022-02-10)
 
-### Breaking Change
+### Breaking Changes
 
 -   The `GUTENBERG_PHASE` environment variable has been renamed to `IS_GUTENBERG_PLUGIN` and is now a boolean ([#38202](https://github.com/WordPress/gutenberg/pull/38202)).
 
-### Bug Fix
+### Bug Fixes
 
 -   Gallery block: disable edit as html support ([#39318](https://github.com/WordPress/gutenberg/pull/39318)).
 -   Removed unused `@wordpress/escape-html` and `@wordpress/is-shallow-equal` dependencies ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
@@ -113,13 +287,13 @@
 
 ## 6.0.0 (2021-09-09)
 
-### Breaking Change
+### Breaking Changes
 
 -   Remove the background-colors, foreground-colors, and gradient-colors mixins.
 
 ## 5.0.0 (2021-07-29)
 
-### Breaking Change
+### Breaking Changes
 
 -   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
 
@@ -145,8 +319,8 @@
 
 ### Breaking Changes
 
--   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/.
--   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at https://nodejs.org/en/about/releases/.
+-   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at <https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/>.
+-   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at <https://nodejs.org/en/about/releases/>.
 
 ## 2.29.0 (2021-03-17)
 
@@ -166,7 +340,7 @@
 
 ## 2.27.0 (2020-12-17)
 
-### Enhancement
+### Enhancements
 
 -   File Block: Copy url button is moved to Block toolbar.
 -   Code and Preformatted Blocks: delete on backspace from an empty block.
@@ -178,13 +352,13 @@
     ([#26569](https://github.com/WordPress/gutenberg/pull/26569)).
 -   Fix Image Block, reset image dimensions when replace URL. bug mentioned in ([#26333](https://github.com/WordPress/gutenberg/issues/26333)).
 
-### Enhancement
+### Enhancements
 
 -   File Block: Copy url button is moved to Block toolbar.
 
 ## 2.23.0 (2020-09-03)
 
-### Enhancement
+### Enhancements
 
 -   Site title is now a link.
 
@@ -231,7 +405,7 @@
 
 ## 2.3.0 (2019-03-06)
 
-### New Feature
+### New Features
 
 -   Add background color controls for the table block.
 -   Add new `RSS` block ([#7966](https://github.com/WordPress/gutenberg/pull/7966)).
@@ -263,7 +437,7 @@
 
 ## 2.2.2 (2018-11-12)
 
-### Polish
+### Internal
 
 -   Columns Block: Improve usability while editing columns.
 
@@ -277,7 +451,7 @@
 
 ## 2.1.8 (2018-11-03)
 
-### Polish
+### Internal
 
 -   File Block: Create file blocks when dropping multiple files at once.
 
@@ -311,7 +485,7 @@
 
 ## 2.0.0 (2018-09-05)
 
-### Breaking Change
+### Breaking Changes
 
 -   Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)). If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.
 

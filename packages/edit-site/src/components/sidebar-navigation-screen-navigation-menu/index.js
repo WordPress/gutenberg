@@ -2,13 +2,11 @@
  * WordPress dependencies
  */
 import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
-import {
-	__experimentalUseNavigator as useNavigator,
-	Spinner,
-} from '@wordpress/components';
+import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -18,14 +16,16 @@ import ScreenNavigationMoreMenu from './more-menu';
 import SingleNavigationMenu from './single-navigation-menu';
 import useNavigationMenuHandlers from './use-navigation-menu-handlers';
 import buildNavigationLabel from '../sidebar-navigation-screen-navigation-menus/build-navigation-label';
+import { unlock } from '../../lock-unlock';
+
+const { useLocation } = unlock( routerPrivateApis );
 
 export const postType = `wp_navigation`;
 
-export default function SidebarNavigationScreenNavigationMenu() {
-	const { params } = useNavigator();
-
-	// See https://github.com/WordPress/gutenberg/pull/52120.
-	const postId = Number( params?.postId );
+export default function SidebarNavigationScreenNavigationMenu( { backPath } ) {
+	const {
+		params: { postId },
+	} = useLocation();
 
 	const { record: navigationMenu, isResolving } = useEntityRecord(
 		'postType',
@@ -65,8 +65,9 @@ export default function SidebarNavigationScreenNavigationMenu() {
 		return (
 			<SidebarNavigationScreenWrapper
 				description={ __(
-					'Navigation menus are a curated collection of blocks that allow visitors to get around your site.'
+					'Navigation Menus are a curated collection of blocks that allow visitors to get around your site.'
 				) }
+				backPath={ backPath }
 			>
 				<Spinner className="edit-site-sidebar-navigation-screen-navigation-menus__loading" />
 			</SidebarNavigationScreenWrapper>
@@ -77,6 +78,7 @@ export default function SidebarNavigationScreenNavigationMenu() {
 		return (
 			<SidebarNavigationScreenWrapper
 				description={ __( 'Navigation Menu missing.' ) }
+				backPath={ backPath }
 			/>
 		);
 	}
@@ -86,12 +88,14 @@ export default function SidebarNavigationScreenNavigationMenu() {
 			<SidebarNavigationScreenWrapper
 				actions={
 					<ScreenNavigationMoreMenu
+						menuId={ navigationMenu?.id }
 						menuTitle={ decodeEntities( menuTitle ) }
 						onDelete={ _handleDelete }
 						onSave={ _handleSave }
 						onDuplicate={ _handleDuplicate }
 					/>
 				}
+				backPath={ backPath }
 				title={ buildNavigationLabel(
 					navigationMenu?.title,
 					navigationMenu?.id,
@@ -105,6 +109,7 @@ export default function SidebarNavigationScreenNavigationMenu() {
 	return (
 		<SingleNavigationMenu
 			navigationMenu={ navigationMenu }
+			backPath={ backPath }
 			handleDelete={ _handleDelete }
 			handleSave={ _handleSave }
 			handleDuplicate={ _handleDuplicate }

@@ -1,0 +1,89 @@
+@use "@wordpress/base-styles/animations" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.media-editor-preview {
+	box-sizing: border-box;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 100%;
+	padding: $grid-unit-40;
+	position: relative;
+
+	&__spinner {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+	}
+
+	&--loading {
+		width: 100%;
+		height: 100%;
+	}
+
+	&--image img {
+		max-width: 100%;
+		max-height: 100%;
+		object-fit: contain;
+		width: auto;
+		height: auto;
+		opacity: 0;
+
+		&.loaded {
+			@include animation__fade-in();
+		}
+	}
+
+	&--video video {
+		max-width: 100%;
+		max-height: 100%;
+		object-fit: contain;
+		width: auto;
+		height: auto;
+	}
+
+	&--audio audio {
+		max-width: 100%;
+	}
+
+	&--file {
+		text-align: center;
+	}
+
+	&__file-info {
+		background: $gray-100;
+		padding: $grid-unit-30;
+		border-radius: 2px;
+	}
+
+	&__file-name {
+		font-weight: 600;
+		margin-bottom: $grid-unit-10;
+	}
+
+	&__mime-type {
+		color: $gray-700;
+		font-size: 0.9em;
+		margin-bottom: $grid-unit-20;
+	}
+
+	&__download-link {
+		display: inline-block;
+		margin-top: $grid-unit-10;
+	}
+
+	&--error,
+	&--empty {
+		color: $gray-700;
+		text-align: center;
+	}
+
+	&__url {
+		font-size: 0.9em;
+		color: $gray-600;
+		word-break: break-all;
+		margin-top: $grid-unit-10;
+	}
+}

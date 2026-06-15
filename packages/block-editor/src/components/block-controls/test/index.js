@@ -43,6 +43,7 @@ describe( 'BlockControls', () => {
 		const edit = ( { children } ) => <>{ children }</>;
 
 		registerBlockType( 'core/test-block', {
+			apiVersion: 3,
 			save: () => {},
 			category: 'text',
 			title: 'block title',
@@ -59,7 +60,7 @@ describe( 'BlockControls', () => {
 	it( 'should render a dynamic toolbar of controls', () => {
 		render(
 			<SlotFillProvider>
-				<BlockEdit name="core/test-block" isSelected>
+				<BlockEdit name="core/test-block" mayDisplayControls>
 					<BlockControls controls={ controls }>
 						<p>Child</p>
 					</BlockControls>
@@ -84,7 +85,7 @@ describe( 'BlockControls', () => {
 	it( 'should render its children', () => {
 		render(
 			<SlotFillProvider>
-				<BlockEdit name="core/test-block" isSelected>
+				<BlockEdit name="core/test-block" mayDisplayControls>
 					<BlockControls controls={ controls }>
 						<p>Child</p>
 					</BlockControls>
@@ -99,7 +100,7 @@ describe( 'BlockControls', () => {
 	it( 'should a dynamic toolbar when passed as children', () => {
 		render(
 			<SlotFillProvider>
-				<BlockEdit name="core/test-block" isSelected>
+				<BlockEdit name="core/test-block" mayDisplayControls>
 					<BlockControls>
 						<ToolbarGroup controls={ controls } />
 					</BlockControls>

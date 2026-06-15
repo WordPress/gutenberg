@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-const path = require( 'path' );
-
-/**
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
@@ -17,6 +12,14 @@ test.use( {
 		height: 1024,
 	},
 } );
+
+async function dragTo( page, x, y ) {
+	// Call the move function twice to make sure the `dragOver` event is sent.
+	// @see https://github.com/microsoft/playwright/issues/17153
+	for ( let i = 0; i < 2; i += 1 ) {
+		await page.mouse.move( x, y );
+	}
+}
 
 test.describe( 'Draggable block', () => {
 	test.beforeEach( async ( { admin } ) => {
@@ -42,9 +45,9 @@ test.describe( 'Draggable block', () => {
 <p>2</p>
 <!-- /wp:paragraph -->` );
 
-		await editor.canvas.focus(
-			'role=document[name="Paragraph block"i] >> text=2'
-		);
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i] >> text=2' )
+			.focus();
 		await editor.showBlockToolbar();
 
 		const dragHandle = page.locator(
@@ -57,17 +60,10 @@ test.describe( 'Draggable block', () => {
 
 		// Move to and hover on the upper half of the paragraph block to trigger the indicator.
 		const firstParagraph = editor.canvas.locator(
-			'role=document[name="Paragraph block"i] >> text=1'
+			'role=document[name="Block: Paragraph"i] >> text=1'
 		);
 		const firstParagraphBound = await firstParagraph.boundingBox();
-		// Call the move function twice to make sure the `dragOver` event is sent.
-		// @see https://github.com/microsoft/playwright/issues/17153
-		for ( let i = 0; i < 2; i += 1 ) {
-			await page.mouse.move(
-				firstParagraphBound.x,
-				firstParagraphBound.y
-			);
-		}
+		await dragTo( page, firstParagraphBound.x, firstParagraphBound.y );
 
 		await expect(
 			page.locator( 'data-testid=block-draggable-chip >> visible=true' )
@@ -114,9 +110,9 @@ test.describe( 'Draggable block', () => {
 <p>2</p>
 <!-- /wp:paragraph -->` );
 
-		await editor.canvas.focus(
-			'role=document[name="Paragraph block"i] >> text=1'
-		);
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i] >> text=1' )
+			.focus();
 		await editor.showBlockToolbar();
 
 		const dragHandle = page.locator(
@@ -129,17 +125,14 @@ test.describe( 'Draggable block', () => {
 
 		// Move to and hover on the bottom half of the paragraph block to trigger the indicator.
 		const secondParagraph = editor.canvas.locator(
-			'role=document[name="Paragraph block"i] >> text=2'
+			'role=document[name="Block: Paragraph"i] >> text=2'
 		);
 		const secondParagraphBound = await secondParagraph.boundingBox();
-		// Call the move function twice to make sure the `dragOver` event is sent.
-		// @see https://github.com/microsoft/playwright/issues/17153
-		for ( let i = 0; i < 2; i += 1 ) {
-			await page.mouse.move(
-				secondParagraphBound.x,
-				secondParagraphBound.y + secondParagraphBound.height * 0.75
-			);
-		}
+		await dragTo(
+			page,
+			secondParagraphBound.x + 32,
+			secondParagraphBound.y + secondParagraphBound.height * 0.75
+		);
 
 		await expect(
 			page.locator( 'data-testid=block-draggable-chip >> visible=true' )
@@ -197,9 +190,9 @@ test.describe( 'Draggable block', () => {
 			],
 		} );
 
-		await editor.canvas.focus(
-			'role=document[name="Paragraph block"i] >> text=2'
-		);
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i] >> text=2' )
+			.focus();
 		await editor.showBlockToolbar();
 
 		const dragHandle = page.locator(
@@ -212,17 +205,14 @@ test.describe( 'Draggable block', () => {
 
 		// Move to and hover on the left half of the paragraph block to trigger the indicator.
 		const firstParagraph = editor.canvas.locator(
-			'role=document[name="Paragraph block"i] >> text=1'
+			'role=document[name="Block: Paragraph"i] >> text=1'
 		);
 		const firstParagraphBound = await firstParagraph.boundingBox();
-		// Call the move function twice to make sure the `dragOver` event is sent.
-		// @see https://github.com/microsoft/playwright/issues/17153
-		for ( let i = 0; i < 2; i += 1 ) {
-			await page.mouse.move(
-				firstParagraphBound.x + firstParagraphBound.width * 0.25,
-				firstParagraphBound.y
-			);
-		}
+		await dragTo(
+			page,
+			firstParagraphBound.x + firstParagraphBound.width * 0.25,
+			firstParagraphBound.y
+		);
 
 		await expect(
 			page.locator( 'data-testid=block-draggable-chip >> visible=true' )
@@ -278,9 +268,9 @@ test.describe( 'Draggable block', () => {
 			],
 		} );
 
-		await editor.canvas.focus(
-			'role=document[name="Paragraph block"i] >> text=1'
-		);
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i] >> text=1' )
+			.focus();
 		await editor.showBlockToolbar();
 
 		const dragHandle = page.locator(
@@ -293,17 +283,14 @@ test.describe( 'Draggable block', () => {
 
 		// Move to and hover on the right half of the paragraph block to trigger the indicator.
 		const secondParagraph = editor.canvas.locator(
-			'role=document[name="Paragraph block"i] >> text=2'
+			'role=document[name="Block: Paragraph"i] >> text=2'
 		);
 		const secondParagraphBound = await secondParagraph.boundingBox();
-		// Call the move function twice to make sure the `dragOver` event is sent.
-		// @see https://github.com/microsoft/playwright/issues/17153
-		for ( let i = 0; i < 2; i += 1 ) {
-			await page.mouse.move(
-				secondParagraphBound.x + secondParagraphBound.width * 0.75,
-				secondParagraphBound.y
-			);
-		}
+		await dragTo(
+			page,
+			secondParagraphBound.x + secondParagraphBound.width * 0.75,
+			secondParagraphBound.y
+		);
 
 		await expect(
 			page.locator( 'data-testid=block-draggable-chip >> visible=true' )
@@ -342,13 +329,6 @@ test.describe( 'Draggable block', () => {
 		editor,
 		pageUtils,
 	} ) => {
-		// To do: run with iframe.
-		await page.evaluate( () => {
-			window.wp.blocks.registerBlockType( 'test/v2', {
-				apiVersion: '2',
-				title: 'test',
-			} );
-		} );
 		// Insert a row.
 		await editor.insertBlock( {
 			name: 'core/group',
@@ -387,16 +367,11 @@ test.describe( 'Draggable block', () => {
 		);
 
 		const testImageName = '10x10_e2e_test_image_z9T8jK.png';
-		const testImagePath = path.join(
-			__dirname,
-			'../../../assets',
-			testImageName
-		);
+		const testImagePath = `./assets/${ testImageName }`;
 
 		{
-			const { dragOver, drop } = await pageUtils.dragFiles(
-				testImagePath
-			);
+			const { dragOver, drop } =
+				await pageUtils.dragFiles( testImagePath );
 
 			const rowBlock = editor.canvas.getByRole( 'document', {
 				name: 'Block: Row',
@@ -411,7 +386,10 @@ test.describe( 'Draggable block', () => {
 			await expect(
 				rowAppender,
 				'Dragging over the button block appender should show the blue background'
-			).toHaveCSS( 'background-color', 'rgb(0, 124, 186)' );
+			).toHaveCSS(
+				'background-color',
+				/rgb\(0, 124, 186\)|rgb\(56, 88, 233\)/
+			);
 
 			const { width: rowWidth } = await rowBlock.boundingBox();
 			await dragOver( rowBlock, { position: { x: rowWidth - 10 } } );
@@ -420,7 +398,10 @@ test.describe( 'Draggable block', () => {
 			await expect(
 				rowAppender,
 				'Dragging over the empty group block but outside the appender should still show the blue background'
-			).toHaveCSS( 'background-color', 'rgb(0, 124, 186)' );
+			).toHaveCSS(
+				'background-color',
+				/rgb\(0, 124, 186\)|rgb\(56, 88, 233\)/
+			);
 
 			await drop();
 			await expect( rowAppender ).toBeHidden();
@@ -434,9 +415,8 @@ test.describe( 'Draggable block', () => {
 		}
 
 		{
-			const { dragOver, drop } = await pageUtils.dragFiles(
-				testImagePath
-			);
+			const { dragOver, drop } =
+				await pageUtils.dragFiles( testImagePath );
 
 			const columnAppender = editor.canvas
 				.getByRole( 'document', {
@@ -452,7 +432,7 @@ test.describe( 'Draggable block', () => {
 			// This is technically an implementation detail but easier to test in this case.
 			await expect( columnAppender ).toHaveCSS(
 				'background-color',
-				'rgb(0, 124, 186)'
+				/rgb\(0, 124, 186\)|rgb\(56, 88, 233\)/
 			);
 
 			await drop();
@@ -472,5 +452,89 @@ test.describe( 'Draggable block', () => {
 				},
 			] );
 		}
+	} );
+
+	test( 'renders the drag chip inside the wp compat overlay slot', async ( {
+		editor,
+		page,
+	} ) => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i] >> text=2' )
+			.focus();
+		await editor.showBlockToolbar();
+
+		const dragHandle = page.locator(
+			'role=toolbar[name="Block tools"i] >> role=button[name="Drag"i][include-hidden]'
+		);
+		await dragHandle.hover();
+		await page.mouse.down();
+
+		const firstParagraph = editor.canvas.locator(
+			'role=document[name="Block: Paragraph"i] >> text=1'
+		);
+		const firstParagraphBound = await firstParagraph.boundingBox();
+		await dragTo( page, firstParagraphBound.x, firstParagraphBound.y );
+
+		const chip = page.locator(
+			'data-testid=block-draggable-chip >> visible=true'
+		);
+		await expect( chip ).toBeVisible();
+
+		// Living in the compat overlay slot is what keeps the chip above
+		// any `@wordpress/components` overlays opened mid-drag.
+		const chipIsInsideCompatSlot = await chip.evaluate(
+			( el ) => el.closest( '[data-wp-compat-overlay-slot]' ) !== null
+		);
+		expect( chipIsInsideCompatSlot ).toBe( true );
+
+		await page.mouse.up();
+	} );
+
+	test( 'can directly drag an image', async ( { page, editor } ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: { layout: { type: 'constrained' } },
+			innerBlocks: [ { name: 'core/paragraph' } ],
+		} );
+
+		const imageBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Image',
+		} );
+
+		const groupBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Group',
+		} );
+
+		await imageBlock.hover();
+		await page.mouse.down();
+		const groupBlockBox = await groupBlock.boundingBox();
+		await dragTo(
+			page,
+			groupBlockBox.x + groupBlockBox.width * 0.5,
+			groupBlockBox.y + groupBlockBox.height * 0.5
+		);
+		await page.mouse.up();
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/group',
+				attributes: {
+					tagName: 'div',
+					layout: { type: 'constrained' },
+				},
+				innerBlocks: [
+					{
+						name: 'core/image',
+						attributes: { alt: '', caption: '' },
+					},
+				],
+			},
+		] );
 	} );
 } );

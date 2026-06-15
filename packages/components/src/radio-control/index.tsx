@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type { ChangeEvent } from 'react';
 
 /**
@@ -13,9 +13,23 @@ import { useInstanceId } from '@wordpress/compose';
  * Internal dependencies
  */
 import BaseControl from '../base-control';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import type { RadioControlProps } from './types';
 import { VStack } from '../v-stack';
+import { StyledHelp } from '../base-control/styles/base-control-styles';
+import { VisuallyHidden } from '../visually-hidden';
+
+function generateOptionDescriptionId( radioGroupId: string, index: number ) {
+	return `${ radioGroupId }-${ index }-option-description`;
+}
+
+function generateOptionId( radioGroupId: string, index: number ) {
+	return `${ radioGroupId }-${ index }`;
+}
+
+function generateHelpId( radioGroupId: string ) {
+	return `${ radioGroupId }__help`;
+}
 
 /**
  * Render a user interface to select the user type using radio inputs.
@@ -51,12 +65,19 @@ export function RadioControl(
 		selected,
 		help,
 		onChange,
+		onClick,
 		hideLabelFromVision,
+		disabled,
 		options = [],
+		id: preferredId,
 		...additionalProps
 	} = props;
-	const instanceId = useInstanceId( RadioControl );
-	const id = `inspector-radio-control-${ instanceId }`;
+	const id = useInstanceId(
+		RadioControl,
+		'inspector-radio-control',
+		preferredId
+	);
+
 	const onChangeValue = ( event: ChangeEvent< HTMLInputElement > ) =>
 		onChange( event.target.value );
 
@@ -65,22 +86,34 @@ export function RadioControl(
 	}
 
 	return (
-		<BaseControl
-			__nextHasNoMarginBottom
-			label={ label }
+		<fieldset
 			id={ id }
-			hideLabelFromVision={ hideLabelFromVision }
-			help={ help }
-			className={ classnames( className, 'components-radio-control' ) }
+			role="radiogroup"
+			className={ clsx( className, 'components-radio-control' ) }
+			disabled={ disabled }
+			aria-describedby={ !! help ? generateHelpId( id ) : undefined }
 		>
-			<VStack spacing={ 1 }>
+			{ hideLabelFromVision ? (
+				<VisuallyHidden as="legend">{ label }</VisuallyHidden>
+			) : (
+				<BaseControl.VisualLabel as="legend">
+					{ label }
+				</BaseControl.VisualLabel>
+			) }
+
+			<VStack
+				spacing={ 3 }
+				className={ clsx( 'components-radio-control__group-wrapper', {
+					'has-help': !! help,
+				} ) }
+			>
 				{ options.map( ( option, index ) => (
 					<div
-						key={ `${ id }-${ index }` }
+						key={ generateOptionId( id, index ) }
 						className="components-radio-control__option"
 					>
 						<input
-							id={ `${ id }-${ index }` }
+							id={ generateOptionId( id, index ) }
 							className="components-radio-control__input"
 							type="radio"
 							name={ id }
@@ -88,17 +121,44 @@ export function RadioControl(
 							onChange={ onChangeValue }
 							checked={ option.value === selected }
 							aria-describedby={
-								!! help ? `${ id }__help` : undefined
+								!! option.description
+									? generateOptionDescriptionId( id, index )
+									: undefined
 							}
+							onClick={ ( event ) => {
+								// Compat code for Safari to ensure that the radio is focused when clicked.
+								event.currentTarget.focus();
+
+								onClick?.( event );
+							} }
 							{ ...additionalProps }
 						/>
-						<label htmlFor={ `${ id }-${ index }` }>
+						<label
+							className="components-radio-control__label"
+							htmlFor={ generateOptionId( id, index ) }
+						>
 							{ option.label }
 						</label>
+						{ !! option.description ? (
+							<StyledHelp
+								id={ generateOptionDescriptionId( id, index ) }
+								className="components-radio-control__option-description"
+							>
+								{ option.description }
+							</StyledHelp>
+						) : null }
 					</div>
 				) ) }
 			</VStack>
-		</BaseControl>
+			{ !! help && (
+				<StyledHelp
+					id={ generateHelpId( id ) }
+					className="components-base-control__help"
+				>
+					{ help }
+				</StyledHelp>
+			) }
+		</fieldset>
 	);
 }
 

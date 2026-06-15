@@ -16,9 +16,11 @@
 				"sticky": "",
 				"inherit": true,
 				"taxQuery": null,
-				"parents": []
+				"parents": [],
+				"format": []
 			},
-			"tagName": "div"
+			"tagName": "div",
+			"enhancedPagination": false
 		},
 		"innerBlocks": []
 	}

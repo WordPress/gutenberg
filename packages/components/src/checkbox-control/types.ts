@@ -10,8 +10,12 @@ import type { BaseControlProps } from '../base-control/types';
 
 export type CheckboxControlProps = Pick<
 	BaseControlProps,
-	'help' | '__nextHasNoMarginBottom'
+	'__nextHasNoMarginBottom' | 'help'
 > & {
+	/**
+	 * Whether the checkbox should be disabled.
+	 */
+	disabled?: boolean;
 	/**
 	 * A function that receives the checked state (boolean) as input.
 	 */

@@ -12,7 +12,7 @@ import { useEffect, useRef } from '@wordpress/element';
  * @return The value from the previous render.
  */
 export default function usePrevious< T >( value: T ): T | undefined {
-	const ref = useRef< T >();
+	const ref = useRef< T >( undefined );
 
 	// Store current value in ref.
 	useEffect( () => {

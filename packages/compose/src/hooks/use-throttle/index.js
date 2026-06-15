@@ -19,7 +19,7 @@ import { throttle } from '../../utils/throttle';
  * including the function to throttle, so please wrap functions created on
  * render in components in `useCallback`.
  *
- * @see https://docs-lodash.com/v4/throttle/
+ * @see https://lodash.com/docs/4#throttle
  *
  * @template {(...args: any[]) => void} TFunc
  *

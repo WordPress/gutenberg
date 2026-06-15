@@ -23,7 +23,7 @@ export type WithInjectedProps< C, I > = ComponentType<
  */
 export function createHigherOrderComponent<
 	TInner extends ComponentType< any >,
-	TOuter extends ComponentType< any >
+	TOuter extends ComponentType< any >,
 >( mapComponent: ( Inner: TInner ) => TOuter, modifierName: string ) {
 	return ( Inner: TInner ) => {
 		const Outer = mapComponent( Inner );

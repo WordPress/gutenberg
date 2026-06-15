@@ -4,7 +4,7 @@
 This feature is still experimental. "Experimental" means this is an early implementation subject to drastic and breaking changes.
 </div>
 
-`ConfirmDialog` is built of top of [`Modal`](/packages/components/src/modal/README.md) and displays a confirmation dialog, with _confirm_ and _cancel_ buttons.
+`ConfirmDialog` is built on top of [`Modal`](/packages/components/src/modal/README.md) and displays a confirmation dialog, with _confirm_ and _cancel_ buttons.
 
 The dialog is confirmed by clicking the _confirm_ button or by pressing the `Enter` key. It is cancelled (closed) by clicking the _cancel_ button, by pressing the `ESC` key, or by clicking outside the dialog focus (i.e, the overlay).
 
@@ -43,8 +43,8 @@ Let the parent component control when the dialog is open/closed. It's activated 
 -   You'll want to update the state that controls `isOpen` by updating it from the `onCancel` and `onConfirm` callbacks.
 
 ```jsx
+import { useState } from 'react';
 import { __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 function Example() {
 	const [ isOpen, setIsOpen ] = useState( true );
@@ -137,4 +137,11 @@ The optional custom text to display as the confirmation button's label
 -   Required: No
 -   Default: "Cancel"
 
-The optional custom text to display as the cancelation button's label
+The optional custom text to display as the cancellation button's label
+
+## Best practices
+
+The ConfirmDialog component should:
+
+-   Be used only for short confirmation messages where a cancel and confirm actions are provided.
+-   Use a descriptive text for the _confirm_ button. Default is "OK".

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -18,8 +18,9 @@ import {
 /**
  * Internal dependencies
  */
-import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
+import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import usePopoverScroll from './use-popover-scroll';
+import { rectUnion, getElementBounds } from '../../utils/dom';
 
 const MAX_POPOVER_RECOMPUTE_COUNTER = Number.MAX_SAFE_INTEGER;
 
@@ -28,8 +29,6 @@ function BlockPopover(
 		clientId,
 		bottomClientId,
 		children,
-		__unstableRefreshSize,
-		__unstableCoverTarget = false,
 		__unstablePopoverSlot,
 		__unstableContentRef,
 		shift = true,
@@ -53,51 +52,37 @@ function BlockPopover(
 		0
 	);
 
-	// When blocks are moved up/down, they are animated to their new position by
-	// updating the `transform` property manually (i.e. without using CSS
-	// transitions or animations). The animation, which can also scroll the block
-	// editor, can sometimes cause the position of the Popover to get out of sync.
-	// A MutationObserver is therefore used to make sure that changes to the
-	// selectedElement's attribute (i.e. `transform`) can be tracked and used to
-	// trigger the Popover to rerender.
+	// `useMovingAnimation` writes the block's `transform` on every spring tick.
+	// Reacting synchronously to each mutation would race with Floating UI's own
+	// autoUpdate frame loop and cause the toolbar to visibly jump. Coalescing
+	// to one recompute per animation frame avoids that. The observer can't
+	// simply be removed: with autoUpdate's animationFrame mode alone, the
+	// toolbar trails the block by ~1 frame because the spring's rAF and
+	// autoUpdate's rAF are independently scheduled.
 	useLayoutEffect( () => {
 		if ( ! selectedElement ) {
 			return;
 		}
 
-		const observer = new window.MutationObserver(
-			forceRecomputePopoverDimensions
-		);
+		let rafId;
+		const observer = new window.MutationObserver( () => {
+			if ( rafId ) {
+				return;
+			}
+			rafId = window.requestAnimationFrame( () => {
+				rafId = null;
+				forceRecomputePopoverDimensions();
+			} );
+		} );
 		observer.observe( selectedElement, { attributes: true } );
 
 		return () => {
 			observer.disconnect();
+			if ( rafId ) {
+				window.cancelAnimationFrame( rafId );
+			}
 		};
 	}, [ selectedElement ] );
-
-	const style = useMemo( () => {
-		if (
-			// popoverDimensionsRecomputeCounter is by definition always equal or greater
-			// than 0. This check is only there to satisfy the correctness of the
-			// exhaustive-deps rule for the `useMemo` hook.
-			popoverDimensionsRecomputeCounter < 0 ||
-			! selectedElement ||
-			lastSelectedElement !== selectedElement
-		) {
-			return {};
-		}
-
-		return {
-			position: 'absolute',
-			width: selectedElement.offsetWidth,
-			height: selectedElement.offsetHeight,
-		};
-	}, [
-		selectedElement,
-		lastSelectedElement,
-		__unstableRefreshSize,
-		popoverDimensionsRecomputeCounter,
-	] );
 
 	const popoverAnchor = useMemo( () => {
 		if (
@@ -113,42 +98,20 @@ function BlockPopover(
 
 		return {
 			getBoundingClientRect() {
-				const selectedBCR = selectedElement.getBoundingClientRect();
-				const lastSelectedBCR =
-					lastSelectedElement?.getBoundingClientRect();
-
-				// Get the biggest rectangle that encompasses completely the currently
-				// selected element and the last selected element:
-				// - for top/left coordinates, use the smaller numbers
-				// - for the bottom/right coordinates, use the largest numbers
-				const left = Math.min(
-					selectedBCR.left,
-					lastSelectedBCR?.left ?? Infinity
-				);
-				const top = Math.min(
-					selectedBCR.top,
-					lastSelectedBCR?.top ?? Infinity
-				);
-				const right = Math.max(
-					selectedBCR.right,
-					lastSelectedBCR.right ?? -Infinity
-				);
-				const bottom = Math.max(
-					selectedBCR.bottom,
-					lastSelectedBCR.bottom ?? -Infinity
-				);
-				const width = right - left;
-				const height = bottom - top;
-
-				return new window.DOMRect( left, top, width, height );
+				return lastSelectedElement
+					? rectUnion(
+							getElementBounds( selectedElement ),
+							getElementBounds( lastSelectedElement )
+					  )
+					: getElementBounds( selectedElement );
 			},
-			ownerDocument: selectedElement.ownerDocument,
+			contextElement: selectedElement,
 		};
 	}, [
+		popoverDimensionsRecomputeCounter,
+		selectedElement,
 		bottomClientId,
 		lastSelectedElement,
-		selectedElement,
-		popoverDimensionsRecomputeCounter,
 	] );
 
 	if ( ! selectedElement || ( bottomClientId && ! lastSelectedElement ) ) {
@@ -163,22 +126,40 @@ function BlockPopover(
 			anchor={ popoverAnchor }
 			// Render in the old slot if needed for backward compatibility,
 			// otherwise render in place (not in the default popover slot).
-			__unstableSlotName={ __unstablePopoverSlot || null }
+			__unstableSlotName={ __unstablePopoverSlot }
+			inline={ ! __unstablePopoverSlot }
 			placement="top-start"
 			resize={ false }
 			flip={ false }
 			shift={ shift }
 			{ ...props }
-			className={ classnames(
-				'block-editor-block-popover',
-				props.className
-			) }
+			className={ clsx( 'block-editor-block-popover', props.className ) }
 			variant="unstyled"
 		>
-			{ __unstableCoverTarget && <div style={ style }>{ children }</div> }
-			{ ! __unstableCoverTarget && children }
+			{ children }
 		</Popover>
 	);
 }
 
-export default forwardRef( BlockPopover );
+export const PrivateBlockPopover = forwardRef( BlockPopover );
+
+const PublicBlockPopover = (
+	{ clientId, bottomClientId, children, ...props },
+	ref
+) => (
+	<PrivateBlockPopover
+		{ ...props }
+		bottomClientId={ bottomClientId }
+		clientId={ clientId }
+		__unstableContentRef={ undefined }
+		__unstablePopoverSlot={ undefined }
+		ref={ ref }
+	>
+		{ children }
+	</PrivateBlockPopover>
+);
+
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-popover/README.md
+ */
+export default forwardRef( PublicBlockPopover );

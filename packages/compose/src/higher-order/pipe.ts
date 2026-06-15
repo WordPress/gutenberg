@@ -43,7 +43,7 @@
  *
  * Allows to choose whether to perform left-to-right or right-to-left composition.
  *
- * @see https://docs-lodash.com/v4/flow/
+ * @see https://lodash.com/docs/4#flow
  *
  * @param {boolean} reverse True if right-to-left, false for left-to-right composition.
  */
@@ -67,7 +67,7 @@ const basePipe =
  *
  * This is inspired by `lodash`'s `flow` function.
  *
- * @see https://docs-lodash.com/v4/flow/
+ * @see https://lodash.com/docs/4#flow
  */
 const pipe = basePipe();
 

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -9,15 +9,15 @@ import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 import { RawHTML, useEffect, renderToString } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
-import { close } from '@wordpress/icons';
+import { closeSmall } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import Button from '../button';
 import type { NoticeAction, NoticeProps } from './types';
-import type { SyntheticEvent } from 'react';
 import type { DeprecatedButtonProps } from '../button/types';
+import { VisuallyHidden } from '../visually-hidden';
 
 const noop = () => {};
 
@@ -45,10 +45,23 @@ function getDefaultPoliteness( status: NoticeProps[ 'status' ] ) {
 		case 'warning':
 		case 'info':
 			return 'polite';
-
-		case 'error':
+		// The default will also catch the 'error' status.
 		default:
 			return 'assertive';
+	}
+}
+
+function getStatusLabel( status: NoticeProps[ 'status' ] ) {
+	switch ( status ) {
+		case 'warning':
+			return __( 'Warning notice' );
+		case 'info':
+			return __( 'Information notice' );
+		case 'error':
+			return __( 'Error notice' );
+		// The default will also catch the 'success' status.
+		default:
+			return __( 'Notice' );
 	}
 }
 
@@ -80,29 +93,24 @@ function Notice( {
 }: NoticeProps ) {
 	useSpokenMessage( spokenMessage, politeness );
 
-	const classes = classnames(
-		className,
-		'components-notice',
-		'is-' + status,
-		{
-			'is-dismissible': isDismissible,
-		}
-	);
+	// Dismissibility is not a wrapper modifier; target `.components-notice__dismiss`
+	// or `.components-notice:has(.components-notice__dismiss)` from outside CSS.
+	const classes = clsx( className, 'components-notice', 'is-' + status );
 
 	if ( __unstableHTML && typeof children === 'string' ) {
 		children = <RawHTML>{ children }</RawHTML>;
 	}
 
-	const onDismissNotice = ( event: SyntheticEvent ) => {
-		event?.preventDefault?.();
+	const onDismissNotice = () => {
 		onDismiss();
 		onRemove();
 	};
 
 	return (
 		<div className={ classes }>
-			<div className="components-notice__content">
-				{ children }
+			<VisuallyHidden>{ getStatusLabel( status ) }</VisuallyHidden>
+			<div className="components-notice__content">{ children }</div>
+			{ actions.length > 0 && (
 				<div className="components-notice__actions">
 					{ actions.map(
 						(
@@ -114,6 +122,7 @@ function Notice( {
 								noDefaultClasses = false,
 								onClick,
 								url,
+								disabled,
 							}: NoticeAction &
 								// `isPrimary` is a legacy prop included for
 								// backcompat, but `variant` should be used
@@ -134,11 +143,14 @@ function Notice( {
 
 							return (
 								<Button
+									size="compact"
 									key={ index }
 									href={ url }
 									variant={ computedVariant }
-									onClick={ url ? undefined : onClick }
-									className={ classnames(
+									onClick={ onClick }
+									disabled={ disabled }
+									accessibleWhenDisabled
+									className={ clsx(
 										'components-notice__action',
 										buttonCustomClasses
 									) }
@@ -149,14 +161,14 @@ function Notice( {
 						}
 					) }
 				</div>
-			</div>
+			) }
 			{ isDismissible && (
 				<Button
+					size="small"
 					className="components-notice__dismiss"
-					icon={ close }
-					label={ __( 'Dismiss this notice' ) }
+					icon={ closeSmall }
+					label={ __( 'Close' ) }
 					onClick={ onDismissNotice }
-					showTooltip={ false }
 				/>
 			) }
 		</div>

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -90,9 +90,63 @@ const migrateCustomColorsAndFontSizes = ( attributes ) => {
 	};
 };
 
+const migrateTextAlign = ( attributes ) => {
+	const { align, ...restAttributes } = attributes;
+	if ( ! align ) {
+		return attributes;
+	}
+	return {
+		...restAttributes,
+		style: {
+			...attributes.style,
+			typography: {
+				...attributes.style?.typography,
+				textAlign: align,
+			},
+		},
+	};
+};
+
 const { style, ...restBlockAttributes } = blockAttributes;
 
 const deprecated = [
+	// Version with `align` attribute.
+	{
+		supports: {
+			className: false,
+			color: true,
+			typography: {
+				fontSize: true,
+			},
+		},
+		attributes: blockAttributes,
+		isEligible( attributes ) {
+			return (
+				!! attributes.align ||
+				!! attributes.className?.match(
+					/\bhas-text-align-(left|center|right)\b/
+				)
+			);
+		},
+		save( { attributes } ) {
+			const { align, content, dropCap, direction } = attributes;
+			const className = clsx( {
+				'has-drop-cap':
+					align === ( isRTL() ? 'left' : 'right' ) ||
+					align === 'center'
+						? false
+						: dropCap,
+				[ `has-text-align-${ align }` ]: align,
+			} );
+
+			return (
+				<p { ...useBlockProps.save( { className, dir: direction } ) }>
+					<RichText.Content value={ content } />
+				</p>
+			);
+		},
+		migrate: migrateTextAlign,
+	},
 	// Version without drop cap on aligned text.
 	{
 		supports,
@@ -108,9 +162,10 @@ const deprecated = [
 				type: 'number',
 			},
 		},
+		migrate: migrateTextAlign,
 		save( { attributes } ) {
 			const { align, content, dropCap, direction } = attributes;
-			const className = classnames( {
+			const className = clsx( {
 				'has-drop-cap':
 					align === ( isRTL() ? 'left' : 'right' ) ||
 					align === 'center'
@@ -140,7 +195,11 @@ const deprecated = [
 				type: 'number',
 			},
 		},
-		migrate: migrateCustomColorsAndFontSizes,
+		migrate( attributes ) {
+			return migrateCustomColorsAndFontSizes(
+				migrateTextAlign( attributes )
+			);
+		},
 		save( { attributes } ) {
 			const {
 				align,
@@ -162,7 +221,7 @@ const deprecated = [
 			);
 			const fontSizeClass = getFontSizeClass( fontSize );
 
-			const className = classnames( {
+			const className = clsx( {
 				'has-text-color': textColor || customTextColor,
 				'has-background': backgroundColor || customBackgroundColor,
 				'has-drop-cap': dropCap,
@@ -205,7 +264,11 @@ const deprecated = [
 				type: 'number',
 			},
 		},
-		migrate: migrateCustomColorsAndFontSizes,
+		migrate( attributes ) {
+			return migrateCustomColorsAndFontSizes(
+				migrateTextAlign( attributes )
+			);
+		},
 		save( { attributes } ) {
 			const {
 				align,
@@ -227,7 +290,7 @@ const deprecated = [
 			);
 			const fontSizeClass = getFontSizeClass( fontSize );
 
-			const className = classnames( {
+			const className = clsx( {
 				'has-text-color': textColor || customTextColor,
 				'has-background': backgroundColor || customBackgroundColor,
 				'has-drop-cap': dropCap,
@@ -273,7 +336,11 @@ const deprecated = [
 				type: 'string',
 			},
 		},
-		migrate: migrateCustomColorsAndFontSizes,
+		migrate( attributes ) {
+			return migrateCustomColorsAndFontSizes(
+				migrateTextAlign( attributes )
+			);
+		},
 		save( { attributes } ) {
 			const {
 				width,
@@ -295,7 +362,7 @@ const deprecated = [
 			);
 			const fontSizeClass = fontSize && `is-${ fontSize }-text`;
 
-			const className = classnames( {
+			const className = clsx( {
 				[ `align${ width }` ]: width,
 				'has-background': backgroundColor || customBackgroundColor,
 				'has-drop-cap': dropCap,
@@ -341,7 +408,7 @@ const deprecated = [
 				textColor,
 				fontSize,
 			} = attributes;
-			const className = classnames( {
+			const className = clsx( {
 				[ `align${ width }` ]: width,
 				'has-background': backgroundColor,
 				'has-drop-cap': dropCap,
@@ -363,21 +430,24 @@ const deprecated = [
 			);
 		},
 		migrate( attributes ) {
-			return migrateCustomColorsAndFontSizes( {
-				...attributes,
-				customFontSize: Number.isFinite( attributes.fontSize )
-					? attributes.fontSize
-					: undefined,
-				customTextColor:
-					attributes.textColor && '#' === attributes.textColor[ 0 ]
-						? attributes.textColor
+			return migrateCustomColorsAndFontSizes(
+				migrateTextAlign( {
+					...attributes,
+					customFontSize: Number.isFinite( attributes.fontSize )
+						? attributes.fontSize
 						: undefined,
-				customBackgroundColor:
-					attributes.backgroundColor &&
-					'#' === attributes.backgroundColor[ 0 ]
-						? attributes.backgroundColor
-						: undefined,
-			} );
+					customTextColor:
+						attributes.textColor &&
+						'#' === attributes.textColor[ 0 ]
+							? attributes.textColor
+							: undefined,
+					customBackgroundColor:
+						attributes.backgroundColor &&
+						'#' === attributes.backgroundColor[ 0 ]
+							? attributes.backgroundColor
+							: undefined,
+				} )
+			);
 		},
 	},
 	{
@@ -393,9 +463,7 @@ const deprecated = [
 		save( { attributes } ) {
 			return <RawHTML>{ attributes.content }</RawHTML>;
 		},
-		migrate( attributes ) {
-			return attributes;
-		},
+		migrate: ( attributes ) => attributes,
 	},
 ];
 

@@ -14,7 +14,7 @@ export const RovingTabIndexItem = forwardRef(
 		{ children, as: Component, ...props }: RovingTabIndexItemProps,
 		forwardedRef: React.ForwardedRef< any >
 	) {
-		const localRef = useRef< any >();
+		const localRef = useRef< any >( null );
 		const ref = forwardedRef || localRef;
 		// @ts-expect-error - We actually want to throw an error if this is undefined.
 		const { lastFocusedElement, setLastFocusedElement } =
@@ -41,10 +41,13 @@ export const RovingTabIndexItem = forwardRef(
 			return children( allProps );
 		}
 
-		if ( ! Component ) return null;
+		if ( ! Component ) {
+			return null;
+		}
 
 		return <Component { ...allProps }>{ children }</Component>;
 	}
 );
+RovingTabIndexItem.displayName = 'RovingTabIndexItem';
 
 export default RovingTabIndexItem;

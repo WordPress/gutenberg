@@ -7,7 +7,7 @@ import { createBlock, getBlockAttributes } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { getLevelFromHeadingNodeName } from './shared';
-import { name } from './block.json';
+import { getTransformedAttributes } from '../utils/get-transformed-attributes';
 
 const transforms = {
 	from: [
@@ -16,13 +16,28 @@ const transforms = {
 			isMultiBlock: true,
 			blocks: [ 'core/paragraph' ],
 			transform: ( attributes ) =>
-				attributes.map( ( { content, anchor, align: textAlign } ) =>
-					createBlock( name, {
+				attributes.map( ( _attributes ) => {
+					const { content, anchor, style } = _attributes;
+					const textAlign = style?.typography?.textAlign;
+					return createBlock( 'core/heading', {
+						...getTransformedAttributes(
+							_attributes,
+							'core/heading',
+							( { content: contentBinding } ) => ( {
+								content: contentBinding,
+							} )
+						),
 						content,
 						anchor,
-						textAlign,
-					} )
-				),
+						...( textAlign && {
+							style: {
+								typography: {
+									textAlign,
+								},
+							},
+						} ),
+					} );
+				} ),
 		},
 		{
 			type: 'raw',
@@ -42,7 +57,10 @@ const transforms = {
 				};
 			},
 			transform( node ) {
-				const attributes = getBlockAttributes( name, node.outerHTML );
+				const attributes = getBlockAttributes(
+					'core/heading',
+					node.outerHTML
+				);
 				const { textAlign } = node.style || {};
 
 				attributes.level = getLevelFromHeadingNodeName( node.nodeName );
@@ -52,17 +70,23 @@ const transforms = {
 					textAlign === 'center' ||
 					textAlign === 'right'
 				) {
-					attributes.align = textAlign;
+					attributes.style = {
+						...attributes.style,
+						typography: {
+							...attributes.style?.typography,
+							textAlign,
+						},
+					};
 				}
 
-				return createBlock( name, attributes );
+				return createBlock( 'core/heading', attributes );
 			},
 		},
 		...[ 1, 2, 3, 4, 5, 6 ].map( ( level ) => ( {
 			type: 'prefix',
 			prefix: Array( level + 1 ).join( '#' ),
 			transform( content ) {
-				return createBlock( name, {
+				return createBlock( 'core/heading', {
 					level,
 					content,
 				} );
@@ -71,12 +95,7 @@ const transforms = {
 		...[ 1, 2, 3, 4, 5, 6 ].map( ( level ) => ( {
 			type: 'enter',
 			regExp: new RegExp( `^/(h|H)${ level }$` ),
-			transform( content ) {
-				return createBlock( name, {
-					level,
-					content,
-				} );
-			},
+			transform: () => createBlock( 'core/heading', { level } ),
 		} ) ),
 	],
 	to: [
@@ -85,9 +104,27 @@ const transforms = {
 			isMultiBlock: true,
 			blocks: [ 'core/paragraph' ],
 			transform: ( attributes ) =>
-				attributes.map( ( { content, textAlign: align } ) =>
-					createBlock( 'core/paragraph', { content, align } )
-				),
+				attributes.map( ( _attributes ) => {
+					const { content, style } = _attributes;
+					const textAlign = style?.typography?.textAlign;
+					return createBlock( 'core/paragraph', {
+						...getTransformedAttributes(
+							_attributes,
+							'core/paragraph',
+							( { content: contentBinding } ) => ( {
+								content: contentBinding,
+							} )
+						),
+						content,
+						...( textAlign && {
+							style: {
+								typography: {
+									textAlign,
+								},
+							},
+						} ),
+					} );
+				} ),
 		},
 	],
 };

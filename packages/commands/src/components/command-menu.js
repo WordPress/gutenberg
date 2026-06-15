@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { Command, useCommandState } from 'cmdk';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -11,31 +12,135 @@ import {
 	useState,
 	useEffect,
 	useRef,
-	useCallback,
-	useMemo,
+	isValidElement,
+	Component,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	Modal,
 	TextHighlight,
 	__experimentalHStack as HStack,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import {
 	store as keyboardShortcutsStore,
 	useShortcut,
 } from '@wordpress/keyboard-shortcuts';
-import { Icon } from '@wordpress/icons';
+import { Icon, search as inputIcon, arrowRight } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { store as commandsStore } from '../store';
+import { unlock } from '../lock-unlock';
+import {
+	recordUsage,
+	useLoaderCollector,
+	useRecentCommands,
+} from './use-recent-commands';
 
-function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
-	const { isLoading, commands = [] } = hook( { search } ) ?? {};
+const { withIgnoreIMEEvents } = unlock( componentsPrivateApis );
+
+// Namespaces item ids to avoid collisions with other elements on the page.
+const ITEM_ID_PREFIX = 'command-palette-item-';
+const inputLabel = __( 'Search commands and settings' );
+
+/**
+ * Icons enforced per command category.
+ * Categories listed here will always use the specified icon,
+ * ignoring whatever icon the command itself provides.
+ */
+const CATEGORY_ICONS = {
+	view: arrowRight,
+};
+
+/**
+ * Translatable labels for command categories.
+ */
+const CATEGORY_LABELS = {
+	command: __( 'Command' ),
+	view: __( 'View' ),
+	edit: __( 'Edit' ),
+	action: __( 'Action' ),
+	workflow: __( 'Workflow' ),
+};
+
+/**
+ * Function that checks if the parameter is a valid icon.
+ * Taken from @wordpress/blocks/src/api/utils.js and copied
+ * in case requirements diverge and to avoid a dependency on @wordpress/blocks.
+ *
+ * @param {*} icon Parameter to be checked.
+ *
+ * @return {boolean} True if the parameter is a valid icon and false otherwise.
+ */
+
+export function isValidIcon( icon ) {
+	return (
+		!! icon &&
+		( typeof icon === 'string' ||
+			isValidElement( icon ) ||
+			typeof icon === 'function' ||
+			icon instanceof Component )
+	);
+}
+
+function CommandItem( { command, search, category, valuePrefix } ) {
+	const { close } = useDispatch( commandsStore );
+	const commandCategory = category ?? command.category;
+	const label = command.searchLabel ?? command.label;
+	const value = valuePrefix ? `${ valuePrefix }${ command.name }` : label;
+	return (
+		<Command.Item
+			key={ command.name }
+			id={ `${ ITEM_ID_PREFIX }${ value.toLowerCase() }` }
+			value={ value }
+			keywords={
+				valuePrefix
+					? [ ...( command.keywords ?? [] ), label ]
+					: command.keywords
+			}
+			onSelect={ () => {
+				recordUsage( command.name );
+				command.callback( { close } );
+			} }
+		>
+			<HStack
+				alignment="left"
+				className={ clsx( 'commands-command-menu__item', {
+					'has-icon':
+						CATEGORY_ICONS[ commandCategory ] || command.icon,
+				} ) }
+			>
+				{ CATEGORY_ICONS[ commandCategory ] ? (
+					<Icon icon={ CATEGORY_ICONS[ commandCategory ] } />
+				) : (
+					isValidIcon( command.icon ) && (
+						<Icon icon={ command.icon } />
+					)
+				) }
+				<span className="commands-command-menu__item-label">
+					<TextHighlight
+						text={ command.label }
+						highlight={ search }
+					/>
+				</span>
+				{ CATEGORY_LABELS[ commandCategory ] && (
+					<span className="commands-command-menu__item-category">
+						{ CATEGORY_LABELS[ commandCategory ] }
+					</span>
+				) }
+			</HStack>
+		</Command.Item>
+	);
+}
+
+function CommandMenuLoader( { name, search, hook, category, valuePrefix } ) {
+	const { setLoaderLoading } = unlock( useDispatch( commandsStore ) );
+	const { isLoading: loading, commands = [] } = hook( { search } ) ?? {};
 	useEffect( () => {
-		setLoader( name, isLoading );
-	}, [ setLoader, name, isLoading ] );
+		setLoaderLoading( name, loading );
+	}, [ setLoaderLoading, name, loading ] );
 
 	if ( ! commands.length ) {
 		return null;
@@ -43,44 +148,29 @@ function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 
 	return (
 		<>
-			<Command.List>
-				{ commands.map( ( command ) => (
-					<Command.Item
-						key={ command.name }
-						value={ command.searchLabel ?? command.label }
-						onSelect={ () => command.callback( { close } ) }
-						id={ command.name }
-					>
-						<HStack
-							alignment="left"
-							className="commands-command-menu__item"
-						>
-							<Icon icon={ command.icon } />
-							<span>
-								<TextHighlight
-									text={ command.label }
-									highlight={ search }
-								/>
-							</span>
-						</HStack>
-					</Command.Item>
-				) ) }
-			</Command.List>
+			{ commands.map( ( command ) => (
+				<CommandItem
+					key={ command.name }
+					command={ command }
+					search={ search }
+					category={ command.category ?? category }
+					valuePrefix={ valuePrefix }
+				/>
+			) ) }
 		</>
 	);
 }
 
-export function CommandMenuLoaderWrapper( { hook, search, setLoader, close } ) {
+function CommandMenuLoaderWrapper( { hook, ...props } ) {
 	// The "hook" prop is actually a custom React hook
 	// so to avoid breaking the rules of hooks
 	// the CommandMenuLoaderWrapper component need to be
-	// remounted on each hook prop change
-	// We use the key state to make sure we do that properly.
-	const currentLoader = useRef( hook );
+	// remounted on each hook prop change.
+	const currentLoaderRef = useRef( hook );
 	const [ key, setKey ] = useState( 0 );
 	useEffect( () => {
-		if ( currentLoader.current !== hook ) {
-			currentLoader.current = hook;
+		if ( currentLoaderRef.current !== hook ) {
+			currentLoaderRef.current = hook;
 			setKey( ( prevKey ) => prevKey + 1 );
 		}
 	}, [ hook ] );
@@ -88,107 +178,155 @@ export function CommandMenuLoaderWrapper( { hook, search, setLoader, close } ) {
 	return (
 		<CommandMenuLoader
 			key={ key }
-			hook={ currentLoader.current }
-			search={ search }
-			setLoader={ setLoader }
-			close={ close }
+			hook={ currentLoaderRef.current }
+			{ ...props }
 		/>
 	);
 }
 
-export function CommandMenuGroup( { isContextual, search, setLoader, close } ) {
-	const { commands, loaders } = useSelect(
-		( select ) => {
-			const { getCommands, getCommandLoaders } = select( commandsStore );
-			return {
-				commands: getCommands( isContextual ),
-				loaders: getCommandLoaders( isContextual ),
-			};
-		},
-		[ isContextual ]
+function CommandList( { search, commands, loaders, valuePrefix } ) {
+	return (
+		<>
+			{ commands.map( ( command ) => (
+				<CommandItem
+					key={ command.name }
+					command={ command }
+					search={ search }
+					valuePrefix={ valuePrefix }
+				/>
+			) ) }
+			{ loaders.map( ( loader ) => (
+				<CommandMenuLoaderWrapper
+					key={ loader.name }
+					name={ loader.name }
+					search={ search }
+					hook={ loader.hook }
+					category={ loader.category }
+					valuePrefix={ valuePrefix }
+				/>
+			) ) }
+		</>
 	);
+}
+
+function RecentLoaderRunner( { hook, name, filterNames, onResolved } ) {
+	useLoaderCollector( hook, name, filterNames, onResolved );
+	return null;
+}
+
+function RecentGroup() {
+	const { commands, loaders, recentSet, onResolved } = useRecentCommands();
 
 	if ( ! commands.length && ! loaders.length ) {
 		return null;
 	}
 
 	return (
-		<Command.Group>
-			{ commands.map( ( command ) => (
-				<Command.Item
-					key={ command.name }
-					value={ command.searchLabel ?? command.label }
-					onSelect={ () => command.callback( { close } ) }
-					id={ command.name }
-				>
-					<HStack
-						alignment="left"
-						className="commands-command-menu__item"
-					>
-						<Icon icon={ command.icon } />
-						<span>
-							<TextHighlight
-								text={ command.label }
-								highlight={ search }
-							/>
-						</span>
-					</HStack>
-				</Command.Item>
-			) ) }
+		<Command.Group heading={ __( 'Recent' ) }>
 			{ loaders.map( ( loader ) => (
-				<CommandMenuLoaderWrapper
+				<RecentLoaderRunner
 					key={ loader.name }
+					name={ loader.name }
 					hook={ loader.hook }
-					search={ search }
-					setLoader={ setLoader }
-					close={ close }
+					filterNames={ recentSet }
+					onResolved={ onResolved }
+				/>
+			) ) }
+			{ commands.map( ( command ) => (
+				<CommandItem
+					key={ command.name }
+					command={ command }
+					search=""
+					valuePrefix="recent-"
 				/>
 			) ) }
 		</Command.Group>
 	);
 }
 
-function CommandInput( { isOpen, search, setSearch } ) {
+function SuggestionsGroup() {
+	const { commands, loaders } = useSelect( ( select ) => {
+		const { getCommands, getCommandLoaders } = select( commandsStore );
+		return {
+			commands: getCommands( true ),
+			loaders: getCommandLoaders( true ),
+		};
+	}, [] );
+
+	return (
+		<Command.Group heading={ __( 'Suggestions' ) }>
+			<CommandList search="" commands={ commands } loaders={ loaders } />
+		</Command.Group>
+	);
+}
+
+function ResultsGroup( { search } ) {
+	const { commands, contextualCommands, loaders, contextualLoaders } =
+		useSelect( ( select ) => {
+			const { getCommands, getCommandLoaders } = select( commandsStore );
+			return {
+				commands: getCommands( false ),
+				contextualCommands: getCommands( true ),
+				loaders: getCommandLoaders( false ),
+				contextualLoaders: getCommandLoaders( true ),
+			};
+		}, [] );
+
+	return (
+		<Command.Group heading={ __( 'Results' ) }>
+			<CommandList
+				search={ search }
+				commands={ commands }
+				loaders={ loaders }
+			/>
+			<CommandList
+				search={ search }
+				commands={ contextualCommands }
+				loaders={ contextualLoaders }
+			/>
+		</Command.Group>
+	);
+}
+
+function CommandInput( { search, setSearch } ) {
 	const commandMenuInput = useRef();
 	const _value = useCommandState( ( state ) => state.value );
-	const selectedItemId = useMemo( () => {
-		const item = document.querySelector(
-			`[cmdk-item=""][data-value="${ _value }"]`
-		);
-		return item?.getAttribute( 'id' );
-	}, [ _value ] );
+	const selectedItemId = _value ? `${ ITEM_ID_PREFIX }${ _value }` : null;
 	useEffect( () => {
 		// Focus the command palette input when mounting the modal.
-		if ( isOpen ) {
-			commandMenuInput.current.focus();
-		}
-	}, [ isOpen ] );
+		commandMenuInput.current.focus();
+	}, [] );
 	return (
 		<Command.Input
 			ref={ commandMenuInput }
 			value={ search }
 			onValueChange={ setSearch }
-			placeholder={ __( 'Type a command or search' ) }
+			placeholder={ inputLabel }
 			aria-activedescendant={ selectedItemId }
 		/>
 	);
 }
 
+/**
+ * @ignore
+ */
 export function CommandMenu() {
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 	const [ search, setSearch ] = useState( '' );
-	const isOpen = useSelect(
-		( select ) => select( commandsStore ).isOpen(),
+	const { isOpen: paletteIsOpen, loadersLoading } = useSelect(
+		( select ) => ( {
+			isOpen: select( commandsStore ).isOpen(),
+			loadersLoading: unlock( select( commandsStore ) ).isLoading(),
+		} ),
 		[]
 	);
 	const { open, close } = useDispatch( commandsStore );
-	const [ loaders, setLoaders ] = useState( {} );
 
 	useEffect( () => {
 		registerShortcut( {
 			name: 'core/commands',
 			category: 'global',
-			description: __( 'Open the command palette' ),
+			description: __( 'Open the command palette.' ),
 			keyCombination: {
 				modifier: 'primary',
 				character: 'k',
@@ -198,50 +336,33 @@ export function CommandMenu() {
 
 	useShortcut(
 		'core/commands',
-		( event ) => {
+		/** @type {React.KeyboardEventHandler} */
+		withIgnoreIMEEvents( ( event ) => {
+			// Bails to avoid obscuring the effect of the preceding handler(s).
+			if ( event.defaultPrevented ) {
+				return;
+			}
+
 			event.preventDefault();
-			if ( isOpen ) {
+			if ( paletteIsOpen ) {
 				close();
 			} else {
 				open();
 			}
-		},
+		} ),
 		{
 			bindGlobal: true,
 		}
 	);
 
-	const setLoader = useCallback(
-		( name, value ) =>
-			setLoaders( ( current ) => ( {
-				...current,
-				[ name ]: value,
-			} ) ),
-		[]
-	);
 	const closeAndReset = () => {
 		setSearch( '' );
 		close();
 	};
 
-	if ( ! isOpen ) {
+	if ( ! paletteIsOpen ) {
 		return false;
 	}
-
-	const onKeyDown = ( event ) => {
-		if (
-			// Ignore keydowns from IMEs
-			event.nativeEvent.isComposing ||
-			// Workaround for Mac Safari where the final Enter/Backspace of an IME composition
-			// is `isComposing=false`, even though it's technically still part of the composition.
-			// These can only be detected by keyCode.
-			event.keyCode === 229
-		) {
-			event.preventDefault();
-		}
-	};
-
-	const isLoading = Object.values( loaders ).some( Boolean );
 
 	return (
 		<Modal
@@ -249,38 +370,30 @@ export function CommandMenu() {
 			overlayClassName="commands-command-menu__overlay"
 			onRequestClose={ closeAndReset }
 			__experimentalHideHeader
+			size="medium"
+			contentLabel={ __( 'Command palette' ) }
 		>
 			<div className="commands-command-menu__container">
-				<Command
-					label={ __( 'Command palette' ) }
-					onKeyDown={ onKeyDown }
-				>
+				<Command label={ inputLabel } loop>
 					<div className="commands-command-menu__header">
+						<Icon
+							className="commands-command-menu__header-search-icon"
+							icon={ inputIcon }
+						/>
 						<CommandInput
 							search={ search }
 							setSearch={ setSearch }
-							isOpen={ isOpen }
 						/>
 					</div>
-					<Command.List>
-						{ search && ! isLoading && (
+					<Command.List label={ __( 'Command suggestions' ) }>
+						{ search && ! loadersLoading && (
 							<Command.Empty>
 								{ __( 'No results found.' ) }
 							</Command.Empty>
 						) }
-						<CommandMenuGroup
-							search={ search }
-							setLoader={ setLoader }
-							close={ closeAndReset }
-							isContextual
-						/>
-						{ search && (
-							<CommandMenuGroup
-								search={ search }
-								setLoader={ setLoader }
-								close={ closeAndReset }
-							/>
-						) }
+						{ ! search && <RecentGroup /> }
+						{ ! search && <SuggestionsGroup /> }
+						{ search && <ResultsGroup search={ search } /> }
 					</Command.List>
 				</Command>
 			</div>

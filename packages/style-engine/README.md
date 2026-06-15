@@ -17,7 +17,7 @@ Upcoming tasks on the roadmap include, but are not limited to, the following:
 -   Propose a way to control hierarchy and specificity, and make the style hierarchy cascade accessible and predictable. This might include preparing for CSS cascade layers until they become more widely supported, and allowing for opt-in support in Gutenberg via theme.json.
 -   Refactor all blocks to consistently use the "style" attribute for all customizations, that is, deprecate preset-specific attributes such as `attributes.fontSize`.
 
-For more information about the roadmap, please refer to [Block editor styles: initiatives and goals](https://make.wordpress.org/core/2022/06/24/block-editor-styles-initiatives-and-goals/) and the [Github project board](https://github.com/orgs/WordPress/projects/19).
+For more information about the roadmap, please refer to [Block editor styles: initiatives and goals](https://make.wordpress.org/core/2022/06/24/block-editor-styles-initiatives-and-goals/) and the [GitHub project board](https://github.com/orgs/WordPress/projects/19).
 
 If you're making changes or additions to the Style Engine, please take a moment to read the [notes on contributing](https://github.com/WordPress/gutenberg/tree/HEAD/packages/style-engine/CONTRIBUTING.md).
 
@@ -108,7 +108,7 @@ _Returns_
 
 Useful for when you wish to compile a bespoke set of CSS rules from a series of selector + declaration items.
 
-The Style Engine will return a sanitized and optimized stylesheet. By passing a `context` identifier in the options, the Style Engine will store the styles for later retrieval, for example, should you wish to batch enqueue a set of CSS rules.
+The Style Engine will return a sanitized stylesheet. By passing a `context` identifier in the options, the Style Engine will store the styles for later retrieval, for example, should you wish to batch enqueue a set of CSS rules.
 
 You can call `wp_style_engine_get_stylesheet_from_css_rules()` multiple times, and, so long as your styles use the same `context` identifier, they will be stored together.
 
@@ -126,9 +126,30 @@ $styles = array(
         'selector'     => '.wp-tomato',
         'declarations' => array( 'padding' => '100px' )
     ),
+);
+
+$stylesheet = wp_style_engine_get_stylesheet_from_css_rules(
+    $styles,
     array(
-        'selector'     => '.wp-kumquat',
+        'context' => 'block-supports', // Indicates that these styles should be stored with block supports CSS.
+    )
+);
+print_r( $stylesheet ); // .wp-pumpkin{color:orange}.wp-tomato{color:red;padding:100px}
+```
+
+It's also possible to build simple, nested CSS rules using the `rules_group` key.
+
+```php
+$styles = array(
+    array(
+        'rules_group'  => '@media (min-width: 80rem)',
+        'selector'     => '.wp-carrot',
         'declarations' => array( 'color' => 'orange' )
+    ),
+    array(
+        'rules_group'  => '@media (min-width: 80rem)',
+        'selector'     => '.wp-tomato',
+        'declarations' => array( 'color' => 'red' )
     ),
 );
 
@@ -138,7 +159,7 @@ $stylesheet = wp_style_engine_get_stylesheet_from_css_rules(
         'context' => 'block-supports', // Indicates that these styles should be stored with block supports CSS.
     )
 );
-print_r( $stylesheet ); // .wp-pumpkin,.wp-kumquat{color:orange}.wp-tomato{color:red;padding:100px}
+print_r( $stylesheet ); // @media (min-width: 80rem){.wp-carrot{color:orange}}@media (min-width: 80rem){.wp-tomato{color:red;}}
 ```
 
 ### wp_style_engine_get_stylesheet_from_context()
@@ -207,6 +228,23 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 Generates a stylesheet for a given style object and selector.
 
+_Usage_
+
+```js
+import { compileCSS } from '@wordpress/style-engine';
+
+// With a selector, a full stylesheet string is returned.
+compileCSS(
+	{ spacing: { padding: '10px', margin: '12px' } },
+	{ selector: '.my-block' }
+);
+// '.my-block { margin: 12px; padding: 10px; }'
+
+// Without a selector, inline declarations are returned.
+compileCSS( { spacing: { padding: '10px', margin: '12px' } } );
+// 'margin: 12px; padding: 10px;'
+```
+
 _Parameters_
 
 -   _style_ `Style`: Style object, for example, the value of a block's attributes.style object or the top level styles in theme.json
@@ -220,9 +258,28 @@ _Changelog_
 
 `6.1.0` Introduced in WordPress core.
 
+### GeneratedCSSRule
+
+A single CSS rule produced by `getCSSRules`.
+
 ### getCSSRules
 
 Returns a JSON representation of the generated CSS rules.
+
+_Usage_
+
+```js
+import { getCSSRules } from '@wordpress/style-engine';
+
+getCSSRules(
+	{ spacing: { padding: '10px', margin: '12px' } },
+	{ selector: '.my-block' }
+);
+// [
+//   { selector: '.my-block', key: 'margin', value: '12px' },
+//   { selector: '.my-block', key: 'padding', value: '10px' },
+// ]
+```
 
 _Parameters_
 
@@ -236,6 +293,32 @@ _Returns_
 _Changelog_
 
 `6.1.0` Introduced in WordPress core.
+
+### getCSSValueFromRawStyle
+
+Returns a WordPress CSS custom var value from incoming style preset value, if one is detected.
+
+The preset value is a string and follows the pattern `var:description|context|slug`.
+
+Example:
+
+`getCSSValueFromRawStyle( 'var:preset|color|heavenlyBlue' )` // returns 'var(--wp--preset--color--heavenly-blue)'
+
+_Parameters_
+
+-   _styleValue_ `StyleValue`: A string representing a raw CSS value. Non-strings won't be processed.
+
+_Returns_
+
+-   `StyleValue`: A CSS custom var value if the incoming style value is a preset value.
+
+### Style
+
+A block or theme style object accepted by `compileCSS` and `getCSSRules`.
+
+### StyleOptions
+
+Options for `compileCSS` and `getCSSRules`.
 
 <!-- END TOKEN(Autogenerated API docs) -->
 

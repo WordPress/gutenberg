@@ -15,6 +15,36 @@ function KeyboardShortcutsRegister() {
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 	useEffect( () => {
 		registerShortcut( {
+			name: 'core/block-editor/copy',
+			category: 'block',
+			description: __( 'Copy the selected block(s).' ),
+			keyCombination: {
+				modifier: 'primary',
+				character: 'c',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/block-editor/cut',
+			category: 'block',
+			description: __( 'Cut the selected block(s).' ),
+			keyCombination: {
+				modifier: 'primary',
+				character: 'x',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/block-editor/paste',
+			category: 'block',
+			description: __( 'Paste the selected block(s).' ),
+			keyCombination: {
+				modifier: 'primary',
+				character: 'v',
+			},
+		} );
+
+		registerShortcut( {
 			name: 'core/block-editor/duplicate',
 			category: 'block',
 			description: __( 'Duplicate the selected block(s).' ),
@@ -31,6 +61,18 @@ function KeyboardShortcutsRegister() {
 			keyCombination: {
 				modifier: 'access',
 				character: 'z',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/block-editor/paste-styles',
+			category: 'block',
+			description: __(
+				'Paste the copied style to the selected block(s).'
+			),
+			keyCombination: {
+				modifier: 'primaryAlt',
+				character: 'v',
 			},
 		} );
 
@@ -73,6 +115,15 @@ function KeyboardShortcutsRegister() {
 		} );
 
 		registerShortcut( {
+			name: 'core/block-editor/stop-editing-as-blocks',
+			category: 'block',
+			description: __( 'Finish editing a design.' ),
+			keyCombination: {
+				character: 'escape',
+			},
+		} );
+
+		registerShortcut( {
 			name: 'core/block-editor/select-all',
 			category: 'selection',
 			description: __(
@@ -90,6 +141,17 @@ function KeyboardShortcutsRegister() {
 			description: __( 'Clear selection.' ),
 			keyCombination: {
 				character: 'escape',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/block-editor/multi-text-selection',
+			category: 'selection',
+			description: __( 'Select text across multiple blocks.' ),
+			keyCombination: {
+				modifier: 'shift',
+				// Spotted during my own research — invalid character?
+				character: 'arrow',
 			},
 		} );
 
@@ -120,6 +182,49 @@ function KeyboardShortcutsRegister() {
 			keyCombination: {
 				modifier: 'secondary',
 				character: 'y',
+			},
+		} );
+
+		// List view shortcuts.
+		registerShortcut( {
+			name: 'core/block-editor/collapse-list-view',
+			category: 'list-view',
+			description: __( 'Collapse all other items.' ),
+			keyCombination: {
+				modifier: 'alt',
+				character: 'l',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/block-editor/group',
+			category: 'block',
+			description: __(
+				'Create a group block from the selected multiple blocks.'
+			),
+			keyCombination: {
+				modifier: 'primary',
+				character: 'g',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/block-editor/toggle-block-visibility',
+			category: 'block',
+			description: __( 'Show or hide the selected block(s).' ),
+			keyCombination: {
+				modifier: 'primaryShift',
+				character: 'h',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/block-editor/rename',
+			category: 'block',
+			description: __( 'Rename the selected block.' ),
+			keyCombination: {
+				modifier: 'primaryAlt',
+				character: 'r',
 			},
 		} );
 	}, [ registerShortcut ] );

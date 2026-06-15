@@ -4,12 +4,10 @@
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
 
-const ARIA_LABEL_SCHEMA = {
-	type: 'string',
-	source: 'attribute',
-	attribute: 'aria-label',
-	selector: '*',
-};
+/**
+ * Internal dependencies
+ */
+import { shouldSkipSerialization } from './utils';
 
 /**
  * Filters registered block settings, extending attributes with ariaLabel using aria-label
@@ -28,7 +26,9 @@ export function addAttribute( settings ) {
 		// Gracefully handle if settings.attributes is undefined.
 		settings.attributes = {
 			...settings.attributes,
-			ariaLabel: ARIA_LABEL_SCHEMA,
+			ariaLabel: {
+				type: 'string',
+			},
 		};
 	}
 
@@ -47,7 +47,10 @@ export function addAttribute( settings ) {
  * @return {Object} Filtered props applied to save element.
  */
 export function addSaveProps( extraProps, blockType, attributes ) {
-	if ( hasBlockSupport( blockType, 'ariaLabel' ) ) {
+	if (
+		hasBlockSupport( blockType, 'ariaLabel' ) &&
+		! shouldSkipSerialization( blockType, 'ariaLabel', 'ariaLabel' )
+	) {
 		extraProps[ 'aria-label' ] =
 			attributes.ariaLabel === '' ? null : attributes.ariaLabel;
 	}
@@ -55,13 +58,16 @@ export function addSaveProps( extraProps, blockType, attributes ) {
 	return extraProps;
 }
 
+export default {
+	addSaveProps,
+	attributeKeys: [ 'ariaLabel' ],
+	hasSupport( name ) {
+		return hasBlockSupport( name, 'ariaLabel' );
+	},
+};
+
 addFilter(
 	'blocks.registerBlockType',
 	'core/ariaLabel/attribute',
 	addAttribute
-);
-addFilter(
-	'blocks.getSaveContent.extraProps',
-	'core/ariaLabel/save-props',
-	addSaveProps
 );

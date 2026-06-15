@@ -4,4 +4,4 @@
 
 There are two types of hooks: [Actions](https://developer.wordpress.org/plugins/hooks/actions/) and [Filters](https://developer.wordpress.org/plugins/hooks/filters/). In addition to PHP actions and filters, WordPress also provides a mechanism for registering and executing hooks in JavaScript. This functionality is also available on npm as the [@wordpress/hooks](https://www.npmjs.com/package/@wordpress/hooks) package, for general purpose use.
 
-You can also learn more about both APIs: [PHP](https://codex.wordpress.org/Plugin_API/) and [JavaScript](/packages/hooks/README.md).
+You can also learn more about both APIs: [PHP](https://developer.wordpress.org/reference/) and [JavaScript](/packages/hooks/README.md).

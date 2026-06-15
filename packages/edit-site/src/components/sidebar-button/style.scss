@@ -1,5 +1,5 @@
 .edit-site-sidebar-button {
-	color: $gray-200;
+	color: var(--wpds-color-foreground-interactive-neutral);
 	flex-shrink: 0;
 
 	// Focus (resets default button focus and use focus-visible).
@@ -10,15 +10,15 @@
 	&:focus-visible:not(:disabled) {
 		box-shadow:
 			0 0 0 var(--wp-admin-border-width-focus)
-			var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+			var(--wp-admin-theme-color);
 		outline: 3px solid transparent;
 	}
 
-	&:hover,
+	&:hover:not(:disabled,[aria-disabled="true"]),
 	&:focus-visible,
 	&:focus,
-	&:not([aria-disabled="true"]):active,
+	&:not(:disabled,[aria-disabled="true"]):active,
 	&[aria-expanded="true"] {
-		color: $gray-100;
+		color: var(--wpds-color-foreground-interactive-neutral-active);
 	}
 }

@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+
 /**
  * Internal dependencies
  */
@@ -31,16 +32,24 @@ export const ALIGNMENT_LABEL: Record< AlignmentMatrixControlValue, string > = {
 export const ALIGNMENTS = GRID.flat();
 
 /**
- * Parses and transforms an incoming value to better match the alignment values
+ * Normalizes and transforms an incoming value to better match the alignment values
  *
  * @param value An alignment value to parse.
  *
  * @return The parsed value.
  */
-export function transformValue( value: AlignmentMatrixControlValue ) {
-	const nextValue = value === 'center' ? 'center center' : value;
+function normalize( value?: string | null ) {
+	const normalized = value === 'center' ? 'center center' : value;
 
-	return nextValue.replace( '-', ' ' ) as AlignmentMatrixControlValue;
+	// Strictly speaking, this could be `string | null | undefined`,
+	// but will be validated shortly, so we're typecasting to an
+	// `AlignmentMatrixControlValue` to keep TypeScript happy.
+	const transformed = normalized?.replace(
+		'-',
+		' '
+	) as AlignmentMatrixControlValue;
+
+	return ALIGNMENTS.includes( transformed ) ? transformed : undefined;
 }
 
 /**
@@ -53,11 +62,27 @@ export function transformValue( value: AlignmentMatrixControlValue ) {
  */
 export function getItemId(
 	prefixId: string,
-	value: AlignmentMatrixControlValue
+	value?: AlignmentMatrixControlValue
 ) {
-	const valueId = transformValue( value ).replace( ' ', '-' );
+	const normalized = normalize( value );
+	if ( ! normalized ) {
+		return;
+	}
 
-	return `${ prefixId }-${ valueId }`;
+	const id = normalized.replace( ' ', '-' );
+	return `${ prefixId }-${ id }`;
+}
+
+/**
+ * Extracts an item value from its ID
+ *
+ * @param prefixId An ID prefix to remove
+ * @param id       An item ID
+ * @return         The item value
+ */
+export function getItemValue( prefixId: string, id?: string | null ) {
+	const value = id?.replace( prefixId + '-', '' );
+	return normalize( value );
 }
 
 /**
@@ -70,8 +95,11 @@ export function getItemId(
 export function getAlignmentIndex(
 	alignment: AlignmentMatrixControlValue = 'center'
 ) {
-	const item = transformValue( alignment );
-	const index = ALIGNMENTS.indexOf( item );
+	const normalized = normalize( alignment );
+	if ( ! normalized ) {
+		return undefined;
+	}
 
+	const index = ALIGNMENTS.indexOf( normalized );
 	return index > -1 ? index : undefined;
 }

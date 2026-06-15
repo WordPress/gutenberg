@@ -5,25 +5,83 @@ import * as globalStyles from './components/global-styles';
 import { ExperimentalBlockEditorProvider } from './components/provider';
 import { lock } from './lock-unlock';
 import { getRichTextValues } from './components/rich-text/get-rich-text-values';
-import { kebabCase } from './utils/object';
 import ResizableBoxPopover from './components/resizable-box-popover';
-import { ComposedPrivateInserter as PrivateInserter } from './components/inserter';
+import { default as PrivateQuickInserter } from './components/inserter/quick-inserter';
+import {
+	extractWords,
+	getNormalizedSearchTerms,
+	normalizeString,
+} from './components/inserter/search-items';
 import { PrivateListView } from './components/list-view';
-import BlockInfo from './components/block-info-slot-fill';
-import { useShouldContextualToolbarShow } from './utils/use-should-contextual-toolbar-show';
-import { cleanEmptyObject } from './hooks/utils';
-import { useBlockEditingMode } from './components/block-editing-mode';
+import InspectorControlsLastItem from './components/inspector-controls/last-item';
+import { useHasBlockToolbar } from './components/block-toolbar/use-has-block-toolbar';
+import { cleanEmptyObject, usePrivateStyleOverride } from './hooks/utils';
+import {
+	getStyleForState,
+	isDefaultBlockStyleState,
+	setStyleForState,
+} from './hooks/block-style-state';
 import BlockQuickNavigation from './components/block-quick-navigation';
 import { LayoutStyle } from './components/block-list/layout';
+import BlockManager from './components/block-manager';
 import { BlockRemovalWarningModal } from './components/block-removal-warning-modal';
-import { useLayoutClasses, useLayoutStyles } from './hooks';
+import {
+	setBackgroundStyleDefaults,
+	useLayoutClasses,
+	useLayoutStyles,
+	BlockStyleVariationOverridesWithConfig,
+	useZoomOut,
+} from './hooks';
 import DimensionsTool from './components/dimensions-tool';
 import ResolutionTool from './components/resolution-tool';
-import {
-	default as ReusableBlocksRenameHint,
-	useReusableBlocksRenameHint,
-} from './components/inserter/reusable-block-rename-hint';
+import TextAlignmentControl from './components/text-alignment-control';
 import { usesContextKey } from './components/rich-text/format-edit';
+import {
+	ExperimentalBlockCanvas,
+	BlockCanvasCover,
+} from './components/block-canvas';
+import { getDuotoneFilter } from './components/duotone/utils';
+import { useFlashEditableBlocks } from './components/use-flash-editable-blocks';
+import {
+	selectBlockPatternsKey,
+	reusableBlocksSelectKey,
+	userPatternCategoriesSelectKey,
+	globalStylesDataKey,
+	globalStylesLinksDataKey,
+	sectionRootClientIdKey,
+	mediaEditKey,
+	getMediaSelectKey,
+	deviceTypeKey,
+	onViewportStateChangeKey,
+	isIsolatedEditorKey,
+	isNavigationOverlayContextKey,
+	isNavigationPostEditorKey,
+	mediaUploadOnSuccessKey,
+	openMediaEditorModalKey,
+} from './store/private-keys';
+import { requiresWrapperOnCopy } from './components/writing-flow/utils';
+import { PrivateRichText } from './components/rich-text/';
+import { PrivateBlockPopover } from './components/block-popover';
+import { PrivateInserterLibrary } from './components/inserter/library';
+import { PrivatePublishDateTimePicker } from './components/publish-date-time-picker';
+import useSpacingSizes from './components/spacing-sizes-control/hooks/use-spacing-sizes';
+import useBlockDisplayTitle from './components/block-title/use-block-display-title';
+import TabbedSidebar from './components/tabbed-sidebar';
+import NoteIconSlotFill from './components/collab/note-icon-slot';
+import NoteIconToolbarSlotFill from './components/collab/note-icon-toolbar-slot';
+import HTMLElementControl from './components/html-element-control';
+import {
+	useBlockElementRef,
+	useBlockElement,
+} from './components/block-list/use-block-props/use-block-refs';
+import { LinkPicker } from './components/link-picker';
+import useRemoteUrlData from './components/link-control/use-rich-url-data';
+import { PrivateBlockContext } from './components/block-list/private-block-context';
+import useListViewPanelState from './components/use-list-view-panel-state';
+import {
+	isHashLink,
+	isRelativePath,
+} from './components/link-control/is-url-like';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -31,24 +89,70 @@ import { usesContextKey } from './components/rich-text/format-edit';
 export const privateApis = {};
 lock( privateApis, {
 	...globalStyles,
+	ExperimentalBlockCanvas,
+	BlockCanvasCover,
 	ExperimentalBlockEditorProvider,
+	getDuotoneFilter,
 	getRichTextValues,
-	kebabCase,
-	PrivateInserter,
+	PrivateQuickInserter,
+	extractWords,
+	getNormalizedSearchTerms,
+	normalizeString,
 	PrivateListView,
 	ResizableBoxPopover,
-	BlockInfo,
-	useShouldContextualToolbarShow,
+	InspectorControlsLastItem,
+	useHasBlockToolbar,
 	cleanEmptyObject,
-	useBlockEditingMode,
+	getStyleForState,
+	isDefaultBlockStyleState,
+	setStyleForState,
+	usePrivateStyleOverride,
 	BlockQuickNavigation,
 	LayoutStyle,
+	BlockManager,
 	BlockRemovalWarningModal,
 	useLayoutClasses,
 	useLayoutStyles,
 	DimensionsTool,
 	ResolutionTool,
-	ReusableBlocksRenameHint,
-	useReusableBlocksRenameHint,
+	TabbedSidebar,
+	TextAlignmentControl,
 	usesContextKey,
+	useFlashEditableBlocks,
+	HTMLElementControl,
+	useZoomOut,
+	globalStylesDataKey,
+	globalStylesLinksDataKey,
+	selectBlockPatternsKey,
+	requiresWrapperOnCopy,
+	PrivateRichText,
+	PrivateInserterLibrary,
+	reusableBlocksSelectKey,
+	userPatternCategoriesSelectKey,
+	PrivateBlockPopover,
+	PrivatePublishDateTimePicker,
+	useSpacingSizes,
+	useBlockDisplayTitle,
+	BlockStyleVariationOverridesWithConfig,
+	setBackgroundStyleDefaults,
+	sectionRootClientIdKey,
+	NoteIconSlotFill,
+	NoteIconToolbarSlotFill,
+	mediaEditKey,
+	getMediaSelectKey,
+	deviceTypeKey,
+	onViewportStateChangeKey,
+	isIsolatedEditorKey,
+	isNavigationOverlayContextKey,
+	isNavigationPostEditorKey,
+	mediaUploadOnSuccessKey,
+	openMediaEditorModalKey,
+	useBlockElement,
+	useBlockElementRef,
+	LinkPicker,
+	useRemoteUrlData,
+	PrivateBlockContext,
+	useListViewPanelState,
+	isHashLink,
+	isRelativePath,
 } );

@@ -3,27 +3,36 @@
  */
 import type { MouseEventHandler, ReactNode } from 'react';
 
-type CommonNoticeActionProps = {
+export type NoticeAction = {
+	/**
+	 * The label for the action button.
+	 */
 	label: string;
+	/**
+	 * A CSS class to add to the action button.
+	 */
 	className?: string;
+	/**
+	 * Whether to remove default styling from the action button.
+	 */
 	noDefaultClasses?: boolean;
+	/**
+	 * The variant of the action button.
+	 */
 	variant?: 'primary' | 'secondary' | 'link';
+	/**
+	 * Whether the action button is disabled.
+	 */
+	disabled?: boolean;
+	/**
+	 * The onClick handler for the action button.
+	 */
+	onClick?: MouseEventHandler< HTMLAnchorElement | HTMLButtonElement >;
+	/**
+	 * The URL for the action button. If provided, the action will render as an anchor tag.
+	 */
+	url?: string;
 };
-// `url` and `onClick` can both be provided, but `url` takes precedence. If
-// `url` is provided, the action's button will be rendered as an anchor and
-// `onClick` will be ignored.
-type NoticeActionWithURL = CommonNoticeActionProps & {
-	url: string;
-	onClick?: never;
-};
-type NoticeActionWithOnClick = CommonNoticeActionProps & {
-	url?: never;
-	onClick: MouseEventHandler< HTMLButtonElement >;
-};
-
-export type NoticeAction = NoticeActionWithURL | NoticeActionWithOnClick;
-
-export type NoticeChildren = string | JSX.Element;
 
 export type NoticeProps = {
 	/**
@@ -44,8 +53,7 @@ export type NoticeProps = {
 	/**
 	 * Determines the color of the notice: `warning` (yellow),
 	 * `success` (green), `error` (red), or `'info'`.
-	 * By default `'info'` will be blue, but if there is a parent Theme component
-	 * with an accent color prop, the notice will take on that color instead.
+	 * By default `'info'` will be blue.
 	 *
 	 * @default 'info'
 	 */
@@ -83,7 +91,7 @@ export type NoticeProps = {
 	isDismissible?: boolean;
 	/**
 	 * A deprecated alternative to `onRemove`. This prop is kept for
-	 * compatibilty reasons but should be avoided.
+	 * compatibility reasons but should be avoided.
 	 *
 	 * @default noop
 	 */

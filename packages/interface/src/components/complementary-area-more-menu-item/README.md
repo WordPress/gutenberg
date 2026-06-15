@@ -5,7 +5,7 @@ Props not referenced here are passed to the component used to render the menu it
 
 ### scope
 
-The scope of the complementary area e.g: "core/edit-post", "core/edit-site", "myplugin/custom-screen-a",
+The scope of the complementary area e.g: "core", "myplugin/custom-screen-a",
 
 -   Type: `String`
 -   Required: Yes
@@ -16,7 +16,7 @@ Identifier of the complementary area. The string is saved on the store and allow
 
 -   Type: `String`
 -   Required: No
--   Default: Concatenation of `name` of the plugin extracted from the context (when available) with the `targe` of the sidebar passed as a property.
+-   Default: Concatenation of `name` of the plugin extracted from the context (when available) with the `target` of the sidebar passed as a property.
 
 ### target
 

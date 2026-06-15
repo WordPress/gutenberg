@@ -7,8 +7,9 @@ import { parseISO, endOfMonth, startOfMonth } from 'date-fns';
  * WordPress dependencies
  */
 import { getSettings } from '@wordpress/date';
+import { _x } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { __experimentalPublishDateTimePicker as PublishDateTimePicker } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useState, useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -16,8 +17,33 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
-export default function PostSchedule( { onClose } ) {
+const { PrivatePublishDateTimePicker } = unlock( blockEditorPrivateApis );
+
+/**
+ * Renders the PostSchedule component. It allows the user to schedule a post.
+ *
+ * @param {Object}   props         Props.
+ * @param {Function} props.onClose Function to close the component.
+ *
+ * @return {React.ReactNode} The rendered component.
+ */
+export default function PostSchedule( props ) {
+	return (
+		<PrivatePostSchedule
+			{ ...props }
+			showPopoverHeaderActions
+			isCompact={ false }
+		/>
+	);
+}
+
+export function PrivatePostSchedule( {
+	onClose,
+	showPopoverHeaderActions,
+	isCompact,
+} ) {
 	const { postDate, postType } = useSelect(
 		( select ) => ( {
 			postDate: select( editorStore ).getEditedPostAttribute( 'date' ),
@@ -33,7 +59,7 @@ export default function PostSchedule( { onClose } ) {
 		startOfMonth( new Date( postDate ) )
 	);
 
-	// Pick up published and schduled site posts.
+	// Pick up published and scheduled site posts.
 	const eventsByPostType = useSelect(
 		( select ) =>
 			select( coreStore ).getEntityRecords( 'postType', postType, {
@@ -69,15 +95,21 @@ export default function PostSchedule( { onClose } ) {
 	);
 
 	return (
-		<PublishDateTimePicker
+		<PrivatePublishDateTimePicker
 			currentDate={ postDate }
 			onChange={ onUpdateDate }
 			is12Hour={ is12HourTime }
+			dateOrder={
+				/* translators: Order of day, month, and year. Available formats are 'dmy', 'mdy', and 'ymd'. */
+				_x( 'dmy', 'date order' )
+			}
 			events={ events }
 			onMonthPreviewed={ ( date ) =>
 				setPreviewedMonth( parseISO( date ) )
 			}
 			onClose={ onClose }
+			isCompact={ isCompact }
+			showPopoverHeaderActions={ showPopoverHeaderActions }
 		/>
 	);
 }

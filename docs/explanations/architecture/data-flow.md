@@ -74,7 +74,7 @@ const columnsBlock = {
 };
 ```
 
-## Serialization and Parsing
+## Serialization and parsing
 
 ![Diagram](https://docs.google.com/drawings/d/1iuownt5etcih7rMMvPvh0Mny8zUA1Z28saxjxaWmfJ0/pub?w=1234&h=453)
 
@@ -88,7 +88,7 @@ This is one end of the process. The other is how to recreate the collection of b
 
 They just happen, incidentally, to be stored inside of `post_content` in a way in which they require no transformation in order to be viewable by any legacy system. It's true that loading the stored HTML into a browser without the corresponding machinery might degrade the experience, and if it included dynamic blocks of content, the dynamic elements may not load, server-generated content may not appear, and interactive content may remain static. However, it at least protects against not being able to view block editor posts on themes and installations that are blocks-unaware, and it provides the most accessible way to the content. In other words, the post remains mostly intact even if the saved HTML is rendered as is.
 
-### Delimiters and Parsing Expression Grammar
+### Delimiters and parsing expression grammar
 
 We chose instead to try to find a way to keep the formality, explicitness, and unambiguity in the existing HTML syntax. Within the HTML there were a number of options.
 
@@ -102,7 +102,7 @@ This has dramatic implications for how simple and performant we can make our par
 
 _N.B.:_ The defining aspects of blocks are their semantics and the isolation mechanism they provide: in other words, their identity. On the other hand, where their data is stored is a more liberal aspect. Blocks support more than just static local data (via JSON literals inside the HTML comment or within the block's HTML), and more mechanisms (_e.g._, global blocks or otherwise resorting to storage in complementary `WP_Post` objects) are expected. See [attributes](/docs/reference-guides/block-api/block-attributes.md) for details.
 
-### The Anatomy of a Serialized Block
+### The anatomy of a serialized block
 
 When blocks are saved to the content after the editing session, its attributes—depending on the nature of the block—are serialized to these explicit comment delimiters.
 
@@ -118,7 +118,7 @@ A purely dynamic block that is to be server-rendered before display could look l
 <!-- wp:latest-posts {"postsToShow":4,"displayPostDate":true} /-->
 ```
 
-## The Data Lifecycle
+## The data lifecycle
 
 In summary, the block editor workflow parses the saved document to an in-memory tree of blocks, using token delimiters to help. During editing, all manipulations happen within the block tree. The process ends by serializing the blocks back to the `post_content`.
 

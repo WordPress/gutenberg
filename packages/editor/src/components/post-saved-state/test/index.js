@@ -47,11 +47,14 @@ describe( 'PostSavedState', () => {
 			isNew: true,
 			isSaveable: false,
 			isSaving: true,
+			postStatus: 'draft',
 		} ) );
 
 		render( <PostSavedState /> );
 
-		expect( screen.getByText( 'Saving' ) ).toBeVisible();
+		expect(
+			screen.getByRole( 'button', { name: /Saving/i } )
+		).toBeVisible();
 	} );
 
 	it( 'returns a disabled button if the post is not saveable', () => {
@@ -60,11 +63,30 @@ describe( 'PostSavedState', () => {
 			isNew: true,
 			isSaveable: false,
 			isSaving: false,
+			postStatus: 'draft',
 		} ) );
 
 		render( <PostSavedState /> );
 
 		expect( screen.getByRole( 'button' ) ).toMatchSnapshot();
+	} );
+
+	it( 'returns a disabled button while a non-post entity is being saved', () => {
+		useSelect.mockImplementation( () => ( {
+			isDirty: true,
+			isNew: false,
+			isSaveable: true,
+			isSaving: false,
+			isSavingNonPostEntityChanges: true,
+			postStatus: 'draft',
+		} ) );
+
+		render( <PostSavedState /> );
+
+		expect( screen.getByRole( 'button' ) ).toHaveAttribute(
+			'aria-disabled',
+			'true'
+		);
 	} );
 
 	it( 'should return Saved text if not new and not dirty', () => {
@@ -73,6 +95,7 @@ describe( 'PostSavedState', () => {
 			isNew: false,
 			isSaveable: true,
 			isSaving: false,
+			postStatus: 'draft',
 		} ) );
 
 		render( <PostSavedState /> );
@@ -91,6 +114,7 @@ describe( 'PostSavedState', () => {
 			isNew: false,
 			isSaveable: true,
 			isSaving: false,
+			postStatus: 'draft',
 		} ) );
 
 		// Simulate the viewport being considered large.

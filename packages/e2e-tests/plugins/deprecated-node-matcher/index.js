@@ -70,7 +70,7 @@
 						} );
 					},
 				} )
-			)
+			);
 		},
 		save( { attributes } ) {
 			return el(

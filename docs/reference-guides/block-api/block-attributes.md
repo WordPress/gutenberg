@@ -1,6 +1,6 @@
 # Attributes
 
-Block attributes provide information about the data stored by a block. For example, rich content, a list of image URLs, a background colour, or a button title.
+Block attributes provide information about the data stored by a block. For example, rich content, a list of image URLs, a background color, or a button title.
 
 A block can contain any number of attributes, and these are specified by the `attributes` field - an object where each key is the name of the attribute, and the value is the attribute definition.
 
@@ -44,11 +44,11 @@ function YourBlockEdit( { attributes } ) {
 
 The block is responsible for using the `save` function to ensure that all attributes with a `source` field are saved according to the attributes definition. This is not automatic.
 
-Attributes without a `source` will be automatically saved in the block [comment delimiter](/docs/explanations/architecture/key-concepts.md#data-attributes).
+Attributes without a `source` will be automatically saved in the block [comment delimiter](/docs/explanations/architecture/key-concepts.md#data-and-attributes).
 
 For example, using the above attributes definition you would need to ensure that your `save` function has a corresponding img tag for the `url` attribute. The `title` and `size` attributes will be saved in the comment delimiter.
 
-_Example_: Example `save` function that contains the `url` attribute
+_Example_: Example `save` function that contains the `url` attribute.
 
 ```js
 function YourBlockSave( { attributes } ) {
@@ -66,9 +66,9 @@ The saved HTML will contain the `title` and `size` in the comment delimiter, and
 <!-- /block:your-block -->
 ```
 
-If an attributes change over time then a [block deprecation](/docs/reference-guides/block-api/block-deprecation.md) can help migrate from an older attribute, or remove it entirely.
+If an attribute changes over time then a [block deprecation](/docs/reference-guides/block-api/block-deprecation.md) can help migrate from an older attribute, or remove it entirely.
 
-## Type Validation
+## Type validation
 
 The `type` indicates the type of data that is stored by the attribute. It does not indicate where the data is stored, which is defined by the `source` field.
 
@@ -86,7 +86,7 @@ The `type` field MUST be one of the following:
 
 Note that the validity of an `object` is determined by your `source`. For an example, see the `query` details below.
 
-## Enum Validation
+## Enum validation
 
 An attribute can be defined as one of a fixed set of values. This is specified by an `enum`, which contains an array of allowed values:
 
@@ -100,12 +100,12 @@ _Example_: Example `enum`.
 }
 ```
 
-## Value Source
+## Value source
 
 Attribute sources are used to define how the attribute values are extracted from saved post content. They provide a mechanism to map from the saved markup to a JavaScript representation of a block.
 
 The available `source` values are:
-- `(no value)` - when no `source` is specified then data is stored in the block's [comment delimiter](/docs/explanations/architecture/key-concepts.md#data-attributes).
+- `(no value)` - when no `source` is specified then data is stored in the block's [comment delimiter](/docs/explanations/architecture/key-concepts.md#data-and-attributes).
 - `attribute` - data is stored in an HTML element attribute.
 - `text` - data is stored in HTML text.
 - `html` - data is stored in HTML. This is typically used by `RichText`.
@@ -305,39 +305,6 @@ Attribute available in the block:
 { "content": "The inner text of the <strong>figcaption</strong> element" }
 ```
 
-Use the `multiline` property to extract the inner HTML of matching tag names for the use in `RichText` with the `multiline` prop.
-
-_Example_: Extract the `content` attribute from a blockquote element found in the block's markup.
-
-Saved content:
-```html
-<div>
-	Block Content
-
-	<blockquote>
-		<p>First line</p>
-		<p>Second line</p>
-	</blockquote>
-</div>
-```
-
-Attribute definition:
-```js
-{
-	content: {
-		type: 'string',
-		source: 'html',
-		multiline: 'p',
-		selector: 'blockquote',
-	}
-}
-```
-
-Attribute available in the block:
-```js
-{ "content": "<p>First line</p><p>Second line</p>" }
-```
-
 ### `query` source
 
 Use `query` to extract an array of values from markup. Entries of the array are determined by the `selector` argument, where each matched element within the block will have an entry structured corresponding to the second argument, an object of attribute sources.
@@ -390,7 +357,7 @@ Attribute available in the block:
 ### Meta source (deprecated)
 
 <div class="callout callout-alert">
-Although attributes may be obtained from a post's meta, meta attribute sources are considered deprecated; <a href="https://github.com/WordPress/gutenberg/blob/c367c4e2765f9e6b890d1565db770147efca5d66/packages/core-data/src/entity-provider.js">EntityProvider and related hook APIs</a> should be used instead, as shown in the <a href="/block-editor/how-to-guides/metabox/#step-2-add-meta-block">Create Meta Block how-to</a>.
+Although attributes may be obtained from a post's meta, meta attribute sources are considered deprecated; <a href="https://github.com/WordPress/gutenberg/blob/c367c4e2765f9e6b890d1565db770147efca5d66/packages/core-data/src/entity-provider.js">EntityProvider and related hook APIs</a> should be used instead, as shown in the <a href="https://developer.wordpress.org/block-editor/how-to-guides/metabox/#step-2-add-meta-block">Create Meta Block how-to</a>.
 </div>
 
 Attributes may be obtained from a post's meta rather than from the block's representation in saved post content. For this, an attribute is required to specify its corresponding meta key under the `meta` key.
@@ -408,9 +375,6 @@ Attribute definition:
 
 From here, meta attributes can be read and written by a block using the same interface as any attribute:
 
-{% codetabs %}
-{% JSX %}
-
 ```js
 edit( { attributes, setAttributes } ) {
 	function onChange( event ) {
@@ -421,22 +385,6 @@ edit( { attributes, setAttributes } ) {
 },
 ```
 
-{% Plain %}
-
-```js
-edit: function( props ) {
-	function onChange( event ) {
-		props.setAttributes( { author: event.target.value } );
-	}
-
-	return el( 'input', {
-		value: props.attributes.author,
-		onChange: onChange,
-	} );
-},
-```
-
-{% end %}
 
 #### Considerations
 
@@ -479,7 +427,7 @@ function onChange( event ) {
 }
 ```
 
-## Default Value
+## Default value
 
 A block attribute can contain a default value, which will be used if the `type` and `source` do not match anything within the block content.
 
@@ -513,3 +461,36 @@ _Example_: Example `default` values.
 	}
 }
 ```
+
+## Role
+
+The `role` property designates an attribute as being of a particular conceptual type. This property can be applied to any attribute to provide semantic meaning about how the attribute should be handled.
+
+Use `content` to designate the attribute as user-editable content. Blocks with attributes marked as `content` may be enabled for privileged editing in special circumstances such as content only locking.
+Use `local` to mark the attribute as temporary and non-persistable. Attributes marked as `local` are ignored by the Block Serializer and never saved to post content.
+
+_Example_: `content` role used by the paragraph block.
+
+```js
+{
+    content: {
+        type: 'string',
+        source: 'html',
+        selector: 'p',
+        role: 'content',
+    }
+}
+```
+
+_Example_: `local` role used for temporary data.
+
+```js
+{
+    blob: {
+        type: 'string',
+        role: 'local',
+    }
+}
+```
+
+Learn more in the [WordPress 6.7 dev note](https://make.wordpress.org/core/2024/10/20/miscellaneous-block-editor-changes-in-wordpress-6-7/#stabilized-role-property-for-block-attributes).

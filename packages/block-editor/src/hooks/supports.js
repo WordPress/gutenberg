@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
-import { Platform } from '@wordpress/element';
 
 const ALIGN_SUPPORT_KEY = 'align';
 const ALIGN_WIDE_SUPPORT_KEY = 'alignWide';
@@ -20,6 +19,11 @@ const FONT_STYLE_SUPPORT_KEY = 'typography.__experimentalFontStyle';
  * Key within block settings' support array indicating support for font weight.
  */
 const FONT_WEIGHT_SUPPORT_KEY = 'typography.__experimentalFontWeight';
+/**
+ * Key within block settings' supports array indicating support for text
+ * align e.g. settings found in `block.json`.
+ */
+const TEXT_ALIGN_SUPPORT_KEY = 'typography.textAlign';
 /**
  * Key within block settings' supports array indicating support for text
  * columns e.g. settings found in `block.json`.
@@ -53,14 +57,17 @@ const TYPOGRAPHY_SUPPORT_KEYS = [
 	FONT_STYLE_SUPPORT_KEY,
 	FONT_WEIGHT_SUPPORT_KEY,
 	FONT_FAMILY_SUPPORT_KEY,
+	TEXT_ALIGN_SUPPORT_KEY,
 	TEXT_COLUMNS_SUPPORT_KEY,
 	TEXT_DECORATION_SUPPORT_KEY,
 	TEXT_TRANSFORM_SUPPORT_KEY,
 	WRITING_MODE_SUPPORT_KEY,
 	LETTER_SPACING_SUPPORT_KEY,
 ];
+const EFFECTS_SUPPORT_KEYS = [ 'shadow' ];
 const SPACING_SUPPORT_KEY = 'spacing';
 const styleSupportKeys = [
+	...EFFECTS_SUPPORT_KEYS,
 	...TYPOGRAPHY_SUPPORT_KEYS,
 	BORDER_SUPPORT_KEY,
 	COLOR_SUPPORT_KEY,
@@ -112,10 +119,6 @@ export const getAlignWideSupport = ( nameOrType ) =>
  * @return {boolean} Whether there is support.
  */
 export function hasBorderSupport( nameOrType, feature = 'any' ) {
-	if ( Platform.OS !== 'web' ) {
-		return false;
-	}
-
 	const support = getBlockSupport( nameOrType, BORDER_SUPPORT_KEY );
 
 	if ( support === true ) {
@@ -169,10 +172,6 @@ export const hasColorSupport = ( nameOrType ) => {
  * @return {boolean} Whether the block supports the feature.
  */
 export const hasLinkColorSupport = ( nameOrType ) => {
-	if ( Platform.OS !== 'web' ) {
-		return false;
-	}
-
 	const colorSupport = getBlockSupport( nameOrType, COLOR_SUPPORT_KEY );
 
 	return (
@@ -209,6 +208,24 @@ export const hasBackgroundColorSupport = ( nameOrType ) => {
 
 	return colorSupport && colorSupport.background !== false;
 };
+
+/**
+ * Returns true if the block defines support for text-align.
+ *
+ * @param {string|Object} nameOrType Block name or type object.
+ * @return {boolean} Whether the block supports the feature.
+ */
+export const hasTextAlignSupport = ( nameOrType ) =>
+	hasBlockSupport( nameOrType, TEXT_ALIGN_SUPPORT_KEY );
+
+/**
+ * Returns the block support value for text-align, if defined.
+ *
+ * @param {string|Object} nameOrType Block name or type object.
+ * @return {unknown} The block support value.
+ */
+export const getTextAlignSupport = ( nameOrType ) =>
+	getBlockSupport( nameOrType, TEXT_ALIGN_SUPPORT_KEY );
 
 /**
  * Returns true if the block defines support for background color.

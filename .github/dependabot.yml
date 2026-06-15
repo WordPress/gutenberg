@@ -4,11 +4,32 @@ version: 2
 updates:
     # Check for updates to GitHub Actions.
     - package-ecosystem: 'github-actions'
+      directories:
+          - '.github/workflows'
+          - '.github/setup-node'
+      schedule:
+          interval: 'daily'
+      open-pull-requests-limit: 20
+      cooldown:
+          default-days: 7
+      labels:
+          - 'GitHub Actions'
+          - '[Type] Build Tooling'
+      groups:
+          github-actions:
+              applies-to: version-updates
+              update-types:
+                  - minor
+                  - patch
+
+    # Manage npm security updates only.
+    - package-ecosystem: 'npm'
       directory: '/'
       schedule:
           interval: 'daily'
-      open-pull-requests-limit: 10
+      # disables noisy npm *version* updates across the monorepo;
+      # *security* updates ignore this limit and keep running.
+      open-pull-requests-limit: 0
       labels:
-          - 'GitHub Actions'
-          - 'Automated Testing'
+          - 'dependencies'
           - '[Type] Build Tooling'

@@ -28,15 +28,30 @@ export type FontSizePickerProps = {
 	) => void;
 	/**
 	 * Available units for custom font size selection.
+	 *
+	 * @default [ 'px', 'em', 'rem', 'vw', 'vh' ]
 	 */
 	units?: string[];
 	/**
 	 * The current font size value.
+	 *
+	 * Note: For the `units` property to work, the current font size value must be specified
+	 * as strings with units (e.g., '12px' instead of 12). When the font size is provided
+	 * as a number, the component operates in "unitless mode" where the `units` property has no effect.
 	 */
 	value?: number | string;
 	/**
-	 * If `true`, the UI will contain a slider, instead of a numeric text input
-	 * field. If `false`, no slider will be present.
+	 * Determines how the `value` prop should be interpreted.
+	 * - `'literal'`: The `value` prop contains the actual font size value (number or string)
+	 * - `'slug'`: The `value` prop contains the slug of the selected font size
+	 *
+	 * @default 'literal'
+	 */
+	valueMode?: 'literal' | 'slug';
+	/**
+	 * If `true`, a slider will be displayed alongside the input field when a
+	 * custom font size is active. Has no effect when `disableCustomFontSizes`
+	 * is `true`.
 	 *
 	 * @default false
 	 */
@@ -44,7 +59,7 @@ export type FontSizePickerProps = {
 	/**
 	 * If `true`, a reset button will be displayed alongside the input field
 	 * when a custom font size is active. Has no effect when
-	 * `disableCustomFontSizes` or `withSlider` is `true`.
+	 * `disableCustomFontSizes` is `true`.
 	 *
 	 * @default true
 	 */
@@ -55,8 +70,16 @@ export type FontSizePickerProps = {
 	 * can be safely removed once this happens.)
 	 *
 	 * @default false
+	 * @deprecated Default behavior since WP 6.5. Prop can be safely removed.
+	 * @ignore
 	 */
 	__nextHasNoMarginBottom?: boolean;
+	/**
+	 * Start opting into the larger default height that will become the default size in a future version.
+	 *
+	 * @default false
+	 */
+	__next40pxDefaultSize?: boolean;
 	/**
 	 * Size of the control.
 	 *
@@ -81,31 +104,44 @@ export type FontSize = {
 	 * size. Used for the class generation process.
 	 */
 	slug: string;
+	/**
+	 * The `hint` property is an optional string that provides additional information
+	 * about the font size, such as fluid typography ranges or custom descriptions.
+	 * Consumers can use this to provide their own preferred hints.
+	 */
+	hint?: string;
 };
 
 export type FontSizePickerSelectProps = Pick<
 	FontSizePickerProps,
-	'value' | 'size'
+	'value' | 'size' | 'valueMode'
 > & {
 	fontSizes: NonNullable< FontSizePickerProps[ 'fontSizes' ] >;
 	disableCustomFontSizes: NonNullable<
 		FontSizePickerProps[ 'disableCustomFontSizes' ]
 	>;
-	onChange: NonNullable< FontSizePickerProps[ 'onChange' ] >;
+	onChange: (
+		value: number | string | undefined,
+		selectedItem?: FontSize
+	) => void;
 	onSelectCustom: () => void;
+	__next40pxDefaultSize: boolean;
 };
 
 export type FontSizePickerSelectOption = {
 	key: string;
 	name: string;
 	value?: FontSize[ 'size' ];
-	__experimentalHint?: string;
+	hint?: string;
 };
 
 export type FontSizePickerToggleGroupProps = Pick<
 	FontSizePickerProps,
-	'value' | 'size' | '__nextHasNoMarginBottom'
+	'value' | 'size' | '__next40pxDefaultSize' | 'valueMode'
 > & {
 	fontSizes: NonNullable< FontSizePickerProps[ 'fontSizes' ] >;
-	onChange: NonNullable< FontSizePickerProps[ 'onChange' ] >;
+	onChange: (
+		value: number | string | undefined,
+		selectedItem?: FontSize
+	) => void;
 };

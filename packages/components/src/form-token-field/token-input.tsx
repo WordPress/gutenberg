@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type { ChangeEvent, ForwardedRef, FocusEventHandler } from 'react';
 
 /**
@@ -12,7 +12,7 @@ import { forwardRef, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import type { TokenInputProps } from './types';
 
 export function UnForwardedTokenInput(
@@ -28,6 +28,7 @@ export function UnForwardedTokenInput(
 		onChange,
 		onFocus,
 		onBlur,
+		'aria-describedby': ariaDescribedBy,
 		...restProps
 	} = props;
 
@@ -48,9 +49,7 @@ export function UnForwardedTokenInput(
 		onFocus?.( e );
 	};
 
-	const onBlurHandler: React.FocusEventHandler< HTMLInputElement > = (
-		e
-	) => {
+	const onBlurHandler: FocusEventHandler< HTMLInputElement > = ( e ) => {
 		setHasFocus( false );
 		onBlur?.( e );
 	};
@@ -66,7 +65,7 @@ export function UnForwardedTokenInput(
 			onFocus={ onFocusHandler }
 			onBlur={ onBlurHandler }
 			size={ size }
-			className={ classnames(
+			className={ clsx(
 				className,
 				'components-form-token-field__input'
 			) }
@@ -88,11 +87,12 @@ export function UnForwardedTokenInput(
 					? `components-form-token-suggestions-${ instanceId }-${ selectedSuggestionIndex }`
 					: undefined
 			}
-			aria-describedby={ `components-form-token-suggestions-howto-${ instanceId }` }
+			aria-describedby={ ariaDescribedBy }
 		/>
 	);
 }
 
 export const TokenInput = forwardRef( UnForwardedTokenInput );
+TokenInput.displayName = 'TokenInput';
 
 export default TokenInput;

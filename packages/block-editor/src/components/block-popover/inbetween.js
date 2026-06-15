@@ -1,18 +1,13 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import {
-	useMemo,
-	createContext,
-	useReducer,
-	useLayoutEffect,
-} from '@wordpress/element';
+import { useMemo, useReducer, useLayoutEffect } from '@wordpress/element';
 import { Popover } from '@wordpress/components';
 import { isRTL } from '@wordpress/i18n';
 
@@ -20,12 +15,10 @@ import { isRTL } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
+import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import usePopoverScroll from './use-popover-scroll';
 
 const MAX_POPOVER_RECOMPUTE_COUNTER = Number.MAX_SAFE_INTEGER;
-
-export const InsertionPointOpenRef = createContext();
 
 function BlockPopoverInbetween( {
 	previousClientId,
@@ -33,6 +26,8 @@ function BlockPopoverInbetween( {
 	children,
 	__unstablePopoverSlot,
 	__unstableContentRef,
+	operation = 'insert',
+	nearestSide = 'right',
 	...props
 } ) {
 	// This is a temporary hack to get the inbetween inserter to recompute properly.
@@ -81,10 +76,13 @@ function BlockPopoverInbetween( {
 			return undefined;
 		}
 
-		const { ownerDocument } = previousElement || nextElement;
+		const contextElement =
+			operation === 'group'
+				? nextElement || previousElement
+				: previousElement || nextElement;
 
 		return {
-			ownerDocument,
+			contextElement,
 			getBoundingClientRect() {
 				const previousRect = previousElement
 					? previousElement.getBoundingClientRect()
@@ -98,7 +96,20 @@ function BlockPopoverInbetween( {
 				let width = 0;
 				let height = 0;
 
-				if ( isVertical ) {
+				if ( operation === 'group' ) {
+					const targetRect = nextRect || previousRect;
+					top = targetRect.top;
+					// No spacing is likely around blocks in this operation.
+					// So width of the inserter containing rect is set to 0.
+					width = 0;
+					height = targetRect.bottom - targetRect.top;
+					// Popover calculates its distance from mid-block so some
+					// adjustments are needed to make it appear in the right place.
+					left =
+						nearestSide === 'left'
+							? targetRect.left - 2
+							: targetRect.right - 2;
+				} else if ( isVertical ) {
 					// vertical
 					top = previousRect ? previousRect.bottom : nextRect.top;
 					width = previousRect ? previousRect.width : nextRect.width;
@@ -130,6 +141,10 @@ function BlockPopoverInbetween( {
 								? nextRect.left - previousRect.right
 								: 0;
 					}
+
+					// Avoid a negative width which happens when the next rect
+					// is on the next line.
+					width = Math.max( width, 0 );
 				}
 
 				return new window.DOMRect( left, top, width, height );
@@ -141,6 +156,8 @@ function BlockPopoverInbetween( {
 		popoverRecomputeCounter,
 		isVertical,
 		isVisible,
+		operation,
+		nearestSide,
 	] );
 
 	const popoverScrollRef = usePopoverScroll( __unstableContentRef );
@@ -200,7 +217,6 @@ function BlockPopoverInbetween( {
 		return null;
 	}
 
-	/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 	// While ideally it would be enough to capture the
 	// bubbling focus event from the Inserter, due to the
 	// characteristics of click focusing of `button`s in
@@ -215,12 +231,13 @@ function BlockPopoverInbetween( {
 			focusOnMount={ false }
 			// Render in the old slot if needed for backward compatibility,
 			// otherwise render in place (not in the default popover slot).
-			__unstableSlotName={ __unstablePopoverSlot || null }
+			__unstableSlotName={ __unstablePopoverSlot }
+			inline={ ! __unstablePopoverSlot }
 			// Forces a remount of the popover when its position changes
 			// This makes sure the popover doesn't animate from its previous position.
 			key={ nextClientId + '--' + rootClientId }
 			{ ...props }
-			className={ classnames(
+			className={ clsx(
 				'block-editor-block-popover',
 				'block-editor-block-popover__inbetween',
 				props.className
@@ -235,7 +252,6 @@ function BlockPopoverInbetween( {
 			</div>
 		</Popover>
 	);
-	/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 }
 
 export default BlockPopoverInbetween;

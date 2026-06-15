@@ -1,3 +1,7 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 /**
  * Editor only CSS.
  */
@@ -5,6 +9,10 @@
 // Undo default editor styles.
 // These need extra specificity.
 .editor-styles-wrapper .wp-block-navigation {
+	// Extra specificity is applied to do two things in classic themes:
+	// 1. Override the auto margin from alignment styles. This is needed as the `ul` element
+	//    has a `wp-block` class applied to it, even though it's not a block.
+	// 2. Override list indentation that targets `ul,ol` elements.
 	ul {
 		margin-top: 0;
 		margin-bottom: 0;
@@ -100,7 +108,6 @@
 		background: $gray-900;
 		padding: 0;
 		width: $button-size-small;
-		border-radius: $radius-block-ui;
 		margin-right: 0;
 		margin-left: auto;
 	}
@@ -200,6 +207,7 @@ $color-control-label-height: 20px;
 .wp-block-navigation .wp-block + .block-list-appender .block-editor-button-block-appender {
 	background-color: $gray-900;
 	color: $white;
+	height: $button-size-small;
 
 	// This needs specificity to override an inherited padding.
 	// That source padding in turn has high specificity to protect
@@ -287,7 +295,6 @@ $color-control-label-height: 20px;
 		left: 0;
 		pointer-events: none;
 		border: $border-width dashed currentColor;
-		@include placeholder-style();
 
 		// Inherit border radius from style variations.
 		border-radius: inherit;
@@ -323,7 +330,7 @@ $color-control-label-height: 20px;
 }
 
 .wp-block-navigation-placeholder__controls {
-	border-radius: $radius-block-ui;
+	border-radius: $radius-small;
 	background-color: $white;
 	box-shadow: inset 0 0 0 $border-width $gray-900;
 	display: none;
@@ -457,19 +464,9 @@ $color-control-label-height: 20px;
 	}
 }
 
-.has-fixed-toolbar .wp-block-navigation__responsive-container.is-menu-open {
-	@include break-medium() {
-		top: $admin-bar-height + $header-height + $block-toolbar-height + $border-width;
-	}
-}
-
 .is-mobile-preview .wp-block-navigation__responsive-container.is-menu-open,
 .is-tablet-preview .wp-block-navigation__responsive-container.is-menu-open {
 	top: $admin-bar-height + $header-height + $block-toolbar-height + $border-width;
-}
-
-.is-sidebar-opened .wp-block-navigation__responsive-container.is-menu-open {
-	right: $sidebar-width;
 }
 
 // When fullscreen.
@@ -483,19 +480,13 @@ $color-control-label-height: 20px;
 		}
 	}
 
-	.has-fixed-toolbar .wp-block-navigation__responsive-container.is-menu-open {
-		@include break-medium() {
-			top: $header-height + $block-toolbar-height + $border-width;
-		}
-	}
-
 	.is-mobile-preview .wp-block-navigation__responsive-container.is-menu-open,
 	.is-tablet-preview .wp-block-navigation__responsive-container.is-menu-open {
 		top: $header-height + $block-toolbar-height + $border-width;
 	}
 }
 
-// The iframe makes these rules a lot simpler.
+// `body.editor-styles-wrapper` ensures this only applies to the iframed editor.
 body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-open {
 	top: 0;
 	right: 0;
@@ -577,8 +568,12 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 	width: 100%;
 	background-color: $gray-100;
 	padding: 0 $grid-unit-30;
-	height: $grid-unit-40 * 2;
-	margin-bottom: $grid-unit-15;
+
+	// Adding !important to override default 40px size.
+	// Ref - https://github.com/WordPress/gutenberg/pull/65075#discussion_r1746282734
+	height: $grid-unit-40 * 2 !important;
+
+	grid-column: span 2;
 
 	&.open {
 		box-shadow: inset 0 0 0 $border-width $gray-200;
@@ -636,12 +631,93 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 	opacity: 1;
 }
 
-.wp-block-navigation__menu-inspector-controls {
-	overflow-x: auto;
-
-	@include custom-scrollbars-on-hover(transparent, $gray-600);
-}
-
 .wp-block-navigation__menu-inspector-controls__empty-message {
 	margin-left: 24px;
+}
+
+.editor-sidebar__panel .wp-block-navigation__submenu-header {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+.wp-block-navigation__submenu-accessibility-notice {
+	grid-column: span 2;
+}
+
+.wp-block-navigation__overlay-selector {
+	position: relative;
+}
+
+.wp-block-navigation__overlay-selector-controls {
+	margin-bottom: $grid-unit-10;
+}
+
+.wp-block-navigation__overlay-create-button {
+	position: absolute;
+	// Align with SelectControl label by offsetting by button padding
+	// Small icon buttons have 0 padding, but we align with default button top padding (4px = $grid-unit-05)
+	top: -$grid-unit-05;
+	right: 0;
+	z-index: 1;
+}
+
+// Overlay Preview styles
+.wp-block-navigation__overlay-preview {
+	border: 1px solid $gray-300;
+	border-radius: 2px;
+	overflow-y: auto;
+	max-height: 200px;
+	background: $white;
+}
+
+.wp-block-navigation__overlay-preview-loading {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 200px;
+	background: $gray-100;
+}
+
+.wp-block-navigation__overlay-preview-empty {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 200px;
+	padding: $grid-unit-20;
+	text-align: center;
+	color: $gray-700;
+	background: $gray-100;
+	font-style: italic;
+}
+
+.wp-block-navigation__overlay-preview-placeholder {
+	width: 100%;
+	height: 200px;
+	background: $gray-100;
+	animation: wp-block-navigation-overlay-preview-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes wp-block-navigation-overlay-preview-pulse {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.5;
+	}
+}
+
+.wp-block-navigation__deleted-overlay-warning {
+	margin-top: $grid-unit-15;
+}
+
+// Create Overlay button
+.wp-block-navigation__overlay-create-button-prominent {
+	width: 100%;
+	justify-content: center;
+	margin-bottom: $grid-unit-10;
+}
+
+.wp-block-navigation__overlay-help-text-wrapper {
+	margin-top: $grid-unit-10;
 }

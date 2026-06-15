@@ -11,8 +11,8 @@ With a clipboard button, users copy text (or other elements) with a single click
 ## Usage
 
 ```jsx
+import { useState } from 'react';
 import { ClipboardButton } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MyClipboardButton = () => {
 	const [ hasCopied, setHasCopied ] = useState( false );
@@ -51,15 +51,15 @@ The text that will be copied to the clipboard.
 
 The function that will be called when the text is copied.
 
--- Type: `() => void`
--- Required: yes
+- Type: `() => void`
+- Required: yes
 
 ### onFinishCopy
 
 The function that will be called when the text is copied and the copy animation is finished.
 
--- Type: `() => void`
--- Required: no
+- Type: `() => void`
+- Required: no
 
 ### Inherited props
 

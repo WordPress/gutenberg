@@ -1,22 +1,22 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
-import scrollIntoView from 'dom-scroll-into-view';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import deprecated from '@wordpress/deprecated';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
 import { UP, DOWN, ENTER, TAB } from '@wordpress/keycodes';
 import {
 	BaseControl,
 	Button,
+	__experimentalInputControl as InputControl,
 	Spinner,
 	withSpokenMessages,
 	Popover,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import {
 	compose,
@@ -31,6 +31,9 @@ import { isURL } from '@wordpress/url';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { ValidatedInputControl } = unlock( componentsPrivateApis );
 
 /**
  * Whether the argument is a function.
@@ -53,7 +56,8 @@ class URLInput extends Component {
 		this.handleOnClick = this.handleOnClick.bind( this );
 		this.bindSuggestionNode = this.bindSuggestionNode.bind( this );
 		this.autocompleteRef = props.autocompleteRef || createRef();
-		this.inputRef = createRef();
+		this.inputRef = props.inputRef || createRef();
+		this.hasRenderedValidation = { current: false };
 		this.updateSuggestions = debounce(
 			this.updateSuggestions.bind( this ),
 			200
@@ -66,7 +70,6 @@ class URLInput extends Component {
 		this.state = {
 			suggestions: [],
 			showSuggestions: false,
-			isUpdatingSuggestions: false,
 			suggestionsValue: null,
 			selectedSuggestion: null,
 			suggestionsListboxId: '',
@@ -84,29 +87,17 @@ class URLInput extends Component {
 		if (
 			showSuggestions &&
 			selectedSuggestion !== null &&
-			this.suggestionNodes[ selectedSuggestion ] &&
-			! this.scrollingIntoView
+			this.suggestionNodes[ selectedSuggestion ]
 		) {
-			this.scrollingIntoView = true;
-			scrollIntoView(
-				this.suggestionNodes[ selectedSuggestion ],
-				this.autocompleteRef.current,
-				{
-					onlyScrollIfNeeded: true,
-				}
-			);
-
-			this.props.setTimeout( () => {
-				this.scrollingIntoView = false;
-			}, 100 );
+			this.suggestionNodes[ selectedSuggestion ].scrollIntoView( {
+				behavior: 'instant',
+				block: 'nearest',
+				inline: 'nearest',
+			} );
 		}
 
 		// Update suggestions when the value changes.
-		if (
-			prevProps.value !== value &&
-			! this.props.disableSuggestions &&
-			! this.state.isUpdatingSuggestions
-		) {
+		if ( prevProps.value !== value && ! this.props.disableSuggestions ) {
 			if ( value?.length ) {
 				// If the new value is not empty we need to update with suggestions for it.
 				this.updateSuggestions( value );
@@ -183,7 +174,6 @@ class URLInput extends Component {
 		}
 
 		this.setState( {
-			isUpdatingSuggestions: true,
 			selectedSuggestion: null,
 			loading: true,
 		} );
@@ -203,7 +193,6 @@ class URLInput extends Component {
 
 				this.setState( {
 					suggestions,
-					isUpdatingSuggestions: false,
 					suggestionsValue: value,
 					loading: false,
 					showSuggestions: !! suggestions.length,
@@ -212,7 +201,7 @@ class URLInput extends Component {
 				if ( !! suggestions.length ) {
 					this.props.debouncedSpeak(
 						sprintf(
-							/* translators: %s: number of results. */
+							/* translators: %d: number of results. */
 							_n(
 								'%d result found, use up and down arrow keys to navigate.',
 								'%d results found, use up and down arrow keys to navigate.',
@@ -235,9 +224,15 @@ class URLInput extends Component {
 				}
 
 				this.setState( {
-					isUpdatingSuggestions: false,
 					loading: false,
 				} );
+			} )
+			.finally( () => {
+				// If this is the current promise then reset the reference
+				// to allow for checking if a new request is made.
+				if ( this.suggestionsRequest === request ) {
+					this.suggestionsRequest = null;
+				}
 			} );
 
 		// Note that this assignment is handled *before* the async search request
@@ -245,8 +240,8 @@ class URLInput extends Component {
 		this.suggestionsRequest = request;
 	}
 
-	onChange( event ) {
-		this.props.onChange( event.target.value );
+	onChange( newValue ) {
+		this.props.onChange( newValue );
 	}
 
 	onFocus() {
@@ -255,11 +250,12 @@ class URLInput extends Component {
 
 		// When opening the link editor, if there's a value present, we want to load the suggestions pane with the results for this input search value
 		// Don't re-run the suggestions on focus if there are already suggestions present (prevents searching again when tabbing between the input and buttons)
+		// or there is already a request in progress.
 		if (
 			value &&
 			! disableSuggestions &&
-			! this.state.isUpdatingSuggestions &&
-			! ( suggestions && suggestions.length )
+			! ( suggestions && suggestions.length ) &&
+			this.suggestionsRequest === null
 		) {
 			// Ensure the suggestions are updated with the current input value.
 			this.updateSuggestions( value );
@@ -425,8 +421,6 @@ class URLInput extends Component {
 
 	renderControl() {
 		const {
-			/** Start opting into the new margin-free styles that will become the default in a future version. */
-			__nextHasNoMarginBottom = false,
 			label = null,
 			className,
 			isFullWidth,
@@ -435,6 +429,10 @@ class URLInput extends Component {
 			__experimentalRenderControl: renderControl,
 			value = '',
 			hideLabelFromVision = false,
+			help = null,
+			disabled = false,
+			customValidity,
+			markWhenOptional,
 		} = this.props;
 
 		const {
@@ -450,7 +448,7 @@ class URLInput extends Component {
 		const controlProps = {
 			id: inputId, // Passes attribute to label for the for attribute
 			label,
-			className: classnames( 'block-editor-url-input', className, {
+			className: clsx( 'block-editor-url-input', className, {
 				'is-full-width': isFullWidth,
 			} ),
 			hideLabelFromVision,
@@ -459,13 +457,14 @@ class URLInput extends Component {
 		const inputProps = {
 			id: inputId,
 			value,
-			required: true,
-			className: 'block-editor-url-input__input',
+			required: this.props.required ?? true,
 			type: 'text',
-			onChange: this.onChange,
-			onFocus: this.onFocus,
+			name: inputId,
+			autoComplete: 'off',
+			onChange: disabled ? () => {} : this.onChange, // Disable onChange when disabled
+			onFocus: disabled ? () => {} : this.onFocus, // Disable onFocus when disabled
 			placeholder,
-			onKeyDown: this.onKeyDown,
+			onKeyDown: disabled ? () => {} : this.onKeyDown, // Disable onKeyDown when disabled
 			role: 'combobox',
 			'aria-label': label ? undefined : __( 'URL' ), // Ensure input always has an accessible label
 			'aria-expanded': showSuggestions,
@@ -476,26 +475,43 @@ class URLInput extends Component {
 					? `${ suggestionOptionIdPrefix }-${ selectedSuggestion }`
 					: undefined,
 			ref: this.inputRef,
+			disabled,
+			suffix: this.props.suffix,
+			help,
+		};
+
+		const validationProps = {
+			customValidity,
+			// Suppress the "(Required)" indicator in the label.
+			// The field is still required for validation, but the indicator
+			// can be hidden when markWhenOptional is set to true.
+			...( markWhenOptional !== undefined && {
+				markWhenOptional,
+			} ),
 		};
 
 		if ( renderControl ) {
 			return renderControl( controlProps, inputProps, loading );
 		}
 
-		if ( ! __nextHasNoMarginBottom ) {
-			deprecated( 'Bottom margin styles for wp.blockEditor.URLInput', {
-				since: '6.2',
-				version: '6.5',
-				hint: 'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version',
-			} );
+		// Use ValidatedInputControl if customValidity has ever had a non-undefined value.
+		if ( customValidity !== undefined ) {
+			this.hasRenderedValidation.current = true;
 		}
 
+		const MaybeValidatedInputControl = this.hasRenderedValidation.current
+			? ValidatedInputControl
+			: InputControl;
+
 		return (
-			<BaseControl
-				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
-				{ ...controlProps }
-			>
-				<input { ...inputProps } />
+			<BaseControl { ...controlProps }>
+				<MaybeValidatedInputControl
+					{ ...inputProps }
+					{ ...( this.hasRenderedValidation.current
+						? validationProps
+						: {} ) }
+					__next40pxDefaultSize
+				/>
 				{ loading && <Spinner /> }
 			</BaseControl>
 		);
@@ -555,16 +571,16 @@ class URLInput extends Component {
 			<Popover placement="bottom" focusOnMount={ false }>
 				<div
 					{ ...suggestionsListProps }
-					className={ classnames(
-						'block-editor-url-input__suggestions',
-						`${ className }__suggestions`
-					) }
+					className={ clsx( 'block-editor-url-input__suggestions', {
+						[ `${ className }__suggestions` ]: className,
+					} ) }
 				>
 					{ suggestions.map( ( suggestion, index ) => (
 						<Button
+							__next40pxDefaultSize
 							{ ...buildSuggestionItemProps( suggestion, index ) }
 							key={ suggestion.id }
-							className={ classnames(
+							className={ clsx(
 								'block-editor-url-input__suggestion',
 								{
 									'is-selected': index === selectedSuggestion,

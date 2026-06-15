@@ -10,8 +10,9 @@ $src_proc_ins = $plugin_url . 'tovdom/processing-instructions.js';
 $src_cdata    = $plugin_url . 'tovdom/cdata.js';
 ?>
 
-<div data-wp-interactive>
+<div data-wp-interactive="tovdom">
 	<div data-testid="it should delete comments">
+		<div>Comment is <!-- ##last-child## --></div>
 		<!-- ##1## -->
 		<div data-testid="it should keep this node between comments">
 			Comments inner node

@@ -38,14 +38,19 @@
 		"customFontSize",
 		"showSubmenuIcon",
 		"style",
-		"openSubmenusOnClick"
+		"openSubmenusOnClick",
+		"submenuVisibility"
 	],
 	"supports": {
+		"anchor": true,
 		"reusable": false,
 		"html": false,
 		"lock": false,
 		"inserter": false,
-		"__experimentalToolbar": false
+		"__experimentalToolbar": false,
+		"interactivity": {
+			"clientNavigation": true
+		}
 	},
 	"editorStyle": "wp-block-page-list-editor",
 	"style": "wp-block-page-list"

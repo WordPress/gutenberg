@@ -10,9 +10,17 @@ test.describe( 'Preformatted', () => {
 
 	test( 'should preserve character newlines', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/html' } );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Edit HTML' } )
+			.click();
+		await page.getByRole( 'dialog' ).getByRole( 'textbox' ).click();
 		await page.keyboard.type( '<pre>1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2</pre>' );
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Update' } )
+			.click();
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 
@@ -33,7 +41,6 @@ test.describe( 'Preformatted', () => {
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
-		await page.keyboard.press( 'Enter' );
 		await editor.insertBlock( { name: 'core/paragraph' } );
 		await page.keyboard.type( '3' );
 		await page.keyboard.press( 'ArrowLeft' );

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -14,15 +14,12 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
-import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { Figure } from './figure';
 import { BlockQuote } from './blockquote';
-
-const isWebPlatform = Platform.OS === 'web';
 
 function PullQuoteEdit( {
 	attributes,
@@ -32,7 +29,7 @@ function PullQuoteEdit( {
 } ) {
 	const { textAlign, citation, value } = attributes;
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		className: clsx( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
@@ -64,12 +61,11 @@ function PullQuoteEdit( {
 							// translators: placeholder text used for the quote
 							__( 'Add quote' )
 						}
-						textAlign="center"
 					/>
 					{ shouldShowCitation && (
 						<RichText
 							identifier="citation"
-							tagName={ isWebPlatform ? 'cite' : undefined }
+							tagName="cite"
 							style={ { display: 'block' } }
 							value={ citation }
 							aria-label={ __( 'Pullquote citation text' ) }
@@ -83,8 +79,6 @@ function PullQuoteEdit( {
 								} )
 							}
 							className="wp-block-pullquote__citation"
-							__unstableMobileNoFocusOnMount
-							textAlign="center"
 							__unstableOnSplitAtEnd={ () =>
 								insertBlocksAfter(
 									createBlock( getDefaultBlockName() )

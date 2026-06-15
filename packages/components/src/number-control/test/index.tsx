@@ -12,8 +12,12 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import NumberControl from '..';
+import _NumberControl from '..';
 import type { NumberControlProps } from '../types';
+
+const NumberControl = (
+	props: React.ComponentProps< typeof _NumberControl >
+) => <_NumberControl __next40pxDefaultSize { ...props } />;
 
 function StatefulNumberControl( props: NumberControlProps ) {
 	const [ value, setValue ] = useState( props.value );
@@ -36,8 +40,21 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should render custom className', () => {
-			render( <NumberControl className="hello" /> );
-			expect( screen.getByRole( 'spinbutton' ) ).toBeVisible();
+			const { container: withoutClassName } = render( <NumberControl /> );
+
+			const { container: withClassName } = render(
+				<NumberControl className="hello" />
+			);
+
+			expect(
+				// eslint-disable-next-line testing-library/no-node-access
+				withoutClassName.querySelector( '.components-number-control' )
+			).not.toHaveClass( 'hello' );
+
+			expect(
+				// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+				withClassName.querySelector( '.components-number-control' )
+			).toHaveClass( 'hello' );
 		} );
 	} );
 
@@ -97,7 +114,7 @@ describe( 'NumberControl', () => {
 			// Second call: type '1'
 			expect( onChangeSpy ).toHaveBeenNthCalledWith( 2, '1', false );
 			// Third call: clamp value
-			expect( onChangeSpy ).toHaveBeenNthCalledWith( 3, 4, true );
+			expect( onChangeSpy ).toHaveBeenNthCalledWith( 3, '4', true );
 		} );
 
 		it( 'should call onChange callback when value is not valid', async () => {
@@ -139,7 +156,7 @@ describe( 'NumberControl', () => {
 			// Third call: invalid, unclamped value
 			expect( onChangeSpy ).toHaveBeenNthCalledWith( 3, '14', false );
 			// Fourth call: valid, clamped value
-			expect( onChangeSpy ).toHaveBeenNthCalledWith( 4, 10, true );
+			expect( onChangeSpy ).toHaveBeenNthCalledWith( 4, '10', true );
 		} );
 	} );
 
@@ -292,6 +309,24 @@ describe( 'NumberControl', () => {
 			expect( input ).toHaveValue( 867.5309 );
 		} );
 
+		it( 'should increment by step multiplied by spinFactor when spinFactor is provided', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<StatefulNumberControl
+					step={ 0.01 }
+					spinFactor={ 10 }
+					value={ 1.65 }
+				/>
+			);
+
+			const input = screen.getByRole( 'spinbutton' );
+			await user.click( input );
+			await user.keyboard( '[ArrowUp]' );
+
+			expect( input ).toHaveValue( 1.75 );
+		} );
+
 		it( 'should increment by shiftStep on key UP + shift press', async () => {
 			const user = userEvent.setup();
 
@@ -302,6 +337,18 @@ describe( 'NumberControl', () => {
 			await user.keyboard( '{Shift>}[ArrowUp]{/Shift}' );
 
 			expect( input ).toHaveValue( 20 );
+		} );
+
+		it( 'should increment by shiftStep multiplied by spinFactor on key UP + shift press', async () => {
+			const user = userEvent.setup();
+
+			render( <StatefulNumberControl value={ 5 } spinFactor={ 5 } /> );
+
+			const input = screen.getByRole( 'spinbutton' );
+			await user.click( input );
+			await user.keyboard( '{Shift>}[ArrowUp]{/Shift}' );
+
+			expect( input ).toHaveValue( 50 );
 		} );
 
 		it( 'should increment by shiftStep while preserving the decimal value when `step` is “any”', async () => {
@@ -415,6 +462,24 @@ describe( 'NumberControl', () => {
 			expect( input ).toHaveValue( 867.5309 );
 		} );
 
+		it( 'should decrement by step multiplied by spinFactor when spinFactor is provided', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<StatefulNumberControl
+					step={ 0.01 }
+					spinFactor={ 10 }
+					value={ 1.65 }
+				/>
+			);
+
+			const input = screen.getByRole( 'spinbutton' );
+			await user.click( input );
+			await user.keyboard( '[ArrowDown]' );
+
+			expect( input ).toHaveValue( 1.55 );
+		} );
+
 		it( 'should decrement by shiftStep on key DOWN + shift press', async () => {
 			const user = userEvent.setup();
 
@@ -425,6 +490,18 @@ describe( 'NumberControl', () => {
 			await user.keyboard( '{Shift>}[ArrowDown]{/Shift}' );
 
 			expect( input ).toHaveValue( 0 );
+		} );
+
+		it( 'should decrement by shiftStep multiplied by spinFactor on key DOWN + shift press', async () => {
+			const user = userEvent.setup();
+
+			render( <StatefulNumberControl value={ 100 } spinFactor={ 5 } /> );
+
+			const input = screen.getByRole( 'spinbutton' );
+			await user.click( input );
+			await user.keyboard( '{Shift>}[ArrowDown]{/Shift}' );
+
+			expect( input ).toHaveValue( 50 );
 		} );
 
 		it( 'should decrement by shiftStep while preserving the decimal value when `step` is “any”', async () => {
@@ -511,10 +588,12 @@ describe( 'NumberControl', () => {
 			[ 'up', '2', { value: '1' } ],
 			[ 'up', '12', { value: '10', step: '2' } ],
 			[ 'up', '10', { value: '10', max: 10 } ],
+			[ 'up', '10.1', { value: '10', step: '0.01', spinFactor: 10 } ],
 			[ 'down', '-1', {} ],
 			[ 'down', '1', { value: '2' } ],
 			[ 'down', '10', { value: '12', step: '2' } ],
 			[ 'down', '10', { value: '10', min: 10 } ],
+			[ 'down', '9.9', { value: '10', step: '0.01', spinFactor: 10 } ],
 		] )(
 			'should spin %s to %s when props = %o',
 			async ( direction, expectedValue, props ) => {

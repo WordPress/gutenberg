@@ -15,7 +15,7 @@
 		},
 		"originalContent": {
 			"type": "string",
-			"source": "html"
+			"source": "raw"
 		}
 	},
 	"supports": {
@@ -23,6 +23,13 @@
 		"customClassName": false,
 		"inserter": false,
 		"html": false,
-		"reusable": false
+		"lock": false,
+		"reusable": false,
+		"renaming": false,
+		"visibility": false,
+		"interactivity": {
+			"clientNavigation": true
+		},
+		"customCSS": false
 	}
 }

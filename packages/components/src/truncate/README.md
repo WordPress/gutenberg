@@ -24,14 +24,22 @@ function Example() {
 
 ## Props
 
-##### `ellipsis`: `string`
+### `children`: `ReactNode`
+
+The children elements.
+
+Note: text truncation will be attempted only if the `children` are either of type `string` or `number`. In any other scenarios, the component will not attempt to truncate the text, and will pass through the `children`.
+
+-   Required: Yes
+
+### `ellipsis`: `string`
 
 The ellipsis string when truncating the text by the `limit` prop's value.
 
 -   Required: No
 -   Default: `…`
 
-##### `ellipsizeMode`: `'auto' | 'head' | 'tail' | 'middle' | 'none'`
+### `ellipsizeMode`: `'auto' | 'head' | 'tail' | 'middle' | 'none'`
 
 Determines where to truncate. For example, we can truncate text right in the middle. To do this, we need to set `ellipsizeMode` to `middle` and a text `limit`.
 
@@ -43,14 +51,14 @@ Determines where to truncate. For example, we can truncate text right in the mid
 -   Required: No
 -   Default: `auto`
 
-##### `limit`: `number`
+### `limit`: `number`
 
 Determines the max number of characters to be displayed before the rest of the text gets truncated. Requires `ellipsizeMode` to assume values different from `auto` and `none`.
 
 -   Required: No
 -   Default: `0`
 
-##### `numberOfLines`: `number`
+### `numberOfLines`: `number`
 
 Clamps the text content to the specified `numberOfLines`, adding an ellipsis at the end. Note: this feature ignores the value of the `ellipsis` prop and always displays the default `…` ellipsis.
 

@@ -1,186 +1,117 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
-import { store as coreStore } from '@wordpress/core-data';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { usePrevious } from '@wordpress/compose';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
+import { generateGlobalStyles } from '@wordpress/global-styles-engine';
+
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import inserterMediaCategories from './inserter-media-categories';
+import useNavigateToEntityRecord from './use-navigate-to-entity-record';
+import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
-function useArchiveLabel( templateSlug ) {
-	const taxonomyMatches = templateSlug?.match(
-		/^(category|tag|taxonomy-([^-]+))$|^(((category|tag)|taxonomy-([^-]+))-(.+))$/
-	);
-	let taxonomy;
-	let term;
-	let isAuthor = false;
-	let authorSlug;
-	if ( taxonomyMatches ) {
-		// If is for a all taxonomies of a type
-		if ( taxonomyMatches[ 1 ] ) {
-			taxonomy = taxonomyMatches[ 2 ]
-				? taxonomyMatches[ 2 ]
-				: taxonomyMatches[ 1 ];
-		}
-		// If is for a all taxonomies of a type
-		else if ( taxonomyMatches[ 3 ] ) {
-			taxonomy = taxonomyMatches[ 6 ]
-				? taxonomyMatches[ 6 ]
-				: taxonomyMatches[ 4 ];
-			term = taxonomyMatches[ 7 ];
-		}
-		taxonomy = taxonomy === 'tag' ? 'post_tag' : taxonomy;
+const { useLocation, useHistory } = unlock( routerPrivateApis );
+const { useGlobalStyles } = unlock( editorPrivateApis );
 
-		//getTaxonomy( 'category' );
-		//wp.data.select('core').getEntityRecords( 'taxonomy', 'category', {slug: 'newcat'} );
-	} else {
-		const authorMatches = templateSlug?.match( /^(author)$|^author-(.+)$/ );
-		if ( authorMatches ) {
-			isAuthor = true;
-			if ( authorMatches[ 2 ] ) {
-				authorSlug = authorMatches[ 2 ];
-			}
-		}
-	}
-	return useSelect(
-		( select ) => {
-			const { getEntityRecords, getTaxonomy, getAuthors } =
-				select( coreStore );
-			let archiveTypeLabel;
-			let archiveNameLabel;
-			if ( taxonomy ) {
-				archiveTypeLabel =
-					getTaxonomy( taxonomy )?.labels?.singular_name;
-			}
-			if ( term ) {
-				const records = getEntityRecords( 'taxonomy', taxonomy, {
-					slug: term,
-					per_page: 1,
-				} );
-				if ( records && records[ 0 ] ) {
-					archiveNameLabel = records[ 0 ].name;
-				}
-			}
-			if ( isAuthor ) {
-				archiveTypeLabel = 'Author';
-				if ( authorSlug ) {
-					const authorRecords = getAuthors( { slug: authorSlug } );
-					if ( authorRecords && authorRecords[ 0 ] ) {
-						archiveNameLabel = authorRecords[ 0 ].name;
-					}
-				}
-			}
-			return {
-				archiveTypeLabel,
-				archiveNameLabel,
-			};
-		},
-		[ authorSlug, isAuthor, taxonomy, term ]
-	);
+function useNavigateToPreviousEntityRecord() {
+	const location = useLocation();
+	const previousCanvas = usePrevious( location.query.canvas );
+	const history = useHistory();
+	const goBack = useMemo( () => {
+		const isFocusMode =
+			location.query.focusMode ||
+			( location?.params?.postId &&
+				FOCUSABLE_ENTITIES.includes( location?.params?.postType ) );
+		const didComeFromEditorCanvas = previousCanvas === 'edit';
+		const showBackButton = isFocusMode && didComeFromEditorCanvas;
+		return showBackButton ? () => history.back() : undefined;
+	}, [ location, history, previousCanvas ] );
+	return goBack;
 }
 
-export default function useSiteEditorSettings() {
-	const { setIsInserterOpened } = useDispatch( editSiteStore );
-	const { storedSettings, canvasMode, templateType } = useSelect(
-		( select ) => {
-			const { getSettings, getCanvasMode, getEditedPostType } = unlock(
-				select( editSiteStore )
-			);
-			return {
-				storedSettings: getSettings( setIsInserterOpened ),
-				canvasMode: getCanvasMode(),
-				templateType: getEditedPostType(),
-			};
-		},
-		[ setIsInserterOpened ]
-	);
+export function useSpecificEditorSettings() {
+	const { query } = useLocation();
+	const { canvas = 'view' } = query;
+	const onNavigateToEntityRecord = useNavigateToEntityRecord();
 
-	const settingsBlockPatterns =
-		storedSettings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
-		storedSettings.__experimentalBlockPatterns; // WP 5.9
-	const settingsBlockPatternCategories =
-		storedSettings.__experimentalAdditionalBlockPatternCategories ?? // WP 6.0
-		storedSettings.__experimentalBlockPatternCategories; // WP 5.9
+	/*
+	 * Generate global styles directly to avoid circular dependency with GlobalStylesRenderer
+	 * (which runs inside ExperimentalEditorProvider after this hook).
+	 * GlobalStylesRenderer updates editorStore, but reading from it here would cause infinite
+	 * loops. Reading config from useGlobalStyles and generating CSS directly keeps us in sync.
+	 * See: https://github.com/WordPress/gutenberg/issues/73350
+	 */
+	const { merged: mergedConfig } = useGlobalStyles();
 
-	const { restBlockPatterns, restBlockPatternCategories, templateSlug } =
-		useSelect( ( select ) => {
-			const { getEditedPostType, getEditedPostId } =
-				select( editSiteStore );
-			const { getEditedEntityRecord } = select( coreStore );
-			const usedPostType = getEditedPostType();
-			const usedPostId = getEditedPostId();
-			const _record = getEditedEntityRecord(
-				'postType',
-				usedPostType,
-				usedPostId
-			);
-			return {
-				restBlockPatterns: select( coreStore ).getBlockPatterns(),
-				restBlockPatternCategories:
-					select( coreStore ).getBlockPatternCategories(),
-				templateSlug: _record.slug,
-			};
-		}, [] );
-	const archiveLabels = useArchiveLabel( templateSlug );
+	const { settings, currentPostIsTrashed } = useSelect( ( select ) => {
+		const { getSettings } = select( editSiteStore );
+		const { getCurrentPostAttribute } = select( editorStore );
+		return {
+			settings: getSettings(),
+			currentPostIsTrashed:
+				getCurrentPostAttribute( 'status' ) === 'trash',
+		};
+	}, [] );
 
-	const blockPatterns = useMemo(
-		() =>
-			[
-				...( settingsBlockPatterns || [] ),
-				...( restBlockPatterns || [] ),
-			]
-				.filter(
-					( x, index, arr ) =>
-						index === arr.findIndex( ( y ) => x.name === y.name )
-				)
-				.filter( ( { postTypes } ) => {
-					return (
-						! postTypes ||
-						( Array.isArray( postTypes ) &&
-							postTypes.includes( templateType ) )
-					);
-				} ),
-		[ settingsBlockPatterns, restBlockPatterns, templateType ]
-	);
+	const onNavigateToPreviousEntityRecord =
+		useNavigateToPreviousEntityRecord();
 
-	const blockPatternCategories = useMemo(
-		() =>
-			[
-				...( settingsBlockPatternCategories || [] ),
-				...( restBlockPatternCategories || [] ),
-			].filter(
-				( x, index, arr ) =>
-					index === arr.findIndex( ( y ) => x.name === y.name )
-			),
-		[ settingsBlockPatternCategories, restBlockPatternCategories ]
-	);
-	return useMemo( () => {
-		const {
-			__experimentalAdditionalBlockPatterns,
-			__experimentalAdditionalBlockPatternCategories,
-			focusMode,
-			...restStoredSettings
-		} = storedSettings;
+	const [ globalStyles, globalSettings ] = useMemo( () => {
+		return generateGlobalStyles( mergedConfig, [], {
+			disableRootPadding: false,
+		} );
+	}, [ mergedConfig ] );
+
+	const defaultEditorSettings = useMemo( () => {
+		// Preserve non-global styles from settings.styles (e.g., editor styles from add_editor_style)
+		const nonGlobalStyles = ( settings?.styles ?? [] ).filter(
+			( style ) => ! style.isGlobalStyles
+		);
 
 		return {
-			...restStoredSettings,
-			inserterMediaCategories,
-			__experimentalBlockPatterns: blockPatterns,
-			__experimentalBlockPatternCategories: blockPatternCategories,
-			focusMode: canvasMode === 'view' && focusMode ? false : focusMode,
-			__experimentalArchiveTitleTypeLabel: archiveLabels.archiveTypeLabel,
-			__experimentalArchiveTitleNameLabel: archiveLabels.archiveNameLabel,
+			...settings,
+			styles: [
+				...nonGlobalStyles,
+				...globalStyles,
+				{
+					// Forming a "block formatting context" to prevent margin collapsing.
+					// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
+					css:
+						canvas === 'view'
+							? `body{min-height: 100vh; ${
+									currentPostIsTrashed
+										? ''
+										: 'cursor: pointer;'
+							  }}`
+							: undefined,
+				},
+			],
+			__experimentalFeatures: globalSettings,
+			richEditingEnabled: true,
+			supportsTemplateMode: true,
+			focusMode: canvas !== 'view',
+			onNavigateToEntityRecord,
+			onNavigateToPreviousEntityRecord,
+			isPreviewMode: canvas === 'view',
 		};
 	}, [
-		storedSettings,
-		blockPatterns,
-		blockPatternCategories,
-		canvasMode,
-		archiveLabels.archiveTypeLabel,
-		archiveLabels.archiveNameLabel,
+		settings,
+		globalStyles,
+		globalSettings,
+		canvas,
+		currentPostIsTrashed,
+		onNavigateToEntityRecord,
+		onNavigateToPreviousEntityRecord,
 	] );
+
+	return defaultEditorSettings;
 }

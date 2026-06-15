@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -17,12 +17,13 @@ import {
 	Warning,
 } from '@wordpress/block-editor';
 import {
-	PanelBody,
 	ToolbarButton,
 	Spinner,
 	Notice,
 	ComboboxControl,
 	Button,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useState, useEffect, useCallback } from '@wordpress/element';
@@ -37,6 +38,7 @@ import {
 	convertDescription,
 	ConvertToLinksModal,
 } from './convert-to-links-modal';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 // We only show the edit option when page count is <= MAX_PAGE_COUNT
 // Performance of Navigation Links is not good past this value.
@@ -63,7 +65,7 @@ function BlockContent( {
 	if ( pages === null ) {
 		return (
 			<div { ...blockProps }>
-				<Notice status={ 'warning' } isDismissible={ false }>
+				<Notice status="warning" isDismissible={ false }>
 					{ __( 'Page List: Cannot retrieve Pages.' ) }
 				</Notice>
 			</div>
@@ -73,7 +75,7 @@ function BlockContent( {
 	if ( pages.length === 0 ) {
 		return (
 			<div { ...blockProps }>
-				<Notice status={ 'info' } isDismissible={ false }>
+				<Notice status="info" isDismissible={ false }>
 					{ __( 'Page List: Cannot retrieve Pages.' ) }
 				</Notice>
 			</div>
@@ -101,7 +103,7 @@ function BlockContent( {
 
 		return (
 			<div { ...blockProps }>
-				<Notice status={ 'warning' } isDismissible={ false }>
+				<Notice status="warning" isDismissible={ false }>
 					{ __( 'Page List: Cannot retrieve Pages.' ) }
 				</Notice>
 			</div>
@@ -123,6 +125,7 @@ export default function PageListEdit( {
 	const [ isOpen, setOpen ] = useState( false );
 	const openModal = useCallback( () => setOpen( true ), [] );
 	const closeModal = () => setOpen( false );
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const { records: pages, hasResolved: hasResolvedPages } = useEntityRecords(
 		'postType',
@@ -170,7 +173,7 @@ export default function PageListEdit( {
 	}, [ pages ] );
 
 	const blockProps = useBlockProps( {
-		className: classnames( 'wp-block-page-list', {
+		className: clsx( 'wp-block-page-list', {
 			'has-text-color': !! context.textColor,
 			[ getColorClassName( 'color', context.textColor ) ]:
 				!! context.textColor,
@@ -179,6 +182,8 @@ export default function PageListEdit( {
 				'background-color',
 				context.backgroundColor
 			) ]: !! context.backgroundColor,
+			'open-on-click': context.submenuVisibility === 'click',
+			'open-always': context.submenuVisibility === 'always',
 		} ),
 		style: { ...context.style?.color },
 	} );
@@ -225,7 +230,11 @@ export default function PageListEdit( {
 						page.title?.rendered?.trim() !== ''
 							? page.title?.rendered
 							: __( '(no title)' ),
-					title: page.title?.rendered,
+					title:
+						// translators: displayed when a page has an empty title.
+						page.title?.rendered?.trim() !== ''
+							? page.title?.rendered
+							: __( '(no title)' ),
 					link: page.url,
 					hasChildren,
 				};
@@ -245,7 +254,6 @@ export default function PageListEdit( {
 	);
 
 	const {
-		isNested,
 		hasSelectedChild,
 		parentClientId,
 		hasDraggedChild,
@@ -257,18 +265,12 @@ export default function PageListEdit( {
 				hasSelectedInnerBlock,
 				hasDraggedInnerBlock,
 			} = select( blockEditorStore );
-			const blockParents = getBlockParentsByBlockName(
-				clientId,
-				'core/navigation-submenu',
-				true
-			);
 			const navigationBlockParents = getBlockParentsByBlockName(
 				clientId,
 				'core/navigation',
 				true
 			);
 			return {
-				isNested: blockParents.length > 0,
 				isChildOfNavigation: navigationBlockParents.length > 0,
 				hasSelectedChild: hasSelectedInnerBlock( clientId, true ),
 				hasDraggedChild: hasDraggedInnerBlock( clientId, true ),
@@ -286,7 +288,6 @@ export default function PageListEdit( {
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		allowedBlocks: [ 'core/page-list-item' ],
 		renderAppender: false,
 		__unstableDisableDropZone: true,
 		templateLock: isChildOfNavigation ? false : 'all',
@@ -310,42 +311,61 @@ export default function PageListEdit( {
 		openModal,
 	] );
 
-	useEffect( () => {
-		setAttributes( { isNested } );
-	}, [ isNested, setAttributes ] );
-
 	return (
 		<>
-			<InspectorControls>
-				{ pagesTree.length > 0 && (
-					<PanelBody>
-						<ComboboxControl
-							className="editor-page-attributes__parent"
-							label={ __( 'Parent page' ) }
-							value={ parentPageID }
-							options={ pagesTree }
-							onChange={ ( value ) =>
-								setAttributes( { parentPageID: value ?? 0 } )
-							}
-							help={ __(
-								'Choose a page to show only its subpages.'
-							) }
-						/>
-					</PanelBody>
-				) }
-				{ allowConvertToLinks && (
-					<PanelBody title={ __( 'Edit this menu' ) }>
-						<p>{ convertDescription }</p>
-						<Button
-							variant="primary"
-							disabled={ ! hasResolvedPages }
-							onClick={ convertToNavigationLinks }
-						>
-							{ __( 'Edit' ) }
-						</Button>
-					</PanelBody>
-				) }
-			</InspectorControls>
+			{ ( pagesTree.length > 0 || allowConvertToLinks ) && (
+				<InspectorControls>
+					<ToolsPanel
+						label={ __( 'Settings' ) }
+						resetAll={ () => {
+							setAttributes( { parentPageID: 0 } );
+						} }
+						dropdownMenuProps={ dropdownMenuProps }
+					>
+						{ pagesTree.length > 0 && (
+							<ToolsPanelItem
+								label={ __( 'Parent Page' ) }
+								hasValue={ () => parentPageID !== 0 }
+								onDeselect={ () =>
+									setAttributes( { parentPageID: 0 } )
+								}
+								isShownByDefault
+							>
+								<ComboboxControl
+									__next40pxDefaultSize
+									className="editor-page-attributes__parent"
+									label={ __( 'Parent' ) }
+									value={ parentPageID }
+									options={ pagesTree }
+									onChange={ ( value ) =>
+										setAttributes( {
+											parentPageID: value ?? 0,
+										} )
+									}
+									help={ __(
+										'Choose a page to show only its subpages.'
+									) }
+								/>
+							</ToolsPanelItem>
+						) }
+
+						{ allowConvertToLinks && (
+							<div style={ { gridColumn: '1 / -1' } }>
+								<p>{ convertDescription }</p>
+								<Button
+									__next40pxDefaultSize
+									variant="primary"
+									accessibleWhenDisabled
+									disabled={ ! hasResolvedPages }
+									onClick={ convertToNavigationLinks }
+								>
+									{ __( 'Edit' ) }
+								</Button>
+							</div>
+						) }
+					</ToolsPanel>
+				</InspectorControls>
+			) }
 			{ allowConvertToLinks && (
 				<>
 					<BlockControls group="other">

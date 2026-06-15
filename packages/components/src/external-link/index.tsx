@@ -1,23 +1,20 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { forwardRef } from '@wordpress/element';
-import { external } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import { VisuallyHidden } from '../visually-hidden';
-import { StyledIcon } from './styles/external-link-styles';
 import type { ExternalLinkProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 
 function UnforwardedExternalLink(
 	props: Omit<
@@ -29,15 +26,10 @@ function UnforwardedExternalLink(
 	const { href, children, className, rel = '', ...additionalProps } = props;
 	const optimizedRel = [
 		...new Set(
-			[
-				...rel.split( ' ' ),
-				'external',
-				'noreferrer',
-				'noopener',
-			].filter( Boolean )
+			[ ...rel.split( ' ' ), 'external', 'noopener' ].filter( Boolean )
 		),
 	].join( ' ' );
-	const classes = classnames( 'components-external-link', className );
+	const classes = clsx( 'components-external-link', className );
 	/* Anchor links are perceived as external links.
 	This constant helps check for on page anchor links,
 	to prevent them from being opened in the editor. */
@@ -66,17 +58,22 @@ function UnforwardedExternalLink(
 			rel={ optimizedRel }
 			ref={ ref }
 		>
-			{ children }
-			<VisuallyHidden as="span">
-				{
+			<span className="components-external-link__contents">
+				{ children }
+			</span>
+			<span
+				className={ clsx(
+					'components-external-link__icon',
+					// This class prevents the arrow from being replaced by a Twemoji image.
+					'wp-exclude-emoji'
+				) }
+				aria-label={
 					/* translators: accessibility text */
 					__( '(opens in a new tab)' )
 				}
-			</VisuallyHidden>
-			<StyledIcon
-				icon={ external }
-				className="components-external-link__icon"
-			/>
+			>
+				{ isRTL() ? '\u2196' : '\u2197' }
+			</span>
 		</a>
 		/* eslint-enable react/jsx-no-target-blank */
 	);
@@ -94,5 +91,6 @@ function UnforwardedExternalLink(
  * ```
  */
 export const ExternalLink = forwardRef( UnforwardedExternalLink );
+ExternalLink.displayName = 'ExternalLink';
 
 export default ExternalLink;

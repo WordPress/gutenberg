@@ -17,11 +17,16 @@ import type { ComponentProps } from 'react';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
+import { logged } from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
-import FormTokenField from '../';
+import _FormTokenField from '../';
+
+const FormTokenField = ( props: ComponentProps< typeof _FormTokenField > ) => (
+	<_FormTokenField __next40pxDefaultSize { ...props } />
+);
 
 const FormTokenFieldWithState = ( {
 	onChange,
@@ -44,7 +49,6 @@ const FormTokenFieldWithState = ( {
 				setSelectedValue( tokens );
 				onChange?.( tokens );
 			} }
-			__nextHasNoMarginBottom
 		/>
 	);
 };
@@ -119,6 +123,14 @@ function unescapeAndFormatSpaces( str: string ) {
 }
 
 describe( 'FormTokenField', () => {
+	afterEach( () => {
+		// `@wordpress/deprecated` caches each warning message after the first
+		// log; reset it so multiple tests can assert the same deprecation.
+		for ( const key in logged ) {
+			delete logged[ key ];
+		}
+	} );
+
 	describe( 'basic usage', () => {
 		it( "should add tokens with the input's value when pressing the enter key", async () => {
 			const user = userEvent.setup();
@@ -205,7 +217,42 @@ describe( 'FormTokenField', () => {
 			] );
 		} );
 
-		it( "should not add a token with the input's value when pressing the tab key", async () => {
+		it( 'should add a token with the input value with onBlur when `tokenizeOnBlur` prop is `true`', async () => {
+			const user = userEvent.setup();
+
+			const onChangeSpy = jest.fn();
+
+			const { rerender } = render(
+				<FormTokenFieldWithState onChange={ onChangeSpy } />
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			// Add 'grapefruit' token by typing it and check blur of field does not tokenize it.
+			await user.type( input, 'grapefruit' );
+			await user.click( document.body );
+			expect( onChangeSpy ).toHaveBeenCalledTimes( 0 );
+			expectTokensNotToBeInTheDocument( [ 'grapefruit' ] );
+
+			rerender(
+				<FormTokenFieldWithState
+					onChange={ onChangeSpy }
+					tokenizeOnBlur
+				/>
+			);
+			await user.clear( input );
+
+			// Add 'grapefruit' token by typing it and check blur of field tokenizes it.
+			await user.type( input, 'grapefruit' );
+
+			await user.click( document.body );
+			expect( onChangeSpy ).toHaveBeenNthCalledWith( 1, [
+				'grapefruit',
+			] );
+			expectTokensToBeInTheDocument( [ 'grapefruit' ] );
+		} );
+
+		it( "should not add a token with the input's value when tokenizeOnBlur is not set and pressing the tab key", async () => {
 			const user = userEvent.setup();
 
 			const onChangeSpy = jest.fn();
@@ -544,18 +591,17 @@ describe( 'FormTokenField', () => {
 			);
 		} );
 
-		it( 'should show extra instructions when the `__experimentalShowHowTo` prop  is set to `true`', () => {
+		it( 'should show the default how-to text via the `help` prop by default', () => {
 			const instructionsTokenizeSpace =
 				'Separate with commas, spaces, or the Enter key.';
 			const instructionsDefault =
 				'Separate with commas or the Enter key.';
 
-			// The __experimentalShowHowTo prop is `true` by default
 			const { rerender } = render( <FormTokenFieldWithState /> );
 
 			expect( screen.getByText( instructionsDefault ) ).toBeVisible();
 
-			// The "show how to" text is used to aria-describedby the input
+			// The default how-to text is used to aria-describedby the input.
 			expect(
 				screen.getByRole( 'combobox' )
 			).toHaveAccessibleDescription( instructionsDefault );
@@ -566,27 +612,79 @@ describe( 'FormTokenField', () => {
 				screen.getByText( instructionsTokenizeSpace )
 			).toBeVisible();
 
-			// The "show how to" text is used to aria-describedby the input
 			expect(
 				screen.getByRole( 'combobox' )
 			).toHaveAccessibleDescription( instructionsTokenizeSpace );
+		} );
 
-			rerender(
-				<FormTokenFieldWithState
-					tokenizeOnSpace
-					__experimentalShowHowTo={ false }
-				/>
-			);
+		it( 'should allow hiding the help text by passing an empty string', () => {
+			render( <FormTokenFieldWithState help="" /> );
 
 			expect(
-				screen.queryByText( instructionsDefault )
-			).not.toBeInTheDocument();
-			expect(
-				screen.queryByText( instructionsTokenizeSpace )
+				screen.queryByText( 'Separate with commas or the Enter key.' )
 			).not.toBeInTheDocument();
 			expect(
 				screen.getByRole( 'combobox' )
 			).not.toHaveAccessibleDescription();
+		} );
+
+		it( 'should associate the `help` text with the input accessibly', () => {
+			render( <FormTokenFieldWithState help="Help text" /> );
+			expect(
+				screen.getByRole( 'combobox' )
+			).toHaveAccessibleDescription( 'Help text' );
+			// The default how-to text should no longer be rendered.
+			expect(
+				screen.queryByText( 'Separate with commas or the Enter key.' )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'should warn and hide the default text when `__experimentalShowHowTo` is `false`', () => {
+			render(
+				<FormTokenFieldWithState __experimentalShowHowTo={ false } />
+			);
+
+			expect( console ).toHaveWarnedWith(
+				'`__experimentalShowHowTo` prop in wp.components.FormTokenField is deprecated since version 7.1. Please use `help` prop instead. Note: The `help` prop now defaults to the previous how-to text. Pass an empty string to hide it.'
+			);
+
+			expect(
+				screen.queryByText( 'Separate with commas or the Enter key.' )
+			).not.toBeInTheDocument();
+			expect(
+				screen.getByRole( 'combobox' )
+			).not.toHaveAccessibleDescription();
+		} );
+
+		it( 'should warn and prefer `help` over `__experimentalShowHowTo` when both are provided', () => {
+			const { rerender } = render(
+				<FormTokenFieldWithState
+					__experimentalShowHowTo={ false }
+					help="Help text"
+				/>
+			);
+
+			expect( console ).toHaveWarned();
+			expect(
+				screen.getByRole( 'combobox' )
+			).toHaveAccessibleDescription( 'Help text' );
+			expect(
+				screen.queryByText( 'Separate with commas or the Enter key.' )
+			).not.toBeInTheDocument();
+
+			rerender(
+				<FormTokenFieldWithState
+					__experimentalShowHowTo
+					help="Help text"
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'combobox' )
+			).toHaveAccessibleDescription( 'Help text' );
+			expect(
+				screen.queryByText( 'Separate with commas or the Enter key.' )
+			).not.toBeInTheDocument();
 		} );
 
 		it( "should use the value of the `placeholder` prop as the input's placeholder only when there are no tokens", async () => {
@@ -704,6 +802,103 @@ describe( 'FormTokenField', () => {
 				'Cobalt',
 				'Octane',
 			] );
+		} );
+
+		it( 'should render suggestions after a selection is made when the `__experimentalExpandOnFocus` prop is set to `true`', async () => {
+			const user = userEvent.setup();
+
+			const onFocusSpy = jest.fn();
+
+			const suggestions = [ 'Green', 'Emerald', 'Seaweed' ];
+
+			render(
+				<>
+					<FormTokenFieldWithState
+						onFocus={ onFocusSpy }
+						suggestions={ suggestions }
+						__experimentalExpandOnFocus
+					/>
+				</>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			await user.type( input, 'ee' );
+
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'Green',
+				'Seaweed',
+			] );
+
+			// Select the first suggestion ("Green")
+			await user.keyboard( '[ArrowDown][Enter]' );
+
+			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
+		} );
+
+		it( 'should not render suggestions after a selection is made when the `__experimentalExpandOnFocus` prop is set to `false` or not defined', async () => {
+			const user = userEvent.setup();
+
+			const onFocusSpy = jest.fn();
+
+			const suggestions = [ 'Green', 'Emerald', 'Seaweed' ];
+
+			render(
+				<>
+					<FormTokenFieldWithState
+						onFocus={ onFocusSpy }
+						suggestions={ suggestions }
+					/>
+				</>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			await user.type( input, 'ee' );
+
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'Green',
+				'Seaweed',
+			] );
+
+			// Select the first suggestion ("Green")
+			await user.keyboard( '[ArrowDown][Enter]' );
+
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		} );
+
+		it( 'should not render suggestions after the input is blurred', async () => {
+			const user = userEvent.setup();
+
+			const onFocusSpy = jest.fn();
+
+			const suggestions = [ 'Green', 'Emerald', 'Seaweed' ];
+
+			render(
+				<>
+					<FormTokenFieldWithState
+						onFocus={ onFocusSpy }
+						suggestions={ suggestions }
+					/>
+				</>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			await user.type( input, 'ee' );
+
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'Green',
+				'Seaweed',
+			] );
+
+			// Select the first suggestion ("Green")
+			await user.keyboard( '[ArrowDown][Enter]' );
+
+			// Click the body, blurring the input.
+			await user.click( document.body );
+
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
 		} );
 
 		it( 'should not render suggestions if the text input is not matching any of the suggestions', async () => {
@@ -1137,6 +1332,45 @@ describe( 'FormTokenField', () => {
 			await user.type( input, 'amp' );
 
 			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		} );
+
+		it( 'should match suggestions with half-width and full-width characters', async () => {
+			const user = userEvent.setup();
+
+			const suggestions = [
+				// Half-width characters
+				'WordPress',
+				'Gutenberg',
+				// Full-width characters
+				'ＷｏｒｄＰｒｅｓｓ',
+				'Ｇｕｔｅｎｂｅｒｇ',
+				// Mixed characters
+				'WordＰｒｅｓｓ',
+				'Guteｎｂｅｒｇ',
+			];
+
+			render( <FormTokenFieldWithState suggestions={ suggestions } /> );
+
+			const input = screen.getByRole( 'combobox' );
+
+			// Search with half-width characters.
+			await user.type( input, 'rdp' );
+
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'WordPress',
+				'ＷｏｒｄＰｒｅｓｓ',
+				'WordＰｒｅｓｓ',
+			] );
+
+			// Search with full-width characters.
+			await user.clear( input );
+			await user.type( input, 'ｔｅｎ' );
+
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'Gutenberg',
+				'Ｇｕｔｅｎｂｅｒｇ',
+				'Guteｎｂｅｒｇ',
+			] );
 		} );
 
 		it( 'should re-render if suggestions change', async () => {
@@ -1694,6 +1928,195 @@ describe( 'FormTokenField', () => {
 			await user.type( input, 'Cranberry[Enter]' );
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 2 );
 			expectTokensToBeInTheDocument( [ 'cherry', 'Cranberry' ] );
+		} );
+
+		it( 'should still preventDefault on Enter when validation rejects the value', async () => {
+			const user = userEvent.setup();
+
+			const onChangeSpy = jest.fn();
+			const onSubmitSpy = jest.fn( ( e: React.FormEvent ) =>
+				e.preventDefault()
+			);
+			const startsWithCapitalLetter = ( tokenText: string ) =>
+				/^[A-Z]/.test( tokenText );
+
+			render(
+				<form onSubmit={ onSubmitSpy }>
+					<FormTokenFieldWithState
+						onChange={ onChangeSpy }
+						__experimentalValidateInput={ startsWithCapitalLetter }
+					/>
+				</form>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			// Type 'hello' — lowercase, fails validation.
+			// Press Enter — should NOT submit the parent form.
+			await user.type( input, 'hello[Enter]' );
+			expect( onChangeSpy ).not.toHaveBeenCalled();
+			expect( onSubmitSpy ).not.toHaveBeenCalled();
+			expect( input ).toHaveValue( 'hello' );
+		} );
+
+		it( 'should not preventDefault on space when validation fails and `tokenizeOnSpace` is true', async () => {
+			const user = userEvent.setup();
+
+			const onChangeSpy = jest.fn();
+			const startsWithCapitalLetter = ( tokenText: string ) =>
+				/^[A-Z]/.test( tokenText );
+
+			render(
+				<FormTokenFieldWithState
+					onChange={ onChangeSpy }
+					tokenizeOnSpace
+					__experimentalValidateInput={ startsWithCapitalLetter }
+				/>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			// Type 'hello ', lowercase, fails validation.
+			// The space should be typed into the input (not prevented), and
+			// the trailing space should be preserved by the rejoin so the
+			// user can keep typing past the failed-validation space.
+			await user.type( input, 'hello ' );
+			expect( onChangeSpy ).not.toHaveBeenCalled();
+			expect( input ).toHaveValue( 'hello ' );
+
+			// User can keep typing past the failed-validation space.
+			await user.type( input, 'w' );
+			expect( input ).toHaveValue( 'hello w' );
+
+			// Clear and type 'Hello ', capital letter, passes validation.
+			// The space should be prevented, and a token should be created.
+			await user.clear( input );
+			await user.type( input, 'Hello ' );
+			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
+			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'Hello' ] );
+			expectTokensToBeInTheDocument( [ 'Hello' ] );
+		} );
+
+		it( 'should filter out invalid tokens when pasting with separators', async () => {
+			const user = userEvent.setup();
+
+			const onChangeSpy = jest.fn();
+			const startsWithCapitalLetter = ( tokenText: string ) =>
+				/^[A-Z]/.test( tokenText );
+
+			render(
+				<FormTokenFieldWithState
+					onChange={ onChangeSpy }
+					__experimentalValidateInput={ startsWithCapitalLetter }
+				/>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			// Paste values separated by comma, only valid ones should be added.
+			// Uses paste (not type) because comma keystrokes go through
+			// handleCommaKey, while pasted text goes through
+			// onInputChangeHandler which splits by separator.
+			await user.click( input );
+			await user.paste( 'Apple,banana,Cherry,' );
+			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'Apple', 'Cherry' ] );
+			expectTokensToBeInTheDocument( [ 'Apple', 'Cherry' ] );
+			expectTokensNotToBeInTheDocument( [ 'banana' ] );
+			expect( input ).toHaveValue( 'banana,' );
+		} );
+
+		it( 'should leave all segments in the input when none pass validation on paste', async () => {
+			const user = userEvent.setup();
+
+			const onChangeSpy = jest.fn();
+			const startsWithCapitalLetter = ( tokenText: string ) =>
+				/^[A-Z]/.test( tokenText );
+
+			render(
+				<FormTokenFieldWithState
+					onChange={ onChangeSpy }
+					__experimentalValidateInput={ startsWithCapitalLetter }
+				/>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			await user.click( input );
+			await user.paste( 'apple,banana,cherry,' );
+
+			expect( onChangeSpy ).not.toHaveBeenCalled();
+			expect( input ).toHaveValue( 'apple,banana,cherry,' );
+		} );
+
+		it( 'should commit a trailing valid segment and leave only failed segments in the input when pasting without a trailing separator', async () => {
+			const user = userEvent.setup();
+
+			const onChangeSpy = jest.fn();
+			const startsWithCapitalLetter = ( tokenText: string ) =>
+				/^[A-Z]/.test( tokenText );
+
+			render(
+				<FormTokenFieldWithState
+					onChange={ onChangeSpy }
+					__experimentalValidateInput={ startsWithCapitalLetter }
+				/>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			await user.click( input );
+			await user.paste( 'Apple,banana,Cherry' );
+
+			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'Apple', 'Cherry' ] );
+			expectTokensToBeInTheDocument( [ 'Apple', 'Cherry' ] );
+			expect( input ).toHaveValue( 'banana' );
+		} );
+
+		it( 'should not leave a duplicate of an existing token in the input when pasting comma-separated values', async () => {
+			const user = userEvent.setup();
+
+			const onChangeSpy = jest.fn();
+
+			render(
+				<FormTokenFieldWithState
+					onChange={ onChangeSpy }
+					initialValue={ [ 'Apple' ] }
+				/>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			await user.click( input );
+			await user.paste( 'Apple,Cherry,' );
+
+			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'Apple', 'Cherry' ] );
+			expectTokensToBeInTheDocument( [ 'Apple', 'Cherry' ] );
+			expect( input ).toHaveValue( '' );
+		} );
+
+		it( 'should not leave a duplicate of an existing token in the input when pasting comma-separated values with `__experimentalValidateInput`', async () => {
+			const user = userEvent.setup();
+
+			const onChangeSpy = jest.fn();
+			const startsWithCapitalLetter = ( tokenText: string ) =>
+				/^[A-Z]/.test( tokenText );
+
+			render(
+				<FormTokenFieldWithState
+					onChange={ onChangeSpy }
+					initialValue={ [ 'Apple' ] }
+					__experimentalValidateInput={ startsWithCapitalLetter }
+				/>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			await user.click( input );
+			await user.paste( 'Apple,Cherry,' );
+
+			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'Apple', 'Cherry' ] );
+			expectTokensToBeInTheDocument( [ 'Apple', 'Cherry' ] );
+			expect( input ).toHaveValue( '' );
 		} );
 	} );
 

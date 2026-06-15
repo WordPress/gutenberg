@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -9,30 +9,40 @@ import classnames from 'classnames';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 import {
-	AlignmentToolbar,
-	BlockControls,
 	InspectorControls,
 	RichText,
 	Warning,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { PanelBody, ToggleControl, RangeControl } from '@wordpress/components';
+import {
+	ToggleControl,
+	RangeControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { useCanEditEntity } from '../utils/hooks';
+import {
+	useCanEditEntity,
+	useToolsPanelDropdownMenuProps,
+} from '../utils/hooks';
+import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
 const ELLIPSIS = '…';
 
-export default function PostExcerptEditor( {
-	attributes: { textAlign, moreText, showMoreOnNewLine, excerptLength },
-	setAttributes,
-	isSelected,
-	context: { postId, postType, queryId },
-} ) {
+export default function PostExcerptEditor( props ) {
+	const {
+		attributes: { moreText, showMoreOnNewLine, excerptLength },
+		setAttributes,
+		isSelected,
+		context: { postId, postType, queryId },
+	} = props;
+	useDeprecatedTextAlign( props );
+
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
 	const [
@@ -40,6 +50,8 @@ export default function PostExcerptEditor( {
 		setExcerpt,
 		{ rendered: renderedExcerpt, protected: isProtected } = {},
 	] = useEntityProp( 'postType', postType, 'excerpt', postId );
+
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	/**
 	 * Check if the post type supports excerpts.
@@ -70,11 +82,7 @@ export default function PostExcerptEditor( {
 	const isEditable =
 		userCanEdit && ! isDescendentOfQueryLoop && postTypeSupportsExcerpts;
 
-	const blockProps = useBlockProps( {
-		className: classnames( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
-	} );
+	const blockProps = useBlockProps();
 
 	/**
 	 * translators: If your word count is based on single characters (e.g. East Asian characters),
@@ -89,7 +97,9 @@ export default function PostExcerptEditor( {
 	 * excerpt has been produced from the content.
 	 */
 	const strippedRenderedExcerpt = useMemo( () => {
-		if ( ! renderedExcerpt ) return '';
+		if ( ! renderedExcerpt ) {
+			return '';
+		}
 		const document = new window.DOMParser().parseFromString(
 			renderedExcerpt,
 			'text/html'
@@ -99,19 +109,9 @@ export default function PostExcerptEditor( {
 
 	if ( ! postType || ! postId ) {
 		return (
-			<>
-				<BlockControls>
-					<AlignmentToolbar
-						value={ textAlign }
-						onChange={ ( newAlign ) =>
-							setAttributes( { textAlign: newAlign } )
-						}
-					/>
-				</BlockControls>
-				<div { ...blockProps }>
-					<p>{ __( 'This block will display the excerpt.' ) }</p>
-				</div>
-			</>
+			<div { ...blockProps }>
+				<p>{ __( 'This block will display the excerpt.' ) }</p>
+			</div>
 		);
 	}
 	if ( isProtected && ! userCanEdit ) {
@@ -127,6 +127,7 @@ export default function PostExcerptEditor( {
 	}
 	const readMoreLink = (
 		<RichText
+			identifier="moreText"
 			className="wp-block-post-excerpt__more-link"
 			tagName="a"
 			aria-label={ __( '“Read more” link text' ) }
@@ -135,10 +136,10 @@ export default function PostExcerptEditor( {
 			onChange={ ( newMoreText ) =>
 				setAttributes( { moreText: newMoreText } )
 			}
-			withoutInteractiveFormatting={ true }
+			withoutInteractiveFormatting
 		/>
 	);
-	const excerptClassName = classnames( 'wp-block-post-excerpt__excerpt', {
+	const excerptClassName = clsx( 'wp-block-post-excerpt__excerpt', {
 		'is-inline': ! showMoreOnNewLine,
 	} );
 
@@ -153,7 +154,7 @@ export default function PostExcerptEditor( {
 	let trimmedExcerpt = '';
 	if ( wordCountType === 'words' ) {
 		trimmedExcerpt = rawOrRenderedExcerpt
-			.split( ' ', excerptLength )
+			.split( /\s+/, excerptLength )
 			.join( ' ' );
 	} else if ( wordCountType === 'characters_excluding_spaces' ) {
 		/*
@@ -197,6 +198,8 @@ export default function PostExcerptEditor( {
 			}
 			onChange={ setExcerpt }
 			tagName="p"
+			allowedFormats={ [] }
+			preserveWhiteSpace
 		/>
 	) : (
 		<p className={ excerptClassName }>
@@ -207,36 +210,55 @@ export default function PostExcerptEditor( {
 	);
 	return (
 		<>
-			<BlockControls>
-				<AlignmentToolbar
-					value={ textAlign }
-					onChange={ ( newAlign ) =>
-						setAttributes( { textAlign: newAlign } )
-					}
-				/>
-			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Settings' ) }>
-					<ToggleControl
-						__nextHasNoMarginBottom
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () => {
+						setAttributes( {
+							showMoreOnNewLine: true,
+							excerptLength: 55,
+						} );
+					} }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<ToolsPanelItem
+						hasValue={ () => showMoreOnNewLine !== true }
 						label={ __( 'Show link on new line' ) }
-						checked={ showMoreOnNewLine }
-						onChange={ ( newShowMoreOnNewLine ) =>
-							setAttributes( {
-								showMoreOnNewLine: newShowMoreOnNewLine,
-							} )
+						onDeselect={ () =>
+							setAttributes( { showMoreOnNewLine: true } )
 						}
-					/>
-					<RangeControl
+						isShownByDefault
+					>
+						<ToggleControl
+							label={ __( 'Show link on new line' ) }
+							checked={ showMoreOnNewLine }
+							onChange={ ( newShowMoreOnNewLine ) =>
+								setAttributes( {
+									showMoreOnNewLine: newShowMoreOnNewLine,
+								} )
+							}
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						hasValue={ () => excerptLength !== 55 }
 						label={ __( 'Max number of words' ) }
-						value={ excerptLength }
-						onChange={ ( value ) => {
-							setAttributes( { excerptLength: value } );
-						} }
-						min="10"
-						max="100"
-					/>
-				</PanelBody>
+						onDeselect={ () =>
+							setAttributes( { excerptLength: 55 } )
+						}
+						isShownByDefault
+					>
+						<RangeControl
+							__next40pxDefaultSize
+							label={ __( 'Max number of words' ) }
+							value={ excerptLength }
+							onChange={ ( value ) => {
+								setAttributes( { excerptLength: value } );
+							} }
+							min="10"
+							max="100"
+						/>
+					</ToolsPanelItem>
+				</ToolsPanel>
 			</InspectorControls>
 			<div { ...blockProps }>
 				{ excerptContent }

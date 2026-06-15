@@ -58,7 +58,8 @@ function MenuItemsChoice( {
 					<MenuItem
 						key={ item.value }
 						role="menuitemradio"
-						icon={ isSelected && check }
+						disabled={ item.disabled }
+						icon={ isSelected ? check : null }
 						info={ item.info }
 						isSelected={ isSelected }
 						shortcut={ item.shortcut }

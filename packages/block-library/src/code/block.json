@@ -8,9 +8,11 @@
 	"textdomain": "default",
 	"attributes": {
 		"content": {
-			"type": "string",
-			"source": "html",
-			"selector": "code"
+			"type": "rich-text",
+			"source": "rich-text",
+			"selector": "code",
+			"__unstablePreserveWhiteSpace": true,
+			"role": "content"
 		}
 	},
 	"supports": {
@@ -55,6 +57,9 @@
 				"background": true,
 				"text": true
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"style": "wp-block-code"

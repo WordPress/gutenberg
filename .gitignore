@@ -3,12 +3,15 @@ build
 build-module
 build-style
 build-types
+build-wp
 node_modules
+.wasm-vips-build
 gutenberg.zip
+.content-entry.js
 coverage
-*-performance-results.json
 .phpunit.result.cache
 .reassure
+.dev-ready
 
 
 # Directories/files that may appear in your environment
@@ -39,6 +42,7 @@ junit.xml
 
 # Local overrides
 .wp-env.override.json
+.wp-env.test.override.json
 playwright.config.override.ts
 phpcs.xml
 phpunit.xml
@@ -47,3 +51,10 @@ phpunit-watcher.yml
 test/storybook-playwright/test-results
 test/storybook-playwright/specs/__snapshots__
 test/storybook-playwright/specs/*-snapshots/**
+test/gutenberg-test-themes/twentytwentyone
+test/gutenberg-test-themes/twentytwentythree
+test/gutenberg-test-themes/twentytwentyfour
+
+# Files related to applying patches
+*.rej
+*.orig

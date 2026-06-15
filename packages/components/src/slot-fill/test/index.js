@@ -4,6 +4,11 @@
 import { render, screen, within } from '@testing-library/react';
 
 /**
+ * WordPress dependencies
+ */
+import { createRef } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import { createSlotFill, Provider as SlotFillProvider } from '../';
@@ -81,5 +86,38 @@ describe( 'createSlotFill', () => {
 		expect(
 			within( pageSidebar ).queryByText( 'Post Section' )
 		).not.toBeInTheDocument();
+	} );
+
+	test( 'should forward ref to the slot when using bubblesVirtually', () => {
+		const TestSlotFill = createSlotFill( 'TestRefSlot' );
+		const ref = createRef();
+
+		render(
+			<SlotFillProvider>
+				<TestSlotFill.Fill>
+					<p>Content</p>
+				</TestSlotFill.Fill>
+				<TestSlotFill.Slot bubblesVirtually ref={ ref } />
+			</SlotFillProvider>
+		);
+
+		expect( ref.current ).not.toBeNull();
+		expect( ref.current.tagName ).toBe( 'DIV' );
+	} );
+
+	test( 'should forward ref without bubblesVirtually (ref stays null for fragment-based slot)', () => {
+		const TestSlotFill = createSlotFill( 'TestRefSlotBase' );
+		const ref = createRef();
+
+		render(
+			<SlotFillProvider>
+				<TestSlotFill.Fill>
+					<p>Content</p>
+				</TestSlotFill.Fill>
+				<TestSlotFill.Slot ref={ ref } />
+			</SlotFillProvider>
+		);
+
+		expect( ref.current ).toBeNull();
 	} );
 } );

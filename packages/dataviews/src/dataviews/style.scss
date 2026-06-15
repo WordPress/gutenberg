@@ -1,0 +1,143 @@
+@use "@wordpress/base-styles/mixins" as *;
+
+@mixin dataviews-refreshing {
+	opacity: 0.5;
+	pointer-events: none;
+
+	@media not (prefers-reduced-motion) {
+		opacity: 1;
+		animation: dataviews-pulse 1s ease-in-out infinite;
+	}
+}
+
+.dataviews-wrapper,
+.dataviews-picker-wrapper {
+	height: 100%;
+	flex-grow: 1;
+	min-height: 0;
+	box-sizing: border-box;
+	scroll-padding-bottom: calc(var(--wpds-dimension-base) * 16);
+	/* stylelint-disable-next-line property-no-unknown -- '@container' not globally permitted */
+	container: dataviews-wrapper / inline-size;
+	display: flex;
+	flex-direction: column;
+	font-size: var(--wpds-typography-font-size-md);
+	line-height: var(--wpds-typography-line-height-sm);
+	background-color: var(--wp-dataviews-color-background, var(--wpds-color-background-surface-neutral-strong));
+}
+
+.dataviews__view-actions,
+.dataviews-filters__container {
+	box-sizing: border-box;
+	padding: var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-2xl);
+	flex-shrink: 0;
+	position: sticky;
+	left: 0;
+	background-color: inherit;
+
+	@media not (prefers-reduced-motion) {
+		transition: padding ease-out 0.1s;
+	}
+}
+
+.dataviews-no-results,
+.dataviews-loading {
+	padding: 0 var(--wpds-dimension-padding-2xl);
+	flex-grow: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	@media not (prefers-reduced-motion) {
+		transition: padding ease-out 0.1s;
+	}
+}
+
+.dataviews-no-results.is-refreshing {
+	@include dataviews-refreshing();
+}
+
+@keyframes dataviews-pulse {
+	0%,
+	100% {
+		opacity: 1;
+	}
+
+	50% {
+		opacity: 0.5;
+	}
+}
+
+.dataviews-loading-more {
+	text-align: center;
+}
+
+@container (max-width: 430px) {
+	.dataviews__view-actions,
+	.dataviews-filters__container {
+		padding: var(--wpds-dimension-padding-md) var(--wpds-dimension-padding-2xl);
+	}
+}
+
+.dataviews-title-field {
+	font-size: var(--wpds-typography-font-size-md);
+	font-weight: var(--wpds-typography-font-weight-medium);
+	color: var(--wpds-color-foreground-content-neutral);
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	width: 100%;
+
+	a {
+		text-decoration: none;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+		display: block;
+		flex-grow: 0;
+		color: var(--wpds-color-foreground-interactive-neutral);
+
+		&:hover {
+			color: var(--wpds-color-foreground-interactive-brand);
+		}
+		@include link-reset();
+	}
+
+	button.components-button.is-link {
+		text-decoration: none;
+		font-weight: inherit;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+		display: block;
+		width: 100%;
+		color: var(--wpds-color-foreground-interactive-neutral-active);
+		&:hover {
+			color: var(--wpds-color-foreground-interactive-brand);
+		}
+	}
+}
+
+.dataviews-title-field--clickable {
+	cursor: var(--wpds-cursor-control);
+	color: var(--wpds-color-foreground-interactive-neutral);
+	&:hover {
+		color: var(--wpds-color-foreground-interactive-brand);
+	}
+	@include link-reset();
+}
+
+.dataviews__view-actions--infinite-scroll {
+	position: sticky;
+	top: 0;
+	z-index: 2; // Ensure it appears above dataview items when scrolling.
+	background-color: #fff;
+}
+
+/**
+ * When DataViews are placed within cards, apply a consistent top padding.
+ */
+.components-card__body:has(> .dataviews-wrapper),
+.components-card__body:has(> .dataviews-picker-wrapper) {
+	padding: var(--wpds-dimension-padding-sm) 0 0;
+	overflow: hidden; // Prevent cells with white backgrounds overflowing the card
+}

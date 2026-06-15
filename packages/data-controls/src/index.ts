@@ -154,7 +154,9 @@ export const __unstableAwaitPromise = function < T >( promise: Promise< T > ) {
  * store.
  */
 export const controls = {
-	AWAIT_PROMISE: < T >( { promise }: { promise: Promise< T > } ) => promise,
+	AWAIT_PROMISE< T >( { promise }: { promise: Promise< T > } ) {
+		return promise;
+	},
 	API_FETCH( { request }: { request: APIFetchOptions } ) {
 		return triggerFetch( request );
 	},

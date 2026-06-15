@@ -22,7 +22,9 @@ jest.mock( '../../../store/actions', () => {
 		...actions,
 		resetBlocks: jest.fn( actions.resetBlocks ),
 		replaceInnerBlocks: jest.fn( actions.replaceInnerBlocks ),
-		setHasControlledInnerBlocks: jest.fn( actions.replaceInnerBlocks ),
+		setHasControlledInnerBlocks: jest.fn(
+			actions.setHasControlledInnerBlocks
+		),
 	};
 } );
 
@@ -31,12 +33,13 @@ const TestWrapper = withRegistryProvider( ( props ) => {
 		props.setRegistry( props.registry );
 	}
 	useBlockSync( props );
-	return <p>Test.</p>;
+	return null;
 } );
 
 describe( 'useBlockSync hook', () => {
 	beforeAll( () => {
 		registerBlockType( 'test/test-block', {
+			apiVersion: 3,
 			title: 'Test block',
 			attributes: {
 				foo: { type: 'number' },
@@ -71,6 +74,7 @@ describe( 'useBlockSync hook', () => {
 		expect( onInput ).not.toHaveBeenCalled();
 		expect( replaceInnerBlocks ).not.toHaveBeenCalled();
 		expect( resetBlocks ).toHaveBeenCalledWith( fakeBlocks );
+		expect( resetBlocks ).toHaveBeenCalledTimes( 1 );
 
 		const testBlocks = [
 			{ clientId: 'a', innerBlocks: [], attributes: { foo: 1 } },
@@ -88,6 +92,7 @@ describe( 'useBlockSync hook', () => {
 		expect( onInput ).not.toHaveBeenCalled();
 		expect( replaceInnerBlocks ).not.toHaveBeenCalled();
 		expect( resetBlocks ).toHaveBeenCalledWith( testBlocks );
+		expect( resetBlocks ).toHaveBeenCalledTimes( 2 );
 
 		unmount();
 
@@ -95,6 +100,7 @@ describe( 'useBlockSync hook', () => {
 		expect( onInput ).not.toHaveBeenCalled();
 		expect( replaceInnerBlocks ).not.toHaveBeenCalled();
 		expect( resetBlocks ).toHaveBeenCalledWith( [] );
+		expect( resetBlocks ).toHaveBeenCalledTimes( 3 );
 	} );
 
 	it( 'replaces the inner blocks of a block when the controlled value changes if a clientId is passed', async () => {
@@ -123,6 +129,7 @@ describe( 'useBlockSync hook', () => {
 			'test', // It should use the given client ID.
 			fakeBlocks // It should use the controlled blocks value.
 		);
+		expect( replaceInnerBlocks ).toHaveBeenCalledTimes( 1 );
 
 		const testBlocks = [
 			{
@@ -148,6 +155,7 @@ describe( 'useBlockSync hook', () => {
 		expect( replaceInnerBlocks ).toHaveBeenCalledWith( 'test', [
 			expect.objectContaining( { name: 'test/test-block' } ),
 		] );
+		expect( replaceInnerBlocks ).toHaveBeenCalledTimes( 2 );
 
 		unmount();
 
@@ -155,6 +163,7 @@ describe( 'useBlockSync hook', () => {
 		expect( onInput ).not.toHaveBeenCalled();
 		expect( resetBlocks ).not.toHaveBeenCalled();
 		expect( replaceInnerBlocks ).toHaveBeenCalledWith( 'test', [] );
+		expect( replaceInnerBlocks ).toHaveBeenCalledTimes( 3 );
 	} );
 
 	it( 'does not add the controlled blocks to the block-editor store if the store already contains them', async () => {
@@ -263,13 +272,47 @@ describe( 'useBlockSync hook', () => {
 
 		expect( onInput ).toHaveBeenCalledWith(
 			[ { clientId: 'a', innerBlocks: [], attributes: { foo: 2 } } ],
-			{
-				selection: {
-					selectionEnd: {},
-					selectionStart: {},
-					initialPosition: null,
-				},
-			}
+			expect.objectContaining( { selection: expect.any( Object ) } )
+		);
+		expect( onChange ).not.toHaveBeenCalled();
+	} );
+
+	it( 'passes undoIgnore when a non-persistent block change ignores history', async () => {
+		const onChange = jest.fn();
+		const onInput = jest.fn();
+		const value1 = [
+			{ clientId: 'a', innerBlocks: [], attributes: { foo: 1 } },
+		];
+		let registry;
+		const setRegistry = ( reg ) => {
+			registry = reg;
+		};
+		render(
+			<TestWrapper
+				setRegistry={ setRegistry }
+				value={ value1 }
+				onChange={ onChange }
+				onInput={ onInput }
+			/>
+		);
+		onChange.mockClear();
+		onInput.mockClear();
+
+		registry
+			.dispatch( blockEditorStore )
+			.__unstableMarkNextChangeAsNotPersistent( {
+				history: 'ignore',
+			} );
+		registry
+			.dispatch( blockEditorStore )
+			.updateBlockAttributes( 'a', { foo: 2 } );
+
+		expect( onInput ).toHaveBeenCalledWith(
+			[ { clientId: 'a', innerBlocks: [], attributes: { foo: 2 } } ],
+			expect.objectContaining( {
+				selection: expect.any( Object ),
+				undoIgnore: true,
+			} )
 		);
 		expect( onChange ).not.toHaveBeenCalled();
 	} );
@@ -303,13 +346,7 @@ describe( 'useBlockSync hook', () => {
 
 		expect( onChange ).toHaveBeenCalledWith(
 			[ { clientId: 'a', innerBlocks: [], attributes: { foo: 2 } } ],
-			{
-				selection: {
-					selectionEnd: {},
-					selectionStart: {},
-					initialPosition: null,
-				},
-			}
+			expect.objectContaining( { selection: expect.any( Object ) } )
 		);
 		expect( onInput ).not.toHaveBeenCalled();
 	} );
@@ -354,6 +391,7 @@ describe( 'useBlockSync hook', () => {
 		);
 
 		expect( replaceInnerBlocks ).toHaveBeenCalledWith( 'test', [] );
+		expect( replaceInnerBlocks ).toHaveBeenCalledTimes( 1 );
 		expect( onChange ).not.toHaveBeenCalled();
 		expect( onInput ).not.toHaveBeenCalled();
 	} );
@@ -406,13 +444,7 @@ describe( 'useBlockSync hook', () => {
 					attributes: { foo: 2 },
 				},
 			],
-			{
-				selection: {
-					selectionEnd: {},
-					selectionStart: {},
-					initialPosition: null,
-				},
-			}
+			expect.objectContaining( { selection: expect.any( Object ) } )
 		);
 		expect( onInput ).not.toHaveBeenCalled();
 	} );
@@ -447,13 +479,10 @@ describe( 'useBlockSync hook', () => {
 			{ clientId: 'a', innerBlocks: [], attributes: { foo: 2 } },
 		];
 
-		expect( onChange1 ).toHaveBeenCalledWith( updatedBlocks1, {
-			selection: {
-				initialPosition: null,
-				selectionEnd: {},
-				selectionStart: {},
-			},
-		} );
+		expect( onChange1 ).toHaveBeenCalledWith(
+			updatedBlocks1,
+			expect.objectContaining( { selection: expect.any( Object ) } )
+		);
 
 		const newBlocks = [
 			{ clientId: 'b', innerBlocks: [], attributes: { foo: 1 } },
@@ -485,13 +514,7 @@ describe( 'useBlockSync hook', () => {
 		// The second callback should be called with the new change.
 		expect( onChange2 ).toHaveBeenCalledWith(
 			[ { clientId: 'b', innerBlocks: [], attributes: { foo: 3 } } ],
-			{
-				selection: {
-					selectionEnd: {},
-					selectionStart: {},
-					initialPosition: null,
-				},
-			}
+			expect.objectContaining( { selection: expect.any( Object ) } )
 		);
 	} );
 
@@ -544,13 +567,110 @@ describe( 'useBlockSync hook', () => {
 		// Only the new callback should be called.
 		expect( onChange2 ).toHaveBeenCalledWith(
 			[ { clientId: 'b', innerBlocks: [], attributes: { foo: 3 } } ],
-			{
-				selection: {
-					selectionEnd: {},
-					selectionStart: {},
-					initialPosition: null,
-				},
-			}
+			expect.objectContaining( { selection: expect.any( Object ) } )
 		);
+	} );
+
+	it( 'preserves external client IDs in onChange callback for inner block controllers', async () => {
+		const originalClientId = 'original-external-id';
+		const innerBlockClientId = 'inner-external-id';
+		const onChange = jest.fn();
+		const onInput = jest.fn();
+		const replaceInnerBlocks = jest.spyOn(
+			blockEditorActions,
+			'replaceInnerBlocks'
+		);
+
+		// Blocks with specific external client IDs
+		const controlledBlocks = [
+			{
+				name: 'test/test-block',
+				clientId: originalClientId,
+				innerBlocks: [
+					{
+						name: 'test/test-block',
+						clientId: innerBlockClientId,
+						innerBlocks: [],
+						attributes: { foo: 10 },
+					},
+				],
+				attributes: { foo: 1 },
+			},
+		];
+
+		let registry;
+		const setRegistry = ( reg ) => {
+			registry = reg;
+		};
+
+		render(
+			<TestWrapper
+				setRegistry={ setRegistry }
+				value={ controlledBlocks }
+				onChange={ onChange }
+				onInput={ onInput }
+			/>
+		);
+
+		// For the root case (no clientId), blocks are not cloned
+		// So the external IDs should be preserved as-is
+		expect( replaceInnerBlocks ).not.toHaveBeenCalled();
+
+		onChange.mockClear();
+		onInput.mockClear();
+
+		registry
+			.dispatch( blockEditorStore )
+			.updateBlockAttributes( originalClientId, { foo: 2 } );
+
+		// The onChange callback should receive blocks with the same external IDs
+		expect( onChange ).toHaveBeenCalledWith(
+			expect.arrayContaining( [
+				expect.objectContaining( {
+					clientId: originalClientId,
+					attributes: { foo: 2 },
+					innerBlocks: expect.arrayContaining( [
+						expect.objectContaining( {
+							clientId: innerBlockClientId,
+						} ),
+					] ),
+				} ),
+			] ),
+			expect.objectContaining( { selection: expect.any( Object ) } )
+		);
+	} );
+
+	it( 'clones blocks with new internal IDs for inner block controllers', async () => {
+		const originalClientId = 'original-external-id';
+		const replaceInnerBlocks = jest.spyOn(
+			blockEditorActions,
+			'replaceInnerBlocks'
+		);
+
+		// Blocks with specific external client IDs
+		const controlledBlocks = [
+			{
+				name: 'test/test-block',
+				clientId: originalClientId,
+				innerBlocks: [],
+				attributes: { foo: 1 },
+			},
+		];
+
+		render(
+			<TestWrapper
+				clientId="test-controller"
+				value={ controlledBlocks }
+				onChange={ jest.fn() }
+				onInput={ jest.fn() }
+			/>
+		);
+
+		// replaceInnerBlocks should have been called with cloned blocks
+		expect( replaceInnerBlocks ).toHaveBeenCalled();
+		const replacedBlocks = replaceInnerBlocks.mock.calls[ 0 ][ 1 ];
+
+		// The internal IDs should be different from the external IDs (due to cloning)
+		expect( replacedBlocks[ 0 ].clientId ).not.toBe( originalClientId );
 	} );
 } );

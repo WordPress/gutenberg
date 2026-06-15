@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -14,7 +14,7 @@ import { chevronUp, chevronDown } from '@wordpress/icons';
  * Internal dependencies
  */
 import type { PanelBodyProps, PanelBodyTitleProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import Button from '../button';
 import Icon from '../icon';
 import { useControlledState, useUpdateEffect } from '../utils';
@@ -57,7 +57,7 @@ export function UnforwardedPanelBody(
 	};
 
 	// Ref is used so that the effect does not re-run upon scrollAfterOpen changing value.
-	const scrollAfterOpenRef = useRef< boolean | undefined >();
+	const scrollAfterOpenRef = useRef< boolean >( undefined );
 	scrollAfterOpenRef.current = scrollAfterOpen;
 	// Runs after initial render.
 	useUpdateEffect( () => {
@@ -79,7 +79,7 @@ export function UnforwardedPanelBody(
 		}
 	}, [ isOpened, scrollBehavior ] );
 
-	const classes = classnames( 'components-panel__body', className, {
+	const classes = clsx( 'components-panel__body', className, {
 		'is-opened': isOpened,
 	} );
 
@@ -109,11 +109,14 @@ const PanelBodyTitle = forwardRef(
 		}: WordPressComponentProps< PanelBodyTitleProps, 'button' >,
 		ref: React.ForwardedRef< any >
 	) => {
-		if ( ! title ) return null;
+		if ( ! title ) {
+			return null;
+		}
 
 		return (
 			<h2 className="components-panel__body-title">
 				<Button
+					__next40pxDefaultSize
 					className="components-panel__body-toggle"
 					aria-expanded={ isOpened }
 					ref={ ref }
@@ -144,5 +147,6 @@ const PanelBodyTitle = forwardRef(
 );
 
 export const PanelBody = forwardRef( UnforwardedPanelBody );
+PanelBody.displayName = 'PanelBody';
 
 export default PanelBody;

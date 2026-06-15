@@ -1,11 +1,5 @@
-/**
- * External dependencies
- */
+import type { useFocusOnMount } from '@wordpress/compose';
 import type { ComponentPropsWithoutRef, CSSProperties, ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import type Popover from '../popover';
 import type { PopoverProps } from '../popover/types';
 
@@ -42,16 +36,17 @@ export type DropdownProps = {
 	 */
 	expandOnMobile?: boolean;
 	/**
-	 * By default, the first tabbable element in the popover will receive focus
-	 * when it mounts. This is the same as setting this prop to "firstElement".
-	 * Specifying a true value will focus the container instead.
-	 * Specifying a false value disables the focus handling entirely
-	 * (this should only be done when an appropriately accessible
-	 * substitute behavior exists).
+	 * Determines focus behavior when the dialog mounts.
+	 *
+	 * - `"firstElement"` focuses the first tabbable element within.
+	 * - `"firstInputElement"` focuses the first value control within.
+	 * - `true` focuses the element itself.
+	 * - `false` does nothing and _should not be used unless an accessible
+	 *    substitute behavior is implemented_.
 	 *
 	 * @default 'firstElement'
 	 */
-	focusOnMount?: 'firstElement' | boolean;
+	focusOnMount?: useFocusOnMount.Mode;
 	/**
 	 * Set this to customize the text that is shown in the dropdown's header
 	 * when it is fullscreen on mobile.
@@ -62,11 +57,8 @@ export type DropdownProps = {
 	 */
 	onClose?: () => void;
 	/**
-	 * A callback invoked when the state of the popover changes
+	 * A callback invoked when the state of the dropdown changes
 	 * from open to closed and vice versa.
-	 * The callback receives a boolean as a parameter.
-	 * If true, the popover will open.
-	 * If false, the popover will close.
 	 */
 	onToggle?: ( willOpen: boolean ) => void;
 	/**
@@ -111,6 +103,17 @@ export type DropdownProps = {
 	 * @deprecated
 	 */
 	position?: PopoverProps[ 'position' ];
+	/**
+	 * The controlled open state of the dropdown.
+	 * Must be used in conjunction with `onToggle`.
+	 */
+	open?: boolean;
+	/**
+	 * The open state of the dropdown when initially rendered.
+	 * Use when you do not need to control its open state. It will be overridden
+	 * by the `open` prop if it is specified on the component's first render.
+	 */
+	defaultOpen?: boolean;
 };
 
 export type DropdownInternalContext = {

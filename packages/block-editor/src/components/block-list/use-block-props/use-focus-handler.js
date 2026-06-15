@@ -2,13 +2,19 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useRefEffect } from '@wordpress/compose';
+import {
+	useRefEffect,
+	privateApis as composePrivateApis,
+} from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { isInsideRootBlock } from '../../../utils/dom';
 import { store as blockEditorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
+
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 /**
  * Selects the block if it receives focus.
@@ -48,7 +54,7 @@ export function useFocusHandler( clientId ) {
 					return;
 				}
 
-				// If an inner block is focussed, that block is resposible for
+				// If an inner block is focussed, that block is responsible for
 				// setting the selected block.
 				if ( ! isInsideRootBlock( node, event.target ) ) {
 					return;
@@ -57,11 +63,7 @@ export function useFocusHandler( clientId ) {
 				selectBlock( clientId );
 			}
 
-			node.addEventListener( 'focusin', onFocus );
-
-			return () => {
-				node.removeEventListener( 'focusin', onFocus );
-			};
+			return subscribeDelegatedListener( node, 'focusin', onFocus );
 		},
 		[ isBlockSelected, selectBlock ]
 	);

@@ -114,7 +114,7 @@ _Returns_
 
 ### getRectangleFromRange
 
-Get the rectangle of a given Range. Returns `null` if no suitable rectangle can be found.
+Get the rectangle of a given Range. Returns `null` if no suitable rectangle can be found. Use instead of `Range.getBoundingClientRect()`, which is often broken, especially for collapsed ranges.
 
 _Parameters_
 
@@ -192,7 +192,7 @@ Check whether the selection is horizontally at the edge of the container.
 
 _Parameters_
 
--   _container_ `Element`: Focusable element.
+-   _container_ `HTMLElement`: Focusable element.
 -   _isReverse_ `boolean`: Set to true to check left, false for right.
 
 _Returns_
@@ -239,6 +239,22 @@ _Returns_
 
 -   `boolean`: True if rtl, false if ltr.
 
+### isSelectionForward
+
+Returns true if the given selection object is in the forward direction, or false otherwise.
+
+_Related_
+
+-   <https://developer.mozilla.org/en-US/docs/Web/API/Node/compareDocumentPosition>
+
+_Parameters_
+
+-   _selection_ `Selection`: Selection object to check.
+
+_Returns_
+
+-   `boolean`: Whether the selection is forward.
+
 ### isTextContent
 
 _Parameters_
@@ -269,7 +285,7 @@ Check whether the selection is vertically at the edge of the container.
 
 _Parameters_
 
--   _container_ `Element`: Focusable element.
+-   _container_ `HTMLElement`: Focusable element.
 -   _isReverse_ `boolean`: Set to true to check top, false for bottom.
 
 _Returns_

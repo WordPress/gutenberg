@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/keyboard-shortcuts",
-	"version": "4.15.0",
+	"version": "5.48.0",
 	"description": "Handling keyboard shortcuts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -13,23 +13,39 @@
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
-		"directory": "packages/keycodes"
+		"directory": "packages/keyboard-shortcuts"
 	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=12"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
-	"main": "build/index.js",
-	"module": "build-module/index.js",
-	"react-native": "src/index",
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"wpScript": true,
+	"types": "build-types/index.d.ts",
 	"dependencies": {
-		"@babel/runtime": "^7.16.0",
+		"@types/react": "^18.3.27",
 		"@wordpress/data": "file:../data",
 		"@wordpress/element": "file:../element",
-		"@wordpress/keycodes": "file:../keycodes",
-		"rememo": "^4.0.2"
+		"@wordpress/keycodes": "file:../keycodes"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0"

@@ -14,6 +14,8 @@ import { superscript } from './superscript';
 import { keyboard } from './keyboard';
 import { unknown } from './unknown';
 import { language } from './language';
+import { math } from './math';
+import { nonBreakingSpace } from './non-breaking-space';
 
 export default [
 	bold,
@@ -29,4 +31,6 @@ export default [
 	keyboard,
 	unknown,
 	language,
+	math,
+	nonBreakingSpace,
 ];

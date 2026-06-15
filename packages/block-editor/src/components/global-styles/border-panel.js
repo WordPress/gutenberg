@@ -2,31 +2,42 @@
  * WordPress dependencies
  */
 import {
-	__experimentalBorderBoxControl as BorderBoxControl,
+	BorderBoxControl,
 	__experimentalHasSplitBorders as hasSplitBorders,
 	__experimentalIsDefinedBorder as isDefinedBorder,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	BaseControl,
 } from '@wordpress/components';
 import { useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { getValueFromVariable } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
  */
 import BorderRadiusControl from '../border-radius-control';
 import { useColorsPerOrigin } from './hooks';
-import { getValueFromVariable } from './utils';
+import { useToolsPanelDropdownMenuProps } from './utils';
+import { setImmutably } from '../../utils/object';
+import { useBorderPanelLabel } from '../../hooks/border';
+import { ShadowPopover, useShadowPresets } from './shadow-panel-components';
 
 export function useHasBorderPanel( settings ) {
-	const controls = [
-		useHasBorderColorControl( settings ),
-		useHasBorderRadiusControl( settings ),
-		useHasBorderStyleControl( settings ),
-		useHasBorderWidthControl( settings ),
-	];
-
+	const controls = Object.values( useHasBorderPanelControls( settings ) );
 	return controls.some( Boolean );
+}
+
+export function useHasBorderPanelControls( settings ) {
+	const controls = {
+		hasBorderColor: useHasBorderColorControl( settings ),
+		hasBorderRadius: useHasBorderRadiusControl( settings ),
+		hasBorderStyle: useHasBorderStyleControl( settings ),
+		hasBorderWidth: useHasBorderWidthControl( settings ),
+		hasShadow: useHasShadowControl( settings ),
+	};
+
+	return controls;
 }
 
 function useHasBorderColorControl( settings ) {
@@ -45,13 +56,20 @@ function useHasBorderWidthControl( settings ) {
 	return settings?.border?.width;
 }
 
+function useHasShadowControl( settings ) {
+	const shadows = useShadowPresets( settings );
+	return !! settings?.shadow && shadows.length > 0;
+}
+
 function BorderToolsPanel( {
 	resetAllFilter,
 	onChange,
 	value,
 	panelId,
 	children,
+	label,
 } ) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const resetAll = () => {
 		const updatedValue = resetAllFilter( value );
 		onChange( updatedValue );
@@ -59,9 +77,10 @@ function BorderToolsPanel( {
 
 	return (
 		<ToolsPanel
-			label={ __( 'Border' ) }
+			label={ label }
 			resetAll={ resetAll }
 			panelId={ panelId }
+			dropdownMenuProps={ dropdownMenuProps }
 		>
 			{ children }
 		</ToolsPanel>
@@ -72,6 +91,7 @@ const DEFAULT_CONTROLS = {
 	radius: true,
 	color: true,
 	width: true,
+	shadow: true,
 };
 
 export default function BorderPanel( {
@@ -81,11 +101,15 @@ export default function BorderPanel( {
 	inheritedValue = value,
 	settings,
 	panelId,
+	name,
 	defaultControls = DEFAULT_CONTROLS,
 } ) {
 	const colors = useColorsPerOrigin( settings );
-	const decodeValue = ( rawValue ) =>
-		getValueFromVariable( { settings }, '', rawValue );
+	const areCustomSolidsEnabled = settings?.color?.custom;
+	const decodeValue = useCallback(
+		( rawValue ) => getValueFromVariable( { settings }, '', rawValue ),
+		[ settings ]
+	);
 	const encodeColorValue = ( colorValue ) => {
 		const allColors = colors.flatMap(
 			( { colors: originColors } ) => originColors
@@ -97,25 +121,13 @@ export default function BorderPanel( {
 			? 'var:preset|color|' + colorObject.slug
 			: colorValue;
 	};
-	const decodeColorValue = useCallback(
-		( colorValue ) => {
-			const allColors = colors.flatMap(
-				( { colors: originColors } ) => originColors
-			);
-			const colorObject = allColors.find(
-				( { slug } ) => colorValue === 'var:preset|color|' + slug
-			);
-			return colorObject ? colorObject.color : colorValue;
-		},
-		[ colors ]
-	);
 	const border = useMemo( () => {
 		if ( hasSplitBorders( inheritedValue?.border ) ) {
 			const borderValue = { ...inheritedValue?.border };
 			[ 'top', 'right', 'bottom', 'left' ].forEach( ( side ) => {
 				borderValue[ side ] = {
 					...borderValue[ side ],
-					color: decodeColorValue( borderValue[ side ]?.color ),
+					color: decodeValue( borderValue[ side ]?.color ),
 				};
 			} );
 			return borderValue;
@@ -123,10 +135,10 @@ export default function BorderPanel( {
 		return {
 			...inheritedValue?.border,
 			color: inheritedValue?.border?.color
-				? decodeColorValue( inheritedValue?.border?.color )
+				? decodeValue( inheritedValue?.border?.color )
 				: undefined,
 		};
-	}, [ inheritedValue?.border, decodeColorValue ] );
+	}, [ inheritedValue?.border, decodeValue ] );
 	const setBorder = ( newBorder ) =>
 		onChange( { ...value, border: newBorder } );
 	const showBorderColor = useHasBorderColorControl( settings );
@@ -135,7 +147,22 @@ export default function BorderPanel( {
 
 	// Border radius.
 	const showBorderRadius = useHasBorderRadiusControl( settings );
-	const borderRadiusValues = decodeValue( border?.radius );
+	const borderRadiusValues = useMemo( () => {
+		if ( typeof inheritedValue?.border?.radius !== 'object' ) {
+			return decodeValue( inheritedValue?.border?.radius );
+		}
+
+		return {
+			topLeft: decodeValue( inheritedValue?.border?.radius?.topLeft ),
+			topRight: decodeValue( inheritedValue?.border?.radius?.topRight ),
+			bottomLeft: decodeValue(
+				inheritedValue?.border?.radius?.bottomLeft
+			),
+			bottomRight: decodeValue(
+				inheritedValue?.border?.radius?.bottomRight
+			),
+		};
+	}, [ inheritedValue?.border?.radius, decodeValue ] );
 	const setBorderRadius = ( newBorderRadius ) =>
 		setBorder( { ...border, radius: newBorderRadius } );
 	const hasBorderRadius = () => {
@@ -145,6 +172,31 @@ export default function BorderPanel( {
 		}
 		return !! borderValues;
 	};
+	const hasShadowControl = useHasShadowControl( settings );
+
+	// Shadow
+	const shadow = decodeValue( inheritedValue?.shadow );
+	const shadowPresets = settings?.shadow?.presets ?? {};
+	const mergedShadowPresets =
+		shadowPresets.custom ??
+		shadowPresets.theme ??
+		shadowPresets.default ??
+		[];
+	const setShadow = ( newValue ) => {
+		const slug = mergedShadowPresets?.find(
+			( { shadow: shadowName } ) => shadowName === newValue
+		)?.slug;
+
+		onChange(
+			setImmutably(
+				value,
+				[ 'shadow' ],
+				slug ? `var:preset|shadow|${ slug }` : newValue || undefined
+			)
+		);
+	};
+	const hasShadow = () => !! value?.shadow;
+	const resetShadow = () => setShadow( undefined );
 
 	const resetBorder = () => {
 		if ( hasBorderRadius() ) {
@@ -182,11 +234,24 @@ export default function BorderPanel( {
 		return {
 			...previousValue,
 			border: undefined,
+			shadow: undefined,
 		};
 	}, [] );
 
 	const showBorderByDefault =
 		defaultControls?.color || defaultControls?.width;
+
+	const hasBorderControl =
+		showBorderColor ||
+		showBorderStyle ||
+		showBorderWidth ||
+		showBorderRadius;
+
+	const label = useBorderPanelLabel( {
+		blockName: name,
+		hasShadowControl,
+		hasBorderControl,
+	} );
 
 	return (
 		<Wrapper
@@ -194,6 +259,7 @@ export default function BorderPanel( {
 			value={ value }
 			onChange={ onChange }
 			panelId={ panelId }
+			label={ label }
 		>
 			{ ( showBorderWidth || showBorderColor ) && (
 				<ToolsPanelItem
@@ -205,14 +271,17 @@ export default function BorderPanel( {
 				>
 					<BorderBoxControl
 						colors={ colors }
-						enableAlpha={ true }
+						disableCustomColors={ ! areCustomSolidsEnabled }
+						enableAlpha
 						enableStyle={ showBorderStyle }
 						onChange={ onBorderChange }
 						popoverOffset={ 40 }
 						popoverPlacement="left-start"
 						value={ border }
-						__experimentalIsRenderedInSidebar={ true }
-						size={ '__unstable-large' }
+						__experimentalIsRenderedInSidebar
+						size="__unstable-large"
+						hideLabelFromVision={ ! hasShadowControl }
+						label={ __( 'Border' ) }
 					/>
 				</ToolsPanelItem>
 			) }
@@ -225,10 +294,32 @@ export default function BorderPanel( {
 					panelId={ panelId }
 				>
 					<BorderRadiusControl
+						presets={ settings?.border?.radiusSizes }
 						values={ borderRadiusValues }
 						onChange={ ( newValue ) => {
 							setBorderRadius( newValue || undefined );
 						} }
+					/>
+				</ToolsPanelItem>
+			) }
+			{ hasShadowControl && (
+				<ToolsPanelItem
+					label={ __( 'Shadow' ) }
+					hasValue={ hasShadow }
+					onDeselect={ resetShadow }
+					isShownByDefault={ defaultControls.shadow }
+					panelId={ panelId }
+				>
+					{ hasBorderControl ? (
+						<BaseControl.VisualLabel as="legend">
+							{ __( 'Shadow' ) }
+						</BaseControl.VisualLabel>
+					) : null }
+
+					<ShadowPopover
+						shadow={ shadow }
+						onShadowChange={ setShadow }
+						settings={ settings }
 					/>
 				</ToolsPanelItem>
 			) }

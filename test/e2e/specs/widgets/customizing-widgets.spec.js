@@ -12,11 +12,17 @@ const {
  * @typedef {import('@playwright/test').FrameLocator} FrameLocator
  * @typedef {import('@wordpress/e2e-test-utils-playwright').PageUtils} PageUtils
  * @typedef {import('@wordpress/e2e-test-utils-playwright').RequestUtils} RequestUtils
+ * @typedef {import('@wordpress/e2e-test-utils-playwright').Editor} Editor
  */
 
 test.use( {
-	widgetsCustomizerPage: async ( { admin, page, pageUtils }, use ) => {
-		await use( new WidgetsCustomizerPage( { admin, page, pageUtils } ) );
+	widgetsCustomizerPage: async (
+		{ admin, page, pageUtils, editor },
+		use
+	) => {
+		await use(
+			new WidgetsCustomizerPage( { admin, page, pageUtils, editor } )
+		);
 	},
 } );
 
@@ -36,11 +42,7 @@ test.describe( 'Widgets Customizer', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test( 'should add blocks', async ( {
-		page,
-		widgetsCustomizerPage,
-		editor,
-	} ) => {
+	test( 'should add blocks', async ( { page, widgetsCustomizerPage } ) => {
 		const previewFrame = widgetsCustomizerPage.previewFrame;
 
 		await widgetsCustomizerPage.visitCustomizerPage();
@@ -77,7 +79,7 @@ test.describe( 'Widgets Customizer', () => {
 		);
 
 		const inlineInserterSearchBox = page.locator(
-			'role=searchbox[name="Search for blocks and patterns"i]'
+			'role=searchbox[name="Search"i]'
 		);
 
 		await expect( inlineInserterSearchBox ).toBeFocused();
@@ -86,9 +88,11 @@ test.describe( 'Widgets Customizer', () => {
 
 		await page.click( 'role=option[name="Search"i]' );
 
-		await editor.canvas.focus(
-			'role=document[name="Block: Search"i] >> role=textbox[name="Label text"i]'
-		);
+		await page
+			.locator(
+				'role=document[name="Block: Search"i] >> role=textbox[name="Label text"i]'
+			)
+			.focus();
 
 		await page.keyboard.type( 'My ' );
 
@@ -147,7 +151,7 @@ test.describe( 'Widgets Customizer', () => {
 		// Go back to the widgets editor.
 		await backButton.click();
 		await expect( widgetsFooter1Heading ).toBeVisible();
-		await expect( inspectorHeading ).not.toBeVisible();
+		await expect( inspectorHeading ).toBeHidden();
 
 		await editor.clickBlockToolbarButton( 'Options' );
 		await showMoreSettingsButton.click();
@@ -161,7 +165,7 @@ test.describe( 'Widgets Customizer', () => {
 		// Go back to the widgets editor.
 		await expect( widgetsFooter1Heading ).toBeVisible();
 
-		await expect( inspectorHeading ).not.toBeVisible();
+		await expect( inspectorHeading ).toBeHidden();
 	} );
 
 	test( 'should handle the inserter outer section', async ( {
@@ -207,11 +211,11 @@ test.describe( 'Widgets Customizer', () => {
 		await expect( publishSettings ).toBeVisible();
 
 		// Expect the inserter outer section to be closed.
-		await expect( inserterHeading ).not.toBeVisible();
+		await expect( inserterHeading ).toBeHidden();
 
 		// Focus the block and start typing to hide the block toolbar.
 		// Shouldn't be needed if we automatically hide the toolbar on blur.
-		await page.focus( 'role=document[name="Paragraph block"i]' );
+		await page.focus( 'role=document[name="Block: Paragraph"i]' );
 		await page.keyboard.type( ' ' );
 
 		// Open the inserter outer section.
@@ -226,14 +230,13 @@ test.describe( 'Widgets Customizer', () => {
 		await page.click( 'role=button[name=/Back$/] >> visible=true' );
 
 		// Expect the inserter outer section to be closed.
-		await expect( inserterHeading ).not.toBeVisible();
+		await expect( inserterHeading ).toBeHidden();
 	} );
 
 	test( 'should move focus to the block', async ( {
 		page,
 		requestUtils,
 		widgetsCustomizerPage,
-		editor,
 	} ) => {
 		await requestUtils.addWidgetBlock(
 			`<!-- wp:paragraph -->\n<p>First Paragraph</p>\n<!-- /wp:paragraph -->`,
@@ -262,7 +265,7 @@ test.describe( 'Widgets Customizer', () => {
 		await editParagraphWidget.click();
 
 		const firstParagraphBlock = page.locator(
-			'role=document[name="Paragraph block"i] >> text="First Paragraph"'
+			'role=document[name="Block: Paragraph"i] >> text="First Paragraph"'
 		);
 		await expect( firstParagraphBlock ).toBeFocused();
 
@@ -282,8 +285,8 @@ test.describe( 'Widgets Customizer', () => {
 		await headingWidget.click(); // noop click on the widget text to unfocus the editor and hide toolbar
 		await editHeadingWidget.click();
 
-		const headingBlock = editor.canvas.locator(
-			'role=document[name="Block: Heading"i] >> text="First Heading"'
+		const headingBlock = page.locator(
+			'role=document[name="Block: Heading 2"i] >> text="First Heading"'
 		);
 		await expect( headingBlock ).toBeFocused();
 	} );
@@ -315,7 +318,7 @@ test.describe( 'Widgets Customizer', () => {
 			await page.click(
 				'role=heading[name="Customizing ▸ Widgets Footer #1"i][level=3]'
 			);
-			await expect( blockToolbar ).not.toBeVisible();
+			await expect( blockToolbar ).toBeHidden();
 
 			await paragraphBlock.focus();
 			await editor.showBlockToolbar();
@@ -324,7 +327,7 @@ test.describe( 'Widgets Customizer', () => {
 		// Expect clicking on the preview iframe should clear the selection.
 		{
 			await page.click( '#customize-preview' );
-			await expect( blockToolbar ).not.toBeVisible();
+			await expect( blockToolbar ).toBeHidden();
 
 			await paragraphBlock.focus();
 			await editor.showBlockToolbar();
@@ -339,7 +342,7 @@ test.describe( 'Widgets Customizer', () => {
 			const { x, y, width, height } = await editorContainer.boundingBox();
 			// Simulate Clicking on the empty space at the end of the editor.
 			await page.mouse.click( x + width / 2, y + height + 10 );
-			await expect( blockToolbar ).not.toBeVisible();
+			await expect( blockToolbar ).toBeHidden();
 		}
 	} );
 
@@ -352,13 +355,10 @@ test.describe( 'Widgets Customizer', () => {
 		await widgetsCustomizerPage.visitCustomizerPage();
 		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
 
-		const legacyWidgetBlock = await widgetsCustomizerPage.addBlock(
-			'Legacy Widget'
-		);
+		const legacyWidgetBlock =
+			await widgetsCustomizerPage.addBlock( 'Legacy Widget' );
 		await page
-			.locator(
-				'role=combobox[name="Select a legacy widget to display:"i]'
-			)
+			.locator( 'role=combobox[name="Legacy widget"i]' )
 			.selectOption( 'test_widget' );
 
 		await expect(
@@ -401,9 +401,8 @@ test.describe( 'Widgets Customizer', () => {
 		await page.click( 'role=menuitem[name=/Delete/]' );
 
 		// Add it back again using the variant.
-		const testWidgetBlock = await widgetsCustomizerPage.addBlock(
-			'Test Widget'
-		);
+		const testWidgetBlock =
+			await widgetsCustomizerPage.addBlock( 'Test Widget' );
 
 		titleInput = testWidgetBlock.locator( 'role=textbox[name="Title:"i]' );
 
@@ -462,20 +461,10 @@ test.describe( 'Widgets Customizer', () => {
 		// Expect pressing the Escape key to close the dropdown,
 		// but not close the editor.
 		await page.keyboard.press( 'Escape' );
-		await expect( optionsMenu ).not.toBeVisible();
+		await expect( optionsMenu ).toBeHidden();
 		await expect( paragraphBlock ).toBeVisible();
 
 		await paragraphBlock.focus();
-
-		// Expect pressing the Escape key to enter navigation mode,
-		// but not close the editor.
-		await page.keyboard.press( 'Escape' );
-		await expect(
-			page.locator(
-				'css=.block-editor-block-list__layout.is-navigate-mode'
-			)
-		).toBeVisible();
-		await expect( paragraphBlock ).toBeVisible();
 	} );
 
 	test( 'should move (inner) blocks to another sidebar', async ( {
@@ -498,7 +487,7 @@ test.describe( 'Widgets Customizer', () => {
 
 		// Refocus the paragraph block.
 		await page.focus(
-			'*role=document[name="Paragraph block"i] >> text="First Paragraph"'
+			'*role=document[name="Block: Paragraph"i] >> text="First Paragraph"'
 		);
 		await editor.clickBlockToolbarButton( 'Move to widget area' );
 
@@ -513,7 +502,7 @@ test.describe( 'Widgets Customizer', () => {
 
 		// The paragraph block should be moved to the new sidebar and have focus.
 		const movedParagraphBlock = page.locator(
-			'*role=document[name="Paragraph block"i] >> text="First Paragraph"'
+			'*role=document[name="Block: Paragraph"i] >> text="First Paragraph"'
 		);
 		await expect( movedParagraphBlock ).toBeVisible();
 		await expect( movedParagraphBlock ).toBeFocused();
@@ -530,7 +519,7 @@ test.describe( 'Widgets Customizer', () => {
 		// integrate the G sidebar inside the customizer.
 		await expect(
 			page.locator( 'role=heading[name=/Block Settings/][level=3]' )
-		).not.toBeVisible();
+		).toBeHidden();
 	} );
 
 	test( 'should stay in block settings after making a change in that area', async ( {
@@ -556,7 +545,7 @@ test.describe( 'Widgets Customizer', () => {
 		).toBeDisabled();
 
 		// Select the paragraph block
-		await page.focus( 'role=document[name="Paragraph block"i]' );
+		await page.focus( 'role=document[name="Block: Paragraph"i]' );
 
 		// Click the three dots button, then click "Show More Settings".
 		await editor.clickBlockToolbarButton( 'Options' );
@@ -588,16 +577,18 @@ test.describe( 'Widgets Customizer', () => {
 	test( 'preserves content in the Custom HTML block', async ( {
 		page,
 		widgetsCustomizerPage,
-		editor,
 	} ) => {
 		await widgetsCustomizerPage.visitCustomizerPage();
 		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
 
 		await widgetsCustomizerPage.addBlock( 'Custom HTML' );
-		const HTMLBlockTextarea = editor.canvas.locator(
-			'role=document[name="Block: Custom HTML"i] >> role=textbox[name="HTML"i]'
-		);
-		await HTMLBlockTextarea.type( 'hello' );
+		await page.getByRole( 'button', { name: 'Edit HTML' } ).click();
+		await page.getByRole( 'dialog' ).getByRole( 'textbox' ).click();
+		await page.keyboard.type( 'hello' );
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Update' } )
+			.click();
 
 		// Click Publish
 		await Promise.all( [
@@ -608,8 +599,13 @@ test.describe( 'Widgets Customizer', () => {
 		// reload
 		await widgetsCustomizerPage.visitCustomizerPage();
 		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
-
-		await expect( HTMLBlockTextarea ).toHaveText( 'hello' );
+		await page
+			.locator( 'role=document[name="Block: Custom HTML"i]' )
+			.click();
+		await page.getByRole( 'button', { name: 'Edit' } ).click();
+		await expect(
+			page.getByRole( 'dialog' ).getByRole( 'textbox' )
+		).toHaveText( 'hello' );
 	} );
 } );
 
@@ -619,11 +615,13 @@ class WidgetsCustomizerPage {
 	 * @param {Admin}     config.admin
 	 * @param {Page}      config.page
 	 * @param {PageUtils} config.pageUtils
+	 * @param {Editor}    config.editor
 	 */
-	constructor( { admin, page, pageUtils } ) {
+	constructor( { admin, page, pageUtils, editor } ) {
 		this.admin = admin;
 		this.page = page;
 		this.pageUtils = pageUtils;
+		this.editor = editor;
 
 		/** @type {FrameLocator} */
 		this.previewFrame = this.page
@@ -637,10 +635,8 @@ class WidgetsCustomizerPage {
 		await this.admin.visitAdminPage( 'customize.php' );
 
 		// Disable welcome guide.
-		await this.page.evaluate( () => {
-			window.wp.data
-				.dispatch( 'core/preferences' )
-				.set( 'core/customize-widgets', 'welcomeGuide', false );
+		await this.editor.setPreferences( 'core/customize-widgets', {
+			welcomeGuide: false,
 		} );
 	}
 
@@ -663,9 +659,7 @@ class WidgetsCustomizerPage {
 			'role=toolbar[name="Document tools"i] >> role=button[name="Add block"i]'
 		);
 
-		const searchBox = this.page.locator(
-			'role=searchbox[name="Search for blocks and patterns"i]'
-		);
+		const searchBox = this.page.locator( 'role=searchbox[name="Search"i]' );
 
 		// Clear the input.
 		await searchBox.evaluate( ( node ) => {

@@ -2,11 +2,12 @@
  * WordPress dependencies
  */
 import { renderToString } from '@wordpress/element';
-import { Button, Path, SVG, VisuallyHidden } from '@wordpress/components';
+import { Button, Path, SVG } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { applyFilters } from '@wordpress/hooks';
 import { store as coreStore } from '@wordpress/core-data';
+import { VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -99,6 +100,21 @@ function writeInterstitialMessage( targetDocument ) {
 	targetDocument.close();
 }
 
+/**
+ * Renders a button that opens a new window or tab for the preview,
+ * writes the interstitial message to this window, and then navigates
+ * to the actual preview link. The button is not rendered if the post
+ * is not viewable and disabled if the post is not saveable.
+ *
+ * @param {Object}   props                     The component props.
+ * @param {string}   props.className           The class name for the button.
+ * @param {string}   props.textContent         The text content for the button.
+ * @param {boolean}  props.forceIsAutosaveable Whether to force autosave.
+ * @param {string}   props.role                The role attribute for the button.
+ * @param {Function} props.onPreview           The callback function for preview event.
+ *
+ * @return {React.ReactNode} The rendered button component.
+ */
 export default function PostPreviewButton( {
 	className,
 	textContent,
@@ -114,13 +130,17 @@ export default function PostPreviewButton( {
 			const postType = core.getPostType(
 				editor.getCurrentPostType( 'type' )
 			);
+			const canView = postType?.viewable ?? false;
+			if ( ! canView ) {
+				return { isViewable: canView };
+			}
 
 			return {
 				postId: editor.getCurrentPostId(),
 				currentPostLink: editor.getCurrentPostAttribute( 'link' ),
 				previewLink: editor.getEditedPostPreviewLink(),
 				isSaveable: editor.isEditedPostSaveable(),
-				isViewable: postType?.viewable ?? false,
+				isViewable: canView,
 			};
 		}, [] );
 
@@ -168,14 +188,16 @@ export default function PostPreviewButton( {
 			className={ className || 'editor-post-preview' }
 			href={ href }
 			target={ targetId }
+			accessibleWhenDisabled
 			disabled={ ! isSaveable }
 			onClick={ openPreviewWindow }
 			role={ role }
+			size="compact"
 		>
 			{ textContent || (
 				<>
 					{ _x( 'Preview', 'imperative verb' ) }
-					<VisuallyHidden as="span">
+					<VisuallyHidden render={ <span /> }>
 						{
 							/* translators: accessibility text */
 							__( '(opens in a new tab)' )

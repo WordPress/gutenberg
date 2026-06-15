@@ -2,6 +2,150 @@
 
 ## Unreleased
 
+## 8.48.0 (2026-06-10)
+
+## 8.47.0 (2026-05-27)
+
+## 8.46.0 (2026-05-14)
+
+## 8.45.0 (2026-04-29)
+
+## 8.44.0 (2026-04-15)
+
+## 8.43.0 (2026-04-01)
+
+## 8.42.0 (2026-03-18)
+
+## 8.41.0 (2026-03-04)
+
+## 8.40.0 (2026-02-18)
+
+## 8.39.0 (2026-01-29)
+
+## 8.38.0 (2026-01-16)
+
+## 8.36.0 (2025-11-26)
+
+## 8.35.0 (2025-11-12)
+
+## 8.34.0 (2025-10-29)
+
+## 8.33.0 (2025-10-17)
+
+## 8.32.0 (2025-10-01)
+
+## 8.31.0 (2025-09-17)
+
+## 8.30.0 (2025-09-03)
+
+## 8.29.0 (2025-08-20)
+
+## 8.28.0 (2025-08-07)
+
+## 8.27.0 (2025-07-23)
+
+## 8.26.0 (2025-06-25)
+
+## 8.25.0 (2025-06-04)
+
+## 8.24.0 (2025-05-22)
+
+## 8.23.0 (2025-05-07)
+
+## 8.22.0 (2025-04-11)
+
+## 8.21.0 (2025-03-27)
+
+## 8.20.0 (2025-03-13)
+
+## 8.19.0 (2025-02-28)
+
+## 8.18.0 (2025-02-12)
+
+## 8.17.0 (2025-01-29)
+
+## 8.16.0 (2025-01-15)
+
+## 8.15.0 (2025-01-02)
+
+## 8.14.0 (2024-12-11)
+
+## 8.13.0 (2024-11-27)
+
+## 8.12.0 (2024-11-16)
+
+## 8.11.0 (2024-10-30)
+
+## 8.10.0 (2024-10-16)
+
+## 8.9.0 (2024-10-03)
+
+## 8.8.0 (2024-09-19)
+
+## 8.7.0 (2024-09-05)
+
+## 8.6.0 (2024-08-21)
+
+## 8.5.0 (2024-08-07)
+
+## 8.4.0 (2024-07-24)
+
+## 8.3.0 (2024-07-10)
+
+## 8.2.0 (2024-06-26)
+
+## 8.1.0 (2024-06-15)
+
+## 8.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 7.29.0 (2024-05-16)
+
+## 7.28.0 (2024-05-02)
+
+## 7.27.0 (2024-04-19)
+
+## 7.26.0 (2024-04-03)
+
+## 7.25.0 (2024-03-21)
+
+## 7.24.0 (2024-03-06)
+
+## 7.23.0 (2024-02-21)
+
+## 7.22.0 (2024-02-09)
+
+## 7.21.0 (2024-01-24)
+
+## 7.20.0 (2024-01-10)
+
+## 7.19.0 (2023-12-13)
+
+## 7.18.0 (2023-11-29)
+
+## 7.17.0 (2023-11-16)
+
+## 7.16.0 (2023-11-02)
+
+## 7.15.0 (2023-10-18)
+
+## 7.14.0 (2023-10-05)
+
+## 7.13.0 (2023-09-20)
+
+### Enhancements
+
+-   Improved error messages and codes printed on the console ([#53743](https://github.com/WordPress/gutenberg/pull/53743)).
+
+## 7.12.0 (2023-08-31)
+
+## 7.11.0 (2023-08-16)
+
+## 7.10.0 (2023-08-10)
+
 ## 7.9.0 (2023-07-20)
 
 ## 7.8.0 (2023-07-05)
@@ -24,7 +168,7 @@
 
 ### Breaking Changes
 
--  Started requiring Jest v29 instead of v27 as a peer dependency. See [breaking changes in Jest 28](https://jestjs.io/blog/2022/04/25/jest-28) and [in jest 29](https://jestjs.io/blog/2022/08/25/jest-29) ([#47388](https://github.com/WordPress/gutenberg/pull/47388))
+-   Started requiring Jest v29 instead of v27 as a peer dependency. See [breaking changes in Jest 28](https://jestjs.io/blog/2022/04/25/jest-28) and [in jest 29](https://jestjs.io/blog/2022/08/25/jest-29) ([#47388](https://github.com/WordPress/gutenberg/pull/47388))
 
 ## 6.11.0 (2023-03-01)
 
@@ -50,7 +194,7 @@
 
 ## 6.0.0 (2022-08-24)
 
-### Breaking Change
+### Breaking Changes
 
 -   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
 
@@ -100,12 +244,12 @@
 
 ## 1.0.7 (2018-05-18)
 
-### Polish
+### Internal
 
 -   Fix: Standardized `package.json` format ([#119](https://github.com/WordPress/packages/pull/119))
 
 ## 1.0.6 (2018-02-28)
 
-### Polish
+### Internal
 
 -   Removed `package-lock.json` file, lockfiles for apps, not packages ([#88](https://github.com/WordPress/packages/pull/88))
