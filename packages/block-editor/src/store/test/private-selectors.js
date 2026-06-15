@@ -138,6 +138,16 @@ describe( 'private selectors', () => {
 			);
 		} );
 
+		it( 'returns false when empty and insertion is disallowed via `allowedBlocks: false`', () => {
+			const state = createState( blockWithListViewSupport, {
+				allowedBlocks: false,
+			} );
+
+			expect( hasBlockListViewSupport( state, 'client-1' ) ).toBe(
+				false
+			);
+		} );
+
 		it( 'returns true when empty but insertion is allowed', () => {
 			// e.g. a static, still-empty gallery: nothing yet, but the user can
 			// start inserting, so its List View stays available.

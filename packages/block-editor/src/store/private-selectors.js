@@ -1086,9 +1086,9 @@ export function getListViewExpandRevision( state ) {
  * `listView` support and the `core/navigation` special case) shared by the List
  * View consumers. A `listView`-supporting block drops out when its List View
  * would be completely unusable — it has no inner blocks and disallows insertion
- * (`allowedBlocks: []`), so there is nothing to show, rearrange, or add — to
- * avoid bloating the UI. Keeping the read internal lets this computation evolve
- * without a back-compat commitment.
+ * (`allowedBlocks` is `[]` or `false`), so there is nothing to show, rearrange,
+ * or add — to avoid bloating the UI. Keeping the read internal lets this
+ * computation evolve without a back-compat commitment.
  *
  * @param {Object} state    Global application state.
  * @param {string} clientId Client ID of the block.
@@ -1109,9 +1109,12 @@ export function hasBlockListViewSupport( state, clientId ) {
 	}
 
 	// Hide the List View only when it would be completely unusable: the block
-	// has no inner blocks to view or rearrange, and disallows insertion
-	// (`allowedBlocks: []`), so it has no appender either. When insertion is
-	// allowed the List View still shows an appender, so it stays.
+	// has no inner blocks to view or rearrange, and disallows insertion, so it
+	// has no appender either. When insertion is allowed the List View still
+	// shows an appender, so it stays.
+	//
+	// Insertion is disallowed when `allowedBlocks` permits nothing — either an
+	// empty array (`allowedBlocks: []`) or the boolean `false`.
 	//
 	// `allowedBlocks` is used rather than inferring this from `templateLock`,
 	// because a content-locked ancestor relaxes a child's own
@@ -1121,10 +1124,11 @@ export function hasBlockListViewSupport( state, clientId ) {
 		state,
 		clientId
 	)?.allowedBlocks;
+	const disallowsInsertion =
+		allowedBlocks === false ||
+		( Array.isArray( allowedBlocks ) && allowedBlocks.length === 0 );
 	const isListViewUnusable =
-		getBlockOrder( state, clientId ).length === 0 &&
-		Array.isArray( allowedBlocks ) &&
-		allowedBlocks.length === 0;
+		getBlockOrder( state, clientId ).length === 0 && disallowsInsertion;
 
 	return ! isListViewUnusable;
 }
