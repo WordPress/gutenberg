@@ -15,14 +15,14 @@
 import { __ } from '@wordpress/i18n';
 
 /**
- * Internal dependencies
- */
-import { isAppleOS } from './platform';
-
-/**
  * External dependencies
  */
 import type { KeyboardEvent as ReactKeyboardEvent } from 'react';
+
+/**
+ * Internal dependencies
+ */
+import { isAppleOS } from './platform';
 
 export type WPModifierPart =
 	| typeof ALT
@@ -221,7 +221,7 @@ export const modifiers: WPModifierHandler< WPModifier > = {
 /**
  * An object that contains functions to get raw shortcuts.
  *
- * These are intended for user with the KeyboardShortcuts.
+ * These are intended for use with the KeyboardShortcuts.
  *
  * @example
  * ```js

@@ -18,16 +18,16 @@ import {
 import { __ } from '@wordpress/i18n';
 import { plugins } from '@wordpress/icons';
 import { Card, Icon, Stack, Notice, Text, VisuallyHidden } from '@wordpress/ui';
+import type { WidgetType } from '@wordpress/widget-primitives';
 
 /**
  * Internal dependencies
  */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { WidgetContextProvider } from '../../context/widget-context';
-import { WidgetRender } from '../widget-render';
+import { DashboardWidgetRender } from '../widget-render';
 import styles from './dashboard-widget-chrome.module.css';
 import type { DashboardWidget } from '../../types';
-import type { WidgetType } from '../../../widget-primitives';
 
 interface ErrorBoundaryProps {
 	children: ReactNode;
@@ -211,7 +211,10 @@ export const DashboardWidgetChrome = forwardRef<
 	const body = (
 		<WidgetErrorBoundary>
 			<Suspense fallback={ <LoadingOverlay /> }>
-				<WidgetRender widget={ widget } widgetType={ widgetType } />
+				<DashboardWidgetRender
+					widget={ widget }
+					widgetType={ widgetType }
+				/>
 			</Suspense>
 		</WidgetErrorBoundary>
 	);
@@ -223,7 +226,7 @@ export const DashboardWidgetChrome = forwardRef<
 				ref={ ref }
 				className={ clsx( styles.widgetChrome, className ) }
 				aria-labelledby={ widgetType.title ? titleId : undefined }
-				inert={ editMode || undefined }
+				inert={ editMode ? 'true' : undefined }
 			>
 				{ isHeaderHidden ? (
 					<VisuallyHidden>{ header }</VisuallyHidden>

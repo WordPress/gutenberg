@@ -1541,6 +1541,203 @@ test.describe( 'List (@firefox)', () => {
 		} );
 	} );
 
+	test.describe( 'should preserve a nested list when deleting a text selection across sibling list items', () => {
+		const start = {
+			name: 'core/list',
+			innerBlocks: [
+				{
+					name: 'core/list-item',
+					attributes: { content: 'ab' },
+				},
+				{
+					name: 'core/list-item',
+					attributes: { content: 'cd' },
+					innerBlocks: [
+						{
+							name: 'core/list',
+							innerBlocks: [
+								{
+									name: 'core/list-item',
+									attributes: { content: 'test' },
+								},
+							],
+						},
+					],
+				},
+			],
+		};
+		const end = [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'a‸d' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'test' },
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+		];
+
+		for ( const key of [ 'Backspace', 'Delete' ] ) {
+			test( key, async ( { editor, page, pageUtils } ) => {
+				await editor.canvas
+					.locator( 'role=button[name="Add default block"i]' )
+					.click();
+				await page.keyboard.type( '* ab' );
+				await page.keyboard.press( 'Enter' );
+				await page.keyboard.type( 'cd' );
+				await page.keyboard.press( 'Enter' );
+				// Leading space at the start of an empty item triggers indent.
+				await page.keyboard.type( ' test' );
+
+				// Verify setup: sibling items "ab" and "cd", the latter with a
+				// nested "test" item; caret at the end of "test".
+				await page.keyboard.type( '‸' );
+				await expect.poll( editor.getBlocks ).toMatchObject( [
+					{
+						...start,
+						innerBlocks: [
+							start.innerBlocks[ 0 ],
+							{
+								...start.innerBlocks[ 1 ],
+								innerBlocks: [
+									{
+										name: 'core/list',
+										innerBlocks: [
+											{
+												name: 'core/list-item',
+												attributes: {
+													content: 'test‸',
+												},
+											},
+										],
+									},
+								],
+							},
+						],
+					},
+				] );
+				await page.keyboard.press( 'Backspace' );
+
+				// Move up to the end of "cd" (the longer, more indented "test"
+				// line clamps the caret to the end of the shorter line above),
+				// then back one character to offset 1.
+				await page.keyboard.press( 'ArrowUp' );
+				await page.keyboard.press( 'ArrowLeft' );
+
+				// Extend the selection backward to offset 1 of "ab" (away from
+				// the nested list), then yield to an idle callback so the
+				// multi-block selection can catch up before deleting.
+				await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 3 } );
+				await page.evaluate(
+					() => new Promise( window.requestIdleCallback )
+				);
+
+				await page.keyboard.press( key );
+
+				await page.keyboard.type( '‸' );
+				await expect.poll( editor.getBlocks ).toMatchObject( end );
+			} );
+		}
+	} );
+
+	test.describe( 'should delete a nested list inside a text selection across sibling list items', () => {
+		// The nested "x" was inside the deleted range, so the merged item
+		// must have no inner blocks left.
+		const end = [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'a‸d' },
+						innerBlocks: [],
+					},
+				],
+			},
+		];
+
+		for ( const key of [ 'Backspace', 'Delete' ] ) {
+			test( key, async ( { editor, page, pageUtils } ) => {
+				await editor.canvas
+					.locator( 'role=button[name="Add default block"i]' )
+					.click();
+				await page.keyboard.type( '* ab' );
+				await page.keyboard.press( 'Enter' );
+				// Leading space at the start of an empty item triggers indent.
+				await page.keyboard.type( ' x' );
+				// Enter on an empty nested item outdents back to the top level.
+				await page.keyboard.press( 'Enter' );
+				await page.keyboard.press( 'Enter' );
+				await page.keyboard.type( 'cd' );
+
+				// Verify setup: "ab" with a nested "x" item, then sibling
+				// "cd" at the top level; caret at the end of "cd".
+				await page.keyboard.type( '‸' );
+				await expect.poll( editor.getBlocks ).toMatchObject( [
+					{
+						name: 'core/list',
+						innerBlocks: [
+							{
+								name: 'core/list-item',
+								attributes: { content: 'ab' },
+								innerBlocks: [
+									{
+										name: 'core/list',
+										innerBlocks: [
+											{
+												name: 'core/list-item',
+												attributes: { content: 'x' },
+											},
+										],
+									},
+								],
+							},
+							{
+								name: 'core/list-item',
+								attributes: { content: 'cd‸' },
+							},
+						],
+					},
+				] );
+				await page.keyboard.press( 'Backspace' );
+
+				// Navigate to the middle of "ab" (offset 1). ArrowUp from
+				// the end of a longer/more-indented line below clamps the
+				// caret to the end of the shorter line above, so two
+				// ArrowUps land at the end of "ab"; ArrowLeft then puts
+				// the caret between "a" and "b".
+				await page.keyboard.press( 'ArrowUp' );
+				await page.keyboard.press( 'ArrowUp' );
+				await page.keyboard.press( 'ArrowLeft' );
+
+				// Extend the selection forward two lines into "cd", then
+				// yield to an idle callback so the multi-block selection
+				// can catch up before deleting.
+				await pageUtils.pressKeys( 'shift+ArrowDown', { times: 2 } );
+				await page.evaluate(
+					() => new Promise( window.requestIdleCallback )
+				);
+
+				await page.keyboard.press( key );
+
+				await page.keyboard.type( '‸' );
+				await expect.poll( editor.getBlocks ).toMatchObject( end );
+			} );
+		}
+	} );
+
 	test( 'should merge a following paragraph into the outermost list with Delete from a nested item (#77245)', async ( {
 		editor,
 		page,

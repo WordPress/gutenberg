@@ -1,8 +1,8 @@
 .page {
 	display: flex;
 	height: 100%;
-	background-color: var(--wpds-color-bg-surface-neutral);
-	color: var(--wpds-color-fg-content-neutral);
+	background-color: var(--wpds-color-background-surface-neutral);
+	color: var(--wpds-color-foreground-content-neutral);
 	position: relative;
 	z-index: 1;
 	flex-flow: column;
@@ -12,7 +12,7 @@
 .header {
 	padding: var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-2xl);
 	border-block-end: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
-	background: var(--wpds-color-bg-surface-neutral-strong);
+	background: var(--wpds-color-background-surface-neutral-strong);
 	position: sticky;
 	inset-block-start: 0;
 	z-index: 1;
@@ -57,7 +57,7 @@
 
 .header-subtitle {
 	padding-block-end: var(--wpds-dimension-padding-xs);
-	color: var(--wpds-color-fg-content-neutral-weak);
+	color: var(--wpds-color-foreground-content-neutral-weak);
 }
 
 .content {

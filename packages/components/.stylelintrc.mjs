@@ -1,6 +1,6 @@
 /** @type {import('stylelint').Config} */
 export default {
-	extends: '../../.stylelintrc.js',
+	extends: '@wordpress/stylelint-tools/config',
 	rules: {
 		'declaration-property-value-disallowed-list': [
 			{
