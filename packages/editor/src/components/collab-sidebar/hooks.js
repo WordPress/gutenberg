@@ -19,8 +19,6 @@ import { store as noticesStore } from '@wordpress/notices';
 import { getScrollContainer } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as interfaceStore } from '@wordpress/interface';
-import { store as annotationsStore } from '@wordpress/annotations';
-import { RichTextData, applyFormat, create } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -37,6 +35,12 @@ import {
 	addNoteIdToMetadata,
 	removeNoteIdFromMetadata,
 } from './utils';
+import {
+	wrapInlineMarker,
+	readInlineSelection,
+	reconcileMarkerRemoval,
+	useAnnotateRanges,
+} from '../inline-markers';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
@@ -208,41 +212,6 @@ export function useNoteThreads( postId ) {
 }
 
 /**
- * Read an inline selection from block-editor selection state, returning
- * normalized anchor data when a non-collapsed selection sits inside a single
- * rich-text attribute. Returns null for block-level or collapsed selections.
- *
- * @param {Function} getSelectionStart Block-editor selector.
- * @param {Function} getSelectionEnd   Block-editor selector.
- * @return {?Object} { clientId, attributeKey, start, end } or null.
- */
-function readInlineSelection( getSelectionStart, getSelectionEnd ) {
-	const start = getSelectionStart();
-	const end = getSelectionEnd();
-	if (
-		! start?.clientId ||
-		start.clientId !== end.clientId ||
-		! start.attributeKey ||
-		start.offset === undefined ||
-		end.offset === undefined ||
-		start.offset === end.offset
-	) {
-		return null;
-	}
-	// Normalize direction so callers don't have to think about reversed ranges.
-	const [ startOffset, endOffset ] =
-		start.offset < end.offset
-			? [ start.offset, end.offset ]
-			: [ end.offset, start.offset ];
-	return {
-		clientId: start.clientId,
-		attributeKey: start.attributeKey,
-		start: startOffset,
-		end: endOffset,
-	};
-}
-
-/**
  * Wrap a rich-text range with a core/note marker. Returns a new
  * RichTextData ready to write back into block attributes, or null when the
  * incoming value isn't a rich-text instance (legacy/string attributes).
@@ -254,16 +223,12 @@ function readInlineSelection( getSelectionStart, getSelectionEnd ) {
  * @return {?RichTextData} Wrapped value or null when the attribute isn't rich text.
  */
 function wrapInlineNote( value, id, start, end ) {
-	if ( ! ( value instanceof RichTextData ) ) {
-		return null;
-	}
-	const record = applyFormat(
-		create( { html: value.toHTMLString() } ),
-		{ type: NOTE_FORMAT_NAME, attributes: { 'data-id': String( id ) } },
+	return wrapInlineMarker( value, {
+		formatType: NOTE_FORMAT_NAME,
+		attributes: { 'data-id': String( id ) },
 		start,
-		end
-	);
-	return new RichTextData( record );
+		end,
+	} );
 }
 
 export function useNoteActions() {
@@ -581,10 +546,6 @@ const NOTE_ANNOTATION_SOURCE = 'core-note';
  */
 export function useAnnotateBlocks( threads ) {
 	const { getBlockAttributes } = useSelect( blockEditorStore );
-	const {
-		__experimentalAddAnnotation,
-		__experimentalRemoveAnnotationsBySource,
-	} = useDispatch( annotationsStore );
 
 	const annotations = useMemo( () => {
 		if ( ! threads?.length ) {
@@ -633,27 +594,7 @@ export function useAnnotateBlocks( threads ) {
 		return out;
 	}, [ threads, getBlockAttributes ] );
 
-	useEffect( () => {
-		if ( annotations.length === 0 ) {
-			return;
-		}
-		for ( const a of annotations ) {
-			__experimentalAddAnnotation( {
-				id: a.id,
-				source: NOTE_ANNOTATION_SOURCE,
-				blockClientId: a.clientId,
-				richTextIdentifier: a.attributeKey,
-				range: { start: a.start, end: a.end },
-			} );
-		}
-		return () => {
-			__experimentalRemoveAnnotationsBySource( NOTE_ANNOTATION_SOURCE );
-		};
-	}, [
-		annotations,
-		__experimentalAddAnnotation,
-		__experimentalRemoveAnnotationsBySource,
-	] );
+	useAnnotateRanges( NOTE_ANNOTATION_SOURCE, annotations );
 }
 
 /**
@@ -683,16 +624,13 @@ export function reconcileInlineNoteMarker( thread, attributes, anchored ) {
 		! thread?.blockClientId ||
 		! attributes
 	) {
-		return 'skip';
+		return reconcileMarkerRemoval( null, thread?.id, anchored );
 	}
 	const present = !! findNoteRange(
 		attributes[ selection.attributeKey ],
 		thread.id
 	);
-	if ( present ) {
-		return 'anchor';
-	}
-	return anchored.has( thread.id ) ? 'delete' : 'skip';
+	return reconcileMarkerRemoval( present, thread.id, anchored );
 }
 
 /**
