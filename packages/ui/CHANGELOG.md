@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   `Field.Description`: Apply `text-wrap: pretty` to description text to avoid typographic widows ([#79143](https://github.com/WordPress/gutenberg/pull/79143)).
+-   `Autocomplete`: Add `Autocomplete.Group` and `Autocomplete.GroupLabel` subcomponents ([#78901](https://github.com/WordPress/gutenberg/pull/78901)).
 
 ### Code Quality
 
