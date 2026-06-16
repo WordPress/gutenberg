@@ -55,7 +55,7 @@ export default function InspectorControlsFill( {
 
 	// During pattern editing:
 	// - All blocks can show pattern editing groups (content, list).
-	// - Template parts can show a settings tab (default, settings, advanced groups).
+	// - Template parts can show any inspector group.
 	// - Other blocks cannot show a settings tab.
 	if ( context[ mayDisplayPatternEditingControlsKey ] ) {
 		// Template parts have also historically supported

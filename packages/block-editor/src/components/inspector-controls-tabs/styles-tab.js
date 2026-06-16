@@ -81,7 +81,7 @@ const StylesTab = ( {
 			) }
 			{
 				// Extenders have in the past always been allowed to add controls to group
-				// the restrictions are lessended for that block.
+				// the restrictions are lessened for that block.
 			 }
 			{ ( ! isSectionBlock || blockName === 'core/template-part' ) && (
 				<>
