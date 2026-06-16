@@ -34,7 +34,9 @@ export function TemplateItemTitle( {
 			<span className="routes-post-list__template-title-content">
 				{ children }
 			</span>
-			<TemplateItemBadge>{ badgeLabel }</TemplateItemBadge>
+			{ !! badgeLabel && (
+				<TemplateItemBadge>{ badgeLabel }</TemplateItemBadge>
+			) }
 		</span>
 	);
 }

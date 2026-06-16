@@ -13,6 +13,7 @@ import type {
 } from '@wordpress/dataviews';
 
 export const TEMPLATE_PAGE_ITEM_ID_PREFIX = 'template:';
+export const TEMPLATE_PLACEHOLDER_ITEM_ID_PREFIX = 'template-placeholder:';
 
 const DEFAULT_VIEW: View = {
 	type: 'table' as const,
@@ -106,6 +107,18 @@ export function getTemplateIdFromPageItemId( itemId: string ) {
 	}
 
 	return itemId.slice( TEMPLATE_PAGE_ITEM_ID_PREFIX.length );
+}
+
+export function getTemplatePlaceholderItemId( templateSlug: string ) {
+	return `${ TEMPLATE_PLACEHOLDER_ITEM_ID_PREFIX }${ templateSlug }`;
+}
+
+export function getTemplateSlugFromPlaceholderItemId( itemId: string ) {
+	if ( ! itemId.startsWith( TEMPLATE_PLACEHOLDER_ITEM_ID_PREFIX ) ) {
+		return undefined;
+	}
+
+	return itemId.slice( TEMPLATE_PLACEHOLDER_ITEM_ID_PREFIX.length );
 }
 
 export function getDefaultView( postType: Type | undefined ): View {

@@ -23,6 +23,13 @@ import { unlock } from '../../../lock-unlock';
 // @ts-ignore
 import { store as editorStore } from '../../../store';
 
+type EditorSettings = Record< string, unknown > & {
+	styles?: Array< {
+		isGlobalStyles?: boolean;
+		[ key: string ]: unknown;
+	} >;
+};
+
 function PostPreviewContainer( {
 	template,
 	post,
@@ -72,7 +79,9 @@ export default function PostPreviewView( { item }: { item: BasePost } ) {
 				kind: 'postType',
 				name: 'wp_template',
 			} );
-			const _settings = select( editorStore ).getEditorSettings();
+			const _settings = select(
+				editorStore
+			).getEditorSettings() as EditorSettings;
 			const isViewable = getPostType( item.type )?.viewable ?? false;
 
 			const templateId =
@@ -89,8 +98,8 @@ export default function PostPreviewView( { item }: { item: BasePost } ) {
 		[ item.type, item.id ]
 	);
 	const previewSettings = useMemo( () => {
-		const nonGlobalStyles = Object.values( settings?.styles ?? [] ).filter(
-			( style: any ) => ! style.isGlobalStyles
+		const nonGlobalStyles = ( settings?.styles ?? [] ).filter(
+			( style ) => ! style.isGlobalStyles
 		);
 
 		return {

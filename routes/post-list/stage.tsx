@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { dequal } from 'dequal';
 import type { ComponentType } from 'react';
 
 /**
@@ -251,38 +250,6 @@ function PostList() {
 			invalidate();
 		}
 	};
-	const onChangeSharedLayoutView = useCallback(
-		( newView: View ) => {
-			updateView( {
-				...view,
-				type: newView.type,
-				layout: newView.layout,
-			} );
-
-			if ( newView.type !== view.type ) {
-				invalidate();
-			}
-		},
-		[ invalidate, updateView, view ]
-	);
-	const isSharedLayoutModified = useMemo(
-		() =>
-			view.type !== defaultView.type ||
-			! dequal( view.layout, defaultView.layout ),
-		[ defaultView.layout, defaultView.type, view.layout, view.type ]
-	);
-	const resetSharedLayoutView = useCallback( () => {
-		updateView( {
-			...view,
-			type: defaultView.type,
-			layout: defaultView.layout,
-		} );
-
-		if ( view.type !== defaultView.type ) {
-			invalidate();
-		}
-	}, [ defaultView.layout, defaultView.type, invalidate, updateView, view ] );
-
 	const postTypeQuery = useMemo(
 		() => viewToQuery( view, postType ),
 		[ view, postType ]
@@ -746,13 +713,7 @@ function PostList() {
 					</Notice>
 				) }
 			{ activeContentTab === 'templates' ? (
-				<PostTypeTemplatesTab
-					postType={ postType }
-					sharedView={ view }
-					onChangeSharedView={ onChangeSharedLayoutView }
-					isSharedViewModified={ isSharedLayoutModified }
-					resetSharedView={ resetSharedLayoutView }
-				/>
+				<PostTypeTemplatesTab postType={ postType } />
 			) : (
 				<DataViews
 					data={ displayedPosts || [] }

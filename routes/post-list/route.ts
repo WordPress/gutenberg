@@ -9,12 +9,106 @@ import { notFound } from '@wordpress/route';
  * Internal dependencies
  */
 import {
-	ensureTemplateView,
 	ensureView,
 	getTemplateIdFromPageItemId,
-	templateViewToQuery,
+	getTemplateSlugFromPlaceholderItemId,
 	viewToQuery,
 } from './view-utils';
+
+function getFirstPostId( postIds?: string[] | string ) {
+	if ( Array.isArray( postIds ) ) {
+		return postIds[ 0 ];
+	}
+
+	return postIds;
+}
+
+type PostTypeObject = {
+	has_archive?: boolean;
+};
+
+type TemplateSlotKind = 'archive' | 'single';
+
+type TemplateSlot = {
+	kind: TemplateSlotKind;
+	slug: string;
+};
+
+type TemplateRecord = {
+	id: string | number;
+	slug?: string;
+	post_types?: string[];
+	postTypes?: string[];
+	site_editor_template_context?: {
+		post_type?: string;
+		slot?: TemplateSlotKind | null;
+		canonical_slug?: string | null;
+		is_active_slot?: boolean;
+	} | null;
+};
+
+function getPreferredTemplateSlot(
+	postType: string,
+	postTypeObject?: PostTypeObject
+): TemplateSlot | undefined {
+	if ( postType === 'page' ) {
+		return undefined;
+	}
+
+	if ( postType === 'post' ) {
+		return {
+			kind: 'archive',
+			slug: 'home',
+		};
+	}
+
+	if ( postTypeObject?.has_archive ) {
+		return {
+			kind: 'archive',
+			slug: `archive-${ postType }`,
+		};
+	}
+
+	return {
+		kind: 'single',
+		slug: `single-${ postType }`,
+	};
+}
+
+function isTemplateForSlot(
+	record: TemplateRecord,
+	postType: string,
+	slot: TemplateSlot
+) {
+	const context = record.site_editor_template_context;
+	return (
+		context?.post_type === postType &&
+		context?.is_active_slot &&
+		context?.slot === slot.kind &&
+		context?.canonical_slug === slot.slug
+	);
+}
+
+function isPageTemplate( record: TemplateRecord ) {
+	return (
+		record.post_types?.includes( 'page' ) ||
+		record.postTypes?.includes( 'page' ) ||
+		record.slug === 'page' ||
+		!! record.slug?.startsWith( 'page-' )
+	);
+}
+
+function getTemplateCanvas( templateId: string | number, editLink?: string ) {
+	const postId = String( templateId );
+	return {
+		postType: 'wp_template',
+		postId,
+		isPreview: true,
+		editLink:
+			editLink ??
+			`/types/wp_template/edit/${ encodeURIComponent( postId ) }`,
+	};
+}
 
 /**
  * Route configuration for post list.
@@ -47,55 +141,86 @@ export const route = {
 		search: {
 			page?: number;
 			search?: string;
-			postIds?: string[];
+			postIds?: string[] | string;
 			content?: string;
 		};
 	} ) {
 		const { params, search } = context;
 
 		if ( search.content === 'templates' ) {
-			const sharedView = await ensureView( params.type, params.slug, {
-				page: search.page,
-				search: search.search,
-			} );
-			const templateView = await ensureTemplateView( params.type, {
-				page: search.page,
-				search: search.search,
-			} );
+			const selectedTemplateId = getFirstPostId( search.postIds );
+			if ( selectedTemplateId ) {
+				const templateId = selectedTemplateId.toString();
+				const placeholderTemplateSlug =
+					getTemplateSlugFromPlaceholderItemId( templateId );
 
-			if ( sharedView.type !== 'list' ) {
+				if ( placeholderTemplateSlug ) {
+					const fallbackTemplateId = await resolveSelect(
+						coreStore
+					).getDefaultTemplateId( {
+						slug: placeholderTemplateSlug,
+					} );
+
+					if ( ! fallbackTemplateId ) {
+						return undefined;
+					}
+
+					return getTemplateCanvas(
+						fallbackTemplateId,
+						`/types/${ encodeURIComponent(
+							params.type
+						) }/list/${ encodeURIComponent(
+							params.slug
+						) }?content=templates&postIds=${ encodeURIComponent(
+							templateId
+						) }&createTemplate=${ encodeURIComponent(
+							placeholderTemplateSlug
+						) }`
+					);
+				}
+
+				return getTemplateCanvas( templateId );
+			}
+
+			const templates = ( await resolveSelect(
+				coreStore
+			).getEntityRecords( 'postType', 'wp_template', {
+				per_page: -1,
+				post_type: params.type,
+			} ) ) as TemplateRecord[] | undefined;
+
+			if ( params.type === 'page' ) {
+				const pageTemplate = templates?.find( isPageTemplate );
+				if ( pageTemplate ) {
+					return getTemplateCanvas( pageTemplate.id );
+				}
+
 				return undefined;
 			}
 
-			if ( search.postIds && search.postIds.length > 0 ) {
-				const templateId = search.postIds[ 0 ].toString();
-				return {
-					postType: 'wp_template',
-					postId: templateId,
-					isPreview: true,
-					editLink: `/types/wp_template/edit/${ encodeURIComponent(
-						templateId
-					) }`,
-				};
+			const postTypeObject = await resolveSelect( coreStore ).getPostType(
+				params.type
+			);
+			const preferredSlot = getPreferredTemplateSlot(
+				params.type,
+				postTypeObject
+			);
+			if ( ! preferredSlot ) {
+				return undefined;
 			}
 
-			const query = templateViewToQuery( templateView, params.type );
-			const templates = await resolveSelect( coreStore ).getEntityRecords(
-				'postType',
-				'wp_template',
-				{ ...query, per_page: 1 }
+			const slotTemplate = templates?.find( ( template ) =>
+				isTemplateForSlot( template, params.type, preferredSlot )
 			);
+			if ( slotTemplate ) {
+				return getTemplateCanvas( slotTemplate.id );
+			}
 
-			if ( templates && templates.length > 0 ) {
-				const templateId = ( templates[ 0 ] as any ).id.toString();
-				return {
-					postType: 'wp_template',
-					postId: templateId,
-					isPreview: true,
-					editLink: `/types/wp_template/edit/${ encodeURIComponent(
-						templateId
-					) }`,
-				};
+			const fallbackTemplateId = await resolveSelect(
+				coreStore
+			).getDefaultTemplateId( { slug: preferredSlot.slug } );
+			if ( fallbackTemplateId ) {
+				return getTemplateCanvas( fallbackTemplateId );
 			}
 
 			return undefined;
@@ -113,8 +238,9 @@ export const route = {
 		}
 
 		// Check if postId is provided in query params
-		if ( search.postIds && search.postIds.length > 0 ) {
-			const postId = search.postIds[ 0 ].toString();
+		const selectedPostId = getFirstPostId( search.postIds );
+		if ( selectedPostId ) {
+			const postId = selectedPostId.toString();
 			const templateId = getTemplateIdFromPageItemId( postId );
 			if ( templateId ) {
 				return {

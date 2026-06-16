@@ -119,6 +119,9 @@ interface PostTypeRecord {
 	slug: string;
 	rest_base?: string;
 	viewable?: boolean;
+	visibility?: {
+		public?: boolean;
+	};
 	labels?: {
 		name?: string;
 		singular_name?: string;
@@ -401,6 +404,7 @@ function isContentPostType( postType: PostTypeRecord ) {
 		!! postType?.slug &&
 		! excluded.has( postType.slug ) &&
 		! postType.slug.startsWith( 'wp_' ) &&
+		postType.visibility?.public !== false &&
 		postType.viewable !== false
 	);
 }

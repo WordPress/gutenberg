@@ -41,6 +41,7 @@ function gutenberg_site_editor_get_content_post_types() {
 
 	$post_types = get_post_types(
 		array(
+			'public'       => true,
 			'show_in_rest' => true,
 			'show_ui'      => true,
 		),
@@ -275,6 +276,259 @@ function gutenberg_site_editor_register_preview_link_endpoint() {
 	);
 }
 add_action( 'rest_api_init', 'gutenberg_site_editor_register_preview_link_endpoint' );
+
+/**
+ * Normalize template and post type text for conservative template-slot matching.
+ *
+ * @param string $value Text to normalize.
+ * @return string Normalized text.
+ */
+function gutenberg_site_editor_normalize_template_match_text( $value ) {
+	$value = strtolower( wp_strip_all_tags( (string) $value ) );
+	$value = preg_replace( '/[_-]+/', ' ', $value );
+	$value = preg_replace( '/[^a-z0-9]+/', ' ', $value );
+	return trim( $value );
+}
+
+/**
+ * Get normalized terms that can identify a post type in a template title/slug.
+ *
+ * @param WP_Post_Type $post_type Post type object.
+ * @return string[] Terms.
+ */
+function gutenberg_site_editor_get_post_type_template_match_terms( $post_type ) {
+	$candidates = array(
+		$post_type->name,
+		str_replace( array( '_', '-' ), ' ', $post_type->name ),
+		$post_type->label,
+		$post_type->labels->name ?? '',
+		$post_type->labels->singular_name ?? '',
+		$post_type->labels->menu_name ?? '',
+	);
+	$terms      = array();
+
+	foreach ( $candidates as $candidate ) {
+		$normalized_candidate = gutenberg_site_editor_normalize_template_match_text( $candidate );
+		foreach ( preg_split( '/\s+/', $normalized_candidate ) as $term ) {
+			if ( strlen( $term ) <= 2 ) {
+				continue;
+			}
+
+			$terms[ $term ] = true;
+			if ( strlen( $term ) > 3 && str_ends_with( $term, 's' ) ) {
+				$terms[ substr( $term, 0, -1 ) ] = true;
+			}
+		}
+	}
+
+	return array_keys( $terms );
+}
+
+/**
+ * Get the normalized text used to classify a template.
+ *
+ * @param array $template REST template response object.
+ * @return string Normalized text.
+ */
+function gutenberg_site_editor_get_template_match_text( $template ) {
+	$title = '';
+	if ( isset( $template['title']['rendered'] ) ) {
+		$title = $template['title']['rendered'];
+	} elseif ( isset( $template['title'] ) && is_string( $template['title'] ) ) {
+		$title = $template['title'];
+	}
+
+	return gutenberg_site_editor_normalize_template_match_text(
+		implode(
+			' ',
+			array(
+				$template['slug'] ?? '',
+				$title,
+				$template['description'] ?? '',
+			)
+		)
+	);
+}
+
+/**
+ * Determine whether normalized template text contains any of the supplied terms.
+ *
+ * @param string   $text Normalized template text.
+ * @param string[] $terms Terms.
+ * @return bool Whether the text contains any term.
+ */
+function gutenberg_site_editor_template_text_contains_any_term( $text, $terms ) {
+	$text_terms = preg_split( '/\s+/', $text );
+
+	foreach ( $terms as $term ) {
+		if ( in_array( $term, $text_terms, true ) ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/**
+ * Get template slots for a post type in the Content templates tab.
+ *
+ * @param WP_Post_Type $post_type Post type object.
+ * @return array[] Slots.
+ */
+function gutenberg_site_editor_get_template_slots_for_post_type( $post_type ) {
+	if ( 'page' === $post_type->name ) {
+		return array();
+	}
+
+	$slots = array();
+
+	if ( 'post' === $post_type->name ) {
+		$slots[] = array(
+			'kind'                  => 'archive',
+			'canonical_slug'        => 'home',
+			'active_fallback_slugs' => array(),
+		);
+		$slots[] = array(
+			'kind'                  => 'single',
+			'canonical_slug'        => 'single-post',
+			'active_fallback_slugs' => array( 'single' ),
+		);
+		return $slots;
+	}
+
+	if ( $post_type->has_archive ) {
+		$slots[] = array(
+			'kind'                  => 'archive',
+			'canonical_slug'        => 'archive-' . $post_type->name,
+			'active_fallback_slugs' => array(),
+		);
+	}
+
+	$slots[] = array(
+		'kind'                  => 'single',
+		'canonical_slug'        => 'single-' . $post_type->name,
+		'active_fallback_slugs' => array(),
+	);
+
+	return $slots;
+}
+
+/**
+ * Determine whether a template response represents a slot for the requested post type.
+ *
+ * @param array           $template  REST template response object.
+ * @param array           $slot      Template slot.
+ * @param WP_Post_Type    $post_type Requested post type object.
+ * @param string|string[] $post_types Template post type support, if known.
+ * @return bool Whether the template matches the slot.
+ */
+function gutenberg_site_editor_template_matches_slot( $template, $slot, $post_type, $post_types ) {
+	$slug = $template['slug'] ?? '';
+	if ( $slug === $slot['canonical_slug'] || in_array( $slug, $slot['active_fallback_slugs'], true ) ) {
+		return true;
+	}
+
+	if ( is_string( $post_types ) ) {
+		$post_types = array( $post_types );
+	}
+
+	$text              = gutenberg_site_editor_get_template_match_text( $template );
+	$matches_slot      = 'archive' === $slot['kind']
+		? gutenberg_site_editor_template_text_contains_any_term( $text, array( 'archive', 'listing', 'list' ) )
+		: gutenberg_site_editor_template_text_contains_any_term( $text, array( 'single', 'detail', 'item' ) );
+	$matches_post_type = gutenberg_site_editor_template_text_contains_any_term(
+		$text,
+		gutenberg_site_editor_get_post_type_template_match_terms( $post_type )
+	);
+
+	if ( is_array( $post_types ) && in_array( $post_type->name, $post_types, true ) ) {
+		return $matches_slot;
+	}
+
+	// Plugin or alternate template namespaces sometimes save wp_template posts
+	// without post type metadata. Only infer these when both the post type and
+	// slot intent are present in the template label/slug/description.
+	$is_external_template_namespace = ! empty( $template['theme'] ) && get_stylesheet() !== $template['theme'];
+
+	return $is_external_template_namespace && $matches_post_type && $matches_slot;
+}
+
+/**
+ * Register Content template context on wp_template responses.
+ */
+function gutenberg_site_editor_register_template_context_rest_field() {
+	register_rest_field(
+		'wp_template',
+		'site_editor_template_context',
+		array(
+			'get_callback' => function ( $template, $field_name, $request ) {
+				$post_type_name = $request['post_type'];
+				if ( ! $post_type_name ) {
+					return null;
+				}
+
+				$post_type = get_post_type_object( $post_type_name );
+				if ( ! $post_type ) {
+					return null;
+				}
+
+				$post_types = $template['post_types'] ?? ( $template['postTypes'] ?? null );
+				foreach ( gutenberg_site_editor_get_template_slots_for_post_type( $post_type ) as $slot ) {
+					if ( ! gutenberg_site_editor_template_matches_slot( $template, $slot, $post_type, $post_types ) ) {
+						continue;
+					}
+
+					$slug = $template['slug'] ?? '';
+					return array(
+						'post_type'          => $post_type_name,
+						'slot'               => $slot['kind'],
+						'canonical_slug'     => $slot['canonical_slug'],
+						'is_specific'        => $slug === $slot['canonical_slug'],
+						'is_active_slot'     => true,
+						'is_active_fallback' => in_array( $slug, $slot['active_fallback_slugs'], true ),
+					);
+				}
+
+				return array(
+					'post_type'          => $post_type_name,
+					'slot'               => null,
+					'canonical_slug'     => null,
+					'is_specific'        => false,
+					'is_active_slot'     => false,
+					'is_active_fallback' => false,
+				);
+			},
+			'schema'       => array(
+				'description' => __( 'Content template context for the Extensible Site Editor.', 'gutenberg' ),
+				'type'        => array( 'object', 'null' ),
+				'context'     => array( 'view', 'edit' ),
+				'readonly'    => true,
+				'properties'  => array(
+					'post_type'          => array(
+						'type' => 'string',
+					),
+					'slot'               => array(
+						'type' => array( 'string', 'null' ),
+						'enum' => array( 'archive', 'single', null ),
+					),
+					'canonical_slug'     => array(
+						'type' => array( 'string', 'null' ),
+					),
+					'is_specific'        => array(
+						'type' => 'boolean',
+					),
+					'is_active_slot'     => array(
+						'type' => 'boolean',
+					),
+					'is_active_fallback' => array(
+						'type' => 'boolean',
+					),
+				),
+			),
+		)
+	);
+}
+add_action( 'rest_api_init', 'gutenberg_site_editor_register_template_context_rest_field' );
 
 /**
  * Register default menu items for the site editor page.
