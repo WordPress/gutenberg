@@ -21,15 +21,25 @@ import {
 	store as coreStore,
 	privateApis as coreDataPrivateApis,
 } from '@wordpress/core-data';
-import { Button, DropdownMenu, MenuItem, Notice } from '@wordpress/components';
+import {
+	Button as ComponentsButton,
+	DropdownMenu,
+	MenuItem,
+	Notice,
+} from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useMemo, useCallback, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
-import { __ } from '@wordpress/i18n';
-import { drawerRight, moreVertical } from '@wordpress/icons';
+import { __, sprintf } from '@wordpress/i18n';
+import {
+	drawerRight,
+	moreVertical,
+	page as pageIcon,
+	post as postIcon,
+} from '@wordpress/icons';
 import type { Post, WpTemplate } from '@wordpress/core-data';
 import { unlock } from '@wordpress/routes-lock-unlock';
-import { Tabs } from '@wordpress/ui';
+import { EmptyState, Tabs } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -89,6 +99,22 @@ function getItemId( item: PageListItem ) {
 
 function getItemLevel( item: PageListItem ) {
 	return ( item as { level?: number } ).level ?? 0;
+}
+
+function getPostTypeRecordsExistenceQuery( postType: string ) {
+	return {
+		_fields: 'id',
+		page: 1,
+		per_page: 1,
+		status:
+			postType === 'attachment'
+				? 'inherit'
+				: 'draft,future,pending,private,publish',
+	};
+}
+
+function capitalizeFirstLetter( value: string ) {
+	return value.charAt( 0 ).toLocaleUpperCase() + value.slice( 1 );
 }
 
 function PostList() {
@@ -261,6 +287,18 @@ function PostList() {
 		isResolving,
 		hasResolved,
 	} = useEntityRecordsWithPermissions( 'postType', postType, postTypeQuery );
+	const postTypeRecordsExistenceQuery = useMemo(
+		() => getPostTypeRecordsExistenceQuery( postType ),
+		[ postType ]
+	);
+	const {
+		totalItems: totalExistingRecords,
+		hasResolved: hasResolvedExistingRecords,
+	} = useEntityRecordsWithPermissions(
+		'postType',
+		postType,
+		postTypeRecordsExistenceQuery
+	);
 	const displayedPosts = useMemo( () => {
 		if ( postType !== 'page' ) {
 			return posts;
@@ -553,6 +591,17 @@ function PostList() {
 		return _actions;
 	}, [ quickEditAction, postTypeActions, view.type ] );
 
+	const openAddNewFlow = useCallback( () => {
+		if ( postType === 'page' ) {
+			setIsAddingPage( true );
+			return;
+		}
+
+		navigate( {
+			to: `/types/${ postType }/new`,
+		} );
+	}, [ navigate, postType ] );
+
 	const handleContentTabChange = useCallback(
 		( contentTab: string ) => {
 			navigate( {
@@ -604,14 +653,14 @@ function PostList() {
 	const pageHeaderActions = (
 		<>
 			{ labels?.add_new_item && canCreateRecord && (
-				<Button
+				<ComponentsButton
 					variant="primary"
-					onClick={ () => setIsAddingPage( true ) }
+					onClick={ openAddNewFlow }
 					size="compact"
 					__next40pxDefaultSize
 				>
 					{ labels.add_new_item }
-				</Button>
+				</ComponentsButton>
 			) }
 			<DropdownMenu
 				icon={ moreVertical }
@@ -653,19 +702,70 @@ function PostList() {
 			: labels?.add_new_item &&
 			  canCreateRecord &&
 			  postType !== 'attachment' && (
-					<Button
+					<ComponentsButton
 						variant="primary"
-						onClick={ () => {
-							navigate( {
-								to: `/types/${ postType }/new`,
-							} );
-						} }
+						onClick={ openAddNewFlow }
 						size="compact"
 						__next40pxDefaultSize
 					>
 						{ labels.add_new_item }
-					</Button>
+					</ComponentsButton>
 			  );
+	const postTypePluralLabel =
+		labels?.name || postTypeObject.labels?.name || postType;
+	const postTypeSingularLabel =
+		labels?.singular_name ||
+		postTypeObject.labels?.singular_name ||
+		postTypePluralLabel;
+	const postTypePluralLabelCapitalized =
+		capitalizeFirstLetter( postTypePluralLabel );
+	const postTypeSingularLabelCapitalized = capitalizeFirstLetter(
+		postTypeSingularLabel
+	);
+	const hasNoExistingRecords =
+		hasResolvedExistingRecords && totalExistingRecords === 0;
+	const emptyState = hasNoExistingRecords ? (
+		<EmptyState.Root>
+			<EmptyState.Icon
+				icon={ postType === 'page' ? pageIcon : postIcon }
+			/>
+			<EmptyState.Title>
+				{ sprintf(
+					// translators: %s: Post type plural label, e.g. "posts", "pages", or "products".
+					__( 'No %s yet' ),
+					postTypePluralLabelCapitalized
+				) }
+			</EmptyState.Title>
+			<EmptyState.Description>
+				{ canCreateRecord
+					? sprintf(
+							// translators: %s: Post type singular label, e.g. "post", "page", or "product".
+							__(
+								'Create your first %s to start adding content here.'
+							),
+							postTypeSingularLabelCapitalized
+					  )
+					: sprintf(
+							// translators: %s: Post type plural label, e.g. "posts", "pages", or "products".
+							__( 'There are currently no %s to display.' ),
+							postTypePluralLabelCapitalized
+					  ) }
+			</EmptyState.Description>
+			{ labels?.add_new_item &&
+				canCreateRecord &&
+				postType !== 'attachment' && (
+					<EmptyState.Actions>
+						<ComponentsButton
+							variant="primary"
+							onClick={ openAddNewFlow }
+							__next40pxDefaultSize
+						>
+							{ labels.add_new_item }
+						</ComponentsButton>
+					</EmptyState.Actions>
+				) }
+		</EmptyState.Root>
+	) : undefined;
 
 	return (
 		<Page
@@ -704,12 +804,12 @@ function PostList() {
 						{ __(
 							'Your homepage is currently set to show your latest posts. WordPress generates that page automatically using the active homepage template.'
 						) }
-						<Button
+						<ComponentsButton
 							variant="link"
 							onClick={ () => setIsConfiguringHomepage( true ) }
 						>
 							{ __( 'Configure Homepage' ) }
-						</Button>
+						</ComponentsButton>
 					</Notice>
 				) }
 			{ activeContentTab === 'templates' ? (
@@ -732,6 +832,7 @@ function PostList() {
 								: totalPages,
 					} }
 					defaultLayouts={ DEFAULT_LAYOUTS }
+					empty={ emptyState }
 					getItemId={ getItemId }
 					getItemLevel={ getItemLevel }
 					selection={ selection }
