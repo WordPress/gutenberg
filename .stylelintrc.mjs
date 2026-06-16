@@ -1,5 +1,7 @@
-/** @type {import('stylelint').Config} */
+import { createRequire } from 'module';
+
+const require = createRequire( import.meta.url );
+
 export default {
-	extends: '@wordpress/stylelint-tools/config',
-	reportDescriptionlessDisables: true,
+	extends: require.resolve( '@wordpress/stylelint-tools/config' ),
 };
