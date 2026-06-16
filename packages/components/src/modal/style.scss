@@ -217,7 +217,7 @@
 	}
 
 	.components-modal__content.has-scrolled-content:not(.hide-header) & {
-		border-bottom-color: var(--wpds-color-stroke-surface-neutral);
+		border-bottom-color: $gray-300;
 	}
 
 	& + p {

@@ -84,7 +84,6 @@ export const colorIndicatorBorder = ( border?: Border ) => {
 	const { color, style } = border || {};
 
 	const fallbackColor =
-		// TODO: should use the `--wpds-color-stroke-interactive-neutral` token when refactored to SCSS modules
 		!! style && style !== 'none' ? COLORS.gray[ 300 ] : undefined;
 
 	return css`
