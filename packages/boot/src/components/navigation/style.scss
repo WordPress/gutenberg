@@ -1,0 +1,16 @@
+@use "@wordpress/base-styles/variables";
+
+.boot-navigation__root-list {
+	display: flex;
+	flex-direction: column;
+	flex: 1 1 auto;
+	min-height: 0;
+	box-sizing: border-box;
+	padding-block-end: variables.$grid-unit-15;
+}
+
+.boot-navigation__pinned-root-items {
+	border-top: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
+	margin-block-start: auto;
+	padding-block-start: variables.$grid-unit-10;
+}

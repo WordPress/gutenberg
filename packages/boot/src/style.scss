@@ -3,6 +3,8 @@
 @use "@wordpress/base-styles/variables" as *;
 @use "./components/canvas/style.scss" as *;
 @use "./components/configure-homepage-modal/style.scss" as *;
+@use "./components/navigation/style.scss" as *;
+@use "./components/sidebar/style.scss" as *;
 
 .boot-layout-container .boot-layout {
 	// On mobile the main content area has to scroll, otherwise you can invoke

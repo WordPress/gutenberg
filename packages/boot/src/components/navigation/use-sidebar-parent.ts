@@ -21,6 +21,22 @@ import {
 	findDropdownParent,
 	findClosestMenuItem,
 } from './path-matching';
+import { ROOT_NAVIGATION_PARENT } from './use-sidebar-navigation-layout';
+
+function resolveParentId(
+	defaultParentId: string | undefined,
+	customParentId: string | undefined
+) {
+	if ( customParentId === undefined ) {
+		return defaultParentId;
+	}
+
+	if ( customParentId === ROOT_NAVIGATION_PARENT ) {
+		return undefined;
+	}
+
+	return customParentId;
+}
 
 /**
  * The `useSidebarParent` hook returns the ID of the parent menu item
@@ -30,9 +46,13 @@ import {
  * - It allows the user to navigate in the sidebar (local state) without changing the URL.
  * - If the URL changes, it will update the parent ID to ensure the correct drilldown level is displayed.
  *
+ * @param getNavigationParentId - Optional resolver for customized navigation sections.
+ *
  * @return The ID of the parent menu item to render in the sidebar.
  */
-export function useSidebarParent() {
+export function useSidebarParent(
+	getNavigationParentId?: ( itemId: string | undefined ) => string | undefined
+) {
 	const matches = useMatches();
 	const router = useRouter();
 	const menuItems = useSelect(
@@ -47,8 +67,14 @@ export function useSidebarParent() {
 	);
 
 	const currentMenuItem = findClosestMenuItem( currentPath, menuItems );
+	const currentNavigationParentId = getNavigationParentId?.(
+		currentMenuItem?.id
+	);
 	const [ parentId, setParentId ] = useState< string | undefined >(
-		findDrilldownParent( currentMenuItem?.id, menuItems )
+		resolveParentId(
+			findDrilldownParent( currentMenuItem?.id, menuItems ),
+			currentNavigationParentId
+		)
 	);
 	const [ parentDropdownId, setParentDropdownId ] = useState<
 		string | undefined
@@ -62,14 +88,15 @@ export function useSidebarParent() {
 			matchedMenuItem?.id,
 			menuItems
 		);
+		const customParentId = getNavigationParentId?.( matchedMenuItem?.id );
 		const updatedDropdownParent = findDropdownParent(
 			matchedMenuItem?.id,
 			menuItems
 		);
 
-		setParentId( updatedParentId );
+		setParentId( resolveParentId( updatedParentId, customParentId ) );
 		setParentDropdownId( updatedDropdownParent );
-	}, [ currentPath, menuItems ] );
+	}, [ currentPath, getNavigationParentId, menuItems ] );
 
 	return [
 		parentId,
