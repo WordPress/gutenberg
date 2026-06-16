@@ -359,6 +359,14 @@ function SuggestingBlockEdit( { BlockEdit, props, isSuggestMode } ) {
 			// overlay deltas. This lets the diff renderer below compare
 			// "what the block looked like when the suggestion started"
 			// against "what the suggester is proposing now".
+			//
+			// TODO(#79220): the overlay is keyed only by `clientId`, so when a
+			// second author edits a block that already carries another
+			// author's hydrated suggestion, `entryExists` is true and this
+			// write merges into that author's entry rather than forking a new,
+			// correctly-attributed suggestion. Supporting concurrent
+			// per-author suggestions on one block requires re-keying the
+			// overlay; tracked separately.
 			if ( ! entryExists ) {
 				captureBaseline( clientId, name, attributesRef.current );
 			}
