@@ -8,9 +8,11 @@ test.describe( 'async actions', () => {
 		await utils.activatePlugins();
 		await utils.addPostWithBlock( 'test/generator-scope' );
 	} );
+
 	test.beforeEach( async ( { interactivityUtils: utils, page } ) => {
 		await page.goto( utils.getLink( 'test/generator-scope' ) );
 	} );
+
 	test.afterAll( async ( { interactivityUtils: utils } ) => {
 		await utils.deactivatePlugins();
 		await utils.deleteAllPosts();

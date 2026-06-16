@@ -65,6 +65,7 @@ test.describe( 'data-wp-on-window', () => {
 		await page.setViewportSize( { width: 200, height: 600 } );
 		await expect( counter ).toHaveText( '2' );
 	} );
+
 	test( 'should work with multiple event handlers on the same event type', async ( {
 		page,
 	} ) => {
