@@ -8,7 +8,7 @@ An [MCP (Model Context Protocol)](https://modelcontextprotocol.io/) server for t
 
 By using the MCP server, you can be confident that your AI agents are correctly following the latest design system guidance when asking questions like:
 
--   What components you should use for a certain type of interaction or user interface, like a button or a dropdown
+-   Which components should be used for a given interaction or user interface, like a button or a dropdown
 -   How to implement those components in code, following sample code from the design system documentation
 -   How to implement new components following the design system styling standards with design tokens
 
