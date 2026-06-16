@@ -10,6 +10,7 @@ import { useNavigate } from '@wordpress/route';
  */
 import type { CanvasData } from '../../store/types';
 import BootBackButton from './back-button';
+import WelcomeGuideFills from '../welcome-guide/fills';
 
 interface CanvasProps {
 	canvas: CanvasData;
@@ -81,7 +82,11 @@ export default function Canvas( { canvas }: CanvasProps ) {
 							: [],
 					} }
 					backButton={ backButton }
-				/>
+				>
+					{ ! canvas.isPreview && (
+						<WelcomeGuideFills postType={ canvas.postType } />
+					) }
+				</Editor>
 			</div>
 			{ canvas.isPreview && canvas.editLink && (
 				<div

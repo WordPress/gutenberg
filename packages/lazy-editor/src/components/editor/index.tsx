@@ -27,6 +27,7 @@ interface EditorProps {
 	postId?: string;
 	settings?: Record< string, any >;
 	backButton?: ReactNode;
+	children?: ReactNode;
 }
 
 /**
@@ -37,6 +38,7 @@ interface EditorProps {
  * @param {string}    props.postId     Optional post ID to edit. If not provided, resolves to homepage.
  * @param {Object}    props.settings   Optional extra settings to merge with editor settings
  * @param {ReactNode} props.backButton Optional back button to render in editor header
+ * @param {ReactNode} props.children   Optional editor children to render inside the editor provider
  * @return The editor component with loading states
  */
 export function Editor( {
@@ -44,6 +46,7 @@ export function Editor( {
 	postId,
 	settings,
 	backButton,
+	children,
 }: EditorProps ) {
 	// Resolve homepage when no postType/postId provided
 	const homePage = useSelect(
@@ -122,6 +125,7 @@ export function Editor( {
 			styles={ finalSettings.styles }
 		>
 			{ backButton && <BackButton>{ backButton }</BackButton> }
+			{ children }
 		</PrivateEditor>
 	);
 }

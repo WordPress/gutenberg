@@ -2,6 +2,7 @@
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 @use "./experimental-omnibar.scss" as *;
+@use "./components/welcome-guide/style.scss" as *;
 
 .boot-layout-container .boot-layout {
 	// On mobile the main content area has to scroll, otherwise you can invoke

@@ -1,0 +1,17 @@
+export default function WelcomeGuideImage( {
+	nonAnimatedSrc,
+	animatedSrc,
+}: {
+	nonAnimatedSrc: string;
+	animatedSrc: string;
+} ) {
+	return (
+		<picture className="edit-site-welcome-guide__image">
+			<source
+				srcSet={ nonAnimatedSrc }
+				media="(prefers-reduced-motion: reduce)"
+			/>
+			<img src={ animatedSrc } width="312" height="240" alt="" />
+		</picture>
+	);
+}
