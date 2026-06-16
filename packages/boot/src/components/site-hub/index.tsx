@@ -22,6 +22,7 @@ import type { UnstableBase } from '@wordpress/core-data';
  * Internal dependencies
  */
 import SiteIconLink from '../site-icon-link';
+import SiteExport from './site-export';
 import { store as bootStore } from '../../store';
 import './style.scss';
 
@@ -69,6 +70,7 @@ function SiteHub() {
 					label={ __( 'Open command palette' ) }
 					shortcut={ displayShortcut.primary( 'k' ) }
 				/>
+				<SiteExport />
 			</HStack>
 		</div>
 	);
