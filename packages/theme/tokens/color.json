@@ -1466,6 +1466,14 @@
 					"$value": "{wpds-color.primitive.warning.stroke3}",
 					"$description": "Decorative stroke color used to define warning-toned surface boundaries with strong emphasis."
 				},
+				"caution": {
+					"$value": "{wpds-color.primitive.caution.stroke1}",
+					"$description": "Decorative stroke color used to define caution-toned surface boundaries with normal emphasis."
+				},
+				"caution-strong": {
+					"$value": "{wpds-color.primitive.caution.stroke3}",
+					"$description": "Decorative stroke color used to define caution-toned surface boundaries with strong emphasis."
+				},
 				"error": {
 					"$value": "{wpds-color.primitive.error.stroke1}",
 					"$description": "Decorative stroke color used to define error-toned surface boundaries with normal emphasis."

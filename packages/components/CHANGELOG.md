@@ -15,6 +15,8 @@
 
 -   Move `@types/react` from `dependencies` to an optional peer dependency so consumers' React type version is used [#79095](https://github.com/WordPress/gutenberg/pull/79095).
 
+## 35.0.1 (2026-06-16)
+
 ## 35.0.0 (2026-06-10)
 
 ### Breaking Changes

@@ -227,6 +227,8 @@ The interactive state of the element. The default (no modifier) is the idle stat
 | `--wpds-color-stroke-surface-info-strong`                     | Decorative stroke color used to define info-toned surface boundaries with strong emphasis.                                                  |
 | `--wpds-color-stroke-surface-warning`                         | Decorative stroke color used to define warning-toned surface boundaries with normal emphasis.                                               |
 | `--wpds-color-stroke-surface-warning-strong`                  | Decorative stroke color used to define warning-toned surface boundaries with strong emphasis.                                               |
+| `--wpds-color-stroke-surface-caution`                         | Decorative stroke color used to define caution-toned surface boundaries with normal emphasis.                                               |
+| `--wpds-color-stroke-surface-caution-strong`                  | Decorative stroke color used to define caution-toned surface boundaries with strong emphasis.                                               |
 | `--wpds-color-stroke-surface-error`                           | Decorative stroke color used to define error-toned surface boundaries with normal emphasis.                                                 |
 | `--wpds-color-stroke-surface-error-strong`                    | Decorative stroke color used to define error-toned surface boundaries with strong emphasis.                                                 |
 | `--wpds-color-stroke-interactive-neutral`                     | Accessible stroke color used for interactive neutrally-toned elements with normal emphasis.                                                 |

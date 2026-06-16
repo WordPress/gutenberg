@@ -131,6 +131,8 @@ export type SurfaceStrokeColor =
 	| 'info-strong'
 	| 'warning'
 	| 'warning-strong'
+	| 'caution'
+	| 'caution-strong'
 	| 'error'
 	| 'error-strong';
 
