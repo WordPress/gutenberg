@@ -195,12 +195,12 @@ class Gutenberg_REST_Field_Collections_Controller_Test extends WP_Test_REST_Cont
 			'test-page-fields-module'
 		);
 
-		wp_register_script_module( '@wordpress/fields/loader', 'https://example.com/loader.js' );
+		wp_register_script_module( '@wordpress/field-collections/loader', 'https://example.com/loader.js' );
 		wp_register_script_module( 'test-page-fields-module', 'https://example.com/page-fields.js' );
 
 		gutenberg_enqueue_field_collections_loader();
 
-		$this->assertContains( '@wordpress/fields/loader', wp_script_modules()->get_queue() );
+		$this->assertContains( '@wordpress/field-collections/loader', wp_script_modules()->get_queue() );
 
 		$import_map = get_echo( array( wp_script_modules(), 'print_import_map' ) );
 
@@ -221,11 +221,11 @@ class Gutenberg_REST_Field_Collections_Controller_Test extends WP_Test_REST_Cont
 			)
 		);
 
-		wp_register_script_module( '@wordpress/fields/loader', 'https://example.com/loader.js' );
+		wp_register_script_module( '@wordpress/field-collections/loader', 'https://example.com/loader.js' );
 
 		gutenberg_enqueue_field_collections_loader();
 
-		$this->assertNotContains( '@wordpress/fields/loader', wp_script_modules()->get_queue() );
+		$this->assertNotContains( '@wordpress/field-collections/loader', wp_script_modules()->get_queue() );
 	}
 
 	public function test_get_items_permissions_check() {

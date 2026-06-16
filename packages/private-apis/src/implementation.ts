@@ -44,6 +44,7 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/sync',
 	'@wordpress/theme',
 	'@wordpress/dataviews',
+	'@wordpress/field-collections',
 	'@wordpress/fields',
 	'@wordpress/lazy-editor',
 	'@wordpress/media-editor',

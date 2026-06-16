@@ -1,10 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
+import { useEffect, useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import type { Field } from '@wordpress/dataviews';
 import type { BasePostWithEmbeddedAuthor } from '@wordpress/fields';
+import { useFieldCollections } from '@wordpress/field-collections';
 
 /**
  * Internal dependencies
@@ -17,22 +18,32 @@ function usePostFields( {
 }: {
 	postType: string;
 } ): Field< BasePostWithEmbeddedAuthor >[] {
+	// Registers the entity actions and the editor-only preview field.
 	const { registerPostTypeSchema } = unlock( useDispatch( editorStore ) );
 	useEffect( () => {
 		registerPostTypeSchema( postType );
 	}, [ registerPostTypeSchema, postType ] );
 
-	const { fields } = useSelect(
+	// The preview field (and any other editor-store field) registered above.
+	const editorFields = useSelect(
 		( select ) => {
 			const { getEntityFields } = unlock( select( editorStore ) );
-			return {
-				fields: getEntityFields( 'postType', postType ),
-			};
+			return getEntityFields( 'postType', postType );
 		},
 		[ postType ]
 	);
 
-	return fields;
+	// The serializable field definitions plus their non-serializable
+	// extensions, merged from the field collections registered server-side.
+	const collectionFields = useFieldCollections< BasePostWithEmbeddedAuthor >(
+		'postType',
+		postType
+	);
+
+	return useMemo(
+		() => [ ...editorFields, ...collectionFields ],
+		[ editorFields, collectionFields ]
+	);
 }
 
 /**

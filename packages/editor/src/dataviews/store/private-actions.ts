@@ -114,21 +114,13 @@ export const registerPostTypeSchema =
 			.resolveSelect( coreStore )
 			.getPostType( postType ) ) as PostType;
 
-		const [ canCreate, currentTheme, fieldCollections ] = await Promise.all(
-			[
-				registry.resolveSelect( coreStore ).canUser( 'create', {
-					kind: 'postType',
-					name: postType,
-				} ),
-				registry.resolveSelect( coreStore ).getCurrentTheme(),
-				registry
-					.resolveSelect( coreStore )
-					.getEntityRecords( 'root', 'fieldCollection', {
-						kind: 'postType',
-						name: postType,
-					} ),
-			]
-		);
+		const [ canCreate, currentTheme ] = await Promise.all( [
+			registry.resolveSelect( coreStore ).canUser( 'create', {
+				kind: 'postType',
+				name: postType,
+			} ),
+			registry.resolveSelect( coreStore ).getCurrentTheme(),
+		] );
 		let canDuplicate =
 			! [ 'wp_block', 'wp_template_part' ].includes(
 				postTypeConfig.slug
@@ -180,60 +172,20 @@ export const registerPostTypeSchema =
 			permanentlyDeletePost,
 		].filter( Boolean );
 
-		// All other fields are provided by the field collections registered
-		// server-side. The preview field cannot move there: its render
-		// depends on editor internals (EditorProvider, global styles, the
-		// editor store) that the collections' script modules in
-		// `@wordpress/fields` cannot import.
+		// The serializable field definitions and their non-serializable
+		// extensions are provided by the field collections registered
+		// server-side, and merged client-side by `useFieldCollections` from
+		// `@wordpress/field-collections`. The preview field is the exception:
+		// it cannot move there because its render depends on editor internals
+		// (EditorProvider, global styles, the editor store) that the
+		// collections' script modules cannot import, so it is registered in the
+		// editor store here and combined with the collection fields by the
+		// `usePostFields` consumer.
 		const fields = [
 			postTypeConfig.supports?.editor &&
 				postTypeConfig.viewable &&
 				postPreviewField,
 		].filter( Boolean );
-
-		// Load the script modules providing the non-serializable extensions
-		// (getValue, render, Edit…) of each field collection, and merge them
-		// into the serializable field definitions by field id.
-		const collectionFields = (
-			await Promise.all(
-				( fieldCollections ?? [] )
-					.filter(
-						( collection: any ) =>
-							collection.kind === 'postType' &&
-							( collection.name === postType ||
-								collection.name === null )
-					)
-					.map( async ( collection: any ) => {
-						let extensions: Partial< Field< any > >[] = [];
-						if ( collection.fields_module ) {
-							try {
-								const fieldsModule = await import(
-									/* webpackIgnore: true */
-									collection.fields_module
-								);
-								extensions = fieldsModule.default ?? [];
-							} catch ( error ) {
-								// eslint-disable-next-line no-console
-								console.warn(
-									`Could not load the "${ collection.fields_module }" script module of the "${ collection.id }" field collection. Falling back to the serializable field definitions.`,
-									error
-								);
-							}
-						}
-						return collection.fields.map(
-							( field: Field< any > ) => {
-								const extension = extensions.find(
-									( fieldExtension ) =>
-										fieldExtension.id === field.id
-								);
-								return extension
-									? { ...field, ...extension }
-									: field;
-							}
-						);
-					} )
-			)
-		).flat();
 
 		registry.batch( () => {
 			actions.forEach( ( action ) => {
@@ -244,13 +196,6 @@ export const registerPostTypeSchema =
 				);
 			} );
 			fields.forEach( ( field ) => {
-				unlock( registry.dispatch( editorStore ) ).registerEntityField(
-					'postType',
-					postType,
-					field
-				);
-			} );
-			collectionFields.forEach( ( field: Field< any > ) => {
 				unlock( registry.dispatch( editorStore ) ).registerEntityField(
 					'postType',
 					postType,

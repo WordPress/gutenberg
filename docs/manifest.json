@@ -2508,6 +2508,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/field-collections",
+		"slug": "packages-field-collections",
+		"markdown_source": "../packages/field-collections/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/fields",
 		"slug": "packages-fields",
 		"markdown_source": "../packages/fields/README.md",
