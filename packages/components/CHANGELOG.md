@@ -571,6 +571,7 @@
 -   `Popover`: improve Storybook examples around onClose and onFocusOutside props. ([#69688](https://github.com/WordPress/gutenberg/pull/69688))
 -   `FormTokenField`: Add theming support ([#69638](https://github.com/WordPress/gutenberg/pull/69638)).
 -   `ComboboxControl`: Add theming support ([#69638](https://github.com/WordPress/gutenberg/pull/69638)).
+-   `ToolsPanel`: Add theming support ([#69815](https://github.com/WordPress/gutenberg/pull/69815)).
 
 ## 29.7.0 (2025-03-27)
 

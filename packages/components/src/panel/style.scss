@@ -4,7 +4,7 @@
 
 .components-panel {
 	background: $white;
-	border: $border-width solid $gray-200;
+	border: $border-width solid $components-color-gray-200;
 
 	> .components-panel__header:first-child,
 	> .components-panel__body:first-child {

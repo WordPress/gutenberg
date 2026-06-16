@@ -34,7 +34,9 @@ export const ToolsPanel = ( columns: number ) => css`
 	${ toolsPanelGrid.columns( columns ) }
 	${ toolsPanelGrid.spacing }
 
-	border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 300 ] };
+	background: ${ COLORS.theme.background };
+	color: ${ COLORS.theme.foreground };
+	border-top: ${ CONFIG.borderWidth } solid ${ COLORS.theme.gray[ 200 ] };
 	margin-top: -1px;
 	padding: ${ space( 4 ) };
 `;
@@ -143,14 +145,14 @@ export const ResetLabel = styled.span`
 `;
 
 export const DefaultControlsItem = css`
-	color: ${ COLORS.gray[ 900 ] };
+	color: ${ COLORS.theme.foreground };
 
 	&&[aria-disabled='true'] {
-		color: ${ COLORS.gray[ 700 ] };
+		color: ${ COLORS.theme.gray[ 700 ] };
 		opacity: 1;
 
 		&:hover {
-			color: ${ COLORS.gray[ 700 ] };
+			color: ${ COLORS.theme.gray[ 700 ] };
 		}
 
 		${ ResetLabel } {
