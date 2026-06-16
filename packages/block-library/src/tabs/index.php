@@ -96,22 +96,10 @@ function block_core_tabs_render_block_callback( array $attributes, string $conte
 		return '';
 	}
 
-	$is_vertical = false;
-
 	$tag_processor = new WP_HTML_Tag_Processor( $content );
 
 	$tag_processor->next_tag( array( 'class_name' => 'wp-block-tabs' ) );
 	$tag_processor->set_attribute( 'data-wp-interactive', 'core/tabs/private' );
-
-	// Inspect inside the tab-list to see if its vertical or not.
-	$tag_processor->set_bookmark( 'core/tabs_wrapper' );
-	while ( $tag_processor->next_tag( array( 'class_name' => 'wp-block-tabs-list' ) ) ) {
-		if ( $tag_processor->has_class( 'is-vertical' ) ) {
-			$is_vertical = true;
-			break;
-		}
-	}
-	$tag_processor->seek( 'core/tabs_wrapper' );
 
 	$tag_processor->set_attribute(
 		'data-wp-context',
@@ -119,7 +107,6 @@ function block_core_tabs_render_block_callback( array $attributes, string $conte
 			array(
 				'tabsId'         => $tabs_id,
 				'activeTabIndex' => $active_tab_index,
-				'isVertical'     => $is_vertical,
 			)
 		)
 	);
