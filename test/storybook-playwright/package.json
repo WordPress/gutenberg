@@ -21,7 +21,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"devDependencies": {
-		"@playwright/test": "^1.60.0",
+		"@playwright/test": "^1.61.0",
 		"@storybook/react-vite": "^10.2.8",
 		"@types/node": "^20.19.39",
 		"@wordpress/element": "file:../../packages/element",
