@@ -219,4 +219,10 @@ export interface StencilProps {
 		rect: NormalizedRect,
 		handle: HandlePosition
 	) => NormalizedRect;
+	/**
+	 * Optional keyboard resize step in normalized space, per axis. Hosts use
+	 * this when keyboard resize should follow the rendered image scale instead
+	 * of the default percentage-based step.
+	 */
+	keyboardResizeStep?: Size;
 }

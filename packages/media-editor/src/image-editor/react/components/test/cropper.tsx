@@ -421,16 +421,17 @@ describe( 'Cropper', () => {
 		const stage = screen.getByTestId( 'cropper-stage' );
 
 		// cropRect starts at {x:0, y:0, width:1, height:1} (right edge = 1.0).
-		// One ArrowRight step (+0.01 normalized) puts the right edge at 1.01.
+		// Pixel snapping is active at zoom:2, so one ArrowRight step is one
+		// source pixel: zoom / sourceWidth = 2 / 600 normalized.
 		// With canvasSize=600×400 and visualSize=600×400:
-		//   rightOverflow = 1.01 * 600 − 600 = 6 → pan.x = −6
+		//   rightOverflow = (1 + 2/600) * 600 − 600 = 2 → pan.x = −2
 		fireEvent.keyDown( eHandle, { key: 'ArrowRight' } );
 
 		const match = stage.style.transform.match(
 			/^translate\((-?\d+(?:\.\d+)?)px, (-?\d+(?:\.\d+)?)px\)$/
 		);
 		expect( match ).not.toBeNull();
-		expect( Number( match?.[ 1 ] ) ).toBeCloseTo( -6, 5 );
+		expect( Number( match?.[ 1 ] ) ).toBeCloseTo( -2, 4 );
 		expect( Number( match?.[ 2 ] ) ).toBeCloseTo( 0, 5 );
 
 		jest.useRealTimers();
@@ -670,6 +671,45 @@ describe( 'Cropper', () => {
 		expect( rect.x ).toBeCloseTo( cropRect.x, 5 );
 		expect( rect.y ).toBeCloseTo( cropRect.y, 5 );
 		expect( rect.height ).toBeCloseTo( cropRect.height, 5 );
+	} );
+
+	it( 'uses source-pixel keyboard steps for horizontal freeform resize when snapping is active', async () => {
+		const image = {
+			src: 'wide.png',
+			naturalWidth: 200,
+			naturalHeight: 100,
+		};
+		const cropRect = { x: 0.1, y: 0.1, width: 0.6, height: 0.6 };
+		const controller = createController();
+		controller.state = {
+			...controller.state,
+			image,
+			cropRect,
+		};
+		const initialRegion = getSourceRegion(
+			{ ...controller.state, cropRect },
+			{ width: image.naturalWidth, height: image.naturalHeight }
+		);
+		render(
+			<Cropper src="wide.png" controller={ controller } freeformCrop />
+		);
+
+		const handle = await screen.findByRole( 'button', {
+			name: 'Resize right edge',
+		} );
+		( controller.setCropRect as jest.Mock ).mockClear();
+		fireEvent.keyDown( handle, { key: 'ArrowRight' } );
+
+		const rect = ( controller.setCropRect as jest.Mock ).mock
+			.calls[ 0 ][ 0 ];
+		const region = getSourceRegion(
+			{ ...controller.state, cropRect: rect },
+			{ width: image.naturalWidth, height: image.naturalHeight }
+		);
+		expect( region.x + region.width ).toBeCloseTo(
+			initialRegion.x + initialRegion.width + 1,
+			3
+		);
 	} );
 
 	it( 'keeps freeform resize smooth below 1:1 display scale', async () => {

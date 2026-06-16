@@ -56,6 +56,8 @@ import { VISUALLY_HIDDEN_STYLE } from '../visually-hidden-style';
 
 /** Threshold for comparing normalized crop rect values. */
 const CROP_RECT_EPSILON = 1e-6;
+/** Threshold for deciding whether rotation is at a 90-degree stop. */
+const CARDINAL_ROTATION_EPSILON = 1e-6;
 
 /**
  * Props for the Cropper component.
@@ -425,6 +427,42 @@ function CropperInner(
 		naturalWidth > 0
 			? ( elementSize.width / naturalWidth ) * state.zoom * viewScale
 			: 0;
+	const keyboardResizeStep = useMemo( () => {
+		if (
+			displayScale < PIXEL_SNAP_DISPLAY_SCALE ||
+			( aspectRatio && aspectRatio > 0 ) ||
+			naturalWidth <= 0 ||
+			naturalHeight <= 0
+		) {
+			return undefined;
+		}
+		const snapRotation = Math.round( state.rotation / 90 ) * 90;
+		if (
+			Math.abs( state.rotation - snapRotation ) >=
+			CARDINAL_ROTATION_EPSILON
+		) {
+			return undefined;
+		}
+		const bbox = getRotatedBBox(
+			naturalWidth,
+			naturalHeight,
+			snapRotation
+		);
+		if ( bbox.width <= 0 || bbox.height <= 0 ) {
+			return undefined;
+		}
+		return {
+			width: state.zoom / bbox.width,
+			height: state.zoom / bbox.height,
+		};
+	}, [
+		displayScale,
+		aspectRatio,
+		naturalWidth,
+		naturalHeight,
+		state.rotation,
+		state.zoom,
+	] );
 
 	// Per-axis minimum crop size in normalized space, expressing a pixel floor
 	// on the captured source region. cropRect is normalized in the viewport's
@@ -944,6 +982,7 @@ function CropperInner(
 						cropBounds={ cropBounds }
 						minCropSize={ minCropSize }
 						snapCropRect={ snapCropRect }
+						keyboardResizeStep={ keyboardResizeStep }
 					/>
 
 					{ /* Rule-of-thirds grid */ }

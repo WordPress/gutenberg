@@ -91,20 +91,21 @@ type RectangleStencilProps = StencilProps;
  * crop pass through to the container for image panning. The crop
  * auto-centers after resize via SETTLE_CROP.
  *
- * @param props                   Component props implementing StencilProps.
- * @param props.cropRect          The crop rectangle in normalized coordinates.
- * @param props.containerSize     The container element dimensions in pixels.
- * @param props.imageSize         The rendered image dimensions in pixels.
- * @param props.onCropChange      Callback fired when the crop rect changes.
- * @param props.onResizeStart     Callback fired when a resize drag starts.
- * @param props.onResizeEnd       Callback fired when a resize drag ends (mouseup).
- * @param props.aspectRatio       Optional fixed aspect ratio (width / height).
- * @param props.freeformCrop      Whether resize handles are shown.
- * @param props.stencilTransition CSS transition string for settle animation.
- * @param props.cropBounds        Maximum crop rect bounds from camera (zoom/rotation-aware).
- * @param props.onEscape          Called when Escape is pressed on a resize handle.
- * @param props.minCropSize       Minimum crop rect dimension in normalized space, per axis.
- * @param props.snapCropRect      Optional post-processor for freeform resize output.
+ * @param props                    Component props implementing StencilProps.
+ * @param props.cropRect           The crop rectangle in normalized coordinates.
+ * @param props.containerSize      The container element dimensions in pixels.
+ * @param props.imageSize          The rendered image dimensions in pixels.
+ * @param props.onCropChange       Callback fired when the crop rect changes.
+ * @param props.onResizeStart      Callback fired when a resize drag starts.
+ * @param props.onResizeEnd        Callback fired when a resize drag ends (mouseup).
+ * @param props.aspectRatio        Optional fixed aspect ratio (width / height).
+ * @param props.freeformCrop       Whether resize handles are shown.
+ * @param props.stencilTransition  CSS transition string for settle animation.
+ * @param props.cropBounds         Maximum crop rect bounds from camera (zoom/rotation-aware).
+ * @param props.onEscape           Called when Escape is pressed on a resize handle.
+ * @param props.minCropSize        Minimum crop rect dimension in normalized space, per axis.
+ * @param props.snapCropRect       Optional post-processor for freeform resize output.
+ * @param props.keyboardResizeStep Optional keyboard resize step in normalized space, per axis.
  * @return The rectangle stencil element.
  */
 export function RectangleStencil( {
@@ -121,6 +122,7 @@ export function RectangleStencil( {
 	onEscape,
 	minCropSize,
 	snapCropRect,
+	keyboardResizeStep,
 }: RectangleStencilProps ) {
 	// Use cropBounds from the camera if available, otherwise default to [0,1].
 	const boundsMinX = cropBounds?.minX ?? 0;
@@ -423,24 +425,28 @@ export function RectangleStencil( {
 				}, KEYBOARD_SETTLE_DELAY );
 			};
 
-			const step = event.shiftKey
-				? DEFAULT_KEYBOARD_STEP * KEYBOARD_SHIFT_STEP_MULTIPLIER
-				: DEFAULT_KEYBOARD_STEP;
+			const stepMultiplier = event.shiftKey
+				? KEYBOARD_SHIFT_STEP_MULTIPLIER
+				: 1;
+			const stepX = keyboardResizeStep?.width ?? DEFAULT_KEYBOARD_STEP;
+			const stepY = keyboardResizeStep?.height ?? DEFAULT_KEYBOARD_STEP;
+			const adjustedStepX = stepX * stepMultiplier;
+			const adjustedStepY = stepY * stepMultiplier;
 
 			// Determine the normalized delta from the arrow key.
 			let dx = 0;
 			let dy = 0;
 			if ( key === 'ArrowLeft' ) {
-				dx = -step;
+				dx = -adjustedStepX;
 			}
 			if ( key === 'ArrowRight' ) {
-				dx = step;
+				dx = adjustedStepX;
 			}
 			if ( key === 'ArrowUp' ) {
-				dy = -step;
+				dy = -adjustedStepY;
 			}
 			if ( key === 'ArrowDown' ) {
-				dy = step;
+				dy = adjustedStepY;
 			}
 
 			if ( hasLockedRatio ) {
@@ -484,6 +490,7 @@ export function RectangleStencil( {
 			onResizeStart,
 			onResizeEnd,
 			onEscape,
+			keyboardResizeStep,
 			snapCropRect,
 		]
 	);
