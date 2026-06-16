@@ -340,4 +340,112 @@ describe( 'SuggestionOverlayHydrator', () => {
 		const { getEntries } = renderWithProbe();
 		expect( getEntries() ).toEqual( {} );
 	} );
+
+	it( 'clears a hydrated entry once its note leaves the unresolved set', () => {
+		// Models a suggestion accepted or rejected in another tab: the note
+		// flips out of `hold`, so `unresolvedNotes` no longer includes it and
+		// the hydrated inline marks must be cleared even though the block
+		// still exists.
+		const thread = {
+			id: 108,
+			blockClientId: 'block-a',
+			status: 'hold',
+			meta: {
+				_wp_suggestion: makePayload( [
+					{
+						type: 'attribute-set',
+						attribute: 'content',
+						before: 'Hello',
+						after: 'Hello world',
+					},
+				] ),
+			},
+		};
+		useNoteThreads.mockReturnValue( {
+			notes: [],
+			unresolvedNotes: [ thread ],
+		} );
+
+		const registry = createRegistry();
+		registry.register( editorStore );
+		registry.dispatch( editorStore ).setEditedPost( 'post', 42 );
+
+		let entries = null;
+		function Probe() {
+			entries = useSuggestionOverlay().entries;
+			return null;
+		}
+
+		// A fresh element each render — passing the identical element
+		// reference makes React bail out of reconciling the subtree, so the
+		// hydrator would never see the updated mock.
+		const tree = () => (
+			<RegistryProvider value={ registry }>
+				<SuggestionOverlayProvider>
+					<Probe />
+					<SuggestionOverlayHydrator />
+				</SuggestionOverlayProvider>
+			</RegistryProvider>
+		);
+
+		const { rerender } = render( tree() );
+		expect( entries[ 'block-a' ] ).toBeDefined();
+
+		// The note is resolved elsewhere: it drops out of the unresolved set.
+		// `rerender` is already wrapped in `act` by Testing Library.
+		useNoteThreads.mockReturnValue( { notes: [], unresolvedNotes: [] } );
+		rerender( tree() );
+
+		expect( entries[ 'block-a' ] ).toBeUndefined();
+	} );
+
+	it( 'leaves a live, non-hydrated overlay in place when the note set is empty', () => {
+		// The cleanup path must only prune hydrator-sourced entries. A purely
+		// local in-progress suggestion (no `hydratedFromCommentId`) is not
+		// backed by a note and must survive an empty unresolved set.
+		useNoteThreads.mockReturnValue( { notes: [], unresolvedNotes: [] } );
+
+		const registry = createRegistry();
+		registry.register( editorStore );
+		registry.dispatch( editorStore ).setEditedPost( 'post', 42 );
+
+		let overlayApi = null;
+		let entries = null;
+		function Probe() {
+			overlayApi = useSuggestionOverlay();
+			entries = overlayApi.entries;
+			return null;
+		}
+
+		const { rerender } = render(
+			<RegistryProvider value={ registry }>
+				<SuggestionOverlayProvider>
+					<Probe />
+				</SuggestionOverlayProvider>
+			</RegistryProvider>
+		);
+
+		act( () => {
+			overlayApi.captureBaseline( 'block-a', 'core/paragraph', {
+				content: 'live baseline',
+			} );
+			overlayApi.setOverlayAttributes( 'block-a', {
+				content: 'live in-progress',
+			} );
+		} );
+
+		rerender(
+			<RegistryProvider value={ registry }>
+				<SuggestionOverlayProvider>
+					<Probe />
+					<SuggestionOverlayHydrator />
+				</SuggestionOverlayProvider>
+			</RegistryProvider>
+		);
+
+		expect( entries[ 'block-a' ] ).toBeDefined();
+		expect( entries[ 'block-a' ].overlayAttributes ).toEqual( {
+			content: 'live in-progress',
+		} );
+	} );
 } );

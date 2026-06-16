@@ -122,13 +122,34 @@ export default function SuggestionOverlayHydrator() {
 		[]
 	);
 	const { unresolvedNotes } = useNoteThreads( postId );
-	const { entries, seedFromComment } = useSuggestionOverlay();
+	const { entries, seedFromComment, clearOverlay } = useSuggestionOverlay();
 
 	useEffect( () => {
-		if ( ! unresolvedNotes || unresolvedNotes.length === 0 ) {
+		const threads = unresolvedNotes ?? [];
+
+		// Inverse of seeding: drop any hydrator-sourced entry whose note is no
+		// longer in the unresolved set. This is the cleanup path for a
+		// suggestion that was accepted or rejected in another tab or by a
+		// collaborator — the note flips out of `hold` status and leaves
+		// `unresolvedNotes`, so its inline marks must be removed even though
+		// the block itself still exists. (The orphan prune in
+		// `overlay-context.js` only fires when a *block* is removed.) Only
+		// entries flagged `hydratedFromCommentId` are pruned; a purely local,
+		// in-progress suggestion has no such flag and is never touched here.
+		const unresolvedIds = new Set( threads.map( ( thread ) => thread.id ) );
+		for ( const [ clientId, entry ] of Object.entries( entries ) ) {
+			if (
+				entry?.hydratedFromCommentId &&
+				! unresolvedIds.has( entry.hydratedFromCommentId )
+			) {
+				clearOverlay( clientId );
+			}
+		}
+
+		if ( threads.length === 0 ) {
 			return;
 		}
-		for ( const thread of unresolvedNotes ) {
+		for ( const thread of threads ) {
 			const clientId = thread.blockClientId;
 			if ( ! clientId ) {
 				continue;
@@ -185,7 +206,7 @@ export default function SuggestionOverlayHydrator() {
 				thread.author ?? null
 			);
 		}
-	}, [ unresolvedNotes, entries, seedFromComment ] );
+	}, [ unresolvedNotes, entries, seedFromComment, clearOverlay ] );
 
 	return null;
 }
