@@ -30,6 +30,8 @@
 
 -   Declare `postcss`, `esbuild`, and `vite` as optional peer dependencies for the bundler plugins, and move `@types/react` from `dependencies` to an optional peer dependency ([#79095](https://github.com/WordPress/gutenberg/pull/79095)).
 
+## 0.15.1 (2026-06-16)
+
 ## 0.15.0 (2026-06-10)
 
 ### New Features
