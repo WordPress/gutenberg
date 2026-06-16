@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `lint-style`: Detect .cjs and .mjs config files so the bundled default config is not used when one of these is present.
+
 ## 32.4.0 (2026-06-10)
 
 ## 32.3.0 (2026-05-27)
