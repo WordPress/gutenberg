@@ -502,17 +502,17 @@ visuals that need to flex between consumers without writing a render
 prop. Override them on any ancestor of the surface root (or on the
 root itself via `style`). All values fall back to sensible defaults.
 
-| Variable                                 | Default                                      | Applies to                                                                                                            |
-| ---------------------------------------- | -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| `--wp-grid-gap`                          | `var(--wpds-dimension-gap-xl)`               | Gap between tiles on `DashboardGrid`, `DashboardLanes`, and the edit overlay.                                         |
-| `--wp-grid-drag-preview-scale`           | `1.05`                                       | Lift scale of the drag-preview functional frame. Set to `1` to disable the lift.                                      |
-| `--wp-grid-drag-preview-radius`          | `0`                                          | Border radius of the drag-preview functional frame so the lift shadow follows the consumer's tile shape.              |
-| `--wp-grid-placeholder-opacity`          | `0.4`                                        | Opacity of the placeholder tile (the original item while a drag is in flight).                                        |
-| `--wp-grid-placeholder-outline-style`    | `dashed`                                     | Outline style of the drag placeholder (for example `solid` or `dotted`).                                              |
-| `--wp-grid-resize-preview-outline-style` | `solid`                                      | Border style of the resize-preview overlay (for example `dashed` or `dotted`).                                        |
-| `--wp-grid-placeholder-outline-color`    | `var(--wpds-color-stroke-interactive-brand)` | Outline color of the placeholder and of the resize-preview overlay.                                                   |
-| `--wp-grid-placeholder-radius`           | `0`                                          | Border radius of the placeholder, used to match the consumer's tile shape so the outline traces the right silhouette. |
-| `--wp-grid-overlay-tile-bg`              | `var(--wpds-color-bg-surface-neutral-weak)`  | Background of the marker tiles painted by the default edit-mode overlay.                                              |
+| Variable                                 | Default                                             | Applies to                                                                                                            |
+| ---------------------------------------- | --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `--wp-grid-gap`                          | `var(--wpds-dimension-gap-xl)`                      | Gap between tiles on `DashboardGrid`, `DashboardLanes`, and the edit overlay.                                         |
+| `--wp-grid-drag-preview-scale`           | `1.05`                                              | Lift scale of the drag-preview functional frame. Set to `1` to disable the lift.                                      |
+| `--wp-grid-drag-preview-radius`          | `0`                                                 | Border radius of the drag-preview functional frame so the lift shadow follows the consumer's tile shape.              |
+| `--wp-grid-placeholder-opacity`          | `0.4`                                               | Opacity of the placeholder tile (the original item while a drag is in flight).                                        |
+| `--wp-grid-placeholder-outline-style`    | `dashed`                                            | Outline style of the drag placeholder (for example `solid` or `dotted`).                                              |
+| `--wp-grid-resize-preview-outline-style` | `solid`                                             | Border style of the resize-preview overlay (for example `dashed` or `dotted`).                                        |
+| `--wp-grid-placeholder-outline-color`    | `var(--wpds-color-stroke-interactive-brand)`        | Outline color of the placeholder and of the resize-preview overlay.                                                   |
+| `--wp-grid-placeholder-radius`           | `0`                                                 | Border radius of the placeholder, used to match the consumer's tile shape so the outline traces the right silhouette. |
+| `--wp-grid-overlay-tile-bg`              | `var(--wpds-color-background-surface-neutral-weak)` | Background of the marker tiles painted by the default edit-mode overlay.                                              |
 
 ---
 
