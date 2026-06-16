@@ -3,7 +3,6 @@
 		"name": "core/icon",
 		"isValid": true,
 		"attributes": {
-			"icon": "core/info",
 			"flipHorizontal": false,
 			"flipVertical": false,
 			"rotation": 0
