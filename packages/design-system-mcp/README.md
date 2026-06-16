@@ -1,4 +1,4 @@
-# WordPress Design System MCP
+# WordPress Design System MCP Server
 
 <div class="callout callout-alert">
 This package is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
