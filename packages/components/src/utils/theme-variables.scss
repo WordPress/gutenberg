@@ -7,11 +7,12 @@ $components-color-accent: var(--wp-components-color-accent, var(--wp-admin-theme
 $components-color-accent-darker-10: var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6));
 $components-color-accent-darker-20: var(--wp-components-color-accent-darker-20, var(--wp-admin-theme-color-darker-20, #183ad6));
 
-// The non-accent values fall back to the design system (`--wpds-*`) tokens,
-// defined at `:root` by the prebuilt `@wordpress/theme` stylesheet, so
-// component styles get sensible defaults even without a runtime
-// `<ThemeProvider>`. The token references intentionally omit a hardcoded
-// fallback — the build plugin injects one automatically.
+// The non-accent values fall back to the design system (`--wpds-*`) tokens.
+// Those are defined at `:root` by the prebuilt `@wordpress/theme` stylesheet
+// when it is loaded (always the case inside WordPress). The references here
+// intentionally omit a hardcoded fallback — the build plugin injects the
+// design system default value, so component styles stay correct even when
+// neither the prebuilt stylesheet nor a runtime `<ThemeProvider>` is present.
 
 // Used when placing text on the accent color.
 $components-color-accent-inverted: var(--wp-components-color-accent-inverted, var(--wpds-color-foreground-interactive-brand-strong));
