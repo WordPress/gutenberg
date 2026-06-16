@@ -66,7 +66,7 @@ npm run wp-env start
 
 This script will create a Docker instance behind the scenes with the latest WordPress Docker image, and then will map the Gutenberg plugin code from your local copy to the environment as a Docker volume. This way, any changes you make to the code locally are reflected immediately in the WordPress instance.
 
-> Note: `npm run` will use the `wp-env` / `WordPress`?? version specified within the Gutenberg project, making sure you are running the latest wp-env version.
+> Note: `npm run` will use the `wp-env` / `WordPress` version specified within the Gutenberg project, making sure you are running the latest wp-env version.
 
 To stop the running environment:
 

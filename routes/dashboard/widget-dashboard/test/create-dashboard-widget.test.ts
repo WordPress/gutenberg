@@ -1,8 +1,12 @@
 /**
+ * WordPress dependencies
+ */
+import type { WidgetType } from '@wordpress/widget-primitives';
+
+/**
  * Internal dependencies
  */
 import { createDashboardWidget } from '../utils/create-dashboard-widget';
-import type { WidgetType } from '../../widget-primitives';
 
 const baseType: WidgetType = {
 	apiVersion: 1,

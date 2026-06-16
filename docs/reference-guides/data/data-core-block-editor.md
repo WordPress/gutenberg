@@ -470,6 +470,7 @@ _Properties_
 
 -   _id_ `string`: Unique identifier for the item.
 -   _name_ `string`: The type of block to create.
+-   _variationName_ `?string`: The target block variation name.
 -   _title_ `string`: Title of the item, as it appears in the inserter.
 -   _icon_ `string`: Dashicon for the item, as it appears in the inserter.
 -   _isDisabled_ `boolean`: Whether or not the user should be prevented from inserting this item.
