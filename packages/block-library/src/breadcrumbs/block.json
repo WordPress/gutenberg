@@ -26,6 +26,10 @@
 		"showOnHomePage": {
 			"type": "boolean",
 			"default": false
+		},
+		"showTaxonomy": {
+			"type": "boolean",
+			"default": true
 		}
 	},
 	"usesContext": [ "postId", "postType", "templateSlug" ],
