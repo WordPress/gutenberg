@@ -6,6 +6,14 @@ This package is still experimental. “Experimental” means this is an early im
 
 An [MCP (Model Context Protocol)](https://modelcontextprotocol.io/) server for the WordPress Design System. Provides AI agents with component documentation, usage examples, and design tokens.
 
+By using the MCP server, you can be confident that your AI agents are correctly following the latest design system guidance when asking questions like:
+
+-   What components you should use for a certain type of interaction or user interface, like a button or a dropdown
+-   How to implement those components in code, following sample code from the design system documentation
+-   How to implement new components following the design system styling standards with design tokens
+
+Without the MCP server, an AI agent may produce a functional and convincing result, but there's a higher risk that its resources are out-of-date or inaccurate, and it may try to use components which are no longer recommended for use. Since AI agents are unable to read [the WordPress Gutenberg Storybook documentation](https://wordpress.github.io/gutenberg/), the MCP server provides an alternative, machine-readable interface to that same information.
+
 ## Setup
 
 ### Claude Code
