@@ -888,7 +888,7 @@ function PostList() {
 		<Page
 			title={ postTypeObject.labels?.name }
 			headingLevel={ 2 }
-			subTitle={ postTypeObject.labels?.description }
+			subTitle={ postTypeObject.description }
 			className={ `${ postTypeObject.name.toLowerCase() }-page` }
 			actions={ postListActions }
 			hasPadding={ false }

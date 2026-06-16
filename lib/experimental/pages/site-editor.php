@@ -746,6 +746,49 @@ function gutenberg_site_editor_hide_admin_bar_in_preview( $show_admin_bar ) {
 add_filter( 'show_admin_bar', 'gutenberg_site_editor_hide_admin_bar_in_preview', PHP_INT_MAX );
 
 /**
+ * Fill blank core post type descriptions for the Extensible Site Editor.
+ *
+ * Core registers the built-in `post` and `page` post types with an empty
+ * `description` argument. The content routes use the REST/Core Data post type
+ * record as the single source of truth for their page subtitle, so this filter
+ * gives those built-in types the same REST shape that custom post types get
+ * when they provide a `description` during `register_post_type()`.
+ *
+ * The filter only fills blank values and only when the `description` field is
+ * present in the response, so custom/plugin-provided descriptions and `_fields`
+ * filtering remain respected.
+ *
+ * @param WP_REST_Response $response  The REST response.
+ * @param WP_Post_Type     $post_type The original post type object.
+ * @return WP_REST_Response The filtered REST response.
+ */
+function gutenberg_site_editor_add_builtin_post_type_descriptions( $response, $post_type ) {
+	if ( ! $response instanceof WP_REST_Response || ! $post_type instanceof WP_Post_Type ) {
+		return $response;
+	}
+
+	$descriptions = array(
+		'post' => __( 'Write posts and control how posts appear on the site.', 'gutenberg' ),
+		'page' => __( 'Create pages and control how pages appear on the site.', 'gutenberg' ),
+	);
+
+	if ( ! isset( $descriptions[ $post_type->name ] ) ) {
+		return $response;
+	}
+
+	$data = $response->get_data();
+	if ( ! is_array( $data ) || ! array_key_exists( 'description', $data ) || '' !== $data['description'] ) {
+		return $response;
+	}
+
+	$data['description'] = $descriptions[ $post_type->name ];
+	$response->set_data( $data );
+
+	return $response;
+}
+add_filter( 'rest_prepare_post_type', 'gutenberg_site_editor_add_builtin_post_type_descriptions', 10, 2 );
+
+/**
  * Normalize template and post type text for conservative template-slot matching.
  *
  * @param string $value Text to normalize.
