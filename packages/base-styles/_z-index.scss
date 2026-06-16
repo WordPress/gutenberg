@@ -89,6 +89,7 @@ $z-layers: (
 	".editor-post-template__swap-template-modal": 1000001,
 	".editor-post-template__create-template-modal": 1000001,
 	".editor-sync-connection-error-modal": 1000001,
+	".media-editor-modal__footer": 1000001,
 	".components-snackbar-list.media-editor-modal__snackbar": 1000001,
 
 	// Note: The ConfirmDialog component's z-index is being set to 1000001 in packages/components/src/confirm-dialog/styles.ts
@@ -112,10 +113,7 @@ $z-layers: (
 	// The focus styles of the region navigation containers should be above their content.
 	".is-focusing-regions {region} :focus::after": 1000000,
 
-	// Show NUX tips above popovers, wp-admin menus, submenus, and sidebar:
-	".nux-dot-tip": 1000001,
-
-	// Show tooltips above NUX tips, wp-admin menus, submenus, and sidebar:
+	// Show tooltips above popovers, wp-admin menus, submenus, and sidebar:
 	".components-tooltip": 1000002,
 
 	// Appear under the customizer heading UI, but over anything else.

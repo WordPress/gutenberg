@@ -27,7 +27,8 @@ function gutenberg_menu() {
 		__( 'Demo', 'gutenberg' ),
 		__( 'Demo', 'gutenberg' ),
 		'edit_posts',
-		'gutenberg'
+		'gutenberg',
+		'__return_null',
 	);
 
 	if ( current_user_can( 'edit_posts' ) ) {

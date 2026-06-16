@@ -23,6 +23,8 @@
 		// Excluded to maintain consistency with bin/tsconfig.json
 		// where packages/build.mjs was also excluded
 		"lib/build.mjs",
-		"lib/worker-build.mjs"
+		"lib/worker-build.mjs",
+		// Test files run via Jest; they are not part of the type-check.
+		"lib/test"
 	]
 }

@@ -11,7 +11,7 @@ const meta: Meta< typeof Icon > = {
 			return (
 				<div
 					style={ {
-						color: 'var( --wpds-color-fg-content-neutral )',
+						color: 'var( --wpds-color-foreground-content-neutral )',
 					} }
 				>
 					<Story />
