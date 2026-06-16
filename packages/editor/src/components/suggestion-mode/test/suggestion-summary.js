@@ -52,6 +52,40 @@ describe( 'summarizeOperations', () => {
 		);
 	} );
 
+	it( 'separates non-contiguous deletions so distinct words do not merge', () => {
+		// Regression for the "jumpslazy" report: "jumps" and "lazy" are
+		// removed but kept apart by unchanged words, so they must not
+		// concatenate into a single mangled token.
+		const lines = summarizeOperations( [
+			{
+				type: 'attribute-set',
+				attribute: 'content',
+				before: 'The quick brown fox jumps over the lazy dog.',
+				after: 'The quick brown fox leaps over the dog.',
+			},
+		] );
+		expect( lines ).toEqual(
+			expect.arrayContaining( [
+				{ label: 'Add:', value: '“leaps”' },
+				{ label: 'Delete:', value: '“jumps … lazy”' },
+			] )
+		);
+	} );
+
+	it( 'keeps a contiguous multi-word deletion intact', () => {
+		const lines = summarizeOperations( [
+			{
+				type: 'attribute-set',
+				attribute: 'content',
+				before: 'Hello brave new world',
+				after: 'Hello world',
+			},
+		] );
+		expect( lines ).toEqual( [
+			{ label: 'Delete:', value: '“brave new”' },
+		] );
+	} );
+
 	it( 'collapses non-content attribute changes into a Format: line', () => {
 		const lines = summarizeOperations( [
 			{

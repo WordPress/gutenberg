@@ -173,10 +173,21 @@ function ellipsize( text ) {
 }
 
 /**
+ * Separator placed between non-contiguous edited spans in a summary line.
+ * Without it, two deletions kept apart by unchanged words — e.g. removing
+ * "jumps" and "lazy" from "jumps over the lazy dog" — would concatenate into
+ * "jumpslazy", reading as a single mangled word. The surrounding spaces keep
+ * the ellipsis from gluing to either span.
+ */
+const SPAN_SEPARATOR = ' … ';
+
+/**
  * Derive the inserted and deleted text spans from a pair of before/after
- * strings by running the shared word-level diff and concatenating matching
- * segments. Whitespace-only runs are excluded from the counts so a pure
- * format change doesn't surface as "Add: ' '".
+ * strings by running the shared word-level diff. Contiguous runs of the same
+ * operation are kept together (preserving their internal spacing); runs that
+ * are separated by unchanged or opposite-type segments are joined with
+ * `SPAN_SEPARATOR` so distinct edits don't visually merge. Whitespace-only
+ * runs are dropped so a pure format change doesn't surface as "Add: ' '".
  *
  * @param {string} before Original text.
  * @param {string} after  Proposed text.
@@ -185,18 +196,41 @@ function ellipsize( text ) {
  */
 function textDelta( before, after ) {
 	const segments = wordDiff( before, after );
-	let inserted = '';
-	let deleted = '';
+	const insertedRuns = [];
+	const deletedRuns = [];
+	let currentInsert = '';
+	let currentDelete = '';
+	const flushInsert = () => {
+		if ( currentInsert.trim() ) {
+			insertedRuns.push( currentInsert.trim() );
+		}
+		currentInsert = '';
+	};
+	const flushDelete = () => {
+		if ( currentDelete.trim() ) {
+			deletedRuns.push( currentDelete.trim() );
+		}
+		currentDelete = '';
+	};
 	for ( const seg of segments ) {
 		if ( seg.type === 'insert' ) {
-			inserted += seg.value;
+			currentInsert += seg.value;
+			flushDelete();
 		} else if ( seg.type === 'delete' ) {
-			deleted += seg.value;
+			currentDelete += seg.value;
+			flushInsert();
+		} else {
+			flushInsert();
+			flushDelete();
 		}
 	}
+	flushInsert();
+	flushDelete();
+	const inserted = insertedRuns.join( SPAN_SEPARATOR );
+	const deleted = deletedRuns.join( SPAN_SEPARATOR );
 	return {
-		inserted: inserted.trim() ? ellipsize( inserted ) : '',
-		deleted: deleted.trim() ? ellipsize( deleted ) : '',
+		inserted: inserted ? ellipsize( inserted ) : '',
+		deleted: deleted ? ellipsize( deleted ) : '',
 	};
 }
 
