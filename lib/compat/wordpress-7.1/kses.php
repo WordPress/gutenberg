@@ -21,6 +21,7 @@ function gutenberg_add_svg_to_safe_style_css( array $attr ): array {
 		'fill',
 		'fill-opacity',
 		'fill-rule',
+
 		// Stroke.
 		'stroke',
 		'stroke-dasharray',
@@ -30,6 +31,7 @@ function gutenberg_add_svg_to_safe_style_css( array $attr ): array {
 		'stroke-miterlimit',
 		'stroke-opacity',
 		'stroke-width',
+
 		// Paint.
 		'color-interpolation',
 		'color-interpolation-filters',
@@ -39,14 +41,17 @@ function gutenberg_add_svg_to_safe_style_css( array $attr ): array {
 		'flood-color',
 		'flood-opacity',
 		'lighting-color',
+
 		// Markers.
 		'marker',
 		'marker-start',
 		'marker-mid',
 		'marker-end',
+
 		// Clipping and masking.
 		'clip-rule',
 		'mask-type',
+
 		// Geometry.
 		'cx',
 		'cy',
@@ -56,6 +61,7 @@ function gutenberg_add_svg_to_safe_style_css( array $attr ): array {
 		'x',
 		'y',
 		'd',
+
 		// Text.
 		'alignment-baseline',
 		'baseline-shift',
@@ -63,6 +69,7 @@ function gutenberg_add_svg_to_safe_style_css( array $attr ): array {
 		'glyph-orientation-horizontal',
 		'glyph-orientation-vertical',
 		'text-anchor',
+
 		// Rendering.
 		'shape-rendering',
 		'vector-effect',
