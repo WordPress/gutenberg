@@ -577,6 +577,17 @@ export interface BlockBindingsSource {
 		select: unknown;
 		context: Record< string, unknown >;
 	} ) => unknown;
+	/**
+	 * Optional function to get inner blocks from the source.
+	 * Used when `metadata.bindings.innerBlocks` is set on a block.
+	 */
+	getInnerBlocks?: Function;
+	/**
+	 * Optional function to update the inner blocks in the source.
+	 * Used when `metadata.bindings.innerBlocks` is set on a block and
+	 * the user modifies the inner blocks in the editor.
+	 */
+	setInnerBlocks?: Function;
 }
 
 /**

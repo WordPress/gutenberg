@@ -921,7 +921,8 @@ function gutenberg_unique_id_from_values( array $data, string $prefix = '' ): st
  * @return string                Filtered block content.
  */
 function gutenberg_render_layout_support_flag( $block_content, $block ) {
-	static $global_styles = null;
+	static $global_styles       = null;
+	static $global_styles_theme = '';
 
 	$block_type            = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	$block_supports_layout = block_has_support( $block_type, array( 'layout' ), false ) || block_has_support( $block_type, array( '__experimentalLayout' ), false );
@@ -1114,9 +1115,11 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 		// Get default blockGap value from global styles for use in layouts like grid.
 		// Check style variation first, then block-specific styles, then fall back to root styles.
-		$block_name = $block['blockName'] ?? '';
-		if ( null === $global_styles ) {
-			$global_styles = gutenberg_get_global_styles();
+		$block_name        = $block['blockName'] ?? '';
+		$active_stylesheet = get_stylesheet();
+		if ( null === $global_styles || $global_styles_theme !== $active_stylesheet ) {
+			$global_styles       = gutenberg_get_global_styles();
+			$global_styles_theme = $active_stylesheet;
 		}
 
 		// Check if the block has an active style variation with a blockGap value.

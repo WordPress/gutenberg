@@ -62,6 +62,8 @@ export function addBlockBindingsSource( source: BlockBindingsSource ): Action {
 		setValues: source.setValues,
 		canUserEditValue: source.canUserEditValue,
 		getFieldsList: source.getFieldsList,
+		getInnerBlocks: source.getInnerBlocks,
+		setInnerBlocks: source.setInnerBlocks,
 	};
 }
 

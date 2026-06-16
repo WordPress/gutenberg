@@ -767,6 +767,8 @@ export const registerBlockBindingsSource = (
 		setValues,
 		canUserEditValue,
 		getFieldsList,
+		getInnerBlocks,
+		setInnerBlocks,
 	} = source;
 
 	const existingSource = unlock(
@@ -862,6 +864,18 @@ export const registerBlockBindingsSource = (
 	// Check the `getFieldsList` property is correct.
 	if ( getFieldsList && typeof getFieldsList !== 'function' ) {
 		warning( 'Block bindings source getFieldsList must be a function.' );
+		return;
+	}
+
+	// Check the `getInnerBlocks` property is correct.
+	if ( getInnerBlocks && typeof getInnerBlocks !== 'function' ) {
+		warning( 'Block bindings source getInnerBlocks must be a function.' );
+		return;
+	}
+
+	// Check the `setInnerBlocks` property is correct.
+	if ( setInnerBlocks && typeof setInnerBlocks !== 'function' ) {
+		warning( 'Block bindings source setInnerBlocks must be a function.' );
 		return;
 	}
 

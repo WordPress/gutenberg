@@ -45,6 +45,21 @@ add_filter(
 	}
 );
 
+if ( ! class_exists( 'WP_Block_Context_Extractor' ) ) {
+	// phpcs:ignore Gutenberg.Commenting.SinceTag.MissingClassSinceTag
+	class WP_Block_Context_Extractor extends WP_Block {
+		/**
+		 * Static methods of subclasses have access to protected properties
+		 * of instances of the parent class.
+		 * In this case, this gives us access to `available_context`.
+		 */
+		// phpcs:ignore Gutenberg.Commenting.SinceTag.MissingMethodSinceTag
+		public static function get_available_context( $instance ) {
+			return $instance->available_context;
+		}
+	}
+}
+
 /**
  * Callback function for the render_block filter.
  *
@@ -62,7 +77,12 @@ function gutenberg_block_bindings_render_block( $block_content, $block, $instanc
 
 	// Process the block bindings and get attributes updated with the values from the sources.
 	$computed_attributes = gutenberg_process_block_bindings( $instance );
-	if ( empty( $computed_attributes ) ) {
+
+	// Process innerBlocks binding.
+	$bound_inner_blocks = gutenberg_process_inner_blocks_binding( $instance );
+
+	// If neither attribute bindings nor innerBlocks binding found, return early.
+	if ( empty( $computed_attributes ) && null === $bound_inner_blocks ) {
 		return $block_content;
 	}
 
@@ -77,7 +97,18 @@ function gutenberg_block_bindings_render_block( $block_content, $block, $instanc
 	 * filter). To do so, we'll run `$instance->render()` once more
 	 * so the block can update its content based on those attributes.
 	 */
-	$instance->attributes = array_merge( $instance->attributes, $computed_attributes );
+	if ( ! empty( $computed_attributes ) ) {
+		$instance->attributes = array_merge( $instance->attributes, $computed_attributes );
+	}
+
+	/*
+	 * Replace the block's inner blocks with the blocks returned by the
+	 * innerBlocks binding source.
+	 */
+	if ( ! empty( $bound_inner_blocks ) && is_string( $bound_inner_blocks ) ) {
+		$parsed_inner_blocks    = parse_blocks( $bound_inner_blocks );
+		$instance->inner_blocks = new WP_Block_List( $parsed_inner_blocks );
+	}
 
 	/*
 	 * If we're dealing with the Button block, we remove the bindings metadata
@@ -295,20 +326,6 @@ function gutenberg_process_block_bindings( $instance ) {
 			continue;
 		}
 
-		if ( ! class_exists( 'WP_Block_Context_Extractor' ) ) {
-			// phpcs:ignore Gutenberg.Commenting.SinceTag.MissingClassSinceTag
-			class WP_Block_Context_Extractor extends WP_Block {
-				/**
-				 * Static methods of subclasses have access to protected properties
-				 * of instances of the parent class.
-				 * In this case, this gives us access to `available_context`.
-				 */
-				// phpcs:ignore Gutenberg.Commenting.SinceTag.MissingMethodSinceTag
-				public static function get_available_context( $instance ) {
-					return $instance->available_context;
-				}
-			}
-		}
 		$available_context = WP_Block_Context_Extractor::get_available_context( $instance );
 
 		// Adds the necessary context defined by the source.
@@ -330,6 +347,78 @@ function gutenberg_process_block_bindings( $instance ) {
 	}
 
 	return $computed_attributes;
+}
+
+/**
+ * Processes the `innerBlocks` binding for a block and returns the serialized
+ * block HTML that should replace the block's inner blocks.
+ *
+ * When a block has `metadata.bindings.innerBlocks` set, the registered source's
+ * `get_value_callback` is invoked with `'innerBlocks'` as the attribute name.
+ * The callback should return serialized block HTML (a string of block comments)
+ * that will be parsed and used as the block's inner blocks during rendering.
+ *
+ * ### Example binding configuration
+ *
+ * ```json
+ * {
+ *   "metadata": {
+ *     "bindings": {
+ *       "innerBlocks": {
+ *         "source": "my-plugin/my-source",
+ *         "args": { "key": "content" }
+ *       }
+ *     }
+ *   }
+ * }
+ * ```
+ *
+ * @since 7.2.0
+ *
+ * @param WP_Block $instance The block instance.
+ * @return string|null Serialized block HTML for the inner blocks, or null if no binding found.
+ */
+function gutenberg_process_inner_blocks_binding( $instance ) {
+	$parsed_block = $instance->parsed_block;
+
+	if (
+		empty( $parsed_block['attrs']['metadata']['bindings']['innerBlocks'] ) ||
+		! is_array( $parsed_block['attrs']['metadata']['bindings']['innerBlocks'] )
+	) {
+		return null;
+	}
+
+	$inner_blocks_binding = $parsed_block['attrs']['metadata']['bindings']['innerBlocks'];
+
+	// If no source is provided, or that source is not registered, return null.
+	if ( ! isset( $inner_blocks_binding['source'] ) || ! is_string( $inner_blocks_binding['source'] ) ) {
+		return null;
+	}
+
+	$block_binding_source = get_block_bindings_source( $inner_blocks_binding['source'] );
+	if ( null === $block_binding_source ) {
+		return null;
+	}
+
+	$available_context = WP_Block_Context_Extractor::get_available_context( $instance );
+
+	// Adds the necessary context defined by the source.
+	if ( ! empty( $block_binding_source->uses_context ) ) {
+		foreach ( $block_binding_source->uses_context as $context_name ) {
+			if ( array_key_exists( $context_name, $available_context ) ) {
+				$instance->context[ $context_name ] = $available_context[ $context_name ];
+			}
+		}
+	}
+
+	$source_args  = ! empty( $inner_blocks_binding['args'] ) && is_array( $inner_blocks_binding['args'] ) ? $inner_blocks_binding['args'] : array();
+	$source_value = $block_binding_source->get_value( $source_args, $instance, 'innerBlocks' );
+
+	if ( ! is_string( $source_value ) || empty( $source_value ) ) {
+		return null;
+	}
+
+	return $source_value;
 }
 
 /**

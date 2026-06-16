@@ -1746,6 +1746,32 @@ describe( 'blocks', () => {
 			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
 		} );
 
+		// Check the `getInnerBlocks` callback is correct.
+		it( 'should reject invalid getInnerBlocks callback', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				getInnerBlocks: 'should be a function',
+			} );
+			expect( console ).toHaveWarnedWith(
+				'Block bindings source getInnerBlocks must be a function.'
+			);
+			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
+		} );
+
+		// Check the `setInnerBlocks` callback is correct.
+		it( 'should reject invalid setInnerBlocks callback', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				setInnerBlocks: 'should be a function',
+			} );
+			expect( console ).toHaveWarnedWith(
+				'Block bindings source setInnerBlocks must be a function.'
+			);
+			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
+		} );
+
 		// Check correct sources are registered as expected.
 		it( 'should register a valid source', () => {
 			const sourceProperties = {
@@ -1754,6 +1780,8 @@ describe( 'blocks', () => {
 				getValues: () => 'value',
 				setValues: () => 'new values',
 				canUserEditValue: () => true,
+				getInnerBlocks: () => [],
+				setInnerBlocks: () => undefined,
 			};
 			registerBlockBindingsSource( {
 				name: 'core/valid-source',
@@ -1776,6 +1804,8 @@ describe( 'blocks', () => {
 			expect( source.setValues ).toBeUndefined();
 			expect( source.canUserEditValue ).toBeUndefined();
 			expect( source.getFieldsList ).toBeUndefined();
+			expect( source.getInnerBlocks ).toBeUndefined();
+			expect( source.setInnerBlocks ).toBeUndefined();
 			unregisterBlockBindingsSource( 'core/valid-source' );
 		} );
 

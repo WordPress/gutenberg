@@ -13,8 +13,13 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
-import { useRegistry, useSelect } from '@wordpress/data';
-import { useCallback, useContext, useMemo } from '@wordpress/element';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
+import {
+	useCallback,
+	useContext,
+	useEffect,
+	useMemo,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -26,6 +31,7 @@ import {
 	replacePatternOverridesDefaultBinding,
 } from '../../utils/block-bindings';
 import { unlock } from '../../lock-unlock';
+import { store as blockEditorStore } from '../../store';
 import { PrivateBlockContext } from '../block-list/private-block-context';
 
 /**
@@ -59,6 +65,7 @@ const EditWithFilters = withFilters( 'editor.BlockEdit' )( Edit );
 const EditWithGeneratedProps = ( props ) => {
 	const { name, clientId, attributes, setAttributes } = props;
 	const registry = useRegistry();
+	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 	const blockType = getBlockType( name );
 	const blockContext = useContext( BlockContext );
 	const registeredSources = useSelect(
@@ -183,6 +190,41 @@ const EditWithGeneratedProps = ( props ) => {
 			registeredSources,
 		]
 	);
+
+	// Handle innerBlocks binding: get inner blocks from the source and sync
+	// them into the block editor store when the binding or context changes.
+	// We use useEffect (not useSelect) to avoid an infinite loop: calling
+	// replaceInnerBlocks changes the store, which would re-trigger a useSelect,
+	// which would call replaceInnerBlocks again, and so on.
+	const innerBlocksBinding = blockBindings?.innerBlocks;
+	const innerBlocksBindingSource = innerBlocksBinding
+		? registeredSources[ innerBlocksBinding.source ]
+		: null;
+
+	useEffect( () => {
+		if (
+			! innerBlocksBinding ||
+			! innerBlocksBindingSource?.getInnerBlocks
+		) {
+			return;
+		}
+		const blocks = innerBlocksBindingSource.getInnerBlocks( {
+			select: registry.select,
+			context,
+			clientId,
+			binding: innerBlocksBinding,
+		} );
+		if ( blocks !== undefined ) {
+			replaceInnerBlocks( clientId, blocks );
+		}
+	}, [
+		clientId,
+		innerBlocksBinding,
+		innerBlocksBindingSource,
+		context,
+		registry.select,
+		replaceInnerBlocks,
+	] );
 
 	const setBoundAttributes = useCallback(
 		( nextAttributes ) => {
