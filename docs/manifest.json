@@ -2532,6 +2532,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/grid",
+		"slug": "packages-grid",
+		"markdown_source": "../packages/grid/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/hooks",
 		"slug": "packages-hooks",
 		"markdown_source": "../packages/hooks/README.md",
