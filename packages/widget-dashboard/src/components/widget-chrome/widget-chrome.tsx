@@ -17,6 +17,7 @@ import {
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { plugins } from '@wordpress/icons';
+// eslint-disable-next-line @wordpress/use-recommended-components
 import { Card, Icon, Stack, Notice, Text, VisuallyHidden } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
 

@@ -1587,11 +1587,6 @@
 			"count": 1
 		}
 	},
-	"packages/widget-dashboard/src/components/widget-chrome/widget-chrome.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/workflow/src/components/workflow-menu.js": {
 		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 1
