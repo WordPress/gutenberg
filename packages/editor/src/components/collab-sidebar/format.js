@@ -19,7 +19,7 @@ export const NOTE_FORMAT_NAME = 'core/note';
 
 export const noteFormat = {
 	title: __( 'Add note' ),
-	tagName: 'span',
+	tagName: 'mark',
 	className: 'wp-note',
 	attributes: {
 		'data-id': 'data-id',

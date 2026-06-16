@@ -6,6 +6,7 @@ import {
 	useState,
 	useEffect,
 	useMemo,
+	useRef,
 	useSyncExternalStore,
 } from '@wordpress/element';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
@@ -653,4 +654,90 @@ export function useAnnotateBlocks( threads ) {
 		__experimentalAddAnnotation,
 		__experimentalRemoveAnnotationsBySource,
 	] );
+}
+
+/**
+ * Decide what to do with an inline note based on whether its in-content marker
+ * is still present. Pure so it can be unit-tested without React/stores.
+ *
+ * - `'anchor'`: the marker is present; record that we've seen it this session.
+ * - `'delete'`: the marker was seen earlier this session but is now gone (the
+ *   user removed the marked text), so the note should be deleted.
+ * - `'skip'`: not an inline note, the block isn't loaded yet, or the marker is
+ *   absent for a note we never saw anchored (e.g. a legacy/never-anchored note,
+ *   which keeps its stored-offset fallback rather than being deleted).
+ *
+ * @param {Object}  thread     Materialized thread record (with `.id`, `.meta`, `.blockClientId`).
+ * @param {?Object} attributes Block attributes for the thread's block, or null/undefined when unloaded.
+ * @param {Set}     anchored   Ids whose marker has been observed present this session.
+ * @return {'anchor'|'delete'|'skip'} The action to take.
+ */
+export function reconcileInlineNoteMarker( thread, attributes, anchored ) {
+	const selection =
+		thread?.meta?._wp_note_selection &&
+		! Array.isArray( thread.meta._wp_note_selection )
+			? thread.meta._wp_note_selection
+			: null;
+	if (
+		! selection?.attributeKey ||
+		! thread?.blockClientId ||
+		! attributes
+	) {
+		return 'skip';
+	}
+	const present = !! findNoteRange(
+		attributes[ selection.attributeKey ],
+		thread.id
+	);
+	if ( present ) {
+		return 'anchor';
+	}
+	return anchored.has( thread.id ) ? 'delete' : 'skip';
+}
+
+/**
+ * Delete inline notes whose in-content marker the user has removed (e.g. by
+ * backspacing the marked text) instead of letting them silently fall back to
+ * block-level notes.
+ *
+ * A note is only deleted once its marker has been observed present earlier in
+ * the same session, guarding against false deletes while content is still
+ * loading or in the brief window after creation before the marker is written.
+ *
+ * @param {Array} threads Inline note threads (unresolved roots) to reconcile.
+ */
+export function useReconcileRemovedInlineNotes( threads ) {
+	const { getBlockAttributes } = useSelect( blockEditorStore );
+	const { onDelete } = useNoteActions();
+	const anchoredRef = useRef();
+
+	useEffect( () => {
+		if ( ! threads?.length ) {
+			return;
+		}
+		// Lazily seed the session set inside the effect; refs must not be
+		// read or written during render.
+		if ( ! anchoredRef.current ) {
+			anchoredRef.current = new Set();
+		}
+		const anchored = anchoredRef.current;
+		for ( const thread of threads ) {
+			const action = reconcileInlineNoteMarker(
+				thread,
+				thread.blockClientId
+					? getBlockAttributes( thread.blockClientId )
+					: null,
+				anchored
+			);
+			if ( action === 'anchor' ) {
+				anchored.add( thread.id );
+			} else if ( action === 'delete' ) {
+				// Drop from the set first so a re-render before the delete
+				// settles (the thread lingers until the entity refetches) does
+				// not enqueue a second delete.
+				anchored.delete( thread.id );
+				onDelete( thread );
+			}
+		}
+	}, [ threads, getBlockAttributes, onDelete ] );
 }

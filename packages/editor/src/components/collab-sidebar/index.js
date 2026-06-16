@@ -34,6 +34,7 @@ import {
 	useAnnotateBlocks,
 	useEnableFloatingSidebar,
 	useNoteThreads,
+	useReconcileRemovedInlineNotes,
 } from './hooks';
 import { getNoteIdsFromMetadata, pickPrimaryNote } from './utils';
 import { NOTE_FORMAT_NAME, noteFormat } from './format';
@@ -85,6 +86,9 @@ function NotesSidebar( { postId } ) {
 
 	const { notes, unresolvedNotes } = useNoteThreads( postId );
 	useAnnotateBlocks( unresolvedNotes );
+	// Removing the marked text deletes the note rather than letting it become a
+	// block-level note.
+	useReconcileRemovedInlineNotes( unresolvedNotes );
 
 	// Only enable the floating sidebar for large viewports.
 	const showFloatingSidebar = isLargeViewport;

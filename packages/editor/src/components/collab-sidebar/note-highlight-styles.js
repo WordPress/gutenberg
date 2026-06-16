@@ -17,9 +17,11 @@ const ACTIVE_ALPHA = '80';
 
 // Reset the browser's default `<mark>` styling so the per-author rules below
 // are what readers actually see (without it, `mark` ships with a bright yellow
-// background in every browser). Scoped to our annotation source.
+// background in every browser). Covers both the visible annotation marker and
+// the `core/note` anchor marker, which also serializes as a `<mark>` and would
+// otherwise inherit the yellow default in the editor canvas.
 const BASE_RESET =
-	'mark.annotation-text-core-note{background-color:transparent;color:inherit;}';
+	'mark.annotation-text-core-note,mark.wp-note{background-color:transparent;color:inherit;}';
 
 /**
  * Build the CSS rule set that tints each inline-note marker with its author's

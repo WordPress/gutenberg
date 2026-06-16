@@ -7,7 +7,7 @@ import { getAvatarBorderColor } from '../utils';
 describe( 'buildHighlightCss', () => {
 	it( 'always emits the mark reset so the browser default yellow does not bleed through', () => {
 		expect( buildHighlightCss( [] ) ).toContain(
-			'mark.annotation-text-core-note{background-color:transparent;color:inherit;}'
+			'mark.annotation-text-core-note,mark.wp-note{background-color:transparent;color:inherit;}'
 		);
 	} );
 
@@ -97,10 +97,10 @@ describe( 'buildHighlightCss', () => {
 
 	it( 'returns just the reset when no threads are provided', () => {
 		expect( buildHighlightCss() ).toBe(
-			'mark.annotation-text-core-note{background-color:transparent;color:inherit;}'
+			'mark.annotation-text-core-note,mark.wp-note{background-color:transparent;color:inherit;}'
 		);
 		expect( buildHighlightCss( null ) ).toBe(
-			'mark.annotation-text-core-note{background-color:transparent;color:inherit;}'
+			'mark.annotation-text-core-note,mark.wp-note{background-color:transparent;color:inherit;}'
 		);
 	} );
 } );

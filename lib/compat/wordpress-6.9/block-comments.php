@@ -89,39 +89,90 @@ add_action( 'init', 'gutenberg_register_block_comment_metadata' );
  * Strip inline note markers from rendered block output.
  *
  * Inline notes are anchored in raw block content with
- * `<span class="wp-note" data-id="N">…</span>` so the marker survives edits,
- * but the public HTML should not expose note metadata. `render_block` removes
- * the `wp-note` class and `data-id` attribute before output while leaving the
- * raw `post_content` (and the REST `raw` view, revisions, exports) intact.
+ * `<mark class="wp-note" data-id="N">…</mark>` so the marker survives edits,
+ * but the public HTML should not expose note metadata. `render_block` unwraps
+ * the marker entirely - dropping the `<mark>` open tag and its matching closer
+ * while keeping the marked text - so nothing leaks to the front end. The raw
+ * `post_content` (and the REST `raw` view, revisions, exports) keeps the marker
+ * so the editor can re-attach on reload.
  *
- * The `WP_HTML_Tag_Processor` is used rather than a regular expression: it
- * matches the `wp-note` class exactly (a regex word boundary also matches
- * `wp-note-foo`) and is unaffected by nested inline formatting (e.g. a note
- * wrapping coloured text serializes as nested `<span>`s, which a backreference
- * `</span>` match would unbalance). The HTML API can rewrite attributes but
- * cannot delete a tag and its matching closer, so the now-inert `<span>`
- * wrapper is left in place; it carries no note metadata.
+ * The `WP_HTML_Tag_Processor` flags the note markers because it matches the
+ * `wp-note` class exactly (a regex word boundary also matches `wp-note-foo`)
+ * and parses attributes reliably. The HTML API cannot remove a tag together
+ * with its closer, so a second offset-based pass pairs each flagged `<mark>`
+ * with its matching `</mark>` - tracking `<mark>` nesting so overlapping notes
+ * and any user highlight `<mark>` left intact still pair correctly - and
+ * removes only the note wrappers.
  *
  * @param string $block_content Rendered block HTML.
- * @return string Block HTML with wp-note markers neutralized.
+ * @return string Block HTML with wp-note markers unwrapped.
  */
 function gutenberg_strip_inline_note_markers( $block_content ) {
 	if ( false === strpos( $block_content, 'wp-note' ) ) {
 		return $block_content;
 	}
 
+	// Flag the note markers with a sentinel attribute so the offset pass below
+	// can identify them without re-parsing classes from raw strings.
 	$processor = new WP_HTML_Tag_Processor( $block_content );
-
-	while ( $processor->next_tag( 'SPAN' ) ) {
+	$found     = false;
+	while ( $processor->next_tag( 'MARK' ) ) {
 		if ( ! $processor->has_class( 'wp-note' ) ) {
 			continue;
 		}
-
-		$processor->remove_class( 'wp-note' );
-		$processor->remove_attribute( 'data-id' );
+		$processor->set_attribute( 'data-wp-note-strip', '' );
+		$found = true;
 	}
 
-	return $processor->get_updated_html();
+	if ( ! $found ) {
+		return $block_content;
+	}
+
+	$block_content = $processor->get_updated_html();
+
+	if ( ! preg_match_all( '~</?mark\b[^>]*>~i', $block_content, $tags, PREG_OFFSET_CAPTURE ) ) {
+		return $block_content;
+	}
+
+	// Pair each flagged opener with its matching closer via a nesting stack,
+	// then collect both byte ranges for removal.
+	$open_stack = array();
+	$removals   = array();
+	foreach ( $tags[0] as $tag ) {
+		$html   = $tag[0];
+		$offset = $tag[1];
+
+		if ( '/' === $html[1] ) {
+			$open = array_pop( $open_stack );
+			if ( null !== $open && $open['is_note'] ) {
+				$removals[] = array( $offset, strlen( $html ) );
+				$removals[] = $open['range'];
+			}
+			continue;
+		}
+
+		$open_stack[] = array(
+			'range'   => array( $offset, strlen( $html ) ),
+			'is_note' => false !== strpos( $html, 'data-wp-note-strip' ),
+		);
+	}
+
+	if ( empty( $removals ) ) {
+		return $block_content;
+	}
+
+	// Remove from the end so earlier offsets remain valid.
+	usort(
+		$removals,
+		static function ( $a, $b ) {
+			return $b[0] - $a[0];
+		}
+	);
+	foreach ( $removals as $range ) {
+		$block_content = substr_replace( $block_content, '', $range[0], $range[1] );
+	}
+
+	return $block_content;
 }
 add_filter( 'render_block', 'gutenberg_strip_inline_note_markers' );
 

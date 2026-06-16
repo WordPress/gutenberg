@@ -12,11 +12,15 @@ import { select } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { BLOCK_LEVEL_NOTE_START, getInlineMarkerStart } from '../hooks';
+import {
+	BLOCK_LEVEL_NOTE_START,
+	getInlineMarkerStart,
+	reconcileInlineNoteMarker,
+} from '../hooks';
 
 // `findNoteRange`, which getInlineMarkerStart delegates to, walks rich-text
 // values and needs the `core/note` format registered to recognize the marker
-// spans the tests construct below.
+// elements the tests construct below.
 const FORMAT_NAME = 'core/note';
 
 const isRegistered = () =>
@@ -26,7 +30,7 @@ beforeAll( () => {
 	if ( ! isRegistered() ) {
 		registerFormatType( FORMAT_NAME, {
 			title: 'Note',
-			tagName: 'span',
+			tagName: 'mark',
 			className: 'wp-note',
 			attributes: { 'data-id': 'data-id' },
 			edit: () => null,
@@ -58,7 +62,7 @@ describe( 'getInlineMarkerStart', () => {
 	it( 'returns the marker start offset when the block carries a matching marker', () => {
 		const attributes = {
 			content: RichTextData.fromHTMLString(
-				'hello <span class="wp-note" data-id="7">marked</span> world'
+				'hello <mark class="wp-note" data-id="7">marked</mark> world'
 			),
 		};
 		const thread = {
@@ -130,7 +134,7 @@ describe( 'getInlineMarkerStart', () => {
 	it( 'is order-stable when used as a sort key: block-level first, then by start offset, then by id', () => {
 		const attributes = {
 			content: RichTextData.fromHTMLString(
-				'a <span class="wp-note" data-id="2">x</span> b <span class="wp-note" data-id="3">y</span> c <span class="wp-note" data-id="1">z</span>'
+				'a <mark class="wp-note" data-id="2">x</mark> b <mark class="wp-note" data-id="3">y</mark> c <mark class="wp-note" data-id="1">z</mark>'
 			),
 		};
 		const threads = [
@@ -159,5 +163,82 @@ describe( 'getInlineMarkerStart', () => {
 			return a.id - b.id;
 		} );
 		expect( sorted.map( ( t ) => t.id ) ).toEqual( [ 99, 2, 3, 1 ] );
+	} );
+} );
+
+describe( 'reconcileInlineNoteMarker', () => {
+	const inlineThread = {
+		id: 7,
+		blockClientId: 'abc',
+		meta: { _wp_note_selection: { attributeKey: 'content' } },
+	};
+	const withMarker = {
+		content: RichTextData.fromHTMLString(
+			'hello <mark class="wp-note" data-id="7">marked</mark> world'
+		),
+	};
+	const withoutMarker = {
+		content: RichTextData.fromHTMLString( 'hello world' ),
+	};
+
+	it( 'returns "anchor" when the marker is present', () => {
+		expect(
+			reconcileInlineNoteMarker( inlineThread, withMarker, new Set() )
+		).toBe( 'anchor' );
+	} );
+
+	it( 'returns "delete" when a previously anchored marker is now gone', () => {
+		expect(
+			reconcileInlineNoteMarker(
+				inlineThread,
+				withoutMarker,
+				new Set( [ 7 ] )
+			)
+		).toBe( 'delete' );
+	} );
+
+	it( 'returns "skip" when the marker is gone but was never observed (legacy/never-anchored note)', () => {
+		expect(
+			reconcileInlineNoteMarker( inlineThread, withoutMarker, new Set() )
+		).toBe( 'skip' );
+	} );
+
+	it( 'returns "skip" for a block-level note (no inline selection meta)', () => {
+		const blockLevel = { id: 7, blockClientId: 'abc', meta: {} };
+		expect(
+			reconcileInlineNoteMarker(
+				blockLevel,
+				withMarker,
+				new Set( [ 7 ] )
+			)
+		).toBe( 'skip' );
+	} );
+
+	it( 'returns "skip" when meta is an empty array (WordPress empty-object serialization)', () => {
+		const thread = {
+			id: 7,
+			blockClientId: 'abc',
+			meta: { _wp_note_selection: [] },
+		};
+		expect(
+			reconcileInlineNoteMarker( thread, withoutMarker, new Set( [ 7 ] ) )
+		).toBe( 'skip' );
+	} );
+
+	it( 'returns "skip" for an orphan thread with no blockClientId', () => {
+		const orphan = {
+			id: 7,
+			blockClientId: null,
+			meta: { _wp_note_selection: { attributeKey: 'content' } },
+		};
+		expect(
+			reconcileInlineNoteMarker( orphan, withMarker, new Set( [ 7 ] ) )
+		).toBe( 'skip' );
+	} );
+
+	it( 'returns "skip" when block attributes are not loaded yet', () => {
+		expect(
+			reconcileInlineNoteMarker( inlineThread, null, new Set( [ 7 ] ) )
+		).toBe( 'skip' );
 	} );
 } );
