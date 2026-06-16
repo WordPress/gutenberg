@@ -5,7 +5,7 @@ import { _x } from '@wordpress/i18n';
 import { create, RichTextData } from '@wordpress/rich-text';
 
 /**
- * Sanitizes a note string by removing non-printable ASCII characters.
+ * Sanitizes a note string by trimming leading and trailing whitespace.
  *
  * @param {string} str - The note string to sanitize.
  * @return {string} - The sanitized note string.
@@ -35,8 +35,11 @@ const AVATAR_BORDER_COLORS = [
 /**
  * Gets the border color for an avatar based on the user ID.
  *
+ * Always returns a 6-digit `#RRGGBB` hex string; callers (e.g. the highlight
+ * styles) rely on this format to append alpha suffixes.
+ *
  * @param {number} userId - The user ID.
- * @return {string} - The border color.
+ * @return {string} - The border color as a `#RRGGBB` hex string.
  */
 export function getAvatarBorderColor( userId ) {
 	return AVATAR_BORDER_COLORS[ userId % AVATAR_BORDER_COLORS.length ];

@@ -36,7 +36,11 @@ export function buildHighlightCss( threads, selectedId = null ) {
 			continue;
 		}
 		const color = getAvatarBorderColor( thread.author ?? 0 );
-		const sel = `#annotation-text-${ thread.id }`;
+		// `thread.id` is a server comment ID (always a positive integer), but
+		// escape it defensively since it composes a selector from stored data.
+		const sel = `#${ window.CSS.escape(
+			`annotation-text-${ thread.id }`
+		) }`;
 		rules.push( `${ sel }{background-color:${ color }${ REST_ALPHA };}` );
 		rules.push(
 			`${ sel }:hover,${ sel }:focus-within{background-color:${ color }${ ACTIVE_ALPHA };}`
