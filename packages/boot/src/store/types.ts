@@ -56,6 +56,12 @@ export interface CanvasData {
 	 * Indicates if the canvas is in preview mode.
 	 */
 	isPreview?: boolean;
+
+	/**
+	 * Whether to render the route's custom canvas surface instead of the default
+	 * editor canvas.
+	 */
+	customCanvas?: boolean;
 	/**
 	 * Optional edit link for click-to-edit navigation.
 	 * When provided with isPreview: true, the preview can expose an edit action.

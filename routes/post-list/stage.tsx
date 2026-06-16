@@ -27,7 +27,8 @@ import {
 	MenuItem,
 	Notice,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import apiFetch from '@wordpress/api-fetch';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useMemo, useCallback, useEffect, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __, sprintf } from '@wordpress/i18n';
@@ -37,9 +38,10 @@ import {
 	page as pageIcon,
 	post as postIcon,
 } from '@wordpress/icons';
-import type { Post, WpTemplate } from '@wordpress/core-data';
+import type { Post, Type, WpTemplate } from '@wordpress/core-data';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import { EmptyState, Tabs } from '@wordpress/ui';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -77,6 +79,7 @@ const { usePostActions, usePostFields, templateTitleField } =
 import './style.scss';
 
 const LAYOUT_LIST = 'list';
+const POST_LIST_REFRESH_STORAGE_PREFIX = 'site-editor-post-list-refresh';
 
 type PageListItem = Post & {
 	_isTemplatePage?: boolean;
@@ -117,6 +120,20 @@ function capitalizeFirstLetter( value: string ) {
 	return value.charAt( 0 ).toLocaleUpperCase() + value.slice( 1 );
 }
 
+function getPostListRefreshStorageKey( postType: string ) {
+	return `${ POST_LIST_REFRESH_STORAGE_PREFIX }:${ postType }`;
+}
+
+function getPostTypeRestPath( postType: string, postTypeObject: Type ) {
+	const restNamespace =
+		( postTypeObject as { rest_namespace?: string } ).rest_namespace ||
+		'wp/v2';
+	const restBase =
+		( postTypeObject as { rest_base?: string } ).rest_base || postType;
+
+	return `/${ restNamespace }/${ restBase }`;
+}
+
 function PostList() {
 	const invalidate = useInvalidate();
 	const { type: postType } = useParams( {
@@ -126,6 +143,9 @@ function PostList() {
 	const [ isAddingPage, setIsAddingPage ] = useState( false );
 	const [ isConfiguringHomepage, setIsConfiguringHomepage ] =
 		useState( false );
+	const [ postListRefreshKey, setPostListRefreshKey ] = useState<
+		string | undefined
+	>();
 	const searchParams = useSearch( { from: '/types/$type/list/$slug' } );
 	const activeContentTab =
 		searchParams.content === 'templates' ? 'templates' : 'content';
@@ -153,6 +173,24 @@ function PostList() {
 		( select ) => select( coreStore ).getPostType( postType ),
 		[ postType ]
 	);
+	const { receiveEntityRecords } = useDispatch( coreStore );
+
+	useEffect( () => {
+		try {
+			const storageKey = getPostListRefreshStorageKey( postType );
+			const refreshKey = window.sessionStorage.getItem( storageKey );
+
+			if ( ! refreshKey ) {
+				return;
+			}
+
+			window.sessionStorage.removeItem( storageKey );
+			setPostListRefreshKey( refreshKey );
+		} catch {
+			// Storage can be unavailable in private browsing contexts. In that
+			// case, normal core-data resolution will continue to be used.
+		}
+	}, [ postType ] );
 
 	const labels = postTypeObject?.labels;
 	const canCreateRecord = useSelect(
@@ -319,6 +357,65 @@ function PostList() {
 		postType,
 		postTypeRecordsExistenceQuery
 	);
+
+	useEffect( () => {
+		if ( ! postListRefreshKey || ! postTypeObject ) {
+			return;
+		}
+
+		let isCurrent = true;
+
+		const refreshPostListRecords = async () => {
+			try {
+				const response = ( await apiFetch( {
+					path: addQueryArgs(
+						getPostTypeRestPath( postType, postTypeObject ),
+						postTypeQuery
+					),
+					parse: false,
+				} ) ) as Response;
+
+				const refreshedPosts = await response.json();
+				if ( ! isCurrent ) {
+					return;
+				}
+
+				receiveEntityRecords(
+					'postType',
+					postType,
+					refreshedPosts,
+					postTypeQuery,
+					true,
+					undefined,
+					{
+						totalItems: Number(
+							response.headers.get( 'X-WP-Total' )
+						),
+						totalPages: Number(
+							response.headers.get( 'X-WP-TotalPages' )
+						),
+					}
+				);
+				invalidate();
+			} catch {
+				// Fall back to the existing core-data records if the explicit
+				// bridge refresh fails.
+			}
+		};
+
+		refreshPostListRecords();
+
+		return () => {
+			isCurrent = false;
+		};
+	}, [
+		invalidate,
+		postListRefreshKey,
+		postType,
+		postTypeObject,
+		postTypeQuery,
+		receiveEntityRecords,
+	] );
 	const displayedPosts = useMemo( () => {
 		if ( postType !== 'page' ) {
 			return posts;

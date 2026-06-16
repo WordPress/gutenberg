@@ -3,18 +3,31 @@
  */
 import { dispatch, resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { redirect } from '@wordpress/route';
+import { notFound, redirect } from '@wordpress/route';
+
+const NATIVE_CREATION_POST_TYPES = [ 'post', 'page' ];
 
 /**
  * Route configuration for creating a new post.
  */
 export const route = {
-	beforeLoad: ( { params }: { params: { type: string } } ) => {
+	beforeLoad: async ( { params }: { params: { type: string } } ) => {
 		if ( params.type === 'page' ) {
 			throw redirect( {
 				throw: true,
 				to: '/types/page/list/all',
 			} );
+		}
+
+		if ( params.type === 'attachment' ) {
+			throw notFound();
+		}
+
+		const postType = await resolveSelect( coreStore ).getPostType(
+			params.type
+		);
+		if ( ! postType ) {
+			throw notFound();
 		}
 	},
 	title: async ( { params }: { params: { type: string } } ) => {
@@ -29,6 +42,14 @@ export const route = {
 		};
 	} ) {
 		const { params } = context;
+
+		if ( ! NATIVE_CREATION_POST_TYPES.includes( params.type ) ) {
+			return {
+				customCanvas: true,
+				postType: params.type,
+				postId: 'new',
+			};
+		}
 
 		const newPost = await dispatch( coreStore ).saveEntityRecord(
 			'postType',

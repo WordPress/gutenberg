@@ -40,7 +40,10 @@ export default function CanvasRenderer( {
 	const [ CustomCanvas, setCustomCanvas ] = useState< any >( null );
 
 	useEffect( () => {
-		if ( canvas === null && routeContentModule ) {
+		if (
+			( canvas === null || canvas?.customCanvas ) &&
+			routeContentModule
+		) {
 			import( routeContentModule )
 				.then( ( module ) => {
 					setCustomCanvas( () => module.canvas );
@@ -60,7 +63,7 @@ export default function CanvasRenderer( {
 	}
 
 	// Custom canvas
-	if ( canvas === null ) {
+	if ( canvas === null || canvas.customCanvas ) {
 		if ( ! CustomCanvas ) {
 			return null; // Still loading
 		}

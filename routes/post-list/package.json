@@ -8,6 +8,7 @@
 	},
 	"dependencies": {
 		"@wordpress/admin-ui": "file:../../packages/admin-ui",
+		"@wordpress/api-fetch": "file:../../packages/api-fetch",
 		"@wordpress/base-styles": "file:../../packages/base-styles",
 		"@wordpress/block-editor": "file:../../packages/block-editor",
 		"@wordpress/blocks": "file:../../packages/blocks",
@@ -28,6 +29,7 @@
 		"@wordpress/route": "file:../../packages/route",
 		"@wordpress/routes-lock-unlock": "file:../lock-unlock",
 		"@wordpress/ui": "file:../../packages/ui",
+		"@wordpress/url": "file:../../packages/url",
 		"@wordpress/views": "file:../../packages/views",
 		"clsx": "^2.1.1",
 		"dequal": "^2.0.3"

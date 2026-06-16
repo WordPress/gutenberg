@@ -21,6 +21,129 @@ function gutenberg_register_site_editor_admin_page() {
 add_action( 'admin_menu', 'gutenberg_register_site_editor_admin_page' );
 
 /**
+ * Check whether the current wp-admin request is embedded as a Site Editor
+ * compatibility bridge.
+ *
+ * @return bool Whether the current request is an embedded admin bridge request.
+ */
+function gutenberg_site_editor_is_admin_bridge_request() {
+	return is_admin() &&
+		isset( $_GET['gutenberg_site_editor_admin_bridge'] ) &&
+		'1' === sanitize_text_field( wp_unslash( $_GET['gutenberg_site_editor_admin_bridge'] ) );
+}
+
+if ( gutenberg_site_editor_is_admin_bridge_request() && ! defined( 'IFRAME_REQUEST' ) ) {
+	define( 'IFRAME_REQUEST', true );
+}
+
+/**
+ * Force the classic wp-admin editor inside the Site Editor admin bridge.
+ *
+ * @param bool   $use_block_editor Whether the post type should use the block editor.
+ * @param string $post_type        Post type name.
+ * @return bool Whether the post type should use the block editor.
+ */
+function gutenberg_site_editor_admin_bridge_use_block_editor_for_post_type( $use_block_editor, $post_type ) {
+	if ( ! gutenberg_site_editor_is_admin_bridge_request() ) {
+		return $use_block_editor;
+	}
+
+	if ( in_array( $post_type, array( 'post', 'page' ), true ) ) {
+		return $use_block_editor;
+	}
+
+	return false;
+}
+add_filter( 'use_block_editor_for_post_type', 'gutenberg_site_editor_admin_bridge_use_block_editor_for_post_type', 100, 2 );
+
+/**
+ * Force the classic wp-admin editor for existing CPT posts inside the Site
+ * Editor admin bridge. This keeps wp-admin redirects after save in the same
+ * compatibility mode.
+ *
+ * @param bool    $use_block_editor Whether the post should use the block editor.
+ * @param WP_Post $post             Post object.
+ * @return bool Whether the post should use the block editor.
+ */
+function gutenberg_site_editor_admin_bridge_use_block_editor_for_post( $use_block_editor, $post ) {
+	if ( ! gutenberg_site_editor_is_admin_bridge_request() ) {
+		return $use_block_editor;
+	}
+
+	if ( ! $post || in_array( $post->post_type, array( 'post', 'page' ), true ) ) {
+		return $use_block_editor;
+	}
+
+	return false;
+}
+add_filter( 'use_block_editor_for_post', 'gutenberg_site_editor_admin_bridge_use_block_editor_for_post', 100, 2 );
+
+/**
+ * Add a body class to wp-admin screens embedded by the Site Editor bridge.
+ *
+ * @param string $classes Space-separated body classes.
+ * @return string Body classes.
+ */
+function gutenberg_site_editor_admin_bridge_body_class( $classes ) {
+	if ( ! gutenberg_site_editor_is_admin_bridge_request() ) {
+		return $classes;
+	}
+
+	return $classes . ' gutenberg-site-editor-admin-bridge';
+}
+add_filter( 'admin_body_class', 'gutenberg_site_editor_admin_bridge_body_class' );
+
+/**
+ * Hide wp-admin chrome that duplicates the Site Editor shell in the bridge.
+ */
+function gutenberg_site_editor_admin_bridge_enqueue_styles() {
+	if ( ! gutenberg_site_editor_is_admin_bridge_request() ) {
+		return;
+	}
+
+	$css = '
+		body.gutenberg-site-editor-admin-bridge #adminmenumain,
+		body.gutenberg-site-editor-admin-bridge #adminmenuback,
+		body.gutenberg-site-editor-admin-bridge #adminmenuwrap {
+			display: none !important;
+		}
+
+		body.gutenberg-site-editor-admin-bridge #wpcontent,
+		body.gutenberg-site-editor-admin-bridge.auto-fold #wpcontent,
+		body.gutenberg-site-editor-admin-bridge.auto-fold #wpfooter {
+			margin-left: 0 !important;
+		}
+
+		body.gutenberg-site-editor-admin-bridge #wpcontent,
+		body.gutenberg-site-editor-admin-bridge.auto-fold #wpcontent {
+			padding-left: 20px;
+		}
+
+		body.gutenberg-site-editor-admin-bridge #wpfooter,
+		body.gutenberg-site-editor-admin-bridge.auto-fold #wpfooter {
+			margin-left: 0 !important;
+		}
+
+		@media screen and (max-width: 782px) {
+			body.gutenberg-site-editor-admin-bridge.auto-fold #wpcontent,
+			body.gutenberg-site-editor-admin-bridge.auto-fold #wpfooter {
+				margin-left: 0 !important;
+			}
+
+			body.gutenberg-site-editor-admin-bridge #wpcontent,
+			body.gutenberg-site-editor-admin-bridge.auto-fold #wpcontent {
+				padding-left: 10px;
+			}
+		}
+	';
+
+	wp_register_style( 'gutenberg-site-editor-admin-bridge', false );
+	wp_enqueue_style( 'gutenberg-site-editor-admin-bridge' );
+	wp_add_inline_style( 'gutenberg-site-editor-admin-bridge', $css );
+}
+add_action( 'admin_enqueue_scripts', 'gutenberg_site_editor_admin_bridge_enqueue_styles' );
+
+/**
  * Get post types that should appear under the Content menu.
  *
  * @return WP_Post_Type[] Post type objects keyed by post type name.

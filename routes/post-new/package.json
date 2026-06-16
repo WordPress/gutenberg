@@ -7,8 +7,12 @@
 		"page": "site-editor-v2"
 	},
 	"dependencies": {
+		"@wordpress/components": "file:../../packages/components",
 		"@wordpress/core-data": "file:../../packages/core-data",
 		"@wordpress/data": "file:../../packages/data",
-		"@wordpress/route": "file:../../packages/route"
+		"@wordpress/i18n": "file:../../packages/i18n",
+		"@wordpress/icons": "file:../../packages/icons",
+		"@wordpress/route": "file:../../packages/route",
+		"@wordpress/url": "file:../../packages/url"
 	}
 }
