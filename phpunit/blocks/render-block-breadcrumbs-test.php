@@ -57,11 +57,15 @@ class Render_Block_Breadcrumbs_Test extends WP_UnitTestCase {
 
 		$block_instance = new WP_Block(
 			array(
-				'name'    => 'core/breadcrumbs',
-				'context' => array(
-					'postId'   => $this->post_id,
-					'postType' => 'post',
-				),
+				'blockName'    => 'core/breadcrumbs',
+				'attrs'        => $attributes,
+				'innerBlocks'  => array(),
+				'innerHTML'    => '',
+				'innerContent' => array(),
+			),
+			array(
+				'postId'   => $this->post_id,
+				'postType' => 'post',
 			)
 		);
 
@@ -84,11 +88,15 @@ class Render_Block_Breadcrumbs_Test extends WP_UnitTestCase {
 
 		$block_instance = new WP_Block(
 			array(
-				'name'    => 'core/breadcrumbs',
-				'context' => array(
-					'postId'   => $this->post_id,
-					'postType' => 'post',
-				),
+				'blockName'    => 'core/breadcrumbs',
+				'attrs'        => $attributes,
+				'innerBlocks'  => array(),
+				'innerHTML'    => '',
+				'innerContent' => array(),
+			),
+			array(
+				'postId'   => $this->post_id,
+				'postType' => 'post',
 			)
 		);
 
