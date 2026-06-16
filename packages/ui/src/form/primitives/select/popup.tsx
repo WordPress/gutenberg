@@ -21,7 +21,7 @@ export const Popup = forwardRef< HTMLDivElement, SelectPopupProps >(
 		ref
 	) {
 		const popupContent = (
-			<ThemeProvider crossesPortalBoundary>
+			<ThemeProvider>
 				<_Select.Popup
 					ref={ ref }
 					className={ clsx( itemPopupStyles.popup, className ) }

@@ -58,7 +58,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 					data-testid="dialog-backdrop"
 				/>
 			) }
-			<ThemeProvider crossesPortalBoundary>
+			<ThemeProvider>
 				<_Dialog.Popup
 					ref={ mergedRef }
 					className={ clsx(

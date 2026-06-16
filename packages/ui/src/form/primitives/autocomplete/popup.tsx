@@ -18,7 +18,7 @@ const ThemeProvider: typeof ThemeProviderType =
 export const Popup = forwardRef< HTMLDivElement, AutocompletePopupProps >(
 	function Popup( { className, portal, positioner, ...restProps }, ref ) {
 		const popupContent = (
-			<ThemeProvider crossesPortalBoundary>
+			<ThemeProvider>
 				<_Autocomplete.Popup
 					ref={ ref }
 					className={ clsx( itemPopupStyles.popup, className ) }

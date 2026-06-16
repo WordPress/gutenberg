@@ -75,20 +75,4 @@ export interface ThemeProviderProps extends ThemeProviderSettings {
 	 * @default false
 	 */
 	isRoot?: boolean;
-
-	/**
-	 * Marks a provider that wraps content rendered through a portal (e.g. an
-	 * overlay's popup). Portalled content is re-parented to `document.body`,
-	 * detaching it from the DOM subtree — and therefore the inherited CSS
-	 * custom properties — of any scoped ancestor provider. React context still
-	 * flows across the portal, so this provider knows the in-scope theme; set
-	 * this flag so it re-emits that theme (relative to the document defaults)
-	 * onto its own element, keeping the portalled content themed.
-	 *
-	 * Not needed for theming applied at the document root (see `isRoot`), which
-	 * the cascade already delivers to portals.
-	 *
-	 * @default false
-	 */
-	crossesPortalBoundary?: boolean;
 }

@@ -3,6 +3,3 @@
 // To ensure that global types are included, we need to
 // explicitly reference them here.
 import '@testing-library/jest-dom';
-// Brings in the global `jest.Matchers` augmentation for the console matchers
-// (e.g. `toHaveErrored`) registered by the monorepo's jest setup.
-import '@wordpress/jest-console';

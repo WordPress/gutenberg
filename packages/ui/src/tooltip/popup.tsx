@@ -31,7 +31,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function TooltipPopup(
 	ref
 ) {
 	const popupContent = (
-		<ThemeProvider color={ POPUP_COLOR } crossesPortalBoundary>
+		<ThemeProvider color={ POPUP_COLOR }>
 			<_Tooltip.Popup
 				ref={ ref }
 				className={ clsx( styles.popup, className ) }

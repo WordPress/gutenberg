@@ -68,7 +68,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 	) : null;
 
 	const popupContent = (
-		<ThemeProvider crossesPortalBoundary>
+		<ThemeProvider>
 			<_Popover.Popup
 				ref={ mergedPopupRef }
 				initialFocus={ resolvedInitialFocus }

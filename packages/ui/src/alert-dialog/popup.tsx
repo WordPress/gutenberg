@@ -133,7 +133,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 		const portalChildren = (
 			<>
 				<_AlertDialog.Backdrop className={ dialogStyles.backdrop } />
-				<ThemeProvider crossesPortalBoundary>
+				<ThemeProvider>
 					<_AlertDialog.Popup
 						ref={ mergedRef }
 						className={ clsx(

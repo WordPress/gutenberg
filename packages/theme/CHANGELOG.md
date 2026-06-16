@@ -8,7 +8,6 @@
 -   Add `--wpds-border-radius-xl` for page and app shell surfaces so nested cards and notices can stay on `--wpds-border-radius-lg` without matching the parent radius ([#78913](https://github.com/WordPress/gutenberg/pull/78913)).
 -   Add `cornerRadius` prop to `ThemeProvider` for configuring the border-radius preset (`none`, `subtle`, `moderate`, `pronounced`) via prebuilt design token modes. [#78816](https://github.com/WordPress/gutenberg/pull/78816).
 -   Add disabled variants for the `brand` and `error` tones of the interactive `background`, `foreground`, and `stroke` color tokens (e.g. `--wpds-color-stroke-interactive-brand-disabled`, `--wpds-color-background-interactive-brand-strong-disabled`), for parity with the existing `neutral` disabled tokens ([#79124](https://github.com/WordPress/gutenberg/pull/79124)).
--   Add `crossesPortalBoundary` prop to `ThemeProvider`. Set it on a provider that wraps content rendered through a portal (e.g. an overlay popup) so the in-scope theme is re-emitted across the portal boundary, where the inherited cascade is otherwise detached. Complements the skip-when-unchanged optimization, which would otherwise stop a scoped ancestor theme from reaching portalled content ([#78664](https://github.com/WordPress/gutenberg/pull/78664)).
 
 ### Enhancements
 
@@ -26,7 +25,6 @@
 ### Internal
 
 -   Add unit tests for `ThemeProvider` and `useThemeProviderStyles` ([#79126](https://github.com/WordPress/gutenberg/pull/79126)).
--   `ThemeProvider`: skip applying per-instance overrides (and the associated color-ramp computation) when the resolved settings already match the inherited ones — the closest parent `<ThemeProvider>`, or the prebuilt `:root` defaults at the top of the tree. `--wp-admin-theme-color*` overrides are applied only when the resolved `color.primary` differs from the inherited value, letting the surrounding admin color scheme show through otherwise ([#78664](https://github.com/WordPress/gutenberg/pull/78664)).
 
 ### Documentation
 

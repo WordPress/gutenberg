@@ -61,7 +61,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DrawerPopup(
 				 * and Popover) so the `display: contents` focus-trap workaround
 				 * selector in the CSS module actually targets this subtree.
 				 */ }
-				<ThemeProvider crossesPortalBoundary>
+				<ThemeProvider>
 					<_Drawer.Popup
 						ref={ mergedRef }
 						className={ ( state ) => {

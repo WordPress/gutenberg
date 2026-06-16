@@ -7,10 +7,6 @@
 -   `Field.Description`: Apply `text-wrap: pretty` to description text to avoid typographic widows ([#79143](https://github.com/WordPress/gutenberg/pull/79143)).
 -   `Autocomplete`: Add `Autocomplete.Group` and `Autocomplete.GroupLabel` subcomponents ([#78901](https://github.com/WordPress/gutenberg/pull/78901)).
 
-### Bug Fixes
-
--   Portalled overlays (`Popover`, `Tooltip`, `Dialog`, `AlertDialog`, `Drawer`, `Select`, `Combobox`, `Autocomplete`): Mark each popup's `ThemeProvider` as crossing a portal boundary so a scoped ancestor theme is re-established inside the portalled content instead of falling back to the document defaults ([#78664](https://github.com/WordPress/gutenberg/pull/78664)).
-
 ### Code Quality
 
 -   Move `@types/react` from `dependencies` to an optional peer dependency so consumers' React type version is used ([#79095](https://github.com/WordPress/gutenberg/pull/79095)).
