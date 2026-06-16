@@ -2,6 +2,13 @@
 	"wpds-color": {
 		"$type": "color",
 		"primitive": {
+			"transparent": {
+				"$value": {
+					"colorSpace": "srgb",
+					"components": [ 0, 0, 0 ],
+					"alpha": 0
+				}
+			},
 			"primary": {
 				"bgFill1": {
 					"$value": {
@@ -1168,11 +1175,7 @@
 					"$description": "Background color for interactive elements with neutral tone and strong emphasis, in their disabled state."
 				},
 				"neutral-weak": {
-					"$value": {
-						"colorSpace": "srgb",
-						"components": [ 0, 0, 0 ],
-						"alpha": 0
-					},
+					"$value": "{wpds-color.primitive.transparent}",
 					"$description": "Background color for interactive elements with neutral tone and weak emphasis."
 				},
 				"neutral-weak-active": {
@@ -1180,12 +1183,8 @@
 					"$description": "Background color for interactive elements with neutral tone and weak emphasis that are hovered, focused, or active."
 				},
 				"neutral-weak-disabled": {
-					"$value": {
-						"colorSpace": "srgb",
-						"components": [ 0, 0, 0 ],
-						"alpha": 0
-					},
-					"$description": "Background color for interactive elements with weak emphasis, in their disabled state, regardless of the tone."
+					"$value": "{wpds-color.primitive.transparent}",
+					"$description": "Background color for interactive elements with neutral tone and weak emphasis, in their disabled state."
 				},
 				"brand-strong": {
 					"$value": "{wpds-color.primitive.primary.bgFill1}",
@@ -1195,29 +1194,33 @@
 					"$value": "{wpds-color.primitive.primary.bgFill2}",
 					"$description": "Background color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active."
 				},
+				"brand-strong-disabled": {
+					"$value": "{wpds-color.primitive.bg.surface5}",
+					"$description": "Background color for interactive elements with brand tone and strong emphasis, in their disabled state."
+				},
 				"brand-weak": {
-					"$value": {
-						"colorSpace": "srgb",
-						"components": [ 0, 0, 0 ],
-						"alpha": 0
-					},
+					"$value": "{wpds-color.primitive.transparent}",
 					"$description": "Background color for interactive elements with brand tone and weak emphasis."
 				},
 				"brand-weak-active": {
 					"$value": "{wpds-color.primitive.primary.surface4}",
 					"$description": "Background color for interactive elements with brand tone and weak emphasis that are hovered, focused, or active."
 				},
+				"brand-weak-disabled": {
+					"$value": "{wpds-color.primitive.transparent}",
+					"$description": "Background color for interactive elements with brand tone and weak emphasis, in their disabled state."
+				},
 				"error": {
-					"$value": {
-						"colorSpace": "srgb",
-						"components": [ 0, 0, 0 ],
-						"alpha": 0
-					},
+					"$value": "{wpds-color.primitive.transparent}",
 					"$description": "Background color for interactive elements with error tone and normal emphasis."
 				},
 				"error-active": {
 					"$value": "{wpds-color.primitive.error.surface2}",
 					"$description": "Background color for interactive elements with error tone and normal emphasis that are hovered, focused, or active."
+				},
+				"error-disabled": {
+					"$value": "{wpds-color.primitive.transparent}",
+					"$description": "Background color for interactive elements with error tone and normal emphasis, in their disabled state."
 				},
 				"error-strong": {
 					"$value": "{wpds-color.primitive.error.bgFill1}",
@@ -1227,17 +1230,21 @@
 					"$value": "{wpds-color.primitive.error.bgFill2}",
 					"$description": "Background color for interactive elements with error tone and strong emphasis that are hovered, focused, or active."
 				},
+				"error-strong-disabled": {
+					"$value": "{wpds-color.primitive.bg.surface5}",
+					"$description": "Background color for interactive elements with error tone and strong emphasis, in their disabled state."
+				},
 				"error-weak": {
-					"$value": {
-						"colorSpace": "srgb",
-						"components": [ 0, 0, 0 ],
-						"alpha": 0
-					},
+					"$value": "{wpds-color.primitive.transparent}",
 					"$description": "Background color for interactive elements with error tone and weak emphasis."
 				},
 				"error-weak-active": {
 					"$value": "{wpds-color.primitive.error.surface4}",
 					"$description": "Background color for interactive elements with error tone and weak emphasis that are hovered, focused, or active."
+				},
+				"error-weak-disabled": {
+					"$value": "{wpds-color.primitive.transparent}",
+					"$description": "Background color for interactive elements with error tone and weak emphasis, in their disabled state."
 				}
 			},
 			"track": {
@@ -1338,7 +1345,7 @@
 				},
 				"neutral-disabled": {
 					"$value": "{wpds-color.primitive.bg.fgSurface2}",
-					"$description": "Foreground color for interactive elements with normal emphasis, in their disabled state, regardless of the tone."
+					"$description": "Foreground color for interactive elements with neutral tone and normal emphasis, in their disabled state."
 				},
 				"neutral-strong": {
 					"$value": "{wpds-color.primitive.bg.fgFillInverted}",
@@ -1350,7 +1357,7 @@
 				},
 				"neutral-strong-disabled": {
 					"$value": "{wpds-color.primitive.bg.fgSurface2}",
-					"$description": "Foreground color for interactive elements with strong emphasis, in their disabled state, regardless of the tone."
+					"$description": "Foreground color for interactive elements with neutral tone and strong emphasis, in their disabled state."
 				},
 				"neutral-weak": {
 					"$value": "{wpds-color.primitive.bg.fgSurface3}",
@@ -1358,7 +1365,7 @@
 				},
 				"neutral-weak-disabled": {
 					"$value": "{wpds-color.primitive.bg.fgSurface2}",
-					"$description": "Foreground color for interactive elements with weak emphasis, in their disabled state, regardless of the tone."
+					"$description": "Foreground color for interactive elements with neutral tone and weak emphasis, in their disabled state."
 				},
 				"brand": {
 					"$value": "{wpds-color.primitive.primary.fgSurface3}",
@@ -1368,6 +1375,10 @@
 					"$value": "{wpds-color.primitive.primary.fgSurface3}",
 					"$description": "Foreground color for interactive elements with brand tone and normal emphasis that are hovered, focused, or active."
 				},
+				"brand-disabled": {
+					"$value": "{wpds-color.primitive.bg.fgSurface2}",
+					"$description": "Foreground color for interactive elements with brand tone and normal emphasis, in their disabled state."
+				},
 				"brand-strong": {
 					"$value": "{wpds-color.primitive.primary.fgFill}",
 					"$description": "Foreground color for interactive elements with brand tone and strong emphasis."
@@ -1375,6 +1386,10 @@
 				"brand-strong-active": {
 					"$value": "{wpds-color.primitive.primary.fgFill}",
 					"$description": "Foreground color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active."
+				},
+				"brand-strong-disabled": {
+					"$value": "{wpds-color.primitive.bg.fgSurface2}",
+					"$description": "Foreground color for interactive elements with brand tone and strong emphasis, in their disabled state."
 				},
 				"error": {
 					"$value": "{wpds-color.primitive.error.fgSurface3}",
@@ -1384,6 +1399,10 @@
 					"$value": "{wpds-color.primitive.error.fgSurface3}",
 					"$description": "Foreground color for interactive elements with error tone and normal emphasis that are hovered, focused, or active."
 				},
+				"error-disabled": {
+					"$value": "{wpds-color.primitive.bg.fgSurface2}",
+					"$description": "Foreground color for interactive elements with error tone and normal emphasis, in their disabled state."
+				},
 				"error-strong": {
 					"$value": "{wpds-color.primitive.error.fgFill}",
 					"$description": "Foreground color for interactive elements with error tone and strong emphasis."
@@ -1391,6 +1410,10 @@
 				"error-strong-active": {
 					"$value": "{wpds-color.primitive.error.fgFill}",
 					"$description": "Foreground color for interactive elements with error tone and strong emphasis that are hovered, focused, or active."
+				},
+				"error-strong-disabled": {
+					"$value": "{wpds-color.primitive.bg.fgSurface2}",
+					"$description": "Foreground color for interactive elements with error tone and strong emphasis, in their disabled state."
 				}
 			},
 			"$extensions": {
@@ -1463,7 +1486,7 @@
 				},
 				"neutral-disabled": {
 					"$value": "{wpds-color.primitive.bg.stroke2}",
-					"$description": "Accessible stroke color used for interactive elements with normal emphasis, in their disabled state, regardless of the tone."
+					"$description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis, in their disabled state."
 				},
 				"neutral-strong": {
 					"$value": "{wpds-color.primitive.bg.stroke4}",
@@ -1477,6 +1500,10 @@
 					"$value": "{wpds-color.primitive.primary.stroke4}",
 					"$description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis that are hovered, focused, or active."
 				},
+				"brand-disabled": {
+					"$value": "{wpds-color.primitive.bg.stroke2}",
+					"$description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis, in their disabled state."
+				},
 				"error": {
 					"$value": "{wpds-color.primitive.error.stroke3}",
 					"$description": "Accessible stroke color used for interactive error-toned elements with normal emphasis."
@@ -1484,6 +1511,10 @@
 				"error-active": {
 					"$value": "{wpds-color.primitive.error.stroke4}",
 					"$description": "Accessible stroke color used for interactive error-toned elements with normal emphasis that are hovered, focused, or active."
+				},
+				"error-disabled": {
+					"$value": "{wpds-color.primitive.bg.stroke2}",
+					"$description": "Accessible stroke color used for interactive error-toned elements with normal emphasis, in their disabled state."
 				},
 				"error-strong": {
 					"$value": "{wpds-color.primitive.error.stroke3}",

@@ -34,6 +34,7 @@ import { getImageFit, getRotatedBBox, getViewScale } from '../../core/camera';
 import { getImageCropBounds, getMinZoom } from '../../core/containment';
 import {
 	MAX_VIEW_SCALE,
+	PIXEL_SNAP_DISPLAY_SCALE,
 	SETTLE_TARGET_CANVAS_FILL,
 } from '../../core/constants';
 import { computeInscribedRect } from '../../core/crop-rect';
@@ -45,12 +46,18 @@ import { RectangleStencil } from './stencils/rectangle-stencil';
 import { DimmingOverlay } from './overlays/dimming-overlay';
 import { GridOverlay } from './overlays/grid-overlay';
 import { DimensionsOverlay } from './overlays/dimensions-overlay';
-import { getSourceRegion } from '../../core/source-region';
+import {
+	getSourceRegion,
+	snapCropRectToSourcePixelGrid,
+	snapCropRectToSourcePixels,
+} from '../../core/source-region';
 import { ViewportProvider, useViewport } from './viewport-provider';
 import { VISUALLY_HIDDEN_STYLE } from '../visually-hidden-style';
 
 /** Threshold for comparing normalized crop rect values. */
 const CROP_RECT_EPSILON = 1e-6;
+/** Threshold for deciding whether rotation is at a 90-degree stop. */
+const CARDINAL_ROTATION_EPSILON = 1e-6;
 
 /**
  * Props for the Cropper component.
@@ -414,6 +421,53 @@ function CropperInner(
 		} ),
 		[ visualSize.width, visualSize.height, viewScale ]
 	);
+	// CSS pixels rendered per source pixel: the contain fit
+	// (elementSize / natural), times zoom and the view-scale magnification.
+	const displayScale =
+		naturalWidth > 0
+			? ( elementSize.width / naturalWidth ) * state.zoom * viewScale
+			: 0;
+	const keyboardResizeStep = useMemo( () => {
+		if (
+			displayScale < PIXEL_SNAP_DISPLAY_SCALE ||
+			( aspectRatio && aspectRatio > 0 ) ||
+			naturalWidth <= 0 ||
+			naturalHeight <= 0
+		) {
+			return undefined;
+		}
+		const snapRotation = Math.round( state.rotation / 90 ) * 90;
+		if (
+			Math.abs( state.rotation - snapRotation ) >=
+			CARDINAL_ROTATION_EPSILON
+		) {
+			return undefined;
+		}
+		const bbox = getRotatedBBox(
+			naturalWidth,
+			naturalHeight,
+			snapRotation
+		);
+		if ( bbox.width <= 0 || bbox.height <= 0 ) {
+			return undefined;
+		}
+		// Keyboard steps are normalized crop-space deltas, but snapping wants
+		// one source pixel per key press. The normalized delta for one source
+		// pixel is different on each axis when the snap-rotation bbox is not
+		// square, so this must be an object with separate width/height steps
+		// instead of a single scalar.
+		return {
+			width: state.zoom / bbox.width,
+			height: state.zoom / bbox.height,
+		};
+	}, [
+		displayScale,
+		aspectRatio,
+		naturalWidth,
+		naturalHeight,
+		state.rotation,
+		state.zoom,
+	] );
 
 	// Per-axis minimum crop size in normalized space, expressing a pixel floor
 	// on the captured source region. cropRect is normalized in the viewport's
@@ -434,8 +488,6 @@ function CropperInner(
 			naturalHeight,
 			snapRotation
 		);
-		const displayScale =
-			( elementSize.width / naturalWidth ) * state.zoom * viewScale;
 		const minPixels = getMinCropPixels( displayScale );
 		return {
 			width: Math.min( 1, ( minPixels * state.zoom ) / bbox.width ),
@@ -446,8 +498,71 @@ function CropperInner(
 		naturalHeight,
 		state.rotation,
 		state.zoom,
-		elementSize.width,
-		viewScale,
+		displayScale,
+	] );
+
+	const snapCropRect = useCallback(
+		( rect: NormalizedRect, handle: HandlePosition ): NormalizedRect => {
+			if (
+				displayScale < PIXEL_SNAP_DISPLAY_SCALE ||
+				naturalWidth <= 0 ||
+				naturalHeight <= 0
+			) {
+				return rect;
+			}
+			return snapCropRectToSourcePixels(
+				state,
+				{ width: naturalWidth, height: naturalHeight },
+				rect,
+				handle
+			);
+		},
+		[ displayScale, naturalWidth, naturalHeight, state ]
+	);
+
+	const wasPixelSnapEnabledRef = useRef( false );
+	useEffect( () => {
+		const isPixelSnapEnabled =
+			freeformCrop &&
+			( ! aspectRatio || aspectRatio <= 0 ) &&
+			displayScale >= PIXEL_SNAP_DISPLAY_SCALE &&
+			naturalWidth > 0 &&
+			naturalHeight > 0;
+		const wasPixelSnapEnabled = wasPixelSnapEnabledRef.current;
+		wasPixelSnapEnabledRef.current = isPixelSnapEnabled;
+
+		if ( ! isPixelSnapEnabled || wasPixelSnapEnabled ) {
+			return;
+		}
+
+		const snappedCropRect = snapCropRectToSourcePixelGrid(
+			state,
+			{ width: naturalWidth, height: naturalHeight },
+			state.cropRect
+		);
+		const currentCropRect = state.cropRect;
+		if (
+			Math.abs( currentCropRect.x - snappedCropRect.x ) <
+				CROP_RECT_EPSILON &&
+			Math.abs( currentCropRect.y - snappedCropRect.y ) <
+				CROP_RECT_EPSILON &&
+			Math.abs( currentCropRect.width - snappedCropRect.width ) <
+				CROP_RECT_EPSILON &&
+			Math.abs( currentCropRect.height - snappedCropRect.height ) <
+				CROP_RECT_EPSILON
+		) {
+			return;
+		}
+
+		setCropRect( snappedCropRect );
+	}, [
+		aspectRatio,
+		displayScale,
+		freeformCrop,
+		naturalWidth,
+		naturalHeight,
+		setCropRect,
+		state,
 	] );
 
 	// Use the interaction hook for mouse, touch, and keyboard events.
@@ -699,15 +814,9 @@ function CropperInner(
 		}
 		const centerX = ( canvasSize.width - elementSize.width ) / 2;
 		const centerY = ( canvasSize.height - elementSize.height ) / 2;
-		// CSS pixels rendered per source pixel: the contain fit
-		// (elementSize / natural), times zoom and the view-scale magnification.
 		// Above 1:1 the image is upscaled, so render nearest-neighbour to keep
 		// pixel boundaries crisp (e.g. small images the cropper magnifies);
 		// below 1:1 leave smoothing on for downscaled large images.
-		const displayScale =
-			naturalWidth > 0
-				? ( elementSize.width / naturalWidth ) * state.zoom * viewScale
-				: 0;
 		return {
 			width: elementSize.width,
 			height: elementSize.height,
@@ -728,10 +837,9 @@ function CropperInner(
 	}, [
 		canvasSize,
 		elementSize,
-		naturalWidth,
-		state.zoom,
 		transformString,
 		imageTransition,
+		displayScale,
 		viewScale,
 	] );
 
@@ -878,6 +986,8 @@ function CropperInner(
 						stencilTransition={ settleStencilTransition }
 						cropBounds={ cropBounds }
 						minCropSize={ minCropSize }
+						snapCropRect={ snapCropRect }
+						keyboardResizeStep={ keyboardResizeStep }
 					/>
 
 					{ /* Rule-of-thirds grid */ }

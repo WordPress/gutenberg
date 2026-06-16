@@ -6,6 +6,10 @@
 
 - `DataViewsPicker`: `DataViewsPicker.BulkActionToolbar` now renders only the bulk-selection info and action buttons, without pagination, matching `DataViews.BulkActionToolbar`. The full footer it previously rendered (including pagination) is now exposed as `DataViewsPicker.Footer`, matching `DataViews.Footer`. [#79180](https://github.com/WordPress/gutenberg/pull/79180)
 
+### Code Quality
+
+- Move `@types/react` from `dependencies` to an optional peer dependency so consumers' React type version is used [#79095](https://github.com/WordPress/gutenberg/pull/79095).
+
 ## 16.0.0 (2026-06-10)
 
 ### Breaking Changes

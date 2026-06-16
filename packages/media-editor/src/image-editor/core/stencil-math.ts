@@ -6,6 +6,9 @@ import type { HandlePosition, NormalizedRect, Size } from './types';
 
 export type { HandlePosition };
 
+/** Axis whose resize distance controls the locked-ratio size projection. */
+export type ResizeDriverAxis = 'width' | 'height';
+
 /**
  * Resolve the minimum crop dimension, in source-image pixels, for the current
  * display scale.
@@ -142,6 +145,8 @@ export function computeFreeResizeRect(
  * @param bounds          The allowed crop area bounds.
  * @param normalizedRatio The locked aspect ratio (width / height in normalized space).
  * @param minCropSize     Minimum crop rect dimension in normalized space, per axis.
+ * @param driverAxis      Optional explicit driver axis. Used for keyboard
+ *                        resize, where one arrow axis should determine the step.
  * @return The new crop rect in normalized coordinates.
  */
 export function computeLockedResizeRect(
@@ -151,7 +156,8 @@ export function computeLockedResizeRect(
 	imageSize: Size,
 	bounds: CropBounds,
 	normalizedRatio: number,
-	minCropSize: Size = DEFAULT_MIN_CROP_SIZE
+	minCropSize: Size = DEFAULT_MIN_CROP_SIZE,
+	driverAxis?: ResizeDriverAxis
 ): NormalizedRect {
 	// The math below divides by `normalizedRatio` and `imageSize`, so
 	// bail out with the start rect when any of them is zero. This can
@@ -199,16 +205,18 @@ export function computeLockedResizeRect(
 	distW = Math.max( distW, minDistW );
 	distH = Math.max( distH, minDistH );
 
-	// Determine which axis "drives" — whichever the user moved more
-	// (in pixel space) determines the size, the other follows. The
-	// `normalizedRatio` is w/h in normalized space; the equivalent
-	// pixel-space ratio is `normalizedRatio * imageW / imageH`. We
-	// compare the pixel motion ratio against that pixel-space ratio
-	// so the units line up (was a unit mismatch on non-square images).
-	const pixelDistW = distW * imageSize.width;
-	const pixelDistH = distH * imageSize.height;
+	// Determine which axis "drives". Pointer drags use the dragged-corner
+	// geometry so the projected crop changes continuously as the pointer moves.
+	// Keyboard resize passes an explicit axis because a single-axis arrow step
+	// should drive that axis instead of being cancelled by the unchanged axis.
 	const pixelRatio = ( normalizedRatio * imageSize.width ) / imageSize.height;
-	if ( pixelDistW / pixelDistH > pixelRatio ) {
+	const isWidthDriver =
+		driverAxis === 'width' ||
+		( ! driverAxis &&
+			( distW * imageSize.width ) / ( distH * imageSize.height ) >
+				pixelRatio );
+
+	if ( isWidthDriver ) {
 		// Width is the driver — compute height from ratio.
 		distH = distW / normalizedRatio;
 	} else {

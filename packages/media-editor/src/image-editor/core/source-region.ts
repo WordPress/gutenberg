@@ -6,9 +6,15 @@ import { mat2d, vec2 } from 'gl-matrix';
 /**
  * Internal dependencies
  */
-import type { CropperState, Size } from './types';
+import type {
+	CropperState,
+	HandlePosition,
+	NormalizedRect,
+	Size,
+} from './types';
 import { createCamera, getRotatedBBox, getVisibleBounds } from './camera';
 import { isValidSize, sanitizeCropperState } from './math/sanitize';
+import { normalizeRotation } from './math/rotation';
 
 /**
  * The selected image region in source-pixel coordinates.
@@ -124,6 +130,201 @@ export function getSourceRegion(
 		rotation: safeState.rotation,
 		flip: { ...safeState.flip },
 		zoom: safeState.zoom,
+	};
+}
+
+/**
+ * Convert a source-pixel region back to the cropper's normalized crop rect.
+ *
+ * The math intentionally mirrors `getSourceRegion`: map the requested source
+ * center through the current camera, then express that screen point inside the
+ * same base visible bounds used to position crop overlays.
+ *
+ * @param state     The current cropper state.
+ * @param imageSize The natural dimensions of the source image.
+ * @param region    The source-pixel region to represent as a crop rect.
+ * @return The normalized crop rect, or null when inputs cannot be mapped.
+ */
+function getCropRectFromSourceRegion(
+	state: CropperState,
+	imageSize: Size,
+	region: SourceRegion
+): NormalizedRect | null {
+	if (
+		! isValidSize( imageSize ) ||
+		region.width <= 0 ||
+		region.height <= 0
+	) {
+		return null;
+	}
+
+	const safeState = sanitizeCropperState( state );
+	const syntheticContainer: Size = { width: 1000, height: 1000 };
+	const baseCamera = createCamera(
+		{ ...safeState, pan: { x: 0, y: 0 }, zoom: 1 },
+		syntheticContainer,
+		imageSize
+	);
+	const visibleBounds = getVisibleBounds( baseCamera );
+	if ( visibleBounds.width <= 0 || visibleBounds.height <= 0 ) {
+		return null;
+	}
+
+	const sourceCenter = vec2.fromValues(
+		( region.x + region.width / 2 ) / imageSize.width,
+		( region.y + region.height / 2 ) / imageSize.height
+	);
+	const screenCenter = vec2.create();
+	const camera = createCamera( safeState, syntheticContainer, imageSize );
+	vec2.transformMat2d( screenCenter, sourceCenter, camera );
+
+	const snapRotation = Math.round( safeState.rotation / 90 ) * 90;
+	const { width: rotW, height: rotH } = getRotatedBBox(
+		imageSize.width,
+		imageSize.height,
+		snapRotation
+	);
+	if ( rotW <= 0 || rotH <= 0 ) {
+		return null;
+	}
+
+	const width = ( region.width * safeState.zoom ) / rotW;
+	const height = ( region.height * safeState.zoom ) / rotH;
+	const centerX =
+		( screenCenter[ 0 ] - visibleBounds.left ) / visibleBounds.width;
+	const centerY =
+		( screenCenter[ 1 ] - visibleBounds.top ) / visibleBounds.height;
+
+	return {
+		x: centerX - width / 2,
+		y: centerY - height / 2,
+		width,
+		height,
+	};
+}
+
+interface SourcePixelSnapEdges {
+	left: boolean;
+	top: boolean;
+	right: boolean;
+	bottom: boolean;
+}
+
+const CARDINAL_ROTATION_EPSILON = 1e-6;
+
+/**
+ * Check whether a rotation is effectively at a 90-degree stop.
+ *
+ * @param rotation The rotation angle in degrees.
+ * @return Whether the rotation is close enough to a cardinal angle.
+ */
+function isCardinalRotation( rotation: number ): boolean {
+	const normalizedRotation = normalizeRotation( rotation );
+	const nearestCardinal = Math.round( normalizedRotation / 90 ) * 90;
+	return (
+		Math.abs( normalizedRotation - nearestCardinal ) <
+		CARDINAL_ROTATION_EPSILON
+	);
+}
+
+/**
+ * Snap a crop rect so the selected source-region edges land on whole pixels.
+ *
+ * This is a display-time affordance for visible pixel grids; it does not alter
+ * pan/zoom/rotation. Callers decide when snapping is appropriate.
+ *
+ * @param state     The current cropper state.
+ * @param imageSize The natural dimensions of the source image.
+ * @param cropRect  The candidate crop rect from resize math.
+ * @param handle    The active resize handle. Only edges moved by the handle snap.
+ * @return A crop rect whose selected source-region edges are whole pixels.
+ */
+export function snapCropRectToSourcePixels(
+	state: CropperState,
+	imageSize: Size,
+	cropRect: NormalizedRect,
+	handle: HandlePosition
+): NormalizedRect {
+	const safeState = sanitizeCropperState( state );
+	if ( ! isCardinalRotation( safeState.rotation ) ) {
+		return cropRect;
+	}
+
+	return snapCropRectEdgesToSourcePixels( safeState, imageSize, cropRect, {
+		left: handle.includes( 'w' ),
+		top: handle.includes( 'n' ),
+		right: handle.includes( 'e' ),
+		bottom: handle.includes( 's' ),
+	} );
+}
+
+/**
+ * Snap all source-region edges for a crop rect to the nearest whole pixels.
+ *
+ * @param state     The current cropper state.
+ * @param imageSize The natural dimensions of the source image.
+ * @param cropRect  The crop rect to align to the source-pixel grid.
+ * @return A crop rect whose source-region edges are whole pixels.
+ */
+export function snapCropRectToSourcePixelGrid(
+	state: CropperState,
+	imageSize: Size,
+	cropRect: NormalizedRect
+): NormalizedRect {
+	return snapCropRectEdgesToSourcePixels( state, imageSize, cropRect, {
+		left: true,
+		top: true,
+		right: true,
+		bottom: true,
+	} );
+}
+
+function snapCropRectEdgesToSourcePixels(
+	state: CropperState,
+	imageSize: Size,
+	cropRect: NormalizedRect,
+	edges: SourcePixelSnapEdges
+): NormalizedRect {
+	if ( ! isValidSize( imageSize ) ) {
+		return cropRect;
+	}
+
+	const stateWithCrop = sanitizeCropperState( { ...state, cropRect } );
+	const region = getSourceRegion( stateWithCrop, imageSize );
+	const shouldSnapX = edges.left || edges.right;
+	const shouldSnapY = edges.top || edges.bottom;
+	const left = edges.left ? Math.round( region.x ) : region.x;
+	const top = edges.top ? Math.round( region.y ) : region.y;
+	const right = edges.right
+		? Math.round( region.x + region.width )
+		: region.x + region.width;
+	const bottom = edges.bottom
+		? Math.round( region.y + region.height )
+		: region.y + region.height;
+	if ( right <= left || bottom <= top ) {
+		return cropRect;
+	}
+
+	const snappedCropRect = getCropRectFromSourceRegion(
+		stateWithCrop,
+		imageSize,
+		{
+			...region,
+			x: left,
+			y: top,
+			width: right - left,
+			height: bottom - top,
+		}
+	);
+	if ( ! snappedCropRect ) {
+		return cropRect;
+	}
+
+	return {
+		x: shouldSnapX ? snappedCropRect.x : cropRect.x,
+		y: shouldSnapY ? snappedCropRect.y : cropRect.y,
+		width: shouldSnapX ? snappedCropRect.width : cropRect.width,
+		height: shouldSnapY ? snappedCropRect.height : cropRect.height,
 	};
 }
 

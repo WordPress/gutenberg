@@ -209,6 +209,55 @@ describe( 'getStateStylesCSS', () => {
 		);
 	} );
 
+	it( 'adds background-image reset when state sets solid background-color', () => {
+		expect(
+			getStateStylesCSS(
+				{
+					color: {
+						background: '#ff0000',
+					},
+				},
+				'.wp-block-test:hover'
+			)
+		).toBe(
+			'.wp-block-test:hover { background-color: #ff0000 !important; }\n.wp-block-test:hover { background-image: unset !important; }'
+		);
+	} );
+
+	it( 'does not add background-image reset when state also sets a legacy gradient', () => {
+		expect(
+			getStateStylesCSS(
+				{
+					color: {
+						background: '#ff0000',
+						gradient: 'linear-gradient(135deg, #ff0000, #0000ff)',
+					},
+				},
+				'.wp-block-test:hover'
+			)
+		).toBe(
+			'.wp-block-test:hover { background: linear-gradient(135deg, #ff0000, #0000ff) !important; background-color: #ff0000 !important; }'
+		);
+	} );
+
+	it( 'does not add background-image reset when state also sets a modern gradient', () => {
+		expect(
+			getStateStylesCSS(
+				{
+					color: {
+						background: '#ff0000',
+					},
+					background: {
+						gradient: 'linear-gradient(135deg, #ff0000, #0000ff)',
+					},
+				},
+				'.wp-block-test:hover'
+			)
+		).toBe(
+			'.wp-block-test:hover { background-color: #ff0000 !important; background-image: linear-gradient(135deg, #ff0000, #0000ff) !important; }'
+		);
+	} );
+
 	it( 'adds important fallback dimensions when aspect ratio is set', () => {
 		expect(
 			getStateStylesCSS(
@@ -290,7 +339,7 @@ describe( 'getBlockStateStylesCSS', () => {
 				}
 			)
 		).toBe(
-			'.wp-elements-abc123 .wp-block-button__link:hover { background-color: #ff00d0 !important; }\n.wp-elements-abc123:hover { width: 50% !important; }'
+			'.wp-elements-abc123 .wp-block-button__link:hover { background-color: #ff00d0 !important; }\n.wp-elements-abc123 .wp-block-button__link:hover { background-image: unset !important; }\n.wp-elements-abc123:hover { width: 50% !important; }'
 		);
 	} );
 
@@ -307,7 +356,7 @@ describe( 'getBlockStateStylesCSS', () => {
 				}
 			)
 		).toBe(
-			'[data-block="client-id"] .wp-block-button__link { background-color: #ff00d0 !important; }\n[data-block="client-id"] { width: 50% !important; }'
+			'[data-block="client-id"] .wp-block-button__link { background-color: #ff00d0 !important; }\n[data-block="client-id"] .wp-block-button__link { background-image: unset !important; }\n[data-block="client-id"] { width: 50% !important; }'
 		);
 	} );
 } );
@@ -378,7 +427,7 @@ describe( 'getResponsiveStateCSSRules', () => {
 				'.wp-elements-1'
 			)
 		).toEqual( [
-			'@media (width <= 480px){.wp-elements-1 .wp-block-button__link { background-color: #ff00d0 !important; }\n.wp-elements-1 { width: 50% !important; }}',
+			'@media (width <= 480px){.wp-elements-1 .wp-block-button__link { background-color: #ff00d0 !important; }\n.wp-elements-1 .wp-block-button__link { background-image: unset !important; }\n.wp-elements-1 { width: 50% !important; }}',
 		] );
 	} );
 
@@ -412,7 +461,7 @@ describe( 'getResponsiveStateCSSRules', () => {
 				'.wp-elements-1'
 			)
 		).toEqual( [
-			'@media (width <= 480px){.wp-elements-1:hover { background-color: black !important; }}',
+			'@media (width <= 480px){.wp-elements-1:hover { background-color: black !important; }\n.wp-elements-1:hover { background-image: unset !important; }}',
 		] );
 	} );
 
