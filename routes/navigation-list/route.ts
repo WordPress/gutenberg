@@ -3,7 +3,9 @@
  */
 import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
+import { menu } from '@wordpress/icons';
 
 const NAVIGATION_POST_TYPE = 'wp_navigation';
 
@@ -13,6 +15,19 @@ const PRELOADED_NAVIGATION_MENUS_QUERY = {
 	order: 'desc',
 	orderby: 'date',
 };
+
+type NavigationRecord = {
+	id: number;
+	title?: {
+		raw?: string;
+		rendered?: string;
+	};
+};
+
+function getNavigationTitle( navigation?: NavigationRecord ) {
+	const title = navigation?.title?.rendered || navigation?.title?.raw;
+	return title ? decodeEntities( title ) : __( 'Navigation' );
+}
 
 export const route = {
 	title: () => __( 'Navigation' ),
@@ -25,27 +40,44 @@ export const route = {
 			search?: string;
 		};
 	} ) => {
-		const [ firstNavigation ] = await resolveSelect(
+		const navigationMenus = ( await resolveSelect(
 			coreStore
 		).getEntityRecords(
 			'postType',
 			NAVIGATION_POST_TYPE,
 			PRELOADED_NAVIGATION_MENUS_QUERY
-		);
+		) ) as NavigationRecord[] | undefined;
+		const firstNavigation = navigationMenus?.[ 0 ];
 
 		if ( ! firstNavigation ) {
-			return { postType: NAVIGATION_POST_TYPE, isPreview: true };
+			return {
+				postType: NAVIGATION_POST_TYPE,
+				isPreview: true,
+				previewLabel: __( 'Navigation' ),
+				previewIcon: menu,
+				previewStatusLabel: __( 'Navigation preview' ),
+				previewEditLabel: __( 'Edit navigation' ),
+				previewTone: 'global' as const,
+			};
 		}
 
 		const postId = search.ids
 			? parseInt( search.ids[ 0 ] )
 			: firstNavigation.id;
+		const navigation =
+			navigationMenus?.find( ( item ) => item.id === postId ) ||
+			firstNavigation;
 
 		return {
 			postType: NAVIGATION_POST_TYPE,
 			postId,
 			isPreview: true,
 			editLink: `/types/wp_navigation/edit/${ postId }`,
+			previewLabel: getNavigationTitle( navigation ),
+			previewIcon: menu,
+			previewStatusLabel: __( 'Navigation preview' ),
+			previewEditLabel: __( 'Edit navigation' ),
+			previewTone: 'global' as const,
 		};
 	},
 	loader: async () => {

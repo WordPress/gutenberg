@@ -3,6 +3,9 @@
  */
 import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
+import { __ } from '@wordpress/i18n';
+import { home, layout, page, postList } from '@wordpress/icons';
 import { notFound } from '@wordpress/route';
 
 /**
@@ -37,6 +40,12 @@ type TemplateSlot = {
 type TemplateRecord = {
 	id: string | number;
 	slug?: string;
+	title?:
+		| string
+		| {
+				raw?: string;
+				rendered?: string;
+		  };
 	post_types?: string[];
 	postTypes?: string[];
 	site_editor_template_context?: {
@@ -46,6 +55,61 @@ type TemplateRecord = {
 		is_active_slot?: boolean;
 	} | null;
 };
+
+type PreviewableRecord = {
+	status?: string;
+	title?:
+		| string
+		| {
+				raw?: string;
+				rendered?: string;
+		  };
+};
+
+function getRecordTitle(
+	record: PreviewableRecord | undefined,
+	fallback: string
+) {
+	const title =
+		typeof record?.title === 'string'
+			? record.title
+			: record?.title?.rendered || record?.title?.raw;
+
+	return title ? decodeEntities( title ) : fallback;
+}
+
+function getPreviewStatusLabel( record?: PreviewableRecord ) {
+	switch ( record?.status ) {
+		case 'publish':
+			return __( 'Published' );
+		case 'future':
+			return __( 'Scheduled' );
+		case 'draft':
+			return __( 'Draft' );
+		case 'pending':
+			return __( 'Pending review' );
+		case 'private':
+			return __( 'Private' );
+		default:
+			return __( 'Preview' );
+	}
+}
+
+function getPostTypePreviewIcon( postType: string ) {
+	if ( postType === 'page' ) {
+		return page;
+	}
+
+	if ( postType === 'post' ) {
+		return postList;
+	}
+
+	return page;
+}
+
+function getPostTypePreviewEditLabel( postType: string ) {
+	return postType === 'page' ? __( 'Edit page' ) : __( 'Edit' );
+}
 
 function getPreferredTemplateSlot(
 	postType: string,
@@ -98,7 +162,11 @@ function isPageTemplate( record: TemplateRecord ) {
 	);
 }
 
-function getTemplateCanvas( templateId: string | number, editLink?: string ) {
+function getTemplateCanvas(
+	templateId: string | number,
+	editLink?: string,
+	template?: TemplateRecord
+) {
 	const postId = String( templateId );
 	return {
 		postType: 'wp_template',
@@ -107,6 +175,11 @@ function getTemplateCanvas( templateId: string | number, editLink?: string ) {
 		editLink:
 			editLink ??
 			`/types/wp_template/edit/${ encodeURIComponent( postId ) }`,
+		previewLabel: getRecordTitle( template, __( 'Template' ) ),
+		previewIcon: layout,
+		previewStatusLabel: __( 'Template preview' ),
+		previewEditLabel: __( 'Edit template' ),
+		previewTone: 'global' as const,
 	};
 }
 
@@ -179,7 +252,17 @@ export const route = {
 					);
 				}
 
-				return getTemplateCanvas( templateId );
+				const selectedTemplate = ( await resolveSelect(
+					coreStore
+				).getEntityRecord( 'postType', 'wp_template', templateId ) ) as
+					| TemplateRecord
+					| undefined;
+
+				return getTemplateCanvas(
+					templateId,
+					undefined,
+					selectedTemplate
+				);
 			}
 
 			const templates = ( await resolveSelect(
@@ -192,7 +275,11 @@ export const route = {
 			if ( params.type === 'page' ) {
 				const pageTemplate = templates?.find( isPageTemplate );
 				if ( pageTemplate ) {
-					return getTemplateCanvas( pageTemplate.id );
+					return getTemplateCanvas(
+						pageTemplate.id,
+						undefined,
+						pageTemplate
+					);
 				}
 
 				return undefined;
@@ -213,7 +300,11 @@ export const route = {
 				isTemplateForSlot( template, params.type, preferredSlot )
 			);
 			if ( slotTemplate ) {
-				return getTemplateCanvas( slotTemplate.id );
+				return getTemplateCanvas(
+					slotTemplate.id,
+					undefined,
+					slotTemplate
+				);
 			}
 
 			const fallbackTemplateId = await resolveSelect(
@@ -243,14 +334,7 @@ export const route = {
 			const postId = selectedPostId.toString();
 			const templateId = getTemplateIdFromPageItemId( postId );
 			if ( templateId ) {
-				return {
-					postType: 'wp_template',
-					postId: templateId,
-					isPreview: true,
-					editLink: `/types/wp_template/edit/${ encodeURIComponent(
-						templateId
-					) }`,
-				};
+				return getTemplateCanvas( templateId );
 			}
 
 			const post = await resolveSelect( coreStore ).getEntityRecord(
@@ -265,6 +349,10 @@ export const route = {
 				isPreview: true,
 				editLink: `/types/${ params.type }/edit/${ postId }?skipStartPageOptions=true`,
 				previewUrl: ( post as any )?.link,
+				previewLabel: getRecordTitle( post as any, params.type ),
+				previewIcon: getPostTypePreviewIcon( params.type ),
+				previewStatusLabel: getPreviewStatusLabel( post as any ),
+				previewEditLabel: getPostTypePreviewEditLabel( params.type ),
 			};
 		}
 
@@ -283,14 +371,10 @@ export const route = {
 				).getDefaultTemplateId( { slug: 'front-page' } );
 
 				if ( templateId ) {
-					return {
-						postType: 'wp_template',
-						postId: templateId,
-						isPreview: true,
-						editLink: `/types/wp_template/edit/${ encodeURIComponent(
-							templateId
-						) }`,
-					};
+					return getTemplateCanvas( templateId, undefined, {
+						id: templateId,
+						title: __( 'Home' ),
+					} );
 				}
 			}
 
@@ -312,6 +396,11 @@ export const route = {
 						isPreview: true,
 						editLink: `/types/${ params.type }/edit/${ postId }?skipStartPageOptions=true`,
 						previewUrl: frontPage.link,
+						previewLabel: getRecordTitle( frontPage, __( 'Home' ) ),
+						previewIcon: home,
+						previewStatus: 'homepage',
+						previewStatusLabel: __( 'Homepage' ),
+						previewEditLabel: __( 'Edit page' ),
 					};
 				}
 			}
@@ -334,6 +423,10 @@ export const route = {
 				isPreview: true,
 				editLink: `/types/${ params.type }/edit/${ postId }?skipStartPageOptions=true`,
 				previewUrl: ( posts[ 0 ] as any ).link,
+				previewLabel: getRecordTitle( posts[ 0 ] as any, params.type ),
+				previewIcon: getPostTypePreviewIcon( params.type ),
+				previewStatusLabel: getPreviewStatusLabel( posts[ 0 ] as any ),
+				previewEditLabel: getPostTypePreviewEditLabel( params.type ),
 			};
 		}
 

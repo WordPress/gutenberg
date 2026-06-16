@@ -28,7 +28,7 @@ import {
 	Notice,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useMemo, useCallback, useState } from '@wordpress/element';
+import { useMemo, useCallback, useEffect, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __, sprintf } from '@wordpress/i18n';
 import {
@@ -129,6 +129,26 @@ function PostList() {
 	const searchParams = useSearch( { from: '/types/$type/list/$slug' } );
 	const activeContentTab =
 		searchParams.content === 'templates' ? 'templates' : 'content';
+
+	useEffect( () => {
+		if ( postType === 'page' && searchParams.configureHomepage ) {
+			setIsConfiguringHomepage( true );
+		}
+	}, [ postType, searchParams.configureHomepage ] );
+
+	const closeConfigureHomepageModal = useCallback( () => {
+		setIsConfiguringHomepage( false );
+
+		if ( searchParams.configureHomepage ) {
+			navigate( {
+				search: {
+					...searchParams,
+					configureHomepage: undefined,
+				},
+			} );
+		}
+	}, [ navigate, searchParams ] );
+
 	const postTypeObject = useSelect(
 		( select ) => select( coreStore ).getPostType( postType ),
 		[ postType ]
@@ -882,7 +902,7 @@ function PostList() {
 			) }
 			{ postType === 'page' && isConfiguringHomepage && (
 				<ConfigureHomepageModal
-					onClose={ () => setIsConfiguringHomepage( false ) }
+					onClose={ closeConfigureHomepageModal }
 					onSaved={ invalidate }
 				/>
 			) }

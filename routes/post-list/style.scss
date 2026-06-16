@@ -49,9 +49,19 @@
 }
 
 .routes-post-list__dataviews-scroll {
+	box-sizing: border-box;
 	min-height: 0;
-	overflow-y: auto;
-	padding-top: $grid-unit-15;
+	overflow: auto;
+	padding: $grid-unit-15 $grid-unit-30 0;
+}
+
+.routes-post-list__dataviews-scroll .dataviews-view-table {
+	tr {
+		td.dataviews-view-table__checkbox-column:first-child,
+		th.dataviews-view-table__checkbox-column:first-child {
+			padding-inline-start: 0;
+		}
+	}
 }
 
 .routes-post-list__template-author {
@@ -139,35 +149,6 @@
 	text-transform: uppercase;
 	white-space: nowrap;
 	z-index: 2;
-}
-
-.configure-homepage-modal__body {
-	display: flex;
-	flex-direction: column;
-	gap: $grid-unit-30;
-}
-
-.configure-homepage-modal__intro {
-	color: $gray-700;
-	margin: 0;
-}
-
-.configure-homepage-modal__static-fields {
-	display: flex;
-	flex-direction: column;
-	gap: $grid-unit-20;
-}
-
-.configure-homepage-modal__static-fields .components-base-control {
-	margin-bottom: 0;
-}
-
-.configure-homepage-modal__footer {
-	align-items: center;
-	display: flex;
-	gap: $grid-unit-10;
-	justify-content: flex-end;
-	margin-top: $grid-unit-30;
 }
 
 .apm-modal.components-modal__frame {

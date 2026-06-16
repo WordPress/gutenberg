@@ -5,9 +5,22 @@ import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
+import { menu } from '@wordpress/icons';
 import { notFound } from '@wordpress/route';
 
 const NAVIGATION_POST_TYPE = 'wp_navigation';
+
+type NavigationRecord = {
+	title?: {
+		raw?: string;
+		rendered?: string;
+	};
+};
+
+function getNavigationTitle( navigation?: NavigationRecord ) {
+	const title = navigation?.title?.rendered || navigation?.title?.raw;
+	return title ? decodeEntities( title ) : __( 'Navigation' );
+}
 
 export const route = {
 	beforeLoad: async ( {
@@ -65,11 +78,21 @@ export const route = {
 		};
 	} ) => {
 		const postId = parseInt( params.id );
+		const navigation = ( await resolveSelect( coreStore ).getEntityRecord(
+			'postType',
+			NAVIGATION_POST_TYPE,
+			postId
+		) ) as NavigationRecord | undefined;
 		return {
 			postType: NAVIGATION_POST_TYPE,
 			postId,
 			isPreview: true,
 			editLink: `/types/wp_navigation/edit/${ postId }`,
+			previewLabel: getNavigationTitle( navigation ),
+			previewIcon: menu,
+			previewStatusLabel: __( 'Navigation preview' ),
+			previewEditLabel: __( 'Edit navigation' ),
+			previewTone: 'global' as const,
 		};
 	},
 	loader: async ( {

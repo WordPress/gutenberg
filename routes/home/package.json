@@ -9,6 +9,7 @@
 	"dependencies": {
 		"@wordpress/core-data": "file:../../packages/core-data",
 		"@wordpress/data": "file:../../packages/data",
-		"@wordpress/i18n": "file:../../packages/i18n"
+		"@wordpress/i18n": "file:../../packages/i18n",
+		"@wordpress/icons": "file:../../packages/icons"
 	}
 }

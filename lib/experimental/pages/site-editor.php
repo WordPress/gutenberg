@@ -247,6 +247,193 @@ function gutenberg_site_editor_get_preview_edit_link( $url ) {
 }
 
 /**
+ * Get a post status label for preview context.
+ *
+ * @param WP_Post $post Post object.
+ * @return string Post status label.
+ */
+function gutenberg_site_editor_get_preview_post_status_label( $post ) {
+	$status = get_post_status_object( $post->post_status );
+	if ( $status && ! empty( $status->label ) ) {
+		return $status->label;
+	}
+
+	return __( 'Preview', 'gutenberg' );
+}
+
+/**
+ * Get preview context for a post.
+ *
+ * @param int    $post_id Post ID.
+ * @param string $preview_type Optional preview type.
+ * @param string $status_label Optional status label override.
+ * @param string $status Optional status slug override.
+ * @return array Preview context.
+ */
+function gutenberg_site_editor_get_post_preview_context(
+	$post_id,
+	$preview_type = '',
+	$status_label = '',
+	$status = ''
+) {
+	$post = get_post( $post_id );
+	if ( ! $post ) {
+		return array();
+	}
+
+	$post_type = get_post_type_object( $post->post_type );
+	$title     = get_the_title( $post );
+	if ( '' === $title ) {
+		$title = $post_type ? $post_type->labels->singular_name : __( 'Untitled', 'gutenberg' );
+	}
+
+	return array(
+		'editLink'           => gutenberg_site_editor_add_preview_edit_args(
+			gutenberg_site_editor_get_post_edit_link( $post_id )
+		),
+		'previewLabel'       => $title,
+		'previewStatus'      => $status ? $status : $post->post_status,
+		'previewStatusLabel' => $status_label ? $status_label : gutenberg_site_editor_get_preview_post_status_label( $post ),
+		'previewType'        => $preview_type ? $preview_type : $post->post_type,
+		'previewEditLabel'   => 'page' === $post->post_type ? __( 'Edit page', 'gutenberg' ) : __( 'Edit', 'gutenberg' ),
+	);
+}
+
+/**
+ * Get preview context for the site's front page.
+ *
+ * @return array Preview context.
+ */
+function gutenberg_site_editor_get_front_page_preview_context() {
+	if ( 'page' === get_option( 'show_on_front' ) ) {
+		$page_on_front = (int) get_option( 'page_on_front' );
+		if ( $page_on_front ) {
+			return gutenberg_site_editor_get_post_preview_context(
+				$page_on_front,
+				'home',
+				__( 'Homepage', 'gutenberg' ),
+				'homepage'
+			);
+		}
+	}
+
+	$edit_link = gutenberg_site_editor_get_front_page_edit_link();
+
+	return array(
+		'editLink'           => gutenberg_site_editor_add_preview_edit_args( $edit_link ),
+		'previewLabel'       => __( 'Home', 'gutenberg' ),
+		'previewStatus'      => 'homepage',
+		'previewStatusLabel' => __( 'Homepage', 'gutenberg' ),
+		'previewType'        => 'template',
+		'previewEditLabel'   => __( 'Edit template', 'gutenberg' ),
+		'previewTone'        => 'global',
+	);
+}
+
+/**
+ * Get preview context for a taxonomy term archive URL.
+ *
+ * @param string $url Preview URL.
+ * @return array Preview context.
+ */
+function gutenberg_site_editor_get_term_preview_context( $url ) {
+	$taxonomies = get_taxonomies( array( 'public' => true ) );
+	if ( empty( $taxonomies ) ) {
+		return array();
+	}
+
+	$terms = get_terms(
+		array(
+			'taxonomy'   => array_values( $taxonomies ),
+			'hide_empty' => false,
+		)
+	);
+	if ( is_wp_error( $terms ) || empty( $terms ) ) {
+		return array();
+	}
+
+	$normalized_url = gutenberg_site_editor_normalize_url_path( $url );
+	$matched_term   = null;
+	foreach ( $terms as $term ) {
+		$term_link = get_term_link( $term );
+		if ( is_wp_error( $term_link ) ) {
+			continue;
+		}
+
+		if (
+			gutenberg_site_editor_normalize_url_path( $term_link ) ===
+			$normalized_url
+		) {
+			$matched_term = $term;
+			break;
+		}
+	}
+
+	if ( ! $matched_term ) {
+		return array();
+	}
+
+	$taxonomy     = get_taxonomy( $matched_term->taxonomy );
+	$preview_type = 'archive';
+	if ( 'category' === $matched_term->taxonomy ) {
+		$preview_type = 'category';
+	} elseif ( 'post_tag' === $matched_term->taxonomy ) {
+		$preview_type = 'tag';
+	}
+
+	return array(
+		'editLink'           => '',
+		'previewLabel'       => $matched_term->name,
+		'previewStatus'      => 'archive',
+		'previewStatusLabel' => $taxonomy
+			? $taxonomy->labels->singular_name
+			: __( 'Archive', 'gutenberg' ),
+		'previewType'        => $preview_type,
+		'previewEditLabel'   => __( 'Edit', 'gutenberg' ),
+	);
+}
+
+/**
+ * Get preview context for the current local preview URL.
+ *
+ * @param string $url Preview URL.
+ * @return array Preview context.
+ */
+function gutenberg_site_editor_get_preview_context( $url ) {
+	$url = remove_query_arg( 'site-editor-preview', $url );
+	$url = gutenberg_site_editor_get_local_preview_url( $url );
+	if ( '' === $url ) {
+		return array();
+	}
+
+	$post_id = url_to_postid( $url );
+	if ( $post_id ) {
+		return gutenberg_site_editor_get_post_preview_context( $post_id );
+	}
+
+	$term_context = gutenberg_site_editor_get_term_preview_context( $url );
+	if ( ! empty( $term_context ) ) {
+		return $term_context;
+	}
+
+	if (
+		gutenberg_site_editor_normalize_url_path( $url ) ===
+		gutenberg_site_editor_normalize_url_path( home_url( '/' ) )
+	) {
+		return gutenberg_site_editor_get_front_page_preview_context();
+	}
+
+	return array(
+		'editLink'           => gutenberg_site_editor_get_preview_edit_link( $url ),
+		'previewLabel'       => __( 'Site preview', 'gutenberg' ),
+		'previewStatus'      => 'preview',
+		'previewStatusLabel' => __( 'Preview', 'gutenberg' ),
+		'previewType'        => 'preview',
+		'previewEditLabel'   => __( 'Edit', 'gutenberg' ),
+	);
+}
+
+/**
  * Register the preview URL to edit route resolver.
  */
 function gutenberg_site_editor_register_preview_link_endpoint() {
@@ -257,9 +444,7 @@ function gutenberg_site_editor_register_preview_link_endpoint() {
 			'methods'             => WP_REST_Server::READABLE,
 			'callback'            => function ( $request ) {
 				return rest_ensure_response(
-					array(
-						'editLink' => gutenberg_site_editor_get_preview_edit_link( $request['url'] ),
-					)
+					gutenberg_site_editor_get_preview_context( $request['url'] )
 				);
 			},
 			'permission_callback' => function () {
@@ -276,6 +461,30 @@ function gutenberg_site_editor_register_preview_link_endpoint() {
 	);
 }
 add_action( 'rest_api_init', 'gutenberg_site_editor_register_preview_link_endpoint' );
+
+/**
+ * Hide the WordPress admin bar inside Extensible Site Editor preview iframes.
+ *
+ * @param bool $show_admin_bar Whether to show the admin bar.
+ * @return bool Whether to show the admin bar.
+ */
+function gutenberg_site_editor_hide_admin_bar_in_preview( $show_admin_bar ) {
+	if ( is_admin() ) {
+		return $show_admin_bar;
+	}
+
+	$is_preview = '1' === filter_input(
+		INPUT_GET,
+		'site-editor-preview',
+		FILTER_SANITIZE_FULL_SPECIAL_CHARS
+	);
+	if ( ! $is_preview ) {
+		return $show_admin_bar;
+	}
+
+	return false;
+}
+add_filter( 'show_admin_bar', 'gutenberg_site_editor_hide_admin_bar_in_preview', PHP_INT_MAX );
 
 /**
  * Normalize template and post type text for conservative template-slot matching.

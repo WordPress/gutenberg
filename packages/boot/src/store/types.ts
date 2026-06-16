@@ -63,6 +63,36 @@ export interface CanvasData {
 	editLink?: string;
 
 	/**
+	 * Optional label for the document being previewed.
+	 */
+	previewLabel?: string;
+
+	/**
+	 * Optional icon for the document being previewed.
+	 */
+	previewIcon?: IconType;
+
+	/**
+	 * Optional status label for the document being previewed.
+	 */
+	previewStatusLabel?: string;
+
+	/**
+	 * Optional status slug for the document being previewed.
+	 */
+	previewStatus?: string;
+
+	/**
+	 * Optional label for the preview edit action.
+	 */
+	previewEditLabel?: string;
+
+	/**
+	 * Optional visual tone for the preview chrome.
+	 */
+	previewTone?: 'default' | 'global';
+
+	/**
 	 * Optional frontend URL to render in preview mode.
 	 * When omitted, preview mode falls back to the editor preview canvas.
 	 */

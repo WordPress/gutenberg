@@ -3,12 +3,49 @@
  */
 import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
+import { layout } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { ensureView, viewToQuery } from './view-utils';
+
+type TemplateRecord = {
+	id: string | number;
+	title?:
+		| string
+		| {
+				raw?: string;
+				rendered?: string;
+		  };
+};
+
+function getTemplateTitle( template: TemplateRecord | undefined ) {
+	const title =
+		typeof template?.title === 'string'
+			? template.title
+			: template?.title?.rendered || template?.title?.raw;
+
+	return title ? decodeEntities( title ) : __( 'Template' );
+}
+
+function getTemplateCanvas( templateId: string, template?: TemplateRecord ) {
+	return {
+		postType: 'wp_template',
+		postId: templateId,
+		isPreview: true,
+		editLink: `/types/wp_template/edit/${ encodeURIComponent(
+			templateId
+		) }`,
+		previewLabel: getTemplateTitle( template ),
+		previewIcon: layout,
+		previewStatusLabel: __( 'Template preview' ),
+		previewEditLabel: __( 'Edit template' ),
+		previewTone: 'global' as const,
+	};
+}
 
 /**
  * Route configuration for template list.
@@ -41,14 +78,12 @@ export const route = {
 		// Check if postId is provided in query params
 		if ( search.postIds && search.postIds.length > 0 ) {
 			const postId = search.postIds[ 0 ].toString();
-			return {
-				postType: 'wp_template',
-				postId,
-				isPreview: true,
-				editLink: `/types/wp_template/edit/${ encodeURIComponent(
-					postId
-				) }`,
-			};
+			const template = ( await resolveSelect( coreStore ).getEntityRecord(
+				'postType',
+				'wp_template',
+				postId
+			) ) as TemplateRecord | undefined;
+			return getTemplateCanvas( postId, template );
 		}
 
 		// Otherwise, fetch the first template from the filtered query
@@ -62,14 +97,7 @@ export const route = {
 		// Return first template if available
 		if ( posts && posts.length > 0 ) {
 			const postId = ( posts[ 0 ] as any ).id.toString();
-			return {
-				postType: 'wp_template',
-				postId,
-				isPreview: true,
-				editLink: `/types/wp_template/edit/${ encodeURIComponent(
-					postId
-				) }`,
-			};
+			return getTemplateCanvas( postId, posts[ 0 ] as TemplateRecord );
 		}
 
 		// No templates to display

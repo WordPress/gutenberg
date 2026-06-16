@@ -3,12 +3,52 @@
  */
 import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
+import { layout } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { ensureView, viewToQuery } from './view-utils';
+
+type TemplatePartRecord = {
+	id: string | number;
+	title?:
+		| string
+		| {
+				raw?: string;
+				rendered?: string;
+		  };
+};
+
+function getTemplatePartTitle( templatePart: TemplatePartRecord | undefined ) {
+	const title =
+		typeof templatePart?.title === 'string'
+			? templatePart.title
+			: templatePart?.title?.rendered || templatePart?.title?.raw;
+
+	return title ? decodeEntities( title ) : __( 'Template part' );
+}
+
+function getTemplatePartCanvas(
+	templatePartId: string,
+	templatePart?: TemplatePartRecord
+) {
+	return {
+		postType: 'wp_template_part',
+		postId: templatePartId,
+		isPreview: true,
+		editLink: `/types/wp_template_part/edit/${ encodeURIComponent(
+			templatePartId
+		) }`,
+		previewLabel: getTemplatePartTitle( templatePart ),
+		previewIcon: layout,
+		previewStatusLabel: __( 'Template part preview' ),
+		previewEditLabel: __( 'Edit template part' ),
+		previewTone: 'global' as const,
+	};
+}
 
 /**
  * Route configuration for template part list.
@@ -41,14 +81,12 @@ export const route = {
 		// Check if postId is provided in query params
 		if ( search.postIds && search.postIds.length > 0 ) {
 			const postId = search.postIds[ 0 ].toString();
-			return {
-				postType: 'wp_template_part',
-				postId,
-				isPreview: true,
-				editLink: `/types/wp_template_part/edit/${ encodeURIComponent(
-					postId
-				) }`,
-			};
+			const templatePart = ( await resolveSelect(
+				coreStore
+			).getEntityRecord( 'postType', 'wp_template_part', postId ) ) as
+				| TemplatePartRecord
+				| undefined;
+			return getTemplatePartCanvas( postId, templatePart );
 		}
 
 		// Otherwise, fetch the first template part from the filtered query
@@ -62,14 +100,10 @@ export const route = {
 		// Return first template part if available
 		if ( posts && posts.length > 0 ) {
 			const postId = ( posts[ 0 ] as any ).id.toString();
-			return {
-				postType: 'wp_template_part',
+			return getTemplatePartCanvas(
 				postId,
-				isPreview: true,
-				editLink: `/types/wp_template_part/edit/${ encodeURIComponent(
-					postId
-				) }`,
-			};
+				posts[ 0 ] as TemplatePartRecord
+			);
 		}
 
 		// No template parts to display
