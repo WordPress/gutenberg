@@ -10,7 +10,8 @@
 	"attributes": {
 		"icon": {
 			"type": "string",
-			"role": "content"
+			"role": "content",
+			"default": "core/info"
 		},
 		"flipHorizontal": {
 			"type": "boolean",

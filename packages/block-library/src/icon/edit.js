@@ -28,11 +28,9 @@ import {
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 	getDimensionsClassesAndStyles as useDimensionsProps,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useEffect, useState } from '@wordpress/element';
-import { SVG, Rect, Path } from '@wordpress/primitives';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useState } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 
 /**
@@ -42,27 +40,7 @@ import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
 import { CustomInserterModal } from './components';
 
-const IconPlaceholder = ( { className, style } ) => (
-	<SVG
-		xmlns="http://www.w3.org/2000/svg"
-		viewBox="0 0 60 60"
-		preserveAspectRatio="none"
-		fill="none"
-		aria-hidden="true"
-		className={ clsx( 'wp-block-icon__placeholder', className ) }
-		style={ style }
-	>
-		<Rect width="60" height="60" fill="currentColor" fillOpacity={ 0.1 } />
-		<Path
-			vectorEffect="non-scaling-stroke"
-			stroke="currentColor"
-			strokeOpacity={ 0.25 }
-			d="M60 60 0 0"
-		/>
-	</SVG>
-);
-
-export function Edit( { attributes, setAttributes, clientId } ) {
+export function Edit( { attributes, setAttributes } ) {
 	const { icon, ariaLabel, flipHorizontal, flipVertical, rotation } =
 		attributes;
 
@@ -90,30 +68,6 @@ export function Edit( { attributes, setAttributes, clientId } ) {
 		},
 		[ isInserterOpen, icon ]
 	);
-
-	const wasJustInserted = useSelect(
-		( select ) =>
-			select( blockEditorStore ).wasBlockJustInserted( clientId ),
-		[ clientId ]
-	);
-	const { __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
-
-	// Default newly inserted Icon blocks to the info icon. Blocks saved in a
-	// placeholder state (no icon) are left untouched, so loading a post never
-	// silently alters existing content.
-	useEffect( () => {
-		if ( ! icon && wasJustInserted ) {
-			// This side-effect should not create an undo level.
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { icon: 'core/info' } );
-		}
-	}, [
-		icon,
-		wasJustInserted,
-		setAttributes,
-		__unstableMarkNextChangeAsNotPersistent,
-	] );
 
 	const iconToDisplay = selectedIcon?.content || '';
 
@@ -245,7 +199,7 @@ export function Edit( { attributes, setAttributes, clientId } ) {
 			{ blockControls }
 			{ inspectorControls }
 			<div { ...useBlockProps() }>
-				{ icon ? (
+				{ icon && (
 					<HtmlRenderer
 						html={ iconToDisplay }
 						wrapperProps={ {
@@ -263,22 +217,6 @@ export function Edit( { attributes, setAttributes, clientId } ) {
 								...dimensionsProps.style,
 								...rotationStyle,
 							},
-						} }
-					/>
-				) : (
-					<IconPlaceholder
-						className={ clsx(
-							borderProps.className,
-							spacingProps.className,
-							dimensionsProps.className,
-							flipClasses
-						) }
-						style={ {
-							...borderProps.style,
-							...spacingProps.style,
-							...dimensionsProps.style,
-							...rotationStyle,
-							height: 'auto',
 						} }
 					/>
 				) }
