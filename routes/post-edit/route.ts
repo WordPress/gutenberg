@@ -34,11 +34,7 @@ function getPostId( params: PostEditParams ) {
  * Route configuration for post edit.
  */
 export const route = {
-	beforeLoad: async ( {
-		params,
-	}: {
-		params: PostEditParams;
-	} ) => {
+	beforeLoad: async ( { params }: { params: PostEditParams } ) => {
 		const postId = getPostId( params );
 
 		if (
@@ -65,11 +61,7 @@ export const route = {
 			throw notFound();
 		}
 	},
-	title: async ( {
-		params,
-	}: {
-		params: PostEditParams;
-	} ) => {
+	title: async ( { params }: { params: PostEditParams } ) => {
 		const postId = getPostId( params );
 		const post = await resolveSelect( coreStore ).getEntityRecord(
 			'postType',
@@ -86,9 +78,7 @@ export const route = {
 		);
 		return postType?.labels?.edit_item || __( 'Edit' );
 	},
-	async canvas( context: {
-		params: PostEditParams;
-	} ) {
+	async canvas( context: { params: PostEditParams } ) {
 		const { params } = context;
 		const postId = getPostId( params );
 
