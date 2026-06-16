@@ -9,7 +9,11 @@ import {
 	type CropBounds,
 	type ResizeDragState,
 } from '../stencil-math';
-import { MIN_CROP_PIXELS, MIN_CROP_SCREEN_PX } from '../constants';
+import {
+	DEFAULT_KEYBOARD_STEP,
+	MIN_CROP_PIXELS,
+	MIN_CROP_SCREEN_PX,
+} from '../constants';
 import type { Size } from '../types';
 
 describe( 'getMinCropPixels — operable on-screen floor', () => {
@@ -148,6 +152,78 @@ describe( 'computeLockedResizeRect — driver-axis selection', () => {
 		expect( pixelW / pixelH ).toBeCloseTo( 1, 5 );
 		expect( pixelW ).toBeCloseTo( 200, 5 );
 		expect( pixelH ).toBeCloseTo( 200, 5 );
+	} );
+
+	it( 'shrinks a locked-ratio crop from horizontal keyboard movement', () => {
+		const squareImageSize: Size = { width: 500, height: 500 };
+		const lockedStartRect = { x: 0.1, y: 0.1, width: 0.8, height: 0.8 };
+		const drag: ResizeDragState = {
+			handle: 'nw',
+			startX: 0,
+			startY: 0,
+			startRect: lockedStartRect,
+		};
+		const rect = computeLockedResizeRect(
+			drag,
+			DEFAULT_KEYBOARD_STEP * squareImageSize.width,
+			0,
+			squareImageSize,
+			FULL_BOUNDS,
+			1
+		);
+
+		expect( rect.x ).toBeCloseTo(
+			lockedStartRect.x + DEFAULT_KEYBOARD_STEP,
+			5
+		);
+		expect( rect.y ).toBeCloseTo(
+			lockedStartRect.y + DEFAULT_KEYBOARD_STEP,
+			5
+		);
+		expect( rect.width ).toBeCloseTo(
+			lockedStartRect.width - DEFAULT_KEYBOARD_STEP,
+			5
+		);
+		expect( rect.height ).toBeCloseTo(
+			lockedStartRect.height - DEFAULT_KEYBOARD_STEP,
+			5
+		);
+	} );
+
+	it( 'shrinks a locked-ratio crop from vertical keyboard movement', () => {
+		const squareImageSize: Size = { width: 500, height: 500 };
+		const lockedStartRect = { x: 0.1, y: 0.1, width: 0.8, height: 0.8 };
+		const drag: ResizeDragState = {
+			handle: 'nw',
+			startX: 0,
+			startY: 0,
+			startRect: lockedStartRect,
+		};
+		const rect = computeLockedResizeRect(
+			drag,
+			0,
+			DEFAULT_KEYBOARD_STEP * squareImageSize.height,
+			squareImageSize,
+			FULL_BOUNDS,
+			1
+		);
+
+		expect( rect.x ).toBeCloseTo(
+			lockedStartRect.x + DEFAULT_KEYBOARD_STEP,
+			5
+		);
+		expect( rect.y ).toBeCloseTo(
+			lockedStartRect.y + DEFAULT_KEYBOARD_STEP,
+			5
+		);
+		expect( rect.width ).toBeCloseTo(
+			lockedStartRect.width - DEFAULT_KEYBOARD_STEP,
+			5
+		);
+		expect( rect.height ).toBeCloseTo(
+			lockedStartRect.height - DEFAULT_KEYBOARD_STEP,
+			5
+		);
 	} );
 } );
 

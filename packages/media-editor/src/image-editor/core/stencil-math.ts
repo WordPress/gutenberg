@@ -200,15 +200,18 @@ export function computeLockedResizeRect(
 	distH = Math.max( distH, minDistH );
 
 	// Determine which axis "drives" — whichever the user moved more
-	// (in pixel space) determines the size, the other follows. The
-	// `normalizedRatio` is w/h in normalized space; the equivalent
-	// pixel-space ratio is `normalizedRatio * imageW / imageH`. We
-	// compare the pixel motion ratio against that pixel-space ratio
-	// so the units line up (was a unit mismatch on non-square images).
-	const pixelDistW = distW * imageSize.width;
-	const pixelDistH = distH * imageSize.height;
+	// (in pixel space) determines the size, the other follows. Use
+	// actual pointer/keyboard movement instead of the resulting crop
+	// dimensions; otherwise a single-axis keyboard shrink can leave the
+	// unchanged axis larger and cancel the resize.
+	const pixelDeltaX = Math.abs( clientX - drag.startX );
+	const pixelDeltaY = Math.abs( clientY - drag.startY );
 	const pixelRatio = ( normalizedRatio * imageSize.width ) / imageSize.height;
-	if ( pixelDistW / pixelDistH > pixelRatio ) {
+	const isWidthDriver =
+		pixelDeltaY === 0 ||
+		( pixelDeltaX > 0 && pixelDeltaX / pixelDeltaY > pixelRatio );
+
+	if ( isWidthDriver ) {
 		// Width is the driver — compute height from ratio.
 		distH = distW / normalizedRatio;
 	} else {

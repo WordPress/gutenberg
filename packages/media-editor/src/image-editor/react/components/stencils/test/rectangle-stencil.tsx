@@ -8,6 +8,7 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
  */
 import { RectangleStencil } from '../rectangle-stencil';
 import type { NormalizedRect, Size } from '../../../../core/types';
+import { DEFAULT_KEYBOARD_STEP } from '../../../../core/constants';
 
 const DEFAULT_CROP_RECT: NormalizedRect = {
 	x: 0.1,
@@ -234,6 +235,41 @@ describe( 'RectangleStencil', () => {
 			expect( snapCropRect.mock.calls[ 0 ][ 1 ] ).toBe( 'e' );
 			expect( onCropChange.mock.calls[ 0 ][ 0 ].width ).toBeCloseTo(
 				0.82,
+				5
+			);
+		} );
+
+		it( 'shrinks a locked-ratio crop from a corner handle', () => {
+			const { onCropChange } = renderStencil( {
+				aspectRatio: 1,
+				containerSize: { width: 500, height: 500 },
+				imageSize: { width: 500, height: 500 },
+			} );
+			const nwHandle = screen.getByRole( 'button', {
+				name: 'Resize top-left corner',
+			} );
+
+			fireEvent.keyDown( nwHandle, {
+				key: 'ArrowRight',
+				shiftKey: false,
+			} );
+
+			expect( onCropChange ).toHaveBeenCalledTimes( 1 );
+			const newRect: NormalizedRect = onCropChange.mock.calls[ 0 ][ 0 ];
+			expect( newRect.x ).toBeCloseTo(
+				DEFAULT_CROP_RECT.x + DEFAULT_KEYBOARD_STEP,
+				5
+			);
+			expect( newRect.y ).toBeCloseTo(
+				DEFAULT_CROP_RECT.y + DEFAULT_KEYBOARD_STEP,
+				5
+			);
+			expect( newRect.width ).toBeCloseTo(
+				DEFAULT_CROP_RECT.width - DEFAULT_KEYBOARD_STEP,
+				5
+			);
+			expect( newRect.height ).toBeCloseTo(
+				DEFAULT_CROP_RECT.height - DEFAULT_KEYBOARD_STEP,
 				5
 			);
 		} );
