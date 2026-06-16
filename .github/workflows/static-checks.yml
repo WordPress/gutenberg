@@ -77,10 +77,10 @@ jobs:
               run: npm run lint:deps
 
             - name: Lint package-lock.json file
-              run: npm run lint:lockfile
+              run: npm run --workspace @wordpress/validation-tools validate-package-lock --
 
             - name: Validate TypeScript config
-              run: npm run lint:tsconfig
+              run: npm run --workspace @wordpress/validation-tools validate-tsconfig --
 
             - name: Lint JavaScript
               if: ${{ matrix.annotations }}
