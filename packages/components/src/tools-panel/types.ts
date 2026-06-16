@@ -139,13 +139,6 @@ export type ToolsPanelItem = {
 	 * from a shared source.
 	 */
 	panelId?: string | null;
-};
-
-export type ToolsPanelItemProps = ToolsPanelItem & {
-	/**
-	 * The child elements.
-	 */
-	children?: ReactNode;
 	/**
 	 * Called when this item is deselected in the `ToolsPanel` menu. This is
 	 * normally used to reset the panel item control's value.
@@ -156,6 +149,13 @@ export type ToolsPanelItemProps = ToolsPanelItem & {
 	 * menu.
 	 */
 	onSelect?: () => void;
+};
+
+export type ToolsPanelItemProps = ToolsPanelItem & {
+	/**
+	 * The child elements.
+	 */
+	children?: ReactNode;
 
 	/**
 	 * A `ToolsPanel` will collect each item's `resetAllFilter` and pass an
