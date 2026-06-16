@@ -6,6 +6,7 @@
 		"checkJs": false
 	},
 	"references": [
+		{ "path": "../api-fetch" },
 		{ "path": "../asset-loader" },
 		{ "path": "../block-editor" },
 		{ "path": "../blocks" },
@@ -16,6 +17,7 @@
 		{ "path": "../editor" },
 		{ "path": "../global-styles-engine" },
 		{ "path": "../i18n" },
-		{ "path": "../private-apis" }
+		{ "path": "../private-apis" },
+		{ "path": "../url" }
 	]
 }

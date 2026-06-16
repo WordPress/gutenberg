@@ -44,6 +44,7 @@
 	"wpScriptModuleExports": "./build-module/index.mjs",
 	"types": "build-types",
 	"dependencies": {
+		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/asset-loader": "file:../asset-loader",
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/block-editor": "file:../block-editor",
@@ -55,7 +56,8 @@
 		"@wordpress/element": "file:../element",
 		"@wordpress/global-styles-engine": "file:../global-styles-engine",
 		"@wordpress/i18n": "file:../i18n",
-		"@wordpress/private-apis": "file:../private-apis"
+		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/url": "file:../url"
 	},
 	"peerDependencies": {
 		"@types/react": "^18.3.27",
