@@ -58,12 +58,23 @@ function gutenberg_register_block_comment_metadata() {
 			'single'        => true,
 			'show_in_rest'  => array(
 				'schema' => array(
-					'type'       => 'object',
-					'properties' => array(
-						'attributeKey' => array( 'type' => 'string' ),
-						'start'        => array( 'type' => 'integer' ),
-						'end'          => array( 'type' => 'integer' ),
+					'type'                 => 'object',
+					'required'             => array( 'attributeKey', 'start', 'end' ),
+					'properties'           => array(
+						'attributeKey' => array(
+							'type'      => 'string',
+							'minLength' => 1,
+						),
+						'start'        => array(
+							'type'    => 'integer',
+							'minimum' => 0,
+						),
+						'end'          => array(
+							'type'    => 'integer',
+							'minimum' => 0,
+						),
 					),
+					'additionalProperties' => false,
 				),
 			),
 			'auth_callback' => function ( $allowed, $meta_key, $object_id ) {
@@ -75,27 +86,42 @@ function gutenberg_register_block_comment_metadata() {
 add_action( 'init', 'gutenberg_register_block_comment_metadata' );
 
 /**
- * Strip inline note span markers from rendered block output.
+ * Strip inline note markers from rendered block output.
  *
  * Inline notes are anchored in raw block content with
  * `<span class="wp-note" data-id="N">…</span>` so the marker survives edits,
- * but the public HTML should not expose note metadata. `render_block`
- * unwraps the spans before output while leaving the raw `post_content`
- * (and the REST `raw` view, revisions, exports) intact.
+ * but the public HTML should not expose note metadata. `render_block` removes
+ * the `wp-note` class and `data-id` attribute before output while leaving the
+ * raw `post_content` (and the REST `raw` view, revisions, exports) intact.
+ *
+ * The `WP_HTML_Tag_Processor` is used rather than a regular expression: it
+ * matches the `wp-note` class exactly (a regex word boundary also matches
+ * `wp-note-foo`) and is unaffected by nested inline formatting (e.g. a note
+ * wrapping coloured text serializes as nested `<span>`s, which a backreference
+ * `</span>` match would unbalance). The HTML API can rewrite attributes but
+ * cannot delete a tag and its matching closer, so the now-inert `<span>`
+ * wrapper is left in place; it carries no note metadata.
  *
  * @param string $block_content Rendered block HTML.
- * @return string Block HTML with wp-note span wrappers unwrapped.
+ * @return string Block HTML with wp-note markers neutralized.
  */
 function gutenberg_strip_inline_note_markers( $block_content ) {
 	if ( false === strpos( $block_content, 'wp-note' ) ) {
 		return $block_content;
 	}
 
-	return preg_replace(
-		'#<span(?=[^>]*\bclass="[^"]*\bwp-note\b)[^>]*>(.*?)</span>#s',
-		'$1',
-		$block_content
-	);
+	$processor = new WP_HTML_Tag_Processor( $block_content );
+
+	while ( $processor->next_tag( 'SPAN' ) ) {
+		if ( ! $processor->has_class( 'wp-note' ) ) {
+			continue;
+		}
+
+		$processor->remove_class( 'wp-note' );
+		$processor->remove_attribute( 'data-id' );
+	}
+
+	return $processor->get_updated_html();
 }
 add_filter( 'render_block', 'gutenberg_strip_inline_note_markers' );
 
