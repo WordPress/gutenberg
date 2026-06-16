@@ -225,6 +225,83 @@ describe( 'useThemeProviderStyles', () => {
 		} );
 	} );
 
+	describe( 'when crossing a portal boundary', () => {
+		// A portal re-parents content to `document.body`, so the inherited
+		// values are absent from the cascade at its destination. These
+		// providers therefore compare against the document defaults (not the
+		// inherited values) and re-emit whatever the in-scope theme adds.
+
+		it( 're-emits an inherited theme that a non-portal provider would skip', () => {
+			const wrapper = withInheritedSettings( {
+				color: { primary: 'hotpink' },
+			} );
+
+			// Without the flag, resolving to the inherited `hotpink` emits
+			// nothing (the cascade already provides it).
+			const { result: withoutFlag } = renderHook(
+				() => useThemeProviderStyles(),
+				{ wrapper }
+			);
+			expect( withoutFlag.current.themeProviderStyles ).toBeUndefined();
+
+			// With the flag, the same inherited `hotpink` is re-emitted so it
+			// survives the portal, including the `--wp-admin-theme-color*`
+			// bridge derived from the primary.
+			const { result: withFlag } = renderHook(
+				() => useThemeProviderStyles( { crossesPortalBoundary: true } ),
+				{ wrapper }
+			);
+			expect( withFlag.current.themeProviderStyles ).toBeDefined();
+			expect(
+				Object.keys( withFlag.current.themeProviderStyles ?? {} )
+			).toEqual( expect.arrayContaining( [ '--wp-admin-theme-color' ] ) );
+		} );
+
+		it( 'still emits nothing when the in-scope theme is the document default', () => {
+			const { result } = renderHook( () =>
+				useThemeProviderStyles( { crossesPortalBoundary: true } )
+			);
+			expect( result.current.themeProviderStyles ).toBeUndefined();
+		} );
+
+		it( 'does not pin `--wp-admin-theme-color*` when only the background differs from the default', () => {
+			const { result } = renderHook(
+				() => useThemeProviderStyles( { crossesPortalBoundary: true } ),
+				{
+					wrapper: withInheritedSettings( {
+						color: { background: '#222222' },
+					} ),
+				}
+			);
+			expect( result.current.themeProviderStyles ).toBeDefined();
+			expect(
+				Object.keys( result.current.themeProviderStyles ?? {} )
+			).toEqual(
+				expect.not.arrayContaining( [ '--wp-admin-theme-color' ] )
+			);
+		} );
+
+		it( 're-emits an inherited cursor that a non-portal provider would skip', () => {
+			const wrapper = withInheritedSettings( {
+				cursor: { control: 'pointer' },
+			} );
+
+			const { result: withoutFlag } = renderHook(
+				() => useThemeProviderStyles(),
+				{ wrapper }
+			);
+			expect( withoutFlag.current.themeProviderStyles ).toBeUndefined();
+
+			const { result: withFlag } = renderHook(
+				() => useThemeProviderStyles( { crossesPortalBoundary: true } ),
+				{ wrapper }
+			);
+			expect( withFlag.current.themeProviderStyles ).toEqual( {
+				'--wpds-cursor-control': 'pointer',
+			} );
+		} );
+	} );
+
 	describe( 'when seeds are unparseable', () => {
 		it( 'does not silently treat an unparseable `color.primary` as default', () => {
 			expect( () =>

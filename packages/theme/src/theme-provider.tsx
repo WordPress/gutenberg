@@ -40,6 +40,7 @@ export const ThemeProvider = ( {
 	cursor,
 	cornerRadius,
 	isRoot = false,
+	crossesPortalBoundary = false,
 }: ThemeProviderProps ) => {
 	const instanceId = useId();
 
@@ -47,6 +48,7 @@ export const ThemeProvider = ( {
 		color,
 		cursor,
 		cornerRadius,
+		crossesPortalBoundary,
 	} );
 
 	const cornerRadiusPreset = resolvedSettings.cornerRadius ?? 'subtle';

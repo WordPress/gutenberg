@@ -107,10 +107,12 @@ export function useThemeProviderStyles( {
 	color = {},
 	cursor,
 	cornerRadius,
+	crossesPortalBoundary = false,
 }: {
 	color?: ThemeProviderProps[ 'color' ];
 	cursor?: ThemeProviderProps[ 'cursor' ];
 	cornerRadius?: ThemeProviderProps[ 'cornerRadius' ];
+	crossesPortalBoundary?: ThemeProviderProps[ 'crossesPortalBoundary' ];
 } = {} ) {
 	const { resolvedSettings: inheritedSettings } = useContext( ThemeContext );
 
@@ -145,15 +147,36 @@ export function useThemeProviderStyles( {
 		[ primary, background, cursorControl, cornerRadiusPreset ]
 	);
 
-	// Whether each resolved value differs from what the cascade already
-	// provides. Emitting overrides identical to the inherited values would be
-	// redundant, so the work is skipped in that case. The comparison is against
-	// the *inherited* values (not the prebuilt defaults) so a nested provider
-	// can still reset a setting back to the default and win over an ancestor's
-	// override.
-	const primaryChanged = ! colorsMatch( primary, inheritedPrimary );
-	const backgroundChanged = ! colorsMatch( background, inheritedBackground );
-	const cursorChanged = cursorControl !== inheritedCursorControl;
+	// The baseline each resolved value is compared against to decide whether
+	// emitting a `<style>` is worthwhile. Overrides identical to the baseline
+	// are redundant, so the work is skipped in that case.
+	//
+	// Normally the baseline is the *inherited* values (not the prebuilt
+	// defaults), so a nested provider can reset a setting back to the default
+	// and still win over an ancestor's override in the cascade.
+	//
+	// `crossesPortalBoundary` flips the baseline to the prebuilt `:root`
+	// defaults. Such a provider wraps content rendered through a portal — i.e.
+	// re-parented to `document.body`, outside the DOM subtree (and therefore
+	// the inherited custom properties) of any scoped ancestor provider. React
+	// context still flows across the portal, so the resolved values are
+	// correct, but the inherited values are not present in the cascade at the
+	// portal's destination; only the `:root` defaults are. Comparing against
+	// the defaults re-emits whatever the in-scope theme adds on top, so it
+	// survives the portal. Theming applied at `:root` (see `isRoot`) needs no
+	// such help — the cascade already delivers it to portals.
+	const [ baselinePrimary, baselineBackground, baselineCursorControl ] =
+		crossesPortalBoundary
+			? [
+					DEFAULT_SEED_COLORS.primary,
+					DEFAULT_SEED_COLORS.background,
+					undefined,
+			  ]
+			: [ inheritedPrimary, inheritedBackground, inheritedCursorControl ];
+
+	const primaryChanged = ! colorsMatch( primary, baselinePrimary );
+	const backgroundChanged = ! colorsMatch( background, baselineBackground );
+	const cursorChanged = cursorControl !== baselineCursorControl;
 
 	const colorStyles = useMemo( () => {
 		if ( ! primaryChanged && ! backgroundChanged ) {

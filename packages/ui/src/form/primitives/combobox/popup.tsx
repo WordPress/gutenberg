@@ -18,7 +18,7 @@ const ThemeProvider: typeof ThemeProviderType =
 export const Popup = forwardRef< HTMLDivElement, ComboboxPopupProps >(
 	function Popup( { className, portal, positioner, ...restProps }, ref ) {
 		const popupContent = (
-			<ThemeProvider>
+			<ThemeProvider crossesPortalBoundary>
 				<_Combobox.Popup
 					ref={ ref }
 					className={ clsx( itemPopupStyles.popup, className ) }
