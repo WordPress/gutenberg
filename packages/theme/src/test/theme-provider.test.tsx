@@ -23,6 +23,7 @@ jest.mock( '../style.module.css', () => ( {
 const BRAND_BG = '--wpds-color-background-interactive-brand-strong';
 const SURFACE_BG = '--wpds-color-background-surface-neutral';
 const CURSOR_CONTROL = '--wpds-cursor-control';
+const BORDER_RADIUS_SM = '--wpds-border-radius-sm';
 const PRIMARY = '#1e90ff';
 const OTHER_PRIMARY = '#8e44ad';
 const BACKGROUND = '#f8f8f8';
@@ -140,7 +141,6 @@ describe( 'ThemeProvider', () => {
 		// block (it also defines base tokens on `:root`) to avoid interfering
 		// with the color assertions above.
 		describe( 'cornerRadius forwarding', () => {
-			const BORDER_RADIUS = '--wpds-border-radius-sm';
 			let prebuiltStyle: HTMLStyleElement;
 
 			beforeAll( () => {
@@ -168,12 +168,14 @@ describe( 'ThemeProvider', () => {
 				);
 				const forwarded = readProp(
 					document.documentElement,
-					BORDER_RADIUS
+					BORDER_RADIUS_SM
 				);
 
 				// `:root` resolves to the same `moderate` value as the provider.
 				expect( forwarded ).toBeTruthy();
-				expect( forwarded ).toBe( readProp( provider, BORDER_RADIUS ) );
+				expect( forwarded ).toBe(
+					readProp( provider, BORDER_RADIUS_SM )
+				);
 			} );
 
 			it( 'does not forward the preset to the document root by default', () => {
@@ -190,8 +192,8 @@ describe( 'ThemeProvider', () => {
 				// `:root` keeps the base preset rather than the provider's
 				// `moderate` one, since the provider is not a root provider.
 				expect(
-					readProp( document.documentElement, BORDER_RADIUS )
-				).not.toBe( readProp( provider, BORDER_RADIUS ) );
+					readProp( document.documentElement, BORDER_RADIUS_SM )
+				).not.toBe( readProp( provider, BORDER_RADIUS_SM ) );
 			} );
 		} );
 	} );
