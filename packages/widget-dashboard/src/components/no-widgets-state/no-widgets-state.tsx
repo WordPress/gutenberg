@@ -20,7 +20,17 @@ export interface NoWidgetsStateProps {
 	children?: ReactNode;
 }
 
-function NoWidgetsStateImpl( { children }: NoWidgetsStateProps ) {
+/**
+ * Empty-state placeholder shown while the dashboard `layout` has no widgets.
+ * Pair it with `WidgetDashboard.Widgets` so it stands in for the grid until
+ * widgets are added. Falls back to a built-in placeholder; pass `children` to
+ * override.
+ *
+ * @param {NoWidgetsStateProps} props Component props.
+ */
+export function NoWidgetsState( {
+	children,
+}: NoWidgetsStateProps ): React.ReactNode {
 	const { layout } = useDashboardInternalContext();
 	if ( layout.length > 0 ) {
 		return null;
@@ -44,12 +54,3 @@ function NoWidgetsStateImpl( { children }: NoWidgetsStateProps ) {
 		</Stack>
 	);
 }
-
-/**
- * Renders an empty-state placeholder when the dashboard's `layout` has no
- * widgets. Pair with `WidgetDashboard.Widgets` inside `WidgetDashboard` so
- * the placeholder shows up in place of the grid until widgets are added.
- * Without children, falls back to a built-in placeholder; pass children to
- * override.
- */
-export const NoWidgetsState = NoWidgetsStateImpl;
