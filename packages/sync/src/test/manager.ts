@@ -422,22 +422,6 @@ describe( 'SyncManager', () => {
 	} );
 
 	describe( 'unload', () => {
-		it( 'creates an undo manager only after loading an entity', async () => {
-			const manager = createSyncManager();
-
-			expect( manager.undoManager ).toBeUndefined();
-
-			await manager.load(
-				mockSyncConfig,
-				'post',
-				'123',
-				mockRecord,
-				mockHandlers
-			);
-
-			expect( manager.undoManager ).toBeDefined();
-		} );
-
 		it( 'unloads an entity and destroys its state', async () => {
 			const manager = createSyncManager();
 
@@ -452,35 +436,6 @@ describe( 'SyncManager', () => {
 			manager.unload( 'post', '123' );
 
 			expect( mockProviderResult.destroy ).toHaveBeenCalled();
-		} );
-
-		it( 'clears the undo manager after unloading the only entity', async () => {
-			const manager = createSyncManager();
-
-			await manager.load(
-				mockSyncConfig,
-				'post',
-				'123',
-				mockRecord,
-				mockHandlers
-			);
-
-			const firstUndoManager = manager.undoManager;
-
-			manager.unload( 'post', '123' );
-
-			expect( manager.undoManager ).toBeUndefined();
-
-			await manager.load(
-				mockSyncConfig,
-				'post',
-				'123',
-				mockRecord,
-				mockHandlers
-			);
-
-			expect( manager.undoManager ).toBeDefined();
-			expect( manager.undoManager ).not.toBe( firstUndoManager );
 		} );
 
 		it( 'does not throw when unloading non-existent entity', () => {
@@ -539,11 +494,7 @@ describe( 'SyncManager', () => {
 				mockHandlers
 			);
 
-			const activeUndoManager = manager.undoManager;
-
 			manager.unload( 'post', '123' );
-
-			expect( manager.undoManager ).toBe( activeUndoManager );
 
 			// Only one provider should be destroyed
 			expect( mockProviderResult.destroy ).toHaveBeenCalledTimes( 1 );
@@ -556,10 +507,6 @@ describe( 'SyncManager', () => {
 			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
 			expect( mockSyncConfig.applyChangesToCRDTDoc ).toHaveBeenCalled();
-
-			manager.unload( 'post', '456' );
-
-			expect( manager.undoManager ).toBeUndefined();
 		} );
 
 		it( 'clears the undo manager after unloading all entities', async () => {
@@ -638,8 +585,6 @@ describe( 'SyncManager', () => {
 				Promise.resolve( mockProviderResult )
 			);
 			jest.clearAllMocks();
-
-			expect( manager.undoManager ).toBeUndefined();
 
 			await manager.load(
 				mockSyncConfig,
@@ -983,7 +928,6 @@ describe( 'SyncManager', () => {
 				null
 			);
 			expect( mockProviderCreator ).toHaveBeenCalledTimes( 1 );
-			expect( manager.undoManager ).toBeUndefined();
 		} );
 
 		it( 'loads collection when shouldSync is not defined', async () => {

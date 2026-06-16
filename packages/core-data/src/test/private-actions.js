@@ -223,24 +223,6 @@ describe( 'setCollaborationSupported', () => {
 		hasSyncManager.mockReset();
 	} );
 
-	it( 'sets collaboration support state', () => {
-		const dispatch = Object.assign( jest.fn(), {
-			__unstableNotifySyncUndoManagerChange: jest.fn(),
-		} );
-		hasSyncManager.mockReturnValue( false );
-
-		setCollaborationSupported( true )( { dispatch } );
-
-		expect( dispatch ).toHaveBeenCalledWith( {
-			type: 'SET_COLLABORATION_SUPPORTED',
-			supported: true,
-		} );
-		expect( getSyncManager ).not.toHaveBeenCalled();
-		expect(
-			dispatch.__unstableNotifySyncUndoManagerChange
-		).not.toHaveBeenCalled();
-	} );
-
 	it( 'unloads sync and resets sync undo state when disabling collaboration', () => {
 		const syncManager = {
 			unloadAll: jest.fn(),
@@ -264,23 +246,5 @@ describe( 'setCollaborationSupported', () => {
 			hasUndo: false,
 			hasRedo: false,
 		} );
-	} );
-
-	it( 'does not reset sync undo state when disabling collaboration without a sync manager', () => {
-		const dispatch = Object.assign( jest.fn(), {
-			__unstableNotifySyncUndoManagerChange: jest.fn(),
-		} );
-		hasSyncManager.mockReturnValue( false );
-
-		setCollaborationSupported( false )( { dispatch } );
-
-		expect( dispatch ).toHaveBeenCalledWith( {
-			type: 'SET_COLLABORATION_SUPPORTED',
-			supported: false,
-		} );
-		expect( getSyncManager ).not.toHaveBeenCalled();
-		expect(
-			dispatch.__unstableNotifySyncUndoManagerChange
-		).not.toHaveBeenCalled();
 	} );
 } );

@@ -367,7 +367,7 @@ export const getEditedEntityRecord = forwardResolver( 'getEntityRecord' );
  */
 export const getEntityRecords =
 	( kind, name, query = {} ) =>
-	async ( { select, dispatch, registry, resolveSelect } ) => {
+	async ( { dispatch, registry, resolveSelect } ) => {
 		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
@@ -508,11 +508,7 @@ export const getEntityRecords =
 				};
 			}
 
-			if (
-				entityConfig.syncConfig &&
-				-1 === query.per_page &&
-				select?.isCollaborationSupported?.() !== false
-			) {
+			if ( entityConfig.syncConfig && -1 === query.per_page ) {
 				const objectType = `${ kind }/${ name }`;
 				getSyncManager()?.loadCollection(
 					entityConfig.syncConfig,

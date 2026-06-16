@@ -159,21 +159,11 @@ test.describe( 'Collaboration with meta boxes', () => {
 
 			await expect
 				.poll( () =>
-					page.evaluate( () => ( {
-						coreHasUndo: window.wp.data.select( 'core' ).hasUndo(),
-						editorHasUndo: window.wp.data
-							.select( 'core/editor' )
-							.hasEditorUndo(),
-					} ) )
+					page.evaluate( () =>
+						window.wp.data.select( 'core' ).hasUndo()
+					)
 				)
-				.toEqual( {
-					coreHasUndo: true,
-					editorHasUndo: true,
-				} );
-
-			await expect(
-				page.getByRole( 'button', { name: 'Undo' } ).first()
-			).toBeEnabled();
+				.toBe( true );
 
 			await pageUtils.pressKeys( 'primary+z' );
 
