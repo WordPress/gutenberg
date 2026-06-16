@@ -26,7 +26,7 @@ export default function BootBackButton( { length }: { length: number } ) {
 		<Button
 			size="compact"
 			onClick={ handleBack }
-			label={ __( 'Go back' ) }
+			label={ __( 'Back' ) }
 			icon={ isRTL() ? chevronRight : chevronLeft }
 		/>
 	);
