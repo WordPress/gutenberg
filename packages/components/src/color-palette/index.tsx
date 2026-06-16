@@ -203,6 +203,7 @@ function UnforwardedColorPalette(
 		headingLevel = 2,
 		'aria-label': ariaLabel,
 		'aria-labelledby': ariaLabelledby,
+		children,
 		...additionalProps
 	} = props;
 	const [ normalizedColorValue, setNormalizedColorValue ] = useState( value );
@@ -334,6 +335,7 @@ function UnforwardedColorPalette(
 					) }
 				/>
 			) }
+			{ children }
 			{ ( colors.length > 0 || actions ) && (
 				<CircularOptionPicker
 					{ ...metaProps }

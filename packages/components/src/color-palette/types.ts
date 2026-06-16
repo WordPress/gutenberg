@@ -119,6 +119,11 @@ export type ColorPaletteProps = Pick<
 	 * @default false
 	 */
 	__experimentalIsRenderedInSidebar?: boolean;
+	/**
+	 * Optional content rendered between the custom color picker and the
+	 * palette of color options.
+	 */
+	children?: ReactNode;
 } & (
 		| {
 				/**
