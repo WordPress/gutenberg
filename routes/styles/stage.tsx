@@ -8,7 +8,12 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { Button, __experimentalHStack as HStack } from '@wordpress/components';
+import {
+	Button,
+	Notice,
+	Spinner,
+	__experimentalHStack as HStack,
+} from '@wordpress/components';
 import { seen } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
 import { useEditorSettings } from '@wordpress/lazy-editor';
@@ -18,6 +23,7 @@ import { unlock } from '@wordpress/routes-lock-unlock';
  * Internal dependencies
  */
 import './style.scss';
+import { isStylesRouteSupported } from './utils';
 
 const { GlobalStylesUIWrapper, GlobalStylesActionMenu } =
 	unlock( editorPrivateApis );
@@ -26,16 +32,22 @@ function Stage() {
 	const navigate = useNavigate();
 	const search = useSearch( { strict: false } ) as any;
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const globalStylesId = useSelect(
-		( select ) =>
-			(
+	const { currentTheme, globalStylesId } = useSelect(
+		( select ) => ( {
+			currentTheme: select( coreStore ).getCurrentTheme(),
+			globalStylesId: (
 				select( coreStore ) as any
 			 ).__experimentalGetCurrentGlobalStylesId(),
+		} ),
 		[]
 	);
-	const { editorSettings } = useEditorSettings( {
-		stylesId: globalStylesId,
-	} );
+	const { isReady: areEditorSettingsReady, editorSettings } =
+		useEditorSettings( {
+			stylesId: globalStylesId,
+		} );
+	const isReady = !! currentTheme && areEditorSettingsReady;
+	const isSupported =
+		isReady && isStylesRouteSupported( currentTheme, editorSettings );
 
 	const section = ( search.section ?? '/' ) as string;
 	const [ isStyleBookOpened, setIsStyleBookOpened ] = useState(
@@ -50,6 +62,36 @@ function Stage() {
 			},
 		} );
 	};
+
+	if ( ! isReady ) {
+		return (
+			<Page
+				headingLevel={ 2 }
+				className="routes-styles__page"
+				title={ __( 'Styles' ) }
+				hasPadding
+			>
+				<Spinner />
+			</Page>
+		);
+	}
+
+	if ( ! isSupported ) {
+		return (
+			<Page
+				headingLevel={ 2 }
+				className="routes-styles__page"
+				title={ __( 'Styles' ) }
+				hasPadding
+			>
+				<Notice status="warning" isDismissible={ false }>
+					{ __(
+						'The theme you are currently using does not support this screen.'
+					) }
+				</Notice>
+			</Page>
+		);
+	}
 
 	return (
 		<Page
