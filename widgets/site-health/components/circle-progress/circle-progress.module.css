@@ -1,7 +1,7 @@
 .root {
 	flex-shrink: 0;
-	width: calc(var(--wpds-dimension-base) * 17);
-	height: calc(var(--wpds-dimension-base) * 17);
+	width: 68px;
+	height: 68px;
 }
 
 .root.success {

@@ -7,7 +7,7 @@
 
 	// Constrain checkbox column to fixed width while other columns share remaining space.
 	.dataviews-view-table__checkbox-column {
-		width: calc(var(--wpds-dimension-base) * 12);
+		width: 48px;
 	}
 
 	tbody:focus-visible {

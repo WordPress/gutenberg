@@ -147,7 +147,7 @@
 		.dataviews-view-grid__field-value:not(:empty) {
 			min-height: var(--wpds-dimension-size-sm);
 			line-height: var(--wpds-typography-line-height-sm);
-			padding-top: calc(var(--wpds-dimension-base) / 2);
+			padding-top: 2px;
 		}
 
 		.dataviews-view-grid__field {

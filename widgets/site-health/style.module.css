@@ -1,11 +1,11 @@
 .root {
 	margin: 0 auto;
-	max-width: calc(var(--wpds-dimension-base) * 80);
+	max-width: 320px;
 	text-align: center;
 	height: 100%;
 }
 
 .loading {
-	min-height: calc(var(--wpds-dimension-base) * 55);
+	min-height: 220px;
 	height: 100%;
 }
