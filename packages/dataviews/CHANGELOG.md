@@ -24,6 +24,7 @@
 ### Internal
 
 - Adopt `--wpds-dimension-size-*` design tokens [#79093](https://github.com/WordPress/gutenberg/pull/79093).
+- Migrate the remaining `var(--wpds-dimension-base)` usages off the removed primitive token [#79254](https://github.com/WordPress/gutenberg/pull/79254).
 
 ## 16.0.1 (2026-06-16)
 
