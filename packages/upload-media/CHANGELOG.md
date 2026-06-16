@@ -5,7 +5,7 @@
 ### Enhancement
 
 -   Add `ErrorCode` enum and localized `getErrorMessage()` helper. Existing `UploadError` throw sites now use enum values, and `ErrorCode` / `getErrorMessage` are exported from the package entry point ([#74917](https://github.com/WordPress/gutenberg/pull/74917)).
--   Log upload cancellations, missing `onError` handlers, and batch completions via `@wordpress/warning` (only fires under `SCRIPT_DEBUG`) ([#74917](https://github.com/WordPress/gutenberg/pull/74917)).
+-   Log upload cancellations and batch completions via a `SCRIPT_DEBUG`-gated `console.debug` diagnostic; top-level cancellations without an `onError` handler are surfaced via `console.error` ([#74917](https://github.com/WordPress/gutenberg/pull/74917)).
 -   Emit User Timings API entries for upload, sideload, resize, rotate, and transcode operations under a custom "Upload Media" DevTools track when `SCRIPT_DEBUG` is enabled ([#74917](https://github.com/WordPress/gutenberg/pull/74917)).
 
 ### Bug Fix

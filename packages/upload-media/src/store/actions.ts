@@ -8,7 +8,6 @@ import { v4 as uuidv4 } from 'uuid';
  */
 import type { createRegistry } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import warning from '@wordpress/warning';
 
 type WPDataRegistry = ReturnType< typeof createRegistry >;
 
@@ -41,7 +40,8 @@ import type {
 	revokeBlobUrls,
 } from './private-actions';
 import { maybeRecycleVipsWorker, vipsCancelOperations } from './utils';
-import { UploadError } from '../upload-error';
+import { debug } from './utils/debug-logger';
+import { ErrorCode, UploadError } from '../upload-error';
 import { validateMimeType } from '../validate-mime-type';
 import { validateMimeTypeForUser } from '../validate-mime-type-for-user';
 import { validateFileSize } from '../validate-file-size';
@@ -210,14 +210,11 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 				// Log errors for top-level items without an onError handler.
 				// Child sideload errors are suppressed here because the
 				// parent will be notified and surface the error to the user.
-				warning(
-					`Upload cancelled for item ${ id }: ${ error.message }`
-				);
 				// eslint-disable-next-line no-console -- Deliberately log errors here.
 				console.error( 'Upload cancelled', error );
 			}
 		} else {
-			warning(
+			debug(
 				`Item cancelled: ${ item.file.name } (item ${ id }): ${
 					error instanceof Error ? error.message : error
 				}`
@@ -316,7 +313,7 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 							code:
 								( error instanceof UploadError &&
 									error.code ) ||
-								'UPLOAD_ERROR',
+								ErrorCode.GENERAL,
 							message:
 								error?.message ||
 								__( 'The image could not be uploaded.' ),
@@ -330,7 +327,7 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 
 		// All items of this batch were cancelled or finished.
 		if ( batchId && select.isBatchUploaded( batchId ) ) {
-			warning( `Batch completed: ${ batchId }` );
+			debug( `Batch completed: ${ batchId }` );
 			item.onBatchSuccess?.();
 		}
 	};

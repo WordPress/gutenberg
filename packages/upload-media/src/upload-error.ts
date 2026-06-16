@@ -25,7 +25,7 @@ export enum ErrorCode {
 }
 
 interface UploadErrorArgs {
-	code: string;
+	code: ErrorCode | string;
 	message: string;
 	file: File;
 	cause?: Error;
@@ -38,7 +38,7 @@ interface UploadErrorArgs {
  * to hold an error code and a reference to a file object.
  */
 export class UploadError extends Error {
-	code: string;
+	code: ErrorCode | string;
 	file: File;
 
 	constructor( { code, message, file, cause }: UploadErrorArgs ) {

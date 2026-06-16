@@ -1,13 +1,34 @@
 /**
  * Debug logger for client-side media processing.
  *
- * Provides performance measurement via the User Timings API.
- * Measurements are only emitted when SCRIPT_DEBUG is true.
+ * Provides diagnostic logging via `console.debug` and performance
+ * measurement via the User Timings API. Both are only emitted when
+ * SCRIPT_DEBUG is true, so there is no overhead in production builds.
  */
 
 function isDebugEnabled(): boolean {
 	// eslint-disable-next-line @wordpress/wp-global-usage
 	return globalThis.SCRIPT_DEBUG === true;
+}
+
+/**
+ * Logs a diagnostic message visible in the browser console.
+ *
+ * Unlike `@wordpress/warning`, this does not throw a caught `Error`, so it
+ * won't trip the debugger for developers who pause on caught exceptions.
+ * Use it for non-error lifecycle diagnostics (cancellations, batch
+ * completion). Only emits when SCRIPT_DEBUG is true.
+ *
+ * @param message Message to log.
+ * @param args    Additional values to log.
+ */
+export function debug( message: string, ...args: unknown[] ): void {
+	if ( ! isDebugEnabled() ) {
+		return;
+	}
+
+	// eslint-disable-next-line no-console -- Deliberately log diagnostics here.
+	console.debug( `[upload-media] ${ message }`, ...args );
 }
 
 interface MeasureOptions {

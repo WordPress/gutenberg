@@ -588,7 +588,6 @@ describe( 'actions', () => {
 
 			expect( vipsCancelOperations ).toHaveBeenCalledWith( item.id );
 			expect( consoleErrorSpy ).toHaveBeenCalled();
-			expect( console ).toHaveWarned();
 
 			consoleErrorSpy.mockRestore();
 		} );
@@ -613,7 +612,6 @@ describe( 'actions', () => {
 			expect(
 				unlock( registry.select( uploadStore ) ).getAllItems()
 			).toHaveLength( 0 );
-			expect( console ).toHaveWarned();
 
 			consoleErrorSpy.mockRestore();
 		} );
@@ -652,7 +650,6 @@ describe( 'actions', () => {
 				.cancelItem( item.id, new Error( 'Test error' ), true );
 
 			expect( onError ).not.toHaveBeenCalled();
-			expect( console ).toHaveWarned();
 		} );
 
 		describe( 'parent cancellation when child sideload fails', () => {
@@ -982,9 +979,6 @@ describe( 'actions', () => {
 			expect(
 				unlock( registry.select( uploadStore ) ).getAllItems()
 			).toHaveLength( 0 );
-
-			// A silent cancel still logs a diagnostic warning.
-			expect( console ).toHaveWarned();
 		} );
 
 		it( 'does NOT schedule retry for non-retryable errors', async () => {
@@ -1008,9 +1002,6 @@ describe( 'actions', () => {
 			expect(
 				unlock( registry.select( uploadStore ) ).getAllItems()
 			).toHaveLength( 0 );
-
-			// Cancelling a top-level item without an onError handler warns.
-			expect( console ).toHaveWarned();
 
 			consoleErrorSpy.mockRestore();
 		} );
@@ -1041,9 +1032,6 @@ describe( 'actions', () => {
 			expect(
 				unlock( registry.select( uploadStore ) ).getAllItems()
 			).toHaveLength( 0 );
-
-			// Cancelling a top-level item without an onError handler warns.
-			expect( console ).toHaveWarned();
 
 			consoleErrorSpy.mockRestore();
 		} );
@@ -1077,9 +1065,6 @@ describe( 'actions', () => {
 			expect(
 				unlock( registry.select( uploadStore ) ).getAllItems()
 			).toHaveLength( 0 );
-
-			// The silent manual cancel logs a diagnostic warning.
-			expect( console ).toHaveWarned();
 
 			// Advance timers — the old retry timer should NOT fire.
 			await jest.runAllTimersAsync();
