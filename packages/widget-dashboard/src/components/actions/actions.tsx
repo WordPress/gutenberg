@@ -12,11 +12,11 @@ import { Button, Stack } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
-import styles from './actions.module.css';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardUIContext } from '../../context/ui-context';
 import { ActionsMenu } from '../actions-menu';
 import type { ActionsMenuItem } from '../actions-menu';
+import styles from './actions.module.css';
 
 /**
  * Edit toolbar for the dashboard. Customize mode surfaces Add widget,
