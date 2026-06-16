@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { _x } from '@wordpress/i18n';
-import { create, RichTextData } from '@wordpress/rich-text';
+
+/**
+ * Internal dependencies
+ */
+import { findMarkerRange } from '../inline-markers';
 
 /**
  * Sanitizes a note string by trimming leading and trailing whitespace.
@@ -154,47 +158,20 @@ const NOTE_FORMAT_TYPE = 'core/note';
  * return its character range. Used to derive an inline note's anchor from
  * the in-content marker (resilient to edits) rather than stale offset meta.
  *
+ * Thin Notes-specific wrapper over the shared inline-markers primitive; the
+ * `wp-note` class short-circuits parsing for content without a note marker.
+ *
  * @param {*}             value  Block attribute value (RichTextData, string, or other).
  * @param {number|string} noteId Note id to search for.
  * @return {?{start: number, end: number}} Range or null when no marker is found.
  */
 export function findNoteRange( value, noteId ) {
-	if ( noteId === undefined || noteId === null ) {
-		return null;
-	}
-	let html = null;
-	if ( value instanceof RichTextData ) {
-		html = value.toHTMLString();
-	} else if ( typeof value === 'string' ) {
-		html = value;
-	}
-	if ( ! html || html.indexOf( 'wp-note' ) === -1 ) {
-		return null;
-	}
-	const target = String( noteId );
-	const record = create( { html } );
-	const formats = record.formats;
-	let start = -1;
-	for ( let i = 0; i < formats.length; i++ ) {
-		const stack = formats[ i ];
-		const hit = stack?.find(
-			( f ) =>
-				f.type === NOTE_FORMAT_TYPE &&
-				f.attributes &&
-				f.attributes[ 'data-id' ] === target
-		);
-		if ( hit ) {
-			if ( start === -1 ) {
-				start = i;
-			}
-		} else if ( start !== -1 ) {
-			return { start, end: i };
-		}
-	}
-	if ( start !== -1 ) {
-		return { start, end: formats.length };
-	}
-	return null;
+	return findMarkerRange( value, {
+		formatType: NOTE_FORMAT_TYPE,
+		idAttribute: 'data-id',
+		id: noteId,
+		quickReject: 'wp-note',
+	} );
 }
 
 /**
