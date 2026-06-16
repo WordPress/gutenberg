@@ -8,9 +8,8 @@ import { join } from 'path';
 import { render, screen } from '@testing-library/react';
 import { ThemeProvider } from '../theme-provider';
 
-// Mock the CSS module so the provider's wrapper has a stable class. The tests
-// use this class as the scoping selector (in place of any instance-specific
-// attribute) and to read computed custom properties from the wrapper itself.
+// Give the wrapper a stable class so tests can locate it and read its
+// computed custom properties.
 jest.mock( '../style.module.css', () => ( {
 	root: 'theme-provider-root',
 } ) );
@@ -144,20 +143,14 @@ describe( 'ThemeProvider', () => {
 
 			unmount();
 
-			// The effect cleanup restores the previous value — here none, so
-			// the property is removed rather than left stuck on the seed.
+			// No prior value, so cleanup removes the property entirely.
 			expect( readProp( document.documentElement, BRAND_BG ) ).toBe( '' );
 		} );
 
-		// Unlike color/cursor (applied as inline custom properties on the
-		// provider's wrapper), the `cornerRadius` preset resolves to
-		// `--wpds-border-radius-*` values through the prebuilt design-token CSS
-		// (the modes authored in `terrazzo.config.ts`). A root provider relies
-		// on that stylesheet's `:root:has( [data-wpds-root-provider='true']… )`
-		// rule to forward the preset to the document element, so these tests
-		// load the prebuilt CSS to exercise it. It is injected only for this
-		// block (it also defines base tokens on `:root`) to avoid interfering
-		// with the color assertions above.
+		// `cornerRadius` forwards to `:root` through the prebuilt CSS's
+		// `:root:has( [data-wpds-root-provider='true']… )` rule (not the JS
+		// mirror used for color/cursor), so load that stylesheet to exercise
+		// it. Scoped to this block since it also defines base `:root` tokens.
 		describe( 'cornerRadius forwarding', () => {
 			let prebuiltStyle: HTMLStyleElement;
 
