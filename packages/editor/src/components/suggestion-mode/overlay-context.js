@@ -60,6 +60,10 @@ const BLOCK_EDITOR_STORE_NAME = 'core/block-editor';
  *                                       this block.
  * @property {Object} overlayAttributes  Pending attribute changes that
  *                                       have not yet been committed.
+ * @property {number} [authorId]         Id of the user who authored the
+ *                                       suggestion, set on hydrator-seeded
+ *                                       entries so inline marks render in the
+ *                                       suggester's color.
  */
 
 /**
@@ -137,9 +141,12 @@ export function overlayReducer( state, action ) {
 			// persisted suggestion comment. `hydratedFromCommentId` flags the
 			// entry so consumers can tell hydrator-sourced state from live
 			// editing (the HOC routes writes through to the real block when
-			// the only reason an entry exists is hydration). `syncedOpsKey`
-			// is preserved from any prior entry so a fresh seed doesn't
-			// re-trigger auto-save on top of an already-persisted payload.
+			// the only reason an entry exists is hydration). `authorId` is the
+			// id of the user who made the suggestion, so the inline diff marks
+			// can be tinted with the suggester's color rather than the current
+			// viewer's. `syncedOpsKey` is preserved from any prior entry so a
+			// fresh seed doesn't re-trigger auto-save on top of an
+			// already-persisted payload.
 			const existing = state[ action.clientId ];
 			return {
 				...state,
@@ -148,6 +155,7 @@ export function overlayReducer( state, action ) {
 					baselineAttributes: action.baselineAttributes,
 					overlayAttributes: action.overlayAttributes,
 					commentId: action.commentId,
+					authorId: action.authorId ?? null,
 					syncedOpsKey: existing?.syncedOpsKey ?? null,
 					hydratedFromCommentId: action.commentId,
 				},
@@ -222,7 +230,8 @@ export function SuggestionOverlayProvider( { children } ) {
 			blockName,
 			commentId,
 			baselineAttributes,
-			overlayAttributes
+			overlayAttributes,
+			authorId = null
 		) =>
 			dispatch( {
 				type: 'SEED_FROM_COMMENT',
@@ -231,6 +240,7 @@ export function SuggestionOverlayProvider( { children } ) {
 				commentId,
 				baselineAttributes,
 				overlayAttributes,
+				authorId,
 			} ),
 		[]
 	);

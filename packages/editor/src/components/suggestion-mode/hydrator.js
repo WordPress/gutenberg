@@ -177,7 +177,12 @@ export default function SuggestionOverlayHydrator() {
 				payload.blockName ?? null,
 				thread.id,
 				pairs.baselineAttributes,
-				pairs.overlayAttributes
+				pairs.overlayAttributes,
+				// The comment author id tints the inline diff marks with the
+				// suggester's color instead of the current viewer's. `author`
+				// is the numeric user id on the comment record; fall back to
+				// null for guest authors so the marks use the default palette.
+				thread.author ?? null
 			);
 		}
 	}, [ unresolvedNotes, entries, seedFromComment ] );

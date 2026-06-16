@@ -300,31 +300,41 @@ function SuggestingBlockEdit( { BlockEdit, props, isSuggestMode } ) {
 	const isHydratedReviewerView =
 		! isSuggestMode && !! overlayEntry?.hydratedFromCommentId;
 
+	// Id of the user the inline marks should be attributed to. A
+	// hydrator-seeded entry carries the original suggester's `authorId`, so a
+	// reviewer (or the suggester after a reload) sees the suggestion tinted
+	// with its author's color rather than whoever is currently viewing. For a
+	// live suggest-mode edit there is no seeded author and the current user is
+	// the suggester, so we fall back to `getCurrentUser()` below.
+	const seededAuthorId = overlayEntry?.authorId ?? null;
+
 	// Whether this block is the currently selected one (skip marking while
-	// the user is typing into it) and the suggester's avatar color (paints
-	// the inline marks so two suggesters' edits read as different colors).
-	// Folded into a single `useSelect` so the HOC stays at one extra
-	// store-subscription per block in suggest mode. `isSelected` defaults
-	// to `true` so any environment without the block-editor store
-	// registered (unit tests of this HOC) skips marking too — production
-	// always has both stores. `authorColor` defaults to `null` for
-	// anonymous / pre-collab edits, in which case the canvas CSS falls
-	// through to the red/green pair.
-	const { isSelected, authorColor } = useSelect(
+	// the user is typing into it) and the current user's id (used to tint a
+	// live suggester's own in-progress marks). Folded into a single
+	// `useSelect` so the HOC stays at one extra store-subscription per block.
+	// `isSelected` defaults to `true` so any environment without the
+	// block-editor store registered (unit tests of this HOC) skips marking
+	// too — production always has both stores.
+	const { isSelected, currentUserId } = useSelect(
 		( select ) => {
 			const blockEditor = select( BLOCK_EDITOR_STORE_NAME );
 			const core = select( coreStore );
-			const userId = core?.getCurrentUser?.()?.id ?? null;
 			return {
 				isSelected: blockEditor?.isBlockSelected
 					? blockEditor.isBlockSelected( clientId )
 					: true,
-				authorColor:
-					userId !== null ? getAvatarBorderColor( userId ) : null,
+				currentUserId: core?.getCurrentUser?.()?.id ?? null,
 			};
 		},
 		[ clientId ]
 	);
+
+	// Prefer the seeded suggestion author; fall back to the current user for
+	// live edits. `authorColor` is `null` for anonymous / pre-collab edits,
+	// in which case the canvas CSS falls through to the red/green pair.
+	const authorId = seededAuthorId ?? currentUserId;
+	const authorColor =
+		authorId !== null ? getAvatarBorderColor( authorId ) : null;
 
 	// Does an overlay entry currently exist for this block? This is the
 	// source of truth; `captureBaseline` only creates an entry when there

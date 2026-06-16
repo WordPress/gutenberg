@@ -187,9 +187,26 @@ describe( 'overlayReducer', () => {
 			baselineAttributes: { content: 'before' },
 			overlayAttributes: { content: 'after' },
 			commentId: 42,
+			authorId: null,
 			syncedOpsKey: null,
 			hydratedFromCommentId: 42,
 		} );
+	} );
+
+	it( 'records the suggestion author id on a seeded entry', () => {
+		// The author id lets the overlay tint inline marks with the
+		// suggester's color rather than the current viewer's.
+		const seeded = overlayReducer( INITIAL, {
+			type: 'SEED_FROM_COMMENT',
+			clientId: 'block-a',
+			blockName: 'core/paragraph',
+			commentId: 42,
+			baselineAttributes: { content: 'before' },
+			overlayAttributes: { content: 'after' },
+			authorId: 7,
+		} );
+
+		expect( seeded[ 'block-a' ].authorId ).toBe( 7 );
 	} );
 
 	it( 'preserves an existing syncedOpsKey when re-seeding the same entry', () => {

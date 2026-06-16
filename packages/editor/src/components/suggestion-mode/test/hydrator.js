@@ -72,6 +72,7 @@ function renderWithProbe( { intent = 'edit' } = {} ) {
 
 	return {
 		...utils,
+		registry,
 		getEntries: () => latestEntries,
 	};
 }
@@ -110,9 +111,39 @@ describe( 'SuggestionOverlayHydrator', () => {
 			baselineAttributes: { content: 'Hello' },
 			overlayAttributes: { content: 'Hello world' },
 			commentId: 101,
+			authorId: null,
 			syncedOpsKey: null,
 			hydratedFromCommentId: 101,
 		} );
+	} );
+
+	it( "carries the note author's id onto the seeded entry", () => {
+		// The author id lets the overlay tint inline marks with the
+		// suggester's color instead of the current viewer's.
+		useNoteThreads.mockReturnValue( {
+			notes: [],
+			unresolvedNotes: [
+				{
+					id: 107,
+					blockClientId: 'block-a',
+					status: 'hold',
+					author: 55,
+					meta: {
+						_wp_suggestion: makePayload( [
+							{
+								type: 'attribute-set',
+								attribute: 'content',
+								before: 'Hello',
+								after: 'Hello world',
+							},
+						] ),
+					},
+				},
+			],
+		} );
+
+		const { getEntries } = renderWithProbe();
+		expect( getEntries()[ 'block-a' ].authorId ).toBe( 55 );
 	} );
 
 	it( 'aggregates multiple attribute-set ops on the same block', () => {

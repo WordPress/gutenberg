@@ -39,6 +39,7 @@ import {
 	useSuggestionOverlay,
 } from '../overlay-context';
 import { store as editorStore } from '../../../store';
+import { getAvatarBorderColor } from '../../collab-sidebar/utils';
 
 function renderWithProviders( ui, { intent = 'edit', blocks = null } = {} ) {
 	const registry = createRegistry();
@@ -311,6 +312,75 @@ describe( 'withSuggestionOverlay', () => {
 		expect( setAttributes ).toHaveBeenCalledWith( {
 			content: 'proposed',
 		} );
+	} );
+
+	it( "tints a hydrated entry's marks with the suggestion author's color, not the viewer's", () => {
+		// Regression: the marks used to be tinted via the current viewer's
+		// `getCurrentUser()` id, so a reviewer (or anyone after reload) saw
+		// another author's suggestion painted in their own color. The seeded
+		// note author must drive the color instead. coreStore is not
+		// registered here, so the viewer id resolves to null — if the marks
+		// pick up a color at all, it can only come from the seeded author.
+		const authorId = 2;
+		const expectedColor = getAvatarBorderColor( authorId );
+
+		function SeedButton() {
+			const { seedFromComment } = useSuggestionOverlay();
+			return (
+				<button
+					type="button"
+					onClick={ () =>
+						seedFromComment(
+							'a',
+							'core/paragraph',
+							42,
+							{ content: 'before' },
+							{ content: 'after' },
+							authorId
+						)
+					}
+				>
+					seed
+				</button>
+			);
+		}
+
+		const setAttributes = jest.fn();
+		renderWithProviders(
+			<>
+				<SeedButton />
+				<Wrapped
+					clientId="a"
+					name="core/paragraph"
+					attributes={ { content: 'before' } }
+					setAttributes={ setAttributes }
+				/>
+			</>,
+			{
+				intent: 'edit',
+				blocks: [
+					{
+						clientId: 'a',
+						name: 'core/paragraph',
+						attributes: { content: 'before' },
+						innerBlocks: [],
+					},
+				],
+			}
+		);
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'seed' } ) );
+
+		expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
+			new RegExp(
+				`<del class="has-suggestion-deletion" style="--suggestion-author-color: ${ expectedColor }">before</del>`
+			)
+		);
+		expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
+			new RegExp(
+				`<ins class="has-suggestion-addition" style="--suggestion-author-color: ${ expectedColor }">after</ins>`
+			)
+		);
 	} );
 
 	it( 'drops marks for a hydrated entry when real content has diverged from the suggester baseline', () => {
