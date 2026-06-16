@@ -1,27 +1,22 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
 
-// Visual treatment for blocks and RichText runs tagged with a pending
-// suggestion. Lives in `block-editor` because the canvas iframe loads
-// `wp-block-editor-content` (compiled from this package) but does NOT load
-// the editor-package chrome stylesheets — keeping these rules here is what
-// makes them apply inside the iframe.
-//
-// - Block-level classes (`is-suggestion-pending*`) are set by the editor
-//   suggestion system via `metadata.suggestion`.
-// - Inline classes (`.has-suggestion-deletion` / `.has-suggestion-addition`)
-//   are applied by the editor-package overlay HOC (`markContentDiff`) to
-//   <del>/<ins> RichText runs.
-//
-// Both consume `--suggestion-author-color`, which the overlay HOC writes
-// from the suggester's avatar color — so individual suggestions tint to
-// their author the same way live cursors do.
+// Visual treatment for blocks tagged with a pending suggestion. The marker
+// itself lives in `metadata.suggestion` (set by the editor-package suggestion
+// system); this stylesheet only knows about the resulting class name. Lives in
+// `block-editor` because the canvas iframe loads `wp-block-editor-content`
+// (compiled from this package) but does NOT load the editor-package chrome
+// stylesheets — keeping these rules here is what makes them apply inside the
+// iframe.
 
-// Default suggestion colors, used when the suggester's avatar color
+// Default suggestion color, used when the suggester's avatar color
 // can't be resolved (e.g., anonymous edits or pre-collab sessions).
+// `withSuggestionBlockClassName` writes the suggester's avatar color
+// into `--suggestion-author-color` on each pending-suggestion block,
+// so individual suggestions tint to their author's color the same way
+// live cursors do — Google Docs-style. Rules below consume the
+// variable with this green as the fallback.
 $suggestion-color: #188038;
-$suggestion-deletion-color: #cc1818;
-$suggestion-addition-color: #007017;
 $suggestion-author-color: var(--suggestion-author-color, #{$suggestion-color});
 
 // Green "bracket" applied to any block with a pending attribute overlay
@@ -116,22 +111,6 @@ $suggestion-author-color: var(--suggestion-author-color, #{$suggestion-color});
 		pointer-events: none;
 		z-index: 1;
 	}
-}
-
-// Inline RichText runs marked as deleted/added in a pending suggestion.
-.has-suggestion-deletion {
-	color: var(--suggestion-author-color, #{$suggestion-deletion-color});
-	text-decoration: line-through;
-	text-decoration-color: var(--suggestion-author-color, #{$suggestion-deletion-color});
-}
-
-.has-suggestion-addition {
-	color: var(--suggestion-author-color, #{$suggestion-addition-color});
-	text-decoration: underline;
-	text-decoration-color: var(--suggestion-author-color, #{$suggestion-addition-color});
-	box-shadow:
-		-1px 0 0 0 var(--suggestion-author-color, #{$suggestion-addition-color}),
-		1px 0 0 0 var(--suggestion-author-color, #{$suggestion-addition-color});
 }
 
 // Move ghost: a non-interactive placeholder rendered at a moved block's

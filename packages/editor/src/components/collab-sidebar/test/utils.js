@@ -1,7 +1,19 @@
 /**
+ * WordPress dependencies
+ */
+import {
+	RichTextData,
+	registerFormatType,
+	unregisterFormatType,
+	store as richTextStore,
+} from '@wordpress/rich-text';
+import { select } from '@wordpress/data';
+
+/**
  * Internal dependencies
  */
 import {
+	findNoteRange,
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
 	removeNoteIdFromMetadata,
@@ -525,5 +537,78 @@ describe( 'calculateNotePositions', () => {
 		// 3 (downward):  (184 + 50) - 200 + 20 = 54 → 254
 		// 1 (upward):    184 - 200 - 50 - 20 = -86 → 114
 		expect( positions ).toEqual( { 1: 114, 2: 184, 3: 254 } );
+	} );
+} );
+
+describe( 'findNoteRange', () => {
+	const FORMAT_NAME = 'core/note';
+
+	const isRegistered = () =>
+		!! select( richTextStore ).getFormatType( FORMAT_NAME );
+
+	beforeAll( () => {
+		if ( ! isRegistered() ) {
+			registerFormatType( FORMAT_NAME, {
+				title: 'Note',
+				tagName: 'span',
+				className: 'wp-note',
+				attributes: { 'data-id': 'data-id' },
+				edit: () => null,
+			} );
+		}
+	} );
+
+	afterAll( () => {
+		if ( isRegistered() ) {
+			unregisterFormatType( FORMAT_NAME );
+		}
+	} );
+
+	it( 'returns null for null/undefined input', () => {
+		expect( findNoteRange( null, 7 ) ).toBeNull();
+		expect( findNoteRange( undefined, 7 ) ).toBeNull();
+	} );
+
+	it( 'returns null when no marker is present', () => {
+		const value = RichTextData.fromHTMLString( 'hello world' );
+		expect( findNoteRange( value, 7 ) ).toBeNull();
+	} );
+
+	it( 'returns range for a marker matching the note id (RichTextData)', () => {
+		const value = RichTextData.fromHTMLString(
+			'hello <span class="wp-note" data-id="7">marked</span> world'
+		);
+		expect( findNoteRange( value, 7 ) ).toEqual( {
+			start: 6,
+			end: 12,
+		} );
+	} );
+
+	it( 'returns range for a marker matching the note id (string)', () => {
+		const html =
+			'hello <span class="wp-note" data-id="7">marked</span> world';
+		expect( findNoteRange( html, 7 ) ).toEqual( { start: 6, end: 12 } );
+	} );
+
+	it( 'returns null when the marker id does not match', () => {
+		const value = RichTextData.fromHTMLString(
+			'<span class="wp-note" data-id="3">x</span>'
+		);
+		expect( findNoteRange( value, 7 ) ).toBeNull();
+	} );
+
+	it( 'coerces ids to strings so numeric vs string ids match', () => {
+		const value = RichTextData.fromHTMLString(
+			'<span class="wp-note" data-id="7">x</span>'
+		);
+		expect( findNoteRange( value, '7' ) ).toEqual( { start: 0, end: 1 } );
+	} );
+
+	it( 'returns null when noteId itself is null/undefined', () => {
+		const value = RichTextData.fromHTMLString(
+			'<span class="wp-note" data-id="7">x</span>'
+		);
+		expect( findNoteRange( value, null ) ).toBeNull();
+		expect( findNoteRange( value, undefined ) ).toBeNull();
 	} );
 } );

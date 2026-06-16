@@ -7,7 +7,7 @@
 		}
 
 		.popup {
-			background-color: var(--wpds-color-bg-surface-neutral-strong);
+			background-color: var(--wpds-color-background-surface-neutral-strong);
 			padding:
 				var(--wpds-dimension-padding-xs)
 				var(--wpds-dimension-padding-sm);
@@ -15,7 +15,7 @@
 			font-family: var(--wpds-typography-font-family-body);
 			font-size: var(--wpds-typography-font-size-sm);
 			line-height: 1.4; /* TODO: use DS token for line height */
-			color: var(--wpds-color-fg-content-neutral);
+			color: var(--wpds-color-foreground-content-neutral);
 			box-shadow: var(--wpds-elevation-sm);
 
 			/*

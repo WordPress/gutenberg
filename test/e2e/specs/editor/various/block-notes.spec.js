@@ -1078,6 +1078,97 @@ test.describe( 'Block Notes', () => {
 			);
 		} );
 	} );
+
+	test.describe( 'Inline notes', () => {
+		// Mirrors AVATAR_BORDER_COLORS in packages/editor/src/components/
+		// collab-sidebar/utils.js. Duplicated so the test fails loudly if the
+		// palette is changed without updating the e2e expectation.
+		const AVATAR_BORDER_COLORS = [
+			'#C36EFF',
+			'#D94145',
+			'#E4780A',
+			'#FF35EE',
+			'#879F11',
+			'#46A494',
+			'#00A2C3',
+		];
+
+		function hexToRgb( hex ) {
+			return {
+				r: parseInt( hex.slice( 1, 3 ), 16 ),
+				g: parseInt( hex.slice( 3, 5 ), 16 ),
+				b: parseInt( hex.slice( 5, 7 ), 16 ),
+			};
+		}
+
+		test( 'highlights an inline marker with the author color at the rest opacity', async ( {
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			const me = await requestUtils.rest( {
+				path: '/wp/v2/users/me',
+			} );
+			const expectedColor =
+				AVATAR_BORDER_COLORS[ me.id % AVATAR_BORDER_COLORS.length ];
+			const { r, g, b } = hexToRgb( expectedColor );
+
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Select me for a note.' },
+			} );
+
+			// Select all of the paragraph text so the inline path is taken
+			// (the "Add note" rich-text toolbar entry only renders for a
+			// non-collapsed selection).
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await paragraph.click();
+			await page.keyboard.press( 'ControlOrMeta+a' );
+
+			// "Add note" lives in the rich-text "More" dropdown alongside
+			// Footnote / Inline image.
+			await page
+				.getByRole( 'button', { name: 'More', exact: true } )
+				.click();
+			await page.getByRole( 'menuitem', { name: 'Add note' } ).click();
+
+			await page
+				.getByRole( 'textbox', { name: 'New note', exact: true } )
+				.fill( 'Color me' );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
+
+			// Wait for the annotation `<mark>` to appear in the canvas; the
+			// `annotation-text-core-note` class is added by the annotations
+			// API for any annotation whose `source` is `core-note`.
+			const mark = editor.canvas
+				.locator( 'mark.annotation-text-core-note' )
+				.first();
+			await expect( mark ).toBeVisible();
+
+			// Browsers report the per-author tint as an rgba() value with
+			// alpha ≈ 0x40/255. Allow a small alpha tolerance (browsers
+			// round differently) but require an exact RGB match — the prior
+			// admin-theme fallback can never satisfy this assertion.
+			const bg = await mark.evaluate(
+				( el ) => window.getComputedStyle( el ).backgroundColor
+			);
+			const match = bg.match(
+				/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/
+			);
+			expect( match ).not.toBeNull();
+			expect( Number( match[ 1 ] ) ).toBe( r );
+			expect( Number( match[ 2 ] ) ).toBe( g );
+			expect( Number( match[ 3 ] ) ).toBe( b );
+			const alpha = match[ 4 ] ? Number( match[ 4 ] ) : 1;
+			expect( alpha ).toBeGreaterThan( 0.2 );
+			expect( alpha ).toBeLessThan( 0.35 );
+		} );
+	} );
 } );
 
 class BlockNoteUtils {

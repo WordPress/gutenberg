@@ -43,8 +43,15 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@types/react": "^18.3.27",
 		"@wordpress/i18n": "file:../i18n"
+	},
+	"peerDependencies": {
+		"@types/react": "^18.3.27"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

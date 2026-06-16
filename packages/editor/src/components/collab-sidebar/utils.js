@@ -2,9 +2,10 @@
  * WordPress dependencies
  */
 import { _x } from '@wordpress/i18n';
+import { create, RichTextData } from '@wordpress/rich-text';
 
 /**
- * Sanitizes a note string by removing non-printable ASCII characters.
+ * Sanitizes a note string by trimming leading and trailing whitespace.
  *
  * @param {string} str - The note string to sanitize.
  * @return {string} - The sanitized note string.
@@ -34,8 +35,11 @@ const AVATAR_BORDER_COLORS = [
 /**
  * Gets the border color for an avatar based on the user ID.
  *
+ * Always returns a 6-digit `#RRGGBB` hex string; callers (e.g. the highlight
+ * styles) rely on this format to append alpha suffixes.
+ *
  * @param {number} userId - The user ID.
- * @return {string} - The border color.
+ * @return {string} - The border color as a `#RRGGBB` hex string.
  */
 export function getAvatarBorderColor( userId ) {
 	return AVATAR_BORDER_COLORS[ userId % AVATAR_BORDER_COLORS.length ];
@@ -141,6 +145,56 @@ export function addNoteIdToMetadata( metadata, noteId ) {
 	}
 	ids.add( id );
 	return { ...metadata, noteId: [ ...ids ] };
+}
+
+const NOTE_FORMAT_TYPE = 'core/note';
+
+/**
+ * Search a rich-text value for a `core/note` marker matching `noteId` and
+ * return its character range. Used to derive an inline note's anchor from
+ * the in-content marker (resilient to edits) rather than stale offset meta.
+ *
+ * @param {*}             value  Block attribute value (RichTextData, string, or other).
+ * @param {number|string} noteId Note id to search for.
+ * @return {?{start: number, end: number}} Range or null when no marker is found.
+ */
+export function findNoteRange( value, noteId ) {
+	if ( noteId === undefined || noteId === null ) {
+		return null;
+	}
+	let html = null;
+	if ( value instanceof RichTextData ) {
+		html = value.toHTMLString();
+	} else if ( typeof value === 'string' ) {
+		html = value;
+	}
+	if ( ! html || html.indexOf( 'wp-note' ) === -1 ) {
+		return null;
+	}
+	const target = String( noteId );
+	const record = create( { html } );
+	const formats = record.formats;
+	let start = -1;
+	for ( let i = 0; i < formats.length; i++ ) {
+		const stack = formats[ i ];
+		const hit = stack?.find(
+			( f ) =>
+				f.type === NOTE_FORMAT_TYPE &&
+				f.attributes &&
+				f.attributes[ 'data-id' ] === target
+		);
+		if ( hit ) {
+			if ( start === -1 ) {
+				start = i;
+			}
+		} else if ( start !== -1 ) {
+			return { start, end: i };
+		}
+	}
+	if ( start !== -1 ) {
+		return { start, end: formats.length };
+	}
+	return null;
 }
 
 /**

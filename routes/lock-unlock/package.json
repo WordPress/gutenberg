@@ -1,0 +1,12 @@
+{
+	"name": "@wordpress/routes-lock-unlock",
+	"version": "1.0.0",
+	"private": true,
+	"exports": {
+		".": "./index.ts",
+		"./package.json": "./package.json"
+	},
+	"dependencies": {
+		"@wordpress/private-apis": "file:../../packages/private-apis"
+	}
+}
