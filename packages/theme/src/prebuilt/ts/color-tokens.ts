@@ -139,4 +139,6 @@ export default {
 	'caution-surface4': [ 'background-surface-caution' ],
 	'caution-fgSurface4': [ 'foreground-content-caution' ],
 	'caution-fgSurface3': [ 'foreground-content-caution-weak' ],
+	'caution-stroke3': [ 'stroke-surface-caution-strong' ],
+	'caution-stroke1': [ 'stroke-surface-caution' ],
 } as Record< string, string[] >;

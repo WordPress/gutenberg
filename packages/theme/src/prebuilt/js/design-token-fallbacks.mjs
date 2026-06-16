@@ -114,6 +114,8 @@ export default {
 		'color-mix(in oklch, var(--wp-admin-theme-color, #3858e9) 40%, white)',
 	'--wpds-color-stroke-surface-brand-strong':
 		'var(--wp-admin-theme-color, #3858e9)',
+	'--wpds-color-stroke-surface-caution': '#cfc28d',
+	'--wpds-color-stroke-surface-caution-strong': '#826a00',
 	'--wpds-color-stroke-surface-error': '#dab1aa',
 	'--wpds-color-stroke-surface-error-strong': '#cc1818',
 	'--wpds-color-stroke-surface-info': '#a9c6e7',
