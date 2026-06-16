@@ -415,8 +415,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			// When in template-locked mode (e.g., "Show Template" in the post editor),
 			// don't treat template parts as contentOnly sections.
 			disableContentOnlyForTemplateParts:
-				settings.disableContentOnlyForTemplateParts ||
-				renderingMode === 'template-locked',
+				renderingMode === 'template-locked' ||
+				settings.disableContentOnlyForTemplateParts,
 			...( deviceType ? { [ deviceTypeKey ]: deviceType } : {} ),
 			[ onViewportStateChangeKey ]: updateDeviceTypeForViewportState,
 			[ isNavigationOverlayContextKey ]: isNavigationOverlayContext,
