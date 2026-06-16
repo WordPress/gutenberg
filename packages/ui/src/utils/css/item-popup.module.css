@@ -101,6 +101,11 @@
 			}
 
 			&[aria-disabled="true"] {
+				/* Background is brand-toned (see `[data-highlighted]` above); the
+				   foreground text stays neutral in every state. The disabled
+				   background currently resolves to transparent, but referencing the
+				   token keeps it in sync if its value ever changes. */
+				background-color: var(--wpds-color-background-interactive-brand-weak-disabled);
 				color: var(--wpds-color-foreground-interactive-neutral-disabled);
 
 				@media ( forced-colors: active ) {

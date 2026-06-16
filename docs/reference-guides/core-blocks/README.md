@@ -1006,7 +1006,7 @@ Display the tab buttons for a tabbed interface.
 -	**Experimental:** true
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Parent:** core/tabs
--	**Supports:** color (background, text), dimensions (~~aspectRatio~~, ~~height~~, ~~minHeight~~, ~~width~~), layout (allowJustification, allowOrientation, allowVerticalAlignment, default, ~~allowSwitching~~), spacing (blockGap, margin, padding), typography (fontSize), ~~html~~, ~~lock~~, ~~reusable~~, ~~visibility~~
+-	**Supports:** color (background, text), layout (default, ~~allowOrientation~~, ~~allowVerticalAlignment~~, ~~allowWrap~~), spacing (blockGap, padding), typography (fontSize), ~~html~~, ~~lock~~, ~~visibility~~
 -	**Attributes:** tabs
 
 ## Tab Panel
@@ -1017,7 +1017,7 @@ Content for a tab in a tabbed interface.
 -	**Experimental:** true
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Parent:** core/tab-panels
--	**Supports:** anchor, color (background, text), layout, renaming, spacing (blockGap, padding, ~~margin~~), typography (fontSize), ~~html~~, ~~reusable~~, ~~visibility~~
+-	**Supports:** anchor, color (background, text), layout, spacing (blockGap, padding), typography (fontSize), ~~html~~, ~~visibility~~
 -	**Attributes:** label
 
 ## Tab Panels
@@ -1029,7 +1029,7 @@ Container for tab panel content in a tabbed interface.
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Parent:** core/tabs
 -	**Allowed Blocks:** core/tab-panel
--	**Supports:** color (background, heading, link, text), dimensions (~~aspectRatio~~, ~~height~~, ~~minHeight~~, ~~width~~), layout (allowJustification, default, ~~allowOrientation~~, ~~allowSizingOnChildren~~, ~~allowSwitching~~, ~~allowVerticalAlignment~~), spacing (margin, padding, ~~blockGap~~), typography (fontSize), ~~anchor~~, ~~html~~, ~~lock~~, ~~reusable~~, ~~visibility~~
+-	**Supports:** color (background, heading, link, text), spacing (padding), typography (fontSize), ~~html~~, ~~lock~~, ~~visibility~~
 
 ## Table
 
@@ -1058,7 +1058,7 @@ Display content in a tabbed interface to help users navigate detailed content wi
 -	**Experimental:** true
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Allowed Blocks:** core/tab-list, core/tab-panels
--	**Supports:** align, anchor, color (background, text), interactivity, layout (allowJustification, allowOrientation, allowSizingOnChildren, allowVerticalAlignment, default, ~~allowSwitching~~), renaming, spacing (blockGap, margin, padding), typography (fontSize), ~~html~~
+-	**Supports:** align, anchor, color (background, text), interactivity, layout (~~allowEditing~~), spacing (blockGap, margin, padding), typography (fontSize), ~~html~~
 -	**Attributes:** activeTabIndex, editorActiveTabIndex
 
 ## Tag Cloud

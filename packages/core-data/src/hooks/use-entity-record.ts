@@ -8,9 +8,9 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import useQuerySelect from './use-query-select';
 import { store as coreStore } from '../';
 import type { Status } from './constants';
+import { getResolutionStatus } from './utils';
 
 export interface EntityRecordResolution< RecordType > {
 	/** The requested entity record */
@@ -37,6 +37,11 @@ export interface EntityRecordResolution< RecordType > {
 	 * Does the record have any local edits?
 	 */
 	hasEdits: boolean;
+
+	/**
+	 * Has the resolution started?
+	 */
+	hasStarted: boolean;
 
 	/**
 	 * Is the record resolved by now?
@@ -169,45 +174,47 @@ export default function useEntityRecord< RecordType >(
 		[ editEntityRecord, kind, name, recordId, saveEditedEntityRecord ]
 	);
 
-	const { editedRecord, hasEdits, edits } = useSelect(
+	const { record, editedRecord, hasEdits, edits, ...resolution } = useSelect(
 		( select ) => {
 			if ( ! options.enabled ) {
 				return {
+					record: null,
 					editedRecord: EMPTY_OBJECT,
 					hasEdits: false,
 					edits: EMPTY_OBJECT,
+					...getResolutionStatus(),
 				};
 			}
+
+			const storeSelectors = select( coreStore );
+			const resolutionStatus = storeSelectors.getResolutionState(
+				'getEntityRecord',
+				[ kind, name, recordId ]
+			)?.status;
 
 			return {
-				editedRecord: select( coreStore ).getEditedEntityRecord(
+				record: ( storeSelectors.getEntityRecord(
+					kind,
+					name,
+					recordId
+				) ?? null ) as RecordType | null,
+				editedRecord: storeSelectors.getEditedEntityRecord(
 					kind,
 					name,
 					recordId
 				),
-				hasEdits: select( coreStore ).hasEditsForEntityRecord(
+				hasEdits: storeSelectors.hasEditsForEntityRecord(
 					kind,
 					name,
 					recordId
 				),
-				edits: select( coreStore ).getEntityRecordNonTransientEdits(
+				edits: storeSelectors.getEntityRecordNonTransientEdits(
 					kind,
 					name,
 					recordId
 				),
+				...getResolutionStatus( resolutionStatus ),
 			};
-		},
-		[ kind, name, recordId, options.enabled ]
-	);
-
-	const { data: record, ...querySelectRest } = useQuerySelect(
-		( query ) => {
-			if ( ! options.enabled ) {
-				return {
-					data: null,
-				};
-			}
-			return query( coreStore ).getEntityRecord( kind, name, recordId );
 		},
 		[ kind, name, recordId, options.enabled ]
 	);
@@ -217,9 +224,9 @@ export default function useEntityRecord< RecordType >(
 		editedRecord,
 		hasEdits,
 		edits,
-		...querySelectRest,
+		...resolution,
 		...mutations,
-	};
+	} as EntityRecordResolution< RecordType >;
 }
 
 export function useDeprecatedEntityRecord(

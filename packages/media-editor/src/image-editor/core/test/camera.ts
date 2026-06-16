@@ -14,7 +14,12 @@ import {
 	getImageCropBounds,
 	getMinZoom,
 } from '../containment';
-import { getSourceRegion, getSourceRegionPercent } from '../source-region';
+import {
+	getSourceRegion,
+	getSourceRegionPercent,
+	snapCropRectToSourcePixelGrid,
+	snapCropRectToSourcePixels,
+} from '../source-region';
 import { computeTransformStyle } from '../transform-style';
 import { DEFAULT_STATE, MAX_ZOOM, MIN_ZOOM } from '../constants';
 import type { CropperState, Size } from '../types';
@@ -574,6 +579,114 @@ describe( 'getSourceRegion', () => {
 		// Rotated AR should be roughly the inverse of default AR.
 		expect( rotatedAR ).toBeCloseTo( 1 / defaultAR, 1 );
 		expect( region.rotation ).toBe( 90 );
+	} );
+} );
+
+describe( 'snapCropRectToSourcePixels', () => {
+	const getSourceEdges = ( state: CropperState ) => {
+		const region = getSourceRegion( state, IMAGE );
+		return {
+			left: region.x,
+			top: region.y,
+			right: region.x + region.width,
+			bottom: region.y + region.height,
+		};
+	};
+
+	it( 'snaps the selected source-region edges to whole pixels under pan and zoom', () => {
+		const state = makeState( {
+			zoom: 2.25,
+			pan: { x: 0.013, y: -0.017 },
+			cropRect: { x: 0.12, y: 0.18, width: 0.33, height: 0.41 },
+		} );
+		const candidate = { x: 0.123, y: 0.187, width: 0.337, height: 0.419 };
+
+		const unsnapped = getSourceRegion(
+			{ ...state, cropRect: candidate },
+			IMAGE
+		);
+		expect(
+			Math.abs(
+				unsnapped.x +
+					unsnapped.width -
+					Math.round( unsnapped.x + unsnapped.width )
+			)
+		).toBeGreaterThan( 0.01 );
+		expect(
+			Math.abs(
+				unsnapped.y +
+					unsnapped.height -
+					Math.round( unsnapped.y + unsnapped.height )
+			)
+		).toBeGreaterThan( 0.01 );
+
+		const snappedCropRect = snapCropRectToSourcePixels(
+			state,
+			IMAGE,
+			candidate,
+			'se'
+		);
+
+		const snapped = getSourceEdges( {
+			...state,
+			cropRect: snappedCropRect,
+		} );
+		expect( snapped.left ).toBeCloseTo( unsnapped.x, 3 );
+		expect( snapped.top ).toBeCloseTo( unsnapped.y, 3 );
+		expect( snapped.right ).toBeCloseTo( Math.round( snapped.right ), 3 );
+		expect( snapped.bottom ).toBeCloseTo( Math.round( snapped.bottom ), 3 );
+	} );
+
+	it( 'snaps all source-region edges to whole pixels', () => {
+		const state = makeState( {
+			rotation: 30,
+			zoom: 2.25,
+			pan: { x: 0.013, y: -0.017 },
+			cropRect: { x: 0.12, y: 0.18, width: 0.33, height: 0.41 },
+		} );
+		const candidate = { x: 0.123, y: 0.187, width: 0.337, height: 0.419 };
+
+		const snappedCropRect = snapCropRectToSourcePixelGrid(
+			state,
+			IMAGE,
+			candidate
+		);
+		const snapped = getSourceEdges( {
+			...state,
+			cropRect: snappedCropRect,
+		} );
+
+		expect( snapped.left ).toBeCloseTo( Math.round( snapped.left ), 3 );
+		expect( snapped.top ).toBeCloseTo( Math.round( snapped.top ), 3 );
+		expect( snapped.right ).toBeCloseTo( Math.round( snapped.right ), 3 );
+		expect( snapped.bottom ).toBeCloseTo( Math.round( snapped.bottom ), 3 );
+	} );
+
+	it( 'does not snap selected edges while fine rotation couples source axes', () => {
+		const state = makeState( {
+			rotation: 30,
+			zoom: 2.25,
+			pan: { x: 0.013, y: -0.017 },
+			cropRect: { x: 0.12, y: 0.18, width: 0.33, height: 0.41 },
+		} );
+		const candidate = { x: 0.123, y: 0.187, width: 0.337, height: 0.419 };
+
+		expect(
+			snapCropRectToSourcePixels( state, IMAGE, candidate, 'e' )
+		).toBe( candidate );
+	} );
+
+	it( 'returns the input crop rect when the image dimensions are invalid', () => {
+		const cropRect = { x: 0.1, y: 0.2, width: 0.3, height: 0.4 };
+
+		expect(
+			snapCropRectToSourcePixels(
+				makeState(),
+				{ width: 0, height: 0 },
+				cropRect,
+				'se'
+			)
+		).toBe( cropRect );
 	} );
 } );
 

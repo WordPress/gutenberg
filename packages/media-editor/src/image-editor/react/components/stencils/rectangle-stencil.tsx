@@ -25,6 +25,7 @@ import {
 	type HandlePosition,
 	type CropBounds,
 	type ResizeDragState,
+	type ResizeDriverAxis,
 } from '../../../core/stencil-math';
 import { VISUALLY_HIDDEN_STYLE } from '../../visually-hidden-style';
 
@@ -91,19 +92,21 @@ type RectangleStencilProps = StencilProps;
  * crop pass through to the container for image panning. The crop
  * auto-centers after resize via SETTLE_CROP.
  *
- * @param props                   Component props implementing StencilProps.
- * @param props.cropRect          The crop rectangle in normalized coordinates.
- * @param props.containerSize     The container element dimensions in pixels.
- * @param props.imageSize         The rendered image dimensions in pixels.
- * @param props.onCropChange      Callback fired when the crop rect changes.
- * @param props.onResizeStart     Callback fired when a resize drag starts.
- * @param props.onResizeEnd       Callback fired when a resize drag ends (mouseup).
- * @param props.aspectRatio       Optional fixed aspect ratio (width / height).
- * @param props.freeformCrop      Whether resize handles are shown.
- * @param props.stencilTransition CSS transition string for settle animation.
- * @param props.cropBounds        Maximum crop rect bounds from camera (zoom/rotation-aware).
- * @param props.onEscape          Called when Escape is pressed on a resize handle.
- * @param props.minCropSize       Minimum crop rect dimension in normalized space, per axis.
+ * @param props                    Component props implementing StencilProps.
+ * @param props.cropRect           The crop rectangle in normalized coordinates.
+ * @param props.containerSize      The container element dimensions in pixels.
+ * @param props.imageSize          The rendered image dimensions in pixels.
+ * @param props.onCropChange       Callback fired when the crop rect changes.
+ * @param props.onResizeStart      Callback fired when a resize drag starts.
+ * @param props.onResizeEnd        Callback fired when a resize drag ends (mouseup).
+ * @param props.aspectRatio        Optional fixed aspect ratio (width / height).
+ * @param props.freeformCrop       Whether resize handles are shown.
+ * @param props.stencilTransition  CSS transition string for settle animation.
+ * @param props.cropBounds         Maximum crop rect bounds from camera (zoom/rotation-aware).
+ * @param props.onEscape           Called when Escape is pressed on a resize handle.
+ * @param props.minCropSize        Minimum crop rect dimension in normalized space, per axis.
+ * @param props.snapCropRect       Optional post-processor for freeform resize output.
+ * @param props.keyboardResizeStep Optional keyboard resize step in normalized space, per axis.
  * @return The rectangle stencil element.
  */
 export function RectangleStencil( {
@@ -119,6 +122,8 @@ export function RectangleStencil( {
 	cropBounds,
 	onEscape,
 	minCropSize,
+	snapCropRect,
+	keyboardResizeStep,
 }: RectangleStencilProps ) {
 	// Use cropBounds from the camera if available, otherwise default to [0,1].
 	const boundsMinX = cropBounds?.minX ?? 0;
@@ -159,7 +164,8 @@ export function RectangleStencil( {
 		computeLockedRect: (
 			drag: ResizeDragState,
 			clientX: number,
-			clientY: number
+			clientY: number,
+			driverAxis?: ResizeDriverAxis
 		) => NormalizedRect;
 		computeFreeRect: (
 			drag: ResizeDragState,
@@ -173,6 +179,10 @@ export function RectangleStencil( {
 		) => NormalizedRect;
 		onCropChange: ( rect: NormalizedRect ) => void;
 		onResizeEnd?: () => void;
+		snapCropRect?: (
+			rect: NormalizedRect,
+			handle: HandlePosition
+		) => NormalizedRect;
 	} | null >( null );
 
 	// The normalized aspect ratio: the w/h ratio in normalized space that
@@ -258,6 +268,8 @@ export function RectangleStencil( {
 						);
 					} else {
 						newRect = h.computeFreeRect( drag, latestX, latestY );
+						newRect =
+							h.snapCropRect?.( newRect, drag.handle ) ?? newRect;
 					}
 					h.onCropChange( newRect );
 				} );
@@ -329,7 +341,8 @@ export function RectangleStencil( {
 		(
 			drag: ResizeDragState,
 			clientX: number,
-			clientY: number
+			clientY: number,
+			driverAxis?: ResizeDriverAxis
 		): NormalizedRect =>
 			computeLockedResizeRect(
 				drag,
@@ -338,7 +351,8 @@ export function RectangleStencil( {
 				imageSize,
 				bounds,
 				normalizedRatio,
-				minCropSize
+				minCropSize,
+				driverAxis
 			),
 		[ imageSize, bounds, normalizedRatio, minCropSize ]
 	);
@@ -371,6 +385,7 @@ export function RectangleStencil( {
 		computeShiftLockedRect,
 		onCropChange,
 		onResizeEnd,
+		snapCropRect,
 	};
 
 	/**
@@ -414,25 +429,31 @@ export function RectangleStencil( {
 				}, KEYBOARD_SETTLE_DELAY );
 			};
 
-			const step = event.shiftKey
-				? DEFAULT_KEYBOARD_STEP * KEYBOARD_SHIFT_STEP_MULTIPLIER
-				: DEFAULT_KEYBOARD_STEP;
+			const stepMultiplier = event.shiftKey
+				? KEYBOARD_SHIFT_STEP_MULTIPLIER
+				: 1;
+			const stepX = keyboardResizeStep?.width ?? DEFAULT_KEYBOARD_STEP;
+			const stepY = keyboardResizeStep?.height ?? DEFAULT_KEYBOARD_STEP;
+			const adjustedStepX = stepX * stepMultiplier;
+			const adjustedStepY = stepY * stepMultiplier;
 
 			// Determine the normalized delta from the arrow key.
 			let dx = 0;
 			let dy = 0;
 			if ( key === 'ArrowLeft' ) {
-				dx = -step;
+				dx = -adjustedStepX;
 			}
 			if ( key === 'ArrowRight' ) {
-				dx = step;
+				dx = adjustedStepX;
 			}
 			if ( key === 'ArrowUp' ) {
-				dy = -step;
+				dy = -adjustedStepY;
 			}
 			if ( key === 'ArrowDown' ) {
-				dy = step;
+				dy = adjustedStepY;
 			}
+			const keyboardDriverAxis: ResizeDriverAxis =
+				dx !== 0 ? 'width' : 'height';
 
 			if ( hasLockedRatio ) {
 				// For locked aspect ratio, synthesize a drag from the
@@ -446,7 +467,12 @@ export function RectangleStencil( {
 				const clientX = dx * imageSize.width;
 				const clientY = dy * imageSize.height;
 				onCropChange(
-					computeLockedRect( syntheticDrag, clientX, clientY )
+					computeLockedRect(
+						syntheticDrag,
+						clientX,
+						clientY,
+						keyboardDriverAxis
+					)
 				);
 				scheduleKeyboardResizeEnd();
 			} else {
@@ -459,9 +485,8 @@ export function RectangleStencil( {
 				};
 				const clientX = dx * imageSize.width;
 				const clientY = dy * imageSize.height;
-				onCropChange(
-					computeFreeRect( syntheticDrag, clientX, clientY )
-				);
+				const rect = computeFreeRect( syntheticDrag, clientX, clientY );
+				onCropChange( snapCropRect?.( rect, handle ) ?? rect );
 				scheduleKeyboardResizeEnd();
 			}
 		},
@@ -476,6 +501,8 @@ export function RectangleStencil( {
 			onResizeStart,
 			onResizeEnd,
 			onEscape,
+			keyboardResizeStep,
+			snapCropRect,
 		]
 	);
 
