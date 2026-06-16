@@ -96,6 +96,10 @@ const config: StorybookConfig = {
 			// defaults `shouldIncludePropTagMap` to true, splitting tags into
 			// a separate object that Storybook does not read for `@ignore`.
 			shouldIncludePropTagMap: false,
+			// Component names should come from source (displayName or named
+			// functions / exports) rather than build-time plugin injection,
+			// which can clobber author-defined names unpredictably.
+			setDisplayName: false,
 			propFilter: ( prop ) => {
 				if ( ! prop.parent ) {
 					return true;
