@@ -28,28 +28,20 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 _Defined via the [`supports`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/) property in block.json._
 
 - [`html`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#html): `false`
-- [`reusable`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
 - [`visibility`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#visibility): `false`
 - [`lock`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#lock): `false`
-- [`dimensions`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#dimensions):
-  - `aspectRatio`: `false`
-  - `height`: `false`
-  - `minHeight`: `false`
-  - `width`: `false`
 - [`color`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color):
   - [`background`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-background): `true`
   - [`text`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-text): `true`
 - [`typography`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography):
   - [`fontSize`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
 - [`layout`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout):
-  - [`default`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-default): `{"type":"flex","flexWrap":"nowrap","orientation":"horizontal"}`
-  - [`allowSwitching`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowswitching): `false`
-  - [`allowVerticalAlignment`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowverticalalignment): `true`
-  - [`allowJustification`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowjustification): `true`
-  - [`allowOrientation`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-alloworientation): `true`
+  - [`default`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-default): `{"type":"flex"}`
+  - [`allowVerticalAlignment`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowverticalalignment): `false`
+  - [`allowOrientation`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-alloworientation): `false`
+  - [`allowWrap`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowwrap): `false`
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
   - `padding`: `true`
-  - `margin`: `true`
   - `blockGap`: `true`
 
 ## Context

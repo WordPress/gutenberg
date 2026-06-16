@@ -22,7 +22,7 @@
 
 			background-color: transparent;
 			border: none;
-			color: var(--wpds-color-fg-interactive-neutral);
+			color: var(--wpds-color-foreground-interactive-neutral);
 			font-family: inherit;
 			font-size: inherit;
 			line-height: 1.4;
@@ -42,8 +42,8 @@
 			}
 
 			&[data-disabled] {
-				background-color: var(--wpds-color-bg-interactive-neutral-weak-disabled);
-				color: var(--wpds-color-fg-interactive-neutral-disabled);
+				background-color: var(--wpds-color-background-interactive-neutral-weak-disabled);
+				color: var(--wpds-color-foreground-interactive-neutral-disabled);
 			}
 		}
 
@@ -54,7 +54,7 @@
 
 			/* Supports placeholder styling for both Select and Combobox triggers. */
 			.trigger[data-placeholder] & {
-				color: var(--wpds-color-fg-interactive-neutral-disabled);
+				color: var(--wpds-color-foreground-interactive-neutral-disabled);
 			}
 		}
 

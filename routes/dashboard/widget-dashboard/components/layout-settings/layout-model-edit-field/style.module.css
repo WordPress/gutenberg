@@ -19,16 +19,16 @@
 .optionSelected,
 .optionSelected:hover {
 	border-color: var(--wpds-color-stroke-interactive-brand);
-	background-color: color-mix(in srgb, var(--wpds-color-bg-surface-brand) 6%, transparent);
+	background-color: color-mix(in srgb, var(--wpds-color-background-surface-brand) 6%, transparent);
 }
 
 .thumbnail {
 	display: block;
 	inline-size: 100%;
 	block-size: auto;
-	color: var(--wpds-color-fg-content-neutral-weak);
+	color: var(--wpds-color-foreground-content-neutral-weak);
 }
 
 .optionSelected .thumbnail {
-	color: var(--wpds-color-fg-interactive-brand);
+	color: var(--wpds-color-foreground-interactive-brand);
 }

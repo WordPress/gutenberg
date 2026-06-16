@@ -44,7 +44,6 @@
 	"wpScriptModuleExports": "./build-module/index.mjs",
 	"types": "build-types",
 	"dependencies": {
-		"@types/react": "^18.3.27",
 		"@wordpress/asset-loader": "file:../asset-loader",
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/block-editor": "file:../block-editor",
@@ -57,6 +56,15 @@
 		"@wordpress/global-styles-engine": "file:../global-styles-engine",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/private-apis": "file:../private-apis"
+	},
+	"peerDependencies": {
+		"@types/react": "^18.3.27",
+		"react": "^18.0.0"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

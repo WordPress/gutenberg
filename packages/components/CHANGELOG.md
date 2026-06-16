@@ -2,9 +2,17 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `BaseControl`: Apply `text-wrap: pretty` to help text to avoid typographic widows ([#79112](https://github.com/WordPress/gutenberg/pull/79112)).
+
 ### Bug Fixes
 
 -   `SandBox`: Fix the viewport-unit (`vh`, `vw`, etc.) stripping so user-supplied HTML using these units in `width`/`height` no longer triggers a runaway resize loop in the preview ([#78677](https://github.com/WordPress/gutenberg/pull/78677)).
+
+### Code Quality
+
+-   Move `@types/react` from `dependencies` to an optional peer dependency so consumers' React type version is used [#79095](https://github.com/WordPress/gutenberg/pull/79095).
 
 ## 35.0.0 (2026-06-10)
 

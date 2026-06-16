@@ -50,7 +50,6 @@
 		"@dnd-kit/core": "^6.3.1",
 		"@dnd-kit/sortable": "^10.0.0",
 		"@dnd-kit/utilities": "^3.2.2",
-		"@types/react": "^18.3.27",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/element": "file:../element",
 		"@wordpress/style-runtime": "file:../style-runtime",
@@ -64,8 +63,14 @@
 		"@wordpress/ui": "file:../ui"
 	},
 	"peerDependencies": {
+		"@types/react": "^18.3.27",
 		"react": "^18.0.0",
 		"react-dom": "^18.0.0"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"
