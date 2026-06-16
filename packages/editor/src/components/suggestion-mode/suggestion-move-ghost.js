@@ -5,6 +5,7 @@ import { useSelect } from '@wordpress/data';
 import { BlockIcon, store as blockEditorStore } from '@wordpress/block-editor';
 import { getBlockType } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
+import { VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -34,10 +35,16 @@ function toExcerpt( content ) {
 
 /**
  * Non-interactive "ghost" placeholder rendered at a moved block's original
- * position so a reviewer can see where the block came from. Purely
- * presentational — never selectable/focusable, never part of the block list,
- * never written to the store. Styling lives in the canvas-loaded
- * `content-suggestion.scss` (block-editor package).
+ * position so a reviewer can see where the block came from. Never
+ * selectable/focusable, never part of the block list, never written to the
+ * store. Styling lives in the canvas-loaded `content-suggestion.scss`
+ * (block-editor package).
+ *
+ * Accessibility: the visible label, icon, and excerpt are decorative
+ * duplicates of the canvas treatment and are hidden from assistive tech; a
+ * single `role="note"` with a `VisuallyHidden` sentence carries the
+ * original-position cue so screen-reader users get it once, without the
+ * struck-through old content reading as live text.
  *
  * @param {Object}                                            props       Props.
  * @param {import('./move-ghost-index').MovedBlockDescriptor} props.moved The
@@ -74,10 +81,20 @@ export default function SuggestionMoveGhost( { moved } ) {
 			className="is-suggestion-move-ghost"
 			data-testid="suggestion-move-ghost"
 			style={ style }
-			aria-hidden="true"
+			role="note"
 			contentEditable={ false }
 		>
-			<span className="is-suggestion-move-ghost__label">
+			<VisuallyHidden>
+				{ sprintf(
+					/* translators: %s: block type title. */
+					__( 'Original position of moved %s block.' ),
+					title
+				) }
+			</VisuallyHidden>
+			<span
+				className="is-suggestion-move-ghost__label"
+				aria-hidden="true"
+			>
 				<BlockIcon icon={ blockType?.icon } />
 				{ sprintf(
 					/* translators: %s: block type title. */
@@ -86,7 +103,10 @@ export default function SuggestionMoveGhost( { moved } ) {
 				) }
 			</span>
 			{ excerpt && (
-				<span className="is-suggestion-move-ghost__excerpt">
+				<span
+					className="is-suggestion-move-ghost__excerpt"
+					aria-hidden="true"
+				>
 					{ excerpt }
 				</span>
 			) }

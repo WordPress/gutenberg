@@ -46,15 +46,32 @@ describe( 'SuggestionMoveGhost', () => {
 		fromIndex: 0,
 	};
 
-	it( 'renders a non-interactive, aria-hidden placeholder with the block title', () => {
+	it( 'renders a non-interactive note exposing the original position to assistive tech', () => {
 		render( <SuggestionMoveGhost moved={ moved } /> );
 		const ghost = screen.getByTestId( 'suggestion-move-ghost' );
 		expect( ghost ).toBeInTheDocument();
-		expect( ghost ).toHaveAttribute( 'aria-hidden', 'true' );
+		// The placeholder is a note (not aria-hidden) so screen-reader users
+		// also get an original-position cue; it stays non-editable.
+		expect( ghost ).toHaveAttribute( 'role', 'note' );
+		expect( ghost ).not.toHaveAttribute( 'aria-hidden' );
 		expect( ghost ).toHaveAttribute( 'contenteditable', 'false' );
+		// The screen-reader sentence frames it as an original position.
 		expect(
-			screen.getByText( /Moved from here: Paragraph/ )
+			screen.getByText( 'Original position of moved Paragraph block.' )
 		).toBeInTheDocument();
+	} );
+
+	it( 'hides the decorative label and excerpt from assistive tech to avoid a double read', () => {
+		render( <SuggestionMoveGhost moved={ moved } /> );
+		// The visible label and excerpt duplicate the canvas treatment, so
+		// they are aria-hidden — the VisuallyHidden sentence is the single
+		// accessible cue.
+		expect(
+			screen.getByText( /Moved from here: Paragraph/ ).closest( 'span' )
+		).toHaveAttribute( 'aria-hidden', 'true' );
+		expect(
+			screen.getByText( 'Hello world' ).closest( 'span' )
+		).toHaveAttribute( 'aria-hidden', 'true' );
 	} );
 
 	it( 'shows a tag-stripped, trimmed excerpt of the block content', () => {
