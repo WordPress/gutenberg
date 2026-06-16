@@ -13,7 +13,10 @@ function MediaList( {
 	mediaList,
 	category,
 	onClick,
+	onDetach,
+	isItemBusy,
 	label = __( 'Media List' ),
+	variant,
 } ) {
 	return (
 		<Composite
@@ -27,6 +30,9 @@ function MediaList( {
 					media={ media }
 					category={ category }
 					onClick={ onClick }
+					onDetach={ onDetach }
+					isBusy={ isItemBusy?.( media ) }
+					variant={ variant }
 				/>
 			) ) }
 		</Composite>

@@ -10,7 +10,7 @@
  * WordPress dependencies
  */
 import { __, sprintf, _x } from '@wordpress/i18n';
-import { resolveSelect } from '@wordpress/data';
+import { dispatch, resolveSelect, select } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 
 /**
@@ -21,6 +21,8 @@ import { store as coreStore } from '@wordpress/core-data';
 /** @typedef {import('@wordpress/block-editor').InserterMediaRequest} InserterMediaRequest */
 /** @typedef {import('@wordpress/block-editor').InserterMediaItem} InserterMediaItem */
 /** @typedef {import('@wordpress/block-editor').InserterMediaCategory} InserterMediaCategory */
+
+const ATTACHED_IMAGES_PANEL_ITEM_COUNT = 20;
 
 const getExternalLink = ( url, text ) =>
 	`<a ${ getExternalLinkAttributes( url ) }>${ text }</a>`;
@@ -124,16 +126,18 @@ const getOpenverseCaption = ( item ) => {
 	return _caption.replace( /\s{2}/g, ' ' );
 };
 
+const getCoreMediaQuery = ( query = {} ) => ( {
+	...query,
+	orderBy: !! query?.search ? 'relevance' : 'date',
+} );
+
 const coreMediaFetch = async ( query = {} ) => {
 	const mediaItems = await resolveSelect( coreStore ).getEntityRecords(
 		'postType',
 		'attachment',
-		{
-			...query,
-			orderBy: !! query?.search ? 'relevance' : 'date',
-		}
+		getCoreMediaQuery( query )
 	);
-	return mediaItems.map( ( mediaItem ) => ( {
+	return ( mediaItems || [] ).map( ( mediaItem ) => ( {
 		...mediaItem,
 		alt: mediaItem.alt_text,
 		url: mediaItem.source_url,
@@ -142,8 +146,93 @@ const coreMediaFetch = async ( query = {} ) => {
 	} ) );
 };
 
+const getAttachedImagesQuery = ( postId, query = {} ) => ( {
+	...query,
+	media_type: 'image',
+	parent: postId,
+} );
+
+const normalizePostId = ( postId ) => {
+	const parsedPostId = typeof postId === 'number' ? postId : Number( postId );
+
+	return Number.isInteger( parsedPostId ) && parsedPostId > 0
+		? parsedPostId
+		: undefined;
+};
+
+const saveAttachmentParent = ( attachmentId, postId ) =>
+	dispatch( coreStore ).saveEntityRecord( 'postType', 'attachment', {
+		id: attachmentId,
+		post: postId,
+	} );
+
+const getAttachmentIds = ( mediaItems ) => [
+	...new Set(
+		( Array.isArray( mediaItems ) ? mediaItems : [ mediaItems ] )
+			.map( ( mediaItem ) => mediaItem?.id )
+			.filter( Boolean )
+	),
+];
+
+const invalidateAttachedImagesQueries = ( postId, query = {} ) => {
+	const { invalidateResolution } = dispatch( coreStore );
+	const queries = [
+		query,
+		{ per_page: 1 },
+		{ per_page: ATTACHED_IMAGES_PANEL_ITEM_COUNT },
+	];
+
+	for ( const attachedImagesQuery of queries ) {
+		invalidateResolution( 'getEntityRecords', [
+			'postType',
+			'attachment',
+			getCoreMediaQuery(
+				getAttachedImagesQuery( postId, attachedImagesQuery )
+			),
+		] );
+	}
+};
+
+const getAttachedImagesCategory = ( postId ) => ( {
+	name: 'attached-images',
+	labels: {
+		name: __( 'Attached images' ),
+		search_items: __( 'Search attached images' ),
+	},
+	mediaType: 'image',
+	isCurrentPostMedia: true,
+	showIfEmpty: true,
+	async fetch( query = {} ) {
+		return coreMediaFetch( getAttachedImagesQuery( postId, query ) );
+	},
+	getTotalItems( query = {} ) {
+		return select( coreStore ).getEntityRecordsTotalItems(
+			'postType',
+			'attachment',
+			getCoreMediaQuery( getAttachedImagesQuery( postId, query ) )
+		);
+	},
+	async attach( mediaItems ) {
+		const attachmentIds = getAttachmentIds( mediaItems );
+
+		await Promise.all(
+			attachmentIds.map( ( attachmentId ) =>
+				saveAttachmentParent( attachmentId, postId )
+			)
+		);
+
+		return attachmentIds.length;
+	},
+	async detach( mediaItem ) {
+		await saveAttachmentParent( mediaItem.id, 0 );
+	},
+	invalidate( query = {} ) {
+		invalidateAttachedImagesQueries( postId, query );
+	},
+} );
+
 /** @type {InserterMediaCategory[]} */
-const inserterMediaCategories = [
+const coreInserterMediaCategories = [
 	{
 		name: 'images',
 		labels: {
@@ -226,4 +315,15 @@ const inserterMediaCategories = [
 	},
 ];
 
-export default inserterMediaCategories;
+export default function getInserterMediaCategories( postId ) {
+	const currentPostId = normalizePostId( postId );
+
+	if ( ! currentPostId ) {
+		return coreInserterMediaCategories;
+	}
+
+	return [
+		getAttachedImagesCategory( currentPostId ),
+		...coreInserterMediaCategories,
+	];
+}

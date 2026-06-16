@@ -22,7 +22,7 @@ import { privateApis as mediaEditorPrivateApis } from '@wordpress/media-editor';
 /**
  * Internal dependencies
  */
-import inserterMediaCategories from '../media-categories';
+import getInserterMediaCategories from '../media-categories';
 import { mediaUpload } from '../../utils';
 import mediaUploadOnSuccess from '../../utils/media-upload/on-success';
 import { default as mediaSideload } from '../../utils/media-sideload';
@@ -324,6 +324,10 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	}, [ settings.allowedBlockTypes, hiddenBlockTypes, blockTypes ] );
 
 	const forceDisableFocusMode = settings.focusMode === false;
+	const inserterMediaCategories = useMemo(
+		() => getInserterMediaCategories( postId ),
+		[ postId ]
+	);
 
 	return useMemo( () => {
 		const blockEditorSettings = {
@@ -440,6 +444,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		hasUploadPermissions,
 		blockPatterns,
 		blockPatternCategories,
+		inserterMediaCategories,
 		canUseUnfilteredHTML,
 		undo,
 		createPageEntity,

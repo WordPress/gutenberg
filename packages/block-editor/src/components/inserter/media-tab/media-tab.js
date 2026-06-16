@@ -10,6 +10,7 @@ import { useCallback, useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import { MediaCategoryPanel } from './media-panel';
+import AttachedMediaPanel from './attached-media-panel';
 import MediaUploadCheck from '../../media-upload/check';
 import MediaUpload from '../../media-upload';
 import { useMediaCategories } from './hooks';
@@ -54,6 +55,21 @@ function MediaTab( {
 			} ) ),
 		[ mediaCategories ]
 	);
+	const attachedMediaCategory = categories.find(
+		( category ) => category.isCurrentPostMedia
+	);
+	const regularCategories = categories.filter(
+		( category ) => ! category.isCurrentPostMedia
+	);
+	const mobileCategories = [
+		...regularCategories,
+		...( attachedMediaCategory ? [ attachedMediaCategory ] : [] ),
+	];
+	const selectedRegularCategory = regularCategories.includes(
+		selectedCategory
+	)
+		? selectedCategory
+		: null;
 
 	if ( ! categories.length ) {
 		return <InserterNoResults />;
@@ -63,13 +79,23 @@ function MediaTab( {
 		<>
 			{ ! isMobile && (
 				<div className={ `${ baseCssClass }-container` }>
-					<CategoryTabs
-						categories={ categories }
-						selectedCategory={ selectedCategory }
-						onSelectCategory={ onSelectCategory }
-					>
-						{ children }
-					</CategoryTabs>
+					<div className={ `${ baseCssClass }-content` }>
+						{ !! regularCategories.length && (
+							<CategoryTabs
+								categories={ regularCategories }
+								selectedCategory={ selectedRegularCategory }
+								onSelectCategory={ onSelectCategory }
+							>
+								{ children }
+							</CategoryTabs>
+						) }
+						{ attachedMediaCategory && (
+							<AttachedMediaPanel
+								onInsert={ onInsert }
+								category={ attachedMediaCategory }
+							/>
+						) }
+					</div>
 					<MediaUploadCheck>
 						<MediaUpload
 							multiple={ false }
@@ -100,14 +126,21 @@ function MediaTab( {
 				</div>
 			) }
 			{ isMobile && (
-				<MobileTabNavigation categories={ categories }>
-					{ ( category ) => (
-						<MediaCategoryPanel
-							onInsert={ onInsert }
-							rootClientId={ rootClientId }
-							category={ category }
-						/>
-					) }
+				<MobileTabNavigation categories={ mobileCategories }>
+					{ ( category ) =>
+						category.isCurrentPostMedia ? (
+							<AttachedMediaPanel
+								onInsert={ onInsert }
+								category={ category }
+							/>
+						) : (
+							<MediaCategoryPanel
+								onInsert={ onInsert }
+								rootClientId={ rootClientId }
+								category={ category }
+							/>
+						)
+					}
 				</MobileTabNavigation>
 			) }
 		</>

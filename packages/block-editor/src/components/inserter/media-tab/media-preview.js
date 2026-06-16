@@ -21,7 +21,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useCallback, useState } from '@wordpress/element';
 import { cloneBlock } from '@wordpress/blocks';
-import { moreVertical, external } from '@wordpress/icons';
+import { moreVertical, external, linkOff, closeSmall } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { isBlobURL } from '@wordpress/blob';
@@ -43,11 +43,11 @@ const MEDIA_OPTIONS_POPOVER_PROPS = {
 		'block-editor-inserter__media-list__item-preview-options__popover',
 };
 
-function MediaPreviewOptions( { category, media } ) {
-	if ( ! category.getReportUrl ) {
+function MediaPreviewOptions( { category, media, onDetach } ) {
+	if ( ! category.getReportUrl && ! onDetach ) {
 		return null;
 	}
-	const reportUrl = category.getReportUrl( media );
+	const reportUrl = category.getReportUrl?.( media );
 	return (
 		<DropdownMenu
 			className="block-editor-inserter__media-list__item-preview-options"
@@ -57,21 +57,51 @@ function MediaPreviewOptions( { category, media } ) {
 		>
 			{ () => (
 				<MenuGroup>
-					<MenuItem
-						onClick={ () =>
-							window.open( reportUrl, '_blank' ).focus()
-						}
-						icon={ external }
-					>
-						{ sprintf(
-							/* translators: %s: The media type to report e.g: "image", "video", "audio" */
-							__( 'Report %s' ),
-							category.mediaType
-						) }
-					</MenuItem>
+					{ reportUrl && (
+						<MenuItem
+							onClick={ () =>
+								window.open( reportUrl, '_blank' ).focus()
+							}
+							icon={ external }
+						>
+							{ sprintf(
+								/* translators: %s: The media type to report e.g: "image", "video", "audio" */
+								__( 'Report %s' ),
+								category.mediaType
+							) }
+						</MenuItem>
+					) }
+					{ onDetach && (
+						<MenuItem
+							onClick={ () => onDetach( media ) }
+							icon={ linkOff }
+						>
+							{ __( 'Detach from post' ) }
+						</MenuItem>
+					) }
 				</MenuGroup>
 			) }
 		</DropdownMenu>
+	);
+}
+
+function MediaPreviewDetachButton( { media, onDetach, title } ) {
+	return (
+		<Button
+			className="block-editor-inserter__media-list__item-detach-button"
+			icon={ closeSmall }
+			label={ sprintf(
+				/* translators: %s: The title of the media item. */
+				__( 'Detach %s from post' ),
+				title
+			) }
+			onClick={ ( event ) => {
+				event.stopPropagation();
+				onDetach( media );
+			} }
+			size="compact"
+			variant="tertiary"
+		/>
 	);
 }
 
@@ -122,7 +152,14 @@ function InsertExternalImageModal( { onClose, onSubmit } ) {
 	);
 }
 
-export function MediaPreview( { media, onClick, category } ) {
+export function MediaPreview( {
+	media,
+	onClick,
+	onDetach,
+	category,
+	isBusy,
+	variant,
+} ) {
 	const [ showExternalUploadModal, setShowExternalUploadModal ] =
 		useState( false );
 	const [ isHovered, setIsHovered ] = useState( false );
@@ -139,7 +176,7 @@ export function MediaPreview( { media, onClick, category } ) {
 	const onMediaInsert = useCallback(
 		( previewBlock ) => {
 			// Prevent multiple uploads when we're in the process of inserting.
-			if ( isInserting ) {
+			if ( isInserting || isBusy ) {
 				return;
 			}
 
@@ -225,6 +262,7 @@ export function MediaPreview( { media, onClick, category } ) {
 		},
 		[
 			isInserting,
+			isBusy,
 			getSettings,
 			onClick,
 			createSuccessNotice,
@@ -241,15 +279,20 @@ export function MediaPreview( { media, onClick, category } ) {
 
 	const onMouseEnter = useCallback( () => setIsHovered( true ), [] );
 	const onMouseLeave = useCallback( () => setIsHovered( false ), [] );
+	const shouldShowCompactDetachButton = variant === 'compact' && onDetach;
 	return (
 		<>
-			<InserterDraggableBlocks isEnabled blocks={ [ block ] }>
+			<InserterDraggableBlocks
+				isEnabled={ ! isBusy }
+				blocks={ [ block ] }
+			>
 				{ ( { draggable, onDragStart, onDragEnd } ) => (
 					<div
 						className={ clsx(
 							'block-editor-inserter__media-list__list-item',
 							{
 								'is-hovered': isHovered,
+								'is-compact': variant === 'compact',
 							}
 						) }
 						draggable={ draggable }
@@ -279,7 +322,7 @@ export function MediaPreview( { media, onClick, category } ) {
 										>
 											<div className="block-editor-inserter__media-list__item-preview">
 												{ preview }
-												{ isInserting && (
+												{ ( isInserting || isBusy ) && (
 													<div className="block-editor-inserter__media-list__item-preview-spinner">
 														<Spinner />
 													</div>
@@ -290,11 +333,23 @@ export function MediaPreview( { media, onClick, category } ) {
 								/>
 								<Tooltip.Popup>{ title }</Tooltip.Popup>
 							</Tooltip.Root>
-							{ ! isInserting && (
-								<MediaPreviewOptions
-									category={ category }
-									media={ media }
-								/>
+							{ ! isInserting && ! isBusy && (
+								<>
+									{ shouldShowCompactDetachButton && (
+										<MediaPreviewDetachButton
+											media={ media }
+											onDetach={ onDetach }
+											title={ title }
+										/>
+									) }
+									{ ! shouldShowCompactDetachButton && (
+										<MediaPreviewOptions
+											category={ category }
+											media={ media }
+											onDetach={ onDetach }
+										/>
+									) }
+								</>
 							) }
 						</div>
 					</div>

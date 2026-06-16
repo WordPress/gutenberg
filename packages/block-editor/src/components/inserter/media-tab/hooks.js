@@ -119,7 +119,8 @@ export function useMediaCategories( rootClientId ) {
 			inserterMediaCategories.forEach( ( category ) => {
 				if (
 					canInsertMediaType[ category.mediaType ] &&
-					categoriesHaveMedia.get( category.name )
+					( categoriesHaveMedia.get( category.name ) ||
+						category.showIfEmpty )
 				) {
 					_categories.push( category );
 				}
