@@ -35,18 +35,11 @@ function ModelThumbnail( {
 }
 
 /**
- * Card-style picker for the dashboard layout model. Renders each option
- * (`grid`, `masonry`) as a visual card with an inline-SVG thumbnail and a
- * label, exposed as a radio group for assistive tech.
+ * Card-style picker for the layout model: each option (`grid`, `masonry`)
+ * renders as a thumbnail card in a radio group. Wired as the `Edit` control
+ * for the `model` field of the layout settings DataForm.
  *
- * Used as the `Edit` control for the `model` field of the layout
- * settings DataForm.
- *
- * @param props          DataForm control props supplied by `<DataForm />`.
- * @param props.data     Current form data for the dashboard grid settings.
- * @param props.field    Field descriptor with label, description, and options.
- * @param props.onChange Commits an edit to the form's staging buffer.
- * @return The model picker.
+ * @param {DataFormControlProps< WidgetGridSettings >} props DataForm control props.
  */
 export function LayoutModelEditField( {
 	data,

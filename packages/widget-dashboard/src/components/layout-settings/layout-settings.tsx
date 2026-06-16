@@ -80,30 +80,16 @@ const form: Form = {
 };
 
 /**
- * Modal side drawer for grid-level settings (model, row height).
- * Reads from and writes to the staging copy in
- * `useDashboardInternalContext`; edits preview through the backdrop
- * and are committed or rolled back by the drawer's Save / Cancel
- * buttons.
+ * Modal side drawer for grid-level settings (layout model and row height),
+ * mounted by the engine and shown while `layoutSettingsOpen` is set in the
+ * shared UI context. Renders nothing when grid settings are not editable.
  *
- * Gap is intentionally absent: the spacing between tiles is a
- * design-system concern (theme / density / viewport tokens) and
- * should not be configurable per dashboard.
+ * Edits, including Reset, apply to the staging copy and preview live behind
+ * the drawer. Save commits them; Cancel and any other dismissal (X, Escape)
+ * revert them. Either way only grid settings change, so in-progress widget
+ * layout edits survive and customize mode stays active.
  *
- * Save commits the staging buffer; Cancel reverts it; Reset
- * restores the package's built-in defaults in staging (still
- * subject to Save/Cancel). Closing the drawer through the X icon,
- * an Escape press, or any path other than the explicit Cancel/Save
- * buttons is treated as Cancel. None of these exit customize mode.
- *
- * The engine mounts it; it shows while `layoutSettingsOpen` is `true`
- * in the shared UI context, which any trigger can set (today, the
- * Layout settings button in `Actions`). Renders nothing when grid
- * settings are not editable. Cancel and dismiss revert only grid
- * settings so in-progress widget layout edits in the same customize
- * session are preserved.
- *
- * @return {React.ReactNode} The layout settings drawer.
+ * Tile gap is deliberately not exposed; spacing stays a design-system concern.
  */
 export function LayoutSettings(): React.ReactNode {
 	const {
