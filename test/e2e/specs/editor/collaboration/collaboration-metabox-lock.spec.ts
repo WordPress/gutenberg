@@ -178,7 +178,7 @@ test.describe( 'Collaboration with meta boxes', () => {
 			const modal = page2.getByRole( 'dialog', {
 				name: 'This post is already being edited',
 			} );
-			await expect( modal ).toBeHidden();
+			await expect( modal ).not.toBeVisible();
 		} );
 	} );
 } );
