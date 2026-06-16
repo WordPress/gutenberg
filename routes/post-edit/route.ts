@@ -11,13 +11,11 @@ const TEMPLATE_POST_TYPES = [ 'wp_template', 'wp_template_part' ];
 
 type PostEditParams = {
 	type: string;
-	id?: string;
 	'*'?: string;
-	[ key: string ]: string | undefined;
 };
 
 function getPostId( params: PostEditParams ) {
-	const id = params.id ?? params[ '*' ];
+	const id = params[ '*' ];
 
 	if ( ! id ) {
 		throw notFound();
