@@ -8,17 +8,22 @@ import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import type { Post } from '@wordpress/core-data';
+import { Button } from '@wordpress/components';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import NavigationMenuEditor from './editor';
+import AddMenuItemsModal from './add-menu-items-modal';
 
 const NAVIGATION_POST_TYPE = 'wp_navigation';
 
 function NavigationEditStage() {
 	const { id } = useParams( { from: '/navigation/edit/$id' } );
 	const navigationId = parseInt( id );
+	const [ isAddingItems, setIsAddingItems ] = useState( false );
+	const [ editorVersion, setEditorVersion ] = useState( 0 );
 	const { navigationMenu } = useSelect(
 		( select ) => {
 			const { getEntityRecord } = select( coreStore );
@@ -59,8 +64,29 @@ function NavigationEditStage() {
 				/>
 			}
 			hasPadding
+			actions={
+				<Button
+					variant="secondary"
+					onClick={ () => setIsAddingItems( true ) }
+					__next40pxDefaultSize
+				>
+					{ __( 'Add menu items' ) }
+				</Button>
+			}
 		>
-			<NavigationMenuEditor id={ navigationId } />
+			<NavigationMenuEditor
+				key={ `${ navigationId }-${ editorVersion }` }
+				id={ navigationId }
+			/>
+			{ isAddingItems && (
+				<AddMenuItemsModal
+					navigationMenu={ navigationMenu }
+					onClose={ () => setIsAddingItems( false ) }
+					onSaved={ () =>
+						setEditorVersion( ( version ) => version + 1 )
+					}
+				/>
+			) }
 		</Page>
 	);
 }

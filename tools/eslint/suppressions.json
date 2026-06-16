@@ -1375,6 +1375,11 @@
 			"count": 1
 		}
 	},
+	"packages/editor/src/components/sidebar/dataform-post-summary.js": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
+	},
 	"packages/editor/src/components/sidebar/header.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -1829,6 +1834,11 @@
 			"count": 12
 		}
 	},
+	"packages/theme/src/stories/index.story.tsx": {
+		"react-hooks/refs": {
+			"count": 5
+		}
+	},
 	"packages/ui/src/alert-dialog/root.tsx": {
 		"react-hooks/refs": {
 			"count": 2
@@ -1943,11 +1953,6 @@
 			"count": 1
 		}
 	},
-	"routes/navigation-edit/editor/index.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
 	"routes/navigation-list/add-navigation.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
@@ -1967,14 +1972,6 @@
 		}
 	},
 	"routes/post-list/quick-edit-modal.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"routes/post-list/stage.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		},
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		}

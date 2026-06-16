@@ -82,6 +82,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'fontSizes',
 	'gradients',
 	'generateAnchors',
+	'disableStartPageOptions',
 	'onNavigateToEntityRecord',
 	'imageDefaultSize',
 	'imageDimensions',

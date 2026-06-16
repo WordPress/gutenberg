@@ -42,6 +42,7 @@
 	"dependencies": {
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/admin-ui": "file:../admin-ui",
+		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/commands": "file:../commands",
 		"@wordpress/components": "file:../components",

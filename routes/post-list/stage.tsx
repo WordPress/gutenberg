@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+import { dequal } from 'dequal';
+import type { ComponentType } from 'react';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -16,17 +22,15 @@ import {
 	store as coreStore,
 	privateApis as coreDataPrivateApis,
 } from '@wordpress/core-data';
-import {
-	Button,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { Button, DropdownMenu, MenuItem, Notice } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useMemo, useCallback } from '@wordpress/element';
+import { useMemo, useCallback, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
-import { drawerRight } from '@wordpress/icons';
-import type { Post } from '@wordpress/core-data';
+import { drawerRight, moreVertical } from '@wordpress/icons';
+import type { Post, WpTemplate } from '@wordpress/core-data';
 import { unlock } from '@wordpress/routes-lock-unlock';
+import { Tabs } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -34,39 +38,72 @@ import { unlock } from '@wordpress/routes-lock-unlock';
 import {
 	getDefaultView,
 	getActiveViewOverridesForTab,
-	DEFAULT_VIEWS,
 	DEFAULT_LAYOUTS,
+	getPostTypeViewSlug,
+	getTemplatePageItemId,
 	viewToQuery,
 } from './view-utils';
+import { previewField } from '../template-list/fields/preview';
 import { QuickEditModal } from './quick-edit-modal';
+import { AddPageFlow } from './add-page-flow';
+import ConfigureHomepageModal from './configure-homepage-modal';
+import { PostTypeTemplatesTab } from './post-type-templates-tab';
+import { PostListDataViewsLayout } from './dataviews-layout';
+import {
+	isTemplateLikeItem,
+	TemplateItemBadge,
+	TemplateItemPreview,
+	TemplateItemTitle,
+} from './template-item-renderers';
 
 // Unlock WordPress private APIs
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
-const { usePostActions, usePostFields } = unlock( editorPrivateApis );
-const { Tabs } = unlock( componentsPrivateApis );
+const { usePostActions, usePostFields, templateTitleField } =
+	unlock( editorPrivateApis );
 
 /**
  * Style dependencies
  */
+// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import './style.scss';
 
 const LAYOUT_LIST = 'list';
 
-function getItemId( item: Post ) {
+type PageListItem = Post & {
+	_isTemplatePage?: boolean;
+};
+
+const TemplatePreviewRender = previewField.render as ComponentType< {
+	item: PageListItem;
+} >;
+const TemplateTitleRender = templateTitleField.render as ComponentType< {
+	item: PageListItem;
+} >;
+
+function getItemId( item: PageListItem ) {
+	if ( item._isTemplatePage ) {
+		return getTemplatePageItemId( item.id );
+	}
+
 	return item.id.toString();
 }
 
-function getItemLevel( item: Post ) {
+function getItemLevel( item: PageListItem ) {
 	return ( item as { level?: number } ).level ?? 0;
 }
 
 function PostList() {
 	const invalidate = useInvalidate();
-	const { type: postType, slug = 'all' } = useParams( {
+	const { type: postType } = useParams( {
 		from: '/types/$type/list/$slug',
 	} );
 	const navigate = useNavigate();
+	const [ isAddingPage, setIsAddingPage ] = useState( false );
+	const [ isConfiguringHomepage, setIsConfiguringHomepage ] =
+		useState( false );
 	const searchParams = useSearch( { from: '/types/$type/list/$slug' } );
+	const activeContentTab =
+		searchParams.content === 'templates' ? 'templates' : 'content';
 	const postTypeObject = useSelect(
 		( select ) => select( coreStore ).getPostType( postType ),
 		[ postType ]
@@ -81,14 +118,100 @@ function PostList() {
 			} ),
 		[ postType ]
 	);
+	const homepageSettings = useSelect(
+		( select ) => {
+			if ( postType !== 'page' ) {
+				return {
+					needsAttention: false,
+					showOnFront: undefined,
+				};
+			}
+
+			const siteSettings = select( coreStore ).getEntityRecord(
+				'root',
+				'site'
+			) as
+				| {
+						show_on_front?: string;
+						page_on_front?: number;
+						page_for_posts?: number;
+						home?: string;
+						url?: string;
+				  }
+				| undefined;
+			const frontPageId =
+				siteSettings?.show_on_front === 'page'
+					? siteSettings.page_on_front
+					: undefined;
+
+			return {
+				needsAttention:
+					siteSettings?.show_on_front === 'page' &&
+					( ! siteSettings.page_on_front ||
+						! siteSettings.page_for_posts ),
+				showOnFront: siteSettings?.show_on_front,
+				homeUrl: siteSettings?.home || siteSettings?.url,
+				frontPageId,
+				frontPage: frontPageId
+					? ( select( coreStore ).getEntityRecord(
+							'postType',
+							'page',
+							frontPageId
+					  ) as Post )
+					: undefined,
+			};
+		},
+		[ postType ]
+	);
+	const latestPostsTemplatePage = useSelect(
+		( select ) => {
+			if (
+				postType !== 'page' ||
+				homepageSettings.showOnFront !== 'posts'
+			) {
+				return undefined;
+			}
+
+			const store = select( coreStore );
+			const templateId = store.getDefaultTemplateId( {
+				// The front-page lookup follows the WordPress template hierarchy,
+				// so it can resolve the Blog Home template or another fallback.
+				slug: 'front-page',
+			} );
+			const template = templateId
+				? ( store.getEntityRecord(
+						'postType',
+						'wp_template',
+						templateId
+				  ) as WpTemplate | undefined )
+				: undefined;
+
+			if ( ! template ) {
+				return undefined;
+			}
+
+			return {
+				...template,
+				type: 'wp_template',
+				status: 'publish',
+				link: homepageSettings.homeUrl,
+				excerpt: {
+					rendered: template.description || '',
+				},
+				_isTemplatePage: true,
+			} as PageListItem;
+		},
+		[ homepageSettings.homeUrl, homepageSettings.showOnFront, postType ]
+	);
+	const homepageSettingsNeedAttention = homepageSettings.needsAttention;
 
 	const defaultView: View = useMemo( () => {
 		return getDefaultView( postTypeObject );
 	}, [ postTypeObject ] );
 
 	const activeViewOverrides = useMemo(
-		() => getActiveViewOverridesForTab( slug ),
-		[ slug ]
+		() => getActiveViewOverridesForTab(),
+		[]
 	);
 
 	// Callback to handle URL query parameter changes
@@ -108,7 +231,7 @@ function PostList() {
 	const { view, isModified, updateView, resetToDefault } = useView( {
 		kind: 'postType',
 		name: postType,
-		slug: 'default-new',
+		slug: getPostTypeViewSlug( postType ),
 		defaultView,
 		activeViewOverrides,
 		queryParams: searchParams,
@@ -128,6 +251,37 @@ function PostList() {
 			invalidate();
 		}
 	};
+	const onChangeSharedLayoutView = useCallback(
+		( newView: View ) => {
+			updateView( {
+				...view,
+				type: newView.type,
+				layout: newView.layout,
+			} );
+
+			if ( newView.type !== view.type ) {
+				invalidate();
+			}
+		},
+		[ invalidate, updateView, view ]
+	);
+	const isSharedLayoutModified = useMemo(
+		() =>
+			view.type !== defaultView.type ||
+			! dequal( view.layout, defaultView.layout ),
+		[ defaultView.layout, defaultView.type, view.layout, view.type ]
+	);
+	const resetSharedLayoutView = useCallback( () => {
+		updateView( {
+			...view,
+			type: defaultView.type,
+			layout: defaultView.layout,
+		} );
+
+		if ( view.type !== defaultView.type ) {
+			invalidate();
+		}
+	}, [ defaultView.layout, defaultView.type, invalidate, updateView, view ] );
 
 	const postTypeQuery = useMemo(
 		() => viewToQuery( view, postType ),
@@ -140,29 +294,149 @@ function PostList() {
 		isResolving,
 		hasResolved,
 	} = useEntityRecordsWithPermissions( 'postType', postType, postTypeQuery );
+	const displayedPosts = useMemo( () => {
+		if ( postType !== 'page' ) {
+			return posts;
+		}
+
+		if ( latestPostsTemplatePage ) {
+			return [ latestPostsTemplatePage, ...( posts || [] ) ];
+		}
+
+		const frontPage = homepageSettings.frontPage;
+		if ( ! frontPage?.id ) {
+			return posts;
+		}
+
+		return [
+			frontPage,
+			...( posts || [] ).filter(
+				( post: Post ) => post.id !== frontPage.id
+			),
+		];
+	}, [
+		homepageSettings.frontPage,
+		latestPostsTemplatePage,
+		postType,
+		posts,
+	] );
 
 	const allFields = usePostFields( {
 		postType,
 	} );
-
-	// Hide status column except in 'All' tab, and disable status filtering
 	const fields = useMemo( () => {
-		return allFields
-			.filter( ( field: { id: string } ) => {
-				// Hide status column in specific status tabs
-				if ( field.id === 'status' && slug !== 'all' ) {
-					return false;
-				}
-				return true;
-			} )
-			.map( ( field: { id: string; filterBy?: any } ) => {
-				// Disable status field filtering since we use tabs
-				if ( field.id === 'status' ) {
-					return { ...field, filterBy: false };
-				}
-				return field;
+		const mappedFields = allFields.map( ( field ) => {
+			if (
+				field.type === 'media' ||
+				field.id === 'content-preview' ||
+				field.id === 'featured_media'
+			) {
+				return {
+					...field,
+					render( props: { item: PageListItem } ) {
+						if ( isTemplateLikeItem( props.item ) ) {
+							return (
+								<TemplateItemPreview>
+									<TemplatePreviewRender
+										item={ props.item }
+									/>
+								</TemplateItemPreview>
+							);
+						}
+
+						const Render = field.render as ComponentType<
+							typeof props
+						>;
+						return <Render { ...props } />;
+					},
+				};
+			}
+
+			if ( field.id === 'title' ) {
+				return {
+					...field,
+					render( props: { item: PageListItem } ) {
+						if ( isTemplateLikeItem( props.item ) ) {
+							return (
+								<TemplateItemTitle
+									badgeLabel={
+										props.item._isTemplatePage
+											? __( 'Homepage' )
+											: undefined
+									}
+								>
+									<TemplateTitleRender item={ props.item } />
+								</TemplateItemTitle>
+							);
+						}
+
+						const Render = field.render as ComponentType<
+							typeof props
+						>;
+						return <Render { ...props } />;
+					},
+				};
+			}
+
+			if ( field.id === 'status' ) {
+				return {
+					...field,
+					render( props: { item: PageListItem } ) {
+						if ( isTemplateLikeItem( props.item ) ) {
+							return (
+								<TemplateItemBadge>
+									{ __( 'Active' ) }
+								</TemplateItemBadge>
+							);
+						}
+
+						const Render = field.render as ComponentType<
+							typeof props
+						>;
+						return <Render { ...props } />;
+					},
+				};
+			}
+
+			return field;
+		} );
+
+		if (
+			! mappedFields.some( ( field ) => field.id === 'content-preview' )
+		) {
+			mappedFields.push( {
+				id: 'content-preview',
+				type: 'media',
+				label: __( 'Content preview' ),
+				enableSorting: false,
+				render( props: { item: PageListItem } ) {
+					if ( isTemplateLikeItem( props.item ) ) {
+						return (
+							<TemplateItemPreview>
+								<TemplatePreviewRender item={ props.item } />
+							</TemplateItemPreview>
+						);
+					}
+
+					return (
+						<span className="dataviews-view-grid__media-placeholder" />
+					);
+				},
 			} );
-	}, [ allFields, slug ] );
+		}
+
+		return mappedFields;
+	}, [ allFields ] );
+	const dataView = useMemo(
+		() =>
+			postType === 'page'
+				? {
+						...view,
+						mediaField: 'content-preview',
+				  }
+				: view,
+		[ postType, view ]
+	);
 
 	// Helper function to clean up postIds from URL after deletion
 	const cleanupDeletedPostIdsFromUrl = useCallback(
@@ -193,16 +467,16 @@ function PostList() {
 		[ invalidate, searchParams, navigate ]
 	);
 
-	const postTypeActions: Action< Post >[] = usePostActions( {
+	const postTypeActions: Action< PageListItem >[] = usePostActions( {
 		postType,
 		context: 'list',
-		onActionPerformed: ( actionId: string, items: Post[] ) => {
+		onActionPerformed: ( actionId: string, items: PageListItem[] ) => {
 			// Clean up URL when delete actions are performed
 			if (
 				actionId === 'move-to-trash' ||
 				actionId === 'permanently-delete'
 			) {
-				cleanupDeletedPostIdsFromUrl( items );
+				cleanupDeletedPostIdsFromUrl( items as Post[] );
 			}
 		},
 	} );
@@ -214,7 +488,11 @@ function PostList() {
 			icon: drawerRight,
 			isPrimary: true,
 			supportsBulk: true,
-			isEligible( post: Post ) {
+			isEligible( post: PageListItem ) {
+				if ( post._isTemplatePage ) {
+					return false;
+				}
+
 				// PostStatus only includes assignable statuses. 'trash' is managed
 				// internally by WordPress, but the REST API can still return it.
 				if ( ( post.status as string ) === 'trash' ) {
@@ -222,7 +500,7 @@ function PostList() {
 				}
 				return post.type === 'page';
 			},
-			callback( items: Post[] ) {
+			callback( items: PageListItem[] ) {
 				navigate( {
 					search: {
 						...searchParams,
@@ -237,45 +515,70 @@ function PostList() {
 
 	const actions = useMemo( () => {
 		const _actions = [
-			...postTypeActions?.flatMap< Action< Post > >( ( action ) => {
-				switch ( action.id ) {
-					case 'permanently-delete':
-						return [
-							{
-								...action,
-								isEligible( item ) {
-									if ( item.type === 'attachment' ) {
-										return true;
-									}
-									return action.isEligible?.( item ) ?? false;
-								},
-							},
-						];
+			...postTypeActions?.flatMap< Action< PageListItem > >(
+				( action ) => {
+					switch ( action.id ) {
+						case 'permanently-delete':
+							return [
+								{
+									...action,
+									isEligible( item ) {
+										if ( item._isTemplatePage ) {
+											return false;
+										}
 
-					// Media can in some circumstances need a trash option, but
-					// we need to extend the REST API to support it. See
-					// https://github.com/WordPress/wordpress-develop/pull/9210.
-					// Once that is merged we should fix this.
-					case 'move-to-trash':
-						return [
-							{
-								...action,
-								isEligible( item ) {
-									if ( item.type === 'attachment' ) {
-										return false;
-									}
-									return action.isEligible?.( item ) ?? false;
+										if ( item.type === 'attachment' ) {
+											return true;
+										}
+										return (
+											action.isEligible?.( item ) ?? false
+										);
+									},
 								},
-							},
-						];
+							];
 
-					// Skip revisions as the admin does not support it
-					case 'view-post-revisions':
-						return [];
+						// Media can in some circumstances need a trash option, but
+						// we need to extend the REST API to support it. See
+						// https://github.com/WordPress/wordpress-develop/pull/9210.
+						// Once that is merged we should fix this.
+						case 'move-to-trash':
+							return [
+								{
+									...action,
+									isEligible( item ) {
+										if ( item._isTemplatePage ) {
+											return false;
+										}
+
+										if ( item.type === 'attachment' ) {
+											return false;
+										}
+										return (
+											action.isEligible?.( item ) ?? false
+										);
+									},
+								},
+							];
+
+						// Skip revisions as the admin does not support it
+						case 'view-post-revisions':
+							return [];
+					}
+
+					return [
+						{
+							...action,
+							isEligible( item ) {
+								if ( item._isTemplatePage ) {
+									return false;
+								}
+
+								return action.isEligible?.( item ) ?? true;
+							},
+						},
+					];
 				}
-
-				return [ action ];
-			} ),
+			),
 		];
 		if ( view.type !== LAYOUT_LIST ) {
 			_actions.unshift( quickEditAction );
@@ -283,24 +586,38 @@ function PostList() {
 		return _actions;
 	}, [ quickEditAction, postTypeActions, view.type ] );
 
-	const handleTabChange = useCallback(
-		( status: string ) => {
+	const handleContentTabChange = useCallback(
+		( contentTab: string ) => {
 			navigate( {
-				to: `/types/${ postType }/list/${ status }`,
+				to: `/types/${ postType }/list/all`,
+				search: {
+					...searchParams,
+					content:
+						contentTab === 'templates' ? 'templates' : undefined,
+					edit: undefined,
+					page: undefined,
+					postIds: undefined,
+					quickEdit: undefined,
+					search: undefined,
+				},
 			} );
 		},
-		[ navigate, postType ]
+		[ navigate, postType, searchParams ]
 	);
 
 	if ( ! postTypeObject ) {
 		return null;
 	}
 
-	const selection = searchParams.postIds ?? [];
+	const selection = [ ...( searchParams.postIds ?? [] ) ];
 
 	// Auto-select first post in list view if none selected
-	if ( view.type === 'list' && selection.length === 0 && posts?.length > 0 ) {
-		selection.push( posts[ 0 ].id.toString() );
+	if (
+		view.type === 'list' &&
+		selection.length === 0 &&
+		displayedPosts?.length > 0
+	) {
+		selection.push( getItemId( displayedPosts[ 0 ] as PageListItem ) );
 	}
 
 	// Until list view supports multi selection, only keep the first item.
@@ -317,16 +634,58 @@ function PostList() {
 		} );
 	};
 
-	return (
-		<Page
-			title={ postTypeObject.labels?.name }
-			headingLevel={ 2 }
-			subTitle={ postTypeObject.labels?.description }
-			className={ `${ postTypeObject.name.toLowerCase() }-page` }
-			actions={
-				labels?.add_new_item &&
-				canCreateRecord &&
-				postType !== 'attachment' && (
+	const pageHeaderActions = (
+		<>
+			{ labels?.add_new_item && canCreateRecord && (
+				<Button
+					variant="primary"
+					onClick={ () => setIsAddingPage( true ) }
+					size="compact"
+					__next40pxDefaultSize
+				>
+					{ labels.add_new_item }
+				</Button>
+			) }
+			<DropdownMenu
+				icon={ moreVertical }
+				label={
+					homepageSettingsNeedAttention
+						? __(
+								'More page options. Homepage settings need attention.'
+						  )
+						: __( 'More page options' )
+				}
+				className={
+					homepageSettingsNeedAttention
+						? 'routes-post-list__more-options is-attention'
+						: 'routes-post-list__more-options'
+				}
+				popoverProps={ { placement: 'bottom-end' } }
+				toggleProps={ {
+					variant: 'tertiary',
+					__next40pxDefaultSize: true,
+				} }
+			>
+				{ ( { onClose: closeMenu } ) => (
+					<MenuItem
+						onClick={ () => {
+							setIsConfiguringHomepage( true );
+							closeMenu();
+						} }
+					>
+						{ __( 'Configure Homepage' ) }
+					</MenuItem>
+				) }
+			</DropdownMenu>
+		</>
+	);
+
+	const postListActions =
+		postType === 'page'
+			? pageHeaderActions
+			: labels?.add_new_item &&
+			  canCreateRecord &&
+			  postType !== 'attachment' && (
 					<Button
 						variant="primary"
 						onClick={ () => {
@@ -335,76 +694,136 @@ function PostList() {
 							} );
 						} }
 						size="compact"
+						__next40pxDefaultSize
 					>
 						{ labels.add_new_item }
 					</Button>
-				)
-			}
+			  );
+
+	return (
+		<Page
+			title={ postTypeObject.labels?.name }
+			headingLevel={ 2 }
+			subTitle={ postTypeObject.labels?.description }
+			className={ `${ postTypeObject.name.toLowerCase() }-page` }
+			actions={ postListActions }
 			hasPadding={ false }
 		>
-			{ DEFAULT_VIEWS.length > 1 && (
-				<div className="routes-post-list__tabs-wrapper">
-					<Tabs
-						onSelect={ handleTabChange }
-						selectedTabId={ slug ?? 'all' }
+			<div className="routes-post-list__tabs-wrapper">
+				<Tabs.Root
+					onValueChange={ handleContentTabChange }
+					value={ activeContentTab }
+				>
+					<Tabs.List>
+						<Tabs.Tab value="content">
+							{ postTypeObject.labels?.name ||
+								labels?.name ||
+								postType }
+						</Tabs.Tab>
+						<Tabs.Tab value="templates">
+							{ __( 'Templates' ) }
+						</Tabs.Tab>
+					</Tabs.List>
+				</Tabs.Root>
+			</div>
+			{ activeContentTab === 'content' &&
+				postType === 'page' &&
+				homepageSettings.showOnFront === 'posts' && (
+					<Notice
+						className="routes-post-list__homepage-notice"
+						status="info"
+						isDismissible={ false }
 					>
-						<Tabs.TabList>
-							{ DEFAULT_VIEWS.map(
-								( filter: { slug: string; label: string } ) => (
-									<Tabs.Tab
-										tabId={ filter.slug }
-										key={ filter.slug }
-									>
-										{ filter.label }
-									</Tabs.Tab>
-								)
-							) }
-						</Tabs.TabList>
-					</Tabs>
-				</div>
-			) }
-			<DataViews
-				data={ posts }
-				fields={ fields }
-				view={ view }
-				onChangeView={ onChangeView }
-				actions={ actions }
-				isLoading={ isResolving || ! hasResolved }
-				paginationInfo={ {
-					totalItems,
-					totalPages,
-				} }
-				defaultLayouts={ DEFAULT_LAYOUTS }
-				getItemId={ getItemId }
-				getItemLevel={ getItemLevel }
-				selection={ selection }
-				onReset={ isModified ? onReset : false }
-				onChangeSelection={ ( items: string[] ) => {
-					navigate( {
-						search: {
-							...searchParams,
-							postIds: items.length > 0 ? items : undefined,
-							edit:
-								items.length === 0
-									? undefined
-									: searchParams.edit,
-						},
-					} );
-				} }
-				renderItemLink={ ( { item, ...props }: { item: Post } ) => (
-					<Link
-						to={ `/types/${ postType }/edit/${ encodeURIComponent(
-							item.id
-						) }` }
-						{ ...props }
-						onClick={ ( event ) => {
-							// Temporary fix to prevent triggering
-							// onChangeSelection, which would override the URL.
-							event.stopPropagation();
-						} }
-					/>
+						{ __(
+							'Your homepage is currently set to show your latest posts. WordPress generates that page automatically using the active homepage template.'
+						) }
+						<Button
+							variant="link"
+							onClick={ () => setIsConfiguringHomepage( true ) }
+						>
+							{ __( 'Configure Homepage' ) }
+						</Button>
+					</Notice>
 				) }
-			/>
+			{ activeContentTab === 'templates' ? (
+				<PostTypeTemplatesTab
+					postType={ postType }
+					sharedView={ view }
+					onChangeSharedView={ onChangeSharedLayoutView }
+					isSharedViewModified={ isSharedLayoutModified }
+					resetSharedView={ resetSharedLayoutView }
+				/>
+			) : (
+				<DataViews
+					data={ displayedPosts || [] }
+					fields={ fields }
+					view={ dataView }
+					onChangeView={ onChangeView }
+					actions={ actions }
+					isLoading={ isResolving || ! hasResolved }
+					paginationInfo={ {
+						totalItems: latestPostsTemplatePage
+							? totalItems + 1
+							: totalItems,
+						totalPages:
+							latestPostsTemplatePage && view.perPage
+								? Math.ceil( ( totalItems + 1 ) / view.perPage )
+								: totalPages,
+					} }
+					defaultLayouts={ DEFAULT_LAYOUTS }
+					getItemId={ getItemId }
+					getItemLevel={ getItemLevel }
+					selection={ selection }
+					onReset={ isModified ? onReset : false }
+					onChangeSelection={ ( items: string[] ) => {
+						navigate( {
+							search: {
+								...searchParams,
+								postIds: items.length > 0 ? items : undefined,
+								edit:
+									items.length === 0
+										? undefined
+										: searchParams.edit,
+							},
+						} );
+					} }
+					renderItemLink={ ( {
+						item,
+						...props
+					}: {
+						item: PageListItem;
+					} ) => (
+						<Link
+							to={
+								item._isTemplatePage
+									? `/types/wp_template/edit/${ encodeURIComponent(
+											item.id
+									  ) }`
+									: `/types/${ postType }/edit/${ encodeURIComponent(
+											item.id
+									  ) }`
+							}
+							{ ...props }
+							onClick={ ( event ) => {
+								// Temporary fix to prevent triggering
+								// onChangeSelection, which would override the URL.
+								event.stopPropagation();
+							} }
+						/>
+					) }
+				>
+					<PostListDataViewsLayout />
+				</DataViews>
+			) }
+			{ postType === 'page' && isAddingPage && (
+				<AddPageFlow onClose={ () => setIsAddingPage( false ) } />
+			) }
+			{ postType === 'page' && isConfiguringHomepage && (
+				<ConfigureHomepageModal
+					onClose={ () => setIsConfiguringHomepage( false ) }
+					onSaved={ invalidate }
+				/>
+			) }
 			{ searchParams.quickEdit &&
 				! isResolving &&
 				selection.length > 0 &&

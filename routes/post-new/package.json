@@ -8,6 +8,7 @@
 	},
 	"dependencies": {
 		"@wordpress/core-data": "file:../../packages/core-data",
-		"@wordpress/data": "file:../../packages/data"
+		"@wordpress/data": "file:../../packages/data",
+		"@wordpress/route": "file:../../packages/route"
 	}
 }

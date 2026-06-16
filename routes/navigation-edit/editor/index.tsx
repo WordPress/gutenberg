@@ -7,11 +7,12 @@ import { BlockEditorProvider } from '@wordpress/block-editor';
 // @ts-expect-error - No type declarations available for @wordpress/blocks
 import { createBlock } from '@wordpress/blocks';
 import { Spinner } from '@wordpress/components';
-import { useEditorAssets } from '@wordpress/lazy-editor';
+import { useEditorAssets, useEditorSettings } from '@wordpress/lazy-editor';
 
 /**
  * Internal dependencies
  */
+// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import './style.scss';
 import NavigationMenuContent from './content';
 
@@ -19,16 +20,17 @@ const noop = () => {};
 
 export default function NavigationMenuEditor( { id }: { id: number } ) {
 	const { isReady: assetsReady } = useEditorAssets();
+	const { isReady: settingsReady, editorSettings } = useEditorSettings();
 
 	const blocks = useMemo( () => {
-		if ( ! assetsReady || ! id ) {
+		if ( ! assetsReady || ! settingsReady || ! id ) {
 			return [];
 		}
 
 		return [ createBlock( 'core/navigation', { ref: id } ) ];
-	}, [ assetsReady, id ] );
+	}, [ assetsReady, id, settingsReady ] );
 
-	if ( ! assetsReady || ! blocks.length ) {
+	if ( ! assetsReady || ! settingsReady || ! blocks.length ) {
 		return (
 			<div
 				style={ {
@@ -45,7 +47,7 @@ export default function NavigationMenuEditor( { id }: { id: number } ) {
 
 	return (
 		<BlockEditorProvider
-			settings={ {} }
+			settings={ editorSettings }
 			value={ blocks }
 			onChange={ noop }
 			onInput={ noop }

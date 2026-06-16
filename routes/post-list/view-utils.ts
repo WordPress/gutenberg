@@ -12,6 +12,8 @@ import type {
 	ViewTable,
 } from '@wordpress/dataviews';
 
+export const TEMPLATE_PAGE_ITEM_ID_PREFIX = 'template:';
+
 const DEFAULT_VIEW: View = {
 	type: 'table' as const,
 	sort: {
@@ -22,6 +24,12 @@ const DEFAULT_VIEW: View = {
 	titleField: 'title',
 	mediaField: 'featured_media',
 	descriptionField: 'excerpt',
+};
+
+const DEFAULT_PAGE_VIEW: View = {
+	...DEFAULT_VIEW,
+	type: 'grid' as const,
+	mediaField: 'content-preview',
 };
 
 const DEFAULT_TABLE_LAYOUT: Omit< ViewTable, 'type' > = {
@@ -40,35 +48,33 @@ export const DEFAULT_LAYOUTS: SupportedLayouts = {
 	list: true,
 };
 
-export const DEFAULT_VIEWS: {
-	slug: string;
-	label: string;
-}[] = [
-	{
-		slug: 'all',
-		label: 'All',
+export const DEFAULT_TEMPLATE_VIEW: View = {
+	type: 'grid' as const,
+	search: '',
+	filters: [],
+	page: 1,
+	perPage: 20,
+	sort: {
+		field: 'title',
+		direction: 'asc' as const,
 	},
-	{
-		slug: 'publish',
-		label: 'Published',
+	fields: [ 'author', 'active', 'slug' ],
+	titleField: 'title',
+	descriptionField: 'description',
+	mediaField: 'preview',
+};
+
+export const DEFAULT_TEMPLATE_LAYOUTS: SupportedLayouts = {
+	table: {
+		showMedia: false,
 	},
-	{
-		slug: 'draft',
-		label: 'Draft',
+	grid: {
+		showMedia: true,
 	},
-	{
-		slug: 'pending',
-		label: 'Pending',
+	list: {
+		showMedia: false,
 	},
-	{
-		slug: 'private',
-		label: 'Private',
-	},
-	{
-		slug: 'trash',
-		label: 'Trash',
-	},
-];
+};
 
 type ActiveViewOverrides = {
 	filters?: Filter[];
@@ -76,36 +82,42 @@ type ActiveViewOverrides = {
 	layout?: Record< string, unknown >;
 };
 
-export function getActiveViewOverridesForTab(
-	slug: string
-): ActiveViewOverrides {
-	if ( slug === 'all' ) {
-		return {
-			...DEFAULT_TABLE_LAYOUT,
-		};
-	}
+export function getActiveViewOverridesForTab(): ActiveViewOverrides {
 	return {
 		...DEFAULT_TABLE_LAYOUT,
-		filters: [
-			{
-				field: 'status',
-				operator: 'is',
-				value: slug,
-			},
-		],
 	};
+}
+
+export function getTemplateViewSlug( postType: string ) {
+	return `post-list-${ postType }-templates`;
+}
+
+export function getPostTypeViewSlug( postType: string ) {
+	return `post-list-${ postType }-content`;
+}
+
+export function getTemplatePageItemId( templateId: string | number ) {
+	return `${ TEMPLATE_PAGE_ITEM_ID_PREFIX }${ templateId }`;
+}
+
+export function getTemplateIdFromPageItemId( itemId: string ) {
+	if ( ! itemId.startsWith( TEMPLATE_PAGE_ITEM_ID_PREFIX ) ) {
+		return undefined;
+	}
+
+	return itemId.slice( TEMPLATE_PAGE_ITEM_ID_PREFIX.length );
 }
 
 export function getDefaultView( postType: Type | undefined ): View {
 	return {
-		...DEFAULT_VIEW,
+		...( postType?.slug === 'page' ? DEFAULT_PAGE_VIEW : DEFAULT_VIEW ),
 		showLevels: postType?.hierarchical,
 	};
 }
 
 export async function ensureView(
 	type: string,
-	slug?: string,
+	_slug?: string,
 	search?: { page?: number; search?: string }
 ) {
 	const postTypeObject = await resolveSelect( coreStore ).getPostType( type );
@@ -113,9 +125,23 @@ export async function ensureView(
 	return loadView( {
 		kind: 'postType',
 		name: type,
-		slug: 'default-new',
+		slug: getPostTypeViewSlug( type ),
 		defaultView,
-		activeViewOverrides: getActiveViewOverridesForTab( slug ?? 'all' ),
+		activeViewOverrides: getActiveViewOverridesForTab(),
+		queryParams: search,
+	} );
+}
+
+export async function ensureTemplateView(
+	postType: string,
+	search?: { page?: number; search?: string }
+) {
+	return loadView( {
+		kind: 'postType',
+		name: 'wp_template',
+		slug: getTemplateViewSlug( postType ),
+		defaultView: DEFAULT_TEMPLATE_VIEW,
+		activeViewOverrides: {},
 		queryParams: search,
 	} );
 }
@@ -159,7 +185,9 @@ export function viewToQuery( view: View, postType: string ) {
 		( filter ) => filter.field === 'status'
 	);
 	if ( status ) {
-		result.status = status.value;
+		result.status = Array.isArray( status.value )
+			? status.value.join( ',' )
+			: status.value;
 	} else if ( postType === 'attachment' ) {
 		result.status = 'inherit';
 	} else {
@@ -169,10 +197,14 @@ export function viewToQuery( view: View, postType: string ) {
 	const author = view.filters?.find(
 		( filter ) => filter.field === 'author'
 	);
-	if ( author && author.operator === 'is' ) {
-		result.author = author.value;
-	} else if ( author && author.operator === 'isNot' ) {
-		result.author_exclude = author.value;
+	if ( author && [ 'is', 'isAny' ].includes( author.operator ) ) {
+		result.author = Array.isArray( author.value )
+			? author.value.join( ',' )
+			: author.value;
+	} else if ( author && [ 'isNot', 'isNone' ].includes( author.operator ) ) {
+		result.author_exclude = Array.isArray( author.value )
+			? author.value.join( ',' )
+			: author.value;
 	}
 
 	const commentStatus = view.filters?.find(
@@ -204,6 +236,31 @@ export function viewToQuery( view: View, postType: string ) {
 	// For attachments, we need to embed the parent (attached to) post to get its title.
 	if ( postType === 'attachment' ) {
 		result._embed = 'wp:attached-to';
+	}
+
+	return result;
+}
+
+export function templateViewToQuery( view: View, postType: string ) {
+	const result: Record< string, any > = {
+		per_page: -1,
+		post_type: postType,
+	};
+
+	if ( undefined !== view.page ) {
+		result.page = view.page;
+	}
+
+	if ( ! [ undefined, '' ].includes( view.search ) ) {
+		result.search = view.search;
+	}
+
+	if ( undefined !== view.sort?.field ) {
+		result.orderby = view.sort.field;
+	}
+
+	if ( undefined !== view.sort?.direction ) {
+		result.order = view.sort.direction;
 	}
 
 	return result;

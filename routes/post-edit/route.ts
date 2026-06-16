@@ -76,13 +76,21 @@ export const route = {
 		);
 		return postType?.labels?.edit_item || __( 'Edit' );
 	},
-	async canvas( context: { params: PostEditParams } ) {
-		const { params } = context;
+	async canvas( context: {
+		params: PostEditParams;
+		search: {
+			skipStartPageOptions?: boolean | string;
+		};
+	} ) {
+		const { params, search } = context;
 		const postId = getPostId( params );
 
 		return {
 			postType: params.type,
 			postId,
+			skipStartPageOptions:
+				search.skipStartPageOptions === true ||
+				search.skipStartPageOptions === 'true',
 		};
 	},
 };

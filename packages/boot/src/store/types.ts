@@ -58,9 +58,20 @@ export interface CanvasData {
 	isPreview?: boolean;
 	/**
 	 * Optional edit link for click-to-edit navigation.
-	 * When provided with isPreview: true, clicking the canvas navigates to this URL.
+	 * When provided with isPreview: true, the preview can expose an edit action.
 	 */
 	editLink?: string;
+
+	/**
+	 * Optional frontend URL to render in preview mode.
+	 * When omitted, preview mode falls back to the editor preview canvas.
+	 */
+	previewUrl?: string;
+
+	/**
+	 * Whether the editor should skip the starter page pattern chooser.
+	 */
+	skipStartPageOptions?: boolean;
 }
 
 /**

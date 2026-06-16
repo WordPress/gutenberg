@@ -8,7 +8,13 @@ import { notFound } from '@wordpress/route';
 /**
  * Internal dependencies
  */
-import { ensureView, viewToQuery } from './view-utils';
+import {
+	ensureTemplateView,
+	ensureView,
+	getTemplateIdFromPageItemId,
+	templateViewToQuery,
+	viewToQuery,
+} from './view-utils';
 
 /**
  * Route configuration for post list.
@@ -42,9 +48,58 @@ export const route = {
 			page?: number;
 			search?: string;
 			postIds?: string[];
+			content?: string;
 		};
 	} ) {
 		const { params, search } = context;
+
+		if ( search.content === 'templates' ) {
+			const sharedView = await ensureView( params.type, params.slug, {
+				page: search.page,
+				search: search.search,
+			} );
+			const templateView = await ensureTemplateView( params.type, {
+				page: search.page,
+				search: search.search,
+			} );
+
+			if ( sharedView.type !== 'list' ) {
+				return undefined;
+			}
+
+			if ( search.postIds && search.postIds.length > 0 ) {
+				const templateId = search.postIds[ 0 ].toString();
+				return {
+					postType: 'wp_template',
+					postId: templateId,
+					isPreview: true,
+					editLink: `/types/wp_template/edit/${ encodeURIComponent(
+						templateId
+					) }`,
+				};
+			}
+
+			const query = templateViewToQuery( templateView, params.type );
+			const templates = await resolveSelect( coreStore ).getEntityRecords(
+				'postType',
+				'wp_template',
+				{ ...query, per_page: 1 }
+			);
+
+			if ( templates && templates.length > 0 ) {
+				const templateId = ( templates[ 0 ] as any ).id.toString();
+				return {
+					postType: 'wp_template',
+					postId: templateId,
+					isPreview: true,
+					editLink: `/types/wp_template/edit/${ encodeURIComponent(
+						templateId
+					) }`,
+				};
+			}
+
+			return undefined;
+		}
 
 		// Load the view configuration
 		const view = await ensureView( params.type, params.slug, {
@@ -60,12 +115,80 @@ export const route = {
 		// Check if postId is provided in query params
 		if ( search.postIds && search.postIds.length > 0 ) {
 			const postId = search.postIds[ 0 ].toString();
+			const templateId = getTemplateIdFromPageItemId( postId );
+			if ( templateId ) {
+				return {
+					postType: 'wp_template',
+					postId: templateId,
+					isPreview: true,
+					editLink: `/types/wp_template/edit/${ encodeURIComponent(
+						templateId
+					) }`,
+				};
+			}
+
+			const post = await resolveSelect( coreStore ).getEntityRecord(
+				'postType',
+				params.type,
+				postId
+			);
+
 			return {
 				postType: params.type,
 				postId,
 				isPreview: true,
-				editLink: `/types/${ params.type }/edit/${ postId }`,
+				editLink: `/types/${ params.type }/edit/${ postId }?skipStartPageOptions=true`,
+				previewUrl: ( post as any )?.link,
 			};
+		}
+
+		if ( params.type === 'page' ) {
+			const siteSettings = ( await resolveSelect(
+				coreStore
+			).getEntityRecord( 'root', 'site' ) ) as
+				| {
+						show_on_front?: string;
+						page_on_front?: number;
+				  }
+				| undefined;
+			if ( siteSettings?.show_on_front === 'posts' ) {
+				const templateId = await resolveSelect(
+					coreStore
+				).getDefaultTemplateId( { slug: 'front-page' } );
+
+				if ( templateId ) {
+					return {
+						postType: 'wp_template',
+						postId: templateId,
+						isPreview: true,
+						editLink: `/types/wp_template/edit/${ encodeURIComponent(
+							templateId
+						) }`,
+					};
+				}
+			}
+
+			const frontPageId =
+				siteSettings?.show_on_front === 'page'
+					? siteSettings.page_on_front
+					: undefined;
+
+			if ( frontPageId ) {
+				const frontPage = ( await resolveSelect(
+					coreStore
+				).getEntityRecord( 'postType', 'page', frontPageId ) ) as any;
+
+				if ( frontPage ) {
+					const postId = frontPage.id.toString();
+					return {
+						postType: params.type,
+						postId,
+						isPreview: true,
+						editLink: `/types/${ params.type }/edit/${ postId }?skipStartPageOptions=true`,
+						previewUrl: frontPage.link,
+					};
+				}
+			}
 		}
 
 		// Otherwise, fetch the first post from the filtered query
@@ -83,7 +206,8 @@ export const route = {
 				postType: params.type,
 				postId,
 				isPreview: true,
-				editLink: `/types/${ params.type }/edit/${ postId }`,
+				editLink: `/types/${ params.type }/edit/${ postId }?skipStartPageOptions=true`,
+				previewUrl: ( posts[ 0 ] as any ).link,
 			};
 		}
 
