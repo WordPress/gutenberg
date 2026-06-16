@@ -197,9 +197,11 @@ const withSuggestionBlockClassName = createHigherOrderComponent(
 			const { entries, moveGhosts } = useSuggestionOverlay();
 			const ghostsAfter = moveGhosts?.after?.get( clientId );
 			const ghostsBefore = moveGhosts?.before?.get( clientId );
+			const ghostsInside = moveGhosts?.insideParent?.get( clientId );
 			const hasGhosts =
 				( ghostsAfter && ghostsAfter.length > 0 ) ||
-				( ghostsBefore && ghostsBefore.length > 0 );
+				( ghostsBefore && ghostsBefore.length > 0 ) ||
+				( ghostsInside && ghostsInside.length > 0 );
 			const { isSuggestMode, structuralClass, authorId } = useSelect(
 				( select ) => {
 					const editor = select( EDITOR_STORE_NAME );
@@ -281,6 +283,10 @@ const withSuggestionBlockClassName = createHigherOrderComponent(
 							} ),
 						} }
 					/>
+					{ /* Ghosts for blocks that left this (now-empty) container,
+					     rendered just below it since there's no surviving
+					     child to anchor them to inside. */ }
+					{ renderGhosts( ghostsInside, 'gi' ) }
 					{ renderGhosts( ghostsAfter, 'ga' ) }
 				</>
 			);

@@ -538,4 +538,51 @@ describe( 'withSuggestionBlockClassName', () => {
 			screen.queryByTestId( 'suggestion-move-ghost' )
 		).not.toBeInTheDocument();
 	} );
+
+	function setupOnlyChildMove() {
+		const registry = createRegistry();
+		registry.register( noticesStore );
+		registry.register( preferencesStore );
+		registry.register( blockEditorStore );
+		registry.register( editorStore );
+		registry.dispatch( editorStore ).setEditorIntent( 'edit' );
+
+		// The block's only child has moved out, leaving the parent empty;
+		// the moved block now sits at the root as the parent's sibling.
+		const parent = createBlock( TEST_BLOCK_NAME, { content: 'Parent' } );
+		const moved = createBlock( TEST_BLOCK_NAME, {
+			content: 'I was the only child',
+			metadata: {
+				suggestion: {
+					type: 'pending-move',
+					authorId: null,
+					fromAnchorClientId: null,
+					fromParentClientId: parent.clientId,
+					fromIndex: 0,
+				},
+			},
+		} );
+		registry.dispatch( blockEditorStore ).resetBlocks( [ parent, moved ] );
+
+		const wrapper = ( { children } ) => (
+			<RegistryProvider value={ registry }>
+				<SuggestionOverlayProvider>
+					{ children }
+				</SuggestionOverlayProvider>
+			</RegistryProvider>
+		);
+
+		// Render the wrapped *parent* — with no surviving child to anchor to,
+		// the ghost falls back to rendering just below the emptied parent.
+		render( <WrappedBlockListBlock clientId={ parent.clientId } />, {
+			wrapper,
+		} );
+	}
+
+	it( 'renders a ghost on the old parent when the moved block was an only child', () => {
+		setupOnlyChildMove();
+		expect(
+			screen.getByTestId( 'suggestion-move-ghost' )
+		).toBeInTheDocument();
+	} );
 } );

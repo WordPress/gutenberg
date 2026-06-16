@@ -65,17 +65,15 @@ import { buildMoveGhostIndex } from './move-ghost-index';
 
 /**
  * @typedef {Object} OverlayContextValue
- * @property {Object.<string,OverlayEntry>} entries              Per-clientId entries.
- * @property {Function}                     captureBaseline      Store a baseline for a
- *                                                               block if one isn't set.
- * @property {Function}                     setOverlayAttributes Merge overlay attributes
- *                                                               onto an entry.
- * @property {Function}                     clearOverlay         Remove the entry.
- * @property {Function}                     hasOverlay           Check if an entry has any
- *                                                               overlay attributes.
- * @property {{after:Map,before:Map}}       moveGhosts           Anchor → ghost
- *                                                               index for pending
- *                                                               moves.
+ * @property {Object.<string,OverlayEntry>}            entries              Per-clientId entries.
+ * @property {Function}                                captureBaseline      Store a baseline for a
+ *                                                                          block if one isn't set.
+ * @property {Function}                                setOverlayAttributes Merge overlay attributes
+ *                                                                          onto an entry.
+ * @property {Function}                                clearOverlay         Remove the entry.
+ * @property {Function}                                hasOverlay           Check if an entry has any
+ *                                                                          overlay attributes.
+ * @property {{after:Map,before:Map,insideParent:Map}} moveGhosts           Anchor → ghost index for pending moves.
  */
 
 const EMPTY_ENTRIES = Object.freeze( {} );
@@ -83,6 +81,7 @@ const EMPTY_ENTRIES = Object.freeze( {} );
 const EMPTY_GHOSTS = Object.freeze( {
 	after: new Map(),
 	before: new Map(),
+	insideParent: new Map(),
 } );
 
 const OverlayContext = createContext( {
@@ -397,9 +396,18 @@ export function SuggestionOverlayProvider( { children } ) {
 					.find(
 						( id ) => id !== clientId && ! movedIds.has( id )
 					) ?? '';
+			// Whether the old parent can host an inside-parent fallback ghost
+			// (block existed, not root, not itself moved) — keeps the memo in
+			// sync when only the parent's existence/moved-state changes.
+			const parentUsable =
+				fromParent &&
+				blockEditor.getBlockName( fromParent ) &&
+				! movedIds.has( fromParent )
+					? 1
+					: 0;
 			signature += `${ clientId }:${
 				marker.fromIndex ?? 0
-			}:${ fromAnchor }:${ fromParent }:${ anchorUsable }:${ firstSibling }|`;
+			}:${ fromAnchor }:${ fromParent }:${ anchorUsable }:${ firstSibling }:${ parentUsable }|`;
 		}
 		return signature;
 	}, [] );

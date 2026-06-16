@@ -65,13 +65,14 @@ describe( 'SuggestionMoveGhost', () => {
 		render( <SuggestionMoveGhost moved={ moved } /> );
 		// The visible label and excerpt duplicate the canvas treatment, so
 		// they are aria-hidden — the VisuallyHidden sentence is the single
-		// accessible cue.
+		// accessible cue. `getByText` returns the containing span for each.
 		expect(
-			screen.getByText( /Moved from here: Paragraph/ ).closest( 'span' )
+			screen.getByText( /Moved from here: Paragraph/ )
 		).toHaveAttribute( 'aria-hidden', 'true' );
-		expect(
-			screen.getByText( 'Hello world' ).closest( 'span' )
-		).toHaveAttribute( 'aria-hidden', 'true' );
+		expect( screen.getByText( 'Hello world' ) ).toHaveAttribute(
+			'aria-hidden',
+			'true'
+		);
 	} );
 
 	it( 'shows a tag-stripped, trimmed excerpt of the block content', () => {
