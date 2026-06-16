@@ -97,6 +97,7 @@
 		"@types/node": "^20.19.39",
 		"esbuild": "^0.27.2",
 		"esbuild-esm-loader": "^0.3.3",
+		"prettier": "npm:wp-prettier@^3.0.3",
 		"storybook": "^10.2.8",
 		"stylelint": "^16.8.2"
 	},
