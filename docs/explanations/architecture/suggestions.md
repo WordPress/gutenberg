@@ -2,9 +2,9 @@
 
 ## Overview
 
-Suggestions extend the Notes feature (block-level comments) to support proposed content changes. A reviewer switches to **Suggest** intent and edits a block; the change is captured as a versioned suggestion payload on a note comment, auto-saved in the background after a short idle window. The post author then **Accepts** (merges the change) or **Rejects** (dismisses it) from the notes sidebar.
+Suggestions extend the Notes feature (block-level comments) to support proposed content changes. A reviewer switches to **Suggest** intent and edits the content — changing a block's attributes, or inserting, removing, or moving blocks; each change is captured as a versioned suggestion payload on a note comment, auto-saved in the background after a short idle window. The post author then **Accepts** (merges the change) or **Rejects** (dismisses it) from the notes sidebar.
 
-The feature is designed around a swappable provider interface so the storage backend can evolve from comment-meta (v1, current) to Yjs `AttributionManager` (v2, future) without changing the UI or accept/reject logic.
+The feature is designed around a swappable provider interface so the storage backend can evolve from comment-meta (today) to Yjs `AttributionManager` (future) without changing the UI or accept/reject logic.
 
 ## End-to-end lifecycle
 
@@ -57,9 +57,17 @@ When the intent is `suggest`, an `editor.BlockEdit` filter (`withSuggestionOverl
 2. **Diversion** — `setAttributes` writes to a React-context-backed overlay (`SuggestionOverlayProvider`) keyed by `clientId`, not the block-editor store.
 3. **Merge for render** — the block receives `{ ...realAttributes, ...overlayAttributes }` so the user sees their in-progress change live.
 
-A companion `editor.BlockListBlock` filter tags each block that has a pending overlay with an `is-suggestion-pending` class, which renders the green bracket/outline treatment so edited blocks are discoverable without relying on the selected-block toolbar.
+A companion `editor.BlockListBlock` filter tags each block with a pending change so it is discoverable without relying on the selected-block toolbar. Attribute edits get an `is-suggestion-pending` class (the bracket/outline treatment); pending structural changes get `is-suggestion-pending-remove` (strikethrough/dim), `is-suggestion-pending-insert`, or `is-suggestion-pending-move`, mapped from the block's `metadata.suggestion` marker.
 
 Because the store is never touched, autosave, undo/redo, and RTC sync stay at the real baseline.
+
+### Inline preview marks
+
+For text-valued (RichText) attributes, the overlay HOC also renders the change **inline** inside the block, Google-Docs style, rather than only in the sidebar. On each render (gated on `! isBlockSelected`, so the marks never fight the caret), `markContentDiff` word-diffs the baseline against the proposed value and wraps the runs: removed runs in `<del class="has-suggestion-deletion">`, added runs in `<ins class="has-suggestion-addition">`. The marked HTML is fed back into the block's RichText for display only.
+
+The persisted value is never the marked one. Incoming `setAttributes` payloads are passed through `stripSuggestionMarks` first, so the overlay always stores the *clean* proposed value — without this, the next render would diff against an already-marked value and double up the marks. The two format types (`gutenberg/suggested-deletion`, `gutenberg/suggested-addition`) are registered without an `edit` UI in `inline-formats.js` so they never appear in the block toolbar.
+
+When the suggester's user id is known, `getAvatarBorderColor` resolves their avatar color and it rides on each `<del>`/`<ins>` as an inline `style="--suggestion-author-color: …"`, so two suggesters' marks are distinguishable at a glance. Omitting the color leaves the existing red/green CSS fallback, so single-suggester sessions look unchanged.
 
 ### Auto-save
 
@@ -74,10 +82,22 @@ The HOC only catches edits that flow through a block's own `setAttributes` prop.
 1. On Suggest activation it snapshots every block's attributes.
 2. It subscribes to the data registry. On every store update it diffs the live attributes against the snapshot.
 3. For drift on a tracked block it routes the changed attributes into the overlay and dispatches a revert that restores the snapshot. An `isReverting` flag suppresses the recursive subscribe fire that the revert itself triggers.
-4. New blocks (no snapshot entry) are tracked but not intercepted — inserting a block in Suggest mode is currently a real edit, not a suggestion.
+4. Structural mutations (a block inserted, removed, or moved) are captured too — see [Structural suggestions](#structural-suggestions) below.
 5. System-managed metadata (`metadata.noteId` written by the suggestion provider after creating a note comment) is folded into the snapshot before diffing so it's invisible to the diff and never leaks into the user-pending overlay.
 
 The interceptor uses `registry.subscribe` rather than a React `useSelect` because (a) it must run synchronously after each dispatch, before any re-render serializes the now-wrong state, and (b) `subscribe` also catches dispatches from non-React paths.
+
+### Structural suggestions
+
+Inserting, removing, and moving blocks are captured as suggestions, not applied to the post. The interceptor follows the same "keep the store at baseline" principle as attribute edits — it **reverts the structural mutation and tags the block** with a `metadata.suggestion` marker, so the canvas keeps showing blocks at their baseline positions with a pending treatment until the change is accepted or rejected:
+
+| User action | Interceptor response | Persisted op | Reject undoes by |
+|-------------|----------------------|--------------|------------------|
+| Delete a block | Re-inserts the subtree from the previous-tick snapshot at its prior parent + index, tags it `pending-remove` | `block-remove` (carries the serialized `block`) | clearing the marker (the block stays) |
+| Insert a block | Leaves the new block in place, tags it `pending-insert` (it has no baseline to revert to) | `block-insert-after` (with `anchorClientId` / `parentClientId`) | dispatching `removeBlock` |
+| Move a block | Moves it back to its original position, tags it `pending-move` with the from/to anchors | `block-move` (`from*` / `to*` anchor + index fields) | dispatching `moveBlockToPosition` back |
+
+Each marker is written into the overlay so auto-save persists the corresponding structural operation as its own note (attribute-set ops can ride along in the same payload, but the structural op leads). Apply dispatches the real block-editor action (`removeBlock` / `insertBlock` / `moveBlockToPosition`); both Apply and Reject finish by clearing the `metadata.suggestion` marker via `clearSuggestionMarkerAttributes`.
 
 ### Apply-time bypass and the collaborative round-trip
 
@@ -93,10 +113,13 @@ The Suggest-mode subsystem lives in `packages/editor/src/components/suggestion-m
 
 | File | Role |
 |------|------|
+| `index.js`                  | Barrel that re-exports the subsystem's public surface and registers the inline format types on import. |
+| `constants.js`              | Shared constants (`EDITOR_STORE_NAME`, `SUGGEST_INTENT`) referenced by name to avoid a module cycle with the editor store. |
 | `overlay-context.js`        | `SuggestionOverlayProvider`, `useSuggestionOverlay`. The in-memory overlay store and bypass refs. |
-| `with-suggestion-overlay.js`| `editor.BlockEdit` HOC that diverts `setAttributes` into the overlay. |
-| `store-interceptor.js`      | Snapshot/diff/revert subscriber for store-level mutations; multi-peer accept logic. |
-| `provider.js`               | `useSuggestionsProvider` — the `createSuggestion` / `applySuggestion` / `rejectSuggestion` API. Owns `operationsFromOverlay`, `applyOperations`, `parseSuggestionPayload`, and the wrapper-aware equality check. |
+| `with-suggestion-overlay.js`| `editor.BlockEdit` HOC that diverts `setAttributes` into the overlay; renders inline `<del>`/`<ins>` marks for text attributes and the `editor.BlockListBlock` filter for pending-state classes. |
+| `inline-formats.js`         | Registers the `gutenberg/suggested-deletion` / `gutenberg/suggested-addition` RichText formats; `markContentDiff` / `stripSuggestionMarks` for the inline preview. |
+| `store-interceptor.js`      | Snapshot/diff/revert subscriber for store-level mutations (attribute and structural); multi-peer accept logic. |
+| `provider.js`               | `useSuggestionsProvider` — the `createSuggestion` / `applySuggestion` / `rejectSuggestion` API. Owns `operationsFromOverlay`, `applyOperations`, `hasAttributeConflict`, `findStructuralOp`, `clearSuggestionMarkerAttributes`, `parseSuggestionPayload`, and the wrapper-aware equality check. |
 | `suggestion-diff.js`        | Inline diff preview rendered in a comment thread (word-level for text attributes, label fallback otherwise). |
 | `suggestion-summary.js`     | Compact sidebar summary ("Add: …", "Delete: …", "Format: …") used in collapsed thread lists. |
 | `auto-save.js`              | Debounced background persistence of pending overlays as note comments (replaces the explicit "Submit" affordance from earlier phases). |
@@ -108,13 +131,13 @@ REST/PHP surface lives in `lib/compat/wordpress-6.9/`:
 | `block-comments.php`                              | Registers the `_wp_note_status`, `_wp_suggestion`, and `_wp_suggestion_status` comment meta and adds `editor.notes` post-type support. |
 | `class-gutenberg-rest-comment-controller-6-9.php` | REST controller subclass remapping permissions for `note`-type comments (post editors get `edit_post`-based access; updates are gated by an allowlist of suggestion-lifecycle fields). |
 
-## Suggestion Payload (v1)
+## Suggestion Payload (v2)
 
 Stored as a JSON string in the `_wp_suggestion` comment meta on a `note` comment:
 
 ```json
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "blockName": "core/paragraph",
   "baseRevision": "2026-04-15T12:34:56",
   "operations": [
@@ -133,9 +156,22 @@ Stored as a JSON string in the `_wp_suggestion` comment meta on a `note` comment
 | `schemaVersion` | Allows future schema evolution without breaking old payloads. |
 | `blockName` | Safety check — apply is refused if the block type has changed. |
 | `baseRevision` | `post_modified_gmt` at capture time. A mismatch at apply time triggers a staleness warning. |
-| `operations` | Declarative transforms on the block tree. Currently only `attribute-set`; designed to extend to `block-insert-after`, `block-remove` in the future. |
+| `operations` | Declarative transforms on the block tree. v1 emitted `attribute-set` only; v2 adds the structural variants (`block-insert-after`, `block-remove`, `block-move`), tracked in [#77434](https://github.com/WordPress/gutenberg/issues/77434). |
 
 Operations are **declarative transforms**, not HTML diffs. This makes them compatible with Yjs attribution semantics and resilient to concurrent edits on unrelated attributes.
+
+A payload carries at most one structural op (the auto-save loop persists each structural mutation as its own note); `attribute-set` ops may ride along but the structural op leads. The op types and their distinguishing fields:
+
+| `type` | Fields beyond `type` / `blockName` | Apply dispatches |
+|--------|------------------------------------|------------------|
+| `attribute-set`     | `attribute`, `before`, `after` | `updateBlockAttributes` |
+| `block-remove`      | the serialized `block` | `removeBlock` |
+| `block-insert-after`| `anchorClientId`, `parentClientId`, the serialized `block` | `insertBlock` |
+| `block-move`        | `fromAnchorClientId` / `fromParentClientId` / `fromIndex`, `toAnchorClientId` / `toParentClientId` | `moveBlockToPosition` |
+
+### v1 → v2 compatibility
+
+The shape of a v1 payload is a strict subset of v2 (only `attribute-set` operations). v1 payloads are migrated forward in `parseSuggestionPayload` by stamping `schemaVersion: 2` — no rewriting needed. The bump matters because a v1 reader that encountered a v2 payload with structural ops would silently drop them at apply time; refusing the payload outright surfaces an explicit "newer editor" notice and offers only Reject.
 
 ### Schema versioning
 
@@ -151,13 +187,13 @@ When bumping the version, add a migration step in `parseSuggestionPayload` that 
 
 ## Provider Interface
 
-```
+```text
 useSuggestionsProvider() → {
   createSuggestion({ clientId, blockName, operations })  → Promise<comment>
   updateSuggestion({ commentId, blockName, operations }) → Promise<comment>
   deleteSuggestion({ commentId })                        → Promise<void>
   applySuggestion({ commentId, clientId, payload })      → Promise<void>
-  rejectSuggestion({ commentId })                        → Promise<void>
+  rejectSuggestion({ commentId, clientId, payload })     → Promise<void>
 }
 ```
 
@@ -165,9 +201,10 @@ The current implementation (`provider.js`) uses comment meta. A future Yjs-backe
 
 ## Accept / Reject
 
-- **Accept**: runs `applyOperations(currentAttributes, payload.operations)` to produce new attributes, dispatches `updateBlockAttributes`, marks the note as resolved with `_wp_suggestion_status = 'applied'`.
-- **Reject**: marks the note as resolved with `_wp_suggestion_status = 'rejected'`. No content change.
-- **Conflict detection**: accept-time staleness is checked at the attribute level, not the post level. `hasAttributeConflict(currentAttributes, operations)` compares each operation's captured `before` to the block's current value; only a real divergence on a targeted attribute prompts the "apply anyway" confirmation. Post-level `baseRevision` is still stamped into the payload for provenance, but does not drive the prompt — every auto-save bumps `post_modified_gmt`, so a post-level compare would flag nearly every suggestion as stale.
+- **Accept** (attribute ops): runs `applyOperations(currentAttributes, payload.operations)` to produce new attributes, dispatches `updateBlockAttributes`, marks the note as resolved with `_wp_suggestion_status = 'applied'`.
+- **Accept** (structural ops): dispatches the corresponding block-editor action — `removeBlock` for `block-remove`, `insertBlock` for `block-insert-after`, `moveBlockToPosition` for `block-move` — then clears the `metadata.suggestion` marker via `clearSuggestionMarkerAttributes`.
+- **Reject**: marks the note as resolved with `_wp_suggestion_status = 'rejected'` and clears any `metadata.suggestion` marker. For structural suggestions it also undoes the in-canvas pending state: `block-insert-after` runs `removeBlock`, `block-move` runs `moveBlockToPosition` back to the original spot, `block-remove` simply drops the marker (the block was never actually removed). Attribute rejects make no content change.
+- **Conflict detection**: accept-time staleness is checked at the attribute level, not the post level. `hasAttributeConflict(currentAttributes, operations)` compares each operation's captured `before` to the block's current value; only a real divergence on a targeted attribute prompts the "apply anyway" confirmation. (`block-insert-after` is exempt — its baseline is `{}`, so a comparison against the already-typed-into block would always read as divergence.) Post-level `baseRevision` is still stamped into the payload for provenance, but does not drive the prompt — every auto-save bumps `post_modified_gmt`, so a post-level compare would flag nearly every suggestion as stale.
 
 ## Review UI
 
@@ -199,8 +236,7 @@ These are non-obvious quirks reviewers should keep in mind when reading the code
 
 ## Known Limitations
 
-- **Structural suggestions** (block insert, remove, move) are not yet supported. The `operations` array is designed to accept `block-insert-after` and `block-remove` types in the future.
-- **Inline text selections** are not anchored — suggestions apply to the entire attribute, not a sub-range. Fragment-level suggestions depend on inline annotation infrastructure tracked separately.
+- **Sub-attribute anchoring**: a suggestion targets a whole attribute (`before` → `after`), not an anchored sub-range. The inline `<del>`/`<ins>` marks are a display-only rendering of that whole-attribute diff, not independently anchored spans. So if the author edits the same attribute while a suggestion is pending, the captured `before` no longer matches and Apply overwrites the interim edit (after a staleness confirmation) rather than merging it. True fragment-level, edit-resilient suggestions depend on the inline-annotation / Yjs attribution infrastructure tracked separately — see [Yjs v2 Migration Path](#yjs-v2-migration-path).
 - **Permissions**: the Gutenberg REST comment controller overrides `update_item_permissions_check` so users with `edit_post` on the parent can update note comments — **but only for suggestion-lifecycle fields** (`status` limited to `approved`/`hold`, plus `meta._wp_suggestion_status`). Any other field in the update body falls back to core's `edit_comment` check, preventing post editors from rewriting another user's note content. The `_wp_suggestion` and `_wp_suggestion_status` meta `auth_callback`s follow the same `edit_post`-on-parent pattern.
-- **Payload size**: `_wp_suggestion` meta is capped at 64 KB via a `sanitize_callback`. Requests exceeding that limit are truncated to prevent arbitrarily large JSON blobs from flooding comment meta storage.
+- **Payload size**: `_wp_suggestion` meta is capped at 64 KB via a `sanitize_callback`. Requests exceeding that limit are rejected (the callback returns an empty string), not truncated — mid-string truncation would produce invalid JSON that `parseSuggestionPayload` would silently drop.
 - **Rich-text format fidelity**: the word-level diff operates on the serialized HTML string, which may produce noisy diffs when formatting (bold, links) changes. Progressive enhancement planned.
