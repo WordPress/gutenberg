@@ -69,21 +69,42 @@ const config: Config = {
 						'@media ( -webkit-min-device-pixel-ratio: 2 ), ( min-resolution: 192dpi )',
 					],
 				},
+				// Each corner-radius preset is applied via the
+				// `data-wpds-corner-radius` attribute that `ThemeProvider`
+				// sets on its scoping element. The additional
+				// `:root:has([data-wpds-root-provider="true"]…)` selector lets
+				// a root `ThemeProvider` forward its preset to the document
+				// element, matching how `color` and `cursor` tokens already
+				// behave so the whole token surface stays consistent on
+				// `<html>` (e.g. for PHP-rendered admin UI outside the React
+				// app).
 				{
 					mode: 'corner-radius-none',
-					selectors: [ '[data-wpds-corner-radius="none"]' ],
+					selectors: [
+						'[data-wpds-corner-radius="none"]',
+						':root:has([data-wpds-root-provider="true"][data-wpds-corner-radius="none"])',
+					],
 				},
 				{
 					mode: 'corner-radius-subtle',
-					selectors: [ '[data-wpds-corner-radius="subtle"]' ],
+					selectors: [
+						'[data-wpds-corner-radius="subtle"]',
+						':root:has([data-wpds-root-provider="true"][data-wpds-corner-radius="subtle"])',
+					],
 				},
 				{
 					mode: 'corner-radius-moderate',
-					selectors: [ '[data-wpds-corner-radius="moderate"]' ],
+					selectors: [
+						'[data-wpds-corner-radius="moderate"]',
+						':root:has([data-wpds-root-provider="true"][data-wpds-corner-radius="moderate"])',
+					],
 				},
 				{
 					mode: 'corner-radius-pronounced',
-					selectors: [ '[data-wpds-corner-radius="pronounced"]' ],
+					selectors: [
+						'[data-wpds-corner-radius="pronounced"]',
+						':root:has([data-wpds-root-provider="true"][data-wpds-corner-radius="pronounced"])',
+					],
 				},
 			],
 			legacyHex: true,

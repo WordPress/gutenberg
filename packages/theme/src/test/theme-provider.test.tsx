@@ -3,6 +3,8 @@
 // is asserted on the provider's own scoping element (where the property is
 // defined and from which real children would inherit) and on the document root.
 
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import { render, screen } from '@testing-library/react';
 import { ThemeProvider } from '../theme-provider';
 
@@ -21,6 +23,7 @@ jest.mock( '../style.module.css', () => ( {
 const BRAND_BG = '--wpds-color-background-interactive-brand-strong';
 const SURFACE_BG = '--wpds-color-background-surface-neutral';
 const CURSOR_CONTROL = '--wpds-cursor-control';
+const BORDER_RADIUS_SM = '--wpds-border-radius-sm';
 const PRIMARY = '#1e90ff';
 const OTHER_PRIMARY = '#8e44ad';
 const BACKGROUND = '#f8f8f8';
@@ -126,6 +129,72 @@ describe( 'ThemeProvider', () => {
 			);
 
 			expect( readProp( document.documentElement, BRAND_BG ) ).toBe( '' );
+		} );
+
+		// Unlike color/cursor (emitted at runtime in the provider's own
+		// `<style>`), the `cornerRadius` preset resolves to
+		// `--wpds-border-radius-*` values through the prebuilt design-token CSS
+		// (the modes authored in `terrazzo.config.ts`). A root provider relies
+		// on that stylesheet's `:root:has( [data-wpds-root-provider='true']… )`
+		// rule to forward the preset to the document element, so these tests
+		// load the prebuilt CSS to exercise it. It is injected only for this
+		// block (it also defines base tokens on `:root`) to avoid interfering
+		// with the color assertions above.
+		describe( 'cornerRadius forwarding', () => {
+			let prebuiltStyle: HTMLStyleElement;
+
+			beforeAll( () => {
+				prebuiltStyle = document.createElement( 'style' );
+				prebuiltStyle.textContent = readFileSync(
+					join( __dirname, '../prebuilt/css/design-tokens.css' ),
+					'utf8'
+				);
+				document.head.appendChild( prebuiltStyle );
+			} );
+
+			afterAll( () => {
+				prebuiltStyle.remove();
+			} );
+
+			it( 'forwards the preset to the document root when isRoot is set', () => {
+				render(
+					<ThemeProvider isRoot cornerRadius="moderate">
+						<div data-testid="child">x</div>
+					</ThemeProvider>
+				);
+
+				const provider = getScopingProvider(
+					screen.getByTestId( 'child' )
+				);
+				const forwarded = readProp(
+					document.documentElement,
+					BORDER_RADIUS_SM
+				);
+
+				// `:root` resolves to the same `moderate` value as the provider.
+				expect( forwarded ).toBeTruthy();
+				expect( forwarded ).toBe(
+					readProp( provider, BORDER_RADIUS_SM )
+				);
+			} );
+
+			it( 'does not forward the preset to the document root by default', () => {
+				render(
+					<ThemeProvider cornerRadius="moderate">
+						<div data-testid="child">x</div>
+					</ThemeProvider>
+				);
+
+				const provider = getScopingProvider(
+					screen.getByTestId( 'child' )
+				);
+
+				// `:root` keeps the base preset rather than the provider's
+				// `moderate` one, since the provider is not a root provider.
+				expect(
+					readProp( document.documentElement, BORDER_RADIUS_SM )
+				).not.toBe( readProp( provider, BORDER_RADIUS_SM ) );
+			} );
 		} );
 	} );
 
