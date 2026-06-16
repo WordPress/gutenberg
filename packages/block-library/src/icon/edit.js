@@ -30,6 +30,7 @@ import {
 	getDimensionsClassesAndStyles as useDimensionsProps,
 } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
+import { SVG, Rect, Path } from '@wordpress/primitives';
 import { useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 
@@ -39,6 +40,26 @@ import { store as coreDataStore } from '@wordpress/core-data';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
 import { CustomInserterModal } from './components';
+
+const IconPlaceholder = ( { className, style } ) => (
+	<SVG
+		xmlns="http://www.w3.org/2000/svg"
+		viewBox="0 0 60 60"
+		preserveAspectRatio="none"
+		fill="none"
+		aria-hidden="true"
+		className={ clsx( 'wp-block-icon__placeholder', className ) }
+		style={ style }
+	>
+		<Rect width="60" height="60" fill="currentColor" fillOpacity={ 0.1 } />
+		<Path
+			vectorEffect="non-scaling-stroke"
+			stroke="currentColor"
+			strokeOpacity={ 0.25 }
+			d="M60 60 0 0"
+		/>
+	</SVG>
+);
 
 export function Edit( { attributes, setAttributes } ) {
 	const { icon, ariaLabel, flipHorizontal, flipVertical, rotation } =
@@ -199,7 +220,7 @@ export function Edit( { attributes, setAttributes } ) {
 			{ blockControls }
 			{ inspectorControls }
 			<div { ...useBlockProps() }>
-				{ icon && (
+				{ icon ? (
 					<HtmlRenderer
 						html={ iconToDisplay }
 						wrapperProps={ {
@@ -217,6 +238,22 @@ export function Edit( { attributes, setAttributes } ) {
 								...dimensionsProps.style,
 								...rotationStyle,
 							},
+						} }
+					/>
+				) : (
+					<IconPlaceholder
+						className={ clsx(
+							borderProps.className,
+							spacingProps.className,
+							dimensionsProps.className,
+							flipClasses
+						) }
+						style={ {
+							...borderProps.style,
+							...spacingProps.style,
+							...dimensionsProps.style,
+							...rotationStyle,
+							height: 'auto',
 						} }
 					/>
 				) }
