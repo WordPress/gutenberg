@@ -18,8 +18,6 @@ describe( 'overlayReducer', () => {
 			blockName: 'core/paragraph',
 			baselineAttributes: { content: 'Hello' },
 			overlayAttributes: {},
-			commentId: null,
-			syncedOpsKey: null,
 		} );
 
 		const afterSecond = overlayReducer( afterFirst, {
@@ -109,52 +107,6 @@ describe( 'overlayReducer', () => {
 			liveClientIds: new Set( [ 'alive-1' ] ),
 		} );
 		expect( Object.keys( next ) ).toEqual( [ 'alive-1' ] );
-	} );
-
-	it( 'stores a comment id on the entry', () => {
-		const withEntry = overlayReducer( INITIAL, {
-			type: 'CAPTURE_BASELINE',
-			clientId: CLIENT_ID,
-			blockName: 'core/paragraph',
-			attributes: {},
-		} );
-		const withCommentId = overlayReducer( withEntry, {
-			type: 'SET_COMMENT_ID',
-			clientId: CLIENT_ID,
-			commentId: 42,
-		} );
-		expect( withCommentId[ CLIENT_ID ].commentId ).toBe( 42 );
-		// Clearing the id is permitted.
-		const cleared = overlayReducer( withCommentId, {
-			type: 'SET_COMMENT_ID',
-			clientId: CLIENT_ID,
-			commentId: null,
-		} );
-		expect( cleared[ CLIENT_ID ].commentId ).toBeNull();
-	} );
-
-	it( 'stores a synced operations fingerprint on the entry', () => {
-		const withEntry = overlayReducer( INITIAL, {
-			type: 'CAPTURE_BASELINE',
-			clientId: CLIENT_ID,
-			blockName: 'core/paragraph',
-			attributes: {},
-		} );
-		const synced = overlayReducer( withEntry, {
-			type: 'SET_SYNCED_OPS_KEY',
-			clientId: CLIENT_ID,
-			syncedOpsKey: 'fingerprint-1',
-		} );
-		expect( synced[ CLIENT_ID ].syncedOpsKey ).toBe( 'fingerprint-1' );
-	} );
-
-	it( 'ignores SET_COMMENT_ID without a captured baseline', () => {
-		const next = overlayReducer( INITIAL, {
-			type: 'SET_COMMENT_ID',
-			clientId: CLIENT_ID,
-			commentId: 1,
-		} );
-		expect( next ).toBe( INITIAL );
 	} );
 
 	it( 'returns the same reference when no orphans are present', () => {

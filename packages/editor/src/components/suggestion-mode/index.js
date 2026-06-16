@@ -12,7 +12,7 @@ export {
 	default as withSuggestionOverlay,
 	registerSuggestionOverlayFilter,
 } from './with-suggestion-overlay';
-export { default as SuggestionAutoSave } from './auto-save';
+export { default as SuggestionCommitBar } from './commit-bar';
 export { default as SuggestionStoreInterceptor } from './store-interceptor';
 export { default as SuggestionOverlayHydrator } from './hydrator';
 export {
