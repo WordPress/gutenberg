@@ -24,9 +24,7 @@ The [`ThemeProvider`](#theme-provider) component can be used to customize token 
 The design system splits token delivery into two complementary layers:
 
 -   **Static stylesheet (`design-tokens.css`)** — defines the default value for every `--wpds-*` custom property at the document `:root`. Loaded once per document (the main page, _and_ each iframe you render React into). Provides a working baseline even before any JavaScript runs.
--   **Runtime `<ThemeProvider>`** — applies per-instance overrides only when the resolved settings differ from the inherited ones (the closest parent provider, or the static `:root` defaults at the top of the tree). Use it to override individual settings (e.g. `color.primary`, `cursor.control`) for a subtree.
-
-A `<ThemeProvider>` whose resolved settings match the inherited ones is intentionally a no-op — the cascade already supplies every variable.
+-   **Runtime `<ThemeProvider>`** — applies per-instance overrides for a subtree, on top of the static defaults. Use it to override individual settings (e.g. `color.primary`, `cursor.control`).
 
 #### Within WordPress
 
