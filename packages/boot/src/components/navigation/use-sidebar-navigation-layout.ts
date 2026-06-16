@@ -286,6 +286,37 @@ function createSectionMenuItem(
 	};
 }
 
+function getItemAndAncestorIds(
+	itemId: string,
+	itemById: Map< string, MenuItem >
+) {
+	const ids: string[] = [];
+	const visitedIds = new Set< string >();
+	let currentId: string | undefined = itemId;
+
+	while ( currentId && ! visitedIds.has( currentId ) ) {
+		ids.push( currentId );
+		visitedIds.add( currentId );
+		currentId = itemById.get( currentId )?.parent;
+	}
+
+	return ids;
+}
+
+function getSectionNavigationParentId(
+	section: SidebarNavigationSection,
+	hiddenItemIds: Set< string >
+) {
+	if (
+		section.id === DEFAULT_SECTION_ID ||
+		hiddenItemIds.has( section.id )
+	) {
+		return ROOT_NAVIGATION_PARENT;
+	}
+
+	return section.id;
+}
+
 export function useSidebarNavigationLayout(
 	menuItems: MenuItem[]
 ): SidebarNavigationLayout {
@@ -346,6 +377,19 @@ export function useSidebarNavigationLayout(
 		() => new Map( sections.map( ( section ) => [ section.id, section ] ) ),
 		[ sections ]
 	);
+	const itemSectionById = useMemo( () => {
+		const map = new Map< string, SidebarNavigationSection >();
+
+		for ( const section of sections ) {
+			for ( const itemId of section.itemIds ) {
+				if ( ! map.has( itemId ) ) {
+					map.set( itemId, section );
+				}
+			}
+		}
+
+		return map;
+	}, [ sections ] );
 	const visibleSections = useMemo(
 		() =>
 			sections.filter(
@@ -417,24 +461,37 @@ export function useSidebarNavigationLayout(
 				return undefined;
 			}
 
-			const section = sections.find( ( candidate ) =>
-				candidate.itemIds.includes( itemId )
-			);
+			for ( const ancestorId of getItemAndAncestorIds(
+				itemId,
+				itemById
+			) ) {
+				// Some root drilldown items, such as Content and Advanced, are
+				// also section IDs. Prefer opening their section over treating
+				// them as ordinary root items when a matched route points at
+				// that item or one of its descendants.
+				const ancestorSection = sectionById.get( ancestorId );
+				if (
+					ancestorSection &&
+					ancestorSection.id !== DEFAULT_SECTION_ID
+				) {
+					return getSectionNavigationParentId(
+						ancestorSection,
+						hiddenItemIds
+					);
+				}
 
-			if ( ! section ) {
-				return undefined;
+				const section = itemSectionById.get( ancestorId );
+				if ( section ) {
+					return getSectionNavigationParentId(
+						section,
+						hiddenItemIds
+					);
+				}
 			}
 
-			if (
-				section.id === DEFAULT_SECTION_ID ||
-				hiddenItemIds.has( section.id )
-			) {
-				return ROOT_NAVIGATION_PARENT;
-			}
-
-			return section.id;
+			return undefined;
 		},
-		[ sections, hiddenItemIds ]
+		[ itemById, itemSectionById, sectionById, hiddenItemIds ]
 	);
 
 	const setItemVisibility = useCallback(
