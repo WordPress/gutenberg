@@ -86,7 +86,9 @@ $suggestion-author-color: var(--suggestion-author-color, #{$suggestion-color});
 // isn't yet committed. A dotted green outline distinguishes it from the
 // dashed pending-insert (the block existed before — only its position is
 // suggested). The "Suggested move" tab pinned to the top corner makes the
-// preview state unambiguous.
+// preview state unambiguous. The tab text comes from the
+// `data-suggestion-move-label` attribute (set by the editor-package HOC) so
+// it is translatable rather than a hardcoded English string baked into CSS.
 .block-editor-block-list__block.is-suggestion-pending-move {
 	position: relative;
 	opacity: 0.7;
@@ -95,7 +97,7 @@ $suggestion-author-color: var(--suggestion-author-color, #{$suggestion-color});
 	border-radius: $radius-small;
 
 	&::before {
-		content: "Suggested move";
+		content: attr(data-suggestion-move-label);
 		position: absolute;
 		top: -$grid-unit-20;
 		left: -$grid-unit-05;

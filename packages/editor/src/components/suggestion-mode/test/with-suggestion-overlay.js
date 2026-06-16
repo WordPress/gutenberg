@@ -371,8 +371,14 @@ describe( 'withSuggestionBlockClassName', () => {
 		} );
 	} );
 
-	function FakeBlockListBlock( { className } ) {
-		return <div data-testid="block-list-block" className={ className } />;
+	function FakeBlockListBlock( { className, wrapperProps } ) {
+		return (
+			<div
+				data-testid="block-list-block"
+				className={ className }
+				{ ...wrapperProps }
+			/>
+		);
 	}
 
 	const WrappedBlockListBlock =
@@ -428,6 +434,42 @@ describe( 'withSuggestionBlockClassName', () => {
 			metadata: { suggestion: { type: 'pending-move' } },
 		} );
 		expect( node.className ).toContain( 'is-suggestion-pending-move' );
+	} );
+
+	it( 'localizes the destination move tab via a data attribute', () => {
+		const node = setup( {
+			intent: 'edit',
+			metadata: { suggestion: { type: 'pending-move' } },
+		} );
+		// CSS renders the tab from this attribute, so the visible label is
+		// translatable instead of a hardcoded English string.
+		expect( node ).toHaveAttribute(
+			'data-suggestion-move-label',
+			'Suggested move'
+		);
+	} );
+
+	it( 'exposes the move destination to assistive tech', () => {
+		setup( {
+			intent: 'edit',
+			metadata: { suggestion: { type: 'pending-move' } },
+		} );
+		// The CSS tab isn't reliably announced, so a visually-hidden cue
+		// gives screen-reader users the destination signal.
+		expect(
+			screen.getByText( 'Suggested move destination.' )
+		).toBeInTheDocument();
+	} );
+
+	it( 'adds no move data attribute or cue for non-move markers', () => {
+		const node = setup( {
+			intent: 'edit',
+			metadata: { suggestion: { type: 'pending-remove' } },
+		} );
+		expect( node ).not.toHaveAttribute( 'data-suggestion-move-label' );
+		expect(
+			screen.queryByText( 'Suggested move destination.' )
+		).not.toBeInTheDocument();
 	} );
 
 	it( 'applies the structural class for the suggester (Suggest intent) too', () => {

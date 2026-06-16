@@ -11,6 +11,8 @@ import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useCallback, useMemo, useRef } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
+import { __ } from '@wordpress/i18n';
+import { VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -219,6 +221,8 @@ const withSuggestionBlockClassName = createHigherOrderComponent(
 				!! entry &&
 				Object.keys( entry.overlayAttributes ?? {} ).length > 0;
 			const showOverlayBracket = isSuggestMode && hasPendingOverlay;
+			const isPendingMove =
+				structuralClass === 'is-suggestion-pending-move';
 
 			if ( ! showOverlayBracket && ! structuralClass && ! hasGhosts ) {
 				return <BlockListBlock { ...props } />;
@@ -257,12 +261,24 @@ const withSuggestionBlockClassName = createHigherOrderComponent(
 			return (
 				<>
 					{ renderGhosts( ghostsBefore, 'gb' ) }
+					{ isPendingMove && (
+						<VisuallyHidden>
+							{ __( 'Suggested move destination.' ) }
+						</VisuallyHidden>
+					) }
 					<BlockListBlock
 						{ ...props }
 						className={ blockClassName }
 						wrapperProps={ {
 							...props.wrapperProps,
 							style: wrapperStyle,
+							// Localized text for the CSS-rendered "Suggested
+							// move" tab (see content-suggestion.scss); sighted
+							// users in any locale read it from this attribute.
+							...( isPendingMove && {
+								'data-suggestion-move-label':
+									__( 'Suggested move' ),
+							} ),
 						} }
 					/>
 					{ renderGhosts( ghostsAfter, 'ga' ) }
