@@ -1,7 +1,7 @@
 # Grid
 
 <div class="callout callout-alert">
-This package is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes. While it is published as 0.x, breaking changes may ship in minor releases.
+This package is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 
 A collection of grid layout components for arranging tiles in
@@ -73,15 +73,10 @@ consumes yourself.
 | Masonry / waterfall surface, content drives height.   | `DashboardLanes`                                  |
 | Static layout primitive (no per-item state, no drag). | `__experimentalGrid` from `@wordpress/components` |
 
-`__experimentalGrid` is a low-level CSS Grid layout primitive: it
-accepts `columns`, `gap`, `templateColumns`, `alignment`, etc., and
-renders children in a static grid. There is no concept of an item
-having a span, no drag, no resize, no per-item state. Reach for it
-when you only need static CSS Grid ergonomics.
-
-Both components in this package are higher-level: the user, not the
-developer, places and resizes the tiles, and the resulting layout
-is emitted to the consumer through `onChangeLayout`.
+Both components here are higher-level: the user (not the developer)
+places and resizes tiles, and the result is emitted through
+`onChangeLayout`. For a static CSS Grid with no spans, drag, or
+per-item state, use `__experimentalGrid` from `@wordpress/components`.
 
 ---
 
@@ -166,10 +161,9 @@ interface DashboardGridLayoutItem {
 `<div>` attributes (`id`, `aria-*`, `data-*`, event handlers,
 `style`, etc.) flow through. The grid's own layout styles
 (`gridTemplateColumns`, `gridAutoRows`) override any user-supplied
-`style` for those properties. The gap between tiles is owned by the
-design-system gap token (`--wpds-dimension-gap-xl` by default). Set
-`--wp-grid-gap` on the grid root or an ancestor to use another gap
-step.
+`style` for those properties. Tile gap is owned by a design-system
+token; override it with `--wp-grid-gap` (see [Theming with CSS
+variables](#theming-with-css-variables)).
 
 #### Child-level props
 
@@ -357,10 +351,9 @@ reflows.
 
 ### Performance
 
-`onPreviewLayout` typically causes the parent to re-render on every
-gesture frame. To prevent the components' internal children walk
-from re-running on each of those frames, **memoize the children
-array** when its content is stable across re-renders:
+`onPreviewLayout` re-renders the parent on every gesture frame. To
+keep the components' internal children walk from re-running each
+frame, **memoize the children array** when its content is stable:
 
 ```jsx
 const tiles = useMemo(
@@ -375,13 +368,10 @@ return (
 );
 ```
 
-Without memoization the surface still works, but it walks the
-children on every preview update. For typical N (10 to 50 tiles)
-the overhead is minor; for larger grids it adds up.
-
-For `DashboardLanes` specifically, the placement algorithm runs in
-a `useLayoutEffect` and is throttled to one animation frame per
-measurement burst.
+Without it the surface still works but walks the children on every
+preview update; the overhead is minor up to ~50 tiles and grows
+from there. For `DashboardLanes`, placement runs in a
+`useLayoutEffect` throttled to one frame per measurement burst.
 
 ### Accessibility
 

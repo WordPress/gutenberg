@@ -4,9 +4,10 @@
 
 ### New Features
 
--   Initial release. Ships two layout components sharing the same
-    layout-as-data contract (a `layout` array keyed by child `key`,
-    `editMode`, and `onChangeLayout` / `onPreviewLayout` callbacks):
+-   Initial experimental release. Ships two layout components sharing
+    the same layout-as-data contract (a `layout` array keyed by child
+    `key`, `editMode`, and `onChangeLayout` / `onPreviewLayout`
+    callbacks):
     -   `DashboardGrid`, a 2D packed grid with explicit
         `(width, height)` spans, drag-to-reorder, and resize handles.
     -   `DashboardLanes`, a masonry-style surface aligned with the
