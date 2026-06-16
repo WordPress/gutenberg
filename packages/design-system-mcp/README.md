@@ -44,6 +44,12 @@ Add to your MCP client configuration (`mcp.json` or equivalent):
 }
 ```
 
+Configuration instructions for common clients:
+
+-   [VSCode](https://code.visualstudio.com/docs/agent-customization/mcp-servers#_configure-the-mcpjson-file)
+-   [Claude Desktop](https://modelcontextprotocol.io/docs/develop/connect-local-servers#installing-the-filesystem-server)
+    -   This guide is for the "filesystem" server, but you can substitute the `mcpServers` entry from the snippet above and the rest of the instructions still apply.
+
 ## Contributing to this package
 
 This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/org/wordpress) and used by [WordPress](https://make.wordpress.org/core/) as well as by the broader JavaScript ecosystem.
