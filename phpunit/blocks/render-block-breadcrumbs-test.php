@@ -1,3 +1,4 @@
+
 <?php
 /**
  * Breadcrumbs block rendering tests.
@@ -45,7 +46,7 @@ class Render_Block_Breadcrumbs_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @covers ::render_block_core_breadcrumbs
+	 * @covers ::gutenberg_render_block_core_breadcrumbs
 	 */
 	public function test_render_block_core_breadcrumbs_shows_taxonomy_by_default() {
 		$attributes = array(
@@ -69,13 +70,13 @@ class Render_Block_Breadcrumbs_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$output = render_block_core_breadcrumbs( $attributes, '', $block_instance );
+		$output = gutenberg_render_block_core_breadcrumbs( $attributes, '', $block_instance );
 
 		$this->assertStringContainsString( 'Test Category', $output );
 	}
 
 	/**
-	 * @covers ::render_block_core_breadcrumbs
+	 * @covers ::gutenberg_render_block_core_breadcrumbs
 	 */
 	public function test_render_block_core_breadcrumbs_hides_taxonomy_when_show_taxonomy_is_false() {
 		$attributes = array(
@@ -100,7 +101,7 @@ class Render_Block_Breadcrumbs_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$output = render_block_core_breadcrumbs( $attributes, '', $block_instance );
+		$output = gutenberg_render_block_core_breadcrumbs( $attributes, '', $block_instance );
 
 		$this->assertStringNotContainsString( 'Test Category', $output );
 	}
