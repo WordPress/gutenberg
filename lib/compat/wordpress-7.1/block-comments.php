@@ -63,13 +63,20 @@ add_action( 'init', 'gutenberg_register_inline_note_metadata' );
  * `post_content` (and the REST `raw` view, revisions, exports) keeps the marker
  * so the editor can re-attach on reload.
  *
- * The `WP_HTML_Tag_Processor` flags the note markers because it matches the
- * `wp-note` class exactly (a regex word boundary also matches `wp-note-foo`)
- * and parses attributes reliably. The HTML API cannot remove a tag together
- * with its closer, so a second offset-based pass pairs each flagged `<mark>`
- * with its matching `</mark>` - tracking `<mark>` nesting so overlapping notes
- * and any user highlight `<mark>` left intact still pair correctly - and
- * removes only the note wrappers.
+ * Only note markers are unwrapped: `WP_HTML_Tag_Processor::has_class()` matches
+ * the `wp-note` class by exact token, so a `<mark>` a user or plugin added
+ * (e.g. a `core/text-color` highlight, or an unrelated `wp-note-foo` class) is
+ * never flagged and survives byte-for-byte with all of its attributes intact.
+ * A naive regex would be wrong here: a `\bwp-note\b` word boundary also matches
+ * `wp-note-foo`, which is why the class check goes through the HTML API instead.
+ *
+ * The HTML API cannot yet remove a tag together with its closer, so a second
+ * offset-based pass pairs each flagged `<mark>` with its matching `</mark>` -
+ * tracking `<mark>` nesting so overlapping notes and any user highlight `<mark>`
+ * left intact still pair correctly - and removes only the note wrappers. Tag
+ * removal/unwrapping is on the HTML API roadmap
+ * (https://github.com/WordPress/gutenberg/discussions/54583); once it lands this
+ * offset pass can be replaced with a single `WP_HTML_Tag_Processor` call.
  *
  * @param string $block_content Rendered block HTML.
  * @return string Block HTML with wp-note markers unwrapped.

@@ -58,6 +58,15 @@ class Tests_Strip_Inline_Note_Markers extends WP_UnitTestCase {
 		$this->assertSame( $html, $stripped );
 	}
 
+	public function test_strip_preserves_user_mark_attributes_next_to_note() {
+		// A user/plugin `<mark>` with several attributes sitting beside a note
+		// marker must be returned byte-for-byte; only the `wp-note` wrapper goes.
+		$html     = '<p><mark class="highlight" style="background-color:#ff0" data-id="99" title="kept">user</mark> and <mark class="wp-note" data-id="4">noted</mark></p>';
+		$stripped = gutenberg_strip_inline_note_markers( $html );
+
+		$this->assertSame( '<p><mark class="highlight" style="background-color:#ff0" data-id="99" title="kept">user</mark> and noted</p>', $stripped );
+	}
+
 	public function test_strip_preserves_nested_formatting() {
 		// A note wrapping already-formatted text (e.g. coloured text) serializes
 		// with nested inline elements. The wrapper is removed while the inner
