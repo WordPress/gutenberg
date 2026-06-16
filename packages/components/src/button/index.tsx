@@ -302,5 +302,5 @@ export const Button = forwardRef( function UnforwardedButton(
 		</>
 	);
 } );
-Button.displayName = 'Button';
+
 export default Button;
