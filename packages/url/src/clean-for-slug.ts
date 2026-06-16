@@ -4,6 +4,44 @@
 import removeAccents from 'remove-accents';
 
 /**
+ * Locale-specific digraph replacements that must run before removeAccents(),
+ * mirroring the locale block in PHP's remove_accents() (wp-includes/formatting.php).
+ */
+const LOCALE_CHAR_MAP: Record< string, Record< string, string > > = {
+	de: {
+		Ä: 'Ae',
+		ä: 'ae',
+		Ö: 'Oe',
+		ö: 'oe',
+		Ü: 'Ue',
+		ü: 'ue',
+		ẞ: 'SS',
+		ß: 'ss',
+	},
+	da_DK: {
+		Æ: 'Ae',
+		æ: 'ae',
+		Ø: 'Oe',
+		ø: 'oe',
+		Å: 'Aa',
+		å: 'aa',
+	},
+	ca: { 'l·l': 'll' },
+	sr_RS: { Đ: 'DJ', đ: 'dj' },
+	bs_BA: { Đ: 'DJ', đ: 'dj' },
+};
+
+function getLocaleChars(
+	locale: string
+): Record< string, string > | undefined {
+	// str_starts_with( $locale, 'de' ) covers de_DE, de_CH, de_AT, etc.
+	if ( locale.startsWith( 'de' ) ) {
+		return LOCALE_CHAR_MAP.de;
+	}
+	return LOCALE_CHAR_MAP[ locale ];
+}
+
+/**
  * Performs some basic cleanup of a string for use as a post slug.
  *
  * This replicates some of what `sanitize_title_with_dashes()` does in WordPress core, but
@@ -16,13 +54,24 @@ import removeAccents from 'remove-accents';
  * for octets, HTML entities, or other encoded characters.
  *
  * @param string Title or slug to be processed.
+ * @param locale Optional BCP 47 / WordPress locale string (e.g. 'de_DE').
+ *               When provided, locale-specific digraph replacements are applied
+ *               before generic accent removal, mirroring PHP's remove_accents().
  *
  * @return Processed string.
  */
-export function cleanForSlug( string: string ): string {
+export function cleanForSlug( string: string, locale = '' ): string {
 	if ( ! string ) {
 		return '';
 	}
+
+	const localeChars = getLocaleChars( locale );
+	if ( localeChars ) {
+		for ( const [ char, replacement ] of Object.entries( localeChars ) ) {
+			string = string.replaceAll( char, replacement );
+		}
+	}
+
 	return (
 		removeAccents( string )
 			// Convert &nbsp, &ndash, and &mdash to hyphens.

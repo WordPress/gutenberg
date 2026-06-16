@@ -82,8 +82,9 @@ export default function PostURLPanel() {
 
 function PostURLToggle( { isOpen, onClick } ) {
 	const { slug } = useSelect( ( select ) => {
+		const locale = select( coreStore ).getSite()?.language ?? '';
 		return {
-			slug: select( editorStore ).getEditedPostSlug(),
+			slug: select( editorStore ).getEditedPostSlug( locale ),
 		};
 	}, [] );
 	const decodedSlug = safeDecodeURIComponent( slug );

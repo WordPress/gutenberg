@@ -994,14 +994,17 @@ export function getPermalink( state ) {
  * value if one exists, then a sanitized version of the current post title, and
  * finally the post ID.
  *
- * @param {Object} state Editor state.
+ * @param {Object} state  Editor state.
+ * @param {string} locale Optional site locale (e.g. 'de_DE'). When provided,
+ *                        locale-specific digraph rules are applied so the
+ *                        preview matches what the server will generate.
  *
  * @return {string} The current slug to be displayed in the editor
  */
-export function getEditedPostSlug( state ) {
+export function getEditedPostSlug( state, locale = '' ) {
 	return (
 		getEditedPostAttribute( state, 'slug' ) ||
-		cleanForSlug( getEditedPostAttribute( state, 'title' ) ) ||
+		cleanForSlug( getEditedPostAttribute( state, 'title' ), locale ) ||
 		getCurrentPostId( state )
 	);
 }

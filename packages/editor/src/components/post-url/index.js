@@ -45,19 +45,22 @@ export default function PostURL( { onClose } ) {
 		permalinkPrefix,
 		permalinkSuffix,
 		permalink,
+		siteLocale,
 	} = useSelect( ( select ) => {
 		const post = select( editorStore ).getCurrentPost();
 		const postTypeSlug = select( editorStore ).getCurrentPostType();
 		const postType = select( coreStore ).getPostType( postTypeSlug );
 		const permalinkParts = select( editorStore ).getPermalinkParts();
 		const hasPublishAction = post?._links?.[ 'wp:action-publish' ] ?? false;
+		const locale = select( coreStore ).getSite()?.language ?? '';
 
 		return {
 			isEditable:
 				select( editorStore ).isPermalinkEditable() && hasPublishAction,
 			postSlug: safeDecodeURIComponent(
-				select( editorStore ).getEditedPostSlug()
+				select( editorStore ).getEditedPostSlug( locale )
 			),
+			siteLocale: locale,
 			viewPostLabel: postType?.labels.view_item,
 			postLink: post.link,
 			permalinkPrefix: permalinkParts?.prefix,
@@ -151,7 +154,8 @@ export default function PostURL( { onClose } ) {
 								onBlur={ ( event ) => {
 									editPost( {
 										slug: cleanForSlug(
-											event.target.value
+											event.target.value,
+											siteLocale
 										),
 									} );
 									if ( forceEmptyField ) {

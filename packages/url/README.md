@@ -75,6 +75,7 @@ Converts Latin-1 Supplement and Latin Extended-A letters to basic Latin letters.
 _Parameters_
 
 -   _string_ `string`: Title or slug to be processed.
+-   _locale_ Optional BCP 47 / WordPress locale string (e.g. 'de_DE'). When provided, locale-specific digraph replacements are applied before generic accent removal, mirroring PHP's remove_accents().
 
 _Returns_
 

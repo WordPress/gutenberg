@@ -352,6 +352,7 @@ Returns the slug for the post being edited, preferring a manually edited value i
 _Parameters_
 
 -   _state_ `Object`: Editor state.
+-   _locale_ `string`: Optional site locale (e.g. 'de_DE'). When provided, locale-specific digraph rules are applied so the preview matches what the server will generate.
 
 _Returns_
 

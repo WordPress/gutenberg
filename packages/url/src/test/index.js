@@ -1220,6 +1220,58 @@ describe( 'cleanForSlug', () => {
 			cleanForSlug( 'No &nbsp; Entities> &ndash; Here &mdash;&lt;' )
 		).toBe( 'no-entities-here' );
 	} );
+
+	describe( 'locale-aware digraph replacements', () => {
+		it( 'should apply German digraphs for de_DE locale', () => {
+			expect(
+				cleanForSlug( 'Künstler überraschen Hörer', 'de_DE' )
+			).toBe( 'kuenstler-ueberraschen-hoerer' );
+		} );
+
+		it( 'should apply German digraphs for de_CH locale', () => {
+			expect( cleanForSlug( 'Zürich Straße', 'de_CH' ) ).toBe(
+				'zuerich-strasse'
+			);
+		} );
+
+		it( 'should map capital Eszett (ẞ) to SS for de_DE locale', () => {
+			expect( cleanForSlug( 'STRAẞE', 'de_DE' ) ).toBe( 'strasse' );
+		} );
+
+		it( 'should apply German digraphs for de_AT locale', () => {
+			expect( cleanForSlug( 'Österreich', 'de_AT' ) ).toBe(
+				'oesterreich'
+			);
+		} );
+
+		it( 'should apply Danish digraphs for da_DK locale', () => {
+			expect( cleanForSlug( 'Æble Ødemark Åre', 'da_DK' ) ).toBe(
+				'aeble-oedemark-aare'
+			);
+		} );
+
+		it( 'should apply Catalan middle dot for ca locale', () => {
+			expect( cleanForSlug( 'col·legi', 'ca' ) ).toBe( 'collegi' );
+		} );
+
+		it( 'should apply Serbian/Bosnian Đ for sr_RS locale', () => {
+			expect( cleanForSlug( 'Đorđe', 'sr_RS' ) ).toBe( 'djordje' );
+		} );
+
+		it( 'should apply Serbian/Bosnian Đ for bs_BA locale', () => {
+			expect( cleanForSlug( 'Đakovo', 'bs_BA' ) ).toBe( 'djakovo' );
+		} );
+
+		it( 'should behave identically to no-locale when locale is empty', () => {
+			expect( cleanForSlug( 'Künstler', '' ) ).toBe(
+				cleanForSlug( 'Künstler' )
+			);
+		} );
+
+		it( 'should not apply German digraphs for non-German locale', () => {
+			expect( cleanForSlug( 'Künstler', 'fr_FR' ) ).toBe( 'kunstler' );
+		} );
+	} );
 } );
 
 describe( 'normalizePath', () => {
