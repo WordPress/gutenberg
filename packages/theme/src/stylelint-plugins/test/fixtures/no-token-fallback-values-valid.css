@@ -1,7 +1,7 @@
 /* Valid: Using wpds tokens without fallbacks */
 .example {
-	color: var(--wpds-color-fg-content-neutral);
-	background-color: var(--wpds-color-bg-surface-neutral);
+	color: var(--wpds-color-foreground-content-neutral);
+	background-color: var(--wpds-color-background-surface-neutral);
 	border-radius: var(--wpds-border-radius-sm);
 	padding: var(--wpds-dimension-padding-md);
 }
@@ -14,5 +14,5 @@
 
 /* Valid: A wpds token used as a fallback of a non-wpds var, with no comma after the wpds token */
 .nested-no-fallback {
-	color: var(--my-custom-color, var(--wpds-color-fg-content-neutral));
+	color: var(--my-custom-color, var(--wpds-color-foreground-content-neutral));
 }

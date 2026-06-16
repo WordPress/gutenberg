@@ -1,7 +1,7 @@
 /**
  * Generates core block documentation using block.json files.
  * Reads from  : packages/block-library/src
- * Publishes to: docs/reference-guides/core-blocks.md
+ * Publishes to: docs/reference-guides/core-blocks/README.md
  */
 
 /**
@@ -34,7 +34,7 @@ const BLOCK_LIBRARY_DIR = path.resolve(
  */
 const BLOCK_LIBRARY_DOCS_FILE = path.resolve(
 	ROOT_DIR,
-	'docs/reference-guides/core-blocks.md'
+	'docs/reference-guides/core-blocks/README.md'
 );
 
 /**
@@ -130,20 +130,6 @@ function augmentSupports( supports ) {
 }
 
 /**
- * Returns URL to the block directory source.
- *
- * @param {string} filename
- *
- * @return {string} URL
- */
-function getSourceFromFile( filename ) {
-	const pkgdir =
-		'https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/';
-	const blockdir = path.basename( path.dirname( filename ) );
-	return pkgdir + blockdir;
-}
-
-/**
  * Reads block.json file and returns markdown formatted entry.
  *
  * @param {string} filename
@@ -162,14 +148,17 @@ function readBlockJSON( filename ) {
 		__experimental,
 		allowedBlocks,
 	} = blockjson;
-	const sourcefile = getSourceFromFile( filename );
-	const blockInfoList = [ `-	**Name:** ${ name }` ];
+	const blockdir = path.basename( path.dirname( filename ) );
+	const blockDetailUrl = `https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-${ category }/core-block-${ blockdir }/`;
+	const blockInfoList = [ `-	**Name:** [${ name }](${ blockDetailUrl })` ];
 
 	if ( __experimental ) {
 		blockInfoList.push( `-	**Experimental:** ${ __experimental }` );
 	}
 	if ( category?.length > 0 ) {
-		blockInfoList.push( `-	**Category:** ${ category }` );
+		blockInfoList.push(
+			`-	**Category:** [${ category }](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-${ category }/)`
+		);
 	}
 	if ( parent?.length > 0 ) {
 		blockInfoList.push( `-	**Parent:** ${ parent.join( ', ' ) }` );
@@ -201,7 +190,7 @@ function readBlockJSON( filename ) {
 	return `
 ## ${ blockjson.title }
 
-${ blockjson.description } ([Source](${ sourcefile }))
+${ blockjson.description }
 
 ${ blockInfoList.join( '\n' ) }
 `;

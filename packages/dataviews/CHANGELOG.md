@@ -2,6 +2,39 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+- `DataViewsPicker`: `DataViewsPicker.BulkActionToolbar` now renders only the bulk-selection info and action buttons, without pagination, matching `DataViews.BulkActionToolbar`. The full footer it previously rendered (including pagination) is now exposed as `DataViewsPicker.Footer`, matching `DataViews.Footer`. [#79180](https://github.com/WordPress/gutenberg/pull/79180)
+
+### Code Quality
+
+- Move `@types/react` from `dependencies` to an optional peer dependency so consumers' React type version is used [#79095](https://github.com/WordPress/gutenberg/pull/79095).
+
+## 16.0.1 (2026-06-16)
+
+## 16.0.0 (2026-06-10)
+
+### Breaking Changes
+
+- Revert React back to v18 [#78940](https://github.com/WordPress/gutenberg/pull/78940).
+
+### Enhancements
+
+-   DataViewsPicker: Add a new `pickerActivity` layout that renders selectable items as a vertical activity timeline. [#78941](https://github.com/WordPress/gutenberg/pull/78941)
+
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+### Documentation
+
+-   Include DataViews components in [WordPress Design System MCP Server](https://github.com/WordPress/gutenberg/tree/trunk/packages/design-system-mcp) documented components ([#78960](https://github.com/WordPress/gutenberg/pull/78960)).
+
+### Internal
+
+-   Update `@ariakit/react` to `0.4.29` ([#79055](https://github.com/WordPress/gutenberg/pull/79055)).
+-   Dependency updates ([#77954](https://github.com/WordPress/gutenberg/pull/77954)).
+
 ## 15.0.0 (2026-05-27)
 
 ### Breaking Changes

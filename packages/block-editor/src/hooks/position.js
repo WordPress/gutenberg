@@ -11,7 +11,7 @@ import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { BaseControl, CustomSelectControl } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import { useMemo, Platform } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -264,32 +264,28 @@ export function PositionPanelPure( {
 		: DEFAULT_OPTION;
 
 	// Only display position controls if there is at least one option to choose from.
-	return Platform.select( {
-		web:
-			options.length > 1 ? (
-				<InspectorControls group="position">
-					<BaseControl help={ stickyHelpText }>
-						<CustomSelectControl
-							__next40pxDefaultSize
-							label={ __( 'Position' ) }
-							hideLabelFromVision
-							describedBy={ sprintf(
-								// translators: %s: Currently selected position.
-								__( 'Currently selected position: %s' ),
-								selectedOption.name
-							) }
-							options={ options }
-							value={ selectedOption }
-							onChange={ ( { selectedItem } ) => {
-								onChangeType( selectedItem.value );
-							} }
-							size="__unstable-large"
-						/>
-					</BaseControl>
-				</InspectorControls>
-			) : null,
-		native: null,
-	} );
+	return options.length > 1 ? (
+		<InspectorControls group="position">
+			<BaseControl help={ stickyHelpText }>
+				<CustomSelectControl
+					__next40pxDefaultSize
+					label={ __( 'Position' ) }
+					hideLabelFromVision
+					describedBy={ sprintf(
+						// translators: %s: Currently selected position.
+						__( 'Currently selected position: %s' ),
+						selectedOption.name
+					) }
+					options={ options }
+					value={ selectedOption }
+					onChange={ ( { selectedItem } ) => {
+						onChangeType( selectedItem.value );
+					} }
+					size="__unstable-large"
+				/>
+			</BaseControl>
+		</InspectorControls>
+	) : null;
 }
 
 export default {

@@ -55,8 +55,13 @@ const PlaylistEdit = ( {
 		showNumbers,
 		showImages,
 		showArtists,
+		showTrackLength,
 		currentTrack,
 	} = attributes;
+
+	// Extract the waveform style from the block style variation class.
+	const waveformStyle =
+		attributes.className?.match( /is-style-([\w-]+)/ )?.[ 1 ] || 'bars';
 	const blockProps = useBlockProps();
 	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
@@ -276,6 +281,7 @@ const PlaylistEdit = ( {
 							showTracklist: true,
 							showArtists: true,
 							showNumbers: true,
+							showTrackLength: true,
 							showImages: true,
 							order: 'asc',
 						} );
@@ -332,6 +338,24 @@ const PlaylistEdit = ( {
 									checked={ showNumbers }
 								/>
 							</ToolsPanelItem>
+							<ToolsPanelItem
+								label={ __( 'Show track length in Tracklist' ) }
+								isShownByDefault
+								hasValue={ () => showTrackLength !== true }
+								onDeselect={ () =>
+									setAttributes( { showTrackLength: true } )
+								}
+							>
+								<ToggleControl
+									label={ __(
+										'Show track length in Tracklist'
+									) }
+									onChange={ toggleAttribute(
+										'showTrackLength'
+									) }
+									checked={ showTrackLength }
+								/>
+							</ToolsPanelItem>
 						</>
 					) }
 					<ToolsPanelItem
@@ -374,6 +398,7 @@ const PlaylistEdit = ( {
 						title={ currentTrackData?.title }
 						artist={ currentTrackData?.artist }
 						image={ currentTrackData?.image }
+						waveformStyle={ waveformStyle }
 						onEnded={ onTrackEnded }
 					/>
 				</Disabled>
@@ -382,6 +407,8 @@ const PlaylistEdit = ( {
 						className={ clsx( 'wp-block-playlist__tracklist', {
 							'wp-block-playlist__tracklist-show-numbers':
 								showNumbers,
+							'wp-block-playlist__tracklist-length-is-hidden':
+								! showTrackLength,
 						} ) }
 					>
 						{ innerBlocksProps.children }
