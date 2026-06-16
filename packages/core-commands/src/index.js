@@ -9,6 +9,7 @@ import { CommandMenu } from '@wordpress/commands';
  * Internal dependencies
  */
 import { useAdminNavigationCommands } from './admin-navigation-commands';
+import { useAdminCommands } from './admin-commands';
 import { useSiteEditorNavigationCommands } from './site-editor-navigation-commands';
 import { unlock } from './lock-unlock';
 export { privateApis } from './private-apis';
@@ -17,10 +18,14 @@ const { RouterProvider } = unlock( routerPrivateApis );
 
 // Register core commands and render the Command Palette.
 function CommandPalette( { settings } ) {
-	const { menu_commands: menuCommands, is_network_admin: isNetworkAdmin } =
-		settings;
+	const {
+		menu_commands: menuCommands,
+		is_network_admin: isNetworkAdmin,
+		logout_url: logoutUrl,
+	} = settings;
 	useAdminNavigationCommands( menuCommands );
 	useSiteEditorNavigationCommands( isNetworkAdmin );
+	useAdminCommands( logoutUrl );
 	return (
 		<RouterProvider pathArg="p">
 			<CommandMenu />
