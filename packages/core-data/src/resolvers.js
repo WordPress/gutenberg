@@ -194,8 +194,13 @@ export const getEntityRecord =
 					} );
 				}
 
+				const syncManager =
+					select?.isCollaborationSupported?.() === false
+						? undefined
+						: getSyncManager();
+
 				// Load the entity record for syncing. Do not await promise.
-				void getSyncManager()?.load(
+				void syncManager?.load(
 					entityConfig.syncConfig,
 					objectType,
 					objectId,
@@ -362,7 +367,7 @@ export const getEditedEntityRecord = forwardResolver( 'getEntityRecord' );
  */
 export const getEntityRecords =
 	( kind, name, query = {} ) =>
-	async ( { dispatch, registry, resolveSelect } ) => {
+	async ( { select, dispatch, registry, resolveSelect } ) => {
 		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
@@ -503,7 +508,11 @@ export const getEntityRecords =
 				};
 			}
 
-			if ( entityConfig.syncConfig && -1 === query.per_page ) {
+			if (
+				entityConfig.syncConfig &&
+				-1 === query.per_page &&
+				select?.isCollaborationSupported?.() !== false
+			) {
 				const objectType = `${ kind }/${ name }`;
 				getSyncManager()?.loadCollection(
 					entityConfig.syncConfig,

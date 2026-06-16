@@ -63,4 +63,27 @@ describe( 'getUndoManager', () => {
 			} )
 		).toBe( fallbackUndoManager );
 	} );
+
+	it( 'returns the default undo manager when the sync manager has no undo manager', () => {
+		const fallbackUndoManager = {
+			addRecord: jest.fn(),
+			hasRedo: jest.fn(),
+			hasUndo: jest.fn(),
+			redo: jest.fn(),
+			undo: jest.fn(),
+		};
+		getSyncManager.mockReturnValue( {
+			undoManager: undefined,
+		} );
+
+		expect(
+			getUndoManager( {
+				undoManager: fallbackUndoManager,
+				syncUndoManagerState: {
+					hasRedo: true,
+					hasUndo: true,
+				},
+			} )
+		).toBe( fallbackUndoManager );
+	} );
 } );

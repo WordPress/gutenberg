@@ -114,6 +114,17 @@ export function createSyncManager( debug = false ): SyncManager {
 	let undoManager: SyncUndoManager | undefined;
 
 	/**
+	 * The sync undo manager only tracks loaded entity record maps. When all
+	 * synced entities are unloaded, core-data should fall back to its default
+	 * undo manager.
+	 */
+	function clearUndoManagerIfNoEntityStates(): void {
+		if ( entityStates.size === 0 ) {
+			undoManager = undefined;
+		}
+	}
+
+	/**
 	 * Log debug messages if debugging is enabled.
 	 *
 	 * @param component The component or context related to the log message
@@ -474,6 +485,7 @@ export function createSyncManager( debug = false ): SyncManager {
 		const entityId = getEntityId( objectType, objectId );
 		log( 'unloadEntity', 'unloading', entityId );
 		entityStates.get( entityId )?.unload();
+		clearUndoManagerIfNoEntityStates();
 		updateCRDTDoc( objectType, null, {}, origin, {
 			isSave: true,
 		} );
@@ -489,6 +501,7 @@ export function createSyncManager( debug = false ): SyncManager {
 			entityState.unload();
 		}
 		entityStates.clear();
+		clearUndoManagerIfNoEntityStates();
 
 		for ( const [ , collectionState ] of [ ...collectionStates ] ) {
 			collectionState.unload();

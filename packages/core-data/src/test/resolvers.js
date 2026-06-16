@@ -183,6 +183,51 @@ describe( 'getEntityRecord', () => {
 		);
 	} );
 
+	it( 'does not load entity with sync manager when collaboration is unsupported', async () => {
+		const POST_RECORD = { id: 1, title: 'Test Post' };
+		const POST_RESPONSE = {
+			json: () => Promise.resolve( POST_RECORD ),
+		};
+		const ENTITIES_WITH_SYNC = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				baseURLParams: { context: 'edit' },
+				syncConfig: {},
+			},
+		];
+
+		const resolveSelectWithSync = {
+			getEntitiesConfig: jest.fn( () => ENTITIES_WITH_SYNC ),
+		};
+		const select = {
+			isCollaborationSupported: jest.fn( () => false ),
+		};
+
+		triggerFetch.mockImplementation( () => POST_RESPONSE );
+
+		await getEntityRecord(
+			'postType',
+			'post',
+			1
+		)( {
+			select,
+			dispatch,
+			registry,
+			resolveSelect: resolveSelectWithSync,
+		} );
+
+		expect( syncManager.load ).not.toHaveBeenCalled();
+		expect( select.isCollaborationSupported ).toHaveBeenCalledTimes( 1 );
+		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+			'postType',
+			'post',
+			POST_RECORD,
+			undefined
+		);
+	} );
+
 	it( 'notifies core-data when the sync undo manager stack changes', async () => {
 		const POST_RECORD = { id: 1, title: 'Test Post' };
 		const POST_RESPONSE = {
@@ -590,6 +635,7 @@ describe( 'getEntityRecords', () => {
 
 	beforeEach( async () => {
 		triggerFetch.mockReset();
+		getSyncManager.mockReset();
 	} );
 
 	it( 'dispatches the requested post type', async () => {
@@ -622,6 +668,100 @@ describe( 'getEntityRecords', () => {
 			undefined,
 			{ totalItems: 2, totalPages: 1 }
 		);
+	} );
+
+	it( 'loads collection with sync manager', async () => {
+		const syncManager = {
+			loadCollection: jest.fn(),
+		};
+		getSyncManager.mockReturnValue( syncManager );
+		const dispatch = Object.assign( jest.fn(), {
+			receiveEntityRecords: jest.fn(),
+			__unstableAcquireStoreLock: jest.fn(),
+			__unstableReleaseStoreLock: jest.fn(),
+			setSyncConnectionStatus: jest.fn(),
+		} );
+		const ENTITIES_WITH_SYNC = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				baseURLParams: { context: 'edit' },
+				syncConfig: {},
+			},
+		];
+		const resolveSelectWithSync = {
+			getEntitiesConfig: jest.fn( () => ENTITIES_WITH_SYNC ),
+		};
+		const select = {
+			isCollaborationSupported: jest.fn( () => true ),
+		};
+
+		triggerFetch.mockImplementation( () => [
+			{ id: 1, title: 'Hello World' },
+		] );
+
+		await getEntityRecords( 'postType', 'post', {
+			per_page: -1,
+		} )( {
+			select,
+			dispatch,
+			registry,
+			resolveSelect: resolveSelectWithSync,
+		} );
+
+		expect( syncManager.loadCollection ).toHaveBeenCalledTimes( 1 );
+		expect( syncManager.loadCollection ).toHaveBeenCalledWith(
+			{},
+			'postType/post',
+			{
+				onStatusChange: expect.any( Function ),
+				refetchRecords: expect.any( Function ),
+			}
+		);
+	} );
+
+	it( 'does not load collection with sync manager when collaboration is unsupported', async () => {
+		const syncManager = {
+			loadCollection: jest.fn(),
+		};
+		getSyncManager.mockReturnValue( syncManager );
+		const dispatch = Object.assign( jest.fn(), {
+			receiveEntityRecords: jest.fn(),
+			__unstableAcquireStoreLock: jest.fn(),
+			__unstableReleaseStoreLock: jest.fn(),
+		} );
+		const ENTITIES_WITH_SYNC = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				baseURLParams: { context: 'edit' },
+				syncConfig: {},
+			},
+		];
+		const resolveSelectWithSync = {
+			getEntitiesConfig: jest.fn( () => ENTITIES_WITH_SYNC ),
+		};
+		const select = {
+			isCollaborationSupported: jest.fn( () => false ),
+		};
+
+		triggerFetch.mockImplementation( () => [
+			{ id: 1, title: 'Hello World' },
+		] );
+
+		await getEntityRecords( 'postType', 'post', {
+			per_page: -1,
+		} )( {
+			select,
+			dispatch,
+			registry,
+			resolveSelect: resolveSelectWithSync,
+		} );
+
+		expect( syncManager.loadCollection ).not.toHaveBeenCalled();
+		expect( select.isCollaborationSupported ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'Uses state locks', async () => {

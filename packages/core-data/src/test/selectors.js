@@ -72,6 +72,27 @@ describe( 'hasUndo/hasRedo', () => {
 		expect( undoManager.hasUndo ).toHaveBeenCalled();
 		expect( undoManager.hasRedo ).toHaveBeenCalled();
 	} );
+
+	it( 'falls back to the default undo manager when the sync manager has no undo manager', () => {
+		const undoManager = {
+			hasUndo: jest.fn( () => true ),
+			hasRedo: jest.fn( () => false ),
+		};
+		getSyncManager.mockReturnValue( { undoManager: undefined } );
+
+		const state = {
+			undoManager,
+			syncUndoManagerState: deepFreeze( {
+				hasRedo: true,
+				hasUndo: false,
+			} ),
+		};
+
+		expect( hasUndo( state ) ).toBe( true );
+		expect( hasRedo( state ) ).toBe( false );
+		expect( undoManager.hasUndo ).toHaveBeenCalled();
+		expect( undoManager.hasRedo ).toHaveBeenCalled();
+	} );
 } );
 
 describe( 'getEntityRecord', () => {

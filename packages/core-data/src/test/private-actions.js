@@ -6,9 +6,14 @@ import apiFetch from '@wordpress/api-fetch';
 /**
  * Internal dependencies
  */
-import { editMediaEntity } from '../private-actions';
+import { editMediaEntity, setCollaborationSupported } from '../private-actions';
+import { getSyncManager, hasSyncManager } from '../sync';
 
 jest.mock( '@wordpress/api-fetch' );
+jest.mock( '../sync', () => ( {
+	getSyncManager: jest.fn(),
+	hasSyncManager: jest.fn(),
+} ) );
 
 describe( 'editMediaEntity', () => {
 	let dispatch;
@@ -209,5 +214,73 @@ describe( 'editMediaEntity', () => {
 
 		expect( dispatch.receiveEntityRecords ).not.toHaveBeenCalled();
 		expect( result ).toBeUndefined();
+	} );
+} );
+
+describe( 'setCollaborationSupported', () => {
+	afterEach( () => {
+		getSyncManager.mockReset();
+		hasSyncManager.mockReset();
+	} );
+
+	it( 'sets collaboration support state', () => {
+		const dispatch = Object.assign( jest.fn(), {
+			__unstableNotifySyncUndoManagerChange: jest.fn(),
+		} );
+		hasSyncManager.mockReturnValue( false );
+
+		setCollaborationSupported( true )( { dispatch } );
+
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'SET_COLLABORATION_SUPPORTED',
+			supported: true,
+		} );
+		expect( getSyncManager ).not.toHaveBeenCalled();
+		expect(
+			dispatch.__unstableNotifySyncUndoManagerChange
+		).not.toHaveBeenCalled();
+	} );
+
+	it( 'unloads sync and resets sync undo state when disabling collaboration', () => {
+		const syncManager = {
+			unloadAll: jest.fn(),
+		};
+		const dispatch = Object.assign( jest.fn(), {
+			__unstableNotifySyncUndoManagerChange: jest.fn(),
+		} );
+		hasSyncManager.mockReturnValue( true );
+		getSyncManager.mockReturnValue( syncManager );
+
+		setCollaborationSupported( false )( { dispatch } );
+
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'SET_COLLABORATION_SUPPORTED',
+			supported: false,
+		} );
+		expect( syncManager.unloadAll ).toHaveBeenCalledTimes( 1 );
+		expect(
+			dispatch.__unstableNotifySyncUndoManagerChange
+		).toHaveBeenCalledWith( {
+			hasUndo: false,
+			hasRedo: false,
+		} );
+	} );
+
+	it( 'does not reset sync undo state when disabling collaboration without a sync manager', () => {
+		const dispatch = Object.assign( jest.fn(), {
+			__unstableNotifySyncUndoManagerChange: jest.fn(),
+		} );
+		hasSyncManager.mockReturnValue( false );
+
+		setCollaborationSupported( false )( { dispatch } );
+
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'SET_COLLABORATION_SUPPORTED',
+			supported: false,
+		} );
+		expect( getSyncManager ).not.toHaveBeenCalled();
+		expect(
+			dispatch.__unstableNotifySyncUndoManagerChange
+		).not.toHaveBeenCalled();
 	} );
 } );
