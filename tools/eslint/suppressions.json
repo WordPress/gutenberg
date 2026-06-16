@@ -1537,26 +1537,6 @@
 			"count": 1
 		}
 	},
-	"packages/patterns/src/components/allow-overrides-modal.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		}
-	},
-	"packages/patterns/src/components/create-pattern-modal.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
-	"packages/patterns/src/components/rename-pattern-category-modal.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
-	"packages/patterns/src/components/rename-pattern-modal.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
 	"packages/preferences/src/components/preferences-modal-tabs/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 6
