@@ -40,7 +40,7 @@
 	justify-content: space-between;
 	align-items: center;
 	padding: 0 $grid-unit-20;
-	border-bottom: $border-width solid $gray-300;
+	border-bottom: $border-width solid var(--wpds-color-stroke-surface-neutral);
 
 	// This helps ensure the correct panel height, including the border, avoiding subpixel rounding issues.
 	box-sizing: content-box;

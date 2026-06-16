@@ -193,6 +193,10 @@
 	--wpds-color-stroke-surface-warning: #e1bc7c;
 	/* Decorative stroke color used to define warning-toned surface boundaries with strong emphasis. */
 	--wpds-color-stroke-surface-warning-strong: #926300;
+	/* Decorative stroke color used to define caution-toned surface boundaries with normal emphasis. */
+	--wpds-color-stroke-surface-caution: #cfc28d;
+	/* Decorative stroke color used to define caution-toned surface boundaries with strong emphasis. */
+	--wpds-color-stroke-surface-caution-strong: #826a00;
 	/* Decorative stroke color used to define error-toned surface boundaries with normal emphasis. */
 	--wpds-color-stroke-surface-error: #dab1aa;
 	/* Decorative stroke color used to define error-toned surface boundaries with strong emphasis. */
