@@ -451,6 +451,11 @@ function CropperInner(
 		if ( bbox.width <= 0 || bbox.height <= 0 ) {
 			return undefined;
 		}
+		// Keyboard steps are normalized crop-space deltas, but snapping wants
+		// one source pixel per key press. The normalized delta for one source
+		// pixel is different on each axis when the snap-rotation bbox is not
+		// square, so this must be an object with separate width/height steps
+		// instead of a single scalar.
 		return {
 			width: state.zoom / bbox.width,
 			height: state.zoom / bbox.height,
