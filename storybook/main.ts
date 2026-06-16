@@ -87,6 +87,7 @@ const config: StorybookConfig = {
 			plugins: [
 				dsTokenFallbacksJs(),
 				react( {
+					include: /\.[jt]sx?$/,
 					jsxImportSource: '@emotion/react',
 					babel: {
 						plugins: [ '@emotion/babel-plugin' ],
