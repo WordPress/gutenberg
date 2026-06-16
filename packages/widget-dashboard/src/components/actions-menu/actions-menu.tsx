@@ -67,21 +67,10 @@ function ActionsMenuEntry( { item }: { item: ActionsMenuItem } ) {
 }
 
 /**
- * Renders the dashboard's overflow menu: a vertical-three-dots trigger
- * that surfaces secondary actions. Each entry in `items` becomes a menu
- * item; clicking it fires the entry's `onClick` and closes the menu.
+ * Renders the dashboard's overflow menu: a three-dots trigger surfacing
+ * secondary actions. Returns `null` when there are no items.
  *
- * Trigger and items both delegate their visual presentation to the
- * design system via Ariakit's `render` prop: `Menu.TriggerButton`
- * borrows `IconButton`, and each `Menu.Item` borrows `Button`. The
- * accessibility wiring (focus, keyboard, aria) stays with the menu
- * primitives.
- *
- * Returns `null` when `items` is empty so the menu collapses
- * gracefully without leaving an empty trigger in the toolbar.
- *
- * @param props
- * @param props.items Menu entries to render under the trigger.
+ * @param {ActionsMenuProps} props Component props.
  */
 export function ActionsMenu( { items }: ActionsMenuProps ): React.ReactNode {
 	if ( items.length === 0 ) {
