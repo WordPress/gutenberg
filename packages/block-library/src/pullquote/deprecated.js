@@ -170,7 +170,12 @@ const v6 = {
 		);
 	},
 	isEligible( attributes ) {
-		return !! attributes.textAlign;
+		return (
+			!! attributes.textAlign ||
+			!! attributes.className?.match(
+				/\bhas-text-align-(left|center|right)\b/
+			)
+		);
 	},
 	migrate: migrateTextAlignAttributeToBlockSupport,
 };
