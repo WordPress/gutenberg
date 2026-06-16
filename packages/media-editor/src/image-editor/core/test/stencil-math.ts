@@ -154,6 +154,41 @@ describe( 'computeLockedResizeRect — driver-axis selection', () => {
 		expect( pixelH ).toBeCloseTo( 200, 5 );
 	} );
 
+	it( 'keeps pointer resize continuous near the pixel-motion threshold', () => {
+		const originalImageSize: Size = { width: 600, height: 400 };
+		const fullImageCrop = { x: 0, y: 0, width: 1, height: 1 };
+		const drag: ResizeDragState = {
+			handle: 'nw',
+			startX: 0,
+			startY: 0,
+			startRect: fullImageCrop,
+		};
+
+		const beforeThreshold = computeLockedResizeRect(
+			drag,
+			60,
+			-39.6,
+			originalImageSize,
+			FULL_BOUNDS,
+			1
+		);
+		const afterThreshold = computeLockedResizeRect(
+			drag,
+			60,
+			-40.4,
+			originalImageSize,
+			FULL_BOUNDS,
+			1
+		);
+
+		expect(
+			Math.abs( beforeThreshold.width - afterThreshold.width )
+		).toBeLessThan( 0.01 );
+		expect(
+			Math.abs( beforeThreshold.height - afterThreshold.height )
+		).toBeLessThan( 0.01 );
+	} );
+
 	it( 'shrinks a locked-ratio crop from horizontal keyboard movement', () => {
 		const squareImageSize: Size = { width: 500, height: 500 };
 		const lockedStartRect = { x: 0.1, y: 0.1, width: 0.8, height: 0.8 };
@@ -169,7 +204,9 @@ describe( 'computeLockedResizeRect — driver-axis selection', () => {
 			0,
 			squareImageSize,
 			FULL_BOUNDS,
-			1
+			1,
+			undefined,
+			'width'
 		);
 
 		expect( rect.x ).toBeCloseTo(
@@ -205,7 +242,9 @@ describe( 'computeLockedResizeRect — driver-axis selection', () => {
 			DEFAULT_KEYBOARD_STEP * squareImageSize.height,
 			squareImageSize,
 			FULL_BOUNDS,
-			1
+			1,
+			undefined,
+			'height'
 		);
 
 		expect( rect.x ).toBeCloseTo(

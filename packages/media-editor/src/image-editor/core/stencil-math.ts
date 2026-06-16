@@ -6,6 +6,8 @@ import type { HandlePosition, NormalizedRect, Size } from './types';
 
 export type { HandlePosition };
 
+export type ResizeDriverAxis = 'width' | 'height';
+
 /**
  * Resolve the minimum crop dimension, in source-image pixels, for the current
  * display scale.
@@ -142,6 +144,8 @@ export function computeFreeResizeRect(
  * @param bounds          The allowed crop area bounds.
  * @param normalizedRatio The locked aspect ratio (width / height in normalized space).
  * @param minCropSize     Minimum crop rect dimension in normalized space, per axis.
+ * @param driverAxis      Optional explicit driver axis. Used for keyboard
+ *                        resize, where one arrow axis should determine the step.
  * @return The new crop rect in normalized coordinates.
  */
 export function computeLockedResizeRect(
@@ -151,7 +155,8 @@ export function computeLockedResizeRect(
 	imageSize: Size,
 	bounds: CropBounds,
 	normalizedRatio: number,
-	minCropSize: Size = DEFAULT_MIN_CROP_SIZE
+	minCropSize: Size = DEFAULT_MIN_CROP_SIZE,
+	driverAxis?: ResizeDriverAxis
 ): NormalizedRect {
 	// The math below divides by `normalizedRatio` and `imageSize`, so
 	// bail out with the start rect when any of them is zero. This can
@@ -199,17 +204,16 @@ export function computeLockedResizeRect(
 	distW = Math.max( distW, minDistW );
 	distH = Math.max( distH, minDistH );
 
-	// Determine which axis "drives" — whichever the user moved more
-	// (in pixel space) determines the size, the other follows. Use
-	// actual pointer/keyboard movement instead of the resulting crop
-	// dimensions; otherwise a single-axis keyboard shrink can leave the
-	// unchanged axis larger and cancel the resize.
-	const pixelDeltaX = Math.abs( clientX - drag.startX );
-	const pixelDeltaY = Math.abs( clientY - drag.startY );
+	// Determine which axis "drives". Pointer drags use the dragged-corner
+	// geometry so the projected crop changes continuously as the pointer moves.
+	// Keyboard resize passes an explicit axis because a single-axis arrow step
+	// should drive that axis instead of being cancelled by the unchanged axis.
 	const pixelRatio = ( normalizedRatio * imageSize.width ) / imageSize.height;
 	const isWidthDriver =
-		pixelDeltaY === 0 ||
-		( pixelDeltaX > 0 && pixelDeltaX / pixelDeltaY > pixelRatio );
+		driverAxis === 'width' ||
+		( ! driverAxis &&
+			( distW * imageSize.width ) / ( distH * imageSize.height ) >
+				pixelRatio );
 
 	if ( isWidthDriver ) {
 		// Width is the driver — compute height from ratio.

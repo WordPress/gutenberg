@@ -25,6 +25,7 @@ import {
 	type HandlePosition,
 	type CropBounds,
 	type ResizeDragState,
+	type ResizeDriverAxis,
 } from '../../../core/stencil-math';
 import { VISUALLY_HIDDEN_STYLE } from '../../visually-hidden-style';
 
@@ -163,7 +164,8 @@ export function RectangleStencil( {
 		computeLockedRect: (
 			drag: ResizeDragState,
 			clientX: number,
-			clientY: number
+			clientY: number,
+			driverAxis?: ResizeDriverAxis
 		) => NormalizedRect;
 		computeFreeRect: (
 			drag: ResizeDragState,
@@ -339,7 +341,8 @@ export function RectangleStencil( {
 		(
 			drag: ResizeDragState,
 			clientX: number,
-			clientY: number
+			clientY: number,
+			driverAxis?: ResizeDriverAxis
 		): NormalizedRect =>
 			computeLockedResizeRect(
 				drag,
@@ -348,7 +351,8 @@ export function RectangleStencil( {
 				imageSize,
 				bounds,
 				normalizedRatio,
-				minCropSize
+				minCropSize,
+				driverAxis
 			),
 		[ imageSize, bounds, normalizedRatio, minCropSize ]
 	);
@@ -448,6 +452,8 @@ export function RectangleStencil( {
 			if ( key === 'ArrowDown' ) {
 				dy = adjustedStepY;
 			}
+			const keyboardDriverAxis: ResizeDriverAxis =
+				dx !== 0 ? 'width' : 'height';
 
 			if ( hasLockedRatio ) {
 				// For locked aspect ratio, synthesize a drag from the
@@ -461,7 +467,12 @@ export function RectangleStencil( {
 				const clientX = dx * imageSize.width;
 				const clientY = dy * imageSize.height;
 				onCropChange(
-					computeLockedRect( syntheticDrag, clientX, clientY )
+					computeLockedRect(
+						syntheticDrag,
+						clientX,
+						clientY,
+						keyboardDriverAxis
+					)
 				);
 				scheduleKeyboardResizeEnd();
 			} else {
