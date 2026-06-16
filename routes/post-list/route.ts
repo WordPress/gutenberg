@@ -45,6 +45,7 @@ type TemplateSlot = {
 type TemplateRecord = {
 	id: string | number;
 	slug?: string;
+	status?: string;
 	title?:
 		| string
 		| {
@@ -114,18 +115,28 @@ function getStaticHomepageLabel( record: PreviewableRecord | undefined ) {
 	);
 }
 
-function getPreviewStatusLabel( record?: PreviewableRecord ) {
-	switch ( record?.status ) {
+function getPreviewStatusLabel(
+	recordOrStatus?: PreviewableRecord | TemplateRecord | string
+) {
+	const status =
+		typeof recordOrStatus === 'string'
+			? recordOrStatus
+			: recordOrStatus?.status;
+
+	switch ( status ) {
 		case 'publish':
 			return __( 'Published' );
 		case 'future':
 			return __( 'Scheduled' );
 		case 'draft':
+		case 'auto-draft':
 			return __( 'Draft' );
 		case 'pending':
 			return __( 'Pending review' );
 		case 'private':
 			return __( 'Private' );
+		case 'trash':
+			return __( 'Trash' );
 		default:
 			return __( 'Preview' );
 	}
@@ -145,6 +156,17 @@ function getPostTypePreviewIcon( postType: string ) {
 
 function getPostTypePreviewEditLabel( postType: string ) {
 	return postType === 'page' ? __( 'Edit page' ) : __( 'Edit' );
+}
+
+async function canEditPostTypeRecord(
+	postType: string,
+	postId: string | number
+) {
+	return !! ( await resolveSelect( coreStore ).canUser( 'update', {
+		kind: 'postType',
+		name: postType,
+		id: postId,
+	} ) );
 }
 
 function getPreferredTemplateSlot(
@@ -201,7 +223,8 @@ function isPageTemplate( record: TemplateRecord ) {
 function getTemplateCanvas(
 	templateId: string | number,
 	editLink?: string,
-	template?: TemplateRecord
+	template?: TemplateRecord,
+	previewCanEdit?: boolean
 ) {
 	const postId = String( templateId );
 	return {
@@ -213,8 +236,12 @@ function getTemplateCanvas(
 			`/types/wp_template/edit/${ encodeURIComponent( postId ) }`,
 		previewLabel: getRecordTitle( template, __( 'Template' ) ),
 		previewIcon: layout,
-		previewStatusLabel: __( 'Template preview' ),
+		previewStatus: template?.status || 'publish',
+		previewStatusLabel: getPreviewStatusLabel(
+			template?.status || 'publish'
+		),
 		previewEditLabel: __( 'Edit template' ),
+		previewCanEdit,
 		previewTone: 'global' as const,
 	};
 }
@@ -297,7 +324,8 @@ export const route = {
 				return getTemplateCanvas(
 					templateId,
 					undefined,
-					selectedTemplate
+					selectedTemplate,
+					await canEditPostTypeRecord( 'wp_template', templateId )
 				);
 			}
 
@@ -314,7 +342,11 @@ export const route = {
 					return getTemplateCanvas(
 						pageTemplate.id,
 						undefined,
-						pageTemplate
+						pageTemplate,
+						await canEditPostTypeRecord(
+							'wp_template',
+							pageTemplate.id
+						)
 					);
 				}
 
@@ -339,7 +371,11 @@ export const route = {
 				return getTemplateCanvas(
 					slotTemplate.id,
 					undefined,
-					slotTemplate
+					slotTemplate,
+					await canEditPostTypeRecord(
+						'wp_template',
+						slotTemplate.id
+					)
 				);
 			}
 
@@ -347,7 +383,15 @@ export const route = {
 				coreStore
 			).getDefaultTemplateId( { slug: preferredSlot.slug } );
 			if ( fallbackTemplateId ) {
-				return getTemplateCanvas( fallbackTemplateId );
+				return getTemplateCanvas(
+					fallbackTemplateId,
+					undefined,
+					undefined,
+					await canEditPostTypeRecord(
+						'wp_template',
+						fallbackTemplateId
+					)
+				);
 			}
 
 			return undefined;
@@ -370,7 +414,12 @@ export const route = {
 			const postId = selectedPostId.toString();
 			const templateId = getTemplateIdFromPageItemId( postId );
 			if ( templateId ) {
-				return getTemplateCanvas( templateId );
+				return getTemplateCanvas(
+					templateId,
+					undefined,
+					undefined,
+					await canEditPostTypeRecord( 'wp_template', templateId )
+				);
 			}
 
 			const post = await resolveSelect( coreStore ).getEntityRecord(
@@ -401,8 +450,12 @@ export const route = {
 						previewLabel: getStaticHomepageLabel( previewRecord ),
 						previewIcon: home,
 						previewStatus: 'homepage',
-						previewStatusLabel: __( 'Homepage' ),
+						previewStatusLabel: getPreviewStatusLabel( 'publish' ),
 						previewEditLabel: __( 'Edit page' ),
+						previewCanEdit: await canEditPostTypeRecord(
+							params.type,
+							postId
+						),
 					};
 				}
 			}
@@ -415,8 +468,13 @@ export const route = {
 				previewUrl: previewRecord?.link,
 				previewLabel: getRecordTitle( previewRecord, params.type ),
 				previewIcon: getPostTypePreviewIcon( params.type ),
+				previewStatus: previewRecord?.status,
 				previewStatusLabel: getPreviewStatusLabel( previewRecord ),
 				previewEditLabel: getPostTypePreviewEditLabel( params.type ),
+				previewCanEdit: await canEditPostTypeRecord(
+					params.type,
+					postId
+				),
 			};
 		}
 
@@ -430,10 +488,15 @@ export const route = {
 				).getDefaultTemplateId( { slug: 'front-page' } );
 
 				if ( templateId ) {
-					return getTemplateCanvas( templateId, undefined, {
-						id: templateId,
-						title: __( 'Home' ),
-					} );
+					return getTemplateCanvas(
+						templateId,
+						undefined,
+						{
+							id: templateId,
+							title: __( 'Home' ),
+						},
+						await canEditPostTypeRecord( 'wp_template', templateId )
+					);
 				}
 			}
 
@@ -458,8 +521,12 @@ export const route = {
 						previewLabel: getStaticHomepageLabel( frontPage ),
 						previewIcon: home,
 						previewStatus: 'homepage',
-						previewStatusLabel: __( 'Homepage' ),
+						previewStatusLabel: getPreviewStatusLabel( 'publish' ),
 						previewEditLabel: __( 'Edit page' ),
+						previewCanEdit: await canEditPostTypeRecord(
+							params.type,
+							postId
+						),
 					};
 				}
 			}
@@ -484,8 +551,13 @@ export const route = {
 				previewUrl: ( posts[ 0 ] as any ).link,
 				previewLabel: getRecordTitle( posts[ 0 ] as any, params.type ),
 				previewIcon: getPostTypePreviewIcon( params.type ),
+				previewStatus: ( posts[ 0 ] as any ).status,
 				previewStatusLabel: getPreviewStatusLabel( posts[ 0 ] as any ),
 				previewEditLabel: getPostTypePreviewEditLabel( params.type ),
+				previewCanEdit: await canEditPostTypeRecord(
+					params.type,
+					postId
+				),
 			};
 		}
 

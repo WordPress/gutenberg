@@ -748,6 +748,11 @@ export function PostTypeTemplatesTab( {
 							type="button"
 							variant="outline"
 							tone={ isSelected ? 'brand' : 'neutral' }
+							className={
+								isActive
+									? 'routes-post-list__template-card'
+									: 'routes-post-list__template-card is-inactive'
+							}
 							aria-pressed={ isSelected }
 							onClick={ () => selectTemplate( template ) }
 							style={ {

@@ -14,6 +14,7 @@ import { ensureView, viewToQuery } from './view-utils';
 
 type TemplateRecord = {
 	id: string | number;
+	status?: string;
 	title?:
 		| string
 		| {
@@ -31,7 +32,40 @@ function getTemplateTitle( template: TemplateRecord | undefined ) {
 	return title ? decodeEntities( title ) : __( 'Template' );
 }
 
-function getTemplateCanvas( templateId: string, template?: TemplateRecord ) {
+function getPreviewStatusLabel( status?: string ) {
+	switch ( status ) {
+		case 'publish':
+			return __( 'Published' );
+		case 'future':
+			return __( 'Scheduled' );
+		case 'draft':
+		case 'auto-draft':
+			return __( 'Draft' );
+		case 'pending':
+			return __( 'Pending review' );
+		case 'private':
+			return __( 'Private' );
+		case 'trash':
+			return __( 'Trash' );
+		default:
+			return __( 'Preview' );
+	}
+}
+
+async function canEditTemplate( templateId: string ) {
+	return !! ( await resolveSelect( coreStore ).canUser( 'update', {
+		kind: 'postType',
+		name: 'wp_template',
+		id: templateId,
+	} ) );
+}
+
+async function getTemplateCanvas(
+	templateId: string,
+	template?: TemplateRecord
+) {
+	const previewStatus = template?.status || 'publish';
+
 	return {
 		postType: 'wp_template',
 		postId: templateId,
@@ -41,8 +75,10 @@ function getTemplateCanvas( templateId: string, template?: TemplateRecord ) {
 		) }`,
 		previewLabel: getTemplateTitle( template ),
 		previewIcon: layout,
-		previewStatusLabel: __( 'Template preview' ),
+		previewStatus,
+		previewStatusLabel: getPreviewStatusLabel( previewStatus ),
 		previewEditLabel: __( 'Edit template' ),
+		previewCanEdit: await canEditTemplate( templateId ),
 		previewTone: 'global' as const,
 	};
 }

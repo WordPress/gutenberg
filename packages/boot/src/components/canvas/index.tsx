@@ -60,6 +60,7 @@ interface CanvasProps {
 interface CanvasEditButtonProps {
 	editLink?: string;
 	isResolving?: boolean;
+	canEdit?: boolean;
 }
 
 interface PreviewLinkResponse {
@@ -69,6 +70,7 @@ interface PreviewLinkResponse {
 	previewStatusLabel?: string;
 	previewType?: string;
 	previewEditLabel?: string;
+	previewCanEdit?: boolean;
 	previewTone?: CanvasData[ 'previewTone' ];
 }
 
@@ -197,6 +199,29 @@ function getPreviewStatusClass( status?: string ) {
 	}
 }
 
+function getPreviewStatusTooltipLabel( status?: string ) {
+	switch ( status ) {
+		case 'homepage':
+		case 'publish':
+			return __( 'Published' );
+		case 'future':
+			return __( 'Scheduled' );
+		case 'draft':
+		case 'auto-draft':
+			return __( 'Draft' );
+		case 'pending':
+			return __( 'Pending review' );
+		case 'private':
+			return __( 'Private' );
+		case 'trash':
+			return __( 'Trash' );
+		case 'archive':
+			return __( 'Archive' );
+		default:
+			return __( 'Preview' );
+	}
+}
+
 function isGlobalPreview( canvas: CanvasData ) {
 	return (
 		canvas.previewTone === 'global' ||
@@ -209,19 +234,21 @@ function isGlobalPreview( canvas: CanvasData ) {
 function PreviewEditButton( {
 	editLink,
 	isResolving,
+	canEdit,
 	label,
 }: CanvasEditButtonProps & { label: string } ) {
 	const navigate = useNavigate();
+	const isDisabled = ! editLink || isResolving || canEdit === false;
 
 	return (
 		<Button
 			variant="primary"
 			icon={ pencil }
-			disabled={ ! editLink || isResolving }
+			disabled={ isDisabled }
 			accessibleWhenDisabled
 			__next40pxDefaultSize
 			onClick={ () => {
-				if ( editLink ) {
+				if ( ! isDisabled && editLink ) {
 					navigate( { to: editLink } );
 				}
 			} }
@@ -238,16 +265,22 @@ function PreviewDocumentInfo( {
 	const invalidate = useInvalidate();
 	const [ isConfiguringHomepage, setIsConfiguringHomepage ] =
 		useState( false );
+	const showPreviewStatus = Boolean(
+		canvas.previewStatus || canvas.previewStatusLabel
+	);
 
 	if (
 		! canvas.previewLabel &&
 		! canvas.previewIcon &&
-		! canvas.previewStatusLabel
+		! showPreviewStatus
 	) {
 		return null;
 	}
 
 	const icon = wrapIcon( canvas.previewIcon, false );
+	const statusTooltipLabel = getPreviewStatusTooltipLabel(
+		canvas.previewStatus
+	);
 	const documentInfo = (
 		<>
 			<div className="boot-preview-canvas__document">
@@ -288,15 +321,13 @@ function PreviewDocumentInfo( {
 						) }
 					</DropdownMenu>
 				) }
-				{ canvas.previewStatusLabel && (
-					<WCTooltip
-						text={ canvas.previewStatusLabel }
-						placement="bottom"
-					>
+				{ showPreviewStatus && (
+					<WCTooltip text={ statusTooltipLabel } placement="bottom">
 						<span
 							className="boot-preview-canvas__document-status"
 							role="status"
-							aria-label={ canvas.previewStatusLabel }
+							aria-label={ statusTooltipLabel }
+							title={ statusTooltipLabel }
 						>
 							<span
 								className={ clsx(
@@ -393,6 +424,7 @@ function PreviewToolbar( {
 				<PreviewEditButton
 					editLink={ editLink }
 					isResolving={ isResolving }
+					canEdit={ canvas.previewCanEdit }
 					label={ canvas.previewEditLabel || __( 'Edit' ) }
 				/>
 				<div
@@ -445,9 +477,11 @@ function FrontendPreviewCanvas( { canvas }: CanvasProps ) {
 			previewStatus: canvas.previewStatus,
 			previewStatusLabel: canvas.previewStatusLabel,
 			previewEditLabel: canvas.previewEditLabel,
+			previewCanEdit: canvas.previewCanEdit,
 			previewTone: canvas.previewTone,
 		} ),
 		[
+			canvas.previewCanEdit,
 			canvas.previewEditLabel,
 			canvas.previewIcon,
 			canvas.previewLabel,
@@ -532,6 +566,8 @@ function FrontendPreviewCanvas( { canvas }: CanvasProps ) {
 						canvas.previewStatusLabel,
 					previewEditLabel:
 						response.previewEditLabel || canvas.previewEditLabel,
+					previewCanEdit:
+						response.previewCanEdit ?? canvas.previewCanEdit,
 					previewTone: response.previewTone || canvas.previewTone,
 				} );
 			} catch {
@@ -550,6 +586,7 @@ function FrontendPreviewCanvas( { canvas }: CanvasProps ) {
 		[
 			canvas.editLink,
 			canvas.previewEditLabel,
+			canvas.previewCanEdit,
 			canvas.previewIcon,
 			canvas.previewLabel,
 			canvas.previewStatus,

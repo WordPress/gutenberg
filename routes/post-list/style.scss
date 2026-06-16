@@ -68,6 +68,10 @@
 	color: $gray-900;
 }
 
+.routes-post-list__template-card.is-inactive {
+	border-style: dashed;
+}
+
 .routes-post-list__template-title {
 	align-items: center;
 	display: inline-flex;

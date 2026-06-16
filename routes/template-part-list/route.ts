@@ -14,6 +14,7 @@ import { ensureView, viewToQuery } from './view-utils';
 
 type TemplatePartRecord = {
 	id: string | number;
+	status?: string;
 	title?:
 		| string
 		| {
@@ -31,10 +32,40 @@ function getTemplatePartTitle( templatePart: TemplatePartRecord | undefined ) {
 	return title ? decodeEntities( title ) : __( 'Template part' );
 }
 
-function getTemplatePartCanvas(
+function getPreviewStatusLabel( status?: string ) {
+	switch ( status ) {
+		case 'publish':
+			return __( 'Published' );
+		case 'future':
+			return __( 'Scheduled' );
+		case 'draft':
+		case 'auto-draft':
+			return __( 'Draft' );
+		case 'pending':
+			return __( 'Pending review' );
+		case 'private':
+			return __( 'Private' );
+		case 'trash':
+			return __( 'Trash' );
+		default:
+			return __( 'Preview' );
+	}
+}
+
+async function canEditTemplatePart( templatePartId: string ) {
+	return !! ( await resolveSelect( coreStore ).canUser( 'update', {
+		kind: 'postType',
+		name: 'wp_template_part',
+		id: templatePartId,
+	} ) );
+}
+
+async function getTemplatePartCanvas(
 	templatePartId: string,
 	templatePart?: TemplatePartRecord
 ) {
+	const previewStatus = templatePart?.status || 'publish';
+
 	return {
 		postType: 'wp_template_part',
 		postId: templatePartId,
@@ -44,8 +75,10 @@ function getTemplatePartCanvas(
 		) }`,
 		previewLabel: getTemplatePartTitle( templatePart ),
 		previewIcon: layout,
-		previewStatusLabel: __( 'Template part preview' ),
+		previewStatus,
+		previewStatusLabel: getPreviewStatusLabel( previewStatus ),
 		previewEditLabel: __( 'Edit template part' ),
+		previewCanEdit: await canEditTemplatePart( templatePartId ),
 		previewTone: 'global' as const,
 	};
 }

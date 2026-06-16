@@ -461,6 +461,40 @@ function gutenberg_site_editor_get_preview_post_status_label( $post ) {
 }
 
 /**
+ * Get a stable status label for synthetic preview states.
+ *
+ * Some preview contexts, such as the generated homepage or taxonomy archives,
+ * do not have a real post status object. The canvas status dot still needs a
+ * status-like hover label rather than contextual labels like "Homepage" or
+ * "Category".
+ *
+ * @param string $status Preview status slug.
+ * @return string Preview status label.
+ */
+function gutenberg_site_editor_get_preview_status_label( $status ) {
+	switch ( $status ) {
+		case 'homepage':
+		case 'publish':
+			return __( 'Published', 'gutenberg' );
+		case 'future':
+			return __( 'Scheduled', 'gutenberg' );
+		case 'draft':
+		case 'auto-draft':
+			return __( 'Draft', 'gutenberg' );
+		case 'pending':
+			return __( 'Pending review', 'gutenberg' );
+		case 'private':
+			return __( 'Private', 'gutenberg' );
+		case 'trash':
+			return __( 'Trash', 'gutenberg' );
+		case 'archive':
+			return __( 'Archive', 'gutenberg' );
+		default:
+			return __( 'Preview', 'gutenberg' );
+	}
+}
+
+/**
  * Get preview context for a post.
  *
  * @param int    $post_id Post ID.
@@ -486,15 +520,18 @@ function gutenberg_site_editor_get_post_preview_context(
 		$title = $post_type ? $post_type->labels->singular_name : __( 'Untitled', 'gutenberg' );
 	}
 
+	$edit_link = gutenberg_site_editor_add_preview_edit_args(
+		gutenberg_site_editor_get_post_edit_link( $post_id )
+	);
+
 	return array(
-		'editLink'           => gutenberg_site_editor_add_preview_edit_args(
-			gutenberg_site_editor_get_post_edit_link( $post_id )
-		),
+		'editLink'           => $edit_link,
 		'previewLabel'       => $title,
 		'previewStatus'      => $status ? $status : $post->post_status,
 		'previewStatusLabel' => $status_label ? $status_label : gutenberg_site_editor_get_preview_post_status_label( $post ),
 		'previewType'        => $preview_type ? $preview_type : $post->post_type,
 		'previewEditLabel'   => 'page' === $post->post_type ? __( 'Edit page', 'gutenberg' ) : __( 'Edit', 'gutenberg' ),
+		'previewCanEdit'     => '' !== $edit_link,
 	);
 }
 
@@ -531,7 +568,7 @@ function gutenberg_site_editor_get_static_front_page_preview_context( $post_id )
 	$context = gutenberg_site_editor_get_post_preview_context(
 		$post_id,
 		'home',
-		__( 'Homepage', 'gutenberg' ),
+		gutenberg_site_editor_get_preview_status_label( 'homepage' ),
 		'homepage'
 	);
 	if ( empty( $context ) ) {
@@ -568,14 +605,16 @@ function gutenberg_site_editor_get_front_page_preview_context() {
 	}
 
 	$edit_link = gutenberg_site_editor_get_front_page_edit_link();
+	$edit_link = gutenberg_site_editor_add_preview_edit_args( $edit_link );
 
 	return array(
-		'editLink'           => gutenberg_site_editor_add_preview_edit_args( $edit_link ),
+		'editLink'           => $edit_link,
 		'previewLabel'       => __( 'Home', 'gutenberg' ),
 		'previewStatus'      => 'homepage',
-		'previewStatusLabel' => __( 'Homepage', 'gutenberg' ),
+		'previewStatusLabel' => gutenberg_site_editor_get_preview_status_label( 'homepage' ),
 		'previewType'        => 'template',
 		'previewEditLabel'   => __( 'Edit template', 'gutenberg' ),
+		'previewCanEdit'     => '' !== $edit_link,
 		'previewTone'        => 'global',
 	);
 }
@@ -623,7 +662,6 @@ function gutenberg_site_editor_get_term_preview_context( $url ) {
 		return array();
 	}
 
-	$taxonomy     = get_taxonomy( $matched_term->taxonomy );
 	$preview_type = 'archive';
 	if ( 'category' === $matched_term->taxonomy ) {
 		$preview_type = 'category';
@@ -635,11 +673,10 @@ function gutenberg_site_editor_get_term_preview_context( $url ) {
 		'editLink'           => '',
 		'previewLabel'       => $matched_term->name,
 		'previewStatus'      => 'archive',
-		'previewStatusLabel' => $taxonomy
-			? $taxonomy->labels->singular_name
-			: __( 'Archive', 'gutenberg' ),
+		'previewStatusLabel' => gutenberg_site_editor_get_preview_status_label( 'archive' ),
 		'previewType'        => $preview_type,
 		'previewEditLabel'   => __( 'Edit', 'gutenberg' ),
+		'previewCanEdit'     => false,
 	);
 }
 
@@ -682,13 +719,16 @@ function gutenberg_site_editor_get_preview_context( $url ) {
 		return $term_context;
 	}
 
+	$edit_link = gutenberg_site_editor_get_preview_edit_link( $url );
+
 	return array(
-		'editLink'           => gutenberg_site_editor_get_preview_edit_link( $url ),
+		'editLink'           => $edit_link,
 		'previewLabel'       => __( 'Site preview', 'gutenberg' ),
 		'previewStatus'      => 'preview',
 		'previewStatusLabel' => __( 'Preview', 'gutenberg' ),
 		'previewType'        => 'preview',
 		'previewEditLabel'   => __( 'Edit', 'gutenberg' ),
+		'previewCanEdit'     => '' !== $edit_link,
 	);
 }
 
@@ -1051,7 +1091,7 @@ function gutenberg_site_editor_register_default_menu_items() {
 		? '/types/' . $content_post_type_names[0]
 		: '/types/post';
 
-	gutenberg_register_site_editor_v2_menu_item( 'home', __( 'Home', 'gutenberg' ), '/', '' );
+	gutenberg_register_site_editor_v2_menu_item( 'home', __( 'Homepage', 'gutenberg' ), '/', '' );
 	gutenberg_register_site_editor_v2_menu_item( 'pages', __( 'Pages', 'gutenberg' ), '/types/page', '' );
 	gutenberg_register_site_editor_v2_menu_item( 'content', __( 'Content', 'gutenberg' ), $content_target, '', 'drilldown' );
 	foreach ( $content_post_types as $post_type ) {

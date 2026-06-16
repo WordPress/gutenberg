@@ -94,6 +94,13 @@ export interface CanvasData {
 	previewEditLabel?: string;
 
 	/**
+	 * Whether the current user can edit the previewed entity.
+	 * When explicitly false, preview chrome must disable the edit action even
+	 * if a route-like edit link is present.
+	 */
+	previewCanEdit?: boolean;
+
+	/**
 	 * Optional visual tone for the preview chrome.
 	 */
 	previewTone?: 'default' | 'global';

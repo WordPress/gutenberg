@@ -18,6 +18,7 @@ const PRELOADED_NAVIGATION_MENUS_QUERY = {
 
 type NavigationRecord = {
 	id: number;
+	status?: string;
 	title?: {
 		raw?: string;
 		rendered?: string;
@@ -27,6 +28,34 @@ type NavigationRecord = {
 function getNavigationTitle( navigation?: NavigationRecord ) {
 	const title = navigation?.title?.rendered || navigation?.title?.raw;
 	return title ? decodeEntities( title ) : __( 'Navigation' );
+}
+
+function getPreviewStatusLabel( status?: string ) {
+	switch ( status ) {
+		case 'publish':
+			return __( 'Published' );
+		case 'future':
+			return __( 'Scheduled' );
+		case 'draft':
+		case 'auto-draft':
+			return __( 'Draft' );
+		case 'pending':
+			return __( 'Pending review' );
+		case 'private':
+			return __( 'Private' );
+		case 'trash':
+			return __( 'Trash' );
+		default:
+			return __( 'Preview' );
+	}
+}
+
+async function canEditNavigation( navigationId: number ) {
+	return !! ( await resolveSelect( coreStore ).canUser( 'update', {
+		kind: 'postType',
+		name: NAVIGATION_POST_TYPE,
+		id: navigationId,
+	} ) );
 }
 
 export const route = {
@@ -55,8 +84,10 @@ export const route = {
 				isPreview: true,
 				previewLabel: __( 'Navigation' ),
 				previewIcon: menu,
-				previewStatusLabel: __( 'Navigation preview' ),
+				previewStatus: 'preview',
+				previewStatusLabel: getPreviewStatusLabel( 'preview' ),
 				previewEditLabel: __( 'Edit navigation' ),
+				previewCanEdit: false,
 				previewTone: 'global' as const,
 			};
 		}
@@ -75,8 +106,10 @@ export const route = {
 			editLink: `/types/wp_navigation/edit/${ postId }`,
 			previewLabel: getNavigationTitle( navigation ),
 			previewIcon: menu,
-			previewStatusLabel: __( 'Navigation preview' ),
+			previewStatus: navigation?.status,
+			previewStatusLabel: getPreviewStatusLabel( navigation?.status ),
 			previewEditLabel: __( 'Edit navigation' ),
+			previewCanEdit: await canEditNavigation( postId ),
 			previewTone: 'global' as const,
 		};
 	},

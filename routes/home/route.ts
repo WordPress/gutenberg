@@ -59,7 +59,7 @@ function getStaticHomepageLabel( page?: PageRecord ) {
 }
 
 export const route = {
-	title: () => __( 'Home' ),
+	title: () => __( 'Homepage' ),
 	async canvas() {
 		const [ siteData, siteSettings ] = ( await Promise.all( [
 			resolveSelect( coreStore ).getEntityRecord(
@@ -88,7 +88,7 @@ export const route = {
 				: __( 'Home' ),
 			previewIcon: isLatestPostsHomepage ? layout : home,
 			previewStatus: 'homepage',
-			previewStatusLabel: __( 'Homepage' ),
+			previewStatusLabel: __( 'Published' ),
 			previewEditLabel: isLatestPostsHomepage
 				? __( 'Edit template' )
 				: __( 'Edit page' ),

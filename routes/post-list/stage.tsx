@@ -29,8 +29,15 @@ import {
 } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useMemo, useCallback, useEffect, useState } from '@wordpress/element';
+import {
+	createInterpolateElement,
+	useMemo,
+	useCallback,
+	useEffect,
+	useState,
+} from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { decodeEntities } from '@wordpress/html-entities';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	drawerRight,
@@ -38,6 +45,7 @@ import {
 	page as pageIcon,
 	post as postIcon,
 } from '@wordpress/icons';
+import { store as preferencesStore } from '@wordpress/preferences';
 import type { Post, Type, WpTemplate } from '@wordpress/core-data';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import { EmptyState, Tabs } from '@wordpress/ui';
@@ -80,6 +88,9 @@ import './style.scss';
 
 const LAYOUT_LIST = 'list';
 const POST_LIST_REFRESH_STORAGE_PREFIX = 'site-editor-post-list-refresh';
+const POST_LIST_PREFERENCE_SCOPE = 'wordpress/post-list';
+const DISMISSED_HOMEPAGE_NOTICE_TEMPLATE_IDS_KEY =
+	'dismissedHomepageNoticeTemplateIds';
 
 type PageListItem = Post & {
 	_isTemplatePage?: boolean;
@@ -118,6 +129,33 @@ function getPostTypeRecordsExistenceQuery( postType: string ) {
 
 function capitalizeFirstLetter( value: string ) {
 	return value.charAt( 0 ).toLocaleUpperCase() + value.slice( 1 );
+}
+
+function getPlainTextTitle( title?: string ) {
+	if ( ! title ) {
+		return '';
+	}
+
+	return decodeEntities( title.replace( /<[^>]+>/g, '' ) ).trim();
+}
+
+function getRecordTitle(
+	record:
+		| {
+				title?: string | { raw?: string; rendered?: string };
+		  }
+		| undefined,
+	fallback: string
+) {
+	if ( typeof record?.title === 'string' ) {
+		return getPlainTextTitle( record.title ) || fallback;
+	}
+
+	return (
+		getPlainTextTitle( record?.title?.rendered ) ||
+		getPlainTextTitle( record?.title?.raw ) ||
+		fallback
+	);
 }
 
 function getPostListRefreshStorageKey( postType: string ) {
@@ -174,6 +212,7 @@ function PostList() {
 		[ postType ]
 	);
 	const { receiveEntityRecords } = useDispatch( coreStore );
+	const { set: setPreference } = useDispatch( preferencesStore );
 
 	useEffect( () => {
 		try {
@@ -286,6 +325,50 @@ function PostList() {
 		},
 		[ homepageSettings.homeUrl, homepageSettings.showOnFront, postType ]
 	);
+	const dismissedHomepageNoticeTemplateIds = useSelect( ( select ) => {
+		const stored = select( preferencesStore ).get(
+			POST_LIST_PREFERENCE_SCOPE,
+			DISMISSED_HOMEPAGE_NOTICE_TEMPLATE_IDS_KEY
+		) as string[] | undefined;
+
+		return stored ?? [];
+	}, [] );
+	const latestPostsTemplateId = latestPostsTemplatePage?.id?.toString();
+	const latestPostsTemplateEditPath = latestPostsTemplateId
+		? `/types/wp_template/edit/${ encodeURIComponent(
+				latestPostsTemplateId
+		  ) }`
+		: '';
+	const isLatestPostsHomepageNoticeDismissed =
+		!! latestPostsTemplateId &&
+		dismissedHomepageNoticeTemplateIds.includes( latestPostsTemplateId );
+	const showLatestPostsHomepageNotice =
+		activeContentTab === 'content' &&
+		postType === 'page' &&
+		homepageSettings.showOnFront === 'posts' &&
+		!! latestPostsTemplateId &&
+		!! latestPostsTemplateEditPath &&
+		! isLatestPostsHomepageNoticeDismissed;
+	const dismissLatestPostsHomepageNotice = useCallback( () => {
+		if ( ! latestPostsTemplateId ) {
+			return;
+		}
+
+		void setPreference(
+			POST_LIST_PREFERENCE_SCOPE,
+			DISMISSED_HOMEPAGE_NOTICE_TEMPLATE_IDS_KEY,
+			Array.from(
+				new Set( [
+					...dismissedHomepageNoticeTemplateIds,
+					latestPostsTemplateId,
+				] )
+			)
+		);
+	}, [
+		dismissedHomepageNoticeTemplateIds,
+		latestPostsTemplateId,
+		setPreference,
+	] );
 	const homepageSettingsNeedAttention = homepageSettings.needsAttention;
 
 	const defaultView: View = useMemo( () => {
@@ -883,6 +966,10 @@ function PostList() {
 				) }
 		</EmptyState.Root>
 	) : undefined;
+	const latestPostsTemplateTitle = getRecordTitle(
+		latestPostsTemplatePage,
+		__( 'homepage' )
+	);
 
 	return (
 		<Page
@@ -910,25 +997,35 @@ function PostList() {
 					</Tabs.List>
 				</Tabs.Root>
 			</div>
-			{ activeContentTab === 'content' &&
-				postType === 'page' &&
-				homepageSettings.showOnFront === 'posts' && (
-					<Notice
-						className="routes-post-list__homepage-notice"
-						status="info"
-						isDismissible={ false }
+			{ showLatestPostsHomepageNotice && (
+				<Notice
+					className="routes-post-list__homepage-notice"
+					status="info"
+					onDismiss={ dismissLatestPostsHomepageNotice }
+				>
+					{ createInterpolateElement(
+						sprintf(
+							// translators: %s: Template title.
+							__(
+								'Your homepage is currently set to show your latest posts. WordPress generates that page automatically using the <templateLink>%s</templateLink> template.'
+							),
+							latestPostsTemplateTitle
+						),
+						{
+							// @ts-ignore Children are injected by createInterpolateElement.
+							templateLink: (
+								<Link to={ latestPostsTemplateEditPath } />
+							),
+						}
+					) }
+					<ComponentsButton
+						variant="link"
+						onClick={ () => setIsConfiguringHomepage( true ) }
 					>
-						{ __(
-							'Your homepage is currently set to show your latest posts. WordPress generates that page automatically using the active homepage template.'
-						) }
-						<ComponentsButton
-							variant="link"
-							onClick={ () => setIsConfiguringHomepage( true ) }
-						>
-							{ __( 'Configure Homepage' ) }
-						</ComponentsButton>
-					</Notice>
-				) }
+						{ __( 'Configure Homepage' ) }
+					</ComponentsButton>
+				</Notice>
+			) }
 			{ activeContentTab === 'templates' ? (
 				<PostTypeTemplatesTab postType={ postType } />
 			) : (

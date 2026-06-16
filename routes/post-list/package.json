@@ -26,6 +26,7 @@
 		"@wordpress/icons": "file:../../packages/icons",
 		"@wordpress/keycodes": "file:../../packages/keycodes",
 		"@wordpress/notices": "file:../../packages/notices",
+		"@wordpress/preferences": "file:../../packages/preferences",
 		"@wordpress/route": "file:../../packages/route",
 		"@wordpress/routes-lock-unlock": "file:../lock-unlock",
 		"@wordpress/ui": "file:../../packages/ui",
