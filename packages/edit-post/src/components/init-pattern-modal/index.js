@@ -63,7 +63,7 @@ export default function InitPatternModal() {
 							setSyncType( ! syncType ? 'unsynced' : undefined );
 						} }
 					/>
-					<Stack justify="right">
+					<Stack justify="end">
 						<Button
 							__next40pxDefaultSize
 							variant="primary"
