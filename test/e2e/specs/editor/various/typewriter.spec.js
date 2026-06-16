@@ -32,9 +32,9 @@ test.describe( 'Typewriter', () => {
 		// The page shouldn't be scrolled when it's being filled.
 		await page.keyboard.press( 'Enter' );
 
-		await expect
-			.poll( () => typewriterUtils.getCaretPosition() )
-			.toBeGreaterThanOrEqual( initialPosition );
+		expect(
+			await typewriterUtils.getCaretPosition()
+		).toBeGreaterThanOrEqual( initialPosition );
 
 		// Create blocks until the typewriter effect kicks in.
 		while (
@@ -55,9 +55,9 @@ test.describe( 'Typewriter', () => {
 		// Now the scroll position should be maintained.
 		await page.keyboard.press( 'Enter' );
 
-		await expect
-			.poll( () => typewriterUtils.getDiff( newPosition ) )
-			.toBeLessThanOrEqual( BUFFER );
+		expect(
+			await typewriterUtils.getDiff( newPosition )
+		).toBeLessThanOrEqual( BUFFER );
 
 		// Type until the text wraps.
 		while (
@@ -76,17 +76,17 @@ test.describe( 'Typewriter', () => {
 			await page.keyboard.type( 'a' );
 		}
 
-		await expect
-			.poll( () => typewriterUtils.getDiff( newPosition ) )
-			.toBeLessThanOrEqual( BUFFER );
+		expect(
+			await typewriterUtils.getDiff( newPosition )
+		).toBeLessThanOrEqual( BUFFER );
 
 		// Pressing backspace will reposition the caret to the previous line.
 		// Scroll position should be adjusted again.
 		await page.keyboard.press( 'Backspace' );
 
-		await expect
-			.poll( () => typewriterUtils.getDiff( newPosition ) )
-			.toBeLessThanOrEqual( BUFFER );
+		expect(
+			await typewriterUtils.getDiff( newPosition )
+		).toBeLessThanOrEqual( BUFFER );
 
 		// Should reset scroll position to maintain.
 		await page.keyboard.press( 'ArrowUp' );
@@ -98,9 +98,9 @@ test.describe( 'Typewriter', () => {
 		// Should be scrolled to new position.
 		await page.keyboard.press( 'Enter' );
 
-		await expect
-			.poll( () => typewriterUtils.getDiff( positionAfterArrowUp ) )
-			.toBeLessThanOrEqual( BUFFER );
+		expect(
+			await typewriterUtils.getDiff( positionAfterArrowUp )
+		).toBeLessThanOrEqual( BUFFER );
 	} );
 
 	test( 'should maintain caret position after scroll', async ( {
@@ -161,9 +161,7 @@ test.describe( 'Typewriter', () => {
 			);
 		} );
 
-		await expect
-			.poll( () => typewriterUtils.getDiff( initialPosition ) )
-			.toBe( 0 );
+		expect( await typewriterUtils.getDiff( initialPosition ) ).toBe( 0 );
 	} );
 
 	test( 'should maintain caret position after leaving last editable', async ( {
@@ -181,9 +179,9 @@ test.describe( 'Typewriter', () => {
 		const initialPosition = await typewriterUtils.getCaretPosition();
 
 		// Should maintain scroll position.
-		await expect
-			.poll( () => typewriterUtils.getDiff( initialPosition ) )
-			.toBeLessThanOrEqual( BUFFER );
+		expect(
+			await typewriterUtils.getDiff( initialPosition )
+		).toBeLessThanOrEqual( BUFFER );
 	} );
 
 	test( 'should scroll caret into view from the top', async ( {
@@ -245,9 +243,9 @@ test.describe( 'Typewriter', () => {
 		// Should maintain new caret position.
 		await page.keyboard.press( 'Enter' );
 
-		await expect
-			.poll( () => typewriterUtils.getDiff( newBottomPosition ) )
-			.toBeLessThanOrEqual( BUFFER );
+		expect(
+			await typewriterUtils.getDiff( newBottomPosition )
+		).toBeLessThanOrEqual( BUFFER );
 
 		await page.keyboard.press( 'Backspace' );
 
@@ -277,9 +275,9 @@ test.describe( 'Typewriter', () => {
 		// Should maintain new caret position.
 		await page.keyboard.press( 'Enter' );
 
-		await expect
-			.poll( () => typewriterUtils.getDiff( newTopPosition ) )
-			.toBeLessThanOrEqual( BUFFER );
+		expect(
+			await typewriterUtils.getDiff( newTopPosition )
+		).toBeLessThanOrEqual( BUFFER );
 	} );
 } );
 
@@ -293,20 +291,9 @@ class TypewriterUtils {
 
 	async getCaretPosition() {
 		return await this.#page.evaluate( () => {
-			// Wait for one animation frame before measuring. When the selected
-			// block supports an editable root, the writing flow wrapper holds
-			// focus instead of the block's editable element, so a keystroke
-			// does not move the browser's focus to the new caret. The
-			// typewriter's scroll compensation then lands on the next
-			// animation frame rather than synchronously, so the caret reaches
-			// its final position one frame later. Without the wrapper this is
-			// effectively a no-op.
-			return new Promise( ( resolve ) => {
-				const view = document.activeElement?.contentWindow ?? window;
-				view.requestAnimationFrame( () => {
-					resolve( window.wp.dom.computeCaretRect( view ).y );
-				} );
-			} );
+			return window.wp.dom.computeCaretRect(
+				document.activeElement?.contentWindow ?? window
+			).y;
 		} );
 	}
 
