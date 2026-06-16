@@ -15,7 +15,7 @@
  * @param string[] $attr Array of allowed CSS attributes.
  * @return string[] Modified array of allowed CSS attributes.
  */
-function gutenberg_add_svg_to_safe_style_css( $attr ) {
+function gutenberg_add_svg_to_safe_style_css( array $attr ): array {
 	$svg_properties = array(
 		// Fill.
 		'fill',
