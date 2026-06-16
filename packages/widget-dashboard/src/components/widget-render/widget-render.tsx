@@ -16,11 +16,13 @@ interface WidgetRenderProps {
 	widgetType: WidgetType;
 }
 
-/*
+/**
  * Adapter around the host-agnostic `WidgetRender` primitive. Bridges the
  * dashboard context (`resolveWidgetModule`, layout state) and turns
  * layout-level attribute updates into the per-instance `setAttributes`
  * callback the render contract expects.
+ *
+ * @param {WidgetRenderProps} props Component props.
  */
 export function WidgetRender( { widget, widgetType }: WidgetRenderProps ) {
 	const { layout, onLayoutChange, resolveWidgetModule } =

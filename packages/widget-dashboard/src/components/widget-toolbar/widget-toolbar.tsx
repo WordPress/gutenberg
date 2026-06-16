@@ -27,10 +27,7 @@ export interface WidgetToolbarProps {
  * top-right corner and lays controls out in the row the header also uses, so
  * a toolbar lines up with the title when they overlap.
  *
- * @param {WidgetToolbarProps} props             Component props.
- * @param {ReactNode}          props.children    Toolbar controls.
- * @param {string}             [props.className] Variant surface class.
- * @return {React.ReactNode} The toolbar shell.
+ * @param {WidgetToolbarProps} props Component props.
  */
 export function WidgetToolbar( {
 	children,

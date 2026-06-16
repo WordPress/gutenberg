@@ -19,19 +19,13 @@ import type { ActionsMenuItem } from '../actions-menu';
 import styles from './actions.module.css';
 
 /**
- * Edit toolbar for the dashboard. Customize mode surfaces Add widget,
+ * Edit toolbar for the dashboard. In customize mode it surfaces Add widget,
  * Layout settings (when grid settings are editable), Cancel, and Done;
- * otherwise a single Customize button. The buttons and the more-actions
- * menu are triggers: they flip the lifted UI state that the dashboard's
- * targets (the inserter, the settings editors, the reset confirmation)
- * react to. Widget layout edits and grid settings share the same staging
- * layer while customize mode is active.
+ * otherwise a single Customize button. Buttons and the overflow menu are
+ * triggers that flip the shared UI state the overlays react to.
  *
- * Returns `null` when the dashboard is mounted without `onEditChange`
- * so hosts that don't expose edit mode can keep `Actions` in their
- * tree unconditionally.
- *
- * @return {React.ReactNode} - The Actions component.
+ * Returns `null` when mounted without `onEditChange`, so hosts that don't
+ * expose edit mode can keep `Actions` in their tree unconditionally.
  */
 export function Actions(): React.ReactNode {
 	const {

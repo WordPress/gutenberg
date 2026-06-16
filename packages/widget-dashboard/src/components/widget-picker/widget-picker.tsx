@@ -86,8 +86,7 @@ interface WidgetPickerProps {
  * exposes a single "Select" action with bulk support so users can insert one
  * or several widgets at once.
  *
- * @param { WidgetPickerProps } props - The props for the WidgetPicker component.
- * @return { React.ReactNode } - The WidgetPicker component.
+ * @param {WidgetPickerProps} props Component props.
  */
 export function WidgetPicker( {
 	onSelect,
