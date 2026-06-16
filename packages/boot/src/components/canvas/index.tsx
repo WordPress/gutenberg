@@ -78,6 +78,7 @@ type PreparedPreviewDocument = Document & {
 };
 
 const PREVIEW_QUERY_ARG = 'site-editor-preview';
+const PREVIEW_REFRESH_QUERY_ARG = 'site-editor-preview-refresh';
 
 function addPreviewQueryArg( url?: string ) {
 	if ( ! url ) {
@@ -97,6 +98,21 @@ function removePreviewQueryArg( url?: string ) {
 	try {
 		const parsed = new URL( url, window.location.origin );
 		parsed.searchParams.delete( PREVIEW_QUERY_ARG );
+		parsed.searchParams.delete( PREVIEW_REFRESH_QUERY_ARG );
+		return parsed.href;
+	} catch {
+		return url;
+	}
+}
+
+function removePreviewRefreshQueryArg( url?: string ) {
+	if ( ! url ) {
+		return undefined;
+	}
+
+	try {
+		const parsed = new URL( url, window.location.origin );
+		parsed.searchParams.delete( PREVIEW_REFRESH_QUERY_ARG );
 		return parsed.href;
 	} catch {
 		return url;
@@ -110,8 +126,14 @@ function urlsMatch( first?: string, second?: string ) {
 
 	try {
 		return (
-			new URL( first, window.location.origin ).href ===
-			new URL( second, window.location.origin ).href
+			new URL(
+				removePreviewRefreshQueryArg( first ) || '',
+				window.location.origin
+			).href ===
+			new URL(
+				removePreviewRefreshQueryArg( second ) || '',
+				window.location.origin
+			).href
 		);
 	} catch {
 		return first === second;
@@ -209,7 +231,10 @@ function PreviewEditButton( {
 	);
 }
 
-function PreviewDocumentInfo( { canvas }: CanvasProps ) {
+function PreviewDocumentInfo( {
+	canvas,
+	onPreviewRefresh,
+}: CanvasProps & { onPreviewRefresh?: () => void } ) {
 	const invalidate = useInvalidate();
 	const [ isConfiguringHomepage, setIsConfiguringHomepage ] =
 		useState( false );
@@ -289,7 +314,10 @@ function PreviewDocumentInfo( { canvas }: CanvasProps ) {
 			{ isConfiguringHomepage && (
 				<ConfigureHomepageModal
 					onClose={ () => setIsConfiguringHomepage( false ) }
-					onSaved={ invalidate }
+					onSaved={ () => {
+						invalidate();
+						onPreviewRefresh?.();
+					} }
 				/>
 			) }
 		</>
@@ -347,6 +375,7 @@ function PreviewToolbar( {
 	canGoForward = false,
 	onGoBack,
 	onGoForward,
+	onPreviewRefresh,
 }: CanvasProps & {
 	editLink?: string;
 	isResolving?: boolean;
@@ -356,6 +385,7 @@ function PreviewToolbar( {
 	canGoForward?: boolean;
 	onGoBack?: () => void;
 	onGoForward?: () => void;
+	onPreviewRefresh?: () => void;
 } ) {
 	return (
 		<div className="boot-preview-canvas__toolbar">
@@ -392,7 +422,10 @@ function PreviewToolbar( {
 				</div>
 			</div>
 			<div className="boot-preview-canvas__toolbar-center">
-				<PreviewDocumentInfo canvas={ canvas } />
+				<PreviewDocumentInfo
+					canvas={ canvas }
+					onPreviewRefresh={ onPreviewRefresh }
+				/>
 			</div>
 			<div className="boot-preview-canvas__toolbar-end">
 				<PreviewDeviceSwitcher
@@ -432,6 +465,7 @@ function FrontendPreviewCanvas( { canvas }: CanvasProps ) {
 		useState< PreviewDevice >( 'desktop' );
 	const initialPreviewUrl = addPreviewQueryArg( canvas.previewUrl );
 	const [ frameSrc, setFrameSrc ] = useState( initialPreviewUrl );
+	const [ frameRefreshKey, setFrameRefreshKey ] = useState( 0 );
 	const [ previewHistory, setPreviewHistory ] = useState< string[] >(
 		initialPreviewUrl ? [ initialPreviewUrl ] : []
 	);
@@ -524,6 +558,36 @@ function FrontendPreviewCanvas( { canvas }: CanvasProps ) {
 			fallbackPreviewMetadata,
 		]
 	);
+
+	const refreshCurrentPreview = useCallback( () => {
+		previewContextRequestRef.current += 1;
+		setIsResolving( false );
+		setCurrentEditLink( canvas.editLink );
+		setPreviewMetadata( fallbackPreviewMetadata );
+
+		const currentPreviewUrl =
+			previewHistoryRef.current[ previewHistoryIndexRef.current ] ||
+			frameSrc ||
+			addPreviewQueryArg( canvas.previewUrl );
+
+		if ( currentPreviewUrl ) {
+			setFrameSrc(
+				addQueryArgs(
+					removePreviewRefreshQueryArg( currentPreviewUrl ),
+					{
+						[ PREVIEW_REFRESH_QUERY_ARG ]: Date.now().toString(),
+					}
+				)
+			);
+		}
+
+		setFrameRefreshKey( ( key ) => key + 1 );
+	}, [
+		canvas.editLink,
+		canvas.previewUrl,
+		fallbackPreviewMetadata,
+		frameSrc,
+	] );
 
 	const preparePreviewDocument = useCallback(
 		( iframe: HTMLIFrameElement ) => {
@@ -683,6 +747,7 @@ function FrontendPreviewCanvas( { canvas }: CanvasProps ) {
 				canGoForward={ previewHistoryIndex < previewHistory.length - 1 }
 				onGoBack={ () => handleHistoryNavigation( -1 ) }
 				onGoForward={ () => handleHistoryNavigation( 1 ) }
+				onPreviewRefresh={ refreshCurrentPreview }
 			/>
 			<div className="boot-preview-canvas__viewport">
 				<div
@@ -693,6 +758,7 @@ function FrontendPreviewCanvas( { canvas }: CanvasProps ) {
 				>
 					{ frameSrc && (
 						<iframe
+							key={ frameRefreshKey }
 							title={ __( 'Site preview' ) }
 							src={ frameSrc }
 							onLoad={ handleLoad }

@@ -300,6 +300,62 @@ function gutenberg_site_editor_get_post_preview_context(
 }
 
 /**
+ * Determine whether a title is effectively just "Home".
+ *
+ * @param string $title Page title.
+ * @return bool Whether the title is a home-equivalent title.
+ */
+function gutenberg_site_editor_is_home_equivalent_title( $title ) {
+	$normalized_title = strtolower(
+		html_entity_decode(
+			wp_strip_all_tags( (string) $title ),
+			ENT_QUOTES,
+			get_bloginfo( 'charset' )
+		)
+	);
+	$normalized_title = preg_replace( '/[^a-z0-9]+/', '', $normalized_title );
+
+	return in_array(
+		$normalized_title,
+		array( 'home', 'homepage', 'frontpage' ),
+		true
+	);
+}
+
+/**
+ * Get preview context for a static page used as the site's front page.
+ *
+ * @param int $post_id Front page post ID.
+ * @return array Preview context.
+ */
+function gutenberg_site_editor_get_static_front_page_preview_context( $post_id ) {
+	$context = gutenberg_site_editor_get_post_preview_context(
+		$post_id,
+		'home',
+		__( 'Homepage', 'gutenberg' ),
+		'homepage'
+	);
+	if ( empty( $context ) ) {
+		return array();
+	}
+
+	$page_title = get_the_title( $post_id );
+	if ( '' === $page_title ) {
+		$page_title = __( 'Untitled', 'gutenberg' );
+	}
+
+	$context['previewLabel'] = gutenberg_site_editor_is_home_equivalent_title( $page_title )
+		? __( 'Home', 'gutenberg' )
+		: sprintf(
+			/* translators: %s: The title of the static page used as the homepage. */
+			__( 'Home (%s)', 'gutenberg' ),
+			$page_title
+		);
+
+	return $context;
+}
+
+/**
  * Get preview context for the site's front page.
  *
  * @return array Preview context.
@@ -308,12 +364,7 @@ function gutenberg_site_editor_get_front_page_preview_context() {
 	if ( 'page' === get_option( 'show_on_front' ) ) {
 		$page_on_front = (int) get_option( 'page_on_front' );
 		if ( $page_on_front ) {
-			return gutenberg_site_editor_get_post_preview_context(
-				$page_on_front,
-				'home',
-				__( 'Homepage', 'gutenberg' ),
-				'homepage'
-			);
+			return gutenberg_site_editor_get_static_front_page_preview_context( $page_on_front );
 		}
 	}
 
@@ -406,21 +457,30 @@ function gutenberg_site_editor_get_preview_context( $url ) {
 		return array();
 	}
 
+	if (
+		gutenberg_site_editor_normalize_url_path( $url ) ===
+		gutenberg_site_editor_normalize_url_path( home_url( '/' ) )
+	) {
+		return gutenberg_site_editor_get_front_page_preview_context();
+	}
+
 	$post_id = url_to_postid( $url );
 	if ( $post_id ) {
+		$page_on_front = (int) get_option( 'page_on_front' );
+		if (
+			'page' === get_option( 'show_on_front' ) &&
+			$page_on_front &&
+			$post_id === $page_on_front
+		) {
+			return gutenberg_site_editor_get_static_front_page_preview_context( $post_id );
+		}
+
 		return gutenberg_site_editor_get_post_preview_context( $post_id );
 	}
 
 	$term_context = gutenberg_site_editor_get_term_preview_context( $url );
 	if ( ! empty( $term_context ) ) {
 		return $term_context;
-	}
-
-	if (
-		gutenberg_site_editor_normalize_url_path( $url ) ===
-		gutenberg_site_editor_normalize_url_path( home_url( '/' ) )
-	) {
-		return gutenberg_site_editor_get_front_page_preview_context();
 	}
 
 	return array(

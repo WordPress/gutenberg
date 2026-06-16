@@ -4,7 +4,7 @@
 import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { home, layout, page, postList } from '@wordpress/icons';
 import { notFound } from '@wordpress/route';
 
@@ -28,6 +28,11 @@ function getFirstPostId( postIds?: string[] | string ) {
 
 type PostTypeObject = {
 	has_archive?: boolean;
+};
+
+type SiteSettings = {
+	show_on_front?: string;
+	page_on_front?: number;
 };
 
 type TemplateSlotKind = 'archive' | 'single';
@@ -57,6 +62,8 @@ type TemplateRecord = {
 };
 
 type PreviewableRecord = {
+	id?: number | string;
+	link?: string;
 	status?: string;
 	title?:
 		| string
@@ -65,6 +72,14 @@ type PreviewableRecord = {
 				rendered?: string;
 		  };
 };
+
+function getPlainTextTitle( title?: string ) {
+	if ( ! title ) {
+		return '';
+	}
+
+	return decodeEntities( title.replace( /<[^>]+>/g, '' ) ).trim();
+}
 
 function getRecordTitle(
 	record: PreviewableRecord | undefined,
@@ -75,7 +90,28 @@ function getRecordTitle(
 			? record.title
 			: record?.title?.rendered || record?.title?.raw;
 
-	return title ? decodeEntities( title ) : fallback;
+	return getPlainTextTitle( title ) || fallback;
+}
+
+function isHomeEquivalentTitle( title: string ) {
+	const normalizedTitle = title
+		.toLocaleLowerCase()
+		.replace( /[^a-z0-9]+/g, '' );
+
+	return [ 'home', 'homepage', 'frontpage' ].includes( normalizedTitle );
+}
+
+function getStaticHomepageLabel( record: PreviewableRecord | undefined ) {
+	const title = getRecordTitle( record, __( 'Home' ) );
+	if ( isHomeEquivalentTitle( title ) ) {
+		return __( 'Home' );
+	}
+
+	return sprintf(
+		/* translators: %s: The title of the static page used as the homepage. */
+		__( 'Home (%s)' ),
+		title
+	);
 }
 
 function getPreviewStatusLabel( record?: PreviewableRecord ) {
@@ -342,16 +378,44 @@ export const route = {
 				params.type,
 				postId
 			);
+			const previewRecord = post as PreviewableRecord | undefined;
+
+			if ( params.type === 'page' ) {
+				const siteSettings = ( await resolveSelect(
+					coreStore
+				).getEntityRecord( 'root', 'site' ) ) as
+					| SiteSettings
+					| undefined;
+
+				if (
+					siteSettings?.show_on_front === 'page' &&
+					siteSettings.page_on_front &&
+					Number( postId ) === Number( siteSettings.page_on_front )
+				) {
+					return {
+						postType: params.type,
+						postId,
+						isPreview: true,
+						editLink: `/types/${ params.type }/edit/${ postId }?skipStartPageOptions=true`,
+						previewUrl: previewRecord?.link,
+						previewLabel: getStaticHomepageLabel( previewRecord ),
+						previewIcon: home,
+						previewStatus: 'homepage',
+						previewStatusLabel: __( 'Homepage' ),
+						previewEditLabel: __( 'Edit page' ),
+					};
+				}
+			}
 
 			return {
 				postType: params.type,
 				postId,
 				isPreview: true,
 				editLink: `/types/${ params.type }/edit/${ postId }?skipStartPageOptions=true`,
-				previewUrl: ( post as any )?.link,
-				previewLabel: getRecordTitle( post as any, params.type ),
+				previewUrl: previewRecord?.link,
+				previewLabel: getRecordTitle( previewRecord, params.type ),
 				previewIcon: getPostTypePreviewIcon( params.type ),
-				previewStatusLabel: getPreviewStatusLabel( post as any ),
+				previewStatusLabel: getPreviewStatusLabel( previewRecord ),
 				previewEditLabel: getPostTypePreviewEditLabel( params.type ),
 			};
 		}
@@ -359,12 +423,7 @@ export const route = {
 		if ( params.type === 'page' ) {
 			const siteSettings = ( await resolveSelect(
 				coreStore
-			).getEntityRecord( 'root', 'site' ) ) as
-				| {
-						show_on_front?: string;
-						page_on_front?: number;
-				  }
-				| undefined;
+			).getEntityRecord( 'root', 'site' ) ) as SiteSettings | undefined;
 			if ( siteSettings?.show_on_front === 'posts' ) {
 				const templateId = await resolveSelect(
 					coreStore
@@ -396,7 +455,7 @@ export const route = {
 						isPreview: true,
 						editLink: `/types/${ params.type }/edit/${ postId }?skipStartPageOptions=true`,
 						previewUrl: frontPage.link,
-						previewLabel: getRecordTitle( frontPage, __( 'Home' ) ),
+						previewLabel: getStaticHomepageLabel( frontPage ),
 						previewIcon: home,
 						previewStatus: 'homepage',
 						previewStatusLabel: __( 'Homepage' ),

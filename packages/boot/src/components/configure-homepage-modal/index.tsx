@@ -18,6 +18,7 @@ import { Text } from '@wordpress/ui';
 
 const READING_DISPLAY_LATEST = 'posts';
 const READING_DISPLAY_STATIC = 'page';
+const HOME_PAGE_TITLE_SLUGS = [ 'home', 'homepage', 'frontpage' ];
 
 interface ConfigureHomepageModalProps {
 	onClose: () => void;
@@ -38,9 +39,34 @@ interface SiteSettings {
 	page_for_posts?: number;
 }
 
+function getPlainTextTitle( title?: string ) {
+	if ( ! title ) {
+		return '';
+	}
+
+	return decodeEntities( title.replace( /<[^>]+>/g, '' ) ).trim();
+}
+
 function getPageTitle( page: PageRecord ) {
-	return decodeEntities(
-		page.title?.rendered || page.title?.raw || __( '(no title)' )
+	return (
+		getPlainTextTitle( page.title?.rendered || page.title?.raw ) ||
+		__( '(no title)' )
+	);
+}
+
+function isHomeEquivalentTitle( title: string ) {
+	const normalizedTitle = title
+		.toLocaleLowerCase()
+		.replace( /[^a-z0-9]+/g, '' );
+
+	return HOME_PAGE_TITLE_SLUGS.includes( normalizedTitle );
+}
+
+function getSuggestedHomePageId( pages: PageRecord[] ) {
+	return (
+		pages
+			.find( ( page ) => isHomeEquivalentTitle( getPageTitle( page ) ) )
+			?.id.toString() || ''
 	);
 }
 
@@ -114,6 +140,7 @@ export default function ConfigureHomepageModal( {
 	const [ postsPageId, setPostsPageId ] = useState(
 		siteSettings?.page_for_posts?.toString() || ''
 	);
+	const [ hasSelectedHomepage, setHasSelectedHomepage ] = useState( false );
 	const [ validationError, setValidationError ] = useState< string >();
 	const [ isSaving, setIsSaving ] = useState( false );
 
@@ -125,11 +152,16 @@ export default function ConfigureHomepageModal( {
 		setMode( siteSettings.show_on_front || READING_DISPLAY_LATEST );
 		setHomePageId( siteSettings.page_on_front?.toString() || '' );
 		setPostsPageId( siteSettings.page_for_posts?.toString() || '' );
+		setHasSelectedHomepage( false );
 	}, [ siteSettings ] );
 
 	const pageRecords = useMemo(
 		() => ( Array.isArray( pages ) ? ( pages as PageRecord[] ) : [] ),
 		[ pages ]
+	);
+	const suggestedHomePageId = useMemo(
+		() => getSuggestedHomePageId( pageRecords ),
+		[ pageRecords ]
 	);
 	const homepageOptions = useMemo(
 		() => getSelectOptions( pageRecords, homePageId ),
@@ -140,9 +172,32 @@ export default function ConfigureHomepageModal( {
 		[ homePageId, pageRecords, postsPageId ]
 	);
 
+	useEffect( () => {
+		if (
+			mode !== READING_DISPLAY_STATIC ||
+			homePageId ||
+			hasSelectedHomepage ||
+			! suggestedHomePageId
+		) {
+			return;
+		}
+
+		setHomePageId( suggestedHomePageId );
+		if ( suggestedHomePageId === postsPageId ) {
+			setPostsPageId( '' );
+		}
+	}, [
+		hasSelectedHomepage,
+		homePageId,
+		mode,
+		postsPageId,
+		suggestedHomePageId,
+	] );
+
 	const handleDisplayModeChange = ( nextMode: string ) => {
 		setMode( nextMode );
 		setValidationError( undefined );
+		setHasSelectedHomepage( false );
 
 		if ( nextMode === READING_DISPLAY_LATEST ) {
 			setHomePageId( '' );
@@ -150,13 +205,17 @@ export default function ConfigureHomepageModal( {
 			return;
 		}
 
-		if ( ! homePageId && pageRecords.length > 0 ) {
-			setHomePageId( pageRecords[ 0 ].id.toString() );
+		if ( ! homePageId ) {
+			setHomePageId( suggestedHomePageId );
+			if ( suggestedHomePageId === postsPageId ) {
+				setPostsPageId( '' );
+			}
 		}
 	};
 
 	const handleHomepageSelect = ( nextHomePageId: string ) => {
 		setHomePageId( nextHomePageId );
+		setHasSelectedHomepage( true );
 		setValidationError( undefined );
 
 		if ( nextHomePageId === postsPageId ) {
