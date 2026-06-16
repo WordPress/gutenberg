@@ -1085,10 +1085,12 @@ export function getListViewExpandRevision( state ) {
  * Intentionally private: this is the derived participation logic (block type
  * `listView` support and the `core/navigation` special case) shared by the List
  * View consumers. A `listView`-supporting block drops out when it has no inner
- * blocks and disallows inserting any (`allowedBlocks` is `[]` or `false`): the
- * nested List View panel would then render no block rows and no appender, so it
- * is hidden rather than shown empty. Keeping the read internal lets this
- * computation evolve without a back-compat commitment.
+ * blocks and its `allowedBlocks` (`[]` or `false`) permits no block: the nested
+ * List View panel would render no rows and no appender, so it is hidden rather
+ * than shown empty. This is a signal, not a guarantee — a child naming this
+ * block as its `parent` stays insertable regardless (see `canInsertBlockType`);
+ * that edge case is accepted to keep the check cheap. Keeping the read internal
+ * lets this computation evolve without a back-compat commitment.
  *
  * @param {Object} state    Global application state.
  * @param {string} clientId Client ID of the block.
@@ -1108,29 +1110,18 @@ export function hasBlockListViewSupport( state, clientId ) {
 		return false;
 	}
 
-	// When a block has no inner blocks and explicitly disallows inserting any,
-	// the nested List View panel would render no block rows and no appender, so
-	// hide it. When insertion is allowed the panel still shows an appender, so
-	// it stays.
-	//
-	// Insertion is disallowed when `allowedBlocks` permits nothing — either an
-	// empty array (`[]`) or the boolean `false`.
-	//
-	// `allowedBlocks` is used rather than inferring this from `templateLock`,
-	// because a content-locked ancestor relaxes a child's own
-	// `templateLock: 'all'` to `contentOnly` (see `useNestedSettingsUpdate`),
-	// whereas `allowedBlocks` is carried through unchanged.
+	// `allowedBlocks` permits no block when it is `[]` or `false`; an unset value
+	// is unrestricted and is intentionally not matched.
 	const allowedBlocks = getBlockListSettings(
 		state,
 		clientId
 	)?.allowedBlocks;
-	const insertionDisallowed =
-		allowedBlocks === false ||
-		( Array.isArray( allowedBlocks ) && allowedBlocks.length === 0 );
-	const isEmptyAndInsertionDisallowed =
-		getBlockOrder( state, clientId ).length === 0 && insertionDisallowed;
+	const isEmptyAndNoAllowedBlocks =
+		getBlockOrder( state, clientId ).length === 0 &&
+		( allowedBlocks === false ||
+			( Array.isArray( allowedBlocks ) && allowedBlocks.length === 0 ) );
 
-	return ! isEmptyAndInsertionDisallowed;
+	return ! isEmptyAndNoAllowedBlocks;
 }
 
 /**
