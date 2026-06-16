@@ -51,12 +51,12 @@
 		"@wordpress/i18n": "file:../i18n"
 	},
 	"devDependencies": {
-		"@storybook/addon-docs": "^10.2.8",
-		"@storybook/react-vite": "^10.2.8",
+		"@storybook/addon-docs": "^10.4.3",
+		"@storybook/react-vite": "^10.4.3",
 		"@wordpress/components": "file:../components",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/ui": "file:../ui",
-		"storybook": "^10.2.8"
+		"storybook": "^10.4.3"
 	},
 	"peerDependencies": {
 		"@types/react": "^18.3.27",
