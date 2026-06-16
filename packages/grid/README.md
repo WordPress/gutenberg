@@ -156,6 +156,7 @@ interface DashboardGridLayoutItem {
 | `renderDragPreview`  | `ComponentType< DragPreviewRenderProps >`  | —        | Wrap the dragged-clone visual mounted inside `<DragOverlay>`. See [Custom drag preview](#custom-drag-preview).                                          |
 | `renderGridOverlay`  | `ComponentType< GridOverlayRenderProps >`  | —        | Override the default edit-mode overlay that visualizes the column and row tracks. Receives the resolved `columns`, `rows`, `rowHeight`, and `isActive`. |
 | `className`          | `string`                                   | —        | Extra class on the grid root.                                                                                                                           |
+| `style`              | `CSSProperties`                            | —        | Inline styles on the grid root; the grid's own layout styles win over them.                                                                             |
 
 `DashboardGrid` forwards refs to its root `<div>`, and standard
 `<div>` attributes (`id`, `aria-*`, `data-*`, event handlers,
@@ -316,6 +317,7 @@ items flow around them; out-of-range values (negative, or beyond
 | `renderDragPreview`  | `ComponentType< DragPreviewRenderProps >`  | —       | Wrap the dragged-clone visual mounted inside `<DragOverlay>`. See [Custom drag preview](#custom-drag-preview).                                                                                          |
 | `renderGridOverlay`  | `ComponentType< GridOverlayRenderProps >`  | —       | Override the default edit-mode overlay that visualizes the lane tracks. Receives the resolved `columns` and `isActive`; lanes pass no row metrics because heights are content-driven.                   |
 | `className`          | `string`                                   | —       | Extra class on the surface root.                                                                                                                                                                        |
+| `style`              | `CSSProperties`                            | —       | Inline styles on the surface root; the surface's own layout styles win over them.                                                                                                                       |
 
 ### Native vs polyfill
 
