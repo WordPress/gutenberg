@@ -79,6 +79,28 @@ function gutenberg_site_editor_admin_bridge_use_block_editor_for_post( $use_bloc
 add_filter( 'use_block_editor_for_post', 'gutenberg_site_editor_admin_bridge_use_block_editor_for_post', 100, 2 );
 
 /**
+ * Hide the "Screen Options" tab inside the embedded wp-admin bridge.
+ *
+ * The bridge already provides its own Site Editor toolbar and back navigation.
+ * Classic wp-admin's Screen Options control belongs to the full wp-admin shell,
+ * so showing it inside an iframe makes the embedded edit screen feel like a
+ * nested admin page rather than a compatibility surface. This filter is scoped
+ * to requests carrying the bridge query arg, so normal wp-admin screens keep
+ * their Screen Options UI.
+ *
+ * @param bool $show_screen Whether to show Screen Options.
+ * @return bool Whether to show Screen Options.
+ */
+function gutenberg_site_editor_admin_bridge_show_screen_options( $show_screen ) {
+	if ( ! gutenberg_site_editor_is_admin_bridge_request() ) {
+		return $show_screen;
+	}
+
+	return false;
+}
+add_filter( 'screen_options_show_screen', 'gutenberg_site_editor_admin_bridge_show_screen_options' );
+
+/**
  * Add a body class to wp-admin screens embedded by the Site Editor bridge.
  *
  * @param string $classes Space-separated body classes.
@@ -95,6 +117,17 @@ add_filter( 'admin_body_class', 'gutenberg_site_editor_admin_bridge_body_class' 
 
 /**
  * Hide wp-admin chrome that duplicates the Site Editor shell in the bridge.
+ *
+ * This CSS is intentionally bridge-only. The iframe is a compatibility escape
+ * hatch for post types whose creation/editing UI depends on long-standing
+ * wp-admin hooks and meta boxes. In that context, the Site Editor is already
+ * providing the outer navigation, header, and back button, so duplicated
+ * wp-admin chrome creates a confusing "admin inside admin" experience.
+ *
+ * We keep plugin/admin notices visible because they can contain important
+ * contextual information about the embedded editor screen. The selectors below
+ * only hide structural chrome: the wp-admin menu, screen-meta controls, and the
+ * classic edit screen heading/action row.
  */
 function gutenberg_site_editor_admin_bridge_enqueue_styles() {
 	if ( ! gutenberg_site_editor_is_admin_bridge_request() ) {
@@ -102,18 +135,61 @@ function gutenberg_site_editor_admin_bridge_enqueue_styles() {
 	}
 
 	$css = '
+		/*
+		 * The full wp-admin menu is redundant inside the Site Editor iframe.
+		 * The Site Editor sidebar remains the source of navigation.
+		 */
 		body.gutenberg-site-editor-admin-bridge #adminmenumain,
 		body.gutenberg-site-editor-admin-bridge #adminmenuback,
 		body.gutenberg-site-editor-admin-bridge #adminmenuwrap {
 			display: none !important;
 		}
 
+		/*
+		 * Screen meta links include "Screen Options" and "Help". Screen Options
+		 * is also disabled via PHP, but the CSS keeps third-party screen-meta
+		 * output from leaving an empty control strip in the iframe.
+		 */
+		body.gutenberg-site-editor-admin-bridge #screen-meta,
+		body.gutenberg-site-editor-admin-bridge #screen-meta-links {
+			display: none !important;
+		}
+
+		/*
+		 * Classic edit screens render their own page heading row, such as
+		 * "Edit Event" plus an "Add New" action. The outer bridge toolbar already
+		 * labels the current collection and provides the back control, so this row
+		 * duplicates context and pushes the actual editing form down the iframe.
+		 */
+		body.gutenberg-site-editor-admin-bridge.post-php #wpbody-content > .wrap > h1:first-child,
+		body.gutenberg-site-editor-admin-bridge.post-new-php #wpbody-content > .wrap > h1:first-child {
+			display: none;
+		}
+
+		/*
+		 * Removing the heading leaves wp-admin default top spacing feeling too
+		 * large. Reduce only the embedded edit screen spacing; notices and the
+		 * edit form remain visible.
+		 */
+		body.gutenberg-site-editor-admin-bridge.post-php #wpbody-content > .wrap,
+		body.gutenberg-site-editor-admin-bridge.post-new-php #wpbody-content > .wrap {
+			margin-top: 20px;
+		}
+
+		/*
+		 * With the wp-admin menu hidden, reset the content/footer offset that
+		 * normally reserves space for that menu.
+		 */
 		body.gutenberg-site-editor-admin-bridge #wpcontent,
 		body.gutenberg-site-editor-admin-bridge.auto-fold #wpcontent,
 		body.gutenberg-site-editor-admin-bridge.auto-fold #wpfooter {
 			margin-left: 0 !important;
 		}
 
+		/*
+		 * Restore a modest left inset so the embedded edit form does not sit
+		 * flush against the iframe edge after the menu margin is removed.
+		 */
 		body.gutenberg-site-editor-admin-bridge #wpcontent,
 		body.gutenberg-site-editor-admin-bridge.auto-fold #wpcontent {
 			padding-left: 20px;

@@ -8,6 +8,7 @@ import { __ } from '@wordpress/i18n';
 import { notFound } from '@wordpress/route';
 
 const TEMPLATE_POST_TYPES = [ 'wp_template', 'wp_template_part' ];
+const NATIVE_EDIT_POST_TYPES = [ 'post', 'page', ...TEMPLATE_POST_TYPES ];
 
 type PostEditParams = {
 	type: string;
@@ -84,6 +85,14 @@ export const route = {
 	} ) {
 		const { params, search } = context;
 		const postId = getPostId( params );
+
+		if ( ! NATIVE_EDIT_POST_TYPES.includes( params.type ) ) {
+			return {
+				customCanvas: true,
+				postType: params.type,
+				postId,
+			};
+		}
 
 		return {
 			postType: params.type,
