@@ -8,7 +8,7 @@
 /**
  * Adds SVG presentation attributes to the list of safe CSS properties.
  *
- * `safecss_filter_attr()` only keeps allowlisted CSS properties, so SVG
+ * The {@see safecss_filter_attr()} function only keeps allowlisted CSS properties, so SVG
  * presentation attributes such as `fill` are stripped by default. This allows
  * the SVG-specific ones.
  *
