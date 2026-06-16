@@ -158,7 +158,7 @@ describe( 'buildMoveGhostIndex', () => {
 		expect( after.get( 'outside' ) ).toEqual( [ movedSibling ] );
 	} );
 
-	it( 'renders no ghost when the old parent has no other children', () => {
+	it( 'anchors on the old parent when it was an only child (no surviving sibling)', () => {
 		const moved = [
 			{
 				clientId: 'm1',
@@ -169,11 +169,90 @@ describe( 'buildMoveGhostIndex', () => {
 				fromIndex: 0,
 			},
 		];
-		const { after, before } = buildMoveGhostIndex(
+		const { after, before, insideParent } = buildMoveGhostIndex(
 			moved,
-			resolvers( [], { grp: [ 'm1' ] } )
+			// 'grp' still exists but is now empty (only child moved away).
+			resolvers( [ 'grp' ], { grp: [] } )
 		);
 		expect( after.size ).toBe( 0 );
 		expect( before.size ).toBe( 0 );
+		expect( insideParent.get( 'grp' ) ).toEqual( [ moved[ 0 ] ] );
+	} );
+
+	it( 'anchors on the old parent when every sibling also moved away', () => {
+		const m1 = {
+			clientId: 'm1',
+			name: 'core/paragraph',
+			authorId: null,
+			fromAnchorClientId: null,
+			fromParentClientId: 'grp',
+			fromIndex: 0,
+		};
+		const m2 = {
+			clientId: 'm2',
+			name: 'core/paragraph',
+			authorId: null,
+			fromAnchorClientId: 'm1',
+			fromParentClientId: 'grp',
+			fromIndex: 1,
+		};
+		const { insideParent } = buildMoveGhostIndex(
+			[ m1, m2 ],
+			// Both children still exist (moved elsewhere) but neither can
+			// anchor the other, so both fall back to the old parent.
+			resolvers( [ 'grp', 'm1', 'm2' ], { grp: [] } )
+		);
+		expect( insideParent.get( 'grp' ) ).toEqual( [ m1, m2 ] );
+	} );
+
+	it( 'renders no ghost when the old parent is itself gone or pending-moved', () => {
+		const movedChild = {
+			clientId: 'm1',
+			name: 'core/paragraph',
+			authorId: null,
+			fromAnchorClientId: null,
+			fromParentClientId: 'grp',
+			fromIndex: 0,
+		};
+		const movedParent = {
+			clientId: 'grp',
+			name: 'core/group',
+			authorId: null,
+			fromAnchorClientId: 'top',
+			fromParentClientId: '',
+			fromIndex: 1,
+		};
+		const { after, before, insideParent } = buildMoveGhostIndex(
+			[ movedChild, movedParent ],
+			// 'grp' exists but is itself pending-moved, so it can't host the
+			// child's ghost (it would drag it to the parent's destination).
+			resolvers( [ 'grp', 'top' ], { grp: [], '': [ 'top', 'grp' ] } )
+		);
+		// The child has nowhere stable to anchor → no ghost for it.
+		expect( insideParent.has( 'grp' ) ).toBe( false );
+		// The parent itself still gets its normal previous-sibling anchor.
+		expect( after.get( 'top' ) ).toEqual( [ movedParent ] );
+		expect( before.size ).toBe( 0 );
+	} );
+
+	it( 'renders no inside-parent ghost at the root level', () => {
+		const moved = [
+			{
+				clientId: 'm1',
+				name: 'core/paragraph',
+				authorId: null,
+				fromAnchorClientId: null,
+				fromParentClientId: '',
+				fromIndex: 0,
+			},
+		];
+		const { after, before, insideParent } = buildMoveGhostIndex(
+			moved,
+			resolvers( [], { '': [] } )
+		);
+		// The root ('') has no parent block to anchor on.
+		expect( after.size ).toBe( 0 );
+		expect( before.size ).toBe( 0 );
+		expect( insideParent.size ).toBe( 0 );
 	} );
 } );

@@ -15,14 +15,23 @@
  * descriptors. Pure: all store access is injected via `resolvers` so this
  * is unit-testable without a registry.
  *
- * - `after`  : Map<anchorClientId, MovedBlockDescriptor[]> — render the ghost
- *              immediately after the (still-present) previous-sibling anchor.
- * - `before` : Map<firstSiblingClientId, MovedBlockDescriptor[]> — used when
- *              the block was the old parent's first child (null anchor) or the
- *              recorded anchor no longer exists; render the ghost before the
- *              old parent's current first (non-moved) child.
+ * - `after`        : Map<anchorClientId, MovedBlockDescriptor[]> — render the
+ *                    ghost immediately after the (still-present) previous-
+ *                    sibling anchor.
+ * - `before`       : Map<firstSiblingClientId, MovedBlockDescriptor[]> — used
+ *                    when the block was the old parent's first child (null
+ *                    anchor) or the recorded anchor no longer exists; render
+ *                    the ghost before the old parent's current first
+ *                    (non-moved) child.
+ * - `insideParent` : Map<oldParentClientId, MovedBlockDescriptor[]> — used
+ *                    when no sibling survives in the old parent (the moved
+ *                    block was an only child, or every sibling also moved
+ *                    away). The ghost renders adjacent to the now-empty old
+ *                    parent so the original position still has a cue.
  *
- * A move whose old parent has no other children produces no ghost (graceful).
+ * A move at the root with no surviving sibling, or whose old parent is itself
+ * gone or pending-moved, produces no ghost (graceful) — there is no stable
+ * place to anchor it.
  *
  * @param {MovedBlockDescriptor[]}      moved                 Moved-block descriptors.
  * @param {Object}                      resolvers             Injected store accessors.
@@ -31,11 +40,13 @@
  * @param {(parentId:string)=>string[]} resolvers.getSiblings Current child order
  *                                                            of a parent.
  * @return {{ after: Map<string, MovedBlockDescriptor[]>,
- *            before: Map<string, MovedBlockDescriptor[]> }} The ghost index.
+ *            before: Map<string, MovedBlockDescriptor[]>,
+ *            insideParent: Map<string, MovedBlockDescriptor[]> }} The ghost index.
  */
 export function buildMoveGhostIndex( moved, { blockExists, getSiblings } ) {
 	const after = new Map();
 	const before = new Map();
+	const insideParent = new Map();
 	const sorted = [ ...moved ].sort( ( a, b ) => a.fromIndex - b.fromIndex );
 
 	// A pending-moved block is itself displaced to its new position, so it
@@ -62,15 +73,26 @@ export function buildMoveGhostIndex( moved, { blockExists, getSiblings } ) {
 			push( after, anchor, descriptor );
 			continue;
 		}
-		const siblings =
-			getSiblings( descriptor.fromParentClientId ?? '' ) ?? [];
+		const parentId = descriptor.fromParentClientId ?? '';
+		const siblings = getSiblings( parentId ) ?? [];
 		const firstSibling = siblings.find(
 			( id ) => id !== descriptor.clientId && ! movedIds.has( id )
 		);
 		if ( firstSibling ) {
 			push( before, firstSibling, descriptor );
+			continue;
+		}
+		// No surviving sibling to anchor on (only child, or all siblings also
+		// moved). Fall back to the old parent so the ghost still appears at
+		// the emptied container instead of vanishing. Skipped at the root
+		// ('' has no parent block to anchor on) and when the old parent is
+		// itself gone or pending-moved — anchoring there would drag the ghost
+		// to the parent's destination, the same displacement `isUsableAnchor`
+		// guards against.
+		if ( isUsableAnchor( parentId ) ) {
+			push( insideParent, parentId, descriptor );
 		}
 	}
 
-	return { after, before };
+	return { after, before, insideParent };
 }
