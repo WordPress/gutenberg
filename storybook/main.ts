@@ -91,6 +91,11 @@ const config: StorybookConfig = {
 			),
 			shouldExtractLiteralValuesFromEnum: true,
 			shouldRemoveUndefinedFromOptional: true,
+			// Keep JSDoc tags like `@ignore` in prop descriptions so Storybook
+			// native docs-tools parser can filter them. The Vite docgen plugin
+			// defaults `shouldIncludePropTagMap` to true, splitting tags into
+			// a separate object that Storybook does not read for `@ignore`.
+			shouldIncludePropTagMap: false,
 			propFilter: ( prop ) => {
 				if ( ! prop.parent ) {
 					return true;
