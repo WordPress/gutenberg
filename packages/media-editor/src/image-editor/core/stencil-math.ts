@@ -6,6 +6,7 @@ import type { HandlePosition, NormalizedRect, Size } from './types';
 
 export type { HandlePosition };
 
+/** Axis whose resize distance controls the locked-ratio size projection. */
 export type ResizeDriverAxis = 'width' | 'height';
 
 /**
