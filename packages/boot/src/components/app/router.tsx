@@ -8,6 +8,7 @@ import type { ComponentType } from 'react';
  */
 import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
+import { useViewportMatch } from '@wordpress/compose';
 import { Page } from '@wordpress/admin-ui';
 import {
 	privateApis as routePrivateApis,
@@ -124,11 +125,29 @@ function createRouteFromDefinition( route: Route, parentRoute: AnyRoute ) {
 
 		const Stage = module.stage;
 		const Inspector = module.inspector;
+		const MobileContent = module.mobileContent;
+		const MobileSidebar = module.mobileSidebar;
 
 		return createLazyRoute( route.path )( {
 			component: function RouteComponent() {
 				const { inspector: showInspector } =
 					useLoaderData( { from: route.path } ) ?? {};
+				const isMobileViewport = useViewportMatch( 'medium', '<' );
+				const MobileSurface = MobileContent || MobileSidebar;
+
+				if ( isMobileViewport && MobileSurface ) {
+					return (
+						<div
+							className={
+								MobileContent
+									? 'boot-layout__mobile-content'
+									: 'boot-layout__mobile-sidebar'
+							}
+						>
+							<MobileSurface />
+						</div>
+					);
+				}
 
 				return (
 					<>

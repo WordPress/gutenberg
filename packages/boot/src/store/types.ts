@@ -23,11 +23,13 @@ export interface MenuItem {
 
 /**
  * Route surfaces exported from content_module.
- * Stage is required, inspector is optional.
+ * Stage is the main content surface. Inspector and mobile surfaces are optional.
  */
 export interface RouteSurfaces {
 	stage?: ComponentType;
 	inspector?: ComponentType;
+	mobileSidebar?: ComponentType;
+	mobileContent?: ComponentType;
 }
 
 /**
