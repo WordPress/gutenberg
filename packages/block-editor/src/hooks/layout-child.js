@@ -28,6 +28,24 @@ const RESPONSIVE_BREAKPOINTS = {
 	tablet: '@media (480px < width <= 782px)',
 };
 
+// These are the serialized `selfStretch` values. `max` used to be called
+// "Fixed" in the UI, but was renamed and replaced by `fixedNoShrink`.
+const FLEX_CHILD_LAYOUT_VALUES = {
+	fit: 'fit',
+	grow: 'fill',
+	max: 'fixed',
+	fixed: 'fixedNoShrink',
+};
+
+const FLEX_SIZE_VALUES = [
+	FLEX_CHILD_LAYOUT_VALUES.max,
+	FLEX_CHILD_LAYOUT_VALUES.fixed,
+];
+
+function isFlexSizeValue( value ) {
+	return FLEX_SIZE_VALUES.includes( value );
+}
+
 function serializeRule( { selector, declarations } ) {
 	return `${ selector } {
 		${ Object.entries( declarations )
@@ -60,6 +78,7 @@ export function getChildLayoutStyleRules( {
 		columnSpan,
 		rowSpan,
 	} = effectiveLayout;
+	const baseSelfStretch = layout.selfStretch;
 	const { columnCount, minimumColumnWidth } = parentLayout;
 	const rules = [];
 
@@ -69,10 +88,30 @@ export function getChildLayoutStyleRules( {
 		hasViewportOverride( 'selfStretch' ) ||
 		hasViewportOverride( 'flexSize' )
 	) {
-		if ( selfStretch === 'fixed' && flexSize ) {
+		if (
+			hasViewportOverrides &&
+			( selfStretch === FLEX_CHILD_LAYOUT_VALUES.fit ||
+				selfStretch === FLEX_CHILD_LAYOUT_VALUES.grow ) &&
+			isFlexSizeValue( baseSelfStretch ) &&
+			layout.flexSize
+		) {
+			declarations[ 'flex-basis' ] = 'unset';
+			if ( baseSelfStretch === FLEX_CHILD_LAYOUT_VALUES.fixed ) {
+				declarations[ 'flex-shrink' ] = 'unset';
+			}
+		}
+		if ( isFlexSizeValue( selfStretch ) && flexSize ) {
 			declarations[ 'flex-basis' ] = flexSize;
+			if ( selfStretch === FLEX_CHILD_LAYOUT_VALUES.fixed ) {
+				declarations[ 'flex-shrink' ] = '0';
+			} else if (
+				hasViewportOverrides &&
+				baseSelfStretch === FLEX_CHILD_LAYOUT_VALUES.fixed
+			) {
+				declarations[ 'flex-shrink' ] = 'unset';
+			}
 			declarations[ 'box-sizing' ] = 'border-box';
-		} else if ( selfStretch === 'fill' ) {
+		} else if ( selfStretch === FLEX_CHILD_LAYOUT_VALUES.grow ) {
 			declarations[ 'flex-grow' ] = '1';
 		}
 	}

@@ -60,7 +60,7 @@
 
 		/* Simulate disabled button styles */
 		.header[data-disabled] .header-trigger {
-			color: var(--wpds-color-fg-interactive-neutral-disabled);
+			color: var(--wpds-color-foreground-interactive-neutral-disabled);
 		}
 
 		.content {

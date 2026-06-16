@@ -73,7 +73,7 @@ module.exports = {
 		'^.+\\.m?[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
 	},
 	transformIgnorePatterns: [
-		'/node_modules/(?!(docker-compose|yaml|preact|@preact|parsel-js|comctx|uuid)/)',
+		'/node_modules/(?!(docker-compose|yaml|preact|@preact|parsel-js|comctx|uuid|marked)/)',
 		'\\.pnp\\.[^\\/]+$',
 	],
 	snapshotSerializers: [
