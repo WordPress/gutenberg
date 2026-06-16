@@ -11,10 +11,11 @@ import { AlertDialog } from '@wordpress/ui';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardUIContext } from '../../context/ui-context';
 
-/*
- * Confirmation prompt for resetting the dashboard to its default layout.
- * Opened from the more-actions menu and the command palette through lifted
- * UI state. Confirming runs `onLayoutReset` and leaves customize mode.
+/**
+ * Confirmation prompt for resetting the dashboard to its default layout,
+ * mounted by the engine and shown while `resetDialogOpen` is set in the
+ * shared UI context. Confirming runs `onLayoutReset` and leaves customize
+ * mode.
  */
 export function ResetConfirmation(): React.ReactNode {
 	const { onLayoutReset, onEditChange } = useDashboardInternalContext();
