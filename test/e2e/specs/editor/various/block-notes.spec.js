@@ -1085,7 +1085,7 @@ test.describe( 'Block Notes', () => {
 		// palette is changed without updating the e2e expectation.
 		const AVATAR_BORDER_COLORS = [
 			'#C36EFF',
-			'#FF51A8',
+			'#D94145',
 			'#E4780A',
 			'#FF35EE',
 			'#879F11',
