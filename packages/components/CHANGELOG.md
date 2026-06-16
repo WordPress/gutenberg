@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `Button`, `DropdownMenu`, `FormToggle`, `Modal`, `Panel`, `RadioControl`, `Toolbar`, `ToolsPanel`: Migrate hardcoded `gray-300` border and stroke colors to WPDS `stroke-surface-neutral` and `stroke-interactive-neutral-disabled` tokens, so component borders adapt to the active admin color scheme ([#79003](https://github.com/WordPress/gutenberg/pull/79003)).
+
 ### Bug Fixes
 
 -   `SandBox`: Fix the viewport-unit (`vh`, `vw`, etc.) stripping so user-supplied HTML using these units in `width`/`height` no longer triggers a runaway resize loop in the preview ([#78677](https://github.com/WordPress/gutenberg/pull/78677)).
