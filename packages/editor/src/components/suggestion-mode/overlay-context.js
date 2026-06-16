@@ -360,6 +360,21 @@ export function SuggestionOverlayProvider( { children } ) {
 	const moveSignature = useSelect( ( select ) => {
 		const blockEditor = select( BLOCK_EDITOR_STORE_NAME );
 		const ids = blockEditor?.getClientIdsWithDescendants?.() ?? [];
+		// Collect the pending-move set first so anchor/sibling resolution in
+		// the fingerprint matches `buildMoveGhostIndex`: a block that is
+		// itself pending-moved can't anchor a ghost (it would drag the ghost
+		// to its destination), so it must be treated as unusable here too —
+		// otherwise the memo could miss a recompute when an anchor's
+		// moved-state is the only thing that changed.
+		const movedIds = new Set();
+		for ( const clientId of ids ) {
+			if (
+				blockEditor.getBlockAttributes( clientId )?.metadata?.suggestion
+					?.type === 'pending-move'
+			) {
+				movedIds.add( clientId );
+			}
+		}
 		let signature = '';
 		for ( const clientId of ids ) {
 			const marker =
@@ -370,15 +385,21 @@ export function SuggestionOverlayProvider( { children } ) {
 			}
 			const fromParent = marker.fromParentClientId ?? '';
 			const fromAnchor = marker.fromAnchorClientId ?? '';
-			const anchorExists =
-				fromAnchor && blockEditor.getBlockName( fromAnchor ) ? 1 : 0;
+			const anchorUsable =
+				fromAnchor &&
+				blockEditor.getBlockName( fromAnchor ) &&
+				! movedIds.has( fromAnchor )
+					? 1
+					: 0;
 			const firstSibling =
 				blockEditor
 					.getBlockOrder( fromParent )
-					.find( ( id ) => id !== clientId ) ?? '';
+					.find(
+						( id ) => id !== clientId && ! movedIds.has( id )
+					) ?? '';
 			signature += `${ clientId }:${
 				marker.fromIndex ?? 0
-			}:${ fromAnchor }:${ fromParent }:${ anchorExists }:${ firstSibling }|`;
+			}:${ fromAnchor }:${ fromParent }:${ anchorUsable }:${ firstSibling }|`;
 		}
 		return signature;
 	}, [] );
