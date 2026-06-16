@@ -145,17 +145,15 @@ export default function useTabNav() {
 			const nextTabbable = focus.tabbable[ direction ]( target );
 
 			// Prevent tabbing outside the pattern boundary.
-			if ( nextTabbable ) {
-				const editedContentOnlySection = getEditedContentOnlySection();
-				if ( editedContentOnlySection ) {
-					const nextBlockClientId = getBlockClientId( nextTabbable );
-					if (
-						nextBlockClientId &&
-						! isWithinEditedContentOnlySection( nextBlockClientId )
-					) {
-						event.preventDefault();
-						return;
-					}
+			if ( getEditedContentOnlySection() ) {
+				const nextBlockClientId =
+					nextTabbable && getBlockClientId( nextTabbable );
+				if (
+					! nextBlockClientId ||
+					! isWithinEditedContentOnlySection( nextBlockClientId )
+				) {
+					event.preventDefault();
+					return;
 				}
 			}
 

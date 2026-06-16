@@ -131,6 +131,21 @@ test.describe( 'List View Spotlight Mode', () => {
 			.getByRole( 'gridcell' )
 			.first();
 		await expect( blockBeneathPattern ).toBeVisible();
+		await expect( blockBeneathPattern ).not.toHaveAttribute(
+			'aria-disabled',
+			'true'
+		);
+
+		await groupBlock
+			.locator( '.block-editor-list-view-block-contents' )
+			.focus();
+		await page.keyboard.press( 'End' );
+		await expect(
+			fadedBlockRow.locator( '.block-editor-list-view-block-contents' )
+		).not.toBeFocused();
+		await expect(
+			listView.locator( '[role=row].is-faded-in-spotlight:has(:focus)' )
+		).toHaveCount( 0 );
 
 		// Keyboard navigation should be constrained to the pattern
 		await editor.canvas
@@ -184,15 +199,10 @@ test.describe( 'List View Spotlight Mode', () => {
 			.getByRole( 'gridcell' )
 			.first();
 
-		// Faded blocks have aria-disabled="true" (they're outside the edited section).
-		// The intended UX is that clicking a faded block exits section editing. We use
-		// force: true because Playwright skips disabled elements by default; this
-		// asserts that the click handler runs and spotlight mode exits.
 		const fadedBlockButton = blockBeneathPattern.locator(
 			'.block-editor-list-view-block-contents'
 		);
-		// eslint-disable-next-line playwright/no-force-option
-		await fadedBlockButton.click( { force: true } );
+		await fadedBlockButton.click();
 
 		// Spotlight exited: no rows should be faded.
 		await expect(
@@ -205,6 +215,7 @@ test.describe( 'List View Spotlight Mode', () => {
 			} )
 			.filter( { hasText: 'Block beneath pattern' } );
 		await expect( blockBeneath ).toBeVisible();
+		await expect( blockBeneath ).toHaveClass( /is-selected/ );
 	} );
 
 	test( 'should exit spotlight mode when pressing Escape key', async ( {
@@ -249,5 +260,40 @@ test.describe( 'List View Spotlight Mode', () => {
 
 		await blockBeneath.click();
 		await expect( blockBeneath ).toBeFocused();
+	} );
+
+	test( 'should exit spotlight mode when pressing Escape key in list view', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await createPatternWithContent( editor, page );
+
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.type( 'Block beneath pattern' );
+
+		await enterSpotlightModeAndOpenListView( editor, page, pageUtils );
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+		const fadedBlockRow = listView
+			.locator( '[role=row].is-faded-in-spotlight' )
+			.first();
+		await expect( fadedBlockRow ).toBeVisible();
+
+		const groupBlock = listView.getByRole( 'gridcell', {
+			name: 'Test Pattern for Spotlight',
+			exact: true,
+		} );
+		await groupBlock
+			.locator( '.block-editor-list-view-block-contents' )
+			.focus();
+
+		await page.keyboard.press( 'Escape' );
+
+		await expect(
+			listView.locator( '[role=row].is-faded-in-spotlight' )
+		).toHaveCount( 0 );
 	} );
 } );

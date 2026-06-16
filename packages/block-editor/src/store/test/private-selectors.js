@@ -11,6 +11,7 @@ import {
 	getLastInsertedBlocksClientIds,
 	isBlockSubtreeDisabled,
 	getEnabledClientIdsTree,
+	getListViewClientIdsTree,
 	getEnabledBlockParents,
 	getExpandedBlock,
 	isDragging,
@@ -758,16 +759,11 @@ describe( 'private selectors', () => {
 			] );
 		} );
 
-		it( 'should include disabled blocks when a content-only section is being edited', () => {
+		it( 'should filter out disabled blocks when a content-only section is being edited', () => {
 			const state = {
 				...baseState,
-				// getListViewBlockVisibility needs these slices; empty means no
-				// contentOnly parents exist in this fixture.
-				blockListSettings: {},
 				blocks: {
 					...baseState.blocks,
-					attributes: new Map(),
-					controlledInnerBlocks: {},
 					blockEditingModes: new Map( [
 						[ '', 'disabled' ],
 						[
@@ -783,23 +779,11 @@ describe( 'private selectors', () => {
 				// The Group (ef45d5fd) is the section being edited.
 				editedContentOnlySection:
 					'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
-				// The edited Group itself has 'default' mode (set by the reducer)
-				// so it does not appear in derivedBlockEditingModes. Only the
-				// Header (6cf70164), which is outside the edited section, is disabled.
 				derivedBlockEditingModes: new Map( [
 					[ '6cf70164-9097-4460-bcbf-200560546988', 'disabled' ],
 				] ),
-				// listViewBlockVisibility is now a memoized selector — not stored
-				// in state. getListViewBlockVisibility computes it on demand.
 			};
-			// When editing a content-only section, list view shows blocks that were
-			// visible before editing, preserving context without revealing previously
-			// hidden structural blocks from other patterns.
 			expect( getEnabledClientIdsTree( state ) ).toEqual( [
-				{
-					clientId: '6cf70164-9097-4460-bcbf-200560546988',
-					innerBlocks: [],
-				},
 				{
 					clientId: 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
 					innerBlocks: [
@@ -821,6 +805,260 @@ describe( 'private selectors', () => {
 									innerBlocks: [],
 								},
 							],
+						},
+					],
+				},
+			] );
+		} );
+	} );
+
+	describe( 'getListViewClientIdsTree', () => {
+		const TEST_CONTENT_BLOCK = 'core/test-list-view-content-block';
+		const TEST_STRUCTURE_BLOCK = 'core/test-list-view-structure-block';
+
+		const createBaseState = () => ( {
+			settings: {},
+			blocks: {
+				byClientId: new Map( [
+					[
+						'header',
+						{
+							name: TEST_STRUCTURE_BLOCK,
+						},
+					],
+					[
+						'edited-pattern',
+						{
+							name: TEST_STRUCTURE_BLOCK,
+						},
+					],
+					[
+						'edited-content',
+						{
+							name: TEST_CONTENT_BLOCK,
+						},
+					],
+					[
+						'other-pattern',
+						{
+							name: TEST_STRUCTURE_BLOCK,
+						},
+					],
+					[
+						'other-content',
+						{
+							name: TEST_CONTENT_BLOCK,
+						},
+					],
+					[
+						'other-structure',
+						{
+							name: TEST_STRUCTURE_BLOCK,
+						},
+					],
+				] ),
+				attributes: new Map( [
+					[
+						'edited-pattern',
+						{
+							metadata: {
+								patternName: 'test/edited-pattern',
+							},
+						},
+					],
+					[
+						'other-pattern',
+						{
+							metadata: {
+								patternName: 'test/other-pattern',
+							},
+						},
+					],
+				] ),
+				order: new Map( [
+					[ '', [ 'header', 'edited-pattern', 'other-pattern' ] ],
+					[ 'header', [] ],
+					[ 'edited-pattern', [ 'edited-content' ] ],
+					[ 'edited-content', [] ],
+					[ 'other-pattern', [ 'other-content', 'other-structure' ] ],
+					[ 'other-content', [] ],
+					[ 'other-structure', [] ],
+				] ),
+				parents: new Map( [
+					[ 'header', '' ],
+					[ 'edited-pattern', '' ],
+					[ 'edited-content', 'edited-pattern' ],
+					[ 'other-pattern', '' ],
+					[ 'other-content', 'other-pattern' ],
+					[ 'other-structure', 'other-pattern' ],
+				] ),
+				blockEditingModes: new Map(),
+			},
+			blockListSettings: new Map(),
+			editedContentOnlySection: 'edited-pattern',
+			derivedBlockEditingModes: new Map( [
+				[ 'header', 'disabled' ],
+				[ 'other-pattern', 'disabled' ],
+				[ 'other-content', 'disabled' ],
+				[ 'other-structure', 'disabled' ],
+			] ),
+		} );
+
+		beforeAll( () => {
+			registerBlockType( TEST_CONTENT_BLOCK, {
+				apiVersion: 3,
+				title: 'Test content block',
+				category: 'text',
+				attributes: {
+					content: {
+						type: 'string',
+						role: 'content',
+					},
+				},
+				save: () => null,
+			} );
+			registerBlockType( TEST_STRUCTURE_BLOCK, {
+				apiVersion: 3,
+				title: 'Test structure block',
+				category: 'design',
+				save: () => null,
+			} );
+		} );
+
+		afterAll( () => {
+			unregisterBlockType( TEST_CONTENT_BLOCK );
+			unregisterBlockType( TEST_STRUCTURE_BLOCK );
+		} );
+
+		beforeEach( () => {
+			getListViewClientIdsTree.registry = {
+				select: jest.fn( () => ( {} ) ),
+			};
+		} );
+
+		it( 'includes disabled outside-section context while preserving the edited section', () => {
+			const state = createBaseState();
+
+			expect( getListViewClientIdsTree( state ) ).toEqual( [
+				{
+					clientId: 'header',
+					innerBlocks: [],
+				},
+				{
+					clientId: 'edited-pattern',
+					innerBlocks: [
+						{
+							clientId: 'edited-content',
+							innerBlocks: [],
+						},
+					],
+				},
+				{
+					clientId: 'other-pattern',
+					innerBlocks: [
+						{
+							clientId: 'other-content',
+							innerBlocks: [],
+						},
+					],
+				},
+			] );
+		} );
+
+		it( 'keeps structural blocks hidden inside other content-only sections', () => {
+			const state = createBaseState();
+
+			expect(
+				getListViewClientIdsTree( state )[ 2 ].innerBlocks
+			).toEqual( [
+				{
+					clientId: 'other-content',
+					innerBlocks: [],
+				},
+			] );
+		} );
+
+		it( 'uses section-block settings when deciding which disabled blocks were already hidden', () => {
+			const baseState = createBaseState();
+			const state = {
+				...baseState,
+				settings: {
+					disableContentOnlyForTemplateParts: true,
+				},
+				blocks: {
+					...baseState.blocks,
+					byClientId: new Map( [
+						[
+							'edited-pattern',
+							{
+								name: TEST_STRUCTURE_BLOCK,
+							},
+						],
+						[
+							'edited-content',
+							{
+								name: TEST_CONTENT_BLOCK,
+							},
+						],
+						[
+							'template-part',
+							{
+								name: 'core/template-part',
+							},
+						],
+						[
+							'template-part-structure',
+							{
+								name: TEST_STRUCTURE_BLOCK,
+							},
+						],
+					] ),
+					attributes: new Map( [
+						[
+							'edited-pattern',
+							{
+								metadata: {
+									patternName: 'test/edited-pattern',
+								},
+							},
+						],
+					] ),
+					order: new Map( [
+						[ '', [ 'edited-pattern', 'template-part' ] ],
+						[ 'edited-pattern', [ 'edited-content' ] ],
+						[ 'edited-content', [] ],
+						[ 'template-part', [ 'template-part-structure' ] ],
+						[ 'template-part-structure', [] ],
+					] ),
+					parents: new Map( [
+						[ 'edited-pattern', '' ],
+						[ 'edited-content', 'edited-pattern' ],
+						[ 'template-part', '' ],
+						[ 'template-part-structure', 'template-part' ],
+					] ),
+				},
+				derivedBlockEditingModes: new Map( [
+					[ 'template-part', 'disabled' ],
+					[ 'template-part-structure', 'disabled' ],
+				] ),
+			};
+
+			expect( getListViewClientIdsTree( state ) ).toEqual( [
+				{
+					clientId: 'edited-pattern',
+					innerBlocks: [
+						{
+							clientId: 'edited-content',
+							innerBlocks: [],
+						},
+					],
+				},
+				{
+					clientId: 'template-part',
+					innerBlocks: [
+						{
+							clientId: 'template-part-structure',
+							innerBlocks: [],
 						},
 					],
 				},

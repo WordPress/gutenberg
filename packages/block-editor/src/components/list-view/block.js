@@ -228,6 +228,13 @@ function ListViewBlock( {
 			return;
 		}
 
+		if ( editedSection && isMatch( 'core/block-editor/unselect', event ) ) {
+			event.stopPropagation();
+			event.preventDefault();
+			stopEditingContentOnlySection();
+			return;
+		}
+
 		const isDeleteKey = [ BACKSPACE, DELETE ].includes( event.keyCode );
 
 		// If multiple blocks are selected, deselect all blocks when the user
@@ -462,6 +469,7 @@ function ListViewBlock( {
 			// If we're editing a section and clicking outside it, exit section editing.
 			if ( shouldDisableInteractions ) {
 				stopEditingContentOnlySection();
+				selectBlock( event, clientId, null );
 				event.preventDefault();
 				return;
 			}
@@ -516,6 +524,11 @@ function ListViewBlock( {
 	// Allow right-clicking an item in the List View to open up the block settings dropdown.
 	const onContextMenu = useCallback(
 		( event ) => {
+			if ( shouldDisableInteractions ) {
+				event.preventDefault();
+				return;
+			}
+
 			const { ownerDocument } = settingsRef?.current || {};
 			if ( ! ownerDocument || ! ownerDocument.hasFocus() ) {
 				return;
@@ -530,7 +543,12 @@ function ListViewBlock( {
 				event.preventDefault();
 			}
 		},
-		[ allowRightClickOverrides, settingsRef, showBlockActions ]
+		[
+			allowRightClickOverrides,
+			settingsRef,
+			shouldDisableInteractions,
+			showBlockActions,
+		]
 	);
 
 	const onMouseDown = useCallback(
@@ -601,7 +619,9 @@ function ListViewBlock( {
 	);
 
 	const hasSiblings = siblingBlockCount > 0;
-	const hasRenderedMovers = showBlockMovers && hasSiblings;
+	const canShowBlockActions = showBlockActions && ! shouldDisableInteractions;
+	const hasRenderedMovers =
+		showBlockMovers && hasSiblings && ! shouldDisableInteractions;
 	const moverCellClassName = clsx(
 		'block-editor-list-view-block__mover-cell',
 		{ 'is-visible': isHovered || isSelected }
@@ -615,7 +635,7 @@ function ListViewBlock( {
 	let colSpan;
 	if ( hasRenderedMovers ) {
 		colSpan = 2;
-	} else if ( ! showBlockActions ) {
+	} else if ( ! canShowBlockActions ) {
 		colSpan = 3;
 	}
 
@@ -649,6 +669,18 @@ function ListViewBlock( {
 	const currentlyEditingBlockInCanvas =
 		isSelected && selectedClientIds.length === 1;
 
+	const getListViewBlockTabIndex = ( rovingTabIndex ) => {
+		if ( shouldDisableInteractions ) {
+			return -1;
+		}
+
+		if ( currentlyEditingBlockInCanvas ) {
+			return 0;
+		}
+
+		return rovingTabIndex;
+	};
+
 	return (
 		<ListViewLeaf
 			className={ classes }
@@ -672,7 +704,6 @@ function ListViewBlock( {
 				colSpan={ colSpan }
 				ref={ cellRef }
 				aria-selected={ !! isSelected }
-				aria-disabled={ shouldDisableInteractions ? 'true' : undefined }
 			>
 				{ ( { ref, tabIndex, onFocus } ) => (
 					<div className="block-editor-list-view-block__contents-container">
@@ -687,14 +718,13 @@ function ListViewBlock( {
 							siblingBlockCount={ siblingBlockCount }
 							level={ level }
 							ref={ ref }
-							tabIndex={
-								currentlyEditingBlockInCanvas ? 0 : tabIndex
-							}
+							tabIndex={ getListViewBlockTabIndex( tabIndex ) }
 							onFocus={ onFocus }
 							isExpanded={ canEditBlock ? isExpanded : undefined }
 							selectedClientIds={ selectedClientIds }
 							ariaDescribedBy={ descriptionId }
 							visibilityLabel={ blockVisibilityDescription }
+							isFocusable={ ! shouldDisableInteractions }
 						/>
 						<AriaReferencedText id={ descriptionId }>
 							{ [
@@ -740,7 +770,7 @@ function ListViewBlock( {
 				</>
 			) }
 
-			{ showBlockActions && BlockSettingsMenu && (
+			{ canShowBlockActions && BlockSettingsMenu && (
 				<TreeGridCell
 					className={ listViewBlockSettingsClassName }
 					aria-selected={ !! isSelected }

@@ -46,6 +46,7 @@ function ListViewBlockSelectButton(
 		isExpanded,
 		ariaDescribedBy,
 		visibilityLabel,
+		isFocusable = true,
 	},
 	ref
 ) {
@@ -94,7 +95,7 @@ function ListViewBlockSelectButton(
 			onDragStart={ onDragStartHandler }
 			onDragEnd={ onDragEnd }
 			draggable={ draggable }
-			href={ `#block-${ clientId }` }
+			href={ isFocusable ? `#block-${ clientId }` : undefined }
 			aria-describedby={ ariaDescribedBy }
 			aria-expanded={ isExpanded }
 		>
