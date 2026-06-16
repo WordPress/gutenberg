@@ -30,17 +30,12 @@ export interface WidgetSettingsTriggerProps {
 }
 
 /**
- * Per-instance gear that opens the shared settings drawer for its widget
- * by writing the instance `uuid` to the dashboard UI context. The single
- * `WidgetSettings` at the root reacts to that change.
+ * Per-instance gear that opens the shared settings drawer by writing the
+ * instance `uuid` to the UI context; the single `WidgetSettings` at the root
+ * reacts to it. Returns `null` when the type declares no attributes, so chrome
+ * can mount it unconditionally.
  *
- * Returns `null` when the type declares no attributes, so chrome can mount
- * it unconditionally.
- *
- * @param {WidgetSettingsTriggerProps} props            Component props.
- * @param {DashboardWidget}            props.widget     Instance to edit.
- * @param {WidgetType}                 props.widgetType Type backing it.
- * @return {React.ReactNode} The gear button, or `null`.
+ * @param {WidgetSettingsTriggerProps} props Component props.
  */
 export function WidgetSettingsTrigger( {
 	widget,

@@ -20,14 +20,11 @@ export interface WidgetSettingsToolbarProps {
 }
 
 /**
- * Normal-mode per-tile toolbar: the gear that opens the settings drawer.
- * Lives in the grid's `actionableArea` slot, so it shows for every
- * `presentation`. Returns `null` when the type has no attributes.
+ * Normal-mode per-tile toolbar: the gear that opens the settings drawer. Lives
+ * in the grid's `actionableArea` slot, so it shows for every `presentation`.
+ * Returns `null` when the type has no attributes.
  *
- * @param {WidgetSettingsToolbarProps} props            Component props.
- * @param {DashboardWidget}            props.widget     Instance to edit.
- * @param {WidgetType}                 props.widgetType Type backing it.
- * @return {React.ReactNode} The settings toolbar, or `null`.
+ * @param {WidgetSettingsToolbarProps} props Component props.
  */
 export function WidgetSettingsToolbar( {
 	widget,

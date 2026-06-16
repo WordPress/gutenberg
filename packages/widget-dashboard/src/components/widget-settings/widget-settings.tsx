@@ -20,27 +20,15 @@ import styles from './widget-settings.module.css';
 type WidgetAttributes = Record< string, unknown >;
 
 /**
- * Single side drawer that edits one instance's attributes, mounted once
- * at the dashboard root next to the inserter. It reads the active
- * instance from `settingsWidgetUuid` in the UI context (set by the
- * per-instance gear in the chrome) and renders the type's declarative
- * `attributes` straight through `DataForm`, with no per-widget form
- * wiring.
+ * Side drawer that edits one instance's attributes, mounted once at the
+ * dashboard root. It resolves the active instance from `settingsWidgetUuid`
+ * in the UI context (set by the per-instance gear), renders the type's
+ * declarative `attributes` through `DataForm`, and enters from the edge away
+ * from the widget.
  *
- * Edits write to the dashboard's staging layer (the same buffer that
- * `setAttributes` and the layout toolbar use), so changes preview live
- * behind the drawer and are published on Save or rolled back on any other
- * exit. The flow is normal-mode only: the chrome hides the gear while the
- * layout is being edited, keeping the shared commit free of cross-flow
- * edits.
- *
- * The drawer stays mounted and toggles through `open` (rather than
- * unmounting) so it slides in and out like the layout-settings drawer; the
- * last opened instance is retained while it animates closed so the form
- * doesn't blank out mid-transition. It enters from `settingsDrawerSide`,
- * the edge away from the widget, to avoid covering it.
- *
- * @return {React.ReactNode} The settings drawer.
+ * Edits write to the staging layer, so they preview live behind the drawer
+ * and are published on Save or reverted on any other exit. Available in
+ * normal mode only; the gear is hidden while the layout is being edited.
  */
 export function WidgetSettings(): React.ReactNode {
 	const {
