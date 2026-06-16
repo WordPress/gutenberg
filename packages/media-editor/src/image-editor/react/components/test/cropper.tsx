@@ -13,6 +13,7 @@ import {
  * Internal dependencies
  */
 import { Cropper } from '../cropper';
+import * as viewportProvider from '../viewport-provider';
 import type { CropperController } from '../../hooks/use-cropper-reducer';
 import { DEFAULT_STATE } from '../../../core/constants';
 import { getSourceRegion } from '../../../core/source-region';
@@ -589,6 +590,53 @@ describe( 'Cropper', () => {
 		await waitFor( () =>
 			expect( controller.settleCrop ).toHaveBeenCalledTimes( 1 )
 		);
+	} );
+
+	it( 'does not settle the same unreachable crop twice after viewport pan resets', async () => {
+		const controller = createController();
+		controller.state = {
+			...controller.state,
+			cropRect: { x: 2, y: 0.25, width: 0.5, height: 0.5 },
+		};
+		const resetViewport = jest.fn();
+		const setViewportPan = jest.fn();
+		const setViewportZoom = jest.fn();
+		const useViewportSpy = jest.spyOn( viewportProvider, 'useViewport' );
+		useViewportSpy.mockReturnValue( {
+			viewport: { zoom: 1, pan: { x: 24, y: 0 } },
+			setViewportZoom,
+			setViewportPan,
+			resetViewport,
+		} );
+
+		try {
+			const renderCropper = () => (
+				<Cropper
+					src="test.jpg"
+					controller={ controller }
+					showDimming={ false }
+					freeformCrop
+				/>
+			);
+			const { rerender } = render( renderCropper() );
+
+			await waitFor( () =>
+				expect( controller.settleCrop ).toHaveBeenCalledTimes( 1 )
+			);
+			expect( resetViewport ).toHaveBeenCalledTimes( 1 );
+
+			useViewportSpy.mockReturnValue( {
+				viewport: { zoom: 1, pan: { x: 0, y: 0 } },
+				setViewportZoom,
+				setViewportPan,
+				resetViewport,
+			} );
+			rerender( renderCropper() );
+
+			expect( controller.settleCrop ).toHaveBeenCalledTimes( 1 );
+		} finally {
+			useViewportSpy.mockRestore();
+		}
 	} );
 
 	it( 'does not settle visible crops near the canvas edge', async () => {

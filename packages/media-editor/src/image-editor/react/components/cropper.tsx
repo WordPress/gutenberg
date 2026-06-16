@@ -807,11 +807,13 @@ function CropperInner(
 			return;
 		}
 
+		// Dedupe by stable geometry only. Viewport pan is part of the
+		// reachability check above, but resetViewport() changes it during
+		// recovery and should not allow a second settle for the same crop.
 		const recoveryKey = JSON.stringify( {
 			cropRect: state.cropRect,
 			canvasSize,
 			scaledVisualSize,
-			viewportPan: viewportState.pan,
 		} );
 		if ( recoveryKeyRef.current === recoveryKey ) {
 			return;
