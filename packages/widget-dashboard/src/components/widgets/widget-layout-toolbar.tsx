@@ -34,9 +34,7 @@ export interface WidgetLayoutToolbarProps {
  * widget's place in the layout. Lives in the grid's `actionableArea` slot, so
  * it stays interactive while the card is `inert`.
  *
- * @param {WidgetLayoutToolbarProps} props        Component props.
- * @param {DashboardWidget}          props.widget Instance to manage.
- * @return {React.ReactNode} The layout toolbar.
+ * @param {WidgetLayoutToolbarProps} props Component props.
  */
 export function WidgetLayoutToolbar( {
 	widget,
