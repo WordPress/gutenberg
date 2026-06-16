@@ -27,7 +27,8 @@
 		"config",
 		"plugins",
 		"scripts",
-		"utils"
+		"utils",
+		"!**/test"
 	],
 	"bin": {
 		"wp-scripts": "./bin/wp-scripts.js"
@@ -80,7 +81,6 @@
 		"react-refresh": "^0.14.0",
 		"read-pkg-up": "^7.0.1",
 		"resolve-bin": "^0.4.0",
-		"rimraf": "^5.0.10",
 		"rtlcss": "^4.3.0",
 		"sass": "^1.54.0",
 		"sass-loader": "^16.0.3",
@@ -93,6 +93,9 @@
 		"webpack-bundle-analyzer": "^4.9.1",
 		"webpack-cli": "^5.1.4",
 		"webpack-dev-server": "^4.15.1"
+	},
+	"devDependencies": {
+		"rimraf": "^5.0.10"
 	},
 	"peerDependencies": {
 		"@playwright/test": "^1.58.2",

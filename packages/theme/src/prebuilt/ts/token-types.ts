@@ -168,11 +168,15 @@ export type ForegroundColor =
 	| 'neutral-weak-disabled'
 	| 'brand'
 	| 'brand-active'
+	| 'brand-disabled'
 	| 'brand-strong'
 	| 'brand-strong-active'
+	| 'brand-strong-disabled'
 	| 'error-active'
+	| 'error-disabled'
 	| 'error-strong'
-	| 'error-strong-active';
+	| 'error-strong-active'
+	| 'error-strong-disabled';
 
 /**
  * Font family variants.
