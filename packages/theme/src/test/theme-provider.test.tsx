@@ -131,6 +131,24 @@ describe( 'ThemeProvider', () => {
 			expect( readProp( document.documentElement, BRAND_BG ) ).toBe( '' );
 		} );
 
+		it( 'removes the forwarded properties from the document root on unmount', () => {
+			const { unmount } = render(
+				<ThemeProvider isRoot color={ { primary: PRIMARY } }>
+					<div>x</div>
+				</ThemeProvider>
+			);
+
+			expect( readProp( document.documentElement, BRAND_BG ) ).toBe(
+				PRIMARY
+			);
+
+			unmount();
+
+			// The effect cleanup restores the previous value — here none, so
+			// the property is removed rather than left stuck on the seed.
+			expect( readProp( document.documentElement, BRAND_BG ) ).toBe( '' );
+		} );
+
 		// Unlike color/cursor (applied as inline custom properties on the
 		// provider's wrapper), the `cornerRadius` preset resolves to
 		// `--wpds-border-radius-*` values through the prebuilt design-token CSS
