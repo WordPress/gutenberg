@@ -142,7 +142,7 @@ export function CreatePatternModalContents( {
 						);
 					} }
 				/>
-				<Stack justify="end">
+				<Stack gap="sm" justify="end">
 					<Button
 						__next40pxDefaultSize
 						variant="tertiary"
@@ -153,7 +153,6 @@ export function CreatePatternModalContents( {
 					>
 						{ __( 'Cancel' ) }
 					</Button>
-
 					<Button
 						__next40pxDefaultSize
 						variant="primary"

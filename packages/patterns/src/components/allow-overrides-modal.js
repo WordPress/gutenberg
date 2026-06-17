@@ -117,8 +117,7 @@ export function DisallowOverridesModal( { onClose, onSave } ) {
 							'Are you sure you want to disable overrides? Disabling overrides will revert all applied overrides for this block throughout instances of this pattern.'
 						) }
 					</Text>
-
-					<Stack justify="end">
+					<Stack gap="sm" justify="end">
 						<Button
 							__next40pxDefaultSize
 							variant="tertiary"
@@ -126,7 +125,6 @@ export function DisallowOverridesModal( { onClose, onSave } ) {
 						>
 							{ __( 'Cancel' ) }
 						</Button>
-
 						<Button
 							__next40pxDefaultSize
 							variant="primary"

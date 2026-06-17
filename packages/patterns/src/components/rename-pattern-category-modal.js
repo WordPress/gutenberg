@@ -148,7 +148,7 @@ export default function RenamePatternCategoryModal( {
 							</span>
 						) }
 					</Stack>
-					<Stack justify="end">
+					<Stack gap="sm" justify="end">
 						<Button
 							__next40pxDefaultSize
 							variant="tertiary"

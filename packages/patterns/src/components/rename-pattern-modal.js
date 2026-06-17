@@ -99,8 +99,7 @@ export default function RenamePatternModal( {
 						onChange={ setName }
 						required
 					/>
-
-					<Stack justify="end">
+					<Stack gap="sm" justify="end">
 						<Button
 							__next40pxDefaultSize
 							variant="tertiary"
@@ -108,7 +107,6 @@ export default function RenamePatternModal( {
 						>
 							{ __( 'Cancel' ) }
 						</Button>
-
 						<Button
 							__next40pxDefaultSize
 							variant="primary"
