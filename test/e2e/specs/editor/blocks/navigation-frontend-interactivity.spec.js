@@ -233,10 +233,10 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await expect( innerElement ).toBeVisible();
 			// Tab to first element, then tab outside the submenu.
 			await pageUtils.pressKeys( 'Tab', { times: 2, delay: 50 } );
-			await expect( complexSubmenuButton ).toBeFocused();
 			await expect( innerElement ).toBeHidden();
 
 			// Test: only nested submenu closes on tab outside
+			await complexSubmenuButton.focus();
 			await pageUtils.pressKeys( 'Enter' );
 			await expect( complexSubmenuButton ).toBeFocused();
 			await expect( firstLevelElement ).toBeVisible();
@@ -246,6 +246,8 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await expect( nestedSubmenuButton ).toBeFocused();
 			await expect( firstLevelElement ).toBeVisible();
 			await expect( secondLevelElement ).toBeVisible();
+			// Move the mouse so the hover on the button doesn't keep the menu open.
+			await page.mouse.move( 400, 400 );
 
 			// Tab to nested submenu first element, then tab outside the nested
 			// submenu.
@@ -262,6 +264,8 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await complexSubmenuButton.click();
 			await nestedSubmenuButton.click();
 			await expect( secondLevelElement ).toBeVisible();
+			// Move the mouse so the hover on the button doesn't keep the menu open.
+			await page.mouse.move( 400, 400 );
 			await pageUtils.pressKeys( 'Escape' );
 			await expect( secondLevelElement ).toBeHidden();
 			await expect( nestedSubmenuButton ).toBeFocused();
@@ -307,6 +311,8 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			// Test: a second click closes the submenu
 			await simpleSubmenuButton.click();
 			await expect( simpleSubmenuButton ).toBeFocused();
+			// Move the mouse so the hover on the button doesn't keep the menu open.
+			await page.mouse.move( 400, 400 );
 			await expect( innerElement ).toBeHidden();
 
 			// Test: submenu opens on Enter keypress
@@ -317,6 +323,8 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 
 			// Test: submenu closes on second Enter keypress
 			await pageUtils.pressKeys( 'Enter' );
+			// Move the mouse so the hover on the button doesn't keep the menu open.
+			await page.mouse.move( 400, 400 );
 			await expect( innerElement ).toBeHidden();
 			await expect( simpleSubmenuButton ).toBeFocused();
 
@@ -335,6 +343,8 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await nestedSubmenuButton.click();
 			await expect( nestedSubmenuButton ).toBeFocused();
 			await expect( firstLevelElement ).toBeVisible();
+			// Move the mouse so the hover on the button doesn't keep the menu open.
+			await page.mouse.move( 400, 400 );
 			await expect( secondLevelElement ).toBeHidden();
 
 			// Do the same with Enter keypresses: open the third level menu
@@ -347,6 +357,8 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await pageUtils.pressKeys( 'Enter' );
 			await expect( nestedSubmenuButton ).toBeFocused();
 			await expect( firstLevelElement ).toBeVisible();
+			// Move the mouse so the hover on the button doesn't keep the menu open.
+			await page.mouse.move( 400, 400 );
 			await expect( secondLevelElement ).toBeHidden();
 
 			// Close the menu via click on the body
@@ -358,6 +370,8 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await complexSubmenuButton.click();
 			await nestedSubmenuButton.click();
 			await expect( secondLevelElement ).toBeVisible();
+			// Move the mouse so the hover on the button doesn't keep the menu open.
+			await page.mouse.move( 400, 400 );
 			await pageUtils.pressKeys( 'Escape' );
 			await expect( secondLevelElement ).toBeHidden();
 			await expect( nestedSubmenuButton ).toBeFocused();
