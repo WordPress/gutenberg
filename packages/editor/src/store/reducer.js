@@ -417,21 +417,6 @@ export function canvasWidth( state = undefined, action ) {
 }
 
 /**
- * Reducer for the canvas minimum height.
- *
- * @param {number} state  Current state.
- * @param {Object} action Dispatched action.
- * @return {number} Updated state.
- */
-export function canvasMinHeight( state = 0, action ) {
-	switch ( action.type ) {
-		case 'SET_CANVAS_MIN_HEIGHT':
-			return action.minHeight;
-	}
-	return state;
-}
-
-/**
  * Reducer for the revisions preview mode.
  * Stores the current revision ID, or null if not in revisions mode.
  *
@@ -539,7 +524,6 @@ export default combineReducers( {
 	stylesPath,
 	showStylebook,
 	canvasWidth,
-	canvasMinHeight,
 	revisionId,
 	revisionPage,
 	showRevisionDiff,

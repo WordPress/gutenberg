@@ -364,16 +364,6 @@ export function getCanvasWidth( state ) {
 }
 
 /**
- * Get the canvas minimum height.
- *
- * @param {Object} state Global application state.
- * @return {number} The canvas minimum height.
- */
-export function getCanvasMinHeight( state ) {
-	return state.canvasMinHeight;
-}
-
-/**
  * Returns whether Responsive editing is enabled. When enabled, the device
  * preview also drives which viewport block style edits are applied to.
  *
