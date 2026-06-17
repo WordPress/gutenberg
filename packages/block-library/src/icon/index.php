@@ -92,12 +92,36 @@ function render_block_core_icon( $attributes ) {
 		return;
 	}
 
-	if ( ! empty( $styles['css'] ) ) {
-		$processor = new WP_HTML_Tag_Processor( $svg );
-		if ( $processor->next_tag( 'svg' ) ) {
+	$processor = new WP_HTML_Tag_Processor( $svg );
+	if ( $processor->next_tag( 'svg' ) ) {
+		if ( ! empty( $styles['css'] ) ) {
 			$processor->set_attribute( 'style', $styles['css'] );
-			$svg = $processor->get_updated_html();
 		}
+
+		// Apply flip classes to the SVG.
+		$flip_horizontal = $attributes['flipHorizontal'] ?? false;
+		$flip_vertical   = $attributes['flipVertical'] ?? false;
+
+		if ( $flip_horizontal ) {
+			$processor->add_class( 'is-flip-horizontal' );
+		}
+		if ( $flip_vertical ) {
+			$processor->add_class( 'is-flip-vertical' );
+		}
+
+		$rotation = isset( $attributes['rotation'] ) ? (int) $attributes['rotation'] : 0;
+
+		if ( $rotation ) {
+			$current_style = $processor->get_attribute( 'style' ) ?? '';
+			$rotation_css  = 'rotate: ' . $rotation . 'deg;';
+			if ( $current_style ) {
+				$processor->set_attribute( 'style', $current_style . ' ' . $rotation_css );
+			} else {
+				$processor->set_attribute( 'style', $rotation_css );
+			}
+		}
+
+		$svg = $processor->get_updated_html();
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes();

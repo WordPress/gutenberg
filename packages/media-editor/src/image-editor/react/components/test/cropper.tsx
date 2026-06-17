@@ -15,6 +15,7 @@ import {
 import { Cropper } from '../cropper';
 import type { CropperController } from '../../hooks/use-cropper-reducer';
 import { DEFAULT_STATE } from '../../../core/constants';
+import { getSourceRegion } from '../../../core/source-region';
 
 const GRID_TEST_ID = 'cropper-grid';
 const GRID_INTERACTIVE_CLASS =
@@ -420,12 +421,18 @@ describe( 'Cropper', () => {
 		const stage = screen.getByTestId( 'cropper-stage' );
 
 		// cropRect starts at {x:0, y:0, width:1, height:1} (right edge = 1.0).
-		// One ArrowRight step (+0.01 normalized) puts the right edge at 1.01.
+		// Pixel snapping is active at zoom:2, so one ArrowRight step is one
+		// source pixel: zoom / sourceWidth = 2 / 600 normalized.
 		// With canvasSize=600×400 and visualSize=600×400:
-		//   rightOverflow = 1.01 * 600 − 600 = 6 → pan.x = −6
+		//   rightOverflow = (1 + 2/600) * 600 − 600 = 2 → pan.x = −2
 		fireEvent.keyDown( eHandle, { key: 'ArrowRight' } );
 
-		expect( stage ).toHaveStyle( 'transform: translate(-6px, 0px)' );
+		const match = stage.style.transform.match(
+			/^translate\((-?\d+(?:\.\d+)?)px, (-?\d+(?:\.\d+)?)px\)$/
+		);
+		expect( match ).not.toBeNull();
+		expect( Number( match?.[ 1 ] ) ).toBeCloseTo( -2, 4 );
+		expect( Number( match?.[ 2 ] ) ).toBeCloseTo( 0, 5 );
 
 		jest.useRealTimers();
 	} );
@@ -467,5 +474,408 @@ describe( 'Cropper', () => {
 		expect( controller.setZoomAtPoint ).not.toHaveBeenCalled();
 
 		fireEvent.pointerUp( resizeHandle, { pointerId: 1 } );
+	} );
+
+	// View-scale: at rest, the scene magnifies so an under-filling crop fills
+	// the canvas. Canvas is mocked at 600x400. A tall 400x1200 image contain-
+	// fits to a 133.33x400 footprint (fills the height, 133px of 600 wide). A
+	// square crop is bound by the footprint's 133px width, so it magnifies.
+	const TALL_IMAGE = {
+		src: 'tall.jpg',
+		naturalWidth: 400,
+		naturalHeight: 1200,
+	};
+
+	// The view-scale magnification is folded into the image's transform as a
+	// leading `scale(...)`, always present (identity `scale(1)` at rest) so the
+	// transform's function list stays structurally constant for transitions.
+	function imageScale(): number {
+		const img = screen.getByTestId< HTMLImageElement >( 'cropper-image' );
+		const match = img.style.transform.match( /^scale\(\s*([\d.]+)/ );
+		return match ? parseFloat( match[ 1 ] ) : 1;
+	}
+
+	function imageTransformParts(): { viewScale: number; matrix: number[] } {
+		const img = screen.getByTestId< HTMLImageElement >( 'cropper-image' );
+		const match = img.style.transform.match(
+			/^scale\(\s*([^)]+?)\s*\)\s+matrix\(([^)]+)\)/
+		);
+		expect( match ).not.toBeNull();
+		const [ , viewScale, matrix ] = match as RegExpMatchArray;
+		return {
+			viewScale: parseFloat( viewScale ),
+			matrix: matrix
+				.split( ',' )
+				.map( ( value ) => parseFloat( value.trim() ) ),
+		};
+	}
+
+	it( 'magnifies the scene so an under-filling crop fills the canvas at rest', () => {
+		const controller = createController();
+		controller.state = {
+			...controller.state,
+			image: TALL_IMAGE,
+			// Centered square crop: width fills the footprint (133px), height
+			// 1/3 of 400 = 133px. On-screen 133x133, well below 0.8 * 400.
+			cropRect: { x: 0, y: 1 / 3, width: 1, height: 1 / 3 },
+		};
+		render( <Cropper src="tall.jpg" controller={ controller } /> );
+
+		// Footprint is 133.33x400. The square crop's binding axis (height) fills
+		// to 0.8 * 400, so the image magnifies by 0.8 * 400 / 133.33 = 2.4.
+		expect( imageScale() ).toBeCloseTo( 2.4, 2 );
+	} );
+
+	it( 'computes image pan from the unscaled footprint before applying view scale', () => {
+		const controller = createController();
+		controller.state = {
+			...controller.state,
+			image: TALL_IMAGE,
+			cropRect: { x: 0, y: 1 / 3, width: 1, height: 1 / 3 },
+			pan: { x: 0.1, y: -0.05 },
+		};
+		render( <Cropper src="tall.jpg" controller={ controller } /> );
+
+		const { viewScale, matrix } = imageTransformParts();
+
+		expect( viewScale ).toBeCloseTo( 2.4, 2 );
+		// Pan translations are produced by useTransformStyle from the unscaled
+		// 133.33x400 footprint, then magnified by the leading scale(viewScale).
+		// If useTransformStyle received scaledVisualSize, these would be 32 and
+		// -48 instead.
+		expect( matrix[ 4 ] ).toBeCloseTo( ( 400 / 3 ) * 0.1, 5 );
+		expect( matrix[ 5 ] ).toBeCloseTo( 400 * -0.05, 5 );
+	} );
+
+	it( 'positions crop overlays against the magnified footprint', () => {
+		const controller = createController();
+		controller.state = {
+			...controller.state,
+			image: TALL_IMAGE,
+			cropRect: { x: 0, y: 1 / 3, width: 1, height: 1 / 3 },
+		};
+		render( <Cropper src="tall.jpg" controller={ controller } showGrid /> );
+
+		expect( imageScale() ).toBeCloseTo( 2.4, 2 );
+
+		const expectedRect = {
+			left: 140,
+			top: 40,
+			width: 320,
+			height: 320,
+		};
+		const expectOverlayRect = ( element: HTMLElement | null ) => {
+			expect( element ).not.toBeNull();
+			const overlay = element as HTMLElement;
+			expect( parseFloat( overlay.style.left ) ).toBeCloseTo(
+				expectedRect.left,
+				1
+			);
+			expect( parseFloat( overlay.style.top ) ).toBeCloseTo(
+				expectedRect.top,
+				1
+			);
+			expect( parseFloat( overlay.style.width ) ).toBeCloseTo(
+				expectedRect.width,
+				1
+			);
+			expect( parseFloat( overlay.style.height ) ).toBeCloseTo(
+				expectedRect.height,
+				1
+			);
+		};
+
+		expectOverlayRect( screen.getByTestId( 'cropper-stencil' ) );
+		expectOverlayRect( screen.getByTestId( 'cropper-dimming' ) );
+		expectOverlayRect( screen.getByTestId( GRID_TEST_ID ) );
+	} );
+
+	it( 'does not magnify when the crop already fills the canvas', () => {
+		const controller = createController();
+		controller.state = {
+			...controller.state,
+			image: TALL_IMAGE,
+			// Full-frame crop already fills the canvas height (footprint == 400).
+			cropRect: { x: 0, y: 0, width: 1, height: 1 },
+		};
+		render( <Cropper src="tall.jpg" controller={ controller } /> );
+
+		// viewScale = 1, so the leading scale is identity (no magnification).
+		expect( imageScale() ).toBe( 1 );
+	} );
+
+	it( 'holds the magnified view while resizing instead of resetting the zoom', async () => {
+		const controller = createController();
+		controller.state = {
+			...controller.state,
+			image: TALL_IMAGE,
+			cropRect: { x: 0, y: 1 / 3, width: 1, height: 1 / 3 },
+		};
+		render(
+			<Cropper src="tall.jpg" controller={ controller } freeformCrop />
+		);
+
+		// At rest the square crop magnifies the image by 2.4.
+		expect( imageScale() ).toBeCloseTo( 2.4, 2 );
+
+		const handle = await screen.findByRole( 'button', {
+			name: 'Resize top-left corner',
+		} );
+		fireEvent.pointerDown( handle, {
+			button: 0,
+			clientX: 100,
+			clientY: 100,
+			pointerId: 1,
+		} );
+
+		// Grabbing a handle must not snap the scene back to the footprint;
+		// the magnification holds for the duration of the drag.
+		expect( imageScale() ).toBeCloseTo( 2.4, 2 );
+
+		fireEvent.pointerUp( handle, { pointerId: 1 } );
+	} );
+
+	it( 'snaps freeform resize output to source pixels when the image is shown at 1:1 or larger', async () => {
+		const image = { src: 'tiny.png', naturalWidth: 50, naturalHeight: 50 };
+		const cropRect = { x: 0.1, y: 0.12, width: 0.6, height: 0.44 };
+		const controller = createController();
+		controller.state = {
+			...controller.state,
+			image,
+			cropRect,
+		};
+		const initialRegion = getSourceRegion(
+			{ ...controller.state, cropRect },
+			{ width: image.naturalWidth, height: image.naturalHeight }
+		);
+		render(
+			<Cropper src="tiny.png" controller={ controller } freeformCrop />
+		);
+
+		const handle = await screen.findByRole( 'button', {
+			name: 'Resize right edge',
+		} );
+		fireEvent.keyDown( handle, { key: 'ArrowRight' } );
+
+		const rect = ( controller.setCropRect as jest.Mock ).mock
+			.calls[ 0 ][ 0 ];
+		const region = getSourceRegion(
+			{ ...controller.state, cropRect: rect },
+			{ width: image.naturalWidth, height: image.naturalHeight }
+		);
+		expect( region.x ).toBeCloseTo( initialRegion.x, 3 );
+		expect( region.x + region.width ).toBeCloseTo(
+			Math.round( region.x + region.width ),
+			3
+		);
+		expect( rect.x ).toBeCloseTo( cropRect.x, 5 );
+		expect( rect.y ).toBeCloseTo( cropRect.y, 5 );
+		expect( rect.height ).toBeCloseTo( cropRect.height, 5 );
+	} );
+
+	it( 'uses source-pixel keyboard steps for horizontal freeform resize when snapping is active', async () => {
+		const image = {
+			src: 'wide.png',
+			naturalWidth: 200,
+			naturalHeight: 100,
+		};
+		const cropRect = { x: 0.1, y: 0.1, width: 0.6, height: 0.6 };
+		const controller = createController();
+		controller.state = {
+			...controller.state,
+			image,
+			cropRect,
+		};
+		const initialRegion = getSourceRegion(
+			{ ...controller.state, cropRect },
+			{ width: image.naturalWidth, height: image.naturalHeight }
+		);
+		render(
+			<Cropper src="wide.png" controller={ controller } freeformCrop />
+		);
+
+		const handle = await screen.findByRole( 'button', {
+			name: 'Resize right edge',
+		} );
+		( controller.setCropRect as jest.Mock ).mockClear();
+		fireEvent.keyDown( handle, { key: 'ArrowRight' } );
+
+		const rect = ( controller.setCropRect as jest.Mock ).mock
+			.calls[ 0 ][ 0 ];
+		const region = getSourceRegion(
+			{ ...controller.state, cropRect: rect },
+			{ width: image.naturalWidth, height: image.naturalHeight }
+		);
+		expect( region.x + region.width ).toBeCloseTo(
+			initialRegion.x + initialRegion.width + 1,
+			3
+		);
+	} );
+
+	it( 'keeps freeform resize smooth below 1:1 display scale', async () => {
+		const image = {
+			src: 'large.png',
+			naturalWidth: 3333,
+			naturalHeight: 3333,
+		};
+		const cropRect = { x: 0.113, y: 0.127, width: 0.6, height: 0.456 };
+		const controller = createController();
+		controller.state = {
+			...controller.state,
+			image,
+			cropRect,
+		};
+		render(
+			<Cropper src="large.png" controller={ controller } freeformCrop />
+		);
+
+		const handle = await screen.findByRole( 'button', {
+			name: 'Resize right edge',
+		} );
+		fireEvent.keyDown( handle, { key: 'ArrowRight' } );
+
+		const rect = ( controller.setCropRect as jest.Mock ).mock
+			.calls[ 0 ][ 0 ];
+		const region = getSourceRegion(
+			{ ...controller.state, cropRect: rect },
+			{ width: image.naturalWidth, height: image.naturalHeight }
+		);
+		expect( rect.width ).toBeCloseTo( 0.61, 5 );
+		expect(
+			Math.abs(
+				region.x + region.width - Math.round( region.x + region.width )
+			)
+		).toBeGreaterThan( 0.01 );
+	} );
+
+	it( 'snaps all crop edges once when display scale reaches source-pixel size', async () => {
+		const image = {
+			src: 'crossing.png',
+			naturalWidth: 1000,
+			naturalHeight: 1000,
+		};
+		const cropRect = {
+			x: 0.113,
+			y: 0.127,
+			width: 0.733,
+			height: 0.641,
+		};
+		const controller = createController();
+		controller.state = {
+			...controller.state,
+			image,
+			cropRect,
+			zoom: 0.5,
+		};
+		const { rerender } = render(
+			<Cropper
+				src="crossing.png"
+				controller={ controller }
+				freeformCrop
+			/>
+		);
+
+		await screen.findByTestId( 'cropper-image' );
+		expect( controller.setCropRect ).not.toHaveBeenCalled();
+
+		controller.state = { ...controller.state, zoom: 3 };
+		rerender(
+			<Cropper
+				src="crossing.png"
+				controller={ controller }
+				freeformCrop
+			/>
+		);
+
+		await waitFor( () =>
+			expect( controller.setCropRect ).toHaveBeenCalledTimes( 1 )
+		);
+		const rect = ( controller.setCropRect as jest.Mock ).mock
+			.calls[ 0 ][ 0 ];
+		const region = getSourceRegion(
+			{ ...controller.state, cropRect: rect },
+			{ width: image.naturalWidth, height: image.naturalHeight }
+		);
+		for ( const edge of [
+			region.x,
+			region.y,
+			region.x + region.width,
+			region.y + region.height,
+		] ) {
+			expect( edge ).toBeCloseTo( Math.round( edge ), 3 );
+		}
+	} );
+
+	it( 'does not snap all crop edges for fixed-aspect freeform crops', async () => {
+		const image = {
+			src: 'locked-ratio.png',
+			naturalWidth: 1000,
+			naturalHeight: 1000,
+		};
+		const controller = createController();
+		controller.state = {
+			...controller.state,
+			image,
+			cropRect: {
+				x: 0.113,
+				y: 0.127,
+				width: 0.733,
+				height: 0.641,
+			},
+			zoom: 0.5,
+		};
+		const { rerender } = render(
+			<Cropper
+				src="locked-ratio.png"
+				controller={ controller }
+				freeformCrop
+				aspectRatio={ 1 }
+			/>
+		);
+
+		await screen.findByTestId( 'cropper-image' );
+		controller.state = { ...controller.state, zoom: 3 };
+		rerender(
+			<Cropper
+				src="locked-ratio.png"
+				controller={ controller }
+				freeformCrop
+				aspectRatio={ 1 }
+			/>
+		);
+
+		expect( controller.setCropRect ).not.toHaveBeenCalled();
+	} );
+
+	function imageRendering(): string {
+		return screen.getByTestId< HTMLImageElement >( 'cropper-image' ).style
+			.imageRendering;
+	}
+
+	it( 'renders upscaled (small) images pixelated so pixel boundaries stay crisp', () => {
+		const controller = createController();
+		controller.state = {
+			...controller.state,
+			// A 50x50 image contain-fits to 400px in the 600x400 canvas — an 8x
+			// upscale — so the display scale exceeds 1:1.
+			image: { src: 'tiny.png', naturalWidth: 50, naturalHeight: 50 },
+		};
+		render( <Cropper src="tiny.png" controller={ controller } /> );
+
+		expect( imageRendering() ).toBe( 'pixelated' );
+	} );
+
+	it( 'renders downscaled (large) images smoothly', () => {
+		const controller = createController();
+		controller.state = {
+			...controller.state,
+			// Tall image is shown well below 1:1 (fit ~0.33), even when the crop
+			// magnifies, so the image is downscaled and should stay smooth.
+			image: TALL_IMAGE,
+			cropRect: { x: 0, y: 1 / 3, width: 1, height: 1 / 3 },
+		};
+		render( <Cropper src="tall.jpg" controller={ controller } /> );
+
+		expect( imageRendering() ).not.toBe( 'pixelated' );
 	} );
 } );

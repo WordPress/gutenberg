@@ -18,6 +18,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { plugins } from '@wordpress/icons';
 import { Card, Icon, Stack, Notice, Text, VisuallyHidden } from '@wordpress/ui';
+import type { WidgetType } from '@wordpress/widget-primitives';
 
 /**
  * Internal dependencies
@@ -27,7 +28,6 @@ import { WidgetContextProvider } from '../../context/widget-context';
 import { DashboardWidgetRender } from '../widget-render';
 import styles from './dashboard-widget-chrome.module.css';
 import type { DashboardWidget } from '../../types';
-import type { WidgetType } from '../../../widget-primitives';
 
 interface ErrorBoundaryProps {
 	children: ReactNode;

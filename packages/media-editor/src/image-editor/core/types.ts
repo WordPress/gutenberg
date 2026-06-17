@@ -210,4 +210,19 @@ export interface StencilProps {
 	 * the source image dimensions. Omit to use the stencil's default.
 	 */
 	minCropSize?: Size;
+	/**
+	 * Optional post-processor for freeform resize output. Hosts use this for
+	 * display-gated behavior such as snapping visible pixel grids to source
+	 * pixel boundaries.
+	 */
+	snapCropRect?: (
+		rect: NormalizedRect,
+		handle: HandlePosition
+	) => NormalizedRect;
+	/**
+	 * Optional keyboard resize step in normalized space, per axis. Hosts use
+	 * this when keyboard resize should follow the rendered image scale instead
+	 * of the default percentage-based step.
+	 */
+	keyboardResizeStep?: Size;
 }
