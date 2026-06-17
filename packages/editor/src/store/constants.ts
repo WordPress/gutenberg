@@ -49,6 +49,10 @@ export const DESIGN_POST_TYPES = [
  * Matches the breakpoints in packages/base-styles/_breakpoints.scss,
  * and breakpoints in packages/compose/src/hooks/use-viewport-match/index.js.
  * minus 1 to trigger the media query for device preview.
+ *
+ * These breakpoints are currently hardcoded, but are expected to become
+ * customizable via the `settings.viewport` values in theme.json in the future.
+ * See https://github.com/WordPress/gutenberg/pull/79104.
  */
 export const DEVICE_TYPES: Record<
 	string,
