@@ -232,22 +232,30 @@ export function getInlineMarkerStart( thread, attributes ) {
  * Decide what to do with an inline note based on whether its in-content marker
  * is still present. Pure so it can be unit-tested without React/stores.
  *
+ * The marker presence is resolved by the caller and passed in as a tristate so
+ * the expensive content scan (`findNoteInBlock`) can be memoized upstream rather
+ * than re-run on every render:
+ *
+ * - `true`: the block is loaded and its marker is present.
+ * - `false`: the block is loaded but the marker is gone.
+ * - `null`: the block (or its attributes) isn't loaded yet, so presence is
+ *   unknown and the note must not be touched.
+ *
  * - `'anchor'`: the marker is present; record that we've seen it this session.
  * - `'delete'`: the marker was seen earlier this session but is now gone (the
  *   user removed the marked text), so the note should be deleted.
  * - `'skip'`: the block isn't loaded yet, the note is block-level (no marker),
  *   or the marker is absent for a note we never saw anchored this session.
  *
- * @param {Object}  thread     Materialized thread record (with `.id`, `.blockClientId`).
- * @param {?Object} attributes Block attributes for the thread's block, or null/undefined when unloaded.
- * @param {Set}     anchored   Ids whose marker has been observed present this session.
+ * @param {Object}       thread   Materialized thread record (with `.id`, `.blockClientId`).
+ * @param {boolean|null} present  Marker presence: `true`/`false` when loaded, `null` when unloaded.
+ * @param {Set}          anchored Ids whose marker has been observed present this session.
  * @return {'anchor'|'delete'|'skip'} The action to take.
  */
-export function reconcileInlineNoteMarker( thread, attributes, anchored ) {
-	if ( ! thread?.blockClientId || ! attributes ) {
+export function reconcileInlineNoteMarker( thread, present, anchored ) {
+	if ( ! thread?.blockClientId || present === null ) {
 		return 'skip';
 	}
-	const present = !! findNoteInBlock( attributes, thread.id );
 	if ( present ) {
 		return 'anchor';
 	}

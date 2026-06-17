@@ -926,72 +926,39 @@ describe( 'getInlineMarkerStart', () => {
 } );
 
 describe( 'reconcileInlineNoteMarker', () => {
-	const FORMAT_NAME = 'core/note';
-
-	const isRegistered = () =>
-		!! select( richTextStore ).getFormatType( FORMAT_NAME );
-
-	beforeAll( () => {
-		if ( ! isRegistered() ) {
-			registerFormatType( FORMAT_NAME, {
-				title: 'Note',
-				tagName: 'mark',
-				className: 'wp-note',
-				attributes: { 'data-id': 'data-id' },
-				edit: () => null,
-			} );
-		}
-	} );
-
-	afterAll( () => {
-		if ( isRegistered() ) {
-			unregisterFormatType( FORMAT_NAME );
-		}
-	} );
-
+	// Marker presence is resolved by the caller, so these cases drive the
+	// decision directly via the `present` tristate (`true`/`false`/`null`).
 	const inlineThread = { id: 7, blockClientId: 'abc' };
-	const withMarker = {
-		content: RichTextData.fromHTMLString(
-			'hello <mark class="wp-note" data-id="7">marked</mark> world'
-		),
-	};
-	const withoutMarker = {
-		content: RichTextData.fromHTMLString( 'hello world' ),
-	};
 
 	it( 'returns "anchor" when the marker is present', () => {
 		expect(
-			reconcileInlineNoteMarker( inlineThread, withMarker, new Set() )
+			reconcileInlineNoteMarker( inlineThread, true, new Set() )
 		).toBe( 'anchor' );
 	} );
 
 	it( 'returns "delete" when a previously anchored marker is now gone', () => {
 		expect(
-			reconcileInlineNoteMarker(
-				inlineThread,
-				withoutMarker,
-				new Set( [ 7 ] )
-			)
+			reconcileInlineNoteMarker( inlineThread, false, new Set( [ 7 ] ) )
 		).toBe( 'delete' );
 	} );
 
 	it( 'returns "skip" when the marker is gone but was never observed (never-anchored note)', () => {
 		expect(
-			reconcileInlineNoteMarker( inlineThread, withoutMarker, new Set() )
+			reconcileInlineNoteMarker( inlineThread, false, new Set() )
 		).toBe( 'skip' );
 	} );
 
 	it( 'returns "skip" for a block-level note (no marker, never anchored)', () => {
 		const blockLevel = { id: 5, blockClientId: 'abc' };
 		expect(
-			reconcileInlineNoteMarker( blockLevel, withMarker, new Set() )
+			reconcileInlineNoteMarker( blockLevel, false, new Set() )
 		).toBe( 'skip' );
 	} );
 
 	it( 'returns "skip" for an orphan thread with no blockClientId', () => {
 		const orphan = { id: 7, blockClientId: null };
 		expect(
-			reconcileInlineNoteMarker( orphan, withMarker, new Set( [ 7 ] ) )
+			reconcileInlineNoteMarker( orphan, true, new Set( [ 7 ] ) )
 		).toBe( 'skip' );
 	} );
 
