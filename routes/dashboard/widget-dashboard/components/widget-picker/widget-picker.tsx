@@ -5,6 +5,7 @@ import { DataViewsPicker, filterSortAndPaginate } from '@wordpress/dataviews';
 import type { Field, View } from '@wordpress/dataviews';
 import { Suspense, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import type { WidgetType } from '@wordpress/widget-primitives';
 
 /**
  * Internal dependencies
@@ -13,7 +14,6 @@ import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { createDashboardWidget } from '../../utils/create-dashboard-widget';
 import { DashboardWidgetRender } from '../widget-render';
 import styles from './widget-picker.module.css';
-import type { WidgetType } from '../../../widget-primitives';
 
 const DEFAULT_VIEW: View = {
 	type: 'pickerGrid',

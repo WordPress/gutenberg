@@ -99,6 +99,8 @@ export default [
 	'--wpds-color-stroke-surface-info-strong',
 	'--wpds-color-stroke-surface-warning',
 	'--wpds-color-stroke-surface-warning-strong',
+	'--wpds-color-stroke-surface-caution',
+	'--wpds-color-stroke-surface-caution-strong',
 	'--wpds-color-stroke-surface-error',
 	'--wpds-color-stroke-surface-error-strong',
 	'--wpds-color-stroke-interactive-neutral',

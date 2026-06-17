@@ -17,7 +17,7 @@ import { NoWidgetsState } from './components/no-widgets-state';
  *
  * The consumer owns `layout` and `editMode` state; every mutation fires
  * `onLayoutChange` with the fully updated array. The engine never queries a
- * widget-primitives store; types flow in via the `widgetTypes` prop.
+ * widget store; types flow in via the `widgetTypes` prop.
  *
  * ```tsx
  * import { WidgetDashboard } from '@wordpress/dashboard';

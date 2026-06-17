@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/theme",
-	"version": "0.15.0",
+	"version": "0.15.1",
 	"description": "Theme and context provider for the WordPress Design System.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -97,6 +97,7 @@
 		"@types/node": "^20.19.39",
 		"esbuild": "^0.27.2",
 		"esbuild-esm-loader": "^0.3.3",
+		"prettier": "npm:wp-prettier@^3.0.3",
 		"storybook": "^10.2.8",
 		"stylelint": "^16.8.2"
 	},

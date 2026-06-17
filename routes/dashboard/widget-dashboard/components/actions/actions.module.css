@@ -10,8 +10,7 @@
 	flex-shrink: 0;
 	align-self: center;
 	width: 1px;
-	/* TODO: Replace `$button-size-small` with a WPDS size token once size tokens land in `@wordpress/theme`. */
-	height: calc(4 * var(--wpds-dimension-base));
+	height: var(--wpds-dimension-size-2xs);
 	background-color: var(--wpds-color-stroke-surface-neutral);
 }
 
