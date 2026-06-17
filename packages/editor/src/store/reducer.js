@@ -292,6 +292,22 @@ export function canvasWidth( state = undefined, action ) {
 }
 
 /**
+ * Reducer for whether Responsive editing is enabled. When enabled, the device
+ * preview also drives which viewport block style edits are applied to.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ * @return {boolean} Updated state.
+ */
+export function isResponsiveEditing( state = false, action ) {
+	switch ( action.type ) {
+		case 'SET_RESPONSIVE_EDITING':
+			return action.enabled;
+	}
+	return state;
+}
+
+/**
  * Reducer storing the list of all programmatically removed panels.
  *
  * @param {Array}  state  Current state.
@@ -486,23 +502,6 @@ export function selectedNote( state = {}, action ) {
 	return state;
 }
 
-/**
- * Reducer for whether Responsive editing is enabled. When enabled, the device
- * preview also drives which viewport block style edits are applied to. This is
- * a session-only flag and is not persisted.
- *
- * @param {boolean} state  Current state.
- * @param {Object}  action Dispatched action.
- * @return {boolean} Updated state.
- */
-export function isResponsiveEditing( state = false, action ) {
-	switch ( action.type ) {
-		case 'SET_RESPONSIVE_EDITING':
-			return action.enabled;
-	}
-	return state;
-}
-
 export default combineReducers( {
 	postId,
 	postType,
@@ -515,6 +514,8 @@ export default combineReducers( {
 	editorSettings,
 	postAutosavingLock,
 	renderingMode,
+	canvasWidth,
+	isResponsiveEditing,
 	removedPanels,
 	blockInserterPanel,
 	inserterSidebarToggleRef,
@@ -523,11 +524,9 @@ export default combineReducers( {
 	publishSidebarActive,
 	stylesPath,
 	showStylebook,
-	canvasWidth,
 	revisionId,
 	revisionPage,
 	showRevisionDiff,
 	selectedNote,
-	isResponsiveEditing,
 	dataviews: dataviewsReducer,
 } );
