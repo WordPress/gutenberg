@@ -81,9 +81,10 @@ export default function AutosaveMonitor( { interval, autosave } ) {
 
 		const editsReference = getReferenceByDistinctEdits();
 		const hasNewEdits = editsReference !== lastEditsReferenceRef.current;
-		lastEditsReferenceRef.current = editsReference;
-
 		if ( hasNewEdits && isEditedPostDirty() && ! isAutosavingPost() ) {
+			// Only consume the edits reference when we autosave,
+			// so edits made during an in-flight autosave aren't skipped.
+			lastEditsReferenceRef.current = editsReference;
 			triggerAutosave();
 		}
 	}, autosaveInterval );

@@ -146,6 +146,28 @@ describe( 'AutosaveMonitor', () => {
 		expect( autosave ).not.toHaveBeenCalled();
 	} );
 
+	it( 'should autosave edits made during an in-progress autosave once it finishes', () => {
+		const autosave = jest.fn();
+		setState( { isDirty: true, isAutosaveable: true } );
+		render( <AutosaveMonitor autosave={ autosave } interval={ 5 } /> );
+
+		// New edit arrives while an autosave is already in progress: the tick
+		// should not consume the edits reference nor trigger an autosave.
+		setState( {
+			isDirty: true,
+			isAutosaveable: true,
+			isAutosaving: true,
+			editsReference: 2,
+		} );
+		jest.advanceTimersByTime( 5000 );
+		expect( autosave ).not.toHaveBeenCalled();
+
+		// Once the autosave finishes, the pending edit must still be autosaved.
+		setState( { isDirty: true, isAutosaveable: true, editsReference: 2 } );
+		jest.advanceTimersByTime( 5000 );
+		expect( autosave ).toHaveBeenCalledTimes( 1 );
+	} );
+
 	it( 'should not autosave again until there are new edits', () => {
 		const autosave = jest.fn();
 		setState( { isDirty: true, isAutosaveable: true } );
