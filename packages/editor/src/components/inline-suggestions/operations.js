@@ -11,7 +11,36 @@ import {
 /**
  * Internal dependencies
  */
-import { SUGGESTION_FORMAT_NAME, findSuggestionRange } from './format';
+import {
+	SUGGESTION_FORMAT_NAME,
+	SUGGESTION_ID_ATTRIBUTE,
+	SUGGESTION_TYPE_ATTRIBUTE,
+	SUGGESTION_AUTHOR_ATTRIBUTE,
+	findSuggestionRange,
+} from './format';
+
+/**
+ * Build the attribute map for a `core/suggestion` marker. Pins the marker
+ * contract in one place: the id links to the persisted suggestion (its comment
+ * id), the type is `del` or `add`, and the author tags the marker so per-author
+ * attribution survives reload and reviewer view. The author attribute is
+ * omitted when no author id is known.
+ *
+ * @param {Object}        options
+ * @param {number|string} options.id         Suggestion (comment) id.
+ * @param {'del'|'add'}   options.type       Marker kind.
+ * @param {number|string} [options.authorId] Author user id.
+ * @return {Object} Marker attributes for `wrapInlineMarker`.
+ */
+export function buildSuggestionMarkerAttributes( { id, type, authorId } ) {
+	return {
+		[ SUGGESTION_ID_ATTRIBUTE ]: String( id ),
+		[ SUGGESTION_TYPE_ATTRIBUTE ]: type,
+		...( authorId !== undefined && authorId !== null
+			? { [ SUGGESTION_AUTHOR_ATTRIBUTE ]: String( authorId ) }
+			: {} ),
+	};
+}
 
 /**
  * Accept a suggested deletion: drop both the marked text and its marker so the

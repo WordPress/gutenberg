@@ -27,4 +27,8 @@ export {
 	findSuggestionRange,
 } from './format';
 export { useAnnotateSuggestions } from './use-annotate-suggestions';
-export { acceptInlineDeletion, rejectInlineDeletion } from './operations';
+export {
+	acceptInlineDeletion,
+	rejectInlineDeletion,
+	buildSuggestionMarkerAttributes,
+} from './operations';

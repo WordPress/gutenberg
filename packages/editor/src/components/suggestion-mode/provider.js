@@ -228,7 +228,7 @@ export function findStructuralOp( operations ) {
  * re-derived from the in-content marker by id (the comment id) on read — so the
  * op only records which attribute carries the marker and the marker kind.
  */
-const INLINE_OP_TYPE = 'inline-suggestion';
+export const INLINE_OP_TYPE = 'inline-suggestion';
 
 /**
  * Locate the inline-suggestion operation in a payload. A payload describes at

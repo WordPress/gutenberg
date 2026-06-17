@@ -11,7 +11,11 @@ import { select } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { acceptInlineDeletion, rejectInlineDeletion } from '../operations';
+import {
+	acceptInlineDeletion,
+	rejectInlineDeletion,
+	buildSuggestionMarkerAttributes,
+} from '../operations';
 import { registerSuggestionFormat, SUGGESTION_FORMAT_NAME } from '../format';
 
 const getFormatType = ( name ) => select( richTextStore ).getFormatType( name );
@@ -105,5 +109,37 @@ describe( 'inline deletion operations', () => {
 		it( 'returns a non-rich-text value unchanged', () => {
 			expect( rejectInlineDeletion( 'plain', 5 ) ).toBe( 'plain' );
 		} );
+	} );
+} );
+
+describe( 'buildSuggestionMarkerAttributes', () => {
+	it( 'stringifies the id and carries the type and author', () => {
+		expect(
+			buildSuggestionMarkerAttributes( {
+				id: 42,
+				type: 'del',
+				authorId: 7,
+			} )
+		).toEqual( {
+			'data-suggestion-id': '42',
+			'data-suggestion-type': 'del',
+			'data-author': '7',
+		} );
+	} );
+
+	it( 'omits the author attribute when no author id is given', () => {
+		expect(
+			buildSuggestionMarkerAttributes( { id: 1, type: 'add' } )
+		).toEqual( {
+			'data-suggestion-id': '1',
+			'data-suggestion-type': 'add',
+		} );
+		expect(
+			buildSuggestionMarkerAttributes( {
+				id: 1,
+				type: 'del',
+				authorId: null,
+			} )
+		).not.toHaveProperty( 'data-author' );
 	} );
 } );

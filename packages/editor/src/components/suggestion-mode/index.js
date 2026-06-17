@@ -20,6 +20,7 @@ export {
 } from './with-suggestion-overlay';
 export { default as SuggestionAutoSave } from './auto-save';
 export { default as SuggestionStoreInterceptor } from './store-interceptor';
+export { default as SuggestDeletionFormatEdit } from './suggest-deletion-format-edit';
 export {
 	default as SuggestionAnnotations,
 	suggestionAnnotations,
