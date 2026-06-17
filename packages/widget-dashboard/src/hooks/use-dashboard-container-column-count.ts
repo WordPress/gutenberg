@@ -14,20 +14,21 @@ import {
  */
 import { resolveDashboardColumnCount } from '../utils/resolve-dashboard-column-count/resolve-dashboard-column-count';
 
+interface UseDashboardContainerColumnCountResult {
+	containerRef: Ref< HTMLDivElement >;
+	columnCount: number;
+}
+
 /**
  * Tracks the dashboard grid container width and maps it to an opinionated
  * column count (4 → 2 → 1). Measurement is container-based via
  * `ResizeObserver`, not viewport media queries.
  *
- * @param forwardedRef Optional ref forwarded from the grid wrapper.
- * @return Merged ref for the container element and the resolved column count.
+ * @param {Ref< HTMLDivElement >} [forwardedRef] Ref forwarded from the grid wrapper.
  */
 export function useDashboardContainerColumnCount(
 	forwardedRef?: Ref< HTMLDivElement >
-): {
-	containerRef: Ref< HTMLDivElement >;
-	columnCount: number;
-} {
+): UseDashboardContainerColumnCountResult {
 	const [ container, setContainer ] = useState< HTMLDivElement | null >(
 		null
 	);
