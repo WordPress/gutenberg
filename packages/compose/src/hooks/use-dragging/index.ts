@@ -7,18 +7,7 @@ import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import useIsomorphicLayoutEffect from '../use-isomorphic-layout-effect';
-
-interface DraggingProps {
-	onDragStart?: ( e: React.MouseEvent ) => void;
-	onDragMove?: ( e: MouseEvent ) => void;
-	onDragEnd?: ( e?: MouseEvent ) => void;
-}
-
-interface DraggingReturn {
-	startDrag: ( e: React.MouseEvent ) => void;
-	endDrag: ( e?: MouseEvent ) => void;
-	isDragging: boolean;
-}
+import type { DraggingProps, DraggingReturn } from './types';
 
 /**
  * Hook to manage drag events with proper event handling
