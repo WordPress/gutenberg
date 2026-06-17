@@ -58,6 +58,13 @@ choices (defined via the `colors` prop).
 -   Required: No
 -   Default: `false`
 
+### Private APIs
+
+Inline palette editing (add, rename, recolor, delete) is available to
+first-party WordPress packages via a symbol-keyed private prop on
+`ColorPalette`. It is intentionally not part of the public component API. See
+the **WithPaletteEditing** Storybook story for a demonstration.
+
 ### `enableAlpha`: `boolean`
 
 This controls whether the alpha channel will be offered when selecting custom

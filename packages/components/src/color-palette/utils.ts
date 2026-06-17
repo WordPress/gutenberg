@@ -13,7 +13,13 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type { ColorObject, ColorPaletteProps, PaletteObject } from './types';
+import type {
+	ColorEditingProps,
+	ColorObject,
+	ColorPaletteProps,
+	PaletteObject,
+} from './types';
+import { kebabCase } from '../utils/strings';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
@@ -23,58 +29,110 @@ extend( [ namesPlugin, a11yPlugin ] );
  * @param value The color value to check.
  * @return A boolean indicating whether the color value is a simple CSS color.
  */
-const isSimpleCSSColor = ( value: string ): boolean => {
+export const isSimpleCSSColor = ( value: string ): boolean => {
 	const valueIsCssVariable = /var\(/.test( value ?? '' );
 	const valueIsColorMix = /color-mix\(/.test( value ?? '' );
 	return ! valueIsCssVariable && ! valueIsColorMix;
 };
 
+/**
+ * Case-insensitive, whitespace-insensitive equality for raw color strings.
+ * Used to detect whether a color value actually changed (NOT for matching a
+ * value against a palette — see `findSelectedColorEntry` for that).
+ *
+ * @param a First color string.
+ * @param b Second color string.
+ * @return Whether the two color strings are equal after normalization.
+ */
+export const colorsAreEqual = ( a?: string, b?: string ): boolean =>
+	( a ?? '' ).trim().toLocaleLowerCase() ===
+	( b ?? '' ).trim().toLocaleLowerCase();
+
+/**
+ * Whether `colorEditing` is active enough to show the editing UI.
+ *
+ * @param colorEditing
+ * @param options
+ * @param options.disableCustomColors
+ * @param options.requireCallbacks
+ * @return Whether editing UI should be shown.
+ */
+export function isColorEditingEnabled(
+	colorEditing?: ColorEditingProps | null,
+	options?: {
+		disableCustomColors?: boolean;
+		requireCallbacks?: boolean;
+	}
+): boolean {
+	if ( ! colorEditing ) {
+		return false;
+	}
+	if ( options?.disableCustomColors ) {
+		return false;
+	}
+	if ( ! Object.keys( colorEditing.capabilities ?? {} ).length ) {
+		return false;
+	}
+	if ( options?.requireCallbacks ) {
+		return !! (
+			colorEditing.onAdd ||
+			colorEditing.onUpdate ||
+			colorEditing.onDelete
+		);
+	}
+	return true;
+}
+
+/**
+ * Normalizes `colors` into an array of palette objects regardless of input
+ * shape, so callers can traverse palettes without repeated type assertions.
+ *
+ * @param colors Palette input from `ColorPalette`.
+ */
+export function toPaletteObjects(
+	colors: ColorPaletteProps[ 'colors' ] = []
+): PaletteObject[] {
+	return isMultiplePaletteArray( colors )
+		? colors
+		: [ { name: '', colors: colors as ColorObject[] } ];
+}
+
+/**
+ * Returns the flat color list when `colors` is a single palette, or `[]` when
+ * multiple palettes are in use.
+ *
+ * @param colors Palette input from `ColorPalette`.
+ */
+export function toColorObjects(
+	colors: ColorPaletteProps[ 'colors' ] = []
+): ColorObject[] {
+	return isMultiplePaletteArray( colors ) ? [] : ( colors as ColorObject[] );
+}
+
+/**
+ * Resolves the display name for the currently selected color value.
+ *
+ * @param currentValue          The selected color value.
+ * @param colors                The palette(s) to look through.
+ * @param _showMultiplePalettes Kept for backwards-compatible signature.
+ * @param selectedSlug          Optional slug that takes priority over value matching.
+ * @return The matched color name, `'Custom'` for unmatched values, or `''` when empty.
+ */
 export const extractColorNameFromCurrentValue = (
 	currentValue?: ColorPaletteProps[ 'value' ],
 	colors: ColorPaletteProps[ 'colors' ] = [],
-	showMultiplePalettes: boolean = false,
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	_showMultiplePalettes: boolean = false,
 	selectedSlug?: ColorPaletteProps[ 'selectedSlug' ]
 ) => {
 	if ( ! currentValue ) {
 		return '';
 	}
-	const currentValueIsSimpleColor = currentValue
-		? isSimpleCSSColor( currentValue )
-		: false;
-	const normalizedCurrentValue = currentValueIsSimpleColor
-		? colord( currentValue ).toHex()
-		: currentValue;
-
-	// Normalize format of `colors` to simplify the following loop
-	type normalizedPaletteObject = { colors: ColorObject[] };
-	const colorPalettes: normalizedPaletteObject[] = showMultiplePalettes
-		? ( colors as PaletteObject[] )
-		: [ { colors: colors as ColorObject[] } ];
-	for ( const { colors: paletteColors } of colorPalettes ) {
-		for ( const {
-			name: colorName,
-			color: colorValue,
-			slug,
-		} of paletteColors ) {
-			if ( selectedSlug ) {
-				if ( slug === selectedSlug ) {
-					return colorName;
-				}
-				continue;
-			}
-
-			const normalizedColorValue = currentValueIsSimpleColor
-				? colord( colorValue ).toHex()
-				: colorValue;
-
-			if ( normalizedCurrentValue === normalizedColorValue ) {
-				return colorName;
-			}
-		}
-	}
-
-	// translators: shown when the user has picked a custom color (i.e not in the palette of colors).
-	return __( 'Custom' );
+	const found = findSelectedColorEntry( currentValue, colors, selectedSlug );
+	return found
+		? found.color.name
+		: // translators: shown when the user has picked a custom color (i.e not in the palette of colors).
+		  __( 'Custom' );
 };
 
 // The PaletteObject type has a `colors` property (an array of ColorObject),
@@ -116,4 +174,96 @@ export const normalizeColorValue = (
 	return computedBackgroundColor
 		? colord( computedBackgroundColor ).toHex()
 		: value;
+};
+
+// Slug prefix for user-managed custom colors (e.g. `custom-my-color`), matching core's `theme.json` convention and `--wp--preset--color--custom-*` CSS variables.
+export const CUSTOM_COLOR_SLUG_PREFIX = 'custom-';
+
+// Slug for the user-managed custom palette in `MultiplePalettes`.
+export const CUSTOM_PALETTE_SLUG = 'custom';
+
+/**
+ * Generates the slug for a custom color from its display name.
+ *
+ * @param name The (potentially empty) display name.
+ * @return The slug.
+ */
+export const slugifyCustomColorName = ( name: string ): string => {
+	const base = kebabCase( name ?? '' );
+	return `${ CUSTOM_COLOR_SLUG_PREFIX }${ base }`;
+};
+
+/**
+ * Generates a unique custom color slug, following the same convention as
+ * PaletteEdit: the first duplicate slug gets `-1`, then `-2`, and so on.
+ *
+ * @param name         The name to test.
+ * @param customColors Existing custom colors.
+ * @param ignoredSlug  Optional slug to ignore, used when editing a color.
+ * @return The unique custom color slug.
+ */
+export const getUniqueCustomColorSlug = (
+	name: string,
+	customColors: ColorObject[] = [],
+	ignoredSlug?: string
+): string => {
+	const baseSlug = slugifyCustomColorName( name );
+	const usedSlugs = new Set(
+		customColors
+			.map( ( customColor ) => customColor.slug )
+			.filter( ( slug ) => slug && slug !== ignoredSlug )
+	);
+
+	if ( ! usedSlugs.has( baseSlug ) ) {
+		return baseSlug;
+	}
+
+	let suffix = 1;
+	let nextSlug = `${ baseSlug }-${ suffix }`;
+	while ( usedSlugs.has( nextSlug ) ) {
+		suffix += 1;
+		nextSlug = `${ baseSlug }-${ suffix }`;
+	}
+	return nextSlug;
+};
+
+/**
+ * Finds the currently-selected color entry across one or more palettes.
+ *
+ * @param value        The currently selected color value, hex or CSS variable.
+ * @param colors       The palette(s) to look through.
+ * @param selectedSlug Optional slug that takes priority over value matching.
+ * @return The matched palette entry and the slug of the palette it belongs
+ *         to, or `undefined` when nothing matches.
+ */
+export const findSelectedColorEntry = (
+	value: string | undefined,
+	colors: ColorPaletteProps[ 'colors' ] = [],
+	selectedSlug?: string
+): { color: ColorObject; paletteSlug?: string } | undefined => {
+	if ( ! value ) {
+		return undefined;
+	}
+
+	const isSimple = isSimpleCSSColor( value );
+	const normalizedValue = isSimple ? colord( value ).toHex() : value;
+
+	for ( const palette of toPaletteObjects( colors ) ) {
+		for ( const entry of palette.colors ) {
+			if ( selectedSlug ) {
+				if ( entry.slug === selectedSlug ) {
+					return { color: entry, paletteSlug: palette.slug };
+				}
+				continue;
+			}
+			const normalizedEntry = isSimple
+				? colord( entry.color ).toHex()
+				: entry.color;
+			if ( normalizedEntry === normalizedValue ) {
+				return { color: entry, paletteSlug: palette.slug };
+			}
+		}
+	}
+
+	return undefined;
 };

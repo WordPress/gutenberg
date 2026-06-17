@@ -8,6 +8,7 @@ import type { CSSProperties, ReactNode } from 'react';
  */
 import type { DropdownProps } from '../dropdown/types';
 import type { HeadingSize } from '../heading/types';
+import type { ColorEditingPropKey } from './private-keys';
 
 export type ColorObject = {
 	name: string;
@@ -18,6 +19,35 @@ export type ColorObject = {
 export type PaletteObject = {
 	name: string;
 	colors: ColorObject[];
+	slug?: string;
+};
+
+export type PaletteEditingCapability = 'value' | 'full';
+
+export type PaletteColorPayload = {
+	/** Slug of the palette (origin) the color belongs to: 'custom', 'theme', 'default'. */
+	paletteSlug: string;
+	/** Existing slug of the edited/removed color. Omitted on add. */
+	slug?: string;
+	/** Slug after the mutation completes; provided on add and rename. */
+	nextSlug?: string;
+	name: string;
+	color: string;
+};
+
+export type ColorEditingProps = {
+	/** Per-palette editing capability keyed by `slug`: `'full'` (add/rename/recolor/delete) or `'value'` (recolor only). */
+	capabilities: Record< string, PaletteEditingCapability >;
+	/** Called when the user submits the "add color" form (only 'full' palettes). */
+	onAdd?: ( payload: PaletteColorPayload ) => void;
+	/** Called when the user submits the edit form. */
+	onUpdate?: ( payload: PaletteColorPayload ) => void;
+	/** Called when the user confirms deletion (only 'full' palettes). */
+	onDelete?: ( payload: { paletteSlug: string; slug: string } ) => void;
+	/** Live preview while the edit form is open: candidate color on each change, `null` when preview ends. */
+	onPreview?: (
+		payload: { paletteSlug: string; slug: string; color: string } | null
+	) => void;
 };
 
 type PaletteProps = {
@@ -47,10 +77,15 @@ type PaletteProps = {
 
 export type SinglePaletteProps = PaletteProps & {
 	colors: ColorObject[];
+	/** Optional node appended after swatches (e.g. an add-custom-color control). */
+	addAction?: ReactNode;
 };
 
 export type MultiplePalettesProps = PaletteProps & {
 	colors: PaletteObject[];
+	/** When true, renders an add-custom-color button in the custom palette row. */
+	canAddCustomColor?: boolean;
+	onAddCustom?: () => void;
 };
 
 export type CustomColorPickerDropdownProps = DropdownProps & {
@@ -139,3 +174,7 @@ export type ColorPaletteProps = Pick<
 				'aria-label'?: never;
 		  }
 	);
+
+export type ColorPaletteInternalProps = ColorPaletteProps & {
+	[ K in ColorEditingPropKey ]?: ColorEditingProps;
+};

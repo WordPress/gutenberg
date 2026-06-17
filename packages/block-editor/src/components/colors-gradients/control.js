@@ -21,7 +21,9 @@ import {
 import { useSettings } from '../use-settings';
 import { unlock } from '../../lock-unlock';
 
-const { Tabs } = unlock( componentsPrivateApis );
+const { Tabs, colorEditingKey, isColorEditingEnabled } = unlock(
+	componentsPrivateApis
+);
 const colorsAndGradientKeys = [
 	'colors',
 	'disableCustomColors',
@@ -48,6 +50,7 @@ function ColorGradientControlInner( {
 	showTitle = true,
 	enableAlpha,
 	headingLevel,
+	colorEditing,
 } ) {
 	const canChooseAColor =
 		onColorChange &&
@@ -80,6 +83,11 @@ function ColorGradientControlInner( {
 				clearable={ clearable }
 				enableAlpha={ enableAlpha }
 				headingLevel={ headingLevel }
+				{ ...( isColorEditingEnabled( colorEditing, {
+					requireCallbacks: true,
+				} )
+					? { [ colorEditingKey ]: colorEditing }
+					: {} ) }
 			/>
 		),
 		[ TAB_IDS.gradient ]: (

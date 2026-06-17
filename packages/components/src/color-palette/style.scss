@@ -71,3 +71,52 @@ $border-as-box-shadow: inset 0 0 0 $border-width rgba(0, 0, 0, 0.2);
 		visibility: hidden;
 	}
 }
+
+.components-color-palette__info-row-text {
+	min-width: 0;
+	flex: 1 1 auto;
+}
+
+.components-color-palette__info-row-actions {
+	flex: 0 0 auto;
+}
+
+.components-circular-option-picker__option-wrapper.components-color-palette__add-color-wrapper {
+	&:hover {
+		transform: none;
+	}
+
+	// Hide the checkerboard background.
+	&::before {
+		content: none;
+		background: none;
+	}
+}
+
+.components-color-palette__add-color-button.components-button {
+	width: 100%;
+	height: 100%;
+	border-radius: $radius-round;
+	color: $gray-700;
+	border: $border-width solid $gray-600;
+
+	@media not (prefers-reduced-motion) {
+		transition: 100ms transform ease;
+		will-change: transform;
+	}
+
+	&:hover:not(:disabled) {
+		border-color: $components-color-accent;
+		color: $components-color-accent;
+		background: transparent;
+		box-shadow: none;
+		transform: scale(1.2);
+	}
+
+	&:focus:not(:disabled) {
+		border-style: dashed;
+		border-color: $components-color-accent;
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+		outline: 2px solid transparent;
+	}
+}

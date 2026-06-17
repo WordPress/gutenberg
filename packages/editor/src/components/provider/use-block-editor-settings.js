@@ -31,6 +31,7 @@ import { default as mediaDelete } from '../../utils/media-delete';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useGlobalStyles } from '../global-styles';
+import useColorPaletteEditing from '../global-styles/use-color-palette-editor';
 
 const { store: mediaEditorStore } = unlock( mediaEditorPrivateApis );
 
@@ -118,6 +119,7 @@ const {
 	isNavigationPostEditorKey,
 	mediaUploadOnSuccessKey,
 	openMediaEditorModalKey,
+	colorEditingSettingsKey,
 } = unlock( privateApis );
 
 /**
@@ -241,6 +243,11 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	const globalStylesData = mergedGlobalStyles.styles ?? EMPTY_OBJECT;
 	const globalStylesLinksData = mergedGlobalStyles._links ?? EMPTY_OBJECT;
 
+	// Palette-color editing wired to `settings.color[ colorEditingSettingsKey ]`
+	// so the inspector color picker can edit palette entries across origins with
+	// immediate persistence and snackbar feedback.
+	const { colorEditing } = useColorPaletteEditing();
+
 	const settingsBlockPatterns =
 		settings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
 		settings.__experimentalBlockPatterns; // WP 5.9
@@ -333,6 +340,10 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			),
 			[ globalStylesDataKey ]: globalStylesData,
 			[ globalStylesLinksDataKey ]: globalStylesLinksData,
+			color: {
+				...( settings.color || {} ),
+				[ colorEditingSettingsKey ]: colorEditing,
+			},
 			allImageSizes,
 			bigImageSizeThreshold,
 			allowedBlockTypes,
@@ -457,6 +468,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		allImageSizes,
 		bigImageSizeThreshold,
 		isNavigationOverlayContext,
+		colorEditing,
 	] );
 }
 

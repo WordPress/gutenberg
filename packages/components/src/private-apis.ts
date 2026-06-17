@@ -30,6 +30,8 @@ import {
 	ValidatedToggleGroupControl,
 } from './validated-form-controls';
 import { ValidatedFormTokenField } from './validated-form-controls/components/form-token-field';
+import { colorEditingKey } from './color-palette/private-keys';
+import { isColorEditingEnabled } from './color-palette/utils';
 
 export const privateApis = {};
 lock( privateApis, {
@@ -57,4 +59,6 @@ lock( privateApis, {
 	ValidatedToggleControl,
 	ValidatedToggleGroupControl,
 	ValidatedFormTokenField,
+	colorEditingKey,
+	isColorEditingEnabled,
 } );

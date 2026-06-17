@@ -19,20 +19,24 @@ import {
 	Button,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { useMemo, useRef } from '@wordpress/element';
+import { useCallback, useMemo, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getValueFromVariable } from '@wordpress/global-styles-engine';
 import { reset as resetIcon } from '@wordpress/icons';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import ColorGradientControl from '../colors-gradients/control';
 import { useColorsPerOrigin, useGradientsPerOrigin } from './hooks';
+import { useStyleOverride } from '../../hooks/utils';
 import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 import { extractPresetSlug } from '../../utils/color-values';
 import { unlock } from '../../lock-unlock';
+import { store as blockEditorStore } from '../../store';
+import { colorEditingSettingsKey } from '../../store/private-keys';
 
 export function useHasColorPanel( settings ) {
 	const hasTextPanel = useHasTextPanel( settings );
@@ -225,6 +229,15 @@ function ColorPanelTab( {
 	);
 }
 
+// Hosts (e.g. @wordpress/editor) supply palette editing at `settings.color[ colorEditingSettingsKey ]`.
+// Read from the block-editor store to sync in real time. `useSettings` only reflects theme.json and misses this config.
+function useHostColorEditingSettings() {
+	return useSelect( ( select ) => {
+		const settings = select( blockEditorStore ).getSettings();
+		return settings?.color?.[ colorEditingSettingsKey ];
+	}, [] );
+}
+
 export function ColorPanelDropdown( {
 	label,
 	hasValue,
@@ -357,6 +370,43 @@ export default function ColorPanel( {
 } ) {
 	const colors = useColorsPerOrigin( settings );
 	const gradients = useGradientsPerOrigin( settings );
+	const hostColorEditing = useHostColorEditingSettings();
+	const [ palettePreview, setPalettePreview ] = useState( null );
+
+	const onPreview = useCallback( ( payload ) => {
+		setPalettePreview(
+			payload ? { slug: payload.slug, color: payload.color } : null
+		);
+	}, [] );
+
+	const previewCss = useMemo( () => {
+		if ( ! palettePreview ) {
+			return undefined;
+		}
+		const { slug, color } = palettePreview;
+		// Validate slug and color before embedding them in CSS.
+		if ( ! /^[a-zA-Z0-9_-]+$/.test( slug ) ) {
+			return undefined;
+		}
+		const trimmedColor = color.trim();
+		if (
+			/[;{}]/.test( trimmedColor ) ||
+			! /^[\w#(),.%\s-]+$/.test( trimmedColor )
+		) {
+			return undefined;
+		}
+		return `body{--wp--preset--color--${ slug }:${ trimmedColor };}`;
+	}, [ palettePreview ] );
+
+	// Shared across text/background/link pickers; only one dropdown can be open
+	// at a time, so a single preview state cannot be clobbered by another picker.
+	useStyleOverride( { id: 'color-palette-value-preview', css: previewCss } );
+
+	const colorEditing = useMemo(
+		() =>
+			hostColorEditing ? { ...hostColorEditing, onPreview } : undefined,
+		[ hostColorEditing, onPreview ]
+	);
 	const areCustomSolidsEnabled = settings?.color?.custom;
 	const areCustomGradientsEnabled = settings?.color?.customGradient;
 	const hasSolidColors = colors.length > 0 || areCustomSolidsEnabled;
@@ -836,6 +886,7 @@ export default function ColorPanel( {
 							disableCustomColors: ! areCustomSolidsEnabled,
 							gradients,
 							disableCustomGradients: ! areCustomGradientsEnabled,
+							colorEditing,
 						} }
 						panelId={ panelId }
 					/>

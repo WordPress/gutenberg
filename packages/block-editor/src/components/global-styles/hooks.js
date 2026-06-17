@@ -225,6 +225,7 @@ export function useColorsPerOrigin( settings ) {
 					'Theme',
 					'Indicates this palette comes from the theme.'
 				),
+				slug: 'theme',
 				colors: themeColors,
 			} );
 		}
@@ -238,6 +239,7 @@ export function useColorsPerOrigin( settings ) {
 					'Default',
 					'Indicates this palette comes from WordPress.'
 				),
+				slug: 'default',
 				colors: defaultColors,
 			} );
 		}
@@ -247,6 +249,7 @@ export function useColorsPerOrigin( settings ) {
 					'Custom',
 					'Indicates this palette is created by the user.'
 				),
+				slug: 'custom',
 				colors: customColors,
 			} );
 		}
