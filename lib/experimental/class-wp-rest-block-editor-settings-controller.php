@@ -90,10 +90,14 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 		 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
 		 */
 		public function get_items( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis
-			// Simplified context handling: mobile vs default.
-			// Only 'mobile' context is special; everything else uses the default editor context.
+			// Simplified context handling: mobile, Site Editor, or default post editor.
 			$context_param       = $request->get_param( 'context' );
-			$editor_context_name = 'mobile' === $context_param ? 'core/mobile' : 'core/edit-post';
+			$editor_context_name = 'core/edit-post';
+			if ( 'mobile' === $context_param ) {
+				$editor_context_name = 'core/mobile';
+			} elseif ( 'site-editor' === $context_param ) {
+				$editor_context_name = 'core/edit-site';
+			}
 
 			// Apply mobile-specific settings filter only for mobile context.
 			if ( 'mobile' === $context_param ) {
@@ -341,15 +345,28 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 			// Load WordPress admin environment.
 			$this->load_admin_environment();
 
+			$context_param  = $request->get_param( 'context' );
+			$is_site_editor = 'site-editor' === $context_param;
+
 			// Set up the block editor context.
-			set_current_screen();
+			if ( $is_site_editor ) {
+				set_current_screen( 'site-editor' );
+			} else {
+				set_current_screen();
+			}
 			$current_screen = get_current_screen();
 			if ( $current_screen ) {
 				$current_screen->is_block_editor( true );
 			}
 
+			global $hook_suffix, $pagenow;
 			// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
-			$hook_suffix = 'block-editor-assets';
+			$hook_suffix = $is_site_editor ? 'site-editor.php' : 'block-editor-assets';
+			if ( $is_site_editor ) {
+				// Some Site Editor plugins still gate editor asset enqueues on the legacy page.
+				// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+				$pagenow = 'site-editor.php';
+			}
 
 			// Remove unwanted scripts/styles.
 			remove_action( 'admin_enqueue_scripts', 'wp_auth_check_load' );

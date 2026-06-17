@@ -25,6 +25,7 @@ const { Editor: PrivateEditor, BackButton } = unlock( editorPrivateApis );
 interface EditorProps {
 	postType?: string;
 	postId?: string;
+	context?: 'post-editor' | 'site-editor';
 	settings?: Record< string, any >;
 	backButton?: ReactNode;
 }
@@ -35,6 +36,7 @@ interface EditorProps {
  * @param {Object}    props            Component props
  * @param {string}    props.postType   Optional post type to edit. If not provided, resolves to homepage.
  * @param {string}    props.postId     Optional post ID to edit. If not provided, resolves to homepage.
+ * @param {string}    props.context    Optional editor context for settings and assets.
  * @param {Object}    props.settings   Optional extra settings to merge with editor settings
  * @param {ReactNode} props.backButton Optional back button to render in editor header
  * @return The editor component with loading states
@@ -42,6 +44,7 @@ interface EditorProps {
 export function Editor( {
 	postType,
 	postId,
+	context = 'post-editor',
 	settings,
 	backButton,
 }: EditorProps ) {
@@ -86,8 +89,9 @@ export function Editor( {
 	// Load editor settings and assets
 	const { isReady: settingsReady, editorSettings } = useEditorSettings( {
 		stylesId,
+		context,
 	} );
-	const { isReady: assetsReady } = useEditorAssets();
+	const { isReady: assetsReady } = useEditorAssets( context );
 	const finalSettings = useMemo(
 		() => ( {
 			...editorSettings,
