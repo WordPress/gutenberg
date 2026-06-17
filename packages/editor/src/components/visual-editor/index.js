@@ -397,7 +397,11 @@ function VisualEditor( {
 				'edit-post-visual-editor',
 				className,
 				{
+					// Vertical padding frames a width-constrained canvas
+					// (device preview or after a resize) as a centered preview.
 					'has-vertical-padding': isFocusedEntity || hasCanvasWidth,
+					// Horizontal padding leaves room for the resize handles
+					// that appear on the left/right of a resizable canvas.
 					'has-horizontal-padding': isFocusedEntity || enableResizing,
 					'is-iframed': ! disableIframe,
 				}
