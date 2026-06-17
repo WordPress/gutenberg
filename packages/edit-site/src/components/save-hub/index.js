@@ -31,7 +31,7 @@ export default function SaveHub() {
 		<HStack className="edit-site-save-hub" alignment="right" spacing={ 4 }>
 			<SaveButton
 				className="edit-site-save-hub__button"
-				variant={ isDisabled ? null : 'primary' }
+				variant={ isDisabled && ! isSaving ? null : 'primary' }
 				showTooltip={ false }
 				icon={ isDisabled && ! isSaving ? check : null }
 				showReviewMessage
