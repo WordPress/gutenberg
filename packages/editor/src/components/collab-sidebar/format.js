@@ -29,13 +29,9 @@ export const noteFormat = {
 
 function NoteFormatEdit( { value, isActive, activeAttributes } ) {
 	const dispatch = useDispatch();
-	const { selectedNote, currentArea } = useSelect( ( select ) => {
-		return {
-			selectedNote: unlock( select( editorStore ) ).getSelectedNote(),
-			currentArea:
-				select( interfaceStore ).getActiveComplementaryArea( 'core' ),
-		};
-	}, [] );
+	// Static selector getter: the active area is only read when the button is
+	// clicked, so there's no need to subscribe and re-render on its changes.
+	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 
 	// Toolbar button only relevant on an active selection or when standing on
 	// an existing inline note marker.
@@ -46,6 +42,7 @@ function NoteFormatEdit( { value, isActive, activeAttributes } ) {
 	const onClick = () => {
 		// Bias the floating sidebar when no fixed sidebar is mounted; the
 		// floating panel is the default placement and avoids a layout shift.
+		const currentArea = getActiveComplementaryArea( 'core' );
 		const targetSidebar =
 			currentArea === ALL_NOTES_SIDEBAR
 				? ALL_NOTES_SIDEBAR
@@ -69,7 +66,7 @@ function NoteFormatEdit( { value, isActive, activeAttributes } ) {
 			icon={ commentIcon }
 			title={ __( 'Add note' ) }
 			onClick={ onClick }
-			isActive={ isActive || selectedNote === 'new' }
+			isActive={ isActive }
 		/>
 	);
 }
