@@ -20,7 +20,11 @@ import { useEditorSettings } from '../../hooks/use-editor-settings';
 import { useEditorAssets } from '../../hooks/use-editor-assets';
 import { unlock } from '../../lock-unlock';
 
-const { Editor: PrivateEditor, BackButton } = unlock( editorPrivateApis );
+const {
+	Editor: PrivateEditor,
+	BackButton,
+	PreferencesModal,
+} = unlock( editorPrivateApis );
 
 interface EditorProps {
 	postType?: string;
@@ -121,6 +125,7 @@ export function Editor( {
 			settings={ finalSettings }
 			styles={ finalSettings.styles }
 		>
+			<PreferencesModal />
 			{ backButton && <BackButton>{ backButton }</BackButton> }
 		</PrivateEditor>
 	);
