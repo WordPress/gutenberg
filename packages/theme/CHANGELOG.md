@@ -26,6 +26,10 @@
 
 -   Add unit tests for `ThemeProvider` and `useThemeProviderStyles` ([#79126](https://github.com/WordPress/gutenberg/pull/79126)).
 
+### Documentation
+
+-   Document the static-stylesheet + `<ThemeProvider>` delivery model, the `isRoot` prop, and the canonical pattern for using `<ThemeProvider>` across documents (iframes and other portals) ([#78664](https://github.com/WordPress/gutenberg/pull/78664)).
+
 ### Code Quality
 
 -   Declare `postcss`, `esbuild`, and `vite` as optional peer dependencies for the bundler plugins, and move `@types/react` from `dependencies` to an optional peer dependency ([#79095](https://github.com/WordPress/gutenberg/pull/79095)).

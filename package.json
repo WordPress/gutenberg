@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "23.4.0-rc.1",
+	"version": "23.4.0",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -71,7 +71,6 @@
 		"@wordpress/release-tools": "file:./tools/release",
 		"@wordpress/scripts": "file:./packages/scripts",
 		"@wordpress/stylelint-tools": "file:./tools/stylelint",
-		"@wordpress/vips": "file:./packages/vips",
 		"concurrently": "^3.5.0",
 		"cross-env": "^7.0.3",
 		"husky": "^7.0.0",
