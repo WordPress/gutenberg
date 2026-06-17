@@ -67,7 +67,8 @@ import {
 	usePostFormatMenuItems,
 } from './utils';
 import AddCustomGenericTemplateModalContent from './add-custom-generic-template-modal-content';
-import AddPostFormatTemplateModalContent from './add-post-format-template-modal-content';
+import AddPostFormatTemplateModalContent from '../add-new-template-legacy/add-post-format-template-modal-content';
+
 import { unlock } from '../../lock-unlock';
 
 const { useHistory } = unlock( routerPrivateApis );
@@ -276,7 +277,7 @@ function NewTemplateModal( { onClose } ) {
 	} else if ( modalContent === modalContentMap.customGenericTemplate ) {
 		modalTitle = __( 'Create custom template' );
 	} else if ( modalContent === modalContentMap.postFormats ) {
-		modalTitle = __( 'Post Format Archives' );
+		modalTitle = __( 'Post format Archives' );
 	}
 
 	return (
