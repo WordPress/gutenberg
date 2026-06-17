@@ -550,7 +550,7 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
 };
 
 /**
- * Hook that returns a single entry-point menu item for the "Post Format Archives"
+ * Hook that returns a single entry-point menu item for the "Post format Archives"
  * button in the template grid, plus the list of individual format templates
  * available to create. The entry-point item is `null` when the active theme
  * does not support any non-standard post formats, or when every supported
@@ -621,7 +621,7 @@ export function usePostFormatMenuItems( onClickMenuItem ) {
 			// This slug is not a real template slug — it is used only as a
 			// stable React key and for the icon lookup in TEMPLATE_ICONS.
 			slug: 'taxonomy-post_format',
-			title: __( 'Post Format Archives' ),
+			title: __( 'Post format Archives' ),
 			description: __(
 				'Displays a post format archive for themes that support post formats.'
 			),

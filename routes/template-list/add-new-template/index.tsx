@@ -310,7 +310,7 @@ function NewTemplateModal( { onClose }: NewTemplateModalProps ) {
 	} else if ( modalContent === modalContentMap.customGenericTemplate ) {
 		modalTitle = __( 'Create custom template' );
 	} else if ( modalContent === modalContentMap.postFormats ) {
-		modalTitle = __( 'Post Format Archives' );
+		modalTitle = __( 'Post format Archives' );
 	}
 
 	return (
