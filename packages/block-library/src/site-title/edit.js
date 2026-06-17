@@ -31,7 +31,8 @@ export default function SiteTitleEdit( props ) {
 
 	const { attributes, setAttributes, insertBlocksAfter } = props;
 
-	const { level, levelOptions, isLink, linkTarget } = attributes;
+	const { level, levelOptions, isLink, linkTarget, shouldUnlinkOnHomepage } =
+		attributes;
 	const { canUserEdit, title } = useSelect( ( select ) => {
 		const { canUser, getEntityRecord, getEditedEntityRecord } =
 			select( coreStore );
@@ -116,6 +117,7 @@ export default function SiteTitleEdit( props ) {
 						setAttributes( {
 							isLink: true,
 							linkTarget: '_self',
+							shouldUnlinkOnHomepage: false,
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
@@ -151,6 +153,31 @@ export default function SiteTitleEdit( props ) {
 									} )
 								}
 								checked={ linkTarget === '_blank' }
+							/>
+						</ToolsPanelItem>
+					) }
+					{ isLink && (
+						<ToolsPanelItem
+							hasValue={ () => shouldUnlinkOnHomepage }
+							label={ __( 'Unlink on the homepage' ) }
+							onDeselect={ () =>
+								setAttributes( {
+									shouldUnlinkOnHomepage: false,
+								} )
+							}
+							isShownByDefault
+						>
+							<ToggleControl
+								label={ __( 'Unlink on the homepage' ) }
+								help={ __(
+									'Avoids a redundant link to the page visitors are already on.'
+								) }
+								onChange={ ( value ) =>
+									setAttributes( {
+										shouldUnlinkOnHomepage: value,
+									} )
+								}
+								checked={ shouldUnlinkOnHomepage }
 							/>
 						</ToolsPanelItem>
 					) }

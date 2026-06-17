@@ -967,7 +967,7 @@ Displays the name of this site. Update the block, and the changes apply everywhe
 -	**Name:** [core/site-title](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-site-title/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
 -	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
--	**Attributes:** isLink, level, levelOptions, linkTarget
+-	**Attributes:** isLink, level, levelOptions, linkTarget, shouldUnlinkOnHomepage
 
 ## Social Icon
 

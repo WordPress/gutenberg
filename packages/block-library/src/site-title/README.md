@@ -18,6 +18,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `levelOptions` | `array` | `[0,1,2,3,4,5,6]` | — |
 | `isLink` | `boolean` | `true` | [Role](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 | `linkTarget` | `string` | `"_self"` | [Role](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `shouldUnlinkOnHomepage` | `boolean` | `false` | [Role](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 
 ## Supports
 
