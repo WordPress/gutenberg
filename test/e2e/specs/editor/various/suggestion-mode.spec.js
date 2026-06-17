@@ -104,16 +104,15 @@ test.describe( 'Suggestion mode', () => {
 		await expect( paragraph ).toHaveClass( /is-suggestion-pending/ );
 	} );
 
-	test( 'add — golden path: shows appended text wrapped in <ins> after the block deselects', async ( {
+	test( 'add — golden path: typed text becomes an in-content add marker', async ( {
 		editor,
 		page,
 	} ) => {
-		// Golden-path text addition: type at the end of a paragraph, blur
-		// the block, and reviewers should see the new run highlighted with
-		// the addition format. While the block is selected the overlay
-		// renders the plain proposed value so RichText's caret isn't
-		// disrupted by value-prop reconciliation; the marks appear after
-		// blur.
+		// Golden-path text addition (Option B): typing in Suggest mode wraps
+		// the new run in an in-content `core/suggestion` add marker rather
+		// than diverting it to the overlay. The marker is visible immediately
+		// (no blur needed) and the proposed text lives in the serialized post
+		// content, stripped only at the front end until accepted.
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'Hello' },
@@ -128,34 +127,29 @@ test.describe( 'Suggestion mode', () => {
 		await page.keyboard.press( 'End' );
 		await page.keyboard.type( ' world' );
 
-		// Auto-save fires after the debounce; deselect so the inline marks
-		// render in place of the plain proposed value.
-		await waitForSuggestionSaved( page );
-		await page.evaluate( () => {
-			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
-		} );
-
-		// `wordDiff` tokenizes on whitespace runs, so " " and "world" each
-		// land in their own addition span. Filter to the word-bearing run.
+		// The note is created asynchronously, then the marker is written.
 		await expect(
-			paragraph
-				.locator( 'ins.has-suggestion-addition' )
-				.filter( { hasText: 'world' } )
-		).toBeVisible();
+			paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="add"]'
+			)
+		).toContainText( 'world' );
 
-		// Sanity: the original text still reads as part of the paragraph.
-		await expect( paragraph ).toContainText( 'Hello' );
+		// The proposed text now lives in content as a marker (Option B), so
+		// it round-trips through the serialized post — unlike the old overlay.
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).toContain( 'data-suggestion-type="add"' );
+		expect( serialized ).toContain( 'Hello' );
 	} );
 
-	test( 'delete — golden path: shows deleted text wrapped in <del> after the block deselects', async ( {
+	test( 'delete — golden path: deleting a selection becomes an in-content del marker', async ( {
 		editor,
 		page,
 		pageUtils,
 	} ) => {
-		// Golden-path text deletion: select a trailing word and press
-		// Backspace. The deleted run survives in the suggestion preview as
-		// a struck-through fragment so the reviewer can see what the
-		// suggester wants to remove.
+		// Golden-path text deletion (Option B): selecting a run and pressing
+		// Backspace wraps it in a `del` marker in content instead of removing
+		// it. The text survives (struck through) until the suggestion is
+		// accepted, and the marker is visible immediately.
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'Hello world' },
@@ -168,22 +162,81 @@ test.describe( 'Suggestion mode', () => {
 			.first();
 		await paragraph.click();
 		await page.keyboard.press( 'End' );
-		// Select " world" (six characters) then delete.
-		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 6 } );
+		// Select "world" (five characters) then delete.
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
 		await page.keyboard.press( 'Backspace' );
 
-		await waitForSuggestionSaved( page );
-		await page.evaluate( () => {
-			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
+		await expect(
+			paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="del"]'
+			)
+		).toContainText( 'world' );
+
+		// Deletion keeps the text until the suggestion is accepted.
+		await expect( paragraph ).toContainText( 'Hello world' );
+	} );
+
+	test( 'type-over: replacing a selection becomes a del + add pair', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Typing over a selection proposes deleting the old text and adding
+		// the replacement, as two adjacent markers.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello world' },
 		} );
 
-		// The deleted run tokenizes into " " + "world"; filter to the word
-		// so the assertion reads precisely against the text we removed.
+		await switchIntent( page, 'Suggest' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
+		await page.keyboard.type( 'planet' );
+
 		await expect(
-			paragraph
-				.locator( 'del.has-suggestion-deletion' )
-				.filter( { hasText: 'world' } )
-		).toBeVisible();
+			paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="del"]'
+			)
+		).toContainText( 'world' );
+		await expect(
+			paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="add"]'
+			)
+		).toContainText( 'planet' );
+	} );
+
+	test( 'collapsed delete: Backspace at a caret marks the previous character', async ( {
+		editor,
+		page,
+	} ) => {
+		// Backspace with no selection marks the character before the caret
+		// for deletion instead of removing it.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'abcdef' },
+		} );
+
+		await switchIntent( page, 'Suggest' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.press( 'Backspace' );
+
+		await expect(
+			paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="del"]'
+			)
+		).toContainText( 'f' );
+		// The character is kept until accepted.
+		await expect( paragraph ).toContainText( 'abcdef' );
 	} );
 
 	test( 'style — golden path: shows a newly bolded word wrapped in <ins> with <strong> preserved', async ( {
