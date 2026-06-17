@@ -49,7 +49,9 @@ function gutenberg_add_svg_to_safe_style_css( array $attr ): array {
 		'marker-end',
 
 		// Clipping and masking.
+		'clip-path',
 		'clip-rule',
+		'mask',
 		'mask-type',
 
 		// Geometry.
@@ -69,10 +71,27 @@ function gutenberg_add_svg_to_safe_style_css( array $attr ): array {
 		'glyph-orientation-horizontal',
 		'glyph-orientation-vertical',
 		'text-anchor',
+		'unicode-bidi',
+		'word-spacing',
+
+		// Font.
+		'font-size-adjust',
+		'font-stretch',
 
 		// Rendering.
+		'color-rendering',
+		'image-rendering',
 		'shape-rendering',
+		'text-rendering',
 		'vector-effect',
+
+		// Transforms.
+		'transform',
+		'transform-origin',
+
+		// Interactivity and visibility.
+		'pointer-events',
+		'visibility',
 	);
 
 	return array_unique( array_merge( $attr, $svg_properties ) );
