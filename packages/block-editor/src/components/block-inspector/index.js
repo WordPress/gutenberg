@@ -393,13 +393,7 @@ const BlockInspectorSingleBlock = ( {
 } ) => {
 	const listViewRef = useRef( null );
 	const hasMultipleTabs = availableTabs?.length > 1;
-	// The device badge is shown for style-supporting blocks while Responsive
-	// editing is enabled; the "Show state on canvas" toggle only applies to
-	// pseudo states.
 	const hasPseudoState = hasPseudoBlockStyleState( selectedBlockStyleState );
-	const showDeviceBadge =
-		isResponsiveEditing && !! getBlockType( blockName )?.attributes?.style;
-	const showStyleStateInfo = hasPseudoState || showDeviceBadge;
 	const hasParentChildBlockCards =
 		editedContentOnlySection &&
 		editedContentOnlySection !== renderedBlockClientId;
@@ -456,22 +450,23 @@ const BlockInspectorSingleBlock = ( {
 					)
 				}
 			/>
-			{ blockEditingMode === 'default' && showStyleStateInfo && (
-				<Spacer paddingX={ 4 } paddingY={ 2 }>
-					{ hasPseudoState && (
-						<ToggleControl
-							label={ __( 'Show state on canvas' ) }
-							checked={ showStateOnCanvas }
-							onChange={ onShowStateOnCanvasChange }
+			{ blockEditingMode === 'default' &&
+				( hasPseudoState || isResponsiveEditing ) && (
+					<Spacer paddingX={ 4 } paddingY={ 2 }>
+						{ hasPseudoState && (
+							<ToggleControl
+								label={ __( 'Show state on canvas' ) }
+								checked={ showStateOnCanvas }
+								onChange={ onShowStateOnCanvasChange }
+							/>
+						) }
+						<BlockStateBadges
+							name={ blockName }
+							value={ selectedBlockStyleState }
+							isResponsiveEditing={ isResponsiveEditing }
 						/>
-					) }
-					<BlockStateBadges
-						name={ blockName }
-						value={ selectedBlockStyleState }
-						isResponsiveEditing={ isResponsiveEditing }
-					/>
-				</Spacer>
-			) }
+					</Spacer>
+				) }
 			<ViewportVisibilityInfo clientId={ renderedBlockClientId } />
 			<EditContents clientId={ renderedBlockClientId } />
 			{ ! isBlockStyleStateSelected && (
