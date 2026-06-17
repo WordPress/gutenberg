@@ -65,9 +65,13 @@ if ( ! function_exists( 'wp_get_icon' ) ) {
 		if ( ! empty( $args['label'] ) ) {
 			$processor->set_attribute( 'role', 'img' );
 			$processor->set_attribute( 'aria-label', $args['label'] );
+			$processor->remove_attribute( 'aria-hidden' );
+			$processor->remove_attribute( 'focusable' );
 		} else {
 			$processor->set_attribute( 'aria-hidden', 'true' );
 			$processor->set_attribute( 'focusable', 'false' );
+			$processor->remove_attribute( 'role' );
+			$processor->remove_attribute( 'aria-label' );
 		}
 
 		return $processor->get_updated_html();
