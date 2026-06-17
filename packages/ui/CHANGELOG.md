@@ -15,7 +15,7 @@
 ### Internal
 
 -   Adopt `--wpds-dimension-size-*` design tokens [#79093](https://github.com/WordPress/gutenberg/pull/79093).
--   `Button`: Adopt the `--wpds-typography-font-weight-medium` design token instead of the hardcoded `499` font weight. No visual change ([#PR](https://github.com/WordPress/gutenberg/pull/PR)).
+-   `Button`: Adopt the `--wpds-typography-font-weight-medium` design token instead of the hardcoded `499` font weight. No visual change ([#79279](https://github.com/WordPress/gutenberg/pull/79279)).
 
 ## 0.15.1 (2026-06-16)
 
