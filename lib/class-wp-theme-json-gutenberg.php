@@ -2565,36 +2565,22 @@ class WP_Theme_JSON_Gutenberg {
 	 * creates the corresponding ruleset.
 	 *
 	 * @since 5.8.0
-	 * @since 7.1.0 Skip declarations whose value is not a plain string (booleans, arrays, objects, etc.).
+	 * @since 7.2.0 Route to Style Engine trusted compiler.
 	 *
 	 * @param string $selector     CSS selector.
 	 * @param array  $declarations List of declarations.
-	 * @return string The resulting CSS ruleset.
+	 * @return string The compiled CSS rule.
 	 */
 	protected static function to_ruleset( $selector, $declarations ) {
 		if ( empty( $declarations ) ) {
 			return '';
 		}
 
-		$declaration_block = array_reduce(
+		return WP_Style_Engine_Gutenberg::compile_css(
 			$declarations,
-			static function ( $carry, $element ) {
-				$value = $element['value'];
-
-				if ( is_numeric( $value ) ) {
-					$value = (string) $value;
-				}
-
-				if ( ! is_string( $value ) ) {
-					return $carry;
-				}
-
-				return $carry .= $element['name'] . ': ' . $value . ';';
-			},
-			''
+			$selector,
+			array( 'sanitize' => false )
 		);
-
-		return $selector . '{' . $declaration_block . '}';
 	}
 
 	/**
