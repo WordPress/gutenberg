@@ -12,9 +12,11 @@ import { store as coreStore } from '@wordpress/core-data';
 import { EDITOR_STORE_NAME, SUGGEST_INTENT } from './constants';
 import { INLINE_OP_TYPE, useSuggestionsProvider } from './provider';
 import { useSuggestionOverlay } from './overlay-context';
-import { readInlineCaret } from '../inline-markers';
+import { readInlineCaret, wrapInlineMarker } from '../inline-markers';
 import {
+	SUGGESTION_FORMAT_NAME,
 	SUGGESTION_TYPE_ADDITION,
+	SUGGESTION_TYPE_DELETION,
 	buildSuggestionMarkerAttributes,
 	insertInlineAddition,
 	growInlineAddition,
@@ -68,9 +70,12 @@ function getCandidateDocuments() {
  *   stays one `<mark>` rather than fragmenting per keystroke
  *   (`growInlineAddition`).
  *
- * Out of scope for now (left to the existing path): type-over (typing with a
- * non-collapsed selection — that compound delete+add ships with the rest of the
- * deletion cases), IME composition, and paste.
+ * Type-over (typing with a non-collapsed selection) is handled here too: it
+ * proposes deleting the selected text (a `del` marker) and adds the replacement
+ * (an `add` run at the selection end), as two independent notes.
+ *
+ * Out of scope for now (left to the existing overlay/diff path): IME
+ * composition and paste.
  *
  * @return {null} Renders nothing.
  */
@@ -121,10 +126,31 @@ export default function SuggestionAdditionKeyboard() {
 		[ requestInterceptorBypass, updateBlockAttributes, selectionChange ]
 	);
 
+	// Open a fresh inline-suggestion note of the given kind for a block,
+	// resolving to the new comment id (or null on failure/empty).
+	const openInlineNote = useCallback(
+		async ( clientId, attributeKey, suggestionType ) => {
+			const record = await createSuggestion( {
+				clientId,
+				blockName: getBlockName( clientId ),
+				operations: [
+					{
+						type: INLINE_OP_TYPE,
+						attribute: attributeKey,
+						suggestionType,
+					},
+				],
+			} );
+			return record?.id ?? null;
+		},
+		[ createSuggestion, getBlockName ]
+	);
+
 	const onBeforeInput = useCallback(
 		async ( event ) => {
-			// Only plain text insertion concerns us. Composition, paste, and
-			// deletions are handled elsewhere (or left to the default path).
+			// Only plain text insertion concerns us. Composition and paste are
+			// handled elsewhere (or left to the default path); a deletion event
+			// resets any open run so the next typing burst starts fresh.
 			if ( event.inputType !== 'insertText' ) {
 				resetRun();
 				return;
@@ -137,36 +163,129 @@ export default function SuggestionAdditionKeyboard() {
 				resetRun();
 				return;
 			}
-			const caret = readInlineCaret( getSelectionStart, getSelectionEnd );
-			if ( ! caret || caret.start !== caret.end ) {
-				// Block-level caret, or a non-collapsed selection (type-over):
-				// leave to the existing path for now.
-				resetRun();
-				return;
-			}
-			const { clientId, attributeKey, start: pos } = caret;
 
-			// We own this insertion — cancel the native edit. Must be
+			// We own insertion in Suggest mode — cancel the native edit. Must be
 			// synchronous, before any async work below.
 			event.preventDefault();
 
+			// A note request for the open run is still in flight: buffer the
+			// character regardless of where the caret reads right now (during a
+			// type-over the selection hasn't collapsed yet) and let the flush
+			// apply it once the id lands.
+			const inFlight = runRef.current;
+			if ( inFlight && inFlight.id === null ) {
+				inFlight.pending += text;
+				return;
+			}
+
+			const caret = readInlineCaret( getSelectionStart, getSelectionEnd );
+			if ( ! caret ) {
+				// Block-level / cross-attribute selection: nothing to anchor to.
+				resetRun();
+				return;
+			}
+			const { clientId, attributeKey, start, end } = caret;
+
+			// Type-over: typing with a non-collapsed selection. In Suggest mode
+			// that proposes removing the selected text (a `del` marker) and
+			// adding the replacement (an `add` run starting at the selection
+			// end). Two independent notes so each side resolves on its own.
+			if ( start !== end ) {
+				const run = {
+					clientId,
+					attributeKey,
+					id: null,
+					start: end,
+					end,
+					pending: text,
+				};
+				runRef.current = run;
+				try {
+					const baseValue =
+						getBlockAttributes( clientId )?.[ attributeKey ];
+					const delId = await openInlineNote(
+						clientId,
+						attributeKey,
+						SUGGESTION_TYPE_DELETION
+					);
+					if ( runRef.current !== run ) {
+						return;
+					}
+					if ( ! delId ) {
+						resetRun();
+						return;
+					}
+					const deleted = wrapInlineMarker( baseValue, {
+						formatType: SUGGESTION_FORMAT_NAME,
+						attributes: buildSuggestionMarkerAttributes( {
+							id: delId,
+							type: SUGGESTION_TYPE_DELETION,
+							authorId,
+						} ),
+						start,
+						end,
+					} );
+					if ( deleted ) {
+						requestInterceptorBypass( clientId );
+						updateBlockAttributes( clientId, {
+							[ attributeKey ]: deleted,
+						} );
+					}
+
+					const addId = await openInlineNote(
+						clientId,
+						attributeKey,
+						SUGGESTION_TYPE_ADDITION
+					);
+					if ( runRef.current !== run ) {
+						return;
+					}
+					if ( ! addId ) {
+						resetRun();
+						return;
+					}
+					const buffered = run.pending;
+					run.id = addId;
+					run.pending = '';
+					// Wrapping the selection in the `del` marker doesn't change
+					// the text length, so `end` is still the offset right after
+					// it — insert the replacement there.
+					const current =
+						getBlockAttributes( clientId )?.[ attributeKey ];
+					const inserted = insertInlineAddition( current, {
+						text: buffered,
+						attributes: buildSuggestionMarkerAttributes( {
+							id: addId,
+							type: SUGGESTION_TYPE_ADDITION,
+							authorId,
+						} ),
+						start: end,
+						end,
+					} );
+					run.start = end;
+					run.end = end + buffered.length;
+					commit( clientId, attributeKey, inserted, run.end );
+				} catch {
+					if ( runRef.current === run ) {
+						resetRun();
+					}
+				}
+				return;
+			}
+
+			// Collapsed caret from here on.
+			const pos = start;
 			const run = runRef.current;
 			const isContiguous =
 				run &&
+				run.id !== null &&
 				run.clientId === clientId &&
 				run.attributeKey === attributeKey &&
 				run.end === pos;
 
-			// Still creating the note for an active contiguous run: queue the
-			// character and let the flush apply it once the id lands.
-			if ( isContiguous && run.id === null ) {
-				run.pending += text;
-				return;
-			}
-
 			// Active run with a resolved id, caret still at its trailing edge:
 			// grow the existing marker synchronously.
-			if ( isContiguous && run.id !== null ) {
+			if ( isContiguous ) {
 				const value = getBlockAttributes( clientId )?.[ attributeKey ];
 				const grown = growInlineAddition( value, {
 					text,
@@ -196,34 +315,28 @@ export default function SuggestionAdditionKeyboard() {
 			runRef.current = newRun;
 
 			try {
-				const record = await createSuggestion( {
+				const addId = await openInlineNote(
 					clientId,
-					blockName: getBlockName( clientId ),
-					operations: [
-						{
-							type: INLINE_OP_TYPE,
-							attribute: attributeKey,
-							suggestionType: SUGGESTION_TYPE_ADDITION,
-						},
-					],
-				} );
+					attributeKey,
+					SUGGESTION_TYPE_ADDITION
+				);
 				// The run may have been abandoned (caret moved, mode change)
 				// while the request was in flight.
 				if ( runRef.current !== newRun ) {
 					return;
 				}
-				if ( ! record?.id ) {
+				if ( ! addId ) {
 					resetRun();
 					return;
 				}
 				const buffered = newRun.pending;
-				newRun.id = record.id;
+				newRun.id = addId;
 				newRun.pending = '';
 				const value = getBlockAttributes( clientId )?.[ attributeKey ];
 				const inserted = insertInlineAddition( value, {
 					text: buffered,
 					attributes: buildSuggestionMarkerAttributes( {
-						id: record.id,
+						id: addId,
 						type: SUGGESTION_TYPE_ADDITION,
 						authorId,
 					} ),
@@ -244,8 +357,9 @@ export default function SuggestionAdditionKeyboard() {
 			getSelectionStart,
 			getSelectionEnd,
 			getBlockAttributes,
-			getBlockName,
-			createSuggestion,
+			openInlineNote,
+			updateBlockAttributes,
+			requestInterceptorBypass,
 			commit,
 			resetRun,
 			authorId,
