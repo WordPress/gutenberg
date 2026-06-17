@@ -373,18 +373,20 @@ export default function SuggestionStoreInterceptor() {
 	);
 
 	// Mutable references read from inside the subscribe callback. Using refs
-	// avoids resubscribing on every entries / overlay change.
+	// avoids resubscribing on every entries / overlay change. They are kept in
+	// sync from an effect rather than during render so the latest values are
+	// available to the callback without accessing refs while rendering.
 	const entriesRef = useRef( entries );
-	entriesRef.current = entries;
-
 	const captureBaselineRef = useRef( captureBaseline );
-	captureBaselineRef.current = captureBaseline;
-
 	const setOverlayAttributesRef = useRef( setOverlayAttributes );
-	setOverlayAttributesRef.current = setOverlayAttributes;
-
 	const consumeInterceptorBypassRef = useRef( consumeInterceptorBypass );
-	consumeInterceptorBypassRef.current = consumeInterceptorBypass;
+
+	useEffect( () => {
+		entriesRef.current = entries;
+		captureBaselineRef.current = captureBaseline;
+		setOverlayAttributesRef.current = setOverlayAttributes;
+		consumeInterceptorBypassRef.current = consumeInterceptorBypass;
+	} );
 
 	useEffect( () => {
 		if ( ! isSuggestMode ) {
