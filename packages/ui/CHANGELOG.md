@@ -9,6 +9,7 @@
 
 ### Code Quality
 
+-   `Button`: Reference the medium font-weight design token instead of a literal value. No visual change ([#79278](https://github.com/WordPress/gutenberg/pull/79278)).
 -   Move `@types/react` from `dependencies` to an optional peer dependency so consumers' React type version is used ([#79095](https://github.com/WordPress/gutenberg/pull/79095)).
 -   `Button` and `AlertDialog`: Reference the tone-specific `brand`/`error` disabled color tokens for disabled states instead of the `neutral` ones, to match each element's tone. Disabled `Select`/`Autocomplete`/`Combobox` list items also adopt the `brand` disabled background token. No visual change ([#79124](https://github.com/WordPress/gutenberg/pull/79124)).
 
