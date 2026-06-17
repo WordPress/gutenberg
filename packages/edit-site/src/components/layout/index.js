@@ -59,7 +59,7 @@ function Layout() {
 	const { query, name: routeKey, areas, widths } = useLocation();
 	// Force canvas to 'view' on notfound route to show the error message and allow navigation.
 	const canvas = routeKey === 'notfound' ? 'view' : query?.canvas ?? 'view';
-	const showMobileSiteHub = routeKey !== 'home';
+	const showMobileSiteHub = !! areas.mobileContent;
 	const hasMobileAreas =
 		areas.mobileSidebar || areas.mobileContent || areas.preview;
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
