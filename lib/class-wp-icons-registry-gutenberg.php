@@ -182,7 +182,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	 * @param string $icon_content The icon SVG content to sanitize.
 	 * @return string The sanitized icon SVG content.
 	 */
-	protected function sanitize_icon_content( $icon_content ) {
+	protected function sanitize_icon_content( string $icon_content ): string {
 		// Core attributes applicable to most elements. `data-*` is a wildcard
 		// supported by wp_kses() and matches any data attribute.
 		$core_attributes = array(
