@@ -90,7 +90,7 @@ function _gutenberg_migrate_enable_real_time_collaboration() {
  * Rename the experimental Guidelines storage to Knowledge: `wp_guideline`
  * posts become `wp_knowledge`, `wp_guideline_type` terms move to the
  * `wp_knowledge_type` taxonomy, and the built-in type terms are re-slugged
- * (`content` becomes `instruction`, `artifact` becomes `note`).
+ * (`content` becomes `guideline`, `artifact` becomes `note`).
  *
  * Runs regardless of whether the `gutenberg-guidelines` experiment is
  * currently enabled so rows created while it was previously on are migrated
@@ -134,14 +134,14 @@ function _gutenberg_migrate_guidelines_to_knowledge() {
 	 */
 	$type_renames = array(
 		'content'  => array(
-			'slug'       => 'instruction',
+			'slug'       => 'guideline',
 			'old_labels' => array( 'content', 'Content' ),
-			'new_label'  => __( 'Instruction', 'gutenberg' ),
+			'new_label'  => _x( 'Guideline', 'knowledge type', 'gutenberg' ),
 		),
 		'artifact' => array(
 			'slug'       => 'note',
 			'old_labels' => array( 'artifact', 'Artifact' ),
-			'new_label'  => __( 'Note', 'gutenberg' ),
+			'new_label'  => _x( 'Note', 'knowledge type', 'gutenberg' ),
 		),
 	);
 

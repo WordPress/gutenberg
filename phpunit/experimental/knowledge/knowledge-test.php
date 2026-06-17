@@ -20,9 +20,9 @@ class Knowledge_Test extends WP_UnitTestCase {
 	public function test_returns_default_knowledge_types() {
 		$this->assertSame(
 			array(
-				'instruction' => array( 'title' => 'Instruction' ),
-				'memory'      => array( 'title' => 'Memory' ),
-				'note'        => array( 'title' => 'Note' ),
+				'guideline' => array( 'title' => 'Guideline' ),
+				'memory'    => array( 'title' => 'Memory' ),
+				'note'      => array( 'title' => 'Note' ),
 			),
 			wp_knowledge_types()
 		);
@@ -53,14 +53,14 @@ class Knowledge_Test extends WP_UnitTestCase {
 		add_filter(
 			'wp_knowledge_types',
 			static function ( $types ) {
-				unset( $types['instruction'] );
+				unset( $types['guideline'] );
 				return $types;
 			}
 		);
 
 		$types = wp_knowledge_types();
 
-		$this->assertArrayNotHasKey( 'instruction', $types );
+		$this->assertArrayNotHasKey( 'guideline', $types );
 	}
 
 	/**

@@ -31,13 +31,12 @@ class Gutenberg_Knowledge_Post_Type {
 	/**
 	 * Taxonomy term slug used for the site-wide guidelines singleton.
 	 *
-	 * Instructions are loaded by default when applicable; the site-wide
-	 * guidelines post managed by the Settings → Guidelines page carries
-	 * this term.
+	 * The site-wide guidelines post managed by the Settings → Guidelines page
+	 * carries this term; it maps to the `guideline` built-in knowledge type.
 	 *
 	 * @var string
 	 */
-	const TERM_INSTRUCTION = 'instruction';
+	const TERM_GUIDELINE = 'guideline';
 
 	/**
 	 * The standard guideline category meta keys.
@@ -137,7 +136,7 @@ class Gutenberg_Knowledge_Post_Type {
 				// `read` is remapped so Subscribers (who hold the base `read`
 				// cap) are blocked at the post-type door. Every other primitive
 				// defaults to a knowledge-prefixed cap synthesized by
-				// `_wp_knowledge_synthesize_caps()`.
+				// `wp_maybe_grant_knowledge_caps()`.
 				'capabilities'          => array(
 					'read' => 'read_knowledge',
 				),
@@ -149,6 +148,14 @@ class Gutenberg_Knowledge_Post_Type {
 				'can_export'            => true,
 			)
 		);
+
+		/*
+		 * Disable autosave endpoints for knowledge. 'editor' support implies
+		 * 'autosave', but knowledge is headless storage with no editor session,
+		 * so the autosave REST routes have no consumer. Revision history is
+		 * retained.
+		 */
+		remove_post_type_support( self::POST_TYPE, 'autosave' );
 
 		register_taxonomy(
 			self::TAXONOMY,
@@ -183,14 +190,16 @@ class Gutenberg_Knowledge_Post_Type {
 				),
 				'query_var'          => false,
 				'rewrite'            => false,
-				'show_ui'            => true,
+				// Headless, like the post type: knowledge type terms are managed
+				// through the REST API, not a wp-admin taxonomy screen.
+				'show_ui'            => false,
 				'show_admin_column'  => true,
 				'show_in_nav_menus'  => false,
 				'show_in_rest'       => true,
 			)
 		);
 
-		add_filter( 'user_has_cap', '_wp_knowledge_synthesize_caps', 10, 4 );
+		add_filter( 'user_has_cap', 'wp_maybe_grant_knowledge_caps', 1, 4 );
 		add_action( 'save_post_' . self::POST_TYPE, '_wp_knowledge_ensure_default_type_term' );
 		add_filter( 'wp_insert_term_data', '_wp_knowledge_maybe_map_term_label', 10, 2 );
 	}
@@ -200,11 +209,11 @@ class Gutenberg_Knowledge_Post_Type {
 	 * guidelines singleton.
 	 *
 	 * Used by the /wp/v2/content-guidelines route to reject posts without
-	 * the `instruction` term addressed by ID — those belong to the standard
+	 * the `guideline` term addressed by ID — those belong to the standard
 	 * /wp/v2/knowledge collection.
 	 *
 	 * @param int $post_id Post ID.
-	 * @return bool True if the post has the `instruction` term.
+	 * @return bool True if the post has the `guideline` term.
 	 */
 	public static function is_content_guideline( $post_id ) {
 		$terms = get_the_terms( $post_id, self::TAXONOMY );
@@ -213,7 +222,7 @@ class Gutenberg_Knowledge_Post_Type {
 		}
 
 		foreach ( $terms as $term ) {
-			if ( self::TERM_INSTRUCTION === $term->slug ) {
+			if ( self::TERM_GUIDELINE === $term->slug ) {
 				return true;
 			}
 		}

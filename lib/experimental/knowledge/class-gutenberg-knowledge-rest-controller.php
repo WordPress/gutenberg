@@ -87,7 +87,7 @@ class Gutenberg_Knowledge_REST_Controller extends WP_REST_Posts_Controller {
 			if ( 'private' !== $post_status ) {
 				return new WP_Error(
 					'rest_cannot_publish',
-					__( 'Sorry, you are only allowed to set status to private for knowledge.', 'gutenberg' ),
+					__( 'Sorry, you are only allowed to set knowledge to a private status.', 'gutenberg' ),
 					array( 'status' => rest_authorization_required_code() )
 				);
 			}

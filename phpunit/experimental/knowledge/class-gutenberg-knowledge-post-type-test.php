@@ -123,11 +123,11 @@ class Gutenberg_Knowledge_Post_Type_Test extends WP_UnitTestCase {
 	public function test_save_post_preserves_explicit_term() {
 		wp_set_current_user( self::$admin_id );
 
-		$instruction_term_id = self::factory()->term->create(
+		$guideline_term_id = self::factory()->term->create(
 			array(
 				'taxonomy' => Gutenberg_Knowledge_Post_Type::TAXONOMY,
-				'name'     => 'Instruction',
-				'slug'     => Gutenberg_Knowledge_Post_Type::TERM_INSTRUCTION,
+				'name'     => 'Guideline',
+				'slug'     => Gutenberg_Knowledge_Post_Type::TERM_GUIDELINE,
 			)
 		);
 
@@ -135,16 +135,16 @@ class Gutenberg_Knowledge_Post_Type_Test extends WP_UnitTestCase {
 			array(
 				'post_type'   => Gutenberg_Knowledge_Post_Type::POST_TYPE,
 				'post_status' => 'draft',
-				'post_title'  => 'Instruction-typed knowledge post',
+				'post_title'  => 'Guideline-typed knowledge post',
 				'tax_input'   => array(
-					Gutenberg_Knowledge_Post_Type::TAXONOMY => array( $instruction_term_id ),
+					Gutenberg_Knowledge_Post_Type::TAXONOMY => array( $guideline_term_id ),
 				),
 			)
 		);
 
 		$terms = wp_get_object_terms( $post_id, Gutenberg_Knowledge_Post_Type::TAXONOMY, array( 'fields' => 'slugs' ) );
 
-		$this->assertSame( array( Gutenberg_Knowledge_Post_Type::TERM_INSTRUCTION ), $terms );
+		$this->assertSame( array( Gutenberg_Knowledge_Post_Type::TERM_GUIDELINE ), $terms );
 	}
 
 	/**
@@ -190,11 +190,11 @@ class Gutenberg_Knowledge_Post_Type_Test extends WP_UnitTestCase {
 	public function test_save_post_preserves_term_on_update() {
 		wp_set_current_user( self::$admin_id );
 
-		$instruction_term_id = self::factory()->term->create(
+		$guideline_term_id = self::factory()->term->create(
 			array(
 				'taxonomy' => Gutenberg_Knowledge_Post_Type::TAXONOMY,
-				'name'     => 'Instruction',
-				'slug'     => Gutenberg_Knowledge_Post_Type::TERM_INSTRUCTION,
+				'name'     => 'Guideline',
+				'slug'     => Gutenberg_Knowledge_Post_Type::TERM_GUIDELINE,
 			)
 		);
 
@@ -202,9 +202,9 @@ class Gutenberg_Knowledge_Post_Type_Test extends WP_UnitTestCase {
 			array(
 				'post_type'   => Gutenberg_Knowledge_Post_Type::POST_TYPE,
 				'post_status' => 'draft',
-				'post_title'  => 'Instruction-typed knowledge post',
+				'post_title'  => 'Guideline-typed knowledge post',
 				'tax_input'   => array(
-					Gutenberg_Knowledge_Post_Type::TAXONOMY => array( $instruction_term_id ),
+					Gutenberg_Knowledge_Post_Type::TAXONOMY => array( $guideline_term_id ),
 				),
 			)
 		);
@@ -218,7 +218,7 @@ class Gutenberg_Knowledge_Post_Type_Test extends WP_UnitTestCase {
 
 		$terms = wp_get_object_terms( $post_id, Gutenberg_Knowledge_Post_Type::TAXONOMY, array( 'fields' => 'slugs' ) );
 
-		$this->assertSame( array( Gutenberg_Knowledge_Post_Type::TERM_INSTRUCTION ), $terms );
+		$this->assertSame( array( Gutenberg_Knowledge_Post_Type::TERM_GUIDELINE ), $terms );
 	}
 
 	/**

@@ -44,14 +44,14 @@ if ( ! function_exists( 'wp_knowledge_types' ) ) {
 		return apply_filters(
 			'wp_knowledge_types',
 			array(
-				'instruction' => array(
-					'title' => __( 'Instruction', 'gutenberg' ),
+				'guideline' => array(
+					'title' => _x( 'Guideline', 'knowledge type', 'gutenberg' ),
 				),
-				'memory'      => array(
-					'title' => __( 'Memory', 'gutenberg' ),
+				'memory'    => array(
+					'title' => _x( 'Memory', 'knowledge type', 'gutenberg' ),
 				),
-				'note'        => array(
-					'title' => __( 'Note', 'gutenberg' ),
+				'note'      => array(
+					'title' => _x( 'Note', 'knowledge type', 'gutenberg' ),
 				),
 			)
 		);
@@ -95,25 +95,25 @@ if ( ! function_exists( '_wp_knowledge_ensure_default_type_term' ) ) {
 	}
 }
 
-if ( ! function_exists( '_wp_knowledge_synthesize_caps' ) ) {
+if ( ! function_exists( 'wp_maybe_grant_knowledge_caps' ) ) {
 	/**
-	 * Hook callback for the `user_has_cap` filter that grants knowledge
-	 * capabilities based on the user's role, post ownership, and post status.
+	 * Filters the user capabilities to grant the `wp_knowledge` post type capabilities as necessary.
 	 *
-	 * Administrators get every knowledge capability. Contributors, Authors,
-	 * and Editors can list and create knowledge posts, and fully manage their
-	 * own private rows. Publishing knowledge and acting on other users' rows
-	 * is reserved for Administrators.
+	 * The `wp_knowledge` post type uses a `knowledge`-prefixed capability set that
+	 * is granted dynamically rather than stored on roles. Administrators (users
+	 * with `manage_options`) receive every knowledge capability. Contributors,
+	 * authors, and editors (users with `edit_posts`) may list and create knowledge
+	 * rows and fully manage their own private rows; publishing knowledge and acting
+	 * on other users' rows is reserved for administrators. Subscribers receive
+	 * nothing and are stopped at the post-type door by the `read_knowledge` mapping.
 	 *
-	 * @access private
-	 *
-	 * @param array   $allcaps All capabilities of the user.
-	 * @param array   $caps    Required primitive capabilities for the requested capability.
-	 * @param array   $args    Arguments that accompany the requested capability check.
-	 * @param WP_User $user    The user object.
-	 * @return array Possibly augmented capabilities.
+	 * @param bool[]   $allcaps An array of all the user's capabilities.
+	 * @param string[] $caps    Required primitive capabilities for the requested capability.
+	 * @param array    $args    Arguments that accompany the requested capability check.
+	 * @param WP_User  $user    The user object.
+	 * @return bool[] Filtered array of the user's capabilities.
 	 */
-	function _wp_knowledge_synthesize_caps( array $allcaps, array $caps, array $args, WP_User $user ): array {
+	function wp_maybe_grant_knowledge_caps( array $allcaps, array $caps, array $args, WP_User $user ): array {
 		if ( ! empty( $allcaps['manage_options'] ) ) {
 			$allcaps['read_knowledge']             = true;
 			$allcaps['edit_knowledge']             = true;

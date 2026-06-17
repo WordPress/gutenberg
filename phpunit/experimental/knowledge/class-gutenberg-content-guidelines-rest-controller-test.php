@@ -449,7 +449,7 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 	}
 
 	/**
-	 * Test that GET /content-guidelines/{id} rejects non-instruction-typed posts.
+	 * Test that GET /content-guidelines/{id} rejects non-guideline-typed posts.
 	 *
 	 * @covers ::get_post
 	 */
@@ -464,7 +464,7 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 	}
 
 	/**
-	 * Test that PATCH /content-guidelines/{id} rejects non-instruction-typed posts.
+	 * Test that PATCH /content-guidelines/{id} rejects non-guideline-typed posts.
 	 *
 	 * @covers ::get_post
 	 */
@@ -480,7 +480,7 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 	}
 
 	/**
-	 * Test that DELETE /content-guidelines/{id} rejects non-instruction-typed posts.
+	 * Test that DELETE /content-guidelines/{id} rejects non-guideline-typed posts.
 	 *
 	 * @covers ::get_post
 	 */
@@ -496,7 +496,7 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 	}
 
 	/**
-	 * Test that /content-guidelines/{id}/revisions rejects non-instruction-typed parents.
+	 * Test that /content-guidelines/{id}/revisions rejects non-guideline-typed parents.
 	 *
 	 * @covers Gutenberg_Content_Guidelines_Revisions_Controller::get_parent
 	 */

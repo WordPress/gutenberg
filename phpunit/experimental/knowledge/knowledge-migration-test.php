@@ -12,7 +12,7 @@ class Knowledge_Migration_Test extends WP_UnitTestCase {
 	/**
 	 * Legacy `wp_guideline` rows move to `wp_knowledge`, their
 	 * `wp_guideline_type` terms move to `wp_knowledge_type` with the
-	 * built-in slugs renamed (`content` becomes `instruction`), and the
+	 * built-in slugs renamed (`content` becomes `guideline`), and the
 	 * term relationships survive.
 	 */
 	public function test_migrates_legacy_guideline_rows() {
@@ -41,11 +41,11 @@ class Knowledge_Migration_Test extends WP_UnitTestCase {
 		$migrated_term = get_term( $term['term_id'] );
 		$this->assertInstanceOf( WP_Term::class, $migrated_term );
 		$this->assertSame( 'wp_knowledge_type', $migrated_term->taxonomy );
-		$this->assertSame( 'instruction', $migrated_term->slug );
-		$this->assertSame( 'Instruction', $migrated_term->name );
+		$this->assertSame( 'guideline', $migrated_term->slug );
+		$this->assertSame( 'Guideline', $migrated_term->name );
 
 		$slugs = wp_get_object_terms( $post_id, 'wp_knowledge_type', array( 'fields' => 'slugs' ) );
-		$this->assertSame( array( 'instruction' ), $slugs );
+		$this->assertSame( array( 'guideline' ), $slugs );
 	}
 
 	/**
