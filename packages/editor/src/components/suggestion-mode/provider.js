@@ -17,16 +17,23 @@ import {
 	addNoteIdToMetadata,
 	getNoteIdsFromMetadata,
 } from '../collab-sidebar/utils';
+import {
+	acceptInlineDeletion,
+	rejectInlineDeletion,
+} from '../inline-suggestions';
 
 /**
  * @typedef {Object} SuggestionOperation
- * @property {'attribute-set'|'block-insert-after'|'block-remove'|'block-move'} type
- *                                                                                          Operation type. `attribute-set` ships in Phase 2; the structural
- *                                                                                          variants ship in Phase 6 (issue #77434).
- * @property {string}                                                           [attribute] The attribute being changed
- *                                                                                          (`attribute-set` only).
- * @property {*}                                                                [before]    The baseline value (`attribute-set`).
- * @property {*}                                                                [after]     The proposed value (`attribute-set`).
+ * @property {'attribute-set'|'inline-suggestion'|'block-insert-after'|'block-remove'|'block-move'} type
+ *                                                                                                                   Operation type. `attribute-set` and `inline-suggestion` ship in
+ *                                                                                                                   Phase 2; the structural variants ship in Phase 6 (issue #77434).
+ * @property {string}                                                                               [attribute]      The attribute being changed (`attribute-set`) or
+ *                                                                                                                   carrying the marker (`inline-suggestion`).
+ * @property {'del'|'add'}                                                                          [suggestionType] Inline marker kind (`inline-suggestion` only): `del`
+ *                                                                                                                   wraps existing text proposed for removal, `add` wraps proposed
+ *                                                                                                                   new text.
+ * @property {*}                                                                                    [before]         The baseline value (`attribute-set`).
+ * @property {*}                                                                                    [after]          The proposed value (`attribute-set`).
  */
 
 /**
@@ -213,6 +220,31 @@ export function findStructuralOp( operations ) {
 		}
 	}
 	return null;
+}
+
+/**
+ * Operation type for an inline suggestion: a `core/suggestion` marker anchored
+ * in a single rich-text attribute. The marked range is never stored — it is
+ * re-derived from the in-content marker by id (the comment id) on read — so the
+ * op only records which attribute carries the marker and the marker kind.
+ */
+const INLINE_OP_TYPE = 'inline-suggestion';
+
+/**
+ * Locate the inline-suggestion operation in a payload. A payload describes at
+ * most one inline suggestion (each is its own note/comment), so the first match
+ * is returned.
+ *
+ * @param {SuggestionOperation[]} operations Payload operations.
+ * @return {SuggestionOperation|null} Inline op, or null when none.
+ */
+export function findInlineOp( operations ) {
+	if ( ! Array.isArray( operations ) ) {
+		return null;
+	}
+	return (
+		operations.find( ( op ) => op && op.type === INLINE_OP_TYPE ) ?? null
+	);
 }
 
 /**
@@ -637,6 +669,61 @@ export function useSuggestionsProvider() {
 				return;
 			}
 
+			// Inline suggestions live as a `core/suggestion` marker in a
+			// single rich-text attribute. Apply resolves the marker by comment
+			// id and rewrites that one attribute: a deletion drops the marked
+			// text with its marker; an addition unwraps the marker so the
+			// proposed text becomes permanent. The write bypasses the
+			// suggest-mode interceptor so it lands on the live block instead of
+			// being reverted into the overlay.
+			const inlineOp = findInlineOp( payload.operations );
+			if ( inlineOp ) {
+				const attributeKey = inlineOp.attribute;
+				const originalValue =
+					selectBlockAttributes( targetClientId )?.[ attributeKey ];
+				const nextValue =
+					inlineOp.suggestionType === 'add'
+						? rejectInlineDeletion( originalValue, commentId )
+						: acceptInlineDeletion( originalValue, commentId );
+				try {
+					requestInterceptorBypass( targetClientId );
+					clearOverlay( targetClientId );
+					updateBlockAttributes( targetClientId, {
+						[ attributeKey ]: nextValue,
+					} );
+
+					await saveEntityRecord(
+						'root',
+						'comment',
+						{
+							id: commentId,
+							status: 'approved',
+							meta: { _wp_suggestion_status: 'applied' },
+						},
+						{ throwOnError: true }
+					);
+
+					createNotice( 'snackbar', __( 'Suggestion applied.' ), {
+						type: 'snackbar',
+						isDismissible: true,
+					} );
+				} catch ( error ) {
+					// Roll the attribute back so the block isn't left
+					// half-applied if the server rejected the status update.
+					requestInterceptorBypass( targetClientId );
+					updateBlockAttributes( targetClientId, {
+						[ attributeKey ]: originalValue,
+					} );
+					createNotice(
+						'error',
+						error?.message ||
+							__( 'Failed to save suggestion status.' ),
+						{ type: 'snackbar', isDismissible: true }
+					);
+				}
+				return;
+			}
+
 			// Structural ops (block-remove, block-insert-after; block-move
 			// ships in a follow-up) can't ride the updateBlockAttributes
 			// path: their apply mutates the tree rather than a single
@@ -873,6 +960,48 @@ export function useSuggestionsProvider() {
 				}
 			}
 
+			// Inline suggestions: reject restores the block's pre-suggestion
+			// content for the marked attribute — a deletion keeps the text and
+			// drops the marker, an addition removes the proposed text with its
+			// marker. Resolve the target the way apply does (the metadata link
+			// may be absent on a fresh load) and bypass the interceptor so the
+			// change lands on the live block.
+			const inlineOp = findInlineOp( payload?.operations );
+			if ( inlineOp ) {
+				let targetClientId = clientId;
+				if ( ! targetClientId ) {
+					const liveIds = selectClientIdsWithDescendants?.() ?? [];
+					const commentIdKey = String( commentId );
+					for ( const id of liveIds ) {
+						const ids = getNoteIdsFromMetadata(
+							selectBlockAttributes( id )?.metadata
+						);
+						if (
+							ids.some( ( n ) => String( n ) === commentIdKey )
+						) {
+							targetClientId = id;
+							break;
+						}
+					}
+				}
+				if ( targetClientId ) {
+					const attributeKey = inlineOp.attribute;
+					const value =
+						selectBlockAttributes( targetClientId )?.[
+							attributeKey
+						];
+					const nextValue =
+						inlineOp.suggestionType === 'add'
+							? acceptInlineDeletion( value, commentId )
+							: rejectInlineDeletion( value, commentId );
+					requestInterceptorBypass( targetClientId );
+					clearOverlay( targetClientId );
+					updateBlockAttributes( targetClientId, {
+						[ attributeKey ]: nextValue,
+					} );
+				}
+			}
+
 			try {
 				await saveEntityRecord(
 					'root',
@@ -901,6 +1030,7 @@ export function useSuggestionsProvider() {
 			saveEntityRecord,
 			createNotice,
 			selectBlockAttributes,
+			selectClientIdsWithDescendants,
 			updateBlockAttributes,
 			removeBlock,
 			moveBlockToPosition,
