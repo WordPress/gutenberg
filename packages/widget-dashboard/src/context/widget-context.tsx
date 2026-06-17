@@ -15,13 +15,20 @@ import type { WidgetContextValue } from '../types';
 
 const WidgetContext = createContext< WidgetContextValue | null >( null );
 
+interface ProviderProps {
+	value: WidgetContextValue;
+	children: ReactNode;
+}
+
+/**
+ * Provides the current widget's identity to its render subtree.
+ *
+ * @param {ProviderProps} props Component props.
+ */
 export function WidgetContextProvider( {
 	value,
 	children,
-}: {
-	value: WidgetContextValue;
-	children: ReactNode;
-} ) {
+}: ProviderProps ): React.ReactNode {
 	return (
 		<WidgetContext.Provider value={ value }>
 			{ children }
