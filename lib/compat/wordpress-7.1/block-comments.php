@@ -6,51 +6,13 @@
  * `lib/compat/wordpress-6.9/block-comments.php`. Inline notes - notes anchored
  * to a text selection within a block rather than the whole block - are a 7.1
  * addition and live here.
- */
-
-/**
- * Register comment metadata for an inline note's text selection anchor.
  *
- * Stored as a fallback anchor for when the in-content `core/note` marker can't
- * be found (e.g. legacy content, or before a CRDT migration writes its own
- * range).
+ * An inline note's anchor is the in-content `<mark class="wp-note" data-id="N">`
+ * marker alone: the `data-id` identifies the note and the marker's position
+ * follows edits, so no separate selection metadata is stored. The marker is
+ * kept in the raw `post_content` (and REST `raw` view) and only stripped from
+ * rendered front-end output by the filter below.
  */
-function gutenberg_register_inline_note_metadata() {
-	register_meta(
-		'comment',
-		'_wp_note_selection',
-		array(
-			'type'          => 'object',
-			'description'   => __( 'Inline note text selection anchor', 'gutenberg' ),
-			'single'        => true,
-			'show_in_rest'  => array(
-				'schema' => array(
-					'type'                 => 'object',
-					'required'             => array( 'attributeKey', 'start', 'end' ),
-					'properties'           => array(
-						'attributeKey' => array(
-							'type'      => 'string',
-							'minLength' => 1,
-						),
-						'start'        => array(
-							'type'    => 'integer',
-							'minimum' => 0,
-						),
-						'end'          => array(
-							'type'    => 'integer',
-							'minimum' => 0,
-						),
-					),
-					'additionalProperties' => false,
-				),
-			),
-			'auth_callback' => function ( $allowed, $meta_key, $object_id ) {
-				return current_user_can( 'edit_comment', $object_id );
-			},
-		)
-	);
-}
-add_action( 'init', 'gutenberg_register_inline_note_metadata' );
 
 /**
  * Strip inline note markers from rendered block output.

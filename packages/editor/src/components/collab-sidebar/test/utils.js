@@ -14,6 +14,7 @@ import { select } from '@wordpress/data';
  */
 import {
 	findNoteRange,
+	findNoteInBlock,
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
 	removeNoteIdFromMetadata,
@@ -610,5 +611,98 @@ describe( 'findNoteRange', () => {
 		);
 		expect( findNoteRange( value, null ) ).toBeNull();
 		expect( findNoteRange( value, undefined ) ).toBeNull();
+	} );
+} );
+
+describe( 'findNoteInBlock', () => {
+	const FORMAT_NAME = 'core/note';
+
+	const isRegistered = () =>
+		!! select( richTextStore ).getFormatType( FORMAT_NAME );
+
+	beforeAll( () => {
+		if ( ! isRegistered() ) {
+			registerFormatType( FORMAT_NAME, {
+				title: 'Note',
+				tagName: 'span',
+				className: 'wp-note',
+				attributes: { 'data-id': 'data-id' },
+				edit: () => null,
+			} );
+		}
+	} );
+
+	afterAll( () => {
+		if ( isRegistered() ) {
+			unregisterFormatType( FORMAT_NAME );
+		}
+	} );
+
+	it( 'returns null when attributes are null/undefined', () => {
+		expect( findNoteInBlock( null, 7 ) ).toBeNull();
+		expect( findNoteInBlock( undefined, 7 ) ).toBeNull();
+	} );
+
+	it( 'returns null when no attribute carries a matching marker', () => {
+		const attributes = {
+			content: RichTextData.fromHTMLString( 'hello world' ),
+			align: 'left',
+		};
+		expect( findNoteInBlock( attributes, 7 ) ).toBeNull();
+	} );
+
+	it( 'returns the attribute key and range of the matching marker', () => {
+		const attributes = {
+			content: RichTextData.fromHTMLString(
+				'hello <span class="wp-note" data-id="7">marked</span> world'
+			),
+		};
+		expect( findNoteInBlock( attributes, 7 ) ).toEqual( {
+			attributeKey: 'content',
+			start: 6,
+			end: 12,
+		} );
+	} );
+
+	it( 'discovers the marker in a non-primary rich-text attribute', () => {
+		const attributes = {
+			content: RichTextData.fromHTMLString( 'no marker here' ),
+			caption: RichTextData.fromHTMLString(
+				'<span class="wp-note" data-id="9">cap</span>'
+			),
+		};
+		expect( findNoteInBlock( attributes, 9 ) ).toEqual( {
+			attributeKey: 'caption',
+			start: 0,
+			end: 3,
+		} );
+	} );
+
+	it( 'ignores non-rich-text attribute values without throwing', () => {
+		const attributes = {
+			level: 2,
+			anchor: '',
+			content: RichTextData.fromHTMLString(
+				'<span class="wp-note" data-id="3">x</span>'
+			),
+		};
+		expect( findNoteInBlock( attributes, 3 ) ).toEqual( {
+			attributeKey: 'content',
+			start: 0,
+			end: 1,
+		} );
+	} );
+
+	it( 'coerces ids to strings so numeric vs string ids match', () => {
+		const attributes = {
+			content: RichTextData.fromHTMLString(
+				'<span class="wp-note" data-id="7">x</span>'
+			),
+		};
+		expect( findNoteInBlock( attributes, '7' ) ).toEqual( {
+			attributeKey: 'content',
+			start: 0,
+			end: 1,
+		} );
 	} );
 } );

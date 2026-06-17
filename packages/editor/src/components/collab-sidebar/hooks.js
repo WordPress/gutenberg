@@ -32,7 +32,7 @@ import { createBoardStore } from './board-store';
 import { NOTE_FORMAT_NAME } from './format';
 import {
 	calculateNotePositions,
-	findNoteRange,
+	findNoteInBlock,
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
 	removeNoteIdFromMetadata,
@@ -48,33 +48,17 @@ export const BLOCK_LEVEL_NOTE_START = -1;
 
 /**
  * Resolve an inline note's character offset in its block so threads can be
- * sorted by reading order. Block-level notes (whose meta carries no inline
- * selection) sort first within their block via a sentinel.
+ * sorted by reading order. A note is inline iff an in-content `core/note`
+ * marker carries its id; block-level notes (no marker) sort first within their
+ * block via a sentinel.
  *
- * @param {Object}  thread     Materialized thread record (with `.id` and `.meta`).
+ * @param {Object}  thread     Materialized thread record (with `.id`).
  * @param {?Object} attributes Block attributes for the thread's block.
  * @return {number} Marker start offset, or `BLOCK_LEVEL_NOTE_START` when there is no inline anchor.
  */
 export function getInlineMarkerStart( thread, attributes ) {
-	const selection =
-		thread?.meta?._wp_note_selection &&
-		! Array.isArray( thread.meta._wp_note_selection )
-			? thread.meta._wp_note_selection
-			: null;
-	const attributeKey = selection?.attributeKey;
-	if ( ! attributeKey || ! attributes ) {
-		return BLOCK_LEVEL_NOTE_START;
-	}
-	const range = findNoteRange( attributes[ attributeKey ], thread.id );
-	if ( range ) {
-		return range.start;
-	}
-	// Inline note whose marker has been stripped (e.g. by an undo). Fall back
-	// to the stored offset, then to the block-level sentinel.
-	if ( Number.isInteger( selection.start ) ) {
-		return selection.start;
-	}
-	return BLOCK_LEVEL_NOTE_START;
+	const found = findNoteInBlock( attributes, thread?.id );
+	return found ? found.start : BLOCK_LEVEL_NOTE_START;
 }
 
 export function useNoteThreads( postId ) {
@@ -293,7 +277,8 @@ export function useNoteActions() {
 		try {
 			// Capture inline selection *before* the async save: focus may shift
 			// during the round-trip and the editor's stored selection can
-			// collapse if the user clicks elsewhere.
+			// collapse if the user clicks elsewhere. The selection drives the
+			// in-content marker written below, which is the note's only anchor.
 			const inlineSelection = ! parent
 				? readInlineSelection( getSelectionStart, getSelectionEnd )
 				: null;
@@ -307,18 +292,6 @@ export function useNoteActions() {
 					status: 'hold',
 					type: 'note',
 					parent: parent || 0,
-					...( inlineSelection
-						? {
-								meta: {
-									_wp_note_selection: {
-										attributeKey:
-											inlineSelection.attributeKey,
-										start: inlineSelection.start,
-										end: inlineSelection.end,
-									},
-								},
-						  }
-						: {} ),
 				},
 				{ throwOnError: true }
 			);
@@ -573,11 +546,12 @@ export function useFloatingBoard( {
 const NOTE_ANNOTATION_SOURCE = 'core-note';
 
 /**
- * Decorate inline-note ranges using the annotations API. The preferred anchor
- * is the in-content `core/note` marker (resilient to edits); the comment
- * `_wp_note_selection` meta is the fallback for content without a marker.
+ * Decorate inline-note ranges using the annotations API. The in-content
+ * `core/note` marker is the sole anchor: its `data-id` identifies the note and
+ * its position follows edits, so the range is read straight from the block
+ * content.
  *
- * @param {Array} threads Note threads, including resolved status and meta.
+ * @param {Array} threads Note threads, including resolved status.
  */
 export function useAnnotateBlocks( threads ) {
 	const { getBlockAttributes } = useSelect( blockEditorStore );
@@ -597,37 +571,16 @@ export function useAnnotateBlocks( threads ) {
 				continue;
 			}
 			const attributes = getBlockAttributes( thread.blockClientId );
-			if ( ! attributes ) {
-				continue;
-			}
-			// Meta is the fallback anchor and may be missing or returned as `[]`
-			// when WordPress serializes an empty object meta.
-			const selection =
-				thread.meta?._wp_note_selection &&
-				! Array.isArray( thread.meta._wp_note_selection )
-					? thread.meta._wp_note_selection
-					: null;
-			const attributeKey = selection?.attributeKey;
-			if ( ! attributeKey ) {
-				continue;
-			}
-			// Prefer the in-content marker; fall back to stored offsets.
-			const range =
-				findNoteRange( attributes[ attributeKey ], thread.id ) ??
-				( selection &&
-				Number.isInteger( selection.start ) &&
-				Number.isInteger( selection.end )
-					? { start: selection.start, end: selection.end }
-					: null );
-			if ( ! range ) {
+			const found = findNoteInBlock( attributes, thread.id );
+			if ( ! found ) {
 				continue;
 			}
 			out.push( {
 				id: String( thread.id ),
 				clientId: thread.blockClientId,
-				attributeKey,
-				start: range.start,
-				end: range.end,
+				attributeKey: found.attributeKey,
+				start: found.start,
+				end: found.end,
 			} );
 		}
 		return out;
@@ -663,32 +616,19 @@ export function useAnnotateBlocks( threads ) {
  * - `'anchor'`: the marker is present; record that we've seen it this session.
  * - `'delete'`: the marker was seen earlier this session but is now gone (the
  *   user removed the marked text), so the note should be deleted.
- * - `'skip'`: not an inline note, the block isn't loaded yet, or the marker is
- *   absent for a note we never saw anchored (e.g. a legacy/never-anchored note,
- *   which keeps its stored-offset fallback rather than being deleted).
+ * - `'skip'`: the block isn't loaded yet, the note is block-level (no marker),
+ *   or the marker is absent for a note we never saw anchored this session.
  *
- * @param {Object}  thread     Materialized thread record (with `.id`, `.meta`, `.blockClientId`).
+ * @param {Object}  thread     Materialized thread record (with `.id`, `.blockClientId`).
  * @param {?Object} attributes Block attributes for the thread's block, or null/undefined when unloaded.
  * @param {Set}     anchored   Ids whose marker has been observed present this session.
  * @return {'anchor'|'delete'|'skip'} The action to take.
  */
 export function reconcileInlineNoteMarker( thread, attributes, anchored ) {
-	const selection =
-		thread?.meta?._wp_note_selection &&
-		! Array.isArray( thread.meta._wp_note_selection )
-			? thread.meta._wp_note_selection
-			: null;
-	if (
-		! selection?.attributeKey ||
-		! thread?.blockClientId ||
-		! attributes
-	) {
+	if ( ! thread?.blockClientId || ! attributes ) {
 		return 'skip';
 	}
-	const present = !! findNoteRange(
-		attributes[ selection.attributeKey ],
-		thread.id
-	);
+	const present = !! findNoteInBlock( attributes, thread.id );
 	if ( present ) {
 		return 'anchor';
 	}
