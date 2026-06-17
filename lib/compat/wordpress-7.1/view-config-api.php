@@ -765,23 +765,3 @@ if ( has_filter( 'get_entity_view_config_postType_wp_template', '_wp_get_entity_
 }
 add_filter( 'get_entity_view_config_postType_wp_template', '_gutenberg_get_entity_view_config_post_type_wp_template', 10, 1 );
 
-/**
- * Provides the view configuration for the `site` root entity.
- *
- * @param array $config {
- *     The view configuration for the entity.
- * }
- * @return array The filtered view configuration.
- */
-function _gutenberg_get_entity_view_config_root_site( $config ) {
-	$config['form'] = array(
-		'layout' => array( 'type' => 'panel' ),
-		'fields' => array(
-			'posts_per_page',
-			'default_comment_status',
-		),
-	);
-
-	return $config;
-}
-add_filter( 'get_entity_view_config_root_site', '_gutenberg_get_entity_view_config_root_site', 10, 1 );

@@ -26,10 +26,6 @@ Undocumented declaration.
 
 Undocumented declaration.
 
-### blogTitleField
-
-Blog title field for the posts page.
-
 ### commentStatusField
 
 Comment status field for BasePost.

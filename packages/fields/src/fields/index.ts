@@ -27,4 +27,3 @@ export { default as postContentInfoField } from './post-content-info';
 export { default as stickyField } from './sticky';
 export { default as postsPerPageField } from './posts-per-page';
 export { default as siteDiscussionField } from './site-discussion';
-export { default as blogTitleField } from './blog-title';

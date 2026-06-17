@@ -45,7 +45,6 @@ import {
 	readOnlyDescriptionField,
 	postsPerPageField,
 	siteDiscussionField,
-	blogTitleField,
 } from '@wordpress/fields';
 import {
 	altTextField,
@@ -297,16 +296,13 @@ export const registerPostTypeSchema =
 				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
 					passwordField,
 				postTypeConfig.slug === 'post' && stickyField,
-				// `postsPerPageField` and `siteDiscussionField` are `settings`
-				// fields that we now want to display for templates and
-				// specifically for the home/index template.
+				// `postsPerPageField` and `siteDiscussionField` are registered here
+				// for `wp_template` to support the niche editor affordance of
+				// surfacing site settings when editing the home/index template.
+				// When a dedicated site settings screen is built, these fields
+				// will also need to be registered for the `root/site` entity.
 				postTypeConfig.slug === 'wp_template' && postsPerPageField,
 				postTypeConfig.slug === 'wp_template' && siteDiscussionField,
-				// `blogTitleField` is a similar field to the above but it's
-				// special because it's responsible for updating a `page` attribute.
-				// We need to think this through how to best connect
-				// it with `Gutenberg_REST_View_Config_Controller_7_1`.
-				postTypeConfig.slug === 'wp_template' && blogTitleField,
 				postTypeConfig.slug === 'wp_template' && descriptionField,
 				postTypeConfig.slug === 'wp_template' &&
 					readOnlyDescriptionField,
