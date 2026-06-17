@@ -42,7 +42,6 @@ function gutenberg_site_editor_enable_admin_bar() {
 		return;
 	}
 
-	add_action( 'admin_head', 'wp_admin_bar_header' );
 	remove_action( 'admin_bar_menu', 'wp_admin_bar_sidebar_toggle', 0 );
 	add_action( 'admin_footer-site-editor-v2', 'wp_admin_bar_render' );
 
