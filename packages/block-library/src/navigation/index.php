@@ -12,6 +12,8 @@
  * menus render hover-open submenus with indicators; vertical menus render
  * always-open submenus without indicators.
  *
+ * @since 6.9.0
+ *
  * @param array $attributes Block attributes.
  * @return array Attributes to use for render behavior and block context.
  */
