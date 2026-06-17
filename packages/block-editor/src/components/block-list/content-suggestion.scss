@@ -144,6 +144,19 @@ $suggestion-author-color: var(--suggestion-author-color, #{$suggestion-color});
 .wp-suggestion {
 	background: transparent;
 
+	// The runtime annotation decoration nests a `<mark class="annotation-text">`
+	// inside the suggestion marker. Suggestion threads are `note`-type comments,
+	// so `NoteHighlightStyles` tints that inner mark with the author's color by
+	// id (and the browser otherwise paints `<mark>` yellow). Here the marker's
+	// own strikethrough/underline is the visual, so the highlight box — whose
+	// rounded edges read as stray vertical bars around the run and any trailing
+	// space — is redundant. Neutralize it; `!important` overrides the
+	// id-specificity rule `NoteHighlightStyles` injects per thread. Per-author
+	// tinting returns on the marker itself in the Phase 5 visual work.
+	mark.annotation-text {
+		background-color: transparent !important;
+	}
+
 	&[data-suggestion-type="del"] {
 		color: var(--suggestion-author-color, #{$suggestion-deletion-color});
 		text-decoration: line-through;
