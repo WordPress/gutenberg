@@ -2228,25 +2228,11 @@ class WP_Theme_JSON_Gutenberg {
 			return '';
 		}
 
-		$declaration_block = array_reduce(
+		return WP_Style_Engine_Gutenberg::compile_css(
 			$declarations,
-			static function ( $carry, $element ) {
-				$value = $element['value'];
-
-				if ( is_numeric( $value ) ) {
-					$value = (string) $value;
-				}
-
-				if ( ! is_string( $value ) ) {
-					return $carry;
-				}
-
-				return $carry .= $element['name'] . ': ' . $value . ';';
-			},
-			''
+			$selector,
+			array( 'sanitize' => false )
 		);
-
-		return $selector . '{' . $declaration_block . '}';
 	}
 
 	/**

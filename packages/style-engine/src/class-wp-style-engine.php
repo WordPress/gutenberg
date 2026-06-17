@@ -696,12 +696,28 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 *
 		 * @param string[] $css_declarations An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
 		 * @param string   $css_selector     When a selector is passed, the function will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
+		 * @param array    $options          {
+		 *     Optional. An array of options. Default empty array.
+		 *
+		 *     @type bool $sanitize Whether to sanitize declarations before compiling. Default true.
+		 * }
 		 *
 		 * @return string A compiled CSS string.
 		 */
-		public static function compile_css( $css_declarations, $css_selector ) {
+		public static function compile_css( $css_declarations, $css_selector, $options = array() ) {
 			if ( empty( $css_declarations ) || ! is_array( $css_declarations ) ) {
 				return '';
+			}
+
+			$options = wp_parse_args(
+				$options,
+				array(
+					'sanitize' => true,
+				)
+			);
+
+			if ( ! $options['sanitize'] ) {
+				return static::compile_declarations_unfiltered( $css_declarations, $css_selector );
 			}
 
 			// Return an entire rule if there is a selector.
@@ -712,6 +728,74 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 
 			$css_declarations = new WP_Style_Engine_CSS_Declarations( $css_declarations );
 			return $css_declarations->get_declarations_string();
+		}
+
+		/**
+		 * Normalizes CSS declarations to an ordered declaration list.
+		 *
+		 * This accepts Style Engine's associative property/value declarations and Theme JSON's
+		 * ordered list of name/value declaration objects. It does not sanitize declarations.
+		 *
+		 * @param array $declarations CSS declarations.
+		 * @return array Ordered CSS declarations.
+		 */
+		private static function normalize_declarations( $declarations ) {
+			$normalized = array();
+
+			foreach ( $declarations as $property => $value ) {
+				if ( is_array( $value ) && array_key_exists( 'name', $value ) && array_key_exists( 'value', $value ) ) {
+					$property = $value['name'];
+					$value    = $value['value'];
+				}
+
+				if ( ! is_string( $property ) ) {
+					continue;
+				}
+
+				$property = trim( $property );
+				if ( '' === $property ) {
+					continue;
+				}
+
+				if ( is_numeric( $value ) ) {
+					$value = (string) $value;
+				}
+
+				if ( ! is_string( $value ) ) {
+					continue;
+				}
+
+				$normalized[] = array(
+					'property' => $property,
+					'value'    => $value,
+				);
+			}
+
+			return $normalized;
+		}
+
+		/**
+		 * Compiles trusted CSS declarations without sanitizing.
+		 *
+		 * This path is intended for internally generated CSS, such as Theme JSON output.
+		 *
+		 * @param array  $css_declarations CSS declarations.
+		 * @param string $css_selector     Optional. CSS selector.
+		 * @return string A compiled CSS string.
+		 */
+		private static function compile_declarations_unfiltered( $css_declarations, $css_selector = '' ) {
+			$declarations      = static::normalize_declarations( $css_declarations );
+			$declaration_block = '';
+
+			foreach ( $declarations as $declaration ) {
+				$declaration_block .= $declaration['property'] . ': ' . $declaration['value'] . ';';
+			}
+
+			if ( $css_selector ) {
+				return $css_selector . '{' . $declaration_block . '}';
+			}
+
+			return $declaration_block;
 		}
 
 		/**

@@ -875,4 +875,86 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 
 		$this->assertSame( '.foo{@media (orientation: landscape){background-color:blue;}}.foo{@media (min-width > 1024px){background-color:cotton-blue;}}', $compiled_stylesheet );
 	}
+
+	/**
+	 * Tests that compile_css() keeps its sanitized output by default.
+	 *
+	 * @covers WP_Style_Engine_Gutenberg::compile_css
+	 */
+	public function test_compile_css_sanitizes_declarations_by_default() {
+		$compiled_css = WP_Style_Engine_Gutenberg::compile_css(
+			array(
+				'color'  => 'red',
+				'margin' => '0',
+			),
+			'.test'
+		);
+
+		$this->assertSame( '.test{color:red;margin:0;}', $compiled_css );
+	}
+
+	/**
+	 * Tests that compile_css() can serialize trusted Theme JSON declaration lists.
+	 *
+	 * @covers WP_Style_Engine_Gutenberg::compile_css
+	 */
+	public function test_compile_css_serializes_trusted_theme_json_declarations() {
+		$compiled_css = WP_Style_Engine_Gutenberg::compile_css(
+			array(
+				array(
+					'name'  => 'color',
+					'value' => 'red',
+				),
+				array(
+					'name'  => 'color',
+					'value' => 'blue',
+				),
+				array(
+					'name'  => 'margin',
+					'value' => 0,
+				),
+				array(
+					'name'  => 'opacity',
+					'value' => true,
+				),
+				array(
+					'name'  => 'padding',
+					'value' => false,
+				),
+				array(
+					'name'  => 'gap',
+					'value' => array(),
+				),
+				array(
+					'name' => 'line-height',
+				),
+				array(
+					'name'  => '',
+					'value' => '1',
+				),
+			),
+			'.test',
+			array( 'sanitize' => false )
+		);
+
+		$this->assertSame( '.test{color: red;color: blue;margin: 0;}', $compiled_css );
+	}
+
+	/**
+	 * Tests that trusted compile_css() can serialize inline declarations.
+	 *
+	 * @covers WP_Style_Engine_Gutenberg::compile_css
+	 */
+	public function test_compile_css_serializes_trusted_inline_declarations() {
+		$compiled_css = WP_Style_Engine_Gutenberg::compile_css(
+			array(
+				'color'  => 'red',
+				'margin' => 0,
+			),
+			'',
+			array( 'sanitize' => false )
+		);
+
+		$this->assertSame( 'color: red;margin: 0;', $compiled_css );
+	}
 }
