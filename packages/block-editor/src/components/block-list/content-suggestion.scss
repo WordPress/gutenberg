@@ -134,6 +134,29 @@ $suggestion-author-color: var(--suggestion-author-color, #{$suggestion-color});
 		1px 0 0 0 var(--suggestion-author-color, #{$suggestion-addition-color});
 }
 
+// Inline `core/suggestion` markers that live in block content (Option B). The
+// type-specific visual is keyed off the in-content marker's
+// `data-suggestion-type`; the marker is also decorated at runtime through the
+// annotations API (`.annotation-text-core-suggestion`). The default `<mark>`
+// highlight is neutralized so the deletion/addition treatment reads cleanly.
+// Per-author tinting (via `data-author`) and alignment with the Revisions diff
+// UI land with the Phase 5 visual work.
+.wp-suggestion {
+	background: transparent;
+
+	&[data-suggestion-type="del"] {
+		color: var(--suggestion-author-color, #{$suggestion-deletion-color});
+		text-decoration: line-through;
+		text-decoration-color: var(--suggestion-author-color, #{$suggestion-deletion-color});
+	}
+
+	&[data-suggestion-type="add"] {
+		color: var(--suggestion-author-color, #{$suggestion-addition-color});
+		text-decoration: underline;
+		text-decoration-color: var(--suggestion-author-color, #{$suggestion-addition-color});
+	}
+}
+
 // Move ghost: a non-interactive placeholder rendered at a moved block's
 // original position (by the editor-package suggestion HOC) so a reviewer
 // can see where the block came from. Dimmed + struck-through, tinted with
