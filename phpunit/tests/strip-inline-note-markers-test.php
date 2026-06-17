@@ -96,6 +96,17 @@ class Tests_Strip_Inline_Note_Markers extends WP_UnitTestCase {
 		$this->assertSame( '<p>abc</p>', $stripped );
 	}
 
+	public function test_strip_ignores_mark_like_text_inside_a_comment() {
+		// A `</mark>` sequence inside an HTML comment is text, not a tag. Walking
+		// the parsed token stream ignores it; a raw regex over the string would
+		// mistake it for the note's closer, unbalance the pairing, and corrupt
+		// both the comment and the real wrapper.
+		$html     = '<p><mark class="wp-note" data-id="1">a<!-- </mark> -->b</mark>tail</p>';
+		$stripped = gutenberg_strip_inline_note_markers( $html );
+
+		$this->assertSame( '<p>a<!-- </mark> -->btail</p>', $stripped );
+	}
+
 	public function test_strip_filter_is_registered_on_render_block() {
 		// Guards against future hook rewiring that would silently leave
 		// inline-note markers in rendered output.
