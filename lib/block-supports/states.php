@@ -259,8 +259,6 @@ function gutenberg_add_block_state_style_rule( &$css_rules, $state, $selector, $
 		return;
 	}
 
-	$style = gutenberg_get_state_style_with_fallback_dimension_styles( $style );
-
 	$compiled = gutenberg_style_engine_get_styles(
 		gutenberg_normalize_state_style_for_css_output( $style )
 	);
