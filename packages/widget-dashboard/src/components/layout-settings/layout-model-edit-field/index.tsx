@@ -20,13 +20,15 @@ import { GridThumbnail } from './thumbnail-grid';
 import { MasonryThumbnail } from './thumbnail-masonry';
 import styles from './style.module.css';
 
+interface ModelThumbnailProps {
+	model: string;
+	className?: string;
+}
+
 function ModelThumbnail( {
 	model,
 	className,
-}: {
-	model: string;
-	className?: string;
-} ): React.ReactNode {
+}: ModelThumbnailProps ): React.ReactNode {
 	return model === 'masonry' ? (
 		<MasonryThumbnail className={ className } />
 	) : (
