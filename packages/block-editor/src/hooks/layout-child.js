@@ -16,6 +16,7 @@ import {
 	GridItemResizer,
 	GridItemMovers,
 } from '../components/grid';
+import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 import useBlockVisibility from '../components/block-visibility/use-block-visibility';
 import { deviceTypeKey } from '../store/private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/constants';
@@ -408,16 +409,24 @@ function GridTools( {
 		[ clientId ]
 	);
 
+	// Get the block's DOM element to derive the canvas iframe window,
+	// so viewport detection matches the actual block rendering context
+	const blockElement = useBlockElement( clientId );
+	const rawCanvasView = blockElement?.ownerDocument?.defaultView;
+	const canvasView = rawCanvasView === null ? undefined : rawCanvasView;
+
 	const { isBlockCurrentlyHidden: isParentBlockCurrentlyHidden } =
 		useBlockVisibility( {
 			blockVisibility: parentBlockVisibility,
 			deviceType,
+			view: canvasView,
 		} );
 
 	const { isBlockCurrentlyHidden: isBlockItselfCurrentlyHidden } =
 		useBlockVisibility( {
 			blockVisibility: blockBlockVisibility,
 			deviceType,
+			view: canvasView,
 		} );
 
 	// Use useState() instead of useRef() so that GridItemResizer updates when ref is set.
