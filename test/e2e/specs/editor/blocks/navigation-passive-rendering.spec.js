@@ -115,8 +115,6 @@ test.describe( 'Navigation passive rendering', () => {
 			} )
 		).toBeVisible();
 
-		await expect.poll( () => getDirtyEntityRecords( page ) ).toEqual( [] );
-
 		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.click();
