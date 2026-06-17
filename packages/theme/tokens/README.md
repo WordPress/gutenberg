@@ -41,15 +41,18 @@ Example:
 		"$type": "dimension",
 		"primitive": {
 			"space": {
-				"10": {
-					"$value": { "value": 4, "unit": "px" }
+				// ...
+				"80": {
+					"$value": { "value": 40, "unit": "px" }
 				}
 				// ...
 			}
 		},
-		"padding": {
-			"xs": {
-				"$value": "{wpds-dimension.primitive.space.10}"
+		"size": {
+			// ...
+			"lg": {
+				"$value": "{wpds-dimension.primitive.space.80}",
+				"$description": "Default size for buttons and inputs"
 			}
 			// ...
 		}
@@ -60,10 +63,10 @@ Example:
 In the example above, the CSS properties generated from these tokens would include:
 
 ```css
---wpds-dimension-padding-xs: 4px;
+--wpds-dimension-size-lg: 40px;
 ```
 
-Someone using the design system should never see or concern themselves with either the `primitive.space.10` token or the underlying 4 pixel base unit.
+Someone using the design system should never see or concern themselves with either the `primitive.space.80` token or the underlying 4 pixel base unit, and instead focus on the semantics of how element size tokens apply to their component. In this example, a large token being used for a component that follows the size of buttons and inputs in the system.
 
 ## Custom Extensions
 
