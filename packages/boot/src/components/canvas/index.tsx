@@ -810,7 +810,9 @@ function FrontendPreviewCanvas( { canvas }: CanvasProps ) {
 function EditorPreviewCanvas( {
 	canvas,
 	children,
-}: CanvasProps & { children: ReactNode } ) {
+}: CanvasProps & {
+	children: ReactNode;
+} ) {
 	const [ selectedDevice, setSelectedDevice ] =
 		useState< PreviewDevice >( 'desktop' );
 

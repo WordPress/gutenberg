@@ -20,8 +20,8 @@ import { unlock } from '@wordpress/routes-lock-unlock';
 import { getDefaultView } from './view-utils';
 import { useEditNavigationAction } from './actions/edit-navigation';
 import { AddNavigationModal } from './add-navigation';
-import useNavigationStatus from './use-navigation-status';
-import { createUsageField } from './fields/usage';
+import useNavigationLocations from '../navigation/use-navigation-locations';
+import { createLocationsField } from './fields/usage';
 
 /**
  * Style dependencies
@@ -88,18 +88,19 @@ function NavigationList() {
 	const fields = usePostFields( {
 		postType: NAVIGATION_POST_TYPE,
 	} );
-	const { statusMap, isResolving: isResolvingUsage } = useNavigationStatus();
-	const usageField = useMemo(
+	const { locationsMap, isResolving: isResolvingLocations } =
+		useNavigationLocations();
+	const locationsField = useMemo(
 		() =>
-			createUsageField( {
-				statusMap,
-				isResolving: isResolvingUsage,
+			createLocationsField( {
+				locationsMap,
+				isResolving: isResolvingLocations,
 			} ),
-		[ statusMap, isResolvingUsage ]
+		[ locationsMap, isResolvingLocations ]
 	);
 	const navigationFields = useMemo(
-		() => ( fields ? [ ...fields, usageField ] : fields ),
-		[ fields, usageField ]
+		() => ( fields ? [ ...fields, locationsField ] : fields ),
+		[ fields, locationsField ]
 	);
 	const [ showAddModal, setShowAddModal ] = useState( false );
 

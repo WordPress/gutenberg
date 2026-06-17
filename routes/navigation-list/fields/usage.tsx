@@ -4,25 +4,34 @@
 import type { Post } from '@wordpress/core-data';
 import type { Field } from '@wordpress/dataviews';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
-import { __, _n, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { unlock } from '@wordpress/routes-lock-unlock';
+
+/**
+ * Internal dependencies
+ */
+import {
+	type NavigationLocationsMap,
+	getLocationsSummary,
+} from '../../navigation/use-navigation-locations';
 
 const { Badge: WCBadge } = unlock( componentsPrivateApis );
 
 export const NAVIGATION_USAGE_FIELD = 'navigation-usage';
 
-export function createUsageField( {
-	statusMap,
+export function createLocationsField( {
+	locationsMap,
 	isResolving,
 }: {
-	statusMap: Record< number, number >;
+	locationsMap: NavigationLocationsMap;
 	isResolving: boolean;
 } ): Field< Post > {
 	return {
 		id: NAVIGATION_USAGE_FIELD,
-		label: __( 'Usage' ),
+		label: __( 'Shown on site' ),
 		enableSorting: false,
-		getValue: ( { item } ) => statusMap[ item.id ] ?? 0,
+		getValue: ( { item } ) =>
+			getLocationsSummary( locationsMap[ item.id ] ?? [] ),
 		render: function Render( { item } ) {
 			if ( isResolving ) {
 				return (
@@ -30,20 +39,14 @@ export function createUsageField( {
 				);
 			}
 
-			const count = statusMap[ item.id ] ?? 0;
+			const locations = locationsMap[ item.id ] ?? [];
 
-			if ( ! count ) {
-				return <WCBadge intent="default">{ __( 'Inactive' ) }</WCBadge>;
-			}
-
-			return (
+			return locations.length ? (
 				<WCBadge intent="success">
-					{ sprintf(
-						/* translators: %d: Number of locations where this navigation menu is used. */
-						_n( '%d location', '%d locations', count ),
-						count
-					) }
+					{ getLocationsSummary( locations ) }
 				</WCBadge>
+			) : (
+				<WCBadge intent="default">{ __( 'Not shown' ) }</WCBadge>
 			);
 		},
 	};

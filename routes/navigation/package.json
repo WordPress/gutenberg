@@ -7,6 +7,16 @@
 		"page": "site-editor-v2"
 	},
 	"dependencies": {
-		"@wordpress/route": "file:../../packages/route"
+		"@wordpress/blocks": "file:../../packages/blocks",
+		"@wordpress/components": "file:../../packages/components",
+		"@wordpress/core-data": "file:../../packages/core-data",
+		"@wordpress/data": "file:../../packages/data",
+		"@wordpress/element": "file:../../packages/element",
+		"@wordpress/html-entities": "file:../../packages/html-entities",
+		"@wordpress/i18n": "file:../../packages/i18n",
+		"@wordpress/icons": "file:../../packages/icons",
+		"@wordpress/lazy-editor": "file:../../packages/lazy-editor",
+		"@wordpress/route": "file:../../packages/route",
+		"@wordpress/ui": "file:../../packages/ui"
 	}
 }
