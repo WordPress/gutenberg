@@ -25,8 +25,9 @@ const DEFAULT_PLACEMENT: GridTilePlacement = {
  * Generates a unique id and applies default placement. If no initial
  * attributes are provided, falls back to the type's `example.attributes`
  * (matching the `widget.json` schema).
- * @param widgetType
- * @param initialAttributes
+ *
+ * @param widgetType        Source widget type.
+ * @param initialAttributes Initial attributes; default to the type's example.
  */
 export function createDashboardWidget< T >(
 	widgetType: WidgetType,

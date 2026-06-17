@@ -51,8 +51,9 @@ function gridWidthToMasonryWidth(
  * shape. Drops `height` (masonry derives heights from content),
  * preserves `order`, leaves `lane` unset so the auto-flow placer
  * arranges items by source order.
- * @param placement
- * @param context
+ *
+ * @param placement Source grid placement.
+ * @param context   Migration context (column count).
  */
 function migratePlacementGridToMasonry(
 	placement: GridTilePlacement | undefined,
@@ -79,7 +80,8 @@ function migratePlacementGridToMasonry(
  * auto-packs and has no pin-to-column concept), and seeds `height: 1`
  * since masonry never persisted a height. The user is expected to
  * resize tiles vertically after the migration.
- * @param placement
+ *
+ * @param placement Source masonry placement.
  */
 function migratePlacementMasonryToGrid(
 	placement: MasonryTilePlacement | undefined
