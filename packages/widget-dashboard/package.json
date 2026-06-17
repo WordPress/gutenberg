@@ -77,6 +77,11 @@
 		"react": "^18.0.0",
 		"react-dom": "^18.0.0"
 	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
+	},
 	"publishConfig": {
 		"access": "public"
 	}
