@@ -27,7 +27,7 @@ import {
 	getSelectedBlockStyleState,
 	hasSelectedStyleState,
 	isSelectedBlockStyleStateShownOnCanvas,
-	hasBlockListViewSupport,
+	shouldRenderBlockListView,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
 import { deviceTypeKey } from '../private-keys';
@@ -76,7 +76,7 @@ describe( 'private selectors', () => {
 		} );
 	} );
 
-	describe( 'hasBlockListViewSupport', () => {
+	describe( 'shouldRenderBlockListView', () => {
 		const blockWithListViewSupport = 'core/test-list-view-support';
 		const blockWithoutListViewSupport = 'core/test-no-list-view-support';
 
@@ -125,7 +125,9 @@ describe( 'private selectors', () => {
 		it( 'returns true for blocks with list view support', () => {
 			const state = createState( blockWithListViewSupport );
 
-			expect( hasBlockListViewSupport( state, 'client-1' ) ).toBe( true );
+			expect( shouldRenderBlockListView( state, 'client-1' ) ).toBe(
+				true
+			);
 		} );
 
 		it( 'returns false when empty and insertion is disallowed via `allowedBlocks: []`', () => {
@@ -133,7 +135,7 @@ describe( 'private selectors', () => {
 				allowedBlocks: [],
 			} );
 
-			expect( hasBlockListViewSupport( state, 'client-1' ) ).toBe(
+			expect( shouldRenderBlockListView( state, 'client-1' ) ).toBe(
 				false
 			);
 		} );
@@ -143,7 +145,7 @@ describe( 'private selectors', () => {
 				allowedBlocks: false,
 			} );
 
-			expect( hasBlockListViewSupport( state, 'client-1' ) ).toBe(
+			expect( shouldRenderBlockListView( state, 'client-1' ) ).toBe(
 				false
 			);
 		} );
@@ -155,13 +157,17 @@ describe( 'private selectors', () => {
 				allowedBlocks: [ 'core/image' ],
 			} );
 
-			expect( hasBlockListViewSupport( state, 'client-1' ) ).toBe( true );
+			expect( shouldRenderBlockListView( state, 'client-1' ) ).toBe(
+				true
+			);
 		} );
 
 		it( 'returns true when empty with no allowedBlocks restriction', () => {
 			const state = createState( blockWithListViewSupport );
 
-			expect( hasBlockListViewSupport( state, 'client-1' ) ).toBe( true );
+			expect( shouldRenderBlockListView( state, 'client-1' ) ).toBe(
+				true
+			);
 		} );
 
 		it( 'returns true when insertion is disallowed but the block still has inner blocks', () => {
@@ -170,7 +176,9 @@ describe( 'private selectors', () => {
 				innerBlocks: [ 'child-1' ],
 			} );
 
-			expect( hasBlockListViewSupport( state, 'client-1' ) ).toBe( true );
+			expect( shouldRenderBlockListView( state, 'client-1' ) ).toBe(
+				true
+			);
 		} );
 
 		it( 'does not grant list view support to unsupported block types', () => {
@@ -178,7 +186,7 @@ describe( 'private selectors', () => {
 				allowedBlocks: [],
 			} );
 
-			expect( hasBlockListViewSupport( state, 'client-1' ) ).toBe(
+			expect( shouldRenderBlockListView( state, 'client-1' ) ).toBe(
 				false
 			);
 		} );
@@ -186,7 +194,22 @@ describe( 'private selectors', () => {
 		it( 'preserves the navigation block special case', () => {
 			const state = createState( 'core/navigation' );
 
-			expect( hasBlockListViewSupport( state, 'client-1' ) ).toBe( true );
+			expect( shouldRenderBlockListView( state, 'client-1' ) ).toBe(
+				true
+			);
+		} );
+
+		it( 'keeps navigation in list view even when empty and insertion is disallowed', () => {
+			// The navigation special case takes precedence over the
+			// `allowedBlocks` exclusion: even with nothing to show and no
+			// insertion allowed, navigation still participates in List View.
+			const state = createState( 'core/navigation', {
+				allowedBlocks: [],
+			} );
+
+			expect( shouldRenderBlockListView( state, 'client-1' ) ).toBe(
+				true
+			);
 		} );
 	} );
 

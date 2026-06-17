@@ -208,7 +208,7 @@ function BlockInspector() {
 			const {
 				getClientIdsOfDescendants,
 				getBlockEditingMode,
-				hasBlockListViewSupport,
+				shouldRenderBlockListView,
 			} = unlock( select( blockEditorStore ) );
 
 			const descendants = getClientIdsOfDescendants(
@@ -219,7 +219,7 @@ function BlockInspector() {
 			// List View tab.
 			const listViewDescendants = new Set();
 			descendants.forEach( ( clientId ) => {
-				if ( hasBlockListViewSupport( clientId ) ) {
+				if ( shouldRenderBlockListView( clientId ) ) {
 					const listViewChildren =
 						getClientIdsOfDescendants( clientId );
 					listViewChildren.forEach( ( childId ) =>

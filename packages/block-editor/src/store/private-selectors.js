@@ -1097,7 +1097,7 @@ export function getListViewExpandRevision( state ) {
  *
  * @return {boolean} Whether the block participates in List View-specific UI.
  */
-export function hasBlockListViewSupport( state, clientId ) {
+export function shouldRenderBlockListView( state, clientId ) {
 	const blockName = getBlockName( state, clientId );
 
 	// The navigation block always participates; its List View is core to how it

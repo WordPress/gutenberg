@@ -110,13 +110,13 @@ function BlockCard( {
 			if ( parentClientId || isChild || ! allowParentNavigation ) {
 				return {};
 			}
-			const { getBlockParents, getBlockName, hasBlockListViewSupport } =
+			const { getBlockParents, getBlockName, shouldRenderBlockListView } =
 				unlock( select( blockEditorStore ) );
 
 			// Find the top-most parent block that participates in List View.
 			const parents = getBlockParents( clientId, false );
 			const foundParentId = parents.find( ( parentId ) =>
-				hasBlockListViewSupport( parentId )
+				shouldRenderBlockListView( parentId )
 			);
 
 			return {

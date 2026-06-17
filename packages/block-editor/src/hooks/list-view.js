@@ -52,8 +52,11 @@ export function ListViewPanel( { clientId, name } ) {
 
 	const { isEnabled, hasChildren, isNestedListView } = useSelect(
 		( select ) => {
-			const { getBlockCount, getBlockParents, hasBlockListViewSupport } =
-				unlock( select( blockEditorStore ) );
+			const {
+				getBlockCount,
+				getBlockParents,
+				shouldRenderBlockListView,
+			} = unlock( select( blockEditorStore ) );
 
 			// Avoid showing List Views for both parent and child blocks that have support.
 			// In this situation the parent will show the child in its list already.
@@ -61,11 +64,11 @@ export function ListViewPanel( { clientId, name } ) {
 			// This matches closely the logic in the `BlockCard` component.
 			const parents = getBlockParents( clientId, false );
 			const _isNestedListView = parents.find( ( parentId ) =>
-				hasBlockListViewSupport( parentId )
+				shouldRenderBlockListView( parentId )
 			);
 
 			return {
-				isEnabled: hasBlockListViewSupport( clientId ),
+				isEnabled: shouldRenderBlockListView( clientId ),
 				hasChildren: !! getBlockCount( clientId ),
 				isNestedListView: _isNestedListView,
 			};

@@ -53,7 +53,7 @@ function BlockQuickNavigationItem( {
 	hasListViewTab,
 } ) {
 	const blockInformation = useBlockDisplayInformation( clientId );
-	const { isSelected, childBlocks, hasListViewSupport, blockName } =
+	const { isSelected, childBlocks, shouldRenderListView, blockName } =
 		useSelect(
 			( select ) => {
 				const {
@@ -61,7 +61,7 @@ function BlockQuickNavigationItem( {
 					hasSelectedInnerBlock,
 					getBlockOrder,
 					getBlockName,
-					hasBlockListViewSupport,
+					shouldRenderBlockListView,
 				} = unlock( select( blockEditorStore ) );
 
 				const _blockName = getBlockName( clientId );
@@ -71,7 +71,7 @@ function BlockQuickNavigationItem( {
 						isBlockSelected( clientId ) ||
 						hasSelectedInnerBlock( clientId, /* deep: */ true ),
 					childBlocks: getBlockOrder( clientId ),
-					hasListViewSupport: hasBlockListViewSupport( clientId ),
+					shouldRenderListView: shouldRenderBlockListView( clientId ),
 					blockName: _blockName,
 				};
 			},
@@ -88,7 +88,7 @@ function BlockQuickNavigationItem( {
 
 	const hasChildren = childBlocks && childBlocks.length > 0;
 	const canNavigateToListView =
-		hasChildren && hasListViewTab && hasListViewSupport;
+		hasChildren && hasListViewTab && shouldRenderListView;
 
 	return (
 		<Button
