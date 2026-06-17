@@ -175,6 +175,34 @@ test.describe( 'Guidelines', () => {
 		).toHaveValue( imagesText );
 	} );
 
+	test( 'edits a scope guideline after a reload', async ( {
+		page,
+		admin,
+	} ) => {
+		await admin.visitAdminPage( SETTINGS_PAGE_PATH, GUIDELINES_PAGE_QUERY );
+		await expect( getSectionCard( page, 'Copy' ) ).toBeVisible();
+
+		// Create the row in this session.
+		await saveSectionGuidelines( page, 'Copy', 'First version.' );
+
+		// Reload so the row is only available from the collection request
+		// (edit context via the entity's baseURLParams). Editing it must still
+		// work — a regression guard for reading the wrong cache bucket.
+		await page.reload();
+		await expect( getSectionCard( page, 'Copy' ) ).toBeVisible();
+
+		await saveSectionGuidelines( page, 'Copy', 'Second version.' );
+
+		await page.reload();
+		const copyCard = getSectionCard( page, 'Copy' );
+		await copyCard
+			.getByRole( 'button', { name: 'Copy', exact: true } )
+			.click();
+		await expect(
+			copyCard.getByRole( 'textbox', { name: 'Copy guidelines' } )
+		).toHaveValue( 'Second version.' );
+	} );
+
 	test( 'clears a scope guideline', async ( { page, admin } ) => {
 		await admin.visitAdminPage( SETTINGS_PAGE_PATH, GUIDELINES_PAGE_QUERY );
 		await expect( getSectionCard( page, 'Copy' ) ).toBeVisible();

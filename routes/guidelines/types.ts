@@ -33,11 +33,17 @@ export interface ContentBlock {
 
 /**
  * The collection query used to read guideline rows by slug.
+ *
+ * Note: no `context` is set here on purpose. The `wp_knowledge` (postType)
+ * entity already fetches with `context: 'edit'` via its `baseURLParams`, so the
+ * response includes raw field values. Passing `context: 'edit'` in the query
+ * instead would store rows under the `edit` cache bucket, where
+ * `editEntityRecord`/`getRawEntityRecord` (which read the `default` bucket)
+ * can't find them — breaking edits of rows loaded after a page refresh.
  */
 export interface GuidelineQuery {
 	slug: string[];
 	status: string[];
-	context: string;
 	per_page: number;
 }
 

@@ -79,7 +79,7 @@ interface GuidelineData {
  * slug-filtered collection request, indexed by slug.
  */
 export function useGuidelineData(): GuidelineData {
-	const { records: scopeRecords, isResolving: scopesResolving } =
+	const { records: scopeRecords, hasResolved: scopesResolved } =
 		useEntityRecords( 'root', 'guidelineScope' );
 
 	const contentBlocks = useContentBlocks();
@@ -109,14 +109,16 @@ export function useGuidelineData(): GuidelineData {
 		() => ( {
 			slug: slugs,
 			status: [ 'publish', 'draft' ],
-			context: 'edit',
 			per_page: -1,
 		} ),
 		[ slugs ]
 	);
 
-	const { records: rowRecords, isResolving: rowsResolving } =
-		useEntityRecords( KNOWLEDGE_KIND, KNOWLEDGE_NAME, query );
+	const { records: rowRecords, hasResolved: rowsResolved } = useEntityRecords(
+		KNOWLEDGE_KIND,
+		KNOWLEDGE_NAME,
+		query
+	);
 
 	const bySlug = useMemo( () => {
 		const map: Record< string, GuidelineRow > = {};
@@ -134,7 +136,10 @@ export function useGuidelineData(): GuidelineData {
 		contentBlocks,
 		bySlug,
 		query,
-		isLoading: scopesResolving || rowsResolving,
+		// Use hasResolved (not isResolving): isResolving is briefly false before
+		// the rows query starts, which would let the page render with empty
+		// content and clobber freshly-typed text once the rows arrive.
+		isLoading: ! scopesResolved || ! rowsResolved,
 	};
 }
 
@@ -172,7 +177,6 @@ export async function saveGuidelineRow(
 			KNOWLEDGE_KIND,
 			KNOWLEDGE_NAME,
 			existingId,
-			undefined,
 			{ throwOnError: true }
 		);
 		return;
