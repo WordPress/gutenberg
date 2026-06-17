@@ -23,6 +23,7 @@ export {
 	SUGGESTION_TYPE_DELETION,
 	SUGGESTION_TYPE_ADDITION,
 	suggestionFormat,
+	registerSuggestionFormat,
 	findSuggestionRange,
 } from './format';
 export { useAnnotateSuggestions } from './use-annotate-suggestions';
