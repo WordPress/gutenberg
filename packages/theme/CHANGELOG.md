@@ -20,7 +20,7 @@
 
 ### Enhancements
 
--   Tweak `--wpds-color-fg-interactive-brand-active` and `--wpds-color-fg-interactive-error-active` to differentiate them from the non-`active` counterparts ([#79151](https://github.com/WordPress/gutenberg/pull/79151)).
+-   Tweak `--wpds-color-foreground-interactive-brand-active` and `--wpds-color-foreground-interactive-error-active` to differentiate them from the non-`active` counterparts ([#79151](https://github.com/WordPress/gutenberg/pull/79151)).
 
 ### Bug Fixes
 
