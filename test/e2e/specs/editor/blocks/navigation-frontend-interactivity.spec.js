@@ -577,11 +577,8 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 					.filter( { has: page.locator( 'text="Products"' ) } )
 					.first();
 
-				// The legacy setting is no longer applied to render behavior.
-				await expect( submenuItem ).not.toHaveClass( /open-on-click/ );
-				await expect( submenuItem ).toHaveClass(
-					/open-on-hover-click/
-				);
+				// The legacy setting maps to the constrained submenu behavior.
+				await expect( submenuItem ).toHaveClass( /open-on-click/ );
 			} );
 
 			await test.step( 'Load in editor - migration runs in memory only', async () => {
@@ -635,6 +632,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 				expect( content ).not.toContain( 'submenuVisibility' );
 				expect( content ).not.toContain( 'showSubmenuIcon' );
 				expect( content ).not.toContain( 'openSubmenusOnClick' );
+				expect( content ).toContain( 'submenuBehavior' );
 			} );
 
 			await test.step( 'Verify frontend still works after migration', async () => {
@@ -646,11 +644,8 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 					.filter( { has: page.locator( 'text="Products"' ) } )
 					.first();
 
-				// Should use the derived horizontal submenu behavior after migration.
-				await expect( submenuItem ).not.toHaveClass( /open-on-click/ );
-				await expect( submenuItem ).toHaveClass(
-					/open-on-hover-click/
-				);
+				// Should use the constrained click submenu behavior after migration.
+				await expect( submenuItem ).toHaveClass( /open-on-click/ );
 			} );
 		} );
 

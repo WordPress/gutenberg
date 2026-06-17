@@ -51,6 +51,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `backgroundColor` | `string` | — | — |
 | `customBackgroundColor` | `string` | — | — |
 | `rgbBackgroundColor` | `string` | — | — |
+| `submenuBehavior` | `string` | `"hover"` | [Enum](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `hover`, `click` |
 | `overlayMenu` | `string` | `"mobile"` | — |
 | `overlay` | `string` | — | — |
 | `icon` | `string` | `"handle"` | — |

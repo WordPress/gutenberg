@@ -242,17 +242,17 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
 	 * Test migration behavior for blocks saved with obsolete submenu attributes.
 	 *
 	 * This test verifies that navigation blocks saved with old submenu attributes
-	 * render with the derived horizontal submenu behavior.
+	 * render with the constrained submenu behavior.
 	 *
 	 * @group submenu-backward-compatibility
 	 * @covers ::gutenberg_render_block_core_navigation_submenu
 	 */
-	public function test_should_ignore_legacy_open_submenus_on_click_attribute() {
+	public function test_should_migrate_legacy_open_submenus_on_click_attribute() {
 		$page_id = self::$page->ID;
 
 		// Test the full rendering pipeline with a Navigation block containing a submenu.
-		// The Navigation block has obsolete submenu attributes that should no longer
-		// influence the derived submenu context passed from parent to child.
+		// The Navigation block has obsolete submenu attributes that should map to
+		// the constrained submenu context passed from parent to child.
 		$markup = '<!-- wp:navigation {"openSubmenusOnClick":true,"showSubmenuIcon":false,"submenuVisibility":"always","overlayMenu":"never"} -->
 <!-- wp:navigation-submenu {"label":"Submenu Label","type":"page","id":' . $page_id . ',"url":"http://localhost:8888/?page_id=' . $page_id . '","kind":"post-type"} -->
 <!-- wp:navigation-link {"label":"Submenu Item","type":"page","id":' . $page_id . ',"url":"http://localhost:8888/?page_id=' . $page_id . '","kind":"post-type"} /-->
@@ -261,18 +261,10 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
 
 		$rendered_html = do_blocks( $markup );
 
-		// The obsolete attribute should not force click-only submenu behavior.
-		$this->assertStringNotContainsString(
+		$this->assertStringContainsString(
 			'open-on-click',
 			$rendered_html,
-			'Submenu should not apply "open-on-click" class for blocks saved with obsolete submenu attributes'
-		);
-
-		// Horizontal navigation derives the hover-and-click submenu behavior.
-		$this->assertStringContainsString(
-			'open-on-hover-click',
-			$rendered_html,
-			'Submenu should have "open-on-hover-click" class when rendering derived horizontal submenu behavior'
+			'Submenu should apply "open-on-click" class for blocks saved with legacy click submenu behavior'
 		);
 	}
 }

@@ -46,14 +46,23 @@ const migrateWithLayout = ( attributes ) => {
 	return updatedAttributes;
 };
 
-const stripObsoleteSubmenuAttributes = ( {
+const migrateSubmenuAttributes = ( {
 	openSubmenusOnClick,
 	showSubmenuIcon,
 	submenuVisibility,
 	...attributes
-} ) => attributes;
+} ) => {
+	if ( openSubmenusOnClick === true || submenuVisibility === 'click' ) {
+		return {
+			...attributes,
+			submenuBehavior: 'click',
+		};
+	}
 
-// v7: Remove stored submenu behavior attributes.
+	return attributes;
+};
+
+// v7: Replace independent submenu behavior attributes with a constrained setting.
 const v7 = {
 	attributes: {
 		ref: {
@@ -175,7 +184,7 @@ const v7 = {
 		( openSubmenusOnClick !== null && openSubmenusOnClick !== undefined ) ||
 		( showSubmenuIcon !== null && showSubmenuIcon !== undefined ) ||
 		( submenuVisibility !== null && submenuVisibility !== undefined ),
-	migrate: stripObsoleteSubmenuAttributes,
+	migrate: migrateSubmenuAttributes,
 };
 
 const v6 = {
@@ -261,7 +270,7 @@ const v6 = {
 		return <InnerBlocks.Content />;
 	},
 	isEligible: ( { navigationMenuId } ) => !! navigationMenuId,
-	migrate: compose( migrateIdToRef, stripObsoleteSubmenuAttributes ),
+	migrate: compose( migrateIdToRef, migrateSubmenuAttributes ),
 };
 
 const v5 = {
@@ -355,7 +364,7 @@ const v5 = {
 	migrate: compose(
 		migrateIdToRef,
 		migrateWithLayout,
-		stripObsoleteSubmenuAttributes
+		migrateSubmenuAttributes
 	),
 };
 
@@ -443,7 +452,7 @@ const v4 = {
 		migrateIdToRef,
 		migrateWithLayout,
 		migrateFontFamily,
-		stripObsoleteSubmenuAttributes
+		migrateSubmenuAttributes
 	),
 	isEligible( { style } ) {
 		return style?.typography?.fontFamily;
@@ -569,7 +578,7 @@ const deprecated = [
 			migrateWithLayout,
 			migrateFontFamily,
 			migrateIsResponsive,
-			stripObsoleteSubmenuAttributes
+			migrateSubmenuAttributes
 		),
 		save() {
 			return <InnerBlocks.Content />;
@@ -645,7 +654,7 @@ const deprecated = [
 			migrateWithLayout,
 			migrateFontFamily,
 			migrateTypographyPresets,
-			stripObsoleteSubmenuAttributes
+			migrateSubmenuAttributes
 		),
 	},
 	{
@@ -689,7 +698,7 @@ const deprecated = [
 		},
 		migrate: compose(
 			migrateIdToRef,
-			stripObsoleteSubmenuAttributes,
+			migrateSubmenuAttributes,
 			( attributes ) => {
 				const { rgbTextColor, rgbBackgroundColor, ...restAttributes } =
 					attributes;

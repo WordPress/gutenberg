@@ -43,6 +43,11 @@
 		"rgbBackgroundColor": {
 			"type": "string"
 		},
+		"submenuBehavior": {
+			"type": "string",
+			"enum": [ "hover", "click" ],
+			"default": "hover"
+		},
 		"overlayMenu": {
 			"type": "string",
 			"default": "mobile"

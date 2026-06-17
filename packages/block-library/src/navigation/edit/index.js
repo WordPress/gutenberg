@@ -30,7 +30,15 @@ import {
 	useEntityRecords,
 } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { Spinner, ToolbarButton, ToolbarGroup } from '@wordpress/components';
+import {
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	Spinner,
+	ToolbarButton,
+	ToolbarGroup,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { page } from '@wordpress/icons';
@@ -64,6 +72,7 @@ import DeletedNavigationWarning from './deleted-navigation-warning';
 import AccessibleDescription from './accessible-description';
 import AccessibleMenuDescription from './accessible-menu-description';
 import { unlock } from '../../lock-unlock';
+import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { isWithinNavigationOverlay } from '../../utils/is-within-overlay';
 import {
 	DEFAULT_BLOCK,
@@ -257,6 +266,7 @@ function Navigation( {
 	const {
 		overlayMenu,
 		overlay,
+		submenuBehavior = 'hover',
 		templateLock,
 		layout: {
 			justifyContent,
@@ -347,12 +357,56 @@ function Navigation( {
 		hasUncontrolledInnerBlocks,
 		uncontrolledInnerBlocks,
 		isInnerBlockSelected,
+		innerBlocks,
 	} = useInnerBlocks( clientId );
+
+	// Use a ref to store whether we've confirmed a page-list has submenus.
+	// Once confirmed, we don't need to keep checking the page-list blocks.
+	const hasPageListWithSubmenuRef = useRef( false );
+
+	// Check for submenus using getBlocks to include controlled innerBlocks.
+	const hasSubmenus = useSelect(
+		( select ) => {
+			// First check for navigation-submenu (fast, no selector needed).
+			const hasNavigationSubmenu = innerBlocks.some(
+				( block ) => block.name === 'core/navigation-submenu'
+			);
+			if ( hasNavigationSubmenu ) {
+				return true;
+			}
+
+			// Only check page-list if we didn't find a submenu already.
+			const pageList = innerBlocks.find(
+				( block ) => block.name === 'core/page-list'
+			);
+			if ( ! pageList ) {
+				hasPageListWithSubmenuRef.current = false;
+				return false;
+			}
+
+			// If we've already confirmed page-list has submenus, return early.
+			if ( hasPageListWithSubmenuRef.current ) {
+				return true;
+			}
+
+			// Check if the page-list has controlled innerBlocks.
+			const { getBlocks } = select( blockEditorStore );
+			const pageListBlocks = getBlocks( pageList.clientId );
+			if ( pageListBlocks.length > 0 ) {
+				hasPageListWithSubmenuRef.current = true;
+				return true;
+			}
+
+			// No pageList returned with confirmed submenus, so assume it will not have submenus.
+			return false;
+		},
+		[ innerBlocks ]
+	);
 
 	const {
 		submenuVisibility: effectiveSubmenuVisibility,
 		showSubmenuIcon: effectiveShowSubmenuIcon,
-	} = getEffectiveSubmenuSettings( { orientation } );
+	} = getEffectiveSubmenuSettings( { orientation, submenuBehavior } );
 
 	// Check if any overlay template parts exist
 	const { records: overlayTemplateParts } = useEntityRecords(
@@ -694,8 +748,61 @@ function Navigation( {
 		`overlay-menu-preview`
 	);
 
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
 	const stylingInspectorControls = (
 		<>
+			<InspectorControls>
+				{ hasSubmenus && orientation !== 'vertical' && (
+					<ToolsPanel
+						label={ __( 'Display' ) }
+						resetAll={ () => {
+							setAttributes( {
+								submenuBehavior: 'hover',
+								overlayMenu: 'mobile',
+								hasIcon: true,
+								icon: 'handle',
+							} );
+						} }
+						dropdownMenuProps={ dropdownMenuProps }
+					>
+						<h3 className="wp-block-navigation__submenu-header">
+							{ __( 'Submenus' ) }
+						</h3>
+						<ToolsPanelItem
+							hasValue={ () => submenuBehavior !== 'hover' }
+							label={ __( 'Submenu opening' ) }
+							onDeselect={ () =>
+								setAttributes( {
+									submenuBehavior: 'hover',
+								} )
+							}
+							isShownByDefault
+						>
+							<ToggleGroupControl
+								__next40pxDefaultSize
+								label={ __( 'Submenu opening' ) }
+								value={ submenuBehavior }
+								onChange={ ( value ) => {
+									setAttributes( {
+										submenuBehavior: value,
+									} );
+								} }
+								isBlock
+							>
+								<ToggleGroupControlOption
+									value="hover"
+									label={ __( 'Hover' ) }
+								/>
+								<ToggleGroupControlOption
+									value="click"
+									label={ __( 'Click' ) }
+								/>
+							</ToggleGroupControl>
+						</ToolsPanelItem>
+					</ToolsPanel>
+				) }
+			</InspectorControls>
 			{ ! isWithinOverlay && (
 				<InspectorControls>
 					<OverlayPanel
@@ -998,11 +1105,18 @@ export default withColors(
 	{ overlayTextColor: 'color' }
 )( Navigation );
 
-function getEffectiveSubmenuSettings( { orientation } ) {
+function getEffectiveSubmenuSettings( { orientation, submenuBehavior } ) {
 	if ( orientation === 'vertical' ) {
 		return {
 			submenuVisibility: 'always',
 			showSubmenuIcon: false,
+		};
+	}
+
+	if ( submenuBehavior === 'click' ) {
+		return {
+			submenuVisibility: 'click',
+			showSubmenuIcon: true,
 		};
 	}
 

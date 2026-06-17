@@ -4,6 +4,7 @@
 		"isValid": true,
 		"attributes": {
 			"overlayMenu": "mobile",
+			"submenuBehavior": "click",
 			"icon": "handle",
 			"hasIcon": true,
 			"maxNestingLevel": 5

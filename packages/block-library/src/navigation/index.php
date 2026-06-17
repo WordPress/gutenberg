@@ -6,11 +6,13 @@
  */
 
 /**
- * Returns navigation attributes with submenu render context derived from layout.
+ * Returns navigation attributes with submenu render context derived from layout
+ * and the constrained submenu behavior setting.
  *
- * Submenu behavior is no longer stored on the Navigation block. Horizontal
- * menus render hover-open submenus with indicators; vertical menus render
- * always-open submenus without indicators.
+ * The Navigation block no longer stores submenu visibility and icon settings as
+ * independent attributes. Horizontal menus can choose hover or click behavior,
+ * both with indicators; vertical menus render always-open submenus without
+ * indicators.
  *
  * @since 6.9.0
  *
@@ -18,11 +20,22 @@
  * @return array Attributes to use for render behavior and block context.
  */
 function block_core_navigation_get_effective_submenu_attributes( $attributes ) {
-	$orientation = $attributes['layout']['orientation'] ?? 'horizontal';
+	$orientation      = $attributes['layout']['orientation'] ?? 'horizontal';
+	$submenu_behavior = $attributes['submenuBehavior'] ?? null;
+
+	if ( null === $submenu_behavior ) {
+		$submenu_behavior = (
+			! empty( $attributes['openSubmenusOnClick'] ) ||
+			'click' === ( $attributes['submenuVisibility'] ?? null )
+		) ? 'click' : 'hover';
+	}
 
 	if ( 'vertical' === $orientation ) {
 		$attributes['submenuVisibility'] = 'always';
 		$attributes['showSubmenuIcon']   = false;
+	} elseif ( 'click' === $submenu_behavior ) {
+		$attributes['submenuVisibility'] = 'click';
+		$attributes['showSubmenuIcon']   = true;
 	} else {
 		$attributes['submenuVisibility'] = 'hover';
 		$attributes['showSubmenuIcon']   = true;
