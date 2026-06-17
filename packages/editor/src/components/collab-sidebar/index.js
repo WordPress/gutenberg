@@ -2,18 +2,15 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { select as dataSelect, useDispatch, useSelect } from '@wordpress/data';
-import { useRef } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { useEffect, useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
-import {
-	registerFormatType,
-	store as richTextStore,
-} from '@wordpress/rich-text';
+import { registerFormatType, unregisterFormatType } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -41,13 +38,17 @@ import { NOTE_FORMAT_NAME, noteFormat } from './format';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
 
-// Guard against repeated module evaluation under HMR; `registerFormatType`
-// warns when the same name is registered twice.
-if ( ! dataSelect( richTextStore ).getFormatType( NOTE_FORMAT_NAME ) ) {
-	registerFormatType( NOTE_FORMAT_NAME, noteFormat );
-}
-
 function NotesSidebar( { postId } ) {
+	// Register the inline-note format for as long as the notes feature is
+	// mounted, mirroring how revision diff formats are registered. The cleanup
+	// unregisters it, so there's no need to guard against double registration.
+	useEffect( () => {
+		registerFormatType( NOTE_FORMAT_NAME, noteFormat );
+		return () => {
+			unregisterFormatType( NOTE_FORMAT_NAME );
+		};
+	}, [] );
+
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const { toggleBlockSpotlight, selectBlock } = unlock(
