@@ -311,7 +311,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 		 * constraints (similar structure to this array) is proposed to improve
 		 * HTML/SVG sanitization in the future.
 		 *
-		 * @see https://github.com/dmsnell/wordpress-develop/pull/20
+		 * @link https://github.com/dmsnell/wordpress-develop/pull/20
 		 */
 		$allowed_tags = array(
 			// Root SVG element.
