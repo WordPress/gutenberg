@@ -609,7 +609,7 @@ _Returns_
 
 ### useWarnOnChange
 
-Hook that performs a shallow comparison between the preview value of an object and the new one, if there's a difference, it prints it to the console. this is useful in performance related work, to check why a component re-renders.
+Hook that performs a shallow comparison between the previous value of an object and the new one, if there's a difference, it prints it to the console. This is useful in performance related work, to check why a component re-renders.
 
 _Usage_
 
