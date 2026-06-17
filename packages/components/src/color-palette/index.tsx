@@ -232,6 +232,7 @@ function UnforwardedColorPalette(
 		__experimentalIsRenderedInSidebar = false,
 		headingLevel = 2,
 		[ colorEditingKey ]: colorEditing,
+		hasColorsToChoose,
 		'aria-label': ariaLabel,
 		'aria-labelledby': ariaLabelledby,
 		...additionalProps

@@ -177,4 +177,10 @@ export type ColorPaletteProps = Pick<
 
 export type ColorPaletteInternalProps = ColorPaletteProps & {
 	[ K in ColorEditingPropKey ]?: ColorEditingProps;
+} & {
+	/**
+	 * Legacy prop forwarded by some consumers.
+	 * It is destructured only so it isn't spread onto the root element.
+	 */
+	hasColorsToChoose?: boolean;
 };
