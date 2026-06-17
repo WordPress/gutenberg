@@ -12,8 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 require_once __DIR__ . '/knowledge.php';
 require_once __DIR__ . '/class-gutenberg-knowledge-post-type.php';
 require_once __DIR__ . '/class-gutenberg-knowledge-rest-controller.php';
-require_once __DIR__ . '/class-gutenberg-content-guidelines-revisions-controller.php';
-require_once __DIR__ . '/class-gutenberg-content-guidelines-rest-controller.php';
+require_once __DIR__ . '/class-gutenberg-guideline-scopes-rest-controller.php';
 
 /*
  * Register the knowledge post type.
@@ -27,9 +26,8 @@ add_action( 'init', array( 'Gutenberg_Knowledge_Post_Type', 'register' ) );
  * Ensure the post type is registered before any other `rest_api_init` callback
  * runs. `init` normally fires before `rest_api_init`, but anything that calls
  * `rest_get_server()` early (e.g. from `plugins_loaded`) fires `rest_api_init`
- * before `init` priority 10. The callbacks below — both `register_post_meta`
- * and the controller instantiations — dereference the post type object and
- * would fatal (or trip `_doing_it_wrong`) without this guard.
+ * before `init` priority 10. The callback below dereferences the post type
+ * object and would fatal (or trip `_doing_it_wrong`) without this guard.
  */
 add_action(
 	'rest_api_init',
@@ -41,23 +39,17 @@ add_action(
 	1
 );
 
-// Register post meta once the REST API loads and the block registry is available.
-add_action( 'rest_api_init', array( 'Gutenberg_Knowledge_Post_Type', 'register_post_meta' ) );
-
 /*
- * Register content singleton routes beside the standard CPT routes.
- * The singleton rule is scoped to /wp/v2/content-guidelines for UI handling.
- * The standard /wp/v2/knowledge route keeps default post handling for every
- * `wp_knowledge` post. If `guideline` becomes a data level singleton, add
- * enforcement to the default CPT route too.
+ * Register the read-only guideline scopes registry route beside the standard
+ * CPT routes. Guideline data itself is read and written through the standard
+ * /wp/v2/knowledge collection; scope rows are identified by the `guideline-`
+ * slug prefix and the `guideline` knowledge type (see the reservation guard in
+ * knowledge.php).
  */
 add_action(
 	'rest_api_init',
 	static function () {
-		$content_controller = new Gutenberg_Content_Guidelines_REST_Controller();
-		$content_controller->register_routes();
-
-		$content_revisions_controller = new Gutenberg_Content_Guidelines_Revisions_Controller();
-		$content_revisions_controller->register_routes();
+		$scopes_controller = new Gutenberg_Guideline_Scopes_REST_Controller();
+		$scopes_controller->register_routes();
 	}
 );

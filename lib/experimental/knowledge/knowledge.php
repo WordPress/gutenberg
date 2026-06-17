@@ -9,6 +9,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Maximum length, in characters, of a guideline row's content.
+ */
+if ( ! defined( 'GUTENBERG_GUIDELINE_MAX_LENGTH' ) ) {
+	define( 'GUTENBERG_GUIDELINE_MAX_LENGTH', 5000 );
+}
+
 if ( ! function_exists( 'wp_knowledge_types' ) ) {
 	/**
 	 * Returns the registered knowledge types keyed by slug.
@@ -58,13 +65,105 @@ if ( ! function_exists( 'wp_knowledge_types' ) ) {
 	}
 }
 
+if ( ! function_exists( 'wp_guideline_scopes' ) ) {
+	/**
+	 * Returns the registered guideline scopes keyed by slug.
+	 *
+	 * Scopes are the sections shown on the Settings → Guidelines page. Each
+	 * scope is backed by at most one `guideline`-typed `wp_knowledge` row whose
+	 * slug is `guideline-{scope}`. Plugins can register their own scopes via the
+	 * `wp_guideline_scopes` filter and the Settings page grows a section
+	 * automatically. The registry carries identity and presentation only; rows
+	 * are created on first save.
+	 *
+	 * @return array {
+	 *     Slug-keyed map of guideline scopes.
+	 *
+	 *     @type array ...$0 {
+	 *         Data for a single scope.
+	 *
+	 *         @type string $title       Human-readable section title.
+	 *         @type string $description Human-readable section description.
+	 *         @type int    $order       Sort order on the Settings page.
+	 *     }
+	 * }
+	 * @phpstan-return array<string, array{title: string, description: string, order: int}>
+	 */
+	function wp_guideline_scopes(): array {
+		/**
+		 * Filters the guideline scopes available on this site.
+		 *
+		 * @param array $scopes Slug-keyed map of guideline scopes.
+		 */
+		return apply_filters(
+			'wp_guideline_scopes',
+			array(
+				'site'       => array(
+					'title'       => __( 'Site', 'gutenberg' ),
+					'description' => __( "Describe your site's purpose, goals, and primary audience.", 'gutenberg' ),
+					'order'       => 10,
+				),
+				'copy'       => array(
+					'title'       => __( 'Copy', 'gutenberg' ),
+					'description' => __( 'Set your writing standards for tone, voice, style, and formatting.', 'gutenberg' ),
+					'order'       => 20,
+				),
+				'images'     => array(
+					'title'       => __( 'Images', 'gutenberg' ),
+					'description' => __( 'Outline your style, dimensions, formats, mood and aesthetic preferences.', 'gutenberg' ),
+					'order'       => 30,
+				),
+				'additional' => array(
+					'title'       => __( 'Additional', 'gutenberg' ),
+					'description' => __( 'Add additional guidelines.', 'gutenberg' ),
+					'order'       => 50,
+				),
+			)
+		);
+	}
+}
+
+if ( ! function_exists( 'wp_knowledge_get_or_create_type_term' ) ) {
+	/**
+	 * Resolve a `wp_knowledge_type` term by slug, creating it lazily.
+	 *
+	 * Created term names are written once in the site locale (via
+	 * `wp_knowledge_maybe_map_term_label`) so they don't vary with whoever
+	 * triggered creation.
+	 *
+	 * @access private
+	 *
+	 * @param string $slug Term slug.
+	 * @return int|null Term ID, or null on failure.
+	 */
+	function wp_knowledge_get_or_create_type_term( string $slug ): ?int {
+		$term = term_exists( $slug, 'wp_knowledge_type' );
+		if ( $term ) {
+			return (int) $term['term_id'];
+		}
+
+		$switched = switch_to_locale( get_locale() );
+		$term     = wp_insert_term( $slug, 'wp_knowledge_type' );
+		if ( $switched ) {
+			restore_previous_locale();
+		}
+
+		if ( is_wp_error( $term ) ) {
+			return null;
+		}
+
+		return (int) $term['term_id'];
+	}
+}
+
 if ( ! function_exists( 'wp_knowledge_ensure_default_type_term' ) ) {
 	/**
 	 * Hook callback for the `save_post_wp_knowledge` action that assigns the
-	 * `note` fallback term when a knowledge post is saved without a type
-	 * term.
+	 * knowledge type term.
 	 *
-	 * Uses `get_the_terms()` so the check is served by the object term cache.
+	 * Rows whose slug begins with `guideline-` are forced onto the `guideline`
+	 * type (the reservation rule: the prefix is reserved for guideline-typed
+	 * rows). Any other row without a type term falls back to `note`.
 	 *
 	 * @access private
 	 *
@@ -75,23 +174,28 @@ if ( ! function_exists( 'wp_knowledge_ensure_default_type_term' ) ) {
 			return;
 		}
 
+		$post = get_post( $post_id );
+		if ( ! $post instanceof WP_Post ) {
+			return;
+		}
+
+		if ( 0 === strpos( $post->post_name, 'guideline-' ) ) {
+			$term_id = wp_knowledge_get_or_create_type_term( 'guideline' );
+			if ( null !== $term_id ) {
+				wp_set_object_terms( $post_id, $term_id, 'wp_knowledge_type' );
+			}
+			return;
+		}
+
 		$terms = get_the_terms( $post_id, 'wp_knowledge_type' );
 		if ( is_wp_error( $terms ) || ! empty( $terms ) ) {
 			return;
 		}
 
-		// Resolve to an ID up front (creating the term on first use):
-		// wp_set_object_terms() interprets strings as names for hierarchical
-		// taxonomies, not slugs.
-		$term = term_exists( 'note', 'wp_knowledge_type' );
-		if ( ! $term ) {
-			$term = wp_insert_term( 'note', 'wp_knowledge_type' );
-			if ( is_wp_error( $term ) ) {
-				return;
-			}
+		$term_id = wp_knowledge_get_or_create_type_term( 'note' );
+		if ( null !== $term_id ) {
+			wp_set_object_terms( $post_id, $term_id, 'wp_knowledge_type' );
 		}
-
-		wp_set_object_terms( $post_id, (int) $term['term_id'], 'wp_knowledge_type' );
 	}
 }
 
@@ -216,5 +320,142 @@ if ( ! function_exists( 'wp_knowledge_maybe_map_term_label' ) ) {
 		}
 
 		return $data;
+	}
+}
+
+if ( ! function_exists( 'wp_guideline_scope_from_slug' ) ) {
+	/**
+	 * Resolve a registry scope key from a guideline row slug.
+	 *
+	 * Returns the scope key for `guideline-{scope}` slugs that match a
+	 * registered scope, or null for block rows (`guideline-block-*`) and
+	 * unknown scopes.
+	 *
+	 * @access private
+	 *
+	 * @param string $slug Post slug.
+	 * @return string|null Scope key, or null if not a registry scope.
+	 */
+	function wp_guideline_scope_from_slug( string $slug ): ?string {
+		if ( 0 !== strpos( $slug, 'guideline-' ) || 0 === strpos( $slug, 'guideline-block-' ) ) {
+			return null;
+		}
+
+		$scope  = substr( $slug, strlen( 'guideline-' ) );
+		$scopes = wp_guideline_scopes();
+
+		return isset( $scopes[ $scope ] ) ? $scope : null;
+	}
+}
+
+if ( ! function_exists( 'wp_knowledge_preserve_guideline_slug' ) ) {
+	/**
+	 * Hook callback for `wp_unique_post_slug` that keeps `guideline-` slugs
+	 * verbatim.
+	 *
+	 * Slug is identity for guideline rows, so we never want WordPress to append
+	 * a `-2` suffix. Uniqueness is enforced separately on the insert path by
+	 * `wp_knowledge_guard_guideline_row()`.
+	 *
+	 * @access private
+	 *
+	 * @param string $slug          The computed (possibly suffixed) slug.
+	 * @param int    $post_id       Post ID.
+	 * @param string $post_status   Post status.
+	 * @param string $post_type     Post type.
+	 * @param int    $post_parent   Post parent ID.
+	 * @param string $original_slug The desired slug before uniqueness checks.
+	 * @return string The slug to use.
+	 */
+	function wp_knowledge_preserve_guideline_slug( $slug, $post_id, $post_status, $post_type, $post_parent, $original_slug ) {
+		if ( 'wp_knowledge' === $post_type && 0 === strpos( (string) $original_slug, 'guideline-' ) ) {
+			return $original_slug;
+		}
+
+		return $slug;
+	}
+}
+
+if ( ! function_exists( 'wp_knowledge_guard_guideline_row' ) ) {
+	/**
+	 * Hook callback for `rest_pre_insert_wp_knowledge` that enforces the
+	 * guideline-row reservation rule and sanitization on the REST insert path.
+	 *
+	 * For rows whose slug begins with `guideline-`:
+	 * - Rejects a slug already owned by a different row (one row per slug), on
+	 *   create and update alike.
+	 * - Sanitizes `post_content` to plain text capped at the guideline length.
+	 * - Re-stamps the title of registry scopes from `wp_guideline_scopes()` in
+	 *   the site locale. Block rows keep the client-provided canonical block name.
+	 *
+	 * @access private
+	 *
+	 * @param stdClass        $prepared_post Prepared post object.
+	 * @param WP_REST_Request $request       Request object.
+	 * @return stdClass|WP_Error Prepared post, or WP_Error on a slug conflict.
+	 */
+	function wp_knowledge_guard_guideline_row( $prepared_post, $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		$slug = '';
+		if ( ! empty( $prepared_post->post_name ) ) {
+			$slug = $prepared_post->post_name;
+		} elseif ( ! empty( $prepared_post->ID ) ) {
+			$existing = get_post( $prepared_post->ID );
+			if ( $existing instanceof WP_Post ) {
+				$slug = $existing->post_name;
+			}
+		}
+
+		if ( 0 !== strpos( (string) $slug, 'guideline-' ) ) {
+			return $prepared_post;
+		}
+
+		// Enforce one row per slug (the reservation rule). This runs on create
+		// and update alike: on update the row itself is excluded, so a
+		// content-only save passes, but repointing a row's slug onto a
+		// `guideline-` slug already owned by a different row is rejected.
+		$existing_ids = get_posts(
+			array(
+				'post_type'      => Gutenberg_Knowledge_Post_Type::POST_TYPE,
+				'name'           => $slug,
+				'post_status'    => 'any',
+				'posts_per_page' => 1,
+				'fields'         => 'ids',
+				'no_found_rows'  => true,
+				'post__not_in'   => empty( $prepared_post->ID ) ? array() : array( (int) $prepared_post->ID ),
+			)
+		);
+
+		if ( ! empty( $existing_ids ) ) {
+			return new WP_Error(
+				'rest_knowledge_slug_exists',
+				__( 'A guideline with this slug already exists.', 'gutenberg' ),
+				array( 'status' => 409 )
+			);
+		}
+
+		// Sanitize content: plain text, capped at the guideline length.
+		if ( isset( $prepared_post->post_content ) ) {
+			$content = sanitize_textarea_field( $prepared_post->post_content );
+			if ( mb_strlen( $content, 'UTF-8' ) > GUTENBERG_GUIDELINE_MAX_LENGTH ) {
+				$content = mb_substr( $content, 0, GUTENBERG_GUIDELINE_MAX_LENGTH, 'UTF-8' );
+			}
+			$prepared_post->post_content = $content;
+		}
+
+		// Re-stamp registry scope titles in the site locale. Block rows keep the
+		// client-provided canonical block name.
+		$scope = wp_guideline_scope_from_slug( $slug );
+		if ( null !== $scope ) {
+			$switched = switch_to_locale( get_locale() );
+			$scopes   = wp_guideline_scopes();
+			if ( $switched ) {
+				restore_previous_locale();
+			}
+			if ( isset( $scopes[ $scope ]['title'] ) ) {
+				$prepared_post->post_title = $scopes[ $scope ]['title'];
+			}
+		}
+
+		return $prepared_post;
 	}
 }

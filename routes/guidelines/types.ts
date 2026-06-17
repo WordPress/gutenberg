@@ -4,38 +4,41 @@
 
 import type { ReactNode } from 'react';
 
-export interface Categories {
-	site: string;
-	copy: string;
-	images: string;
-	additional: string;
-	blocks: Record< string, string >;
+/**
+ * A guideline scope from the `/wp/v2/knowledge/guideline-scopes` registry.
+ */
+export interface Scope {
+	slug: string;
+	title: string;
+	description: string;
+	order: number;
 }
 
-export interface GuidelinesState {
-	id: number | null;
-	status: string | null;
-	categories: Categories;
-}
-
-interface BlockGuideline {
-	guidelines: string | Record< string, string >;
-}
-
-export interface RestGuidelinesResponse {
+/**
+ * A resolved guideline row (scope or block), indexed by slug.
+ */
+export interface GuidelineRow {
 	id: number;
-	status: string;
-	guideline_categories?: Record< string, BlockGuideline >;
+	content: string;
 }
 
-export interface GuidelinesImportData {
-	guideline_categories: {
-		site?: { guidelines?: string };
-		copy?: { guidelines?: string };
-		images?: { guidelines?: string };
-		additional?: { guidelines?: string };
-		blocks?: Record< string, { guidelines?: string } >;
-	};
+/**
+ * The minimal block-type shape the Guidelines UI reads from the block registry.
+ */
+export interface ContentBlock {
+	name: string;
+	title: string;
+	icon?: { src?: unknown };
+}
+
+/**
+ * The collection query used to read guideline rows by slug.
+ */
+export interface GuidelineQuery {
+	slug: string[];
+	status: string[];
+	context: string;
+	per_page: number;
 }
 
 export interface GuidelineAccordionProps {
@@ -44,11 +47,11 @@ export interface GuidelineAccordionProps {
 	children: ReactNode;
 }
 
-export interface GuidelinesRevision {
-	id: number;
-	date: string;
-	author: number;
-	_embedded?: {
-		author: Array< { name: string } >;
-	};
+/**
+ * The on-disk import/export JSON shape (unchanged from the singleton era so
+ * existing files round-trip). Flat scopes carry `{ guidelines }`; `blocks` is a
+ * map of block name to `{ guidelines }`.
+ */
+export interface GuidelineImportData {
+	guideline_categories: Record< string, unknown >;
 }

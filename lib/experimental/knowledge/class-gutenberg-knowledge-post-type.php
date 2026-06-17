@@ -29,58 +29,16 @@ class Gutenberg_Knowledge_Post_Type {
 	const TAXONOMY = 'wp_knowledge_type';
 
 	/**
-	 * Taxonomy term slug used for the site-wide guidelines singleton.
+	 * Taxonomy term slug for the `guideline` knowledge type.
 	 *
-	 * The site-wide guidelines post managed by the Settings → Guidelines page
-	 * carries this term; it maps to the `guideline` built-in knowledge type.
+	 * Guidelines are loaded by default when applicable; every row managed by
+	 * the Settings → Guidelines page carries this term. Scope rows are further
+	 * identified by the `guideline-` slug prefix (see the reservation guard in
+	 * knowledge.php).
 	 *
 	 * @var string
 	 */
 	const TERM_GUIDELINE = 'guideline';
-
-	/**
-	 * The standard guideline category meta keys.
-	 *
-	 * @var array
-	 */
-	const CATEGORY_META_KEYS = array(
-		'copy',
-		'images',
-		'site',
-		'additional',
-	);
-
-	/**
-	 * All valid guideline category keys for filtering.
-	 *
-	 * Includes standard categories plus 'blocks'.
-	 *
-	 * @var array
-	 */
-	const VALID_CATEGORIES = array(
-		'copy',
-		'images',
-		'site',
-		'additional',
-		'blocks',
-	);
-
-	/**
-	 * Valid guideline statuses.
-	 *
-	 * @var array
-	 */
-	const VALID_STATUSES = array(
-		'draft',
-		'publish',
-	);
-
-	/**
-	 * Prefix for block-specific guideline meta keys.
-	 *
-	 * @var string
-	 */
-	const BLOCK_META_PREFIX = '_guideline_block_';
 
 	/**
 	 * Register the custom post type.
@@ -207,183 +165,11 @@ class Gutenberg_Knowledge_Post_Type {
 		add_filter( 'user_has_cap', 'wp_maybe_grant_knowledge_caps', 1, 4 );
 		add_action( 'save_post_' . self::POST_TYPE, 'wp_knowledge_ensure_default_type_term' );
 		add_filter( 'wp_insert_term_data', 'wp_knowledge_maybe_map_term_label', 10, 2 );
-	}
 
-	/**
-	 * Determines whether a knowledge post belongs to the site-wide
-	 * guidelines singleton.
-	 *
-	 * Used by the /wp/v2/content-guidelines route to reject posts without
-	 * the `guideline` term addressed by ID — those belong to the standard
-	 * /wp/v2/knowledge collection.
-	 *
-	 * @param int $post_id Post ID.
-	 * @return bool True if the post has the `guideline` term.
-	 */
-	public static function is_content_guideline( $post_id ) {
-		$terms = get_the_terms( $post_id, self::TAXONOMY );
-		if ( is_wp_error( $terms ) || empty( $terms ) ) {
-			return false;
-		}
-
-		foreach ( $terms as $term ) {
-			if ( self::TERM_GUIDELINE === $term->slug ) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * Register post meta fields with revision support.
-	 */
-	public static function register_post_meta(): void {
-		$meta_args = array(
-			'show_in_rest'      => true,
-			'single'            => true,
-			'type'              => 'string',
-			'revisions_enabled' => true,
-			'auth_callback'     => function (): bool {
-				return current_user_can( 'manage_options' );
-			},
-			'sanitize_callback' => 'sanitize_textarea_field',
-		);
-
-		// Register standard category meta.
-		foreach ( self::CATEGORY_META_KEYS as $category ) {
-			register_post_meta( self::POST_TYPE, '_guideline_' . $category, $meta_args );
-		}
-
-		// Register meta for content blocks.
-		foreach ( self::get_content_blocks() as $block_name ) {
-			register_post_meta( self::POST_TYPE, self::block_name_to_meta_key( $block_name ), $meta_args );
-		}
-	}
-
-	/**
-	 * Get block names that have content role attributes.
-	 *
-	 * @return array Block names with content role.
-	 */
-	public static function get_content_blocks(): array {
-		$content_blocks = array();
-		$registry       = WP_Block_Type_Registry::get_instance();
-
-		foreach ( $registry->get_all_registered() as $block_type ) {
-			if ( self::block_has_content_role( $block_type ) ) {
-				$content_blocks[] = $block_type->name;
-			}
-		}
-
-		return $content_blocks;
-	}
-
-	/**
-	 * Check if a block type has any attribute with content role.
-	 *
-	 * @param WP_Block_Type $block_type The block type to check.
-	 * @return bool True if block has content role attribute.
-	 */
-	private static function block_has_content_role( WP_Block_Type $block_type ): bool {
-		if ( empty( $block_type->attributes ) ) {
-			return false;
-		}
-
-		foreach ( $block_type->attributes as $attribute ) {
-			if ( isset( $attribute['role'] ) && 'content' === $attribute['role'] ) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * Convert a block name to a meta key.
-	 *
-	 * @param string $block_name The block name (e.g., 'core/paragraph').
-	 * @return string The meta key (e.g., '_guideline_block_core_paragraph').
-	 */
-	public static function block_name_to_meta_key( string $block_name ): string {
-		// Replace '/' with '_' to create a valid meta key.
-		$sanitized = str_replace( '/', '_', $block_name );
-		return self::BLOCK_META_PREFIX . $sanitized;
-	}
-
-	/**
-	 * Convert a meta key back to a block name.
-	 *
-	 * @param string $meta_key The meta key (e.g., '_guideline_block_core_paragraph').
-	 * @return string The block name (e.g., 'core/paragraph').
-	 */
-	public static function meta_key_to_block_name( string $meta_key ): string {
-		// Remove prefix and convert first '_' back to '/'.
-		$without_prefix = str_replace( self::BLOCK_META_PREFIX, '', $meta_key );
-		// Replace first underscore with '/' (namespace separator).
-		return preg_replace( '/_/', '/', $without_prefix, 1 );
-	}
-
-	/**
-	 * Check if a meta key is a block guideline meta key.
-	 *
-	 * @param string $meta_key The meta key to check.
-	 * @return bool True if it's a block guideline meta key.
-	 */
-	public static function is_block_meta_key( string $meta_key ): bool {
-		return str_starts_with( $meta_key, self::BLOCK_META_PREFIX );
-	}
-
-	/**
-	 * Gets guideline categories from post meta.
-	 *
-	 * Shared between the post controller and revisions controller.
-	 *
-	 * @param int $post_id Post ID (can be a post or revision ID).
-	 * @return array Guideline categories.
-	 */
-	public static function get_guideline_categories_from_meta( int $post_id ): array {
-		$category_labels = array(
-			'copy'       => __( 'Copy Guidelines', 'gutenberg' ),
-			'images'     => __( 'Image Guidelines', 'gutenberg' ),
-			'site'       => __( 'Site Context', 'gutenberg' ),
-			'additional' => __( 'Additional Guidelines', 'gutenberg' ),
-		);
-
-		$guideline_categories = array();
-
-		// Get standard categories.
-		foreach ( self::CATEGORY_META_KEYS as $category ) {
-			$meta_key = '_guideline_' . $category;
-			$value    = get_post_meta( $post_id, $meta_key, true );
-
-			$guideline_categories[ $category ] = array(
-				'label'      => $category_labels[ $category ],
-				'guidelines' => $value,
-			);
-		}
-
-		// Get block-specific guidelines from individual meta keys.
-		$all_meta = get_post_meta( $post_id );
-
-		$blocks = array();
-		foreach ( $all_meta as $meta_key => $meta_values ) {
-			if ( self::is_block_meta_key( $meta_key ) ) {
-				$block_name = self::meta_key_to_block_name( $meta_key );
-				$value      = $meta_values[0] ?? '';
-
-				if ( ! empty( $value ) ) {
-					$blocks[ $block_name ] = array(
-						'guidelines' => $value,
-					);
-				}
-			}
-		}
-
-		if ( ! empty( $blocks ) ) {
-			$guideline_categories['blocks'] = $blocks;
-		}
-
-		return $guideline_categories;
+		// Guideline-row reservation guard: keep `guideline-` slugs verbatim
+		// (no `-2` suffix) and enforce uniqueness, type, title, and content
+		// sanitization on the insert path (see knowledge.php).
+		add_filter( 'wp_unique_post_slug', 'wp_knowledge_preserve_guideline_slug', 10, 6 );
+		add_filter( 'rest_pre_insert_' . self::POST_TYPE, 'wp_knowledge_guard_guideline_row', 10, 2 );
 	}
 }

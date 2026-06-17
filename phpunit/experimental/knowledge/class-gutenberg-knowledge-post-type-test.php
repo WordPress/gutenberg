@@ -135,7 +135,7 @@ class Gutenberg_Knowledge_Post_Type_Test extends WP_UnitTestCase {
 			array(
 				'post_type'   => Gutenberg_Knowledge_Post_Type::POST_TYPE,
 				'post_status' => 'draft',
-				'post_title'  => 'Guideline-typed knowledge post',
+				'post_title'  => 'Typed knowledge post',
 				'tax_input'   => array(
 					Gutenberg_Knowledge_Post_Type::TAXONOMY => array( $guideline_term_id ),
 				),
@@ -202,7 +202,7 @@ class Gutenberg_Knowledge_Post_Type_Test extends WP_UnitTestCase {
 			array(
 				'post_type'   => Gutenberg_Knowledge_Post_Type::POST_TYPE,
 				'post_status' => 'draft',
-				'post_title'  => 'Guideline-typed knowledge post',
+				'post_title'  => 'Typed knowledge post',
 				'tax_input'   => array(
 					Gutenberg_Knowledge_Post_Type::TAXONOMY => array( $guideline_term_id ),
 				),
