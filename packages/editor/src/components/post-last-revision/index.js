@@ -104,39 +104,4 @@ export function PrivatePostLastRevision() {
 	);
 }
 
-/**
- * Revisions link for the DataForm post summary. Intended to replace
- * `PrivatePostLastRevision` once the DataForm in editor inspector
- * experiment stabilizes.
- *
- * @return {React.ReactNode} The rendered component.
- */
-export function PostLastRevisionLink() {
-	const { lastRevisionId, revisionsCount, disableVisualRevisions } =
-		usePostLastRevisionInfo();
-	const { setCurrentRevisionId } = unlock( useDispatch( editorStore ) );
-
-	const buttonProps = disableVisualRevisions
-		? {
-				href: addQueryArgs( 'revision.php', {
-					revision: lastRevisionId,
-				} ),
-		  }
-		: { onClick: () => setCurrentRevisionId( lastRevisionId ) };
-
-	return (
-		<PostLastRevisionCheck>
-			<Button
-				{ ...buttonProps }
-				variant="link"
-				text={ sprintf(
-					/* translators: %s: number of revisions. */
-					__( 'View revisions (%s)' ),
-					revisionsCount
-				) }
-			/>
-		</PostLastRevisionCheck>
-	);
-}
-
 export default PostLastRevision;
