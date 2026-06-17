@@ -34,6 +34,13 @@ export function MainSidebarNavigationContent( { isBlockBasedTheme = true } ) {
 					>
 						{ __( 'Styles' ) }
 					</SidebarNavigationItemGlobalStyles>
+					<SidebarNavigationItemIdentity
+						to="/identity"
+						uid="identity-navigation-item"
+						icon={ siteLogo }
+					>
+						{ _x( 'Identity', 'site identity' ) }
+					</SidebarNavigationItemIdentity>
 					<SidebarNavigationItem
 						uid="navigation-navigation-item"
 						to="/navigation"
@@ -42,13 +49,6 @@ export function MainSidebarNavigationContent( { isBlockBasedTheme = true } ) {
 					>
 						{ __( 'Navigation' ) }
 					</SidebarNavigationItem>
-					<SidebarNavigationItemIdentity
-						to="/identity"
-						uid="identity-navigation-item"
-						icon={ siteLogo }
-					>
-						{ _x( 'Identity', 'site identity' ) }
-					</SidebarNavigationItemIdentity>
 					<SidebarNavigationItem
 						uid="page-navigation-item"
 						to="/page"
