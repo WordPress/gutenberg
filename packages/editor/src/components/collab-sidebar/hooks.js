@@ -34,33 +34,14 @@ import {
 	applyNoteFormat,
 	calculateNotePositions,
 	findNoteInBlock,
+	getInlineMarkerStart,
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
+	reconcileInlineNoteMarker,
 	removeNoteIdFromMetadata,
 } from './utils';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
-
-// Sentinel that sorts a block-level (whole-block) note before any inline note
-// within the same block. Negative so any real character offset (>= 0) ranks
-// after it. Number.NEGATIVE_INFINITY would work too; -1 is enough and keeps
-// the diff arithmetic in safe integers.
-export const BLOCK_LEVEL_NOTE_START = -1;
-
-/**
- * Resolve an inline note's character offset in its block so threads can be
- * sorted by reading order. A note is inline iff an in-content `core/note`
- * marker carries its id; block-level notes (no marker) sort first within their
- * block via a sentinel.
- *
- * @param {Object}  thread     Materialized thread record (with `.id`).
- * @param {?Object} attributes Block attributes for the thread's block.
- * @return {number} Marker start offset, or `BLOCK_LEVEL_NOTE_START` when there is no inline anchor.
- */
-export function getInlineMarkerStart( thread, attributes ) {
-	const found = findNoteInBlock( attributes, thread?.id );
-	return found ? found.start : BLOCK_LEVEL_NOTE_START;
-}
 
 export function useNoteThreads( postId ) {
 	const queryArgs = {
@@ -612,32 +593,6 @@ export function useAnnotateBlocks( threads ) {
 		__experimentalAddAnnotation,
 		__experimentalRemoveAnnotationsBySource,
 	] );
-}
-
-/**
- * Decide what to do with an inline note based on whether its in-content marker
- * is still present. Pure so it can be unit-tested without React/stores.
- *
- * - `'anchor'`: the marker is present; record that we've seen it this session.
- * - `'delete'`: the marker was seen earlier this session but is now gone (the
- *   user removed the marked text), so the note should be deleted.
- * - `'skip'`: the block isn't loaded yet, the note is block-level (no marker),
- *   or the marker is absent for a note we never saw anchored this session.
- *
- * @param {Object}  thread     Materialized thread record (with `.id`, `.blockClientId`).
- * @param {?Object} attributes Block attributes for the thread's block, or null/undefined when unloaded.
- * @param {Set}     anchored   Ids whose marker has been observed present this session.
- * @return {'anchor'|'delete'|'skip'} The action to take.
- */
-export function reconcileInlineNoteMarker( thread, attributes, anchored ) {
-	if ( ! thread?.blockClientId || ! attributes ) {
-		return 'skip';
-	}
-	const present = !! findNoteInBlock( attributes, thread.id );
-	if ( present ) {
-		return 'anchor';
-	}
-	return anchored.has( thread.id ) ? 'delete' : 'skip';
 }
 
 /**
