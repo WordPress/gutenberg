@@ -96,6 +96,66 @@ class Gutenberg_Guideline_Reservation_Test extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * An update may not repoint a row's slug onto a `guideline-` slug already
+	 * owned by a different row.
+	 */
+	public function test_update_to_existing_slug_rejected() {
+		wp_set_current_user( self::$admin_id );
+
+		$this->assertSame(
+			201,
+			$this->create_row(
+				array(
+					'slug'    => 'guideline-site',
+					'content' => 'A.',
+					'status'  => 'publish',
+				)
+			)->get_status()
+		);
+		$second = $this->create_row(
+			array(
+				'slug'    => 'guideline-images',
+				'content' => 'B.',
+				'status'  => 'publish',
+			)
+		);
+		$this->assertSame( 201, $second->get_status() );
+		$second_id = $second->get_data()['id'];
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/knowledge/' . $second_id );
+		$request->set_body_params( array( 'slug' => 'guideline-site' ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 409, $response->get_status() );
+		$this->assertSame( 'rest_knowledge_slug_exists', $response->get_data()['code'] );
+	}
+
+	/**
+	 * A content-only update of an existing row is not falsely rejected by the
+	 * uniqueness guard (the row excludes itself).
+	 */
+	public function test_content_only_update_succeeds() {
+		wp_set_current_user( self::$admin_id );
+
+		$created = $this->create_row(
+			array(
+				'slug'    => 'guideline-copy',
+				'content' => 'First.',
+				'status'  => 'publish',
+			)
+		);
+		$this->assertSame( 201, $created->get_status() );
+		$id = $created->get_data()['id'];
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/knowledge/' . $id );
+		$request->set_body_params( array( 'content' => 'Second.' ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 'Second.', get_post( $id )->post_content );
+	}
+
+	/**
 	 * Registry scope titles are re-stamped from `wp_guideline_scopes()`,
 	 * ignoring any client-provided title.
 	 */

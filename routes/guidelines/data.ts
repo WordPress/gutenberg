@@ -41,12 +41,17 @@ export function scopeSlug( scope: string ): string {
 }
 
 /**
- * The slug for a block guideline row, e.g. `guideline-block-core-paragraph`.
- * Forward-only and unambiguous; the canonical block name lives in the title.
+ * The slug for a block guideline row, e.g. `guideline-block-core_paragraph`.
+ *
+ * The namespace separator is encoded as `_` rather than `-`. Block names are
+ * `<namespace>/<name>` where both parts match `[a-z0-9-]+` (never `_`), so `_`
+ * keeps the mapping injective; using `-` would collapse distinct block names
+ * such as `foo/bar-baz` and `foo-bar/baz` onto the same slug, overwriting one
+ * guideline with the other. The canonical block name still lives in the title.
  * @param blockName Exact block name (e.g. `core/paragraph`).
  */
 export function blockSlug( blockName: string ): string {
-	return `${ BLOCK_PREFIX }${ blockName.replace( '/', '-' ) }`;
+	return `${ BLOCK_PREFIX }${ blockName.replace( '/', '_' ) }`;
 }
 
 /**
