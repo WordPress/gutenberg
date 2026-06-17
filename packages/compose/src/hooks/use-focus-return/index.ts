@@ -75,14 +75,11 @@ function useFocusReturn(
 			if ( onFocusReturnRef.current ) {
 				onFocusReturnRef.current();
 			} else {
-				const elementToFocus = ! focusedBeforeMountRef.current
-					.isConnected
-					? origin
-					: focusedBeforeMountRef.current;
-
-				if ( elementToFocus instanceof HTMLElement ) {
-					elementToFocus.focus();
-				}
+				(
+					( ! focusedBeforeMountRef.current.isConnected
+						? origin
+						: focusedBeforeMountRef.current ) as HTMLElement
+				 )?.focus();
 			}
 			origin = null;
 		}
