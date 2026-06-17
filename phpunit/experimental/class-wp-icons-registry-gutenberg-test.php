@@ -68,7 +68,9 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	 */
 	private function sanitize_icon_content( $icon_content ) {
 		$method = new ReflectionMethod( $this->registry, 'sanitize_icon_content' );
-		$method->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
 		return $method->invoke( $this->registry, $icon_content );
 	}
 
