@@ -23,11 +23,13 @@ function block_core_navigation_get_effective_submenu_attributes( $attributes ) {
 	$orientation      = $attributes['layout']['orientation'] ?? 'horizontal';
 	$submenu_behavior = $attributes['submenuBehavior'] ?? null;
 
-	if ( null === $submenu_behavior ) {
-		$submenu_behavior = (
-			! empty( $attributes['openSubmenusOnClick'] ) ||
-			'click' === ( $attributes['submenuVisibility'] ?? null )
-		) ? 'click' : 'hover';
+	if (
+		! empty( $attributes['openSubmenusOnClick'] ) ||
+		'click' === ( $attributes['submenuVisibility'] ?? null )
+	) {
+		$submenu_behavior = 'click';
+	} elseif ( null === $submenu_behavior ) {
+		$submenu_behavior = 'hover';
 	}
 
 	if ( 'vertical' === $orientation ) {
@@ -1009,11 +1011,12 @@ class WP_Navigation_Block_Renderer {
 
 		unset( $attributes['rgbTextColor'], $attributes['rgbBackgroundColor'] );
 
-		$effective_attributes  = block_core_navigation_get_effective_submenu_attributes( $attributes );
-		$use_effective_context = $effective_attributes !== $attributes;
-		$attributes            = $effective_attributes;
+		$parsed_attributes    = $block->parsed_block['attrs'] ?? array();
+		$render_attributes    = array_merge( $attributes, $parsed_attributes );
+		$effective_attributes = block_core_navigation_get_effective_submenu_attributes( $render_attributes );
+		$attributes           = array_merge( $attributes, $effective_attributes );
 
-		$inner_blocks = static::get_inner_blocks( $attributes, $block, $use_effective_context );
+		$inner_blocks = static::get_inner_blocks( $attributes, $block, true );
 		// Prevent navigation blocks referencing themselves from rendering.
 		if ( block_core_navigation_block_tree_has_block_type(
 			$inner_blocks,
