@@ -44,7 +44,7 @@
  * @return string Block HTML with wp-note markers unwrapped.
  */
 function gutenberg_strip_inline_note_markers( $block_content ) {
-	if ( false === strpos( $block_content, 'wp-note' ) ) {
+	if ( ! str_contains( $block_content, 'wp-note' ) ) {
 		return $block_content;
 	}
 
