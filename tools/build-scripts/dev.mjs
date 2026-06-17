@@ -249,16 +249,24 @@ async function dev() {
 						output: 'build/scripts/widgets/blocks/blocks-manifest.php',
 					},
 				];
+
+				// Check if building for WordPress Core to exclude experimental blocks
+				const isWordPressCore = process.env.IS_WORDPRESS_CORE === 'true' ||
+					process.argv.includes( 'IS_WORDPRESS_CORE=true' );
+
 				for ( const { input, output: outputPath } of blocksDirs ) {
-					await exec(
-						'wp-scripts',
-						[
-							'build-blocks-manifest',
-							`--input=${ input }`,
-							`--output=${ outputPath }`,
-						],
-						{ silent: true }
-					);
+					const manifestArgs = [
+						'build-blocks-manifest',
+						`--input=${ input }`,
+						`--output=${ outputPath }`,
+					];
+
+					// Exclude experimental blocks when building for WordPress Core
+					if ( isWordPressCore ) {
+						manifestArgs.push( '--exclude-experimental' );
+					}
+
+					await exec( 'wp-scripts', manifestArgs, { silent: true } );
 				}
 
 				readyMarkerFile.create();

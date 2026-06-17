@@ -37,6 +37,16 @@ return array(
 		'editorStyle' => 'file:./index.css',
 		'style' => 'file:./style-index.css'
 	),
+	'experimental-block' => array(
+		'$schema' => 'https://schemas.wp.org/trunk/block.json',
+		'apiVersion' => 3,
+		'__experimental' => true,
+		'name' => 'my-plugin/experimental-block',
+		'title' => 'Experimental Block',
+		'category' => 'text',
+		'icon' => 'beaker',
+		'description' => 'An experimental block for testing.'
+	),
 	'image-gallery' => array(
 		'$schema' => 'https://schemas.wp.org/trunk/block.json',
 		'apiVersion' => 3,

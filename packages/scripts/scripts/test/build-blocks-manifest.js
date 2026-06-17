@@ -98,4 +98,31 @@ describe( 'build-blocks-manifest script', () => {
 		// Ensure that the output file was not created
 		expect( fs.existsSync( outputFile ) ).toBe( false );
 	} );
+
+	it( 'should exclude experimental blocks when --exclude-experimental flag is set', () => {
+		const inputDir = path.join( fixturesPath, 'input' );
+		const outputFile = path.join(
+			outputPath,
+			'blocks-manifest-filtered.php'
+		);
+
+		// Run the build-blocks-manifest script with --exclude-experimental flag
+		const scriptPath = path.resolve(
+			__dirname,
+			'..',
+			'build-blocks-manifest.js'
+		);
+		execSync(
+			`node ${ scriptPath } --input=${ inputDir } --output=${ outputFile } --exclude-experimental`
+		);
+
+		const generatedContent = fs.readFileSync( outputFile, 'utf8' );
+
+		// Check that experimental blocks are not included
+		expect( generatedContent ).not.toContain( 'experimental-block' );
+		// Check that non-experimental blocks are included
+		expect( generatedContent ).toContain( 'custom-header' );
+		expect( generatedContent ).toContain( 'image-gallery' );
+		expect( generatedContent ).toContain( 'simple-button' );
+	} );
 } );
