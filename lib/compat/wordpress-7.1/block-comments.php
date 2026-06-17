@@ -32,13 +32,14 @@
  * A naive regex would be wrong here: a `\bwp-note\b` word boundary also matches
  * `wp-note-foo`, which is why the class check goes through the HTML API instead.
  *
- * The HTML API cannot yet remove a tag together with its closer, so a second
- * offset-based pass pairs each flagged `<mark>` with its matching `</mark>` -
- * tracking `<mark>` nesting so overlapping notes and any user highlight `<mark>`
- * left intact still pair correctly - and removes only the note wrappers. Tag
- * removal/unwrapping is on the HTML API roadmap
- * (https://github.com/WordPress/gutenberg/discussions/54583); once it lands this
- * offset pass can be replaced with a single `WP_HTML_Tag_Processor` call.
+ * The HTML API has no public token-removal method yet (it is on the roadmap:
+ * https://github.com/WordPress/gutenberg/discussions/54583), so an anonymous
+ * `WP_HTML_Tag_Processor` subclass unwraps each note `<mark>` and its matching
+ * closer directly on the parsed token stream. Walking tokens - rather than
+ * matching `<mark>` with a regex - means `</mark>`-looking text inside a comment
+ * or attribute value can never be mistaken for a real tag, and a nesting stack
+ * keeps each note opener paired with its own closer so overlapping notes and any
+ * user highlight `<mark>` left intact still resolve correctly.
  *
  * @param string $block_content Rendered block HTML.
  * @return string Block HTML with wp-note markers unwrapped.
@@ -48,66 +49,55 @@ function gutenberg_strip_inline_note_markers( $block_content ) {
 		return $block_content;
 	}
 
-	// Flag the note markers with a sentinel attribute so the offset pass below
-	// can identify them without re-parsing classes from raw strings.
-	$processor = new WP_HTML_Tag_Processor( $block_content );
-	$found     = false;
-	while ( $processor->next_tag( 'MARK' ) ) {
-		if ( ! $processor->has_class( 'wp-note' ) ) {
-			continue;
-		}
-		$processor->set_attribute( 'data-wp-note-strip', '' );
-		$found = true;
-	}
-
-	if ( ! $found ) {
-		return $block_content;
-	}
-
-	$block_content = $processor->get_updated_html();
-
-	if ( ! preg_match_all( '~</?mark\b[^>]*>~i', $block_content, $tags, PREG_OFFSET_CAPTURE ) ) {
-		return $block_content;
-	}
-
-	// Pair each flagged opener with its matching closer via a nesting stack,
-	// then collect both byte ranges for removal.
-	$open_stack = array();
-	$removals   = array();
-	foreach ( $tags[0] as $tag ) {
-		$html   = $tag[0];
-		$offset = $tag[1];
-
-		if ( '/' === $html[1] ) {
-			$open = array_pop( $open_stack );
-			if ( null !== $open && $open['is_note'] ) {
-				$removals[] = array( $offset, strlen( $html ) );
-				$removals[] = $open['range'];
-			}
-			continue;
+	// Anonymous subclass exposing token removal, which WP_HTML_Tag_Processor
+	// does not provide publicly yet. Removing the current token via its bookmark
+	// span unwraps the `<mark>` (opener or closer) while keeping the text it
+	// wraps. The redeclaration-guard sniff cannot tell these class methods from
+	// global functions, so it is disabled for the class body.
+	// phpcs:disable Gutenberg.CodeAnalysis.GuardedFunctionAndClassNames.FunctionNotGuardedAgainstRedeclaration
+	$processor = new class( $block_content ) extends WP_HTML_Tag_Processor {
+		/**
+		 * Gets the span for the current token.
+		 *
+		 * @return WP_HTML_Span Current token span.
+		 */
+		private function get_span() {
+			// Always called after next_tag() returned true, so the bookmark is set.
+			$this->set_bookmark( 'here' );
+			return $this->bookmarks['here'];
 		}
 
-		$open_stack[] = array(
-			'range'   => array( $offset, strlen( $html ) ),
-			'is_note' => false !== strpos( $html, 'data-wp-note-strip' ),
-		);
-	}
+		/**
+		 * Removes the current token, keeping any text it wraps.
+		 */
+		public function remove_token() {
+			$span = $this->get_span();
 
-	if ( empty( $removals ) ) {
-		return $block_content;
-	}
-
-	// Remove from the end so earlier offsets remain valid.
-	usort(
-		$removals,
-		static function ( $a, $b ) {
-			return $b[0] - $a[0];
+			$this->lexical_updates[] = new WP_HTML_Text_Replacement( $span->start, $span->length, '' );
 		}
+	};
+	// phpcs:enable Gutenberg.CodeAnalysis.GuardedFunctionAndClassNames.FunctionNotGuardedAgainstRedeclaration
+
+	// Walk every `<mark>`, tracking note nesting on a stack so each note opener
+	// pairs with its own closer, and unwrap only the note markers.
+	$mark_stack = array();
+	$query      = array(
+		'tag_name'    => 'MARK',
+		'tag_closers' => 'visit',
 	);
-	foreach ( $removals as $range ) {
-		$block_content = substr_replace( $block_content, '', $range[0], $range[1] );
+	while ( $processor->next_tag( $query ) ) {
+		if ( $processor->is_tag_closer() ) {
+			$is_note = array_pop( $mark_stack );
+		} else {
+			$is_note      = $processor->has_class( 'wp-note' );
+			$mark_stack[] = $is_note;
+		}
+
+		if ( true === $is_note ) {
+			$processor->remove_token();
+		}
 	}
 
-	return $block_content;
+	return $processor->get_updated_html();
 }
 add_filter( 'render_block', 'gutenberg_strip_inline_note_markers' );
