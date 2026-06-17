@@ -3,7 +3,7 @@
  */
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { press, click, hover } from '@ariakit/test';
+import { press } from '@ariakit/test';
 
 /**
  * WordPress dependencies
@@ -31,6 +31,12 @@ const resetTypeahead = () => {
 // Submenu trigger item => open submenu
 
 describe( 'Menu', () => {
+	let user: ReturnType< typeof userEvent.setup >;
+
+	beforeEach( () => {
+		user = userEvent.setup();
+	} );
+
 	// See https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/
 	it( 'should follow the WAI-ARIA spec', async () => {
 		render(
@@ -59,7 +65,7 @@ describe( 'Menu', () => {
 		expect( toggleButton ).toHaveAttribute( 'aria-haspopup', 'menu' );
 		expect( toggleButton ).toHaveAttribute( 'aria-expanded', 'false' );
 
-		await click( toggleButton );
+		await user.click( toggleButton );
 
 		expect( toggleButton ).toHaveAttribute( 'aria-expanded', 'true' );
 
@@ -83,7 +89,7 @@ describe( 'Menu', () => {
 		expect( submenuTrigger ).toHaveAttribute( 'aria-haspopup', 'menu' );
 		expect( submenuTrigger ).toHaveAttribute( 'aria-expanded', 'false' );
 
-		await hover( submenuTrigger );
+		await user.hover( submenuTrigger );
 
 		// Wait for the open animation after hovering
 		await waitFor( () =>
@@ -120,7 +126,7 @@ describe( 'Menu', () => {
 			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
 
 			// Click to open the menu
-			await click( toggleButton );
+			await user.click( toggleButton );
 
 			// Menu open, focus is on the menu wrapper
 			await waitForFocusedMenu();
@@ -208,7 +214,7 @@ describe( 'Menu', () => {
 				name: 'Open dropdown',
 			} );
 
-			await click( trigger );
+			await user.click( trigger );
 
 			// Focuses menu on mouse click, focuses first item on keyboard press
 			// Can be changed with a custom useEffect
@@ -239,9 +245,11 @@ describe( 'Menu', () => {
 			expect( screen.getByRole( 'menu' ) ).toBeInTheDocument();
 
 			// Click on the body (ie. outside of the dropdown menu)
-			await click( document.body );
+			await user.click( document.body );
 
-			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
+			await waitFor( () =>
+				expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument()
+			);
 		} );
 
 		it( 'should close when clicking on a menu item', async () => {
@@ -257,9 +265,11 @@ describe( 'Menu', () => {
 			expect( screen.getByRole( 'menu' ) ).toBeInTheDocument();
 
 			// Clicking a menu item will close the menu
-			await click( screen.getByRole( 'menuitem' ) );
+			await user.click( screen.getByRole( 'menuitem' ) );
 
-			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
+			await waitFor( () =>
+				expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument()
+			);
 		} );
 
 		it( 'should not close when clicking on a menu item when the `hideOnClick` prop is set to `false`', async () => {
@@ -275,7 +285,7 @@ describe( 'Menu', () => {
 			expect( screen.getByRole( 'menu' ) ).toBeVisible();
 
 			// Clicking a menu item will close the menu
-			await click( screen.getByRole( 'menuitem' ) );
+			await user.click( screen.getByRole( 'menuitem' ) );
 
 			expect( screen.getByRole( 'menu' ) ).toBeVisible();
 		} );
@@ -293,7 +303,7 @@ describe( 'Menu', () => {
 			expect( screen.getByRole( 'menu' ) ).toBeInTheDocument();
 
 			// Clicking a disabled menu item won't close the menu
-			await click( screen.getByRole( 'menuitem' ) );
+			await user.click( screen.getByRole( 'menuitem' ) );
 
 			expect( screen.getByRole( 'menu' ) ).toBeInTheDocument();
 		} );
@@ -326,7 +336,7 @@ describe( 'Menu', () => {
 				} )
 			).not.toBeInTheDocument();
 
-			await hover(
+			await user.hover(
 				screen.getByRole( 'menuitem', { name: 'Submenu trigger item' } )
 			);
 
@@ -479,7 +489,7 @@ describe( 'Menu', () => {
 			render( <ControlledRadioGroup /> );
 
 			// Open dropdown
-			await click(
+			await user.click(
 				screen.getByRole( 'button', { name: 'Open dropdown' } )
 			);
 
@@ -493,7 +503,7 @@ describe( 'Menu', () => {
 			).not.toBeChecked();
 
 			// Click first radio item, make sure that the callback fires
-			await click(
+			await user.click(
 				screen.getByRole( 'menuitemradio', { name: 'Radio item one' } )
 			);
 			expect( onRadioValueChangeSpy ).toHaveBeenCalledTimes( 1 );
@@ -510,7 +520,7 @@ describe( 'Menu', () => {
 			).not.toBeChecked();
 
 			// Click second radio item, make sure that the callback fires
-			await click(
+			await user.click(
 				screen.getByRole( 'menuitemradio', { name: 'Radio item two' } )
 			);
 			expect( onRadioValueChangeSpy ).toHaveBeenCalledTimes( 2 );
@@ -559,7 +569,7 @@ describe( 'Menu', () => {
 			);
 
 			// Open dropdown
-			await click(
+			await user.click(
 				screen.getByRole( 'button', { name: 'Open dropdown' } )
 			);
 
@@ -573,7 +583,7 @@ describe( 'Menu', () => {
 			).toBeChecked();
 
 			// Click first radio item, make sure that the callback fires
-			await click(
+			await user.click(
 				screen.getByRole( 'menuitemradio', { name: 'Radio item one' } )
 			);
 			expect( onRadioValueChangeSpy ).toHaveBeenCalledTimes( 1 );
@@ -590,7 +600,7 @@ describe( 'Menu', () => {
 			).not.toBeChecked();
 
 			// Click second radio item, make sure that the callback fires
-			await click(
+			await user.click(
 				screen.getByRole( 'menuitemradio', { name: 'Radio item two' } )
 			);
 			expect( onRadioValueChangeSpy ).toHaveBeenCalledTimes( 2 );
@@ -659,7 +669,7 @@ describe( 'Menu', () => {
 			render( <ControlledRadioGroup /> );
 
 			// Open dropdown
-			await click(
+			await user.click(
 				screen.getByRole( 'button', { name: 'Open dropdown' } )
 			);
 
@@ -679,7 +689,7 @@ describe( 'Menu', () => {
 			).not.toBeChecked();
 
 			// Click first checkbox item, make sure that the callback fires
-			await click(
+			await user.click(
 				screen.getByRole( 'menuitemcheckbox', {
 					name: 'Checkbox item one',
 				} )
@@ -699,7 +709,7 @@ describe( 'Menu', () => {
 			).toBeChecked();
 
 			// Click second checkbox item, make sure that the callback fires
-			await click(
+			await user.click(
 				screen.getByRole( 'menuitemcheckbox', {
 					name: 'Checkbox item two',
 				} )
@@ -719,7 +729,7 @@ describe( 'Menu', () => {
 			).toBeChecked();
 
 			// Click second checkbox item, make sure that the callback fires
-			await click(
+			await user.click(
 				screen.getByRole( 'menuitemcheckbox', {
 					name: 'Checkbox item two',
 				} )
@@ -779,7 +789,7 @@ describe( 'Menu', () => {
 			);
 
 			// Open dropdown
-			await click(
+			await user.click(
 				screen.getByRole( 'button', { name: 'Open dropdown' } )
 			);
 
@@ -799,7 +809,7 @@ describe( 'Menu', () => {
 			).toBeChecked();
 
 			// Click first checkbox item, make sure that the callback fires
-			await click(
+			await user.click(
 				screen.getByRole( 'menuitemcheckbox', {
 					name: 'Checkbox item one',
 				} )
@@ -819,7 +829,7 @@ describe( 'Menu', () => {
 			).toBeChecked();
 
 			// Click second checkbox item, make sure that the callback fires
-			await click(
+			await user.click(
 				screen.getByRole( 'menuitemcheckbox', {
 					name: 'Checkbox item two',
 				} )
@@ -839,7 +849,7 @@ describe( 'Menu', () => {
 			).not.toBeChecked();
 
 			// Click second checkbox item, make sure that the callback fires
-			await click(
+			await user.click(
 				screen.getByRole( 'menuitemcheckbox', {
 					name: 'Checkbox item two',
 				} )
@@ -875,7 +885,7 @@ describe( 'Menu', () => {
 			);
 
 			// Click to open the menu
-			await click(
+			await user.click(
 				screen.getByRole( 'button', {
 					name: 'Open dropdown',
 				} )
@@ -905,7 +915,7 @@ describe( 'Menu', () => {
 			);
 
 			// Click to open the menu
-			await click(
+			await user.click(
 				screen.getByRole( 'button', {
 					name: 'Open dropdown',
 				} )
@@ -943,7 +953,7 @@ describe( 'Menu', () => {
 			);
 
 			// Click to open the menu
-			await click(
+			await user.click(
 				screen.getByRole( 'button', {
 					name: 'Open dropdown',
 				} )
@@ -970,7 +980,7 @@ describe( 'Menu', () => {
 			);
 
 			// Click to open the menu
-			await click(
+			await user.click(
 				screen.getByRole( 'button', {
 					name: 'Open dropdown',
 				} )
@@ -1001,7 +1011,7 @@ describe( 'Menu', () => {
 			);
 
 			// Click to open the menu
-			await click(
+			await user.click(
 				screen.getByRole( 'button', {
 					name: 'Open dropdown',
 				} )
@@ -1032,7 +1042,7 @@ describe( 'Menu', () => {
 			);
 
 			// Click to open the menu
-			await click(
+			await user.click(
 				screen.getByRole( 'button', {
 					name: 'Open dropdown',
 				} )
@@ -1048,8 +1058,6 @@ describe( 'Menu', () => {
 	} );
 
 	describe( 'typeahead', () => {
-		let user: ReturnType< typeof userEvent.setup >;
-
 		beforeEach( () => {
 			jest.useFakeTimers();
 			user = userEvent.setup( {
