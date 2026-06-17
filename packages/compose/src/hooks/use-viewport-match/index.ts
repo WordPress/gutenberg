@@ -78,8 +78,9 @@ const useViewportMatch = (
 	operator: ViewportOperator = '>=',
 	// Resolve the default lazily so SSR (where `window` is undeclared) does not
 	// throw a ReferenceError when this default expression is evaluated.
-	view: Window = typeof window !== 'undefined' ? window : undefined
-) => {
+	view: Window | undefined = typeof window !== 'undefined'
+		? window
+		: undefined
 ): boolean => {
 	const simulatedWidth = useContext( ViewportMatchWidthContext );
 	const mediaQuery =

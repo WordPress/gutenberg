@@ -601,7 +601,7 @@ _Parameters_
 
 -   _breakpoint_ `Breakpoint`: Breakpoint size name.
 -   _operator_ `ViewportOperator`: Viewport operator.
--   _view_ `Window`: Window instance in which to perform viewport matching.
+-   _view_ `Window | undefined`: Window instance in which to perform viewport matching.
 
 _Returns_
 
