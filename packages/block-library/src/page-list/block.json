@@ -27,7 +27,6 @@
 		"customFontSize",
 		"showSubmenuIcon",
 		"style",
-		"openSubmenusOnClick",
 		"submenuVisibility",
 		"core/isInsideSubmenu"
 	],

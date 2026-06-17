@@ -82,7 +82,7 @@ test.describe( 'Navigation passive rendering', () => {
 		await requestUtils.createTemplate( 'wp_template_part', {
 			slug: 'header',
 			title: 'Header',
-			content: `<!-- wp:navigation {"ref":${ menu.id },"overlayMenu":"never","submenuVisibility":"always"} /-->`,
+			content: `<!-- wp:navigation {"ref":${ menu.id },"overlayMenu":"never"} /-->`,
 		} );
 
 		await requestUtils.createTemplate( 'wp_template', {

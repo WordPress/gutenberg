@@ -22,7 +22,6 @@ test.describe( 'Navigation colors', () => {
 		const { id: menuId } = await requestUtils.createNavigationMenu( {
 			title: 'Colored menu',
 			content: `<!-- wp:navigation-submenu {"label":"Custom Link","type":"custom","url":"https://wordpress.org","kind":"custom"} --><!-- wp:navigation-link {"label":"Submenu Link","type":"custom","url":"https://wordpress.org","kind":"custom"} /--><!-- /wp:navigation-submenu --><!-- wp:navigation-link {"label":"Page Link","type":"page","id": ${ pageId },"url":"http://localhost:8889/?page_id=${ pageId }","kind":"post-type"} /-->`,
-			attributes: { submenuVisibility: 'click' },
 		} );
 
 		await admin.createNewPost();

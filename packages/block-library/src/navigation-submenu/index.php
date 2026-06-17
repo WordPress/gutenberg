@@ -22,24 +22,7 @@ function block_core_navigation_submenu_render_submenu_icon() {
 }
 
 /**
- * Returns the submenu visibility value with backward compatibility
- * for the deprecated openSubmenusOnClick attribute.
- *
- * This function centralizes the migration logic from the boolean
- * openSubmenusOnClick to the new submenuVisibility enum.
- *
- * Backward compatibility handling:
- * - Legacy blocks (saved before migration, never opened in editor):
- *   Have openSubmenusOnClick in database. Parent Navigation block passes it via context.
- *   We prioritize openSubmenusOnClick to preserve the original behavior.
- *
- * - Migrated blocks (opened in editor after migration):
- *   JavaScript deprecation removes openSubmenusOnClick and sets submenuVisibility.
- *   We use submenuVisibility since openSubmenusOnClick is null.
- *
- * - New blocks (created after migration):
- *   Only have submenuVisibility, openSubmenusOnClick is null.
- *   We use submenuVisibility.
+ * Returns the submenu visibility value from Navigation block context.
  *
  * @since 6.9.0
  *
@@ -47,19 +30,7 @@ function block_core_navigation_submenu_render_submenu_icon() {
  * @return string The visibility mode: 'hover', 'click', or 'always'.
  */
 function block_core_navigation_submenu_get_submenu_visibility( $context ) {
-	$deprecated_open_submenus_on_click = $context['openSubmenusOnClick'] ?? null;
-
-	// For backward compatibility, prioritize the legacy attribute if present. If it has been loaded and saved in the editor, then
-	// the deprecated attribute will be replaced by submenuVisibility.
-	if ( null !== $deprecated_open_submenus_on_click ) {
-		// Convert boolean to string: true -> 'click', false -> 'hover'.
-		return ! empty( $deprecated_open_submenus_on_click ) ? 'click' : 'hover';
-	}
-
-	$submenu_visibility = $context['submenuVisibility'] ?? null;
-
-	// Use submenuVisibility for migrated/new blocks.
-	return $submenu_visibility ?? 'hover';
+	return $context['submenuVisibility'] ?? 'hover';
 }
 
 /**

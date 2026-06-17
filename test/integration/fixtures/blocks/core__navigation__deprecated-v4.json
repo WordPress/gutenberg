@@ -3,10 +3,8 @@
 		"name": "core/navigation",
 		"isValid": true,
 		"attributes": {
-			"showSubmenuIcon": true,
 			"overlayMenu": "never",
 			"fontFamily": "cambria-georgia",
-			"submenuVisibility": "hover",
 			"layout": {
 				"type": "flex",
 				"orientation": "horizontal"

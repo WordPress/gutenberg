@@ -43,15 +43,6 @@
 		"rgbBackgroundColor": {
 			"type": "string"
 		},
-		"showSubmenuIcon": {
-			"type": "boolean",
-			"default": true
-		},
-		"submenuVisibility": {
-			"type": "string",
-			"enum": [ "hover", "click", "always" ],
-			"default": "hover"
-		},
 		"overlayMenu": {
 			"type": "string",
 			"default": "mobile"
@@ -102,9 +93,6 @@
 		"customOverlayBackgroundColor": "customOverlayBackgroundColor",
 		"fontSize": "fontSize",
 		"customFontSize": "customFontSize",
-		"showSubmenuIcon": "showSubmenuIcon",
-		"submenuVisibility": "submenuVisibility",
-		"openSubmenusOnClick": "openSubmenusOnClick",
 		"style": "style",
 		"maxNestingLevel": "maxNestingLevel"
 	},

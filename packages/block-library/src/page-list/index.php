@@ -6,8 +6,7 @@
  */
 
 /**
- * Returns the submenu visibility value with backward compatibility
- * for the deprecated openSubmenusOnClick attribute.
+ * Returns the submenu visibility value from Navigation block context.
  *
  * @since 6.9.0
  *
@@ -15,19 +14,7 @@
  * @return string The visibility mode: 'hover', 'click', or 'always'.
  */
 function block_core_page_list_get_submenu_visibility( $context ) {
-	$deprecated_open_submenus_on_click = $context['openSubmenusOnClick'] ?? null;
-
-	// For backward compatibility, prioritize the legacy attribute if present. If it has been loaded and saved in the editor, then
-	// the deprecated attribute will be replaced by submenuVisibility.
-	if ( null !== $deprecated_open_submenus_on_click ) {
-		// Convert boolean to string: true -> 'click', false -> 'hover'.
-		return ! empty( $deprecated_open_submenus_on_click ) ? 'click' : 'hover';
-	}
-
-	$submenu_visibility = $context['submenuVisibility'] ?? null;
-
-	// Use submenuVisibility for migrated/new blocks.
-	return $submenu_visibility ?? 'hover';
+	return $context['submenuVisibility'] ?? 'hover';
 }
 
 /**
@@ -328,7 +315,6 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 
 	$is_navigation_child = array_key_exists( 'showSubmenuIcon', $block->context );
 
-	// Get submenu visibility with backward compatibility for openSubmenusOnClick.
 	$submenu_visibility = $is_navigation_child ? block_core_page_list_get_submenu_visibility( $block->context ) : 'hover';
 
 	$show_submenu_icons = array_key_exists( 'showSubmenuIcon', $block->context ) ? $block->context['showSubmenuIcon'] : false;

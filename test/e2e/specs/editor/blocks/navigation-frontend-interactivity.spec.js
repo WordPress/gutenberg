@@ -159,7 +159,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			} );
 			await editor.insertBlock( {
 				name: 'core/navigation',
-				attributes: { overlayMenu: 'off', submenuVisibility: 'click' },
+				attributes: { overlayMenu: 'off' },
 			} );
 			await editor.saveSiteEditorEntities( {
 				isOnlyCurrentEntityDirty: true,
@@ -169,16 +169,16 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 		test( 'Submenu interactions', async ( { page, pageUtils } ) => {
 			await page.goto( '/' );
 			const simpleSubmenuButton = page.getByRole( 'button', {
-				name: 'Simple Submenu',
+				name: 'Simple Submenu submenu',
 			} );
 			const innerElement = page.getByRole( 'link', {
 				name: 'Simple Submenu Link 1',
 			} );
 			const complexSubmenuButton = page.getByRole( 'button', {
-				name: 'Complex Submenu',
+				name: 'Complex Submenu submenu',
 			} );
 			const nestedSubmenuButton = page.getByRole( 'button', {
-				name: 'Nested Submenu',
+				name: 'Nested Submenu submenu',
 			} );
 			const firstLevelElement = page.getByRole( 'link', {
 				name: 'Complex Submenu Link 1',
@@ -280,16 +280,16 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 		} ) => {
 			await page.goto( '/' );
 			const simpleSubmenuButton = page.getByRole( 'button', {
-				name: 'Simple Submenu',
+				name: 'Simple Submenu submenu',
 			} );
 			const innerElement = page.getByRole( 'link', {
 				name: 'Simple Submenu Link 1',
 			} );
 			const complexSubmenuButton = page.getByRole( 'button', {
-				name: 'Complex Submenu',
+				name: 'Complex Submenu submenu',
 			} );
 			const nestedSubmenuButton = page.getByRole( 'button', {
-				name: 'Nested Submenu',
+				name: 'Nested Submenu submenu',
 			} );
 			const firstLevelElement = page.getByRole( 'link', {
 				name: 'Complex Submenu Link 1',
@@ -478,7 +478,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			} );
 			await editor.insertBlock( {
 				name: 'core/navigation',
-				attributes: { overlayMenu: 'off', submenuVisibility: 'click' },
+				attributes: { overlayMenu: 'off' },
 			} );
 			await editor.saveSiteEditorEntities( {
 				isOnlyCurrentEntityDirty: true,
@@ -491,14 +491,14 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 		} ) => {
 			await page.goto( '/' );
 			const submenuButton = page.getByRole( 'button', {
-				name: 'Parent',
+				name: 'Parent Page submenu',
 			} );
 			const innerElement = page.getByRole( 'link', {
 				name: 'Subpage',
 			} );
 			await expect( innerElement ).toBeHidden();
 
-			// page-list submenu opens on click
+			// page-list submenu opens from the chevron button
 			await submenuButton.click();
 			await expect( innerElement ).toBeVisible();
 
@@ -524,8 +524,8 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 		} );
 	} );
 
-	test.describe( 'Legacy openSubmenusOnClick backward compatibility', () => {
-		test( 'Should render and migrate legacy openSubmenusOnClick blocks', async ( {
+	test.describe( 'Legacy openSubmenusOnClick migration', () => {
+		test( 'Should remove legacy openSubmenusOnClick blocks on save', async ( {
 			page,
 			admin,
 			editor,
@@ -563,8 +563,11 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 					.filter( { has: page.locator( 'text="Products"' ) } )
 					.first();
 
-				// Should have open-on-click class for backward compatibility
-				await expect( submenuItem ).toHaveClass( /open-on-click/ );
+				// The legacy setting is no longer applied to render behavior.
+				await expect( submenuItem ).not.toHaveClass( /open-on-click/ );
+				await expect( submenuItem ).toHaveClass(
+					/open-on-hover-click/
+				);
 			} );
 
 			await test.step( 'Load in editor - migration runs in memory only', async () => {
@@ -612,11 +615,11 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 					},
 				} );
 
-				// After saving, the migration should have been applied
-				// The content should now have submenuVisibility instead of openSubmenusOnClick
+				// After saving, the migration should have removed obsolete submenu attributes.
 				const content = savedPost.content.raw;
 
-				expect( content ).toContain( '"submenuVisibility":"click"' );
+				expect( content ).not.toContain( 'submenuVisibility' );
+				expect( content ).not.toContain( 'showSubmenuIcon' );
 				expect( content ).not.toContain( 'openSubmenusOnClick' );
 			} );
 
@@ -629,8 +632,11 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 					.filter( { has: page.locator( 'text="Products"' ) } )
 					.first();
 
-				// Should still have open-on-click class after migration
-				await expect( submenuItem ).toHaveClass( /open-on-click/ );
+				// Should use the derived horizontal submenu behavior after migration.
+				await expect( submenuItem ).not.toHaveClass( /open-on-click/ );
+				await expect( submenuItem ).toHaveClass(
+					/open-on-hover-click/
+				);
 			} );
 		} );
 

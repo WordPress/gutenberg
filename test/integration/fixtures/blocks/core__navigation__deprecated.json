@@ -3,7 +3,6 @@
 		"name": "core/navigation",
 		"isValid": true,
 		"attributes": {
-			"showSubmenuIcon": true,
 			"style": {
 				"typography": {
 					"textTransform": "lowercase",

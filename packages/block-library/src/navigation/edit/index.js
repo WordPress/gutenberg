@@ -30,17 +30,7 @@ import {
 	useEntityRecords,
 } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
-import {
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-	ToggleControl,
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
-	Spinner,
-	Notice,
-	ToolbarButton,
-	ToolbarGroup,
-} from '@wordpress/components';
+import { Spinner, ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { page } from '@wordpress/icons';
@@ -74,7 +64,6 @@ import DeletedNavigationWarning from './deleted-navigation-warning';
 import AccessibleDescription from './accessible-description';
 import AccessibleMenuDescription from './accessible-menu-description';
 import { unlock } from '../../lock-unlock';
-import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { isWithinNavigationOverlay } from '../../utils/is-within-overlay';
 import {
 	DEFAULT_BLOCK,
@@ -266,10 +255,8 @@ function Navigation( {
 	__unstableLayoutClassNames: layoutClassNames,
 } ) {
 	const {
-		submenuVisibility,
 		overlayMenu,
 		overlay,
-		showSubmenuIcon,
 		templateLock,
 		layout: {
 			justifyContent,
@@ -360,60 +347,12 @@ function Navigation( {
 		hasUncontrolledInnerBlocks,
 		uncontrolledInnerBlocks,
 		isInnerBlockSelected,
-		innerBlocks,
 	} = useInnerBlocks( clientId );
 
 	const {
 		submenuVisibility: effectiveSubmenuVisibility,
 		showSubmenuIcon: effectiveShowSubmenuIcon,
-	} = getEffectiveSubmenuSettings( {
-		orientation,
-		submenuVisibility,
-		showSubmenuIcon,
-	} );
-
-	// Use a ref to store whether we've confirmed a page-list has submenus.
-	// Once confirmed, we don't need to keep checking the page-list blocks.
-	const hasPageListWithSubmenuRef = useRef( false );
-
-	// Check for submenus using getBlocks to include controlled innerBlocks
-	const hasSubmenus = useSelect(
-		( select ) => {
-			// First check for navigation-submenu (fast, no selector needed)
-			const hasNavigationSubmenu = innerBlocks.some(
-				( block ) => block.name === 'core/navigation-submenu'
-			);
-			if ( hasNavigationSubmenu ) {
-				return true;
-			}
-
-			// Only check page-list if we didn't find a submenu already
-			const pageList = innerBlocks.find(
-				( block ) => block.name === 'core/page-list'
-			);
-			if ( ! pageList ) {
-				hasPageListWithSubmenuRef.current = false;
-				return false;
-			}
-
-			// If we've already confirmed page-list has submenus, return early
-			if ( hasPageListWithSubmenuRef.current ) {
-				return true;
-			}
-
-			// Check if the page-list has controlled innerBlocks
-			const { getBlocks } = select( blockEditorStore );
-			const pageListBlocks = getBlocks( pageList.clientId );
-			if ( pageListBlocks.length > 0 ) {
-				hasPageListWithSubmenuRef.current = true;
-				return true;
-			}
-
-			// No pageList returned with confirmed submenus, so assume it will not have submenus
-			return false;
-		},
-		[ innerBlocks ]
-	);
+	} = getEffectiveSubmenuSettings( { orientation } );
 
 	// Check if any overlay template parts exist
 	const { records: overlayTemplateParts } = useEntityRecords(
@@ -574,16 +513,14 @@ function Navigation( {
 			setAttributes( { overlayMenu: 'never' } );
 		}
 
-		// Set vertical orientation and always-open submenus for new blocks.
+		// Set vertical orientation for new blocks.
 		if ( ! hasSetOverlayDefault.current && ! ref ) {
 			hasSetOverlayDefault.current = true;
 			setAttributes( {
-				submenuVisibility: 'always',
 				layout: {
 					...attributes.layout,
 					orientation: 'vertical',
 				},
-				showSubmenuIcon: false,
 			} );
 		}
 	}, [
@@ -752,156 +689,13 @@ function Navigation( {
 		{ open: overlayMenuPreview }
 	);
 
-	const submenuAccessibilityNotice =
-		! effectiveShowSubmenuIcon &&
-		effectiveSubmenuVisibility !== 'click' &&
-		effectiveSubmenuVisibility !== 'always'
-			? __(
-					'The current menu options offer reduced accessibility for users and are not recommended. Enabling either "Open on Click" or "Show arrow" offers enhanced accessibility by allowing keyboard users to browse submenus selectively.'
-			  )
-			: '';
-
-	const isFirstRender = useRef( true ); // Don't speak on first render.
-	useEffect( () => {
-		if ( ! isFirstRender.current && submenuAccessibilityNotice ) {
-			speak( submenuAccessibilityNotice );
-		}
-		isFirstRender.current = false;
-	}, [ submenuAccessibilityNotice ] );
-
 	const overlayMenuPreviewId = useInstanceId(
 		OverlayMenuPreview,
 		`overlay-menu-preview`
 	);
 
-	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-
 	const stylingInspectorControls = (
 		<>
-			<InspectorControls>
-				{ hasSubmenus && (
-					<ToolsPanel
-						label={ __( 'Display' ) }
-						resetAll={ () => {
-							setAttributes( {
-								showSubmenuIcon: true,
-								submenuVisibility: 'hover',
-								overlayMenu: 'mobile',
-								hasIcon: true,
-								icon: 'handle',
-							} );
-						} }
-						dropdownMenuProps={ dropdownMenuProps }
-					>
-						{ hasSubmenus && (
-							<>
-								<h3 className="wp-block-navigation__submenu-header">
-									{ __( 'Submenus' ) }
-								</h3>
-								<ToolsPanelItem
-									hasValue={ () =>
-										effectiveSubmenuVisibility !== 'hover'
-									}
-									label={ __( 'Submenu Visibility' ) }
-									onDeselect={ () =>
-										setAttributes( {
-											submenuVisibility: 'hover',
-										} )
-									}
-									isShownByDefault
-								>
-									<ToggleGroupControl
-										__next40pxDefaultSize
-										label={ __( 'Submenu Visibility' ) }
-										value={ effectiveSubmenuVisibility }
-										onChange={ ( value ) => {
-											const newAttributes = {
-												submenuVisibility: value,
-											};
-											const prevSubmenuVisibility =
-												submenuVisibility;
-											// If "always" is selected, hide the arrow because the formatting is broken for it when using center alignment.
-											if ( value === 'always' ) {
-												newAttributes.showSubmenuIcon = false;
-											} else if (
-												value === 'click' ||
-												prevSubmenuVisibility ===
-													'always'
-											) {
-												// When switching to "click" or away from "always", show the arrow
-												newAttributes.showSubmenuIcon = true;
-											}
-
-											setAttributes( newAttributes );
-										} }
-										isBlock
-									>
-										<ToggleGroupControlOption
-											value="hover"
-											label={ __( 'Hover' ) }
-										/>
-										<ToggleGroupControlOption
-											value="click"
-											label={ __( 'Click' ) }
-										/>
-										{ orientation === 'vertical' && (
-											<ToggleGroupControlOption
-												value="always"
-												label={ __( 'Always' ) }
-											/>
-										) }
-									</ToggleGroupControl>
-								</ToolsPanelItem>
-
-								<ToolsPanelItem
-									hasValue={ () =>
-										! effectiveShowSubmenuIcon
-									}
-									label={ __( 'Show arrow' ) }
-									onDeselect={ () =>
-										setAttributes( {
-											showSubmenuIcon: true,
-										} )
-									}
-									isDisabled={
-										effectiveSubmenuVisibility ===
-											'click' ||
-										effectiveSubmenuVisibility === 'always'
-									}
-									isShownByDefault
-								>
-									<ToggleControl
-										checked={ effectiveShowSubmenuIcon }
-										onChange={ ( value ) => {
-											setAttributes( {
-												showSubmenuIcon: value,
-											} );
-										} }
-										disabled={
-											effectiveSubmenuVisibility ===
-												'click' ||
-											effectiveSubmenuVisibility ===
-												'always'
-										}
-										label={ __( 'Show arrow' ) }
-									/>
-								</ToolsPanelItem>
-
-								{ submenuAccessibilityNotice && (
-									<Notice
-										spokenMessage={ null }
-										status="warning"
-										isDismissible={ false }
-										className="wp-block-navigation__submenu-accessibility-notice"
-									>
-										{ submenuAccessibilityNotice }
-									</Notice>
-								) }
-							</>
-						) }
-					</ToolsPanel>
-				) }
-			</InspectorControls>
 			{ ! isWithinOverlay && (
 				<InspectorControls>
 					<OverlayPanel
@@ -1204,29 +998,16 @@ export default withColors(
 	{ overlayTextColor: 'color' }
 )( Navigation );
 
-function getEffectiveSubmenuSettings( {
-	orientation,
-	submenuVisibility,
-	showSubmenuIcon,
-} ) {
-	const resolvedSubmenuVisibility = submenuVisibility ?? 'hover';
-	const resolvedShowSubmenuIcon = showSubmenuIcon ?? true;
-
-	// Horizontal navigation menus cannot display always-open submenus. Treat
-	// older content with that combination as the horizontal default without
-	// writing the repaired values back to the entity.
-	if (
-		orientation === 'horizontal' &&
-		resolvedSubmenuVisibility === 'always'
-	) {
+function getEffectiveSubmenuSettings( { orientation } ) {
+	if ( orientation === 'vertical' ) {
 		return {
-			submenuVisibility: 'hover',
-			showSubmenuIcon: true,
+			submenuVisibility: 'always',
+			showSubmenuIcon: false,
 		};
 	}
 
 	return {
-		submenuVisibility: resolvedSubmenuVisibility,
-		showSubmenuIcon: resolvedShowSubmenuIcon,
+		submenuVisibility: 'hover',
+		showSubmenuIcon: true,
 	};
 }

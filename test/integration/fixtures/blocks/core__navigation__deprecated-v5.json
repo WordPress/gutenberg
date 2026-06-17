@@ -3,9 +3,7 @@
 		"name": "core/navigation",
 		"isValid": true,
 		"attributes": {
-			"showSubmenuIcon": true,
 			"overlayMenu": "never",
-			"submenuVisibility": "hover",
 			"layout": {
 				"type": "flex",
 				"justifyContent": "center",

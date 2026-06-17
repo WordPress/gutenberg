@@ -3,8 +3,6 @@
 		"name": "core/navigation",
 		"isValid": true,
 		"attributes": {
-			"showSubmenuIcon": true,
-			"submenuVisibility": "hover",
 			"overlayMenu": "mobile",
 			"layout": {
 				"type": "flex",

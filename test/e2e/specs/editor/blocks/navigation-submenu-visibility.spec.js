@@ -30,7 +30,7 @@ async function getSettingsPanel( page ) {
 	return editorSettings.getByRole( 'tabpanel', { name: 'Settings' } );
 }
 
-test.describe( 'Navigation block - Submenu Visibility', () => {
+test.describe( 'Navigation block - derived submenu behavior', () => {
 	test.beforeEach( async ( { admin, editor, requestUtils } ) => {
 		await admin.createNewPost();
 
@@ -65,28 +65,14 @@ test.describe( 'Navigation block - Submenu Visibility', () => {
 		await requestUtils.deleteAllPages();
 	} );
 
-	test( 'When Always is selected, submenus are visible on the page', async ( {
+	test( 'Vertical navigation shows submenus on the page', async ( {
 		editor,
 		page,
 	} ) => {
-		await test.step( 'Switch to vertical orientation and select Always', async () => {
+		await test.step( 'Switch to vertical orientation', async () => {
 			await editor.openDocumentSettingsSidebar();
 
 			await setNavigationOrientationToVertical( page );
-
-			// Select Always from Submenu Visibility
-			const settingsPanel = await getSettingsPanel( page );
-			const submenuVisibilityGroup = settingsPanel.getByRole(
-				'radiogroup',
-				{
-					name: 'Submenu Visibility',
-				}
-			);
-
-			const alwaysOption = submenuVisibilityGroup.getByRole( 'radio', {
-				name: 'Always',
-			} );
-			await alwaysOption.click();
 		} );
 
 		await test.step( 'Verify submenu child links are visible in canvas', async () => {
@@ -196,40 +182,11 @@ test.describe( 'Navigation block - Submenu Visibility', () => {
 			await expect( pageListBlock ).toContainText( 'Phones' );
 		} );
 
-		await test.step( 'Submenu Visibility control appears for page-list', async () => {
-			// Select navigation block and check settings
+		await test.step( 'Set navigation orientation to vertical', async () => {
 			await editor.selectBlocks( navBlock );
 			await editor.openDocumentSettingsSidebar();
 
-			// Check if Submenu Visibility control exists
-			const settingsPanel = await getSettingsPanel( page );
-			const submenuVisibilityGroup = settingsPanel.getByRole(
-				'radiogroup',
-				{
-					name: 'Submenu Visibility',
-				}
-			);
-
-			await expect( submenuVisibilityGroup ).toBeVisible();
-		} );
-
-		await test.step( 'Set submenu visibility to always', async () => {
-			// Switch to vertical orientation first (required for Always option)
 			await setNavigationOrientationToVertical( page );
-
-			// Select Always from Submenu Visibility
-			const settingsPanel = await getSettingsPanel( page );
-			const submenuVisibilityGroup = settingsPanel.getByRole(
-				'radiogroup',
-				{
-					name: 'Submenu Visibility',
-				}
-			);
-
-			const alwaysOption = submenuVisibilityGroup.getByRole( 'radio', {
-				name: 'Always',
-			} );
-			await alwaysOption.click();
 		} );
 
 		await test.step( 'Publish the post', async () => {
@@ -240,7 +197,7 @@ test.describe( 'Navigation block - Submenu Visibility', () => {
 			await page.goto( `/?p=${ postId }` );
 		} );
 
-		await test.step( 'Setting Always makes submenus visible on frontend', async () => {
+		await test.step( 'Vertical navigation makes submenus visible on frontend', async () => {
 			// Find the parent page link in navigation
 			const parentLink = page
 				.getByRole( 'navigation' )

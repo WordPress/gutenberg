@@ -88,8 +88,8 @@ export default function NavigationSubmenuEdit( {
 	const { showSubmenuIcon, maxNestingLevel, submenuVisibility } = context;
 	const blockEditingMode = useBlockEditingMode();
 
-	// Force click-only behavior in contentOnly mode to prevent hover dropdowns
-	const openSubmenusOnClick =
+	// Force click-only behavior in contentOnly mode to prevent hover dropdowns.
+	const openOnClick =
 		blockEditingMode !== 'default' ? true : submenuVisibility === 'click';
 
 	// URL binding logic
@@ -190,7 +190,7 @@ export default function NavigationSubmenuEdit( {
 	// This can't be done in the useState call because it conflicts
 	// with the autofocus behavior of the BlockListBlock component.
 	useEffect( () => {
-		if ( ! openSubmenusOnClick && ! url ) {
+		if ( ! openOnClick && ! url ) {
 			setIsLinkOpen( true );
 		}
 	}, [] );
@@ -250,7 +250,7 @@ export default function NavigationSubmenuEdit( {
 			'has-background': !! backgroundColor || customBackgroundColor,
 			[ getColorClassName( 'background-color', backgroundColor ) ]:
 				!! backgroundColor,
-			'open-on-click': openSubmenusOnClick,
+			'open-on-click': openOnClick,
 			'open-always': submenuVisibility === 'always',
 		} ),
 		style: {
@@ -292,7 +292,7 @@ export default function NavigationSubmenuEdit( {
 				: false,
 	} );
 
-	const ParentElement = openSubmenusOnClick ? 'button' : 'a';
+	const ParentElement = openOnClick ? 'button' : 'a';
 
 	function transformToLink() {
 		const newLinkBlock = createBlock( 'core/navigation-link', attributes );
@@ -316,7 +316,7 @@ export default function NavigationSubmenuEdit( {
 		<>
 			<BlockControls>
 				<ToolbarGroup>
-					{ ! openSubmenusOnClick && (
+					{ ! openOnClick && (
 						<ToolbarButton
 							name="link"
 							icon={ linkIcon }
@@ -343,7 +343,7 @@ export default function NavigationSubmenuEdit( {
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 					clientId={ clientId }
-					isLinkEditable={ ! openSubmenusOnClick }
+					isLinkEditable={ ! openOnClick }
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>
@@ -364,7 +364,7 @@ export default function NavigationSubmenuEdit( {
 								placeholder={ itemLabelPlaceholder }
 								withoutInteractiveFormatting
 								onClick={ () => {
-									if ( ! openSubmenusOnClick && ! url ) {
+									if ( ! openOnClick && ! url ) {
 										setIsLinkOpen( true );
 									}
 								} }
@@ -384,7 +384,7 @@ export default function NavigationSubmenuEdit( {
 							className="wp-block-navigation-item__label"
 						/>
 					) }
-					{ ! openSubmenusOnClick && isLinkOpen && (
+					{ ! openOnClick && isLinkOpen && (
 						<LinkUI
 							clientId={ clientId }
 							link={ attributes }
@@ -405,7 +405,7 @@ export default function NavigationSubmenuEdit( {
 						/>
 					) }
 				</ParentElement>
-				{ ( showSubmenuIcon || openSubmenusOnClick ) && (
+				{ ( showSubmenuIcon || openOnClick ) && (
 					<span className="wp-block-navigation__submenu-icon">
 						<ItemSubmenuIcon />
 					</span>

@@ -46,25 +46,14 @@ const migrateWithLayout = ( attributes ) => {
 	return updatedAttributes;
 };
 
-const migrateOpenSubmenusOnClick = ( attributes ) => {
-	const { openSubmenusOnClick, ...restAttributes } = attributes;
+const stripObsoleteSubmenuAttributes = ( {
+	openSubmenusOnClick,
+	showSubmenuIcon,
+	submenuVisibility,
+	...attributes
+} ) => attributes;
 
-	// Don't migrate if openSubmenusOnClick doesn't exist
-	if ( openSubmenusOnClick === null || openSubmenusOnClick === undefined ) {
-		return attributes;
-	}
-
-	// Always remove openSubmenusOnClick
-	// If submenuVisibility already exists, keep it; otherwise set based on openSubmenusOnClick
-	return {
-		...restAttributes,
-		submenuVisibility:
-			restAttributes.submenuVisibility ??
-			( openSubmenusOnClick ? 'click' : 'hover' ),
-	};
-};
-
-// v7: Migrate openSubmenusOnClick to submenuVisibility
+// v7: Remove stored submenu behavior attributes.
 const v7 = {
 	attributes: {
 		ref: {
@@ -91,6 +80,11 @@ const v7 = {
 		showSubmenuIcon: {
 			type: 'boolean',
 			default: true,
+		},
+		submenuVisibility: {
+			type: 'string',
+			enum: [ 'hover', 'click', 'always' ],
+			default: 'hover',
 		},
 		openSubmenusOnClick: {
 			type: 'boolean',
@@ -173,9 +167,15 @@ const v7 = {
 	save() {
 		return <InnerBlocks.Content />;
 	},
-	isEligible: ( { openSubmenusOnClick } ) =>
-		openSubmenusOnClick !== null && openSubmenusOnClick !== undefined,
-	migrate: migrateOpenSubmenusOnClick,
+	isEligible: ( {
+		openSubmenusOnClick,
+		showSubmenuIcon,
+		submenuVisibility,
+	} ) =>
+		( openSubmenusOnClick !== null && openSubmenusOnClick !== undefined ) ||
+		( showSubmenuIcon !== null && showSubmenuIcon !== undefined ) ||
+		( submenuVisibility !== null && submenuVisibility !== undefined ),
+	migrate: stripObsoleteSubmenuAttributes,
 };
 
 const v6 = {
@@ -261,7 +261,7 @@ const v6 = {
 		return <InnerBlocks.Content />;
 	},
 	isEligible: ( { navigationMenuId } ) => !! navigationMenuId,
-	migrate: migrateIdToRef,
+	migrate: compose( migrateIdToRef, stripObsoleteSubmenuAttributes ),
 };
 
 const v5 = {
@@ -355,7 +355,7 @@ const v5 = {
 	migrate: compose(
 		migrateIdToRef,
 		migrateWithLayout,
-		migrateOpenSubmenusOnClick
+		stripObsoleteSubmenuAttributes
 	),
 };
 
@@ -443,7 +443,7 @@ const v4 = {
 		migrateIdToRef,
 		migrateWithLayout,
 		migrateFontFamily,
-		migrateOpenSubmenusOnClick
+		stripObsoleteSubmenuAttributes
 	),
 	isEligible( { style } ) {
 		return style?.typography?.fontFamily;
@@ -569,7 +569,7 @@ const deprecated = [
 			migrateWithLayout,
 			migrateFontFamily,
 			migrateIsResponsive,
-			migrateOpenSubmenusOnClick
+			stripObsoleteSubmenuAttributes
 		),
 		save() {
 			return <InnerBlocks.Content />;
@@ -644,7 +644,8 @@ const deprecated = [
 			migrateIdToRef,
 			migrateWithLayout,
 			migrateFontFamily,
-			migrateTypographyPresets
+			migrateTypographyPresets,
+			stripObsoleteSubmenuAttributes
 		),
 	},
 	{
@@ -686,19 +687,23 @@ const deprecated = [
 			html: false,
 			inserter: true,
 		},
-		migrate: compose( migrateIdToRef, ( attributes ) => {
-			const { rgbTextColor, rgbBackgroundColor, ...restAttributes } =
-				attributes;
-			return {
-				...restAttributes,
-				customTextColor: attributes.textColor
-					? undefined
-					: attributes.rgbTextColor,
-				customBackgroundColor: attributes.backgroundColor
-					? undefined
-					: attributes.rgbBackgroundColor,
-			};
-		} ),
+		migrate: compose(
+			migrateIdToRef,
+			stripObsoleteSubmenuAttributes,
+			( attributes ) => {
+				const { rgbTextColor, rgbBackgroundColor, ...restAttributes } =
+					attributes;
+				return {
+					...restAttributes,
+					customTextColor: attributes.textColor
+						? undefined
+						: attributes.rgbTextColor,
+					customBackgroundColor: attributes.backgroundColor
+						? undefined
+						: attributes.rgbBackgroundColor,
+				};
+			}
+		),
 		save() {
 			return <InnerBlocks.Content />;
 		},

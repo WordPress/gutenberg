@@ -6,58 +6,27 @@
  */
 
 /**
- * Returns the submenu visibility value with backward compatibility
- * for the deprecated openSubmenusOnClick attribute.
+ * Returns navigation attributes with submenu render context derived from layout.
  *
- * This function centralizes the migration logic from the boolean
- * openSubmenusOnClick to the new submenuVisibility enum.
- *
- * Backward compatibility: WordPress applies default attribute values, so submenuVisibility
- * will always have a value even for legacy blocks. We check the legacy openSubmenusOnClick
- * attribute first to preserve original behavior for blocks saved before the migration.
- *
- * @since 6.9.0
- *
- * @param array $attributes Block attributes containing submenuVisibility and/or openSubmenusOnClick.
- * @return string The visibility mode: 'hover', 'click', or 'always'.
- */
-function block_core_navigation_get_submenu_visibility( $attributes ) {
-	$deprecated_open_submenus_on_click = $attributes['openSubmenusOnClick'] ?? null;
-
-	// For backward compatibility, prioritize the legacy attribute if present.
-	// Legacy blocks have openSubmenusOnClick in the database. Since WordPress applies
-	// default values, submenuVisibility will also have a value, but we check the legacy
-	// attribute first to preserve the original behavior. If the block has been updated
-	// and saved in the editor, then the deprecated attribute will be replaced by submenuVisibility.
-	if ( null !== $deprecated_open_submenus_on_click ) {
-		// Convert boolean to string: true -> 'click', false -> 'hover'.
-		return ! empty( $deprecated_open_submenus_on_click ) ? 'click' : 'hover';
-	}
-
-	$submenu_visibility = $attributes['submenuVisibility'] ?? null;
-
-	// Use submenuVisibility for migrated/new blocks (where openSubmenusOnClick is null).
-	return $submenu_visibility ?? 'hover';
-}
-
-/**
- * Returns navigation attributes with impossible submenu settings coerced for rendering.
- *
- * Horizontal navigation menus cannot display always-open submenus. Older content may
- * still contain that combination, so render it as the horizontal default without
- * writing the repaired values back to the entity.
+ * Submenu behavior is no longer stored on the Navigation block. Horizontal
+ * menus render hover-open submenus with indicators; vertical menus render
+ * always-open submenus without indicators.
  *
  * @param array $attributes Block attributes.
  * @return array Attributes to use for render behavior and block context.
  */
 function block_core_navigation_get_effective_submenu_attributes( $attributes ) {
-	$orientation        = $attributes['layout']['orientation'] ?? 'horizontal';
-	$submenu_visibility = block_core_navigation_get_submenu_visibility( $attributes );
+	$orientation = $attributes['layout']['orientation'] ?? 'horizontal';
 
-	if ( 'horizontal' === $orientation && 'always' === $submenu_visibility ) {
+	if ( 'vertical' === $orientation ) {
+		$attributes['submenuVisibility'] = 'always';
+		$attributes['showSubmenuIcon']   = false;
+	} else {
 		$attributes['submenuVisibility'] = 'hover';
 		$attributes['showSubmenuIcon']   = true;
 	}
+
+	unset( $attributes['openSubmenusOnClick'] );
 
 	return $attributes;
 }
@@ -167,7 +136,7 @@ class WP_Navigation_Block_Renderer {
 	private static function is_interactive( $attributes, $inner_blocks ) {
 		$has_submenus        = static::has_submenus( $inner_blocks );
 		$is_responsive_menu  = static::is_responsive( $attributes );
-		$computed_visibility = block_core_navigation_get_submenu_visibility( $attributes );
+		$computed_visibility = $attributes['submenuVisibility'] ?? 'hover';
 		$open_on_click       = 'click' === $computed_visibility;
 		$show_submenu_icon   = ! empty( $attributes['showSubmenuIcon'] );
 		return ( $has_submenus && ( $open_on_click || $show_submenu_icon ) ) || $is_responsive_menu;
@@ -1233,7 +1202,7 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 		// event.
 		$tags->set_attribute( 'tabindex', '-1' );
 
-		$computed_visibility = block_core_navigation_get_submenu_visibility( $block_attributes );
+		$computed_visibility = $block_attributes['submenuVisibility'] ?? 'hover';
 		$open_on_hover       = 'hover' === $computed_visibility;
 
 		if ( $open_on_hover ) {
