@@ -228,6 +228,19 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 				'<p>before</p><svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0" /></svg>',
 				'',
 			),
+			// Skips leading comments, XML declarations, and whitespace.
+			'extracts svg after xml declaration'          => array(
+				'<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0" /></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0" /></svg>',
+			),
+			'extracts svg after leading comment'          => array(
+				'<!-- Generator: some editor --><svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0" /></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0" /></svg>',
+			),
+			'extracts svg after leading whitespace'       => array(
+				"  \n\t<svg xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M0 0\" /></svg>",
+				'<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0" /></svg>',
+			),
 			// Root SVG element.
 			'preserves root svg element'                  => array(
 				'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" width="24" height="24" class="icon" aria-hidden="true"><path d="M0 0" fill="currentColor" /></svg>',

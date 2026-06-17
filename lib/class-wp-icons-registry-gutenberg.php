@@ -882,7 +882,29 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 		);
 
 		$processor = WP_HTML_Processor::create_fragment( $icon_content );
-		if ( ! $processor || ! $processor->next_token() || 'SVG' !== $processor->get_tag() ) {
+		if ( ! $processor ) {
+			return '';
+		}
+
+		// Skip leading comments, XML declarations, doctype, and whitespace to
+		// reach the root SVG element.
+		while ( $processor->next_token() ) {
+			$token_type = $processor->get_token_type();
+			if ( '#tag' === $token_type ) {
+				break;
+			}
+			if (
+				'#comment' === $token_type
+				|| '#doctype' === $token_type
+				|| ( '#text' === $token_type && '' === trim( $processor->get_modifiable_text() ) )
+			) {
+				continue;
+			}
+			// Any other leading token (e.g. non-whitespace text) is invalid.
+			return '';
+		}
+
+		if ( 'SVG' !== $processor->get_tag() ) {
 			return '';
 		}
 
