@@ -314,7 +314,7 @@ class Field_Collections_Default_Post_Types_Test extends WP_UnitTestCase {
 
 		$this->assertCount( 1, $collections );
 		$this->assertSame( 'core/test_generic-fields', $collections[0]['id'] );
-		$this->assertSame( '@wordpress/field-collections/postType-default', $collections[0]['fields_module'] );
+		$this->assertSame( array( '@wordpress/field-collections/postType-default' ), $collections[0]['fields_modules'] );
 		$this->assertSame(
 			$this->get_field_ids( gutenberg_get_default_post_type_fields( 'test_generic' ) ),
 			$this->get_field_ids( $collections[0]['fields'] )

@@ -45,12 +45,55 @@ function gutenberg_register_field_collection( $id, $kind, $name, $fields, $field
 		}
 	}
 
+	/**
+	 * Filters the serializable field definitions of a field collection.
+	 *
+	 * Lets consumers tailor an auto-registered collection — removing,
+	 * reordering, relabeling, or adding fields — without re-registering it.
+	 * Fires for every collection, whether registered directly or generated
+	 * for a post type from its `supports` (see
+	 * `gutenberg_register_default_post_type_field_collections()`).
+	 *
+	 * Pair with the `gutenberg_field_collection_modules` filter when an added
+	 * or changed field needs non-serializable behavior (render, Edit, …).
+	 *
+	 * @since 20.8.0
+	 *
+	 * @param array       $fields Array of serializable field definitions.
+	 * @param string      $id     The collection identifier.
+	 * @param string      $kind   The entity kind (postType, taxonomy, user, etc.).
+	 * @param string|null $name   The entity name, or null for universal collections.
+	 */
+	$fields = apply_filters( 'gutenberg_field_collection_fields', $fields, $id, $kind, $name );
+
+	$fields_modules = $fields_module ? array( $fields_module ) : array();
+
+	/**
+	 * Filters the script module handles providing a collection's
+	 * non-serializable field extensions.
+	 *
+	 * Each module's default export is a list of `Partial<Field>` keyed by
+	 * field id; the client merges every module in order onto the matching
+	 * field, so a later module overrides an earlier one property by property
+	 * (last wins). Append a handle here to attach JavaScript behavior to a
+	 * field added via the `gutenberg_field_collection_fields` filter, or to
+	 * override the behavior of an existing one.
+	 *
+	 * @since 20.8.0
+	 *
+	 * @param string[]    $fields_modules Script Module handles, in merge order.
+	 * @param string      $id             The collection identifier.
+	 * @param string      $kind           The entity kind (postType, taxonomy, user, etc.).
+	 * @param string|null $name           The entity name, or null for universal collections.
+	 */
+	$fields_modules = apply_filters( 'gutenberg_field_collection_modules', $fields_modules, $id, $kind, $name );
+
 	$collection = array(
-		'id'            => $id,
-		'kind'          => $kind,
-		'name'          => $name,
-		'fields'        => $fields,
-		'fields_module' => $fields_module,
+		'id'             => $id,
+		'kind'           => $kind,
+		'name'           => $name,
+		'fields'         => $fields,
+		'fields_modules' => array_values( array_unique( $fields_modules ) ),
 	);
 
 	$gutenberg_field_collections[] = $collection;
@@ -100,7 +143,7 @@ function gutenberg_get_all_field_collections() {
  * page's import map, and WordPress only prints import map entries for modules
  * reachable from an enqueued module's dependency graph. This re-registers the
  * (intentionally empty) `@wordpress/field-collections/loader` module with
- * every collection's `fields_module` as a dynamic dependency and enqueues it:
+ * every collection's `fields_modules` as dynamic dependencies and enqueues it:
  * the modules land in the import map but are only fetched when
  * `useFieldCollections` dynamically imports them.
  *
@@ -109,9 +152,9 @@ function gutenberg_get_all_field_collections() {
 function gutenberg_enqueue_field_collections_loader() {
 	$dependencies = array();
 	foreach ( gutenberg_get_all_field_collections() as $collection ) {
-		if ( ! empty( $collection['fields_module'] ) ) {
-			$dependencies[ $collection['fields_module'] ] = array(
-				'id'     => $collection['fields_module'],
+		foreach ( $collection['fields_modules'] as $fields_module ) {
+			$dependencies[ $fields_module ] = array(
+				'id'     => $fields_module,
 				'import' => 'dynamic',
 			);
 		}

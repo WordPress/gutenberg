@@ -19,7 +19,9 @@ describe( 'field-collections reducer', () => {
 				kind: 'postType',
 				name: 'post',
 				fields: [],
-				fields_module: '@wordpress/field-collections/postType-post',
+				fields_modules: [
+					'@wordpress/field-collections/postType-default',
+				],
 			},
 		];
 

@@ -2,30 +2,39 @@
 /**
  * Dynamic registrar for the default `core/{post_type}-fields` field collections.
  *
- * Registers a field collection for every REST-enabled post type that does not
+ * This is the primary registration path for post type field collections. It
+ * registers a field collection for every REST-enabled post type that does not
  * already have one, mirroring the client-side fallback in
  * `packages/editor/src/dataviews/store/private-actions.ts` — same conditions,
  * same field order — so the UI is unchanged when the source flips from the
  * fallback to a server-registered collection.
  *
+ * Post types that only need to tweak the generic result (e.g. `page`,
+ * `wp_template`, `wp_block`) do not register their own collection: they hook
+ * the `gutenberg_field_collection_fields` / `gutenberg_field_collection_modules`
+ * filters to adjust this one. Post types whose fields are unrelated to the
+ * generic set (e.g. `attachment`) register their own collection instead, which
+ * makes this registrar skip them.
+ *
  * The non-serializable extensions (getValue, render, Edit…) shared by these
  * collections live in the collocated `extensions.ts`, exposed as the
  * `@wordpress/field-collections/postType-default` script module. The client merge ignores
  * extension entries for fields a collection does not include, so the one
- * module serves all post types.
+ * module serves all post types; per-post-type overrides append their own
+ * module via the `gutenberg_field_collection_modules` filter.
  *
  * This file is copied to `build/scripts/field-collections/collections/postType-default/fields.php`
  * by the `wpCopyFiles` config in the package's package.json, and required on
  * `init` by `gutenberg_register_core_field_collections()`. Because the loader
  * requires the collection files in alphabetical glob order, this file is
- * loaded before most hand-written collections (`postType-default` sorts before
- * `postType-page`…), so it must not register anything at require time.
+ * loaded before the per-post-type override files (`postType-default` sorts
+ * before `postType-page`…), so it must not register anything at require time.
  * Instead, it hooks the registration loop on `init` at priority 100 — after
- * the hand-written core collections (registered while the loader runs at
- * priority 10) and after typical third-party registrations. Post types
- * registered after `init` priority 100 are not covered, matching WordPress's
- * own constraint that post types must be registered during `init` to be
- * available via REST.
+ * the override files have added their filters and any bespoke collections have
+ * been registered (the loader runs at priority 10) and after typical
+ * third-party registrations. Post types registered after `init` priority 100
+ * are not covered, matching WordPress's own constraint that post types must be
+ * registered during `init` to be available via REST.
  *
  * @package gutenberg
  */
@@ -334,11 +343,13 @@ if ( ! function_exists( 'gutenberg_register_default_post_type_field_collections'
 	 * Registers the default field collection for every REST-enabled post type
 	 * that does not already have one.
 	 *
-	 * Hand-written core collections and third-party collections registered
-	 * earlier on `init` take precedence: registering a collection for a post
-	 * type is the override mechanism that keeps the generic one away. The
-	 * registry's id-based dedupe (`core/{$post_type}-fields`) is a second
-	 * safety net.
+	 * Bespoke collections (and third-party collections) registered earlier on
+	 * `init` take precedence: registering a collection for a post type is how
+	 * it opts out of the generic one. Post types that only need to tweak the
+	 * generic collection instead leave it to register here and adjust it
+	 * through the `gutenberg_field_collection_fields` /
+	 * `gutenberg_field_collection_modules` filters. The registry's id-based
+	 * dedupe (`core/{$post_type}-fields`) is a second safety net.
 	 */
 	function gutenberg_register_default_post_type_field_collections() {
 		$post_types = get_post_types( array( 'show_in_rest' => true ) );

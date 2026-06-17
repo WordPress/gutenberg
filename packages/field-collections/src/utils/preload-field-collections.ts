@@ -7,9 +7,10 @@ import type { FieldCollection } from '../store/types';
 /**
  * Preload field collections data and their script modules.
  *
- * Resolves the field collections for an entity and eagerly imports each
- * collection's `fields_module`, so a later `useFieldCollections` call for the
- * same entity renders without a loading flash. Intended for route loaders.
+ * Resolves the field collections for an entity and eagerly imports every
+ * script module in each collection's `fields_modules`, so a later
+ * `useFieldCollections` call for the same entity renders without a loading
+ * flash. Intended for route loaders.
  *
  * @param kind Entity kind (e.g., 'postType', 'taxonomy', 'user').
  * @param name Entity name (e.g., 'attachment', 'post', 'category').
@@ -26,12 +27,12 @@ export async function preloadFieldCollections(
 	).getEntityFieldCollections( kind, name ) ) as FieldCollection< unknown >[];
 
 	const modulePromises = collections
-		.filter( ( collection ) => collection.fields_module )
-		.map( async ( collection ) => {
+		.flatMap( ( collection ) => collection.fields_modules ?? [] )
+		.map( async ( handle ) => {
 			try {
 				await import(
 					/* webpackIgnore: true */
-					collection.fields_module!
+					handle
 				);
 			} catch {
 				// Ignore preload failures; useFieldCollections falls back to

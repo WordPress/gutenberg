@@ -76,7 +76,7 @@ class Gutenberg_REST_Field_Collections_Controller_Test extends WP_Test_REST_Cont
 		gutenberg_register_field_collection(
 			'test/basic',
 			'postType',
-			'page',
+			'test_entity',
 			array(
 				array(
 					'id'   => 'title',
@@ -89,7 +89,7 @@ class Gutenberg_REST_Field_Collections_Controller_Test extends WP_Test_REST_Cont
 
 		$request = new WP_REST_Request( 'GET', '/wp/v2/field-collections' );
 		$request->set_param( 'kind', 'postType' );
-		$request->set_param( 'name', 'page' );
+		$request->set_param( 'name', 'test_entity' );
 
 		$response = rest_get_server()->dispatch( $request );
 
@@ -98,15 +98,15 @@ class Gutenberg_REST_Field_Collections_Controller_Test extends WP_Test_REST_Cont
 		$data = $response->get_data();
 		$this->assertCount( 1, $data );
 		$this->assertSame( 'test/basic', $data[0]['id'] );
-		$this->assertArrayHasKey( 'fields_module', $data[0] );
-		$this->assertNull( $data[0]['fields_module'] );
+		$this->assertArrayHasKey( 'fields_modules', $data[0] );
+		$this->assertSame( array(), $data[0]['fields_modules'] );
 	}
 
 	public function test_prepare_item() {
 		gutenberg_register_field_collection(
 			'test/with-module',
 			'postType',
-			'page',
+			'test_entity',
 			array(
 				array(
 					'id'   => 'status',
@@ -120,12 +120,12 @@ class Gutenberg_REST_Field_Collections_Controller_Test extends WP_Test_REST_Cont
 
 		$request = new WP_REST_Request( 'GET', '/wp/v2/field-collections' );
 		$request->set_param( 'kind', 'postType' );
-		$request->set_param( 'name', 'page' );
+		$request->set_param( 'name', 'test_entity' );
 
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertSame( 'my-plugin-page-fields', $data[0]['fields_module'] );
+		$this->assertSame( array( 'my-plugin-page-fields' ), $data[0]['fields_modules'] );
 	}
 
 	public function test_get_item_schema() {
@@ -136,10 +136,10 @@ class Gutenberg_REST_Field_Collections_Controller_Test extends WP_Test_REST_Cont
 		$schema     = $data['schema'];
 		$properties = $schema['properties'];
 
-		$this->assertArrayHasKey( 'fields_module', $properties );
-		$this->assertSame( array( 'string', 'null' ), $properties['fields_module']['type'] );
-		$this->assertSame( array( 'view' ), $properties['fields_module']['context'] );
-		$this->assertTrue( $properties['fields_module']['readonly'] );
+		$this->assertArrayHasKey( 'fields_modules', $properties );
+		$this->assertSame( 'array', $properties['fields_modules']['type'] );
+		$this->assertSame( array( 'view' ), $properties['fields_modules']['context'] );
+		$this->assertTrue( $properties['fields_modules']['readonly'] );
 	}
 
 	public function test_register_field_collection_with_fields_module() {
@@ -159,7 +159,7 @@ class Gutenberg_REST_Field_Collections_Controller_Test extends WP_Test_REST_Cont
 		$collections = gutenberg_get_field_collections( 'postType', 'post' );
 
 		$this->assertCount( 1, $collections );
-		$this->assertSame( 'my-plugin-post-fields', $collections[0]['fields_module'] );
+		$this->assertSame( array( 'my-plugin-post-fields' ), $collections[0]['fields_modules'] );
 	}
 
 	public function test_register_field_collection_without_fields_module() {
@@ -178,14 +178,107 @@ class Gutenberg_REST_Field_Collections_Controller_Test extends WP_Test_REST_Cont
 		$collections = gutenberg_get_field_collections( 'postType', 'post' );
 
 		$this->assertCount( 1, $collections );
-		$this->assertNull( $collections[0]['fields_module'] );
+		$this->assertSame( array(), $collections[0]['fields_modules'] );
+	}
+
+	public function test_field_collection_fields_filter_can_modify_fields() {
+		$callback = function ( $fields, $id, $kind, $name ) {
+			if ( 'postType' !== $kind || 'post' !== $name ) {
+				return $fields;
+			}
+
+			// Remove an existing field, relabel another, and add a new one.
+			$fields = array_values(
+				array_filter(
+					$fields,
+					static function ( $field ) {
+						return 'drop_me' !== $field['id'];
+					}
+				)
+			);
+
+			foreach ( $fields as &$field ) {
+				if ( 'title' === $field['id'] ) {
+					$field['label'] = 'Renamed';
+				}
+			}
+			unset( $field );
+
+			$fields[] = array(
+				'id'   => 'added',
+				'type' => 'text',
+			);
+
+			return $fields;
+		};
+
+		add_filter( 'gutenberg_field_collection_fields', $callback, 10, 4 );
+
+		gutenberg_register_field_collection(
+			'test/filtered',
+			'postType',
+			'post',
+			array(
+				array(
+					'id'    => 'title',
+					'type'  => 'text',
+					'label' => 'Title',
+				),
+				array(
+					'id'   => 'drop_me',
+					'type' => 'text',
+				),
+			)
+		);
+
+		remove_filter( 'gutenberg_field_collection_fields', $callback, 10 );
+
+		$collections = gutenberg_get_field_collections( 'postType', 'post' );
+		$ids         = array_column( $collections[0]['fields'], 'id' );
+
+		$this->assertSame( array( 'title', 'added' ), $ids );
+		$this->assertSame( 'Renamed', $collections[0]['fields'][0]['label'] );
+	}
+
+	public function test_field_collection_modules_filter_appends_modules() {
+		$callback = function ( $modules, $id, $kind, $name ) {
+			if ( 'postType' === $kind && 'post' === $name ) {
+				$modules[] = 'my-plugin-extra-module';
+			}
+
+			return $modules;
+		};
+
+		add_filter( 'gutenberg_field_collection_modules', $callback, 10, 4 );
+
+		gutenberg_register_field_collection(
+			'test/with-extra-module',
+			'postType',
+			'post',
+			array(
+				array(
+					'id'   => 'title',
+					'type' => 'text',
+				),
+			),
+			'my-plugin-own-module'
+		);
+
+		remove_filter( 'gutenberg_field_collection_modules', $callback, 10 );
+
+		$collections = gutenberg_get_field_collections( 'postType', 'post' );
+
+		$this->assertSame(
+			array( 'my-plugin-own-module', 'my-plugin-extra-module' ),
+			$collections[0]['fields_modules']
+		);
 	}
 
 	public function test_enqueue_field_collections_loader_adds_modules_to_import_map() {
 		gutenberg_register_field_collection(
 			'test/with-module',
 			'postType',
-			'page',
+			'test_entity',
 			array(
 				array(
 					'id'   => 'status',
@@ -212,7 +305,7 @@ class Gutenberg_REST_Field_Collections_Controller_Test extends WP_Test_REST_Cont
 		gutenberg_register_field_collection(
 			'test/basic',
 			'postType',
-			'page',
+			'test_entity',
 			array(
 				array(
 					'id'   => 'title',
@@ -233,7 +326,7 @@ class Gutenberg_REST_Field_Collections_Controller_Test extends WP_Test_REST_Cont
 
 		$request = new WP_REST_Request( 'GET', '/wp/v2/field-collections' );
 		$request->set_param( 'kind', 'postType' );
-		$request->set_param( 'name', 'page' );
+		$request->set_param( 'name', 'test_entity' );
 
 		$response = rest_get_server()->dispatch( $request );
 

@@ -1,14 +1,27 @@
 <?php
 /**
- * Serializable field definitions for the `core/template-fields` field collection.
+ * Overrides for the `core/wp_template-fields` field collection.
  *
- * The non-serializable extensions (getValue, render, Edit…) live in the
- * collocated `extensions.ts`, exposed as the
- * `@wordpress/field-collections/postType-wp_template` script module.
+ * `wp_template` does not register its own collection: the default registrar
+ * (`gutenberg_register_default_post_type_field_collections()`) generates one
+ * from the post type's `supports`. As a design post type it omits the date,
+ * excerpt, and content-info fields, leaving the author, status, slug, template,
+ * password, and title fields this collection needs. This file only tailors
+ * what differs from that baseline, via the `gutenberg_field_collection_fields`
+ * and `gutenberg_field_collection_modules` filters:
+ *
+ * - The title is relabeled "Template" and always shown (its `enableHiding` is
+ *   forced off).
+ * - The template-specific title behavior (getValue/render) ships in the
+ *   collocated `extensions.ts`, exposed as the
+ *   `@wordpress/field-collections/postType-wp_template` script module and merged
+ *   after the default module so it wins.
  *
  * This file is copied to `build/scripts/field-collections/collections/postType-wp_template/fields.php`
  * by the `wpCopyFiles` config in the package's package.json, and required on
- * `init` by `gutenberg_register_core_field_collections()`.
+ * `init` by `gutenberg_register_core_field_collections()` at priority 10 —
+ * before the default registrar runs at priority 100, so these filters are in
+ * place when the collection is registered.
  *
  * @package gutenberg
  */
@@ -17,73 +30,36 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Silence is golden.' );
 }
 
-$author = array(
-	'id'       => 'author',
-	'type'     => 'integer',
-	'label'    => __( 'Author', 'gutenberg' ),
-	'filterBy' => array(
-		'operators' => array( 'isAny', 'isNone' ),
-	),
+add_filter(
+	'gutenberg_field_collection_fields',
+	function ( $fields, $id, $kind, $name ) {
+		if ( 'postType' !== $kind || 'wp_template' !== $name ) {
+			return $fields;
+		}
+
+		foreach ( $fields as &$field ) {
+			if ( 'title' === $field['id'] ) {
+				$field['label']        = __( 'Template', 'gutenberg' );
+				$field['enableHiding'] = false;
+			}
+		}
+		unset( $field );
+
+		return $fields;
+	},
+	10,
+	4
 );
 
-// The `elements` of the status field live in the script module: each element
-// carries an icon, which is not serializable.
-$status = array(
-	'id'            => 'status',
-	'type'          => 'text',
-	'label'         => __( 'Status', 'gutenberg' ),
-	'Edit'          => 'radio',
-	'enableSorting' => false,
-	'filterBy'      => array(
-		'operators' => array( 'isAny' ),
-	),
-);
+add_filter(
+	'gutenberg_field_collection_modules',
+	function ( $modules, $id, $kind, $name ) {
+		if ( 'postType' === $kind && 'wp_template' === $name ) {
+			$modules[] = '@wordpress/field-collections/postType-wp_template';
+		}
 
-$slug = array(
-	'id'       => 'slug',
-	'type'     => 'text',
-	'label'    => __( 'Slug', 'gutenberg' ),
-	'filterBy' => false,
-);
-
-$template = array(
-	'id'            => 'template',
-	'type'          => 'text',
-	'label'         => __( 'Template', 'gutenberg' ),
-	'enableSorting' => false,
-	'filterBy'      => false,
-);
-
-$password = array(
-	'id'            => 'password',
-	'type'          => 'text',
-	'label'         => __( 'Password', 'gutenberg' ),
-	'enableSorting' => false,
-	'enableHiding'  => false,
-	'filterBy'      => false,
-);
-
-$title = array(
-	'id'                 => 'title',
-	'type'               => 'text',
-	'label'              => __( 'Template', 'gutenberg' ),
-	'placeholder'        => __( 'No title', 'gutenberg' ),
-	'enableHiding'       => false,
-	'enableGlobalSearch' => true,
-	'filterBy'           => false,
-);
-
-gutenberg_register_field_collection(
-	'core/template-fields',
-	'postType',
-	'wp_template',
-	array(
-		$author,
-		$status,
-		$slug,
-		$template,
-		$password,
-		$title,
-	),
-	'@wordpress/field-collections/postType-wp_template'
+		return $modules;
+	},
+	10,
+	4
 );

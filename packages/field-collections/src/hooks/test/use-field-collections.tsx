@@ -23,12 +23,23 @@ jest.mock( '../../store', () => ( {
 	store: 'core/field-collections',
 } ) );
 
-// Virtual script modules standing in for a collection's `fields_module`.
+// Virtual script modules standing in for a collection's `fields_modules`.
 jest.mock(
 	'@test/extensions-title',
 	() => ( {
 		__esModule: true,
 		default: [ { id: 'title', render: () => 'rendered-title' } ],
+	} ),
+	{ virtual: true }
+);
+
+// A second module that overrides the title's render, to exercise the
+// last-wins merge across multiple modules.
+jest.mock(
+	'@test/extensions-title-override',
+	() => ( {
+		__esModule: true,
+		default: [ { id: 'title', render: () => 'overridden-title' } ],
 	} ),
 	{ virtual: true }
 );
@@ -62,7 +73,7 @@ describe( 'useFieldCollections', () => {
 					{ id: 'title', label: 'Title', type: 'text' } as any,
 					{ id: 'slug', label: 'Slug', type: 'text' } as any,
 				],
-				fields_module: '@test/extensions-title',
+				fields_modules: [ '@test/extensions-title' ],
 			},
 		] );
 
@@ -81,7 +92,34 @@ describe( 'useFieldCollections', () => {
 		expect( slug?.render ).toBeUndefined();
 	} );
 
-	it( 'treats a collection without a fields_module as having no extensions', async () => {
+	it( 'merges multiple modules in order, last one winning per property', async () => {
+		setCollections( [
+			{
+				id: 'core/page-fields',
+				kind: 'postType',
+				name: 'page',
+				fields: [
+					{ id: 'title', label: 'Title', type: 'text' } as any,
+				],
+				fields_modules: [
+					'@test/extensions-title',
+					'@test/extensions-title-override',
+				],
+			},
+		] );
+
+		const { result } = renderHook( () =>
+			useFieldCollections( 'postType', 'page' )
+		);
+
+		await waitFor( () => expect( result.current ).toHaveLength( 1 ) );
+
+		const title = result.current.find( ( f ) => f.id === 'title' );
+		// The later module's `render` wins.
+		expect( ( title?.render as any )?.() ).toBe( 'overridden-title' );
+	} );
+
+	it( 'treats a collection without fields_modules as having no extensions', async () => {
 		setCollections( [
 			{
 				id: 'core/no-module',
@@ -90,7 +128,7 @@ describe( 'useFieldCollections', () => {
 				fields: [
 					{ id: 'title', label: 'Title', type: 'text' } as any,
 				],
-				fields_module: null,
+				fields_modules: [],
 			},
 		] );
 
@@ -112,7 +150,7 @@ describe( 'useFieldCollections', () => {
 					{ id: 'title', label: 'Title', type: 'text' } as any,
 					{ id: 'slug', label: 'Slug', type: 'text' } as any,
 				],
-				fields_module: '@test/extensions-title',
+				fields_modules: [ '@test/extensions-title' ],
 			},
 		] );
 
@@ -139,7 +177,7 @@ describe( 'useFieldCollections', () => {
 				fields: [
 					{ id: 'title', label: 'Title', type: 'text' } as any,
 				],
-				fields_module: '@test/missing-module',
+				fields_modules: [ '@test/missing-module' ],
 			},
 		] );
 

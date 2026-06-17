@@ -17,7 +17,7 @@ export interface FieldCollection< T > {
 	kind: string;
 	name: string;
 	fields: Field< T >[];
-	fields_module?: string | null;
+	fields_modules?: string[];
 }
 
 export interface State {

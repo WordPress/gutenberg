@@ -106,11 +106,11 @@ class Gutenberg_REST_Field_Collections_Controller extends WP_REST_Controller {
 	 */
 	public function prepare_item_for_response( $collection, $request ) {
 		$data = array(
-			'id'            => $collection['id'],
-			'kind'          => $collection['kind'],
-			'name'          => $collection['name'],
-			'fields'        => $collection['fields'],
-			'fields_module' => isset( $collection['fields_module'] ) ? $collection['fields_module'] : null,
+			'id'             => $collection['id'],
+			'kind'           => $collection['kind'],
+			'name'           => $collection['name'],
+			'fields'         => $collection['fields'],
+			'fields_modules' => isset( $collection['fields_modules'] ) ? $collection['fields_modules'] : array(),
 		);
 
 		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
@@ -147,33 +147,34 @@ class Gutenberg_REST_Field_Collections_Controller extends WP_REST_Controller {
 			'title'      => 'field-collection',
 			'type'       => 'object',
 			'properties' => array(
-				'id'            => array(
+				'id'             => array(
 					'description' => __( 'Unique identifier for the field collection.', 'gutenberg' ),
 					'type'        => 'string',
 					'context'     => array( 'view' ),
 					'readonly'    => true,
 				),
-				'kind'          => array(
+				'kind'           => array(
 					'description' => __( 'Entity kind (postType, taxonomy, user, etc.).', 'gutenberg' ),
 					'type'        => 'string',
 					'context'     => array( 'view' ),
 					'readonly'    => true,
 				),
-				'name'          => array(
+				'name'           => array(
 					'description' => __( 'Entity name or null for universal collections.', 'gutenberg' ),
 					'type'        => array( 'string', 'null' ),
 					'context'     => array( 'view' ),
 					'readonly'    => true,
 				),
-				'fields'        => array(
+				'fields'         => array(
 					'description' => __( 'Field definitions keyed by field ID.', 'gutenberg' ),
 					'type'        => 'object',
 					'context'     => array( 'view' ),
 					'readonly'    => true,
 				),
-				'fields_module' => array(
-					'description' => __( 'Script Module handle for non-serializable field extensions, or null.', 'gutenberg' ),
-					'type'        => array( 'string', 'null' ),
+				'fields_modules' => array(
+					'description' => __( 'Script Module handles for non-serializable field extensions, in merge order.', 'gutenberg' ),
+					'type'        => 'array',
+					'items'       => array( 'type' => 'string' ),
 					'context'     => array( 'view' ),
 					'readonly'    => true,
 				),

@@ -2,54 +2,21 @@
  * WordPress dependencies
  */
 import type { Field } from '@wordpress/dataviews';
-import {
-	authorField,
-	passwordField,
-	slugField,
-	statusField,
-	templateField,
-	templateTitleField,
-} from '@wordpress/fields';
+import { templateTitleField } from '@wordpress/fields';
 
 /**
- * Non-serializable extensions for the `core/template-fields` field collection,
- * loaded on demand as the `@wordpress/field-collections/postType-wp_template` script
- * module. The serializable parts of the field definitions live in the
- * collocated `fields.php`, registered server-side via
- * `gutenberg_register_field_collection()`.
+ * Template-specific overrides for the `core/wp_template-fields` field
+ * collection, loaded on demand as the
+ * `@wordpress/field-collections/postType-wp_template` script module and merged
+ * after `@wordpress/field-collections/postType-default` (see the
+ * `gutenberg_field_collection_modules` filter in the collocated `fields.php`).
  *
- * Each extension picks the non-serializable members (getValue, render, Edit,
- * elements carrying icons…) from the canonical field definition, so they
- * cannot drift from the fields registered for other post types.
+ * The generic fields and their extensions come from the default collection;
+ * only the title needs template-specific `getValue`/`render`, so this module
+ * overrides just that field, leaving every other field served by the default
+ * module untouched.
  */
 const templateFieldExtensions: Partial< Field< any > >[] = [
-	{
-		id: 'author',
-		getElements: authorField.getElements,
-		setValue: authorField.setValue,
-		render: authorField.render,
-		sort: authorField.sort,
-	},
-	{
-		id: 'status',
-		elements: statusField.elements,
-		render: statusField.render,
-	},
-	{
-		id: 'slug',
-		Edit: slugField.Edit,
-		render: slugField.render,
-	},
-	{
-		id: 'template',
-		Edit: templateField.Edit,
-		render: templateField.render,
-	},
-	{
-		id: 'password',
-		Edit: passwordField.Edit,
-		isVisible: passwordField.isVisible,
-	},
 	{
 		id: 'title',
 		getValue: templateTitleField.getValue,

@@ -17,9 +17,12 @@ import type { FieldCollection } from '../store/types';
  * non-serializable extensions into the serializable field definitions.
  *
  * The serializable field definitions come from the `core/field-collections`
- * store (fetched from `GET /wp/v2/field-collections`). Each collection that
- * declares a `fields_module` has its script module lazily imported and merged
- * onto the matching field by `id`.
+ * store (fetched from `GET /wp/v2/field-collections`). Each script module a
+ * collection lists in `fields_modules` is lazily imported and merged onto the
+ * matching field by `id`. Modules merge in order, so a later module overrides
+ * an earlier one property by property (last wins) — this is how a consumer
+ * attaches behavior to a field it added, or overrides a default field's
+ * behavior, via the `gutenberg_field_collection_modules` PHP filter.
  *
  * @param kind                  Entity kind (e.g., 'postType', 'taxonomy', 'user').
  * @param name                  Entity name (e.g., 'attachment', 'post', 'category').
@@ -48,34 +51,34 @@ export function useFieldCollections< T = any >(
 		Record< string, Partial< Field< T > >[] >
 	>( {} );
 
-	const loadModuleForCollection = useEvent(
+	const loadModulesForCollection = useEvent(
 		async ( collection: FieldCollection< T > ) => {
-			if ( ! collection.fields_module ) {
-				setLoadedModules( ( prev ) => ( {
-					...prev,
-					[ collection.id ]: [],
-				} ) );
-				return;
-			}
+			const handles = collection.fields_modules ?? [];
 
-			let extensions: Partial< Field< T > >[] = [];
-			try {
-				const module = await import(
-					/* webpackIgnore: true */
-					collection.fields_module
-				);
-				extensions = module.default || [];
-			} catch ( error ) {
-				// eslint-disable-next-line no-console
-				console.warn(
-					`Could not load the "${ collection.fields_module }" script module of the "${ collection.id }" field collection. Falling back to the serializable field definitions.`,
-					error
-				);
-			}
+			const lists = await Promise.all(
+				handles.map( async ( handle ) => {
+					try {
+						const module = await import(
+							/* webpackIgnore: true */
+							handle
+						);
+						return ( module.default || [] ) as Partial<
+							Field< T >
+						>[];
+					} catch ( error ) {
+						// eslint-disable-next-line no-console
+						console.warn(
+							`Could not load the "${ handle }" script module of the "${ collection.id }" field collection. Falling back to the serializable field definitions.`,
+							error
+						);
+						return [];
+					}
+				} )
+			);
 
 			setLoadedModules( ( prev ) => ( {
 				...prev,
-				[ collection.id ]: extensions,
+				[ collection.id ]: lists.flat(),
 			} ) );
 		}
 	);
@@ -87,9 +90,9 @@ export function useFieldCollections< T = any >(
 		}
 
 		for ( const collection of fieldCollections ) {
-			void loadModuleForCollection( collection );
+			void loadModulesForCollection( collection );
 		}
-	}, [ fieldCollections, loadModuleForCollection ] );
+	}, [ fieldCollections, loadModulesForCollection ] );
 
 	const enhancedFields: Field< T >[] = useMemo( () => {
 		if ( ! fieldCollections || fieldCollections.length === 0 ) {
@@ -109,16 +112,15 @@ export function useFieldCollections< T = any >(
 		return fieldCollections.flatMap( ( collection ) => {
 			const extensions = loadedModules[ collection.id ];
 			return collection.fields.map( ( field: Field< T > ) => {
-				const extensionField = extensions.find(
+				// Merge every extension matching this field id in order, so a
+				// later module wins property by property over an earlier one.
+				const matching = extensions.filter(
 					( f ) => f.id === field.id
 				);
-				if ( extensionField ) {
-					return {
-						...field,
-						...extensionField,
-					};
+				if ( matching.length === 0 ) {
+					return field;
 				}
-				return field;
+				return Object.assign( {}, field, ...matching );
 			} );
 		} );
 	}, [ fieldCollections, loadedModules ] );
