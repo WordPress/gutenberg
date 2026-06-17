@@ -20,16 +20,6 @@ async function setNavigationOrientationToVertical( page ) {
 		.click();
 }
 
-async function getSettingsPanel( page ) {
-	const editorSettings = page.getByRole( 'region', {
-		name: 'Editor settings',
-	} );
-
-	await editorSettings.getByRole( 'tab', { name: 'Settings' } ).click();
-
-	return editorSettings.getByRole( 'tabpanel', { name: 'Settings' } );
-}
-
 test.describe( 'Navigation block - derived submenu behavior', () => {
 	test.beforeEach( async ( { admin, editor, requestUtils } ) => {
 		await admin.createNewPost();
