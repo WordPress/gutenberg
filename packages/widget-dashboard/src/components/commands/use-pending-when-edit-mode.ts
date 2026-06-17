@@ -3,24 +3,24 @@
  */
 import { useCallback, useEffect, useRef } from '@wordpress/element';
 
-type usePendingWhenEditModeProps = {
+type UsePendingWhenEditModeProps = {
 	editMode: boolean;
 	onEditChange?: ( next: boolean ) => void;
 };
 
-type usePendingWhenEditModeResult = ( action: () => void ) => void;
+type UsePendingWhenEditModeResult = ( action: () => void ) => void;
 
 /**
  * Runs an action immediately when already in edit mode. Otherwise enables
  * edit mode and runs the action after edit mode becomes active.
  *
- * @param {usePendingWhenEditModeProps} params - The parameters for the function.
- * @return {usePendingWhenEditModeResult} The function result.
+ * @param {UsePendingWhenEditModeProps} params Current edit mode and the change handler.
+ * @return {UsePendingWhenEditModeResult} Runs an action, deferring it until edit mode is active.
  */
 export function usePendingWhenEditMode( {
 	editMode,
 	onEditChange,
-}: usePendingWhenEditModeProps ): usePendingWhenEditModeResult {
+}: UsePendingWhenEditModeProps ): UsePendingWhenEditModeResult {
 	const pendingRef = useRef< ( () => void ) | null >( null );
 	const wasEditingRef = useRef( editMode );
 

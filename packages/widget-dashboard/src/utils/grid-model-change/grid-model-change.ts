@@ -13,27 +13,28 @@ export function getGridModel( settings: WidgetGridSettings ): WidgetGridModel {
 	return settings.model ?? 'grid';
 }
 
-type computeGridModelChangeProps = {
+type ComputeGridModelChangeProps = {
 	layout: DashboardWidget[];
 	gridSettings: WidgetGridSettings;
 	targetModel: WidgetGridModel;
 };
 
-type computeGridModelChangeResult = {
+type ComputeGridModelChangeResult = {
 	layout: DashboardWidget[];
 	gridSettings: WidgetGridSettings;
 } | null;
 
 /**
  * Computes the staged layout and grid settings after a layout-model change.
- * @param {computeGridModelChangeProps} params - The parameters for the function.
- * @return {computeGridModelChangeResult} The function result.
+ *
+ * @param {ComputeGridModelChangeProps} params Layout, current settings, and target model.
+ * @return {ComputeGridModelChangeResult} Migrated layout and settings, or `null` when the model is unchanged.
  */
 export function computeGridModelChange( {
 	layout,
 	gridSettings,
 	targetModel,
-}: computeGridModelChangeProps ): computeGridModelChangeResult {
+}: ComputeGridModelChangeProps ): ComputeGridModelChangeResult {
 	const currentModel = getGridModel( gridSettings );
 
 	if ( currentModel === targetModel ) {
