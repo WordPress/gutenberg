@@ -419,7 +419,10 @@ export function getResponsiveStateCSSRules( style, name, baseSelector ) {
 
 	Object.entries( RESPONSIVE_BREAKPOINTS ).forEach(
 		( [ viewport, mediaQuery ] ) => {
-			const viewportStyles = style?.[ viewport ];
+			const viewportStyles = getStyleForState( style, {
+				viewport,
+				pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
+			} );
 			if ( ! viewportStyles ) {
 				return;
 			}

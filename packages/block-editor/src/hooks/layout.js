@@ -252,7 +252,10 @@ export function getResponsiveLayoutStyles( {
 } ) {
 	return Object.entries( RESPONSIVE_BREAKPOINTS )
 		.map( ( [ viewport, mediaQuery ] ) => {
-			const viewportStyle = attributes?.style?.[ viewport ];
+			const viewportStyle = getStyleForState( attributes?.style, {
+				viewport,
+				pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
+			} );
 			const viewportLayout = getLayoutContainerValues(
 				viewportStyle?.layout
 			);

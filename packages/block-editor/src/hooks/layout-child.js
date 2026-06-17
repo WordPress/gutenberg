@@ -19,6 +19,10 @@ import {
 import useBlockVisibility from '../components/block-visibility/use-block-visibility';
 import { deviceTypeKey } from '../store/private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/constants';
+import {
+	DEFAULT_BLOCK_STYLE_STATE,
+	getStyleForState,
+} from './block-style-state';
 
 // Used for generating the instance ID
 const LAYOUT_CHILD_BLOCK_PROPS_REFERENCE = {};
@@ -252,7 +256,10 @@ export function getResponsiveChildLayoutStyles( {
 
 	return Object.entries( RESPONSIVE_BREAKPOINTS )
 		.map( ( [ viewport, mediaQuery ] ) => {
-			const viewportLayout = style?.[ viewport ]?.layout;
+			const viewportLayout = getStyleForState( style, {
+				viewport,
+				pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
+			} )?.layout;
 			if ( ! viewportLayout || ! Object.keys( viewportLayout ).length ) {
 				return '';
 			}

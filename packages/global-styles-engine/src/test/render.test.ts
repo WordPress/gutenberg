@@ -1040,6 +1040,45 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
+		it( 'handles legacy responsive block styles', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/button': {
+							color: {
+								text: 'red',
+							},
+							mobile: {
+								color: {
+									text: 'blue',
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				':root :where(.wp-block-button){color: red;}@media (width <= 480px){:root :where(.wp-block-button){color: blue;}}'
+			);
+		} );
+
 		it( 'handles responsive pseudo selector styles', () => {
 			const tree = {
 				styles: {
