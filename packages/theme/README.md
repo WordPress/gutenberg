@@ -17,7 +17,7 @@ Rather than hardcoding values like `#3858e9` or `16px` throughout your code, tok
 
 The **[Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md)** contains a complete reference of all available design tokens including colors, spacing, typography, and more.
 
-For more information about how design tokens are implemented, see [`tokens/README.md`](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/tokens/README.md).
+The **[Design Tokens Maintainer's Guide](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/tokens/README.md)** describes how design tokens are implemented in the design system.
 
 ### Using Design Tokens
 
