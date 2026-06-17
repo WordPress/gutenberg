@@ -255,9 +255,9 @@ function BlockInspector() {
 		useBlockInspectorAnimationSettings( blockType );
 
 	const hasSelectedBlocks = selectedBlockCount > 1;
-	// The viewport state is global (driven by the device preview), so only treat
-	// it as selected for blocks that actually support viewport styles. Pseudo
-	// states are only ever set for blocks that support them.
+	// The viewport state is global, so only treat it as selected for
+	// blocks that actually support viewport styles. Pseudo states are
+	// only ever set for blocks that support them.
 	const isBlockStyleStateSelected =
 		( !! blockType?.attributes?.style &&
 			hasViewportBlockStyleState( selectedBlockStyleState ) ) ||

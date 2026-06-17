@@ -1167,9 +1167,6 @@ export function getStyleStateViewport( state ) {
 /**
  * Returns the selected style state for a block's style controls.
  *
- * The viewport dimension is global (driven by the editor's device preview),
- * while the pseudo dimension is tracked per block.
- *
  * @param {Object} state    Global application state.
  * @param {string} clientId The block client ID.
  *
