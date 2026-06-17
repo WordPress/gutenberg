@@ -179,14 +179,14 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	 * content would terminate the SVG element when parsed as HTML, and ensures
 	 * proper handling of SVG structure including self-closing tags.
 	 *
-	 * The parameter is intentionally left untyped to stay signature-compatible
-	 * with the parent WP_Icons_Registry::sanitize_icon_content() shipped in
-	 * WordPress core, which declares no parameter type.
+	 * The signature is intentionally left without type declarations to stay
+	 * compatible with the parent WP_Icons_Registry::sanitize_icon_content()
+	 * shipped in WordPress core, which declares none.
 	 *
 	 * @param string $icon_content The icon SVG content to sanitize.
-	 * @return string|null The sanitized icon SVG content, or null on failure.
+	 * @return string The sanitized icon SVG content.
 	 */
-	protected function sanitize_icon_content( $icon_content ): ?string {
+	protected function sanitize_icon_content( $icon_content ) {
 		// Core attributes applicable to most elements. `data-*` is a wildcard
 		// supported by wp_kses() and matches any data attribute.
 		$core_attributes = array_fill_keys(
@@ -887,7 +887,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 
 		$processor = WP_HTML_Processor::create_fragment( $icon_content );
 		if ( ! $processor ) {
-			return null;
+			return '';
 		}
 
 		// Skip leading comments, XML declarations, doctype, and whitespace to
@@ -905,11 +905,11 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				continue;
 			}
 			// Any other leading token (e.g. non-whitespace text) is invalid.
-			return null;
+			return '';
 		}
 
 		if ( 'SVG' !== $processor->get_tag() ) {
-			return null;
+			return '';
 		}
 
 		$svg   = $processor->serialize_token();
@@ -921,7 +921,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			null !== $processor->get_last_error()
 			|| $processor->paused_at_incomplete_token()
 		) {
-			return null;
+			return '';
 		}
 		$svg .= '</svg>';
 		return wp_kses( $svg, $allowed_tags );
