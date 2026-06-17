@@ -19,6 +19,7 @@ import {
 	useResizeObserver,
 	usePrevious,
 } from '@wordpress/compose';
+import { focus } from '@wordpress/dom';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState, useRef, useEffect, useMemo } from '@wordpress/element';
 import {
@@ -62,7 +63,8 @@ function Layout() {
 	const hasMobileAreas =
 		areas.mobileSidebar || areas.mobileContent || areas.preview;
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const toggleRef = useRef();
+	const mobileToggleRef = useRef();
+	const sidebarRegionRef = useRef();
 	const navigateRegionsProps = useNavigateRegions();
 	const disableMotion = useReducedMotion();
 	const [ canvasResizer, canvasSize ] = useResizeObserver();
@@ -87,7 +89,10 @@ function Layout() {
 	const previousCanvaMode = usePrevious( canvas );
 	useEffect( () => {
 		if ( previousCanvaMode === 'edit' ) {
-			toggleRef.current?.focus();
+			const desktopToggle = sidebarRegionRef.current
+				? focus.tabbable.find( sidebarRegionRef.current )[ 0 ]
+				: undefined;
+			( desktopToggle ?? mobileToggleRef.current )?.focus();
 		}
 		// Should not depend on the previous canvas mode value but the next.
 	}, [ canvas ] );
@@ -115,6 +120,7 @@ function Layout() {
 					*/ }
 					{ ( ! isMobileViewport || ! hasMobileAreas ) && (
 						<NavigableRegion
+							ref={ sidebarRegionRef }
 							ariaLabel={ __( 'Navigation' ) }
 							className="edit-site-layout__sidebar-region"
 						>
@@ -167,7 +173,7 @@ function Layout() {
 									<>
 										{ showMobileSiteHub && (
 											<SiteHubMobile
-												ref={ toggleRef }
+												ref={ mobileToggleRef }
 												isTransparent={
 													isResizableFrameOversized
 												}
