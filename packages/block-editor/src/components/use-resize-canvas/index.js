@@ -10,7 +10,7 @@ import deprecated from '@wordpress/deprecated';
  */
 export default function useResizeCanvas() {
 	deprecated( 'wp.blockEditor.useResizeCanvas', {
-		since: '7.0',
+		since: '7.1',
 		hint: 'This hook is deprecated and no longer does anything.',
 	} );
 }
