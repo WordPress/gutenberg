@@ -18,6 +18,7 @@ import { useCallback, useMemo, useState, forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import Dropdown from '../dropdown';
+import Notice from '../notice';
 import { ColorPicker } from '../color-picker';
 import CircularOptionPicker, {
 	getComputeCircularOptionPickerCommonProps,
@@ -203,7 +204,7 @@ function UnforwardedColorPalette(
 		headingLevel = 2,
 		'aria-label': ariaLabel,
 		'aria-labelledby': ariaLabelledby,
-		children,
+		noticeProps,
 		...additionalProps
 	} = props;
 	const [ normalizedColorValue, setNormalizedColorValue ] = useState( value );
@@ -335,7 +336,9 @@ function UnforwardedColorPalette(
 					) }
 				/>
 			) }
-			{ children }
+			{ noticeProps && (
+				<Notice isDismissible={ false } { ...noticeProps } />
+			) }
 			{ ( colors.length > 0 || actions ) && (
 				<CircularOptionPicker
 					{ ...metaProps }

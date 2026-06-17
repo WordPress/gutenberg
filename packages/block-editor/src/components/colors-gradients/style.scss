@@ -194,14 +194,3 @@ $swatch-gap: 12px;
 		border-radius: $radius-small;
 	}
 }
-
-// Contrast warning notice rendered within the color picker popover,
-// between the custom color picker and the palette swatches. The
-// `Notice` component ships with default outer margins intended for
-// full-width admin contexts; remove them so the notice aligns with
-// the popover's own padding.
-.block-editor-panel-color-gradient-settings__contrast-notice {
-	.components-notice {
-		margin: 0;
-	}
-}

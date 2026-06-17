@@ -16,7 +16,6 @@ import {
 	FlexItem,
 	Dropdown,
 	Button,
-	Notice,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useRef } from '@wordpress/element';
@@ -144,19 +143,16 @@ function ColorGradientTab( {
 			onGradientChange={ isGradient ? setValue : undefined }
 			clearable={ inheritedValue === userValue }
 			headingLevel={ 3 }
-		>
-			{ ! isGradient && contrastWarning && (
-				<div className="block-editor-panel-color-gradient-settings__contrast-notice">
-					<Notice
-						spokenMessage={ null }
-						status="warning"
-						isDismissible={ false }
-					>
-						{ contrastWarning }
-					</Notice>
-				</div>
-			) }
-		</ColorGradientControl>
+			noticeProps={
+				! isGradient && contrastWarning
+					? {
+							children: contrastWarning,
+							status: 'warning',
+							spokenMessage: null,
+					  }
+					: undefined
+			}
+		/>
 	);
 }
 

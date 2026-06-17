@@ -8,6 +8,7 @@ import type { CSSProperties, ReactNode } from 'react';
  */
 import type { DropdownProps } from '../dropdown/types';
 import type { HeadingSize } from '../heading/types';
+import type { NoticeProps } from '../notice/types';
 
 export type ColorObject = {
 	name: string;
@@ -120,10 +121,14 @@ export type ColorPaletteProps = Pick<
 	 */
 	__experimentalIsRenderedInSidebar?: boolean;
 	/**
-	 * Optional content rendered between the custom color picker and the
-	 * palette of color options.
+	 * Props for an optional `Notice` rendered between the custom color picker
+	 * and the palette of color options. Intended for short, contextual status
+	 * messages about the current selection, such as a contrast warning.
+	 *
+	 * The notice is rendered as non-dismissible: provide the message via
+	 * `children`, and optionally set the `status` and `spokenMessage`.
 	 */
-	children?: ReactNode;
+	noticeProps?: Pick< NoticeProps, 'children' | 'status' | 'spokenMessage' >;
 } & (
 		| {
 				/**

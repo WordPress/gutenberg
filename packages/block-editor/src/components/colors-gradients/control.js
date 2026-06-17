@@ -48,7 +48,7 @@ function ColorGradientControlInner( {
 	showTitle = true,
 	enableAlpha,
 	headingLevel,
-	children,
+	noticeProps,
 } ) {
 	const canChooseAColor =
 		onColorChange &&
@@ -81,9 +81,8 @@ function ColorGradientControlInner( {
 				clearable={ clearable }
 				enableAlpha={ enableAlpha }
 				headingLevel={ headingLevel }
-			>
-				{ children }
-			</ColorPalette>
+				noticeProps={ noticeProps }
+			/>
 		),
 		[ TAB_IDS.gradient ]: (
 			<GradientPicker
