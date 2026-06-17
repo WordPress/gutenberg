@@ -193,7 +193,7 @@ function BlockInspector() {
 				_renderedBlockClientId
 			),
 			isResponsiveEditing:
-				blockEditorSettings?.[ isResponsiveEditingKey ] ?? false,
+				blockEditorSettings?.[ isResponsiveEditingKey ],
 		};
 	}, [] );
 
