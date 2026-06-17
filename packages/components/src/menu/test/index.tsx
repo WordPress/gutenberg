@@ -1089,9 +1089,7 @@ describe( 'Menu', () => {
 			await waitForFocusedMenu();
 
 			// Type "tw", it should match and focus the item with content "Two"
-			await user.type( screen.getByRole( 'menu' ), 'tw', {
-				skipClick: true,
-			} );
+			await user.keyboard( 'tw' );
 			expect(
 				screen.getByRole( 'menuitem', { name: 'Two' } )
 			).toHaveFocus();
@@ -1100,11 +1098,7 @@ describe( 'Menu', () => {
 			resetTypeahead();
 
 			// Type "on", it should match and focus the item with content "One"
-			await user.type(
-				screen.getByRole( 'menuitem', { name: 'Two' } ),
-				'on',
-				{ skipClick: true }
-			);
+			await user.keyboard( 'on' );
 			expect(
 				screen.getByRole( 'menuitem', { name: 'One' } )
 			).toHaveFocus();
@@ -1130,18 +1124,14 @@ describe( 'Menu', () => {
 			await waitForFocusedMenu();
 
 			// Type a string that doesn't match any items. Focus shouldn't move.
-			await user.type( screen.getByRole( 'menu' ), 'abc', {
-				skipClick: true,
-			} );
+			await user.keyboard( 'abc' );
 			expect( screen.getByRole( 'menu' ) ).toHaveFocus();
 
 			// Reset the typeahead search so the next keystrokes start a new query.
 			resetTypeahead();
 
 			// Type "on", it should match and focus the item with content "One"
-			await user.type( screen.getByRole( 'menu' ), 'on', {
-				skipClick: true,
-			} );
+			await user.keyboard( 'on' );
 			expect(
 				screen.getByRole( 'menuitem', { name: 'One' } )
 			).toHaveFocus();
@@ -1150,11 +1140,7 @@ describe( 'Menu', () => {
 			resetTypeahead();
 
 			// Type a string that doesn't match any items. Focus shouldn't move.
-			await user.type(
-				screen.getByRole( 'menuitem', { name: 'One' } ),
-				'abc',
-				{ skipClick: true }
-			);
+			await user.keyboard( 'abc' );
 			expect(
 				screen.getByRole( 'menuitem', { name: 'One' } )
 			).toHaveFocus();
@@ -1163,11 +1149,7 @@ describe( 'Menu', () => {
 			resetTypeahead();
 
 			// Type "tw", it should match and focus the item with content "Two"
-			await user.type(
-				screen.getByRole( 'menuitem', { name: 'One' } ),
-				'tw',
-				{ skipClick: true }
-			);
+			await user.keyboard( 'tw' );
 			expect(
 				screen.getByRole( 'menuitem', { name: 'Two' } )
 			).toHaveFocus();
