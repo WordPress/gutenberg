@@ -50,20 +50,13 @@ const DEFAULT_RESOLVE_WIDGET_MODULE: ResolveWidgetModule = ( moduleId ) =>
 	import( /* webpackIgnore: true */ moduleId );
 
 /**
- * Returns the canonical form of `layout`.
+ * Canonical form of `layout`: widgets sorted by `placement.order` (falling
+ * back to array index), then `order` stripped since position now implies it.
+ * Used both as the comparison form for `hasUncommittedChanges` (so a change
+ * and its undo compare equal) and as the publish form, keeping persisted
+ * payloads free of redundant `order` fields.
  *
- * Sorts widgets by their declared `placement.order` (falling back to
- * the array index when omitted) and then strips `order` from each
- * placement, since the order is now implicit in the array position.
- *
- * Used in two places: as the comparison form for
- * `hasUncommittedChanges` (so a swap and its undo are reported as
- * equal even though the staged copy carries explicit `0, 1, …` orders
- * the grid wrote during the drag) and as the publish form for
- * `commitLayout`, so the persisted payload stays free of redundant
- * `order` fields and matches what the comparison treats as canonical.
- *
- * @param {DashboardWidget[]} layout - Layout to canonicalize.
+ * @param {DashboardWidget[]} layout Layout to canonicalize.
  * @return {DashboardWidget[]} Canonicalized layout.
  */
 function canonicalize( layout: DashboardWidget[] ): DashboardWidget[] {
@@ -115,7 +108,7 @@ interface InternalDashboardContextValue {
 	 * `{ exitEditMode: false }` when committing from the layout
 	 * settings drawer so customize mode stays active.
 	 */
-	commit: ( options?: { exitEditMode?: boolean } ) => void;
+	commit: ( options?: CommitOptions ) => void;
 
 	/**
 	 * Switches the layout model, updates staging, and publishes
@@ -131,15 +124,21 @@ interface InternalDashboardContextValue {
 	 * to revert only grid settings (preserves in-progress widget layout
 	 * edits while customize mode is active).
 	 */
-	cancel: ( options?: {
-		exitEditMode?: boolean;
-		revertLayout?: boolean;
-	} ) => void;
+	cancel: ( options?: CancelOptions ) => void;
 
 	hasUncommittedChanges: boolean;
 	editMode: boolean;
 	onEditChange?: ( next: boolean ) => void;
 	resolveWidgetModule: ResolveWidgetModule;
+}
+
+interface CommitOptions {
+	exitEditMode?: boolean;
+}
+
+interface CancelOptions {
+	exitEditMode?: boolean;
+	revertLayout?: boolean;
 }
 
 const Context = createContext< InternalDashboardContextValue | null >( null );
@@ -160,19 +159,8 @@ export function useDashboardInternalContext(): InternalDashboardContextValue {
 }
 
 interface ProviderProps {
-	/**
-	 * Widget types available for rendering.
-	 */
 	widgetTypes: WidgetType[];
-
-	/**
-	 * When true, widget types are still loading.
-	 */
 	isResolvingWidgetTypes?: boolean;
-
-	/**
-	 * Committed layout.
-	 */
 	layout: DashboardWidget[];
 
 	/**
@@ -185,14 +173,7 @@ interface ProviderProps {
 	 */
 	onLayoutReset?: () => void;
 
-	/**
-	 * Whether the dashboard is in edit mode.
-	 */
 	editMode?: boolean;
-
-	/**
-	 * Fired when edit mode toggles.
-	 */
 	onEditChange?: ( next: boolean ) => void;
 
 	/**
@@ -201,9 +182,6 @@ interface ProviderProps {
 	 */
 	resolveWidgetModule?: ResolveWidgetModule;
 
-	/**
-	 * Committed grid settings.
-	 */
 	gridSettings?: WidgetGridSettings;
 
 	/**
@@ -212,9 +190,6 @@ interface ProviderProps {
 	 */
 	onGridSettingsChange?: ( gridSettings: WidgetGridSettings ) => void;
 
-	/**
-	 * Compound subtree consuming the context.
-	 */
 	children: ReactNode;
 }
 
@@ -228,8 +203,7 @@ interface ProviderProps {
  * reset, websocket push) lands. Consumers that cannot tolerate this
  * loss should mediate the prop updates before forwarding them here.
  *
- * @param {ProviderProps} props Provider props
- * @return {React.ReactNode} The provider component.
+ * @param {ProviderProps} props Component props.
  */
 export function WidgetDashboardProvider( {
 	widgetTypes,
@@ -243,7 +217,7 @@ export function WidgetDashboardProvider( {
 	gridSettings: committedGridSettings = DEFAULT_GRID,
 	onGridSettingsChange,
 	children,
-}: ProviderProps ) {
+}: ProviderProps ): React.ReactNode {
 	const [ stagingLayout, setStagingLayout ] =
 		useState< DashboardWidget[] >( committedLayout );
 
@@ -283,7 +257,7 @@ export function WidgetDashboardProvider( {
 	const hasUncommittedChanges = hasLayoutChanges || hasGridSettingsChanges;
 
 	const commit = useCallback(
-		( options?: { exitEditMode?: boolean } ) => {
+		( options?: CommitOptions ) => {
 			if ( hasLayoutChanges ) {
 				onLayoutChange( canonicalize( stagingLayout ) );
 			}
@@ -313,7 +287,7 @@ export function WidgetDashboardProvider( {
 	);
 
 	const cancel = useCallback(
-		( options?: { exitEditMode?: boolean; revertLayout?: boolean } ) => {
+		( options?: CancelOptions ) => {
 			if ( options?.revertLayout !== false ) {
 				setStagingLayout( committedLayout );
 			}
