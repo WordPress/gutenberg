@@ -1,11 +1,11 @@
 .root {
 	margin: 0 auto;
-	max-width: 320px;
+	max-width: var(--wpds-dimension-surface-width-sm);
 	text-align: center;
 	height: 100%;
 }
 
 .loading {
-	min-height: 220px;
+	min-height: var(--wpds-dimension-surface-width-xs);
 	height: 100%;
 }
