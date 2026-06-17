@@ -18,6 +18,17 @@
 		"node": ">=20.19.0",
 		"npm": ">=10.2.3"
 	},
+	"allowScripts": {
+		"@parcel/watcher": true,
+		"core-js": true,
+		"core-js-pure": true,
+		"esbuild": true,
+		"fs-ext": true,
+		"fsevents": true,
+		"leveldown": true,
+		"nx": true,
+		"unrs-resolver": true
+	},
 	"wpPlugin": {
 		"name": "gutenberg",
 		"scriptGlobal": "wp",
