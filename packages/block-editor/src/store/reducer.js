@@ -419,18 +419,20 @@ const withBlockTree =
  */
 function withPersistentBlockChange( reducer ) {
 	let lastAction;
-	let markNextChangeAsNotPersistent = false;
+	let nextHistoryMode;
 
 	return ( state, action ) => {
 		const nextState = reducer( state, action );
 
-		const wasMarkedAsNotPersistent = markNextChangeAsNotPersistent;
-		markNextChangeAsNotPersistent =
-			action.type === 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT';
+		const pendingHistoryMode = nextHistoryMode;
+		nextHistoryMode =
+			action.type === 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT'
+				? action.history ?? 'merge'
+				: undefined;
 
 		const isExplicitPersistentChange =
 			action.type === 'MARK_LAST_CHANGE_AS_PERSISTENT' ||
-			wasMarkedAsNotPersistent;
+			pendingHistoryMode;
 
 		// Defer to previous state value (or default) unless changing or
 		// explicitly marking as persistent.
@@ -442,7 +444,7 @@ function withPersistentBlockChange( reducer ) {
 		}
 
 		const isPersistentChange = isExplicitPersistentChange
-			? ! wasMarkedAsNotPersistent
+			? ! pendingHistoryMode
 			: ! isUpdatingSameBlockAttribute( action, lastAction );
 
 		// In comparing against the previous action, consider only those which
@@ -450,7 +452,17 @@ function withPersistentBlockChange( reducer ) {
 		// have resulted in a changed state.
 		lastAction = action;
 
-		return { ...nextState, isPersistentChange };
+		if ( pendingHistoryMode === 'ignore' ) {
+			return {
+				...nextState,
+				isPersistentChange,
+				lastBlockChangeHistoryMode: 'ignore',
+			};
+		}
+
+		const { lastBlockChangeHistoryMode, ...blockChange } = nextState;
+
+		return { ...blockChange, isPersistentChange };
 	};
 }
 
@@ -2276,7 +2288,7 @@ export function requestedInspectorTab( state = null, action ) {
 }
 
 /**
- * Reducer tracking the selected pseudo-state for block style controls.
+ * Reducer tracking the selected style state for block style controls.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
@@ -2286,17 +2298,44 @@ export function requestedInspectorTab( state = null, action ) {
 export function selectedBlockStyleState( state = undefined, action ) {
 	switch ( action.type ) {
 		case 'SET_SELECTED_BLOCK_STYLE_STATE': {
-			if (
-				! action.clientId ||
-				! action.value ||
-				action.value === 'default'
-			) {
+			if ( ! action.clientId || ! action.value ) {
 				return undefined;
 			}
+			const showStateOnCanvas =
+				state?.clientId === action.clientId
+					? state.showStateOnCanvas ?? true
+					: true;
+			const previousValue =
+				state?.clientId === action.clientId ? state.value : {};
 
 			return {
 				clientId: action.clientId,
-				value: action.value,
+				showStateOnCanvas,
+				value: {
+					viewport: 'default',
+					pseudo: 'default',
+					...previousValue,
+					...action.value,
+				},
+			};
+		}
+
+		case 'SET_SELECTED_BLOCK_STYLE_STATE_CANVAS_PREVIEW': {
+			if ( ! action.clientId || typeof action.value !== 'boolean' ) {
+				return state;
+			}
+
+			const previousValue =
+				state?.clientId === action.clientId ? state.value : {};
+
+			return {
+				clientId: action.clientId,
+				showStateOnCanvas: action.value,
+				value: {
+					viewport: 'default',
+					pseudo: 'default',
+					...previousValue,
+				},
 			};
 		}
 

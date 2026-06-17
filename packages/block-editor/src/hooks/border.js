@@ -8,7 +8,7 @@ import clsx from 'clsx';
  */
 import { hasBlockSupport, getBlockSupport } from '@wordpress/blocks';
 import { __experimentalHasSplitBorders as hasSplitBorders } from '@wordpress/components';
-import { Platform, useCallback, useMemo } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -32,6 +32,7 @@ import {
 import { store as blockEditorStore } from '../store';
 import {
 	getStyleForState,
+	isDefaultBlockStyleState,
 	setStyleForState,
 	useBlockStyleState,
 } from './block-style-state';
@@ -161,7 +162,7 @@ export function BorderPanel( { clientId, name, setAttributes, settings } ) {
 		[ clientId, isEnabled ]
 	);
 
-	const isStateSelected = selectedState !== 'default';
+	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
 
 	const value = useMemo( () => {
 		if ( isStateSelected ) {
@@ -216,10 +217,6 @@ export function BorderPanel( { clientId, name, setAttributes, settings } ) {
  * @return {boolean} Whether there is support.
  */
 export function hasBorderSupport( blockName, feature = 'any' ) {
-	if ( Platform.OS !== 'web' ) {
-		return false;
-	}
-
 	const support = getBlockSupport( blockName, BORDER_SUPPORT_KEY );
 
 	if ( support === true ) {

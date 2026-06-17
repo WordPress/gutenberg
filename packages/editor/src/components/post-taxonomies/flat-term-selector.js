@@ -3,11 +3,8 @@
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useEffect, useMemo, useState } from '@wordpress/element';
-import {
-	FormTokenField,
-	withFilters,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { FormTokenField, withFilters } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDebounce } from '@wordpress/compose';
@@ -280,7 +277,7 @@ export function FlatTermSelector( { slug } ) {
 	);
 
 	return (
-		<VStack spacing={ 4 }>
+		<Stack direction="column" gap="lg">
 			<FormTokenField
 				__next40pxDefaultSize
 				value={ values }
@@ -296,7 +293,7 @@ export function FlatTermSelector( { slug } ) {
 				} }
 			/>
 			<MostUsedTerms taxonomy={ taxonomy } onSelect={ appendTerm } />
-		</VStack>
+		</Stack>
 	);
 }
 

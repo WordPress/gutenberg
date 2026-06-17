@@ -2,10 +2,13 @@
  * WordPress dependencies
  */
 import { Page } from '@wordpress/admin-ui';
-import { useDispatch } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as viewportStore } from '@wordpress/viewport';
+import { useWidgetTypes } from '@wordpress/widget-primitives';
 
 /**
  * Internal dependencies
@@ -13,8 +16,6 @@ import { store as noticesStore } from '@wordpress/notices';
 import { useDashboardGridSettings, useDashboardLayout } from './hooks';
 import { WidgetDashboard } from './widget-dashboard';
 import type { DashboardWidget } from './widget-dashboard';
-import { useWidgetTypes } from './widget-types';
-import styles from './stage.module.css';
 
 function Dashboard() {
 	const [ layout, setLayout, resetLayout ] = useDashboardLayout(
@@ -23,9 +24,37 @@ function Dashboard() {
 
 	const [ gridSettings, setGridSettings ] = useDashboardGridSettings();
 
-	const widgetTypes = useWidgetTypes();
+	const [ widgetTypes, isResolving ] = useWidgetTypes();
 
 	const [ editMode, setEditMode ] = useState( false );
+
+	// @TODO: switch to using Admin UI declaratively for mobile viewport support once available.
+	// https://github.com/WordPress/gutenberg/issues/77628
+	const isMobileViewport = useSelect(
+		( select ) => select( viewportStore ).isViewportMatch( '< small' ),
+		[]
+	);
+
+	const greetingName = useSelect( ( select ) => {
+		const user = select( coreStore ).getCurrentUser();
+		if ( ! user ) {
+			return undefined;
+		}
+
+		const displayName = user.name?.trim();
+		if ( displayName ) {
+			return displayName;
+		}
+
+		if ( 'username' in user && typeof user.username === 'string' ) {
+			const username = user.username.trim();
+			if ( username ) {
+				return username;
+			}
+		}
+
+		return user.slug;
+	}, [] );
 
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
@@ -36,9 +65,21 @@ function Dashboard() {
 		} );
 	};
 
+	let pageTitle: string = __( 'Dashboard' );
+	if ( editMode ) {
+		pageTitle = __( 'Customize Dashboard' );
+	} else if ( greetingName ) {
+		pageTitle = sprintf(
+			/* translators: %s: current user's display name. */
+			__( 'Howdy, %s' ),
+			greetingName
+		);
+	}
+
 	return (
 		<WidgetDashboard
 			widgetTypes={ widgetTypes }
+			isResolvingWidgetTypes={ isResolving }
 			layout={ layout }
 			onLayoutChange={ handleLayoutChange }
 			onLayoutReset={ resetLayout }
@@ -48,13 +89,13 @@ function Dashboard() {
 			onEditChange={ setEditMode }
 		>
 			<Page
-				title={ __( 'Dashboard' ) }
+				title={ editMode && isMobileViewport ? undefined : pageTitle }
+				ariaLabel={ pageTitle }
 				actions={ <WidgetDashboard.Actions /> }
+				hasPadding
 			>
-				<div className={ styles[ 'dashboard-widgets-container' ] }>
-					<WidgetDashboard.NoWidgetsState />
-					<WidgetDashboard.Widgets />
-				</div>
+				<WidgetDashboard.NoWidgetsState />
+				<WidgetDashboard.Widgets />
 			</Page>
 		</WidgetDashboard>
 	);

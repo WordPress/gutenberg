@@ -20,13 +20,13 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { store as noticesStore } from '@wordpress/notices';
+import { unlock } from '@wordpress/routes-lock-unlock';
 
 /**
  * Internal dependencies
  */
 import { saveGuidelines } from '../api';
 import { store as coreGuidelinesStore } from '../store';
-import { unlock } from '../../lock-unlock';
 import './block-guideline-modal.scss';
 
 const { isContentBlock } = unlock( blocksPrivateApis );
@@ -189,6 +189,7 @@ export default function BlockGuidelineModal( {
 							disabled={ isSaving }
 							accessibleWhenDisabled
 							type="button"
+							__next40pxDefaultSize
 						>
 							{ __( 'Remove' ) }
 						</Button>
@@ -199,6 +200,7 @@ export default function BlockGuidelineModal( {
 						disabled={ ! canSubmit || isSaving }
 						isBusy={ isSaving }
 						accessibleWhenDisabled
+						__next40pxDefaultSize
 					>
 						{ submitButtonLabel }
 					</Button>

@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+## 5.48.1 (2026-06-16)
+
+## 5.48.0 (2026-06-10)
+
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+## 5.47.0 (2026-05-27)
+
+### Enhancements
+
+-   `InlineNotices`: Wrap pinned and dismissible lists in a `notices-inline-notices-wrapper` container with spacing between lists. Add optional `className` prop for the wrapper.
+
+### Internal
+
+-   `InlineNotices`: Remove package-level `Notice` style overrides; `Notice` from `@wordpress/components` owns layout and chrome ([#78231](https://github.com/WordPress/gutenberg/pull/78231)).
+
 ## 5.46.0 (2026-05-14)
 
 ## 5.45.0 (2026-04-29)

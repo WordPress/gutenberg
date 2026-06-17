@@ -11,15 +11,17 @@ import { BlockPreview } from '@wordpress/block-editor';
 import {
 	PanelBody,
 	Button,
-	Tooltip as WCTooltip,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
+import { ENTER, SPACE } from '@wordpress/keycodes';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
+// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+import { Tooltip } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -117,18 +119,31 @@ export default function TemplateActionsPanelContent() {
 		if ( hasSwapTargets ) {
 			const tooltipText = __( 'Change template' );
 			return (
-				<WCTooltip text={ tooltipText }>
-					<div
-						className="editor-template-actions-panel__preview"
-						role="button"
-						tabIndex={ 0 }
-						aria-label={ tooltipText }
-						onClick={ () => setIsSwapModalOpen( true ) }
-						onKeyPress={ () => setIsSwapModalOpen( true ) }
-					>
-						{ previewContent }
-					</div>
-				</WCTooltip>
+				<Tooltip.Root>
+					<Tooltip.Trigger
+						render={
+							<div
+								className="editor-template-actions-panel__preview"
+								role="button"
+								tabIndex={ 0 }
+								aria-label={ tooltipText }
+								onClick={ () => setIsSwapModalOpen( true ) }
+								onKeyDown={ ( event ) => {
+									if (
+										event.keyCode === ENTER ||
+										event.keyCode === SPACE
+									) {
+										event.preventDefault();
+										setIsSwapModalOpen( true );
+									}
+								} }
+							>
+								{ previewContent }
+							</div>
+						}
+					/>
+					<Tooltip.Popup>{ tooltipText }</Tooltip.Popup>
+				</Tooltip.Root>
 			);
 		}
 

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/route",
-	"version": "0.12.0",
+	"version": "0.14.1",
 	"description": "Routing utilities for WordPress admin interfaces.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -38,7 +38,6 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScriptModuleExports": "./build-module/index.mjs",
 	"types": "build-types",
 	"sideEffects": false,

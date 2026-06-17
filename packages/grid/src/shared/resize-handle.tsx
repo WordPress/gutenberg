@@ -155,7 +155,9 @@ export default function ResizeHandleWrapper( props: ResizeHandleProps ) {
 			onDragMove={ handleDragMove }
 			onDragEnd={ handleDragEnd }
 		>
-			<ResizeHandle { ...props } />
+			<div className={ styles[ 'resize-handle-slot' ] }>
+				<ResizeHandle { ...props } />
+			</div>
 		</DndContext>
 	);
 }

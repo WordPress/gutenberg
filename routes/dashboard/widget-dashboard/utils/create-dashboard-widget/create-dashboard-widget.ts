@@ -1,11 +1,17 @@
 /**
+ * External dependencies
+ */
+import { v4 as uuid } from 'uuid';
+
+/**
+ * WordPress dependencies
+ */
+import type { WidgetType } from '@wordpress/widget-primitives';
+
+/**
  * Internal dependencies
  */
-import type {
-	DashboardWidget,
-	WidgetType,
-	GridTilePlacement,
-} from '../../types';
+import type { DashboardWidget, GridTilePlacement } from '../../types';
 
 const DEFAULT_PLACEMENT: GridTilePlacement = {
 	width: 1,
@@ -27,7 +33,7 @@ export function createDashboardWidget< T >(
 	initialAttributes?: T
 ): DashboardWidget< T > {
 	return {
-		uuid: crypto.randomUUID(),
+		uuid: uuid(),
 		type: widgetType.name,
 		attributes:
 			initialAttributes ?? ( widgetType.example?.attributes as T ),

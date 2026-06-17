@@ -781,4 +781,23 @@ describe( 'Popover', () => {
 			} );
 		} );
 	} );
+
+	it( 'should call a consumer-provided onKeyDown alongside close-on-Escape', async () => {
+		const user = userEvent.setup();
+		const onClose = jest.fn();
+		const onKeyDown = jest.fn();
+
+		render(
+			<Popover onClose={ onClose } onKeyDown={ onKeyDown }>
+				<button>Inside popover</button>
+			</Popover>
+		);
+
+		await user.click( screen.getByText( 'Inside popover' ) );
+		await user.keyboard( '[Escape]' );
+
+		expect( onKeyDown ).toHaveBeenCalled();
+		expect( onKeyDown.mock.calls[ 0 ][ 0 ].key ).toBe( 'Escape' );
+		expect( onClose ).toHaveBeenCalledTimes( 1 );
+	} );
 } );

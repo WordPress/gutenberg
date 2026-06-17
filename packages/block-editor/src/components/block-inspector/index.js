@@ -5,10 +5,13 @@ import { __ } from '@wordpress/i18n';
 import {
 	getBlockType,
 	getUnregisteredTypeHandlerName,
-	hasBlockSupport,
 	store as blocksStore,
 } from '@wordpress/blocks';
-import { __unstableMotion as motion } from '@wordpress/components';
+import {
+	ToggleControl,
+	__experimentalSpacer as Spacer,
+	__unstableMotion as motion,
+} from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
 
@@ -33,10 +36,16 @@ import AdvancedControls from '../inspector-controls-tabs/advanced-controls-panel
 import PositionControls from '../inspector-controls-tabs/position-controls-panel';
 import useBlockInspectorAnimationSettings from './useBlockInspectorAnimationSettings';
 import { useBorderPanelLabel } from '../../hooks/border';
-import { BlockStatesControl } from '../../hooks/states';
+import { BlockStateBadges, BlockStatesControl } from '../../hooks/states';
 import ContentTab from '../inspector-controls-tabs/content-tab';
 import ViewportVisibilityInfo from '../block-visibility/viewport-visibility-info';
 import { unlock } from '../../lock-unlock';
+import {
+	hasPseudoBlockStyleState,
+	hasViewportBlockStyleState,
+	isDefaultBlockStyleState,
+} from '../../hooks/block-style-state';
+import { onViewportStateChangeKey } from '../../store/private-keys';
 
 function StyleInspectorSlots( {
 	blockName,
@@ -82,8 +91,11 @@ function StyleInspectorSlots( {
 	);
 }
 
-function StyleStateInspectorSlots( { blockName } ) {
+function StyleStateInspectorSlots( { blockName, selectedBlockStyleState } ) {
 	const borderPanelLabel = useBorderPanelLabel( { blockName } );
+	const showLayoutControls =
+		hasViewportBlockStyleState( selectedBlockStyleState ) &&
+		! hasPseudoBlockStyleState( selectedBlockStyleState );
 	return (
 		<>
 			<InspectorControls.Slot
@@ -100,6 +112,12 @@ function StyleStateInspectorSlots( { blockName } ) {
 				group="typography"
 				label={ __( 'Typography' ) }
 			/>
+			{ showLayoutControls && (
+				<InspectorControls.Slot
+					group="layout"
+					label={ __( 'Layout' ) }
+				/>
+			) }
 			<InspectorControls.Slot
 				group="dimensions"
 				label={ __( 'Dimensions' ) }
@@ -121,6 +139,8 @@ function BlockInspector() {
 		editedContentOnlySection,
 		blockEditingMode,
 		selectedBlockStyleState,
+		showStateOnCanvas,
+		onViewportStateChange,
 	} = useSelect( ( select ) => {
 		const {
 			getSelectedBlockClientId,
@@ -133,7 +153,9 @@ function BlockInspector() {
 			isWithinEditedContentOnlySection,
 			getBlockEditingMode,
 			getSelectedBlockStyleState,
+			isSelectedBlockStyleStateShownOnCanvas,
 		} = unlock( select( blockEditorStore ) );
+		const blockEditorSettings = select( blockEditorStore ).getSettings();
 		const { getBlockStyles } = select( blocksStore );
 		const _selectedBlockClientId = getSelectedBlockClientId();
 		const isWithinEditedSection = isWithinEditedContentOnlySection(
@@ -168,6 +190,11 @@ function BlockInspector() {
 			selectedBlockStyleState: getSelectedBlockStyleState(
 				_renderedBlockClientId
 			),
+			showStateOnCanvas: isSelectedBlockStyleStateShownOnCanvas(
+				_renderedBlockClientId
+			),
+			onViewportStateChange:
+				blockEditorSettings?.[ onViewportStateChangeKey ],
 		};
 	}, [] );
 
@@ -180,8 +207,8 @@ function BlockInspector() {
 
 			const {
 				getClientIdsOfDescendants,
-				getBlockName,
 				getBlockEditingMode,
+				shouldRenderBlockListView,
 			} = unlock( select( blockEditorStore ) );
 
 			const descendants = getClientIdsOfDescendants(
@@ -192,14 +219,7 @@ function BlockInspector() {
 			// List View tab.
 			const listViewDescendants = new Set();
 			descendants.forEach( ( clientId ) => {
-				const blockName = getBlockName( clientId );
-				// Navigation block doesn't have List View block support, but
-				// it does have a custom implementation that is shown within
-				// patterns, so it's included in this condition.
-				if (
-					blockName === 'core/navigation' ||
-					hasBlockSupport( blockName, 'listView' )
-				) {
+				if ( shouldRenderBlockListView( clientId ) ) {
 					const listViewChildren =
 						getClientIdsOfDescendants( clientId );
 					listViewChildren.forEach( ( childId ) =>
@@ -236,7 +256,9 @@ function BlockInspector() {
 		useBlockInspectorAnimationSettings( blockType );
 
 	const hasSelectedBlocks = selectedBlockCount > 1;
-	const isBlockStyleStateSelected = selectedBlockStyleState !== 'default';
+	const isBlockStyleStateSelected = ! isDefaultBlockStyleState(
+		selectedBlockStyleState
+	);
 
 	if ( hasSelectedBlocks && ! isSectionBlockInSelection ) {
 		return (
@@ -306,6 +328,8 @@ function BlockInspector() {
 				editedContentOnlySection={ editedContentOnlySection }
 				blockEditingMode={ blockEditingMode }
 				selectedBlockStyleState={ selectedBlockStyleState }
+				showStateOnCanvas={ showStateOnCanvas }
+				onViewportStateChange={ onViewportStateChange }
 				isBlockStyleStateSelected={ isBlockStyleStateSelected }
 			/>
 		</BlockInspectorSingleBlockWrapper>
@@ -360,6 +384,8 @@ const BlockInspectorSingleBlock = ( {
 	editedContentOnlySection,
 	blockEditingMode,
 	selectedBlockStyleState,
+	showStateOnCanvas,
+	onViewportStateChange,
 	isBlockStyleStateSelected,
 } ) => {
 	const listViewRef = useRef( null );
@@ -374,9 +400,38 @@ const BlockInspectorSingleBlock = ( {
 		renderedBlockClientId
 	);
 	const isBlockSynced = blockInformation.isSynced;
-	const { setSelectedBlockStyleState } = unlock(
-		useDispatch( blockEditorStore )
-	);
+	const {
+		setSelectedBlockStyleState,
+		setSelectedBlockStyleStateCanvasPreview,
+	} = unlock( useDispatch( blockEditorStore ) );
+	const onBlockStyleStateChange = ( value ) => {
+		const nextSelectedBlockStyleState = {
+			...selectedBlockStyleState,
+			...value,
+		};
+
+		setSelectedBlockStyleState(
+			renderedBlockClientId,
+			nextSelectedBlockStyleState
+		);
+
+		if ( value.viewport ) {
+			onViewportStateChange?.( {
+				viewport: nextSelectedBlockStyleState.viewport,
+				showStateOnCanvas,
+			} );
+		}
+	};
+	const onShowStateOnCanvasChange = ( value ) => {
+		setSelectedBlockStyleStateCanvasPreview( renderedBlockClientId, value );
+
+		if ( value ) {
+			onViewportStateChange?.( {
+				viewport: selectedBlockStyleState.viewport,
+				showStateOnCanvas: value,
+			} );
+		}
+	};
 
 	return (
 		<div className="block-editor-block-inspector">
@@ -400,22 +455,37 @@ const BlockInspectorSingleBlock = ( {
 						<BlockStatesControl
 							name={ blockName }
 							value={ selectedBlockStyleState }
-							onChange={ ( value ) =>
-								setSelectedBlockStyleState(
-									renderedBlockClientId,
-									value
-								)
-							}
+							onChange={ onBlockStyleStateChange }
 						/>
 					)
 				}
 			/>
+			{ blockEditingMode === 'default' && isBlockStyleStateSelected && (
+				<Spacer paddingX={ 4 } paddingY={ 2 }>
+					<ToggleControl
+						label={ __( 'Show state on canvas' ) }
+						checked={ showStateOnCanvas }
+						onChange={ onShowStateOnCanvasChange }
+					/>
+					<BlockStateBadges
+						name={ blockName }
+						value={ selectedBlockStyleState }
+					/>
+				</Spacer>
+			) }
 			<ViewportVisibilityInfo clientId={ renderedBlockClientId } />
 			<EditContents clientId={ renderedBlockClientId } />
-			<BlockVariationTransforms blockClientId={ renderedBlockClientId } />
+			{ ! isBlockStyleStateSelected && (
+				<BlockVariationTransforms
+					blockClientId={ renderedBlockClientId }
+				/>
+			) }
 			<BlockInspectorPreTabsSlot />
 			{ isBlockStyleStateSelected && ! isSectionBlock && (
-				<StyleStateInspectorSlots blockName={ blockName } />
+				<StyleStateInspectorSlots
+					blockName={ blockName }
+					selectedBlockStyleState={ selectedBlockStyleState }
+				/>
 			) }
 			{ ! isBlockStyleStateSelected && hasMultipleTabs && (
 				<>

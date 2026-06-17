@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { CSSProperties } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useMemo, useId } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { ThemeContext } from './context';
 import { useThemeProviderStyles } from './use-theme-provider-styles';
 import { type ThemeProviderProps } from './types';
@@ -49,15 +38,18 @@ export const ThemeProvider = ( {
 	children,
 	color = {},
 	cursor,
+	cornerRadius,
 	isRoot = false,
-	density,
 }: ThemeProviderProps ) => {
 	const instanceId = useId();
 
 	const { themeProviderStyles, resolvedSettings } = useThemeProviderStyles( {
 		color,
 		cursor,
+		cornerRadius,
 	} );
+
+	const cornerRadiusPreset = resolvedSettings.cornerRadius ?? 'subtle';
 
 	const contextValue = useMemo(
 		() => ( {
@@ -79,7 +71,7 @@ export const ThemeProvider = ( {
 			<div
 				data-wpds-theme-provider-id={ instanceId }
 				data-wpds-root-provider={ isRoot }
-				data-wpds-density={ density }
+				data-wpds-corner-radius={ cornerRadiusPreset }
 				className={ styles.root }
 			>
 				<ThemeContext.Provider value={ contextValue }>

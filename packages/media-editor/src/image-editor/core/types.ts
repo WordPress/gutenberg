@@ -109,7 +109,8 @@ export interface CropperState {
  *
  * This type is intentionally not exported from the image-editor public barrel.
  * Consumers should drive state through the controller returned by
- * `useCropperState()` or through serializable `TransformOperation` values.
+ * `useCropperReducer()` (or a composite store) or through serializable
+ * `TransformOperation` values.
  */
 export type CropperAction =
 	/** Sets the loaded image metadata (natural size, src). */
@@ -209,4 +210,19 @@ export interface StencilProps {
 	 * the source image dimensions. Omit to use the stencil's default.
 	 */
 	minCropSize?: Size;
+	/**
+	 * Optional post-processor for freeform resize output. Hosts use this for
+	 * display-gated behavior such as snapping visible pixel grids to source
+	 * pixel boundaries.
+	 */
+	snapCropRect?: (
+		rect: NormalizedRect,
+		handle: HandlePosition
+	) => NormalizedRect;
+	/**
+	 * Optional keyboard resize step in normalized space, per axis. Hosts use
+	 * this when keyboard resize should follow the rendered image scale instead
+	 * of the default percentage-based step.
+	 */
+	keyboardResizeStep?: Size;
 }

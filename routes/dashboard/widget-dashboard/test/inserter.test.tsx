@@ -78,19 +78,19 @@ function Harness( {
 }
 
 describe( 'WidgetDashboard.Inserter', () => {
-	it( 'is hidden until the "Add widgets" trigger is clicked', () => {
+	it( 'is hidden until the "Add widget" trigger is clicked', () => {
 		render( <Harness /> );
 		expect(
 			screen.queryByRole( 'dialog', { name: 'Add widget' } )
 		).not.toBeInTheDocument();
 	} );
 
-	it( 'opens after clicking the "Add widgets" trigger', async () => {
+	it( 'opens after clicking the "Add widget" trigger', async () => {
 		const user = userEvent.setup();
 		render( <Harness /> );
 
 		await user.click(
-			screen.getByRole( 'button', { name: 'Add widgets' } )
+			screen.getByRole( 'button', { name: 'Add widget' } )
 		);
 
 		expect(
@@ -104,7 +104,7 @@ describe( 'WidgetDashboard.Inserter', () => {
 		render( <Harness onLayoutChange={ onLayoutChange } /> );
 
 		await user.click(
-			screen.getByRole( 'button', { name: 'Add widgets' } )
+			screen.getByRole( 'button', { name: 'Add widget' } )
 		);
 
 		const dialog = await screen.findByRole( 'dialog', {
@@ -145,7 +145,7 @@ describe( 'WidgetDashboard.Inserter', () => {
 		render( <Harness onLayoutChange={ onLayoutChange } /> );
 
 		await user.click(
-			screen.getByRole( 'button', { name: 'Add widgets' } )
+			screen.getByRole( 'button', { name: 'Add widget' } )
 		);
 
 		const dialog = await screen.findByRole( 'dialog', {
@@ -189,7 +189,7 @@ describe( 'WidgetDashboard.Inserter', () => {
 		);
 
 		await user.click(
-			screen.getByRole( 'button', { name: 'Add widgets' } )
+			screen.getByRole( 'button', { name: 'Add widget' } )
 		);
 
 		const dialog = await screen.findByRole( 'dialog', {

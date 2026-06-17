@@ -25,6 +25,9 @@ import {
 	isSectionBlock,
 	getParentSectionBlock,
 	getSelectedBlockStyleState,
+	hasSelectedStyleState,
+	isSelectedBlockStyleStateShownOnCanvas,
+	shouldRenderBlockListView,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
 import { deviceTypeKey } from '../private-keys';
@@ -73,26 +76,165 @@ describe( 'private selectors', () => {
 		} );
 	} );
 
+	describe( 'shouldRenderBlockListView', () => {
+		const blockWithListViewSupport = 'core/test-list-view-support';
+		const blockWithoutListViewSupport = 'core/test-no-list-view-support';
+
+		const createState = (
+			blockName,
+			{ allowedBlocks, innerBlocks = [] } = {}
+		) => {
+			const blockListSettings = new Map();
+			if ( allowedBlocks !== undefined ) {
+				blockListSettings.set( 'client-1', { allowedBlocks } );
+			}
+
+			return {
+				blocks: {
+					byClientId: new Map( [
+						[ 'client-1', { name: blockName } ],
+					] ),
+					order: new Map( [ [ 'client-1', innerBlocks ] ] ),
+					parents: new Map(),
+				},
+				blockListSettings,
+			};
+		};
+
+		beforeAll( () => {
+			registerBlockType( blockWithListViewSupport, {
+				apiVersion: 3,
+				title: 'List View support',
+				category: 'text',
+				supports: {
+					listView: true,
+				},
+			} );
+			registerBlockType( blockWithoutListViewSupport, {
+				apiVersion: 3,
+				title: 'No List View support',
+				category: 'text',
+			} );
+		} );
+
+		afterAll( () => {
+			unregisterBlockType( blockWithListViewSupport );
+			unregisterBlockType( blockWithoutListViewSupport );
+		} );
+
+		it( 'returns true for blocks with list view support', () => {
+			const state = createState( blockWithListViewSupport );
+
+			expect( shouldRenderBlockListView( state, 'client-1' ) ).toBe(
+				true
+			);
+		} );
+
+		it( 'returns false when empty and insertion is disallowed via `allowedBlocks: []`', () => {
+			const state = createState( blockWithListViewSupport, {
+				allowedBlocks: [],
+			} );
+
+			expect( shouldRenderBlockListView( state, 'client-1' ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'returns false when empty and insertion is disallowed via `allowedBlocks: false`', () => {
+			const state = createState( blockWithListViewSupport, {
+				allowedBlocks: false,
+			} );
+
+			expect( shouldRenderBlockListView( state, 'client-1' ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'returns true when empty but insertion is allowed', () => {
+			// e.g. a static, still-empty gallery: nothing yet, but the user can
+			// start inserting, so its List View stays available.
+			const state = createState( blockWithListViewSupport, {
+				allowedBlocks: [ 'core/image' ],
+			} );
+
+			expect( shouldRenderBlockListView( state, 'client-1' ) ).toBe(
+				true
+			);
+		} );
+
+		it( 'returns true when empty with no allowedBlocks restriction', () => {
+			const state = createState( blockWithListViewSupport );
+
+			expect( shouldRenderBlockListView( state, 'client-1' ) ).toBe(
+				true
+			);
+		} );
+
+		it( 'returns true when insertion is disallowed but the block still has inner blocks', () => {
+			const state = createState( blockWithListViewSupport, {
+				allowedBlocks: [],
+				innerBlocks: [ 'child-1' ],
+			} );
+
+			expect( shouldRenderBlockListView( state, 'client-1' ) ).toBe(
+				true
+			);
+		} );
+
+		it( 'does not grant list view support to unsupported block types', () => {
+			const state = createState( blockWithoutListViewSupport, {
+				allowedBlocks: [],
+			} );
+
+			expect( shouldRenderBlockListView( state, 'client-1' ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'preserves the navigation block special case', () => {
+			const state = createState( 'core/navigation' );
+
+			expect( shouldRenderBlockListView( state, 'client-1' ) ).toBe(
+				true
+			);
+		} );
+
+		it( 'keeps navigation in list view even when empty and insertion is disallowed', () => {
+			// The navigation special case takes precedence over the
+			// `allowedBlocks` exclusion: even with nothing to show and no
+			// insertion allowed, navigation still participates in List View.
+			const state = createState( 'core/navigation', {
+				allowedBlocks: [],
+			} );
+
+			expect( shouldRenderBlockListView( state, 'client-1' ) ).toBe(
+				true
+			);
+		} );
+	} );
+
 	describe( 'getSelectedBlockStyleState', () => {
 		it( 'returns default when the block has no selected state', () => {
 			const state = {};
 
-			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toBe(
-				'default'
-			);
+			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
+				viewport: 'default',
+				pseudo: 'default',
+			} );
 		} );
 
 		it( 'returns the selected state for the block', () => {
 			const state = {
 				selectedBlockStyleState: {
 					clientId: 'client-1',
-					value: ':hover',
+					value: { viewport: 'mobile', pseudo: ':hover' },
 				},
 			};
 
-			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toBe(
-				':hover'
-			);
+			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
+				viewport: 'mobile',
+				pseudo: ':hover',
+			} );
 		} );
 
 		it( 'returns default when the selected state has no value', () => {
@@ -102,22 +244,112 @@ describe( 'private selectors', () => {
 				},
 			};
 
-			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toBe(
-				'default'
-			);
+			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
+				viewport: 'default',
+				pseudo: 'default',
+			} );
 		} );
 
 		it( 'returns default when another block has the selected state', () => {
 			const state = {
 				selectedBlockStyleState: {
 					clientId: 'client-2',
-					value: ':hover',
+					value: { viewport: 'default', pseudo: ':hover' },
 				},
 			};
 
-			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toBe(
-				'default'
-			);
+			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
+				viewport: 'default',
+				pseudo: 'default',
+			} );
+		} );
+	} );
+
+	describe( 'hasSelectedStyleState', () => {
+		it( 'returns false when the block has no selected state', () => {
+			const state = {};
+
+			expect( hasSelectedStyleState( state, 'client-1' ) ).toBe( false );
+		} );
+
+		it( 'returns false when another block has the selected state', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-2',
+					value: { viewport: 'default', pseudo: ':hover' },
+				},
+			};
+
+			expect( hasSelectedStyleState( state, 'client-1' ) ).toBe( false );
+		} );
+
+		it( 'returns true when a viewport state is selected', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-1',
+					value: { viewport: 'mobile', pseudo: 'default' },
+				},
+			};
+
+			expect( hasSelectedStyleState( state, 'client-1' ) ).toBe( true );
+		} );
+
+		it( 'returns true when a pseudo state is selected', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-1',
+					value: { viewport: 'default', pseudo: ':hover' },
+				},
+			};
+
+			expect( hasSelectedStyleState( state, 'client-1' ) ).toBe( true );
+		} );
+
+		it( 'returns true when viewport and pseudo states are selected', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-1',
+					value: { viewport: 'mobile', pseudo: ':hover' },
+				},
+			};
+
+			expect( hasSelectedStyleState( state, 'client-1' ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isSelectedBlockStyleStateShownOnCanvas', () => {
+		it( 'returns true when the block has no canvas preview state', () => {
+			const state = {};
+
+			expect(
+				isSelectedBlockStyleStateShownOnCanvas( state, 'client-1' )
+			).toBe( true );
+		} );
+
+		it( 'returns the canvas preview state for the block', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-1',
+					showStateOnCanvas: false,
+				},
+			};
+
+			expect(
+				isSelectedBlockStyleStateShownOnCanvas( state, 'client-1' )
+			).toBe( false );
+		} );
+
+		it( 'returns true when another block has canvas preview state', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-2',
+					showStateOnCanvas: false,
+				},
+			};
+
+			expect(
+				isSelectedBlockStyleStateShownOnCanvas( state, 'client-1' )
+			).toBe( true );
 		} );
 	} );
 
