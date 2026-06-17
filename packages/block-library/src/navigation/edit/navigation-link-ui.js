@@ -18,7 +18,12 @@ const BLOCKS_WITH_LINK_UI_SUPPORT = [
 	'core/navigation-submenu',
 ];
 
-export function NavigationLinkUI( { block, insertedBlock, setInsertedBlock } ) {
+export function NavigationLinkUI( {
+	block,
+	insertedBlock,
+	setInsertedBlock,
+	showBlockInserter,
+} ) {
 	const { updateBlockAttributes, removeBlock } =
 		useDispatch( blockEditorStore );
 
@@ -85,6 +90,7 @@ export function NavigationLinkUI( { block, insertedBlock, setInsertedBlock } ) {
 		<LinkUI
 			clientId={ insertedBlock?.clientId }
 			link={ insertedBlock?.attributes }
+			showBlockInserter={ showBlockInserter }
 			onBlockInsert={ handleSetInsertedBlock }
 			onClose={ () => {
 				// Use cleanup function

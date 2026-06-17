@@ -58,9 +58,16 @@ type NavigationLinkControlsProps = {
 	isContentOnly?: boolean;
 };
 
+type NavigationLinkUIProps = {
+	block: Block;
+	insertedBlock?: Block | null;
+	setInsertedBlock: ( block: Block | null ) => void;
+	showBlockInserter?: boolean;
+};
+
 type BlockLibraryPrivateApis = {
 	NavigationLinkControls?: ComponentType< NavigationLinkControlsProps >;
-	NavigationLinkUI?: ComponentType;
+	NavigationLinkUI?: ComponentType< NavigationLinkUIProps >;
 };
 
 function getBlockLibraryPrivateApis(): BlockLibraryPrivateApis {
@@ -229,6 +236,13 @@ export default function NavigationMenuContent( {
 	);
 	const { NavigationLinkControls, NavigationLinkUI } =
 		getBlockLibraryPrivateApis();
+	const InsertedNavigationLinkUI = useCallback(
+		( props: NavigationLinkUIProps ) =>
+			NavigationLinkUI ? (
+				<NavigationLinkUI { ...props } showBlockInserter={ false } />
+			) : null,
+		[ NavigationLinkUI ]
+	);
 
 	const addMenuItemBlocks = useCallback(
 		( blocks: Block[] ) => {
@@ -254,7 +268,9 @@ export default function NavigationMenuContent( {
 								onSelect={ handleSelect }
 								blockSettingsMenu={ LeafMoreMenu }
 								showAppender
-								additionalBlockContent={ NavigationLinkUI }
+								additionalBlockContent={
+									InsertedNavigationLinkUI
+								}
 								isExpanded
 							/>
 						</div>

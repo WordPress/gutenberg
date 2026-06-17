@@ -46,7 +46,7 @@
 	width: 232px;
 	flex: 0 0 232px;
 	flex-direction: column;
-	padding: 8px 0;
+	padding: 0 0 8px;
 	border-inline-end: 1px solid #e0e0e0;
 	background: #fff;
 	overflow-x: hidden;
@@ -159,6 +159,17 @@
 	flex-shrink: 0;
 	align-items: center;
 	gap: 8px;
+}
+
+.navigation-add-items-modal__filters {
+	padding: 8px 20px;
+	border-bottom: 1px solid #e0e0e0;
+	background: #fff;
+	flex-shrink: 0;
+}
+
+.navigation-add-items-modal__filters:empty {
+	display: none;
 }
 
 .navigation-add-items-modal .dataviews-picker-wrapper {

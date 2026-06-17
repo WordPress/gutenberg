@@ -187,6 +187,7 @@ interface TermRecordEntry {
 }
 
 interface MenuItemSourceRecords {
+	contentPostTypes: PostTypeRecord[];
 	contentRecords: ContentRecordEntry[];
 	termRecords: TermRecordEntry[];
 	mediaRecords: MediaRecord[];
@@ -229,6 +230,7 @@ interface AddMenuItemsModalProps {
 }
 
 const EMPTY_SOURCE_RECORDS: MenuItemSourceRecords = {
+	contentPostTypes: [],
 	contentRecords: [],
 	termRecords: [],
 	mediaRecords: [],
@@ -256,8 +258,20 @@ function getDefaultFieldsForGroup( group: PickerGroup ) {
 	return [ 'typeLabel', 'linkLabel', 'inThisMenu' ];
 }
 
+function getPostTypeFilterLabel( postType: PostTypeRecord ) {
+	return (
+		postType.labels?.name || postType.labels?.singular_name || postType.slug
+	);
+}
+
+function getPostTypeItemLabel( postType: PostTypeRecord ) {
+	return (
+		postType.labels?.singular_name || postType.labels?.name || postType.slug
+	);
+}
+
 function createDefaultView( group: PickerGroup ): View {
-	const isGrid = group === 'pages' || group === 'media';
+	const isGrid = group === 'media';
 	return {
 		type: isGrid ? 'pickerGrid' : 'pickerTable',
 		search: '',
@@ -751,15 +765,20 @@ export default function AddMenuItemsModal( {
 		 * subscribing to the dynamic entity selectors above.
 		 */
 		return JSON.stringify( {
+			contentPostTypes: resolvedPostTypes.map( ( postType ) => ( {
+				slug: postType.slug,
+				labels: postType.labels,
+			} ) ),
 			contentRecords,
 			termRecords,
 			mediaRecords,
 		} );
 	}, [] );
-	const { contentRecords, termRecords, mediaRecords } = useMemo(
-		() => parseMenuItemSourceRecords( sourceRecordsPayload ),
-		[ sourceRecordsPayload ]
-	);
+	const { contentPostTypes, contentRecords, termRecords, mediaRecords } =
+		useMemo(
+			() => parseMenuItemSourceRecords( sourceRecordsPayload ),
+			[ sourceRecordsPayload ]
+		);
 
 	const menuContent = navigationMenu.content?.raw || '';
 	const linkedState = useMemo(
@@ -804,10 +823,7 @@ export default function AddMenuItemsModal( {
 					title: getPostTitle( record ),
 					linkLabel: record.link || '',
 					status: record.status,
-					typeLabel:
-						postType.labels?.singular_name ||
-						postType.labels?.name ||
-						postType.slug,
+					typeLabel: getPostTypeItemLabel( postType ),
 					group: 'content' as const,
 					sourceKind: 'post-type' as const,
 					sourceType: postType.slug,
@@ -820,6 +836,15 @@ export default function AddMenuItemsModal( {
 				};
 			} ),
 		[ contentRecords, linkedState ]
+	);
+
+	const contentPostTypeElements = useMemo(
+		() =>
+			contentPostTypes.map( ( postType ) => ( {
+				value: postType.slug,
+				label: getPostTypeFilterLabel( postType ),
+			} ) ),
+		[ contentPostTypes ]
 	);
 
 	const taxonomyItems: PickerItem[] = useMemo(
@@ -894,9 +919,32 @@ export default function AddMenuItemsModal( {
 	const activeGroupConfig =
 		GROUPS.find( ( group ) => group.id === activeGroup ) || GROUPS[ 0 ];
 	const activeItems = itemsByGroup[ activeGroup ];
+	const pickerFields = useMemo( () => {
+		if ( activeGroup !== 'content' || contentPostTypeElements.length < 2 ) {
+			return fields;
+		}
+
+		const postTypeFilterField: Field< PickerItem > = {
+			id: 'sourceType',
+			type: 'text',
+			label: __( 'Content type' ),
+			elements: contentPostTypeElements,
+			getValue: ( { item } ) => item.sourceType,
+			filterBy: {
+				operators: [ 'is' ],
+				isPrimary: true,
+			},
+			enableSorting: false,
+			enableHiding: false,
+			enableGlobalSearch: false,
+			render: ( { item } ) => item.typeLabel,
+		};
+
+		return [ ...fields, postTypeFilterField ];
+	}, [ activeGroup, contentPostTypeElements ] );
 	const { data: processedItems, paginationInfo } = useMemo(
-		() => filterSortAndPaginate( activeItems, view, fields ),
-		[ activeItems, view ]
+		() => filterSortAndPaginate( activeItems, view, pickerFields ),
+		[ activeItems, pickerFields, view ]
 	);
 
 	const addItems = useCallback(
@@ -1081,7 +1129,7 @@ export default function AddMenuItemsModal( {
 						) : (
 							<DataViewsPicker
 								data={ processedItems }
-								fields={ fields }
+								fields={ pickerFields }
 								view={ view }
 								onChangeView={ setView }
 								actions={ actions }
@@ -1117,10 +1165,12 @@ export default function AddMenuItemsModal( {
 										) }
 									/>
 									<div className="navigation-add-items-modal__toolbar-actions">
+										<DataViewsPicker.FiltersToggle />
 										<DataViewsPicker.LayoutSwitcher />
 										<DataViewsPicker.ViewConfig />
 									</div>
 								</div>
+								<DataViewsPicker.FiltersToggled className="navigation-add-items-modal__filters" />
 								<div className="navigation-add-items-modal__picker-scroll">
 									<DataViewsPicker.Layout />
 								</div>

@@ -85,6 +85,7 @@ function UnforwardedLinkUI( props, ref ) {
 
 	const { clientId } = props;
 	const postType = type || 'page';
+	const showBlockInserter = props.showBlockInserter ?? true;
 
 	const [ addingBlock, setAddingBlock ] = useState( false );
 	const [ addingPage, setAddingPage ] = useState( false );
@@ -252,6 +253,7 @@ function UnforwardedLinkUI( props, ref ) {
 										type === 'page'
 									}
 									canAddBlock={
+										showBlockInserter &&
 										blockEditingMode === 'default'
 									}
 								/>
