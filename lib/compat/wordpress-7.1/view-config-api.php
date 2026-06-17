@@ -764,4 +764,3 @@ if ( has_filter( 'get_entity_view_config_postType_wp_template', '_wp_get_entity_
 	remove_filter( 'get_entity_view_config_postType_wp_template', '_wp_get_entity_view_config_post_type_wp_template' );
 }
 add_filter( 'get_entity_view_config_postType_wp_template', '_gutenberg_get_entity_view_config_post_type_wp_template', 10, 1 );
-
