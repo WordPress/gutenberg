@@ -409,7 +409,7 @@
 	},
 	"packages/block-library/src/navigation/edit/index.js": {
 		"react-hooks/immutability": {
-			"count": 3
+			"count": 1
 		}
 	},
 	"packages/block-library/src/navigation/edit/navigation-list-view-header.js": {
