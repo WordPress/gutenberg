@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { RawHTML, useRef, useState, useEffect } from '@wordpress/element';
+import { useRef, useState, useLayoutEffect } from '@wordpress/element';
 import {
 	__experimentalConfirmDialog as ConfirmDialog,
 	Button,
@@ -107,41 +107,27 @@ export function Note( {
 			  )
 			: __( 'Are you sure you want to delete this reply?' );
 
-	const prevContentRef = useRef( note?.content?.raw );
 	const commentRef = useRef( null );
+	const rawContent = note?.content?.raw;
+	const [ prevContent, setPrevContent ] = useState( rawContent );
+	const [ isExpanded, setIsExpanded ] = useState( false );
 	const [ isOverflowing, setIsOverflowing ] = useState( false );
-	const [ collapsed, setCollapsed ] = useState( true );
 
-	useEffect( () => {
-		if ( prevContentRef.current !== note?.content?.raw ) {
-			setCollapsed( true );
-		}
-	}, [ note?.content?.raw ] );
+	// Collapse whenever the content changes so it can be re-measured.
+	if ( prevContent !== rawContent ) {
+		setPrevContent( rawContent );
+		setIsExpanded( false );
+	}
 
-	useEffect( () => {
-		if ( ! collapsed ) {
-			return;
-		}
-
+	// Measure the (clamped) content to decide whether the toggle is needed.
+	useLayoutEffect( () => {
 		const commentElement = commentRef.current;
-		if ( ! commentElement ) {
-			return;
+		if ( commentElement ) {
+			setIsOverflowing(
+				commentElement.scrollHeight > commentElement.clientHeight
+			);
 		}
-
-		const isEdit = prevContentRef.current !== note?.content?.raw;
-		prevContentRef.current = note?.content?.raw;
-
-		if ( commentElement.scrollHeight > commentElement.clientHeight ) {
-			setIsOverflowing( true );
-
-			if ( isEdit ) {
-				setCollapsed( false );
-			}
-		} else {
-			setIsOverflowing( false );
-			setCollapsed( null );
-		}
-	}, [ collapsed, note?.content?.raw ] );
+	}, [ rawContent ] );
 
 	const handleCancel = () => {
 		setActionState( null );
@@ -197,11 +183,10 @@ export function Note( {
 				className={ clsx( 'editor-collab-sidebar-panel__note-content', {
 					'editor-collab-sidebar-panel__resolution-text':
 						isResolutionNote,
-					'is-collapsed': collapsed,
+					'is-collapsed': ! isExpanded,
 				} ) }
-			>
-				<RawHTML>{ content }</RawHTML>
-			</div>
+				dangerouslySetInnerHTML={ { __html: content ?? '' } }
+			/>
 		);
 	}
 
@@ -249,9 +234,9 @@ export function Note( {
 					className="editor-collab-sidebar-panel__show-more-button"
 					variant="unstyled"
 					size="small"
-					onClick={ () => setCollapsed( ! collapsed ) }
+					onClick={ () => setIsExpanded( ! isExpanded ) }
 				>
-					{ collapsed ? __( 'Show more' ) : __( 'Show less' ) }
+					{ ! isExpanded ? __( 'Show more' ) : __( 'Show less' ) }
 				</UIButton>
 			) }
 		</NoteCard>
