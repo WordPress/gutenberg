@@ -5898,7 +5898,6 @@ describe( 'state', () => {
 				clientId: 'client-1',
 				showStateOnCanvas: true,
 				value: {
-					viewport: 'default',
 					pseudo: ':hover',
 				},
 			} );
@@ -5944,7 +5943,6 @@ describe( 'state', () => {
 				clientId: 'client-2',
 				showStateOnCanvas: true,
 				value: {
-					viewport: 'default',
 					pseudo: ':focus',
 				},
 			} );

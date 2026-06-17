@@ -2312,7 +2312,6 @@ export function selectedBlockStyleState( state = undefined, action ) {
 				clientId: action.clientId,
 				showStateOnCanvas,
 				value: {
-					viewport: 'default',
 					pseudo: 'default',
 					...previousValue,
 					...action.value,
@@ -2332,7 +2331,6 @@ export function selectedBlockStyleState( state = undefined, action ) {
 				clientId: action.clientId,
 				showStateOnCanvas: action.value,
 				value: {
-					viewport: 'default',
 					pseudo: 'default',
 					...previousValue,
 				},

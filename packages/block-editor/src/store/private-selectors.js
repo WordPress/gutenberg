@@ -1174,7 +1174,6 @@ export function getStyleStateViewport( state ) {
  */
 export const getSelectedBlockStyleState = createSelector(
 	( state, clientId ) => {
-		const viewport = getStyleStateViewport( state );
 		const perBlockState =
 			state.selectedBlockStyleState?.clientId === clientId
 				? state.selectedBlockStyleState.value ??
@@ -1183,7 +1182,7 @@ export const getSelectedBlockStyleState = createSelector(
 
 		return {
 			...perBlockState,
-			viewport,
+			viewport: getStyleStateViewport( state ),
 		};
 	},
 	( state ) => [ state.styleStateViewport, state.selectedBlockStyleState ]
