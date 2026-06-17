@@ -3,6 +3,7 @@
  */
 import { Button } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { _n, sprintf } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -44,6 +45,15 @@ export default function RevisionsView() {
 			{ ...buttonProps }
 			variant="link"
 			text={ String( revisionsCount ) }
+			aria-label={ sprintf(
+				/* translators: %d: number of revisions. */
+				_n(
+					'Open revisions screen: %d revision',
+					'Open revisions screen: %d revisions',
+					revisionsCount
+				),
+				revisionsCount
+			) }
 		/>
 	);
 }
