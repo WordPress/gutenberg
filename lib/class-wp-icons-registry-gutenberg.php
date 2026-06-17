@@ -180,9 +180,9 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	 * proper handling of SVG structure including self-closing tags.
 	 *
 	 * @param string $icon_content The icon SVG content to sanitize.
-	 * @return string The sanitized icon SVG content.
+	 * @return string|null The sanitized icon SVG content, or null on failure.
 	 */
-	protected function sanitize_icon_content( string $icon_content ): string {
+	protected function sanitize_icon_content( string $icon_content ): ?string {
 		// Core attributes applicable to most elements. `data-*` is a wildcard
 		// supported by wp_kses() and matches any data attribute.
 		$core_attributes = array_fill_keys(
@@ -883,7 +883,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 
 		$processor = WP_HTML_Processor::create_fragment( $icon_content );
 		if ( ! $processor ) {
-			return '';
+			return null;
 		}
 
 		// Skip leading comments, XML declarations, doctype, and whitespace to
@@ -901,11 +901,11 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				continue;
 			}
 			// Any other leading token (e.g. non-whitespace text) is invalid.
-			return '';
+			return null;
 		}
 
 		if ( 'SVG' !== $processor->get_tag() ) {
-			return '';
+			return null;
 		}
 
 		$svg   = $processor->serialize_token();
@@ -917,7 +917,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			null !== $processor->get_last_error()
 			|| $processor->paused_at_incomplete_token()
 		) {
-			return '';
+			return null;
 		}
 		$svg .= '</svg>';
 		return wp_kses( $svg, $allowed_tags );

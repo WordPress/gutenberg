@@ -141,8 +141,8 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	 * @dataProvider data_sanitize_icon_content
 	 * @covers WP_Icons_Registry_Gutenberg::sanitize_icon_content
 	 *
-	 * @param string $input    The icon content to sanitize.
-	 * @param string $expected The expected sanitized output.
+	 * @param string      $input    The icon content to sanitize.
+	 * @param string|null $expected The expected sanitized output.
 	 */
 	public function test_sanitize_icon_content( $input, $expected ) {
 		$sanitized = $this->sanitize_icon_content( $input );
@@ -207,26 +207,26 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 				'<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0"/><iframe src="evil"></iframe><object data="x" /></svg>',
 				'<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0" /></svg>',
 			),
-			// Returns empty string when input is not SVG.
-			'returns empty for empty string'              => array(
+			// Returns null when input is not SVG.
+			'returns null for empty string'               => array(
 				'',
-				'',
+				null,
 			),
-			'returns empty for whitespace only'           => array(
+			'returns null for whitespace only'            => array(
 				"   \n\t  ",
-				'',
+				null,
 			),
-			'returns empty for plain text'                => array(
+			'returns null for plain text'                 => array(
 				'plain text without svg',
-				'',
+				null,
 			),
-			'returns empty for html without svg'          => array(
+			'returns null for html without svg'           => array(
 				'<div>not svg</div><p>content</p>',
-				'',
+				null,
 			),
-			'returns empty when svg is not first element' => array(
+			'returns null when svg is not first element'  => array(
 				'<p>before</p><svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0" /></svg>',
-				'',
+				null,
 			),
 			// Skips leading comments, XML declarations, and whitespace.
 			'extracts svg after xml declaration'          => array(
