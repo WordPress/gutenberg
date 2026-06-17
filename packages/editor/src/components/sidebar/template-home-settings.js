@@ -6,14 +6,23 @@ import { store as coreDataStore } from '@wordpress/core-data';
 import { DataForm } from '@wordpress/dataviews';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { postsPerPageField, siteDiscussionField } from '@wordpress/fields';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
-import usePostFields from '../post-fields';
 
-const HOME_TEMPLATE_FIELD_IDS = [ 'posts_per_page', 'default_comment_status' ];
+// The hardcoded `posts_per_page`, `default_comment_status`, and `blog-title`
+// fields are a niche editor affordance specific to the post summary panel for
+// `home/index` templates. They target different entities — `posts_per_page` and
+// `default_comment_status` write to `root/site`, `blog-title` writes to the
+// posts page — and the data model around forms and templates intentionally
+// excludes this case to keep a cleaner model. Multi-entity support in the
+// view config API may be considered in the future. As a consequence, these
+// fields cannot be controlled via the fields API or the PHP view config —
+// unlike fields registered for `wp_template` in general.
+const SITE_FIELDS = [ postsPerPageField, siteDiscussionField ];
 
 // Inlined here because it's only meaningful in the home/index template context:
 // it proxies writes to the posts page title, not to the template entity.
@@ -31,13 +40,9 @@ const blogTitleField = {
 	filterBy: false,
 };
 
-// These are editor-specific affordances for the home/index template context:
-// posts_per_page and default_comment_status edit root/site, blog-title edits
-// the posts page. Hardcoded until the view config API supports cross-entity
-// field routing, if we decide to implement that.
 const HOME_TEMPLATE_FORM = {
 	layout: { type: 'panel' },
-	fields: [ blogTitleField.id, ...HOME_TEMPLATE_FIELD_IDS ],
+	fields: [ blogTitleField, ...SITE_FIELDS ].map( ( f ) => f.id ),
 };
 
 export default function TemplateHomeSettings( { postType } ) {
@@ -67,15 +72,10 @@ export default function TemplateHomeSettings( { postType } ) {
 		[]
 	);
 	const { editEntityRecord } = useDispatch( coreDataStore );
-	const postFields = usePostFields( { postType } );
 
 	const fields = useMemo( () => {
-		const siteFields =
-			postFields?.filter( ( field ) =>
-				HOME_TEMPLATE_FIELD_IDS.includes( field.id )
-			) ?? [];
-		return postsPageId ? [ blogTitleField, ...siteFields ] : siteFields;
-	}, [ postFields, postsPageId ] );
+		return postsPageId ? [ blogTitleField, ...SITE_FIELDS ] : SITE_FIELDS;
+	}, [ postsPageId ] );
 
 	const data = useMemo(
 		() => ( { ...siteSettings, ...postsPageRecord } ),
