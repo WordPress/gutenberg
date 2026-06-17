@@ -17,10 +17,14 @@ export default function clearUnchangedEdits(
 	edits: Record< string, unknown >,
 	persistedRecord: Record< string, any > | undefined
 ): Record< string, unknown > {
+	if ( ! persistedRecord ) {
+		return edits;
+	}
+
 	return Object.fromEntries(
 		Object.entries( edits ).map( ( [ key, value ] ) => {
 			const persisted =
-				persistedRecord?.[ key ]?.raw ?? persistedRecord?.[ key ];
+				persistedRecord[ key ]?.raw ?? persistedRecord[ key ];
 			return [
 				key,
 				fastDeepEqual( value, persisted ) ? undefined : value,
