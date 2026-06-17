@@ -2,6 +2,28 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `BaseControl`: Apply `text-wrap: pretty` to help text to avoid typographic widows ([#79112](https://github.com/WordPress/gutenberg/pull/79112)).
+-   `Button`, `DropdownMenu`, `FormToggle`, `Modal`, `Panel`, `RadioControl`, `Toolbar`: Migrate hardcoded border and stroke colors to WPDS tokens ([#79244](https://github.com/WordPress/gutenberg/pull/79244)).
+
+### Bug Fixes
+
+-   `SandBox`: Fix the viewport-unit (`vh`, `vw`, etc.) stripping so user-supplied HTML using these units in `width`/`height` no longer triggers a runaway resize loop in the preview ([#78677](https://github.com/WordPress/gutenberg/pull/78677)).
+
+### Internal
+
+-   Adopt `--wpds-dimension-size-*` design tokens [#79093](https://github.com/WordPress/gutenberg/pull/79093).
+-   Point the legacy `--wp-components-*` color fallbacks at the design system tokens (`--wpds-*` / `--wp-admin-theme-color*`), so component styles get sensible defaults from the prebuilt token stylesheet without a runtime `<ThemeProvider>` ([#78664](https://github.com/WordPress/gutenberg/pull/78664)).
+
+### Code Quality
+
+-   Move `@types/react` from `dependencies` to an optional peer dependency so consumers' React type version is used [#79095](https://github.com/WordPress/gutenberg/pull/79095).
+
+## 35.0.1 (2026-06-16)
+
+## 35.0.0 (2026-06-10)
+
 ### Breaking Changes
 
 -   Revert React back to v18 [#78940](https://github.com/WordPress/gutenberg/pull/78940).
@@ -9,6 +31,21 @@
 ### Documentation
 
 -   Fix documentation typos and grammar ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
+
+### Enhancements
+
+-   `Tooltip`: Use `--wpds-border-radius-md` for portaled popup surfaces, aligning with menus and popovers ([#78983](https://github.com/WordPress/gutenberg/pull/78983)).
+
+### Bug Fixes
+
+-   `ColorPalette`: Avoid rendering an empty palette when custom colors are disabled and no color presets are available ([#72402](https://github.com/WordPress/gutenberg/pull/72402)).
+
+### Internal
+
+-   `UnitControl`: Remove dead native code branches now that `Platform.OS` is always `'web'` following the React Native removal ([#79031](https://github.com/WordPress/gutenberg/pull/79031)).
+-   `Tabs`: Update `@ariakit/react` to `0.4.29`, adopting the upstream fix that moves focus to the selected tab on a controlled selection change, and removing the now-unnecessary controlled-mode focus workarounds ([#79055](https://github.com/WordPress/gutenberg/pull/79055)).
+-   `ToggleGroupControl`: Radio options now render an auto-generated `name` attribute, following Ariakit's `Radio` behavior ([#79055](https://github.com/WordPress/gutenberg/pull/79055)).
+-   Dependency updates ([#77954](https://github.com/WordPress/gutenberg/pull/77954)).
 
 ## 34.0.0 (2026-05-27)
 

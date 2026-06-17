@@ -157,7 +157,13 @@ export default function useBlockToolbarPopoverProps( {
 					isSticky
 				)
 			),
-		[ contentElement, selectedBlockElement, scrollContainer, toolbarHeight ]
+		[
+			contentElement,
+			selectedBlockElement,
+			scrollContainer,
+			toolbarHeight,
+			isSticky,
+		]
 	);
 
 	// Update props when the block is moved. This also ensures the props are
@@ -173,18 +179,18 @@ export default function useBlockToolbarPopoverProps( {
 
 		// Update the toolbar props on viewport resize.
 		const contentView = contentElement?.ownerDocument?.defaultView;
-		contentView?.addEventHandler?.( 'resize', updateProps );
+		contentView?.addEventListener?.( 'resize', updateProps );
 
 		// Update the toolbar props on block resize.
 		let resizeObserver;
 		const blockView = selectedBlockElement?.ownerDocument?.defaultView;
-		if ( blockView.ResizeObserver ) {
+		if ( blockView?.ResizeObserver ) {
 			resizeObserver = new blockView.ResizeObserver( updateProps );
 			resizeObserver.observe( selectedBlockElement );
 		}
 
 		return () => {
-			contentView?.removeEventHandler?.( 'resize', updateProps );
+			contentView?.removeEventListener?.( 'resize', updateProps );
 
 			if ( resizeObserver ) {
 				resizeObserver.disconnect();

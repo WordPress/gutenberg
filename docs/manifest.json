@@ -1146,12 +1146,6 @@
 		"parent": "core-blocks-design"
 	},
 	{
-		"title": "Tab",
-		"slug": "core-block-tab",
-		"markdown_source": "../packages/block-library/src/tab/README.md",
-		"parent": "core-blocks-design"
-	},
-	{
 		"title": "Table of Contents",
 		"slug": "core-block-table-of-contents",
 		"markdown_source": "../packages/block-library/src/table-of-contents/README.md",
@@ -2538,6 +2532,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/grid",
+		"slug": "packages-grid",
+		"markdown_source": "../packages/grid/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/hooks",
 		"slug": "packages-hooks",
 		"markdown_source": "../packages/hooks/README.md",
@@ -2898,6 +2898,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/widget-primitives",
+		"slug": "packages-widget-primitives",
+		"markdown_source": "../packages/widget-primitives/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/widgets",
 		"slug": "packages-widgets",
 		"markdown_source": "../packages/widgets/README.md",
@@ -3090,6 +3096,12 @@
 		"parent": "architecture"
 	},
 	{
+		"title": "The Dashboard Widget System",
+		"slug": "dashboard-widgets",
+		"markdown_source": "../docs/explanations/architecture/dashboard-widgets.md",
+		"parent": "architecture"
+	},
+	{
 		"title": "User Interface",
 		"slug": "user-interface",
 		"markdown_source": "../docs/explanations/user-interface/README.md",
@@ -3208,36 +3220,6 @@
 		"slug": "auto-cherry-picking",
 		"markdown_source": "../docs/contributors/code/auto-cherry-picking.md",
 		"parent": "release"
-	},
-	{
-		"title": "React Native mobile editor",
-		"slug": "react-native",
-		"markdown_source": "../docs/contributors/code/react-native/README.md",
-		"parent": "code"
-	},
-	{
-		"title": "Getting Started for the React Native based Mobile Gutenberg",
-		"slug": "getting-started-react-native",
-		"markdown_source": "../docs/contributors/code/react-native/getting-started-react-native.md",
-		"parent": "react-native"
-	},
-	{
-		"title": "Setup guide for React Native development (macOS)",
-		"slug": "osx-setup-guide",
-		"markdown_source": "../docs/contributors/code/react-native/osx-setup-guide.md",
-		"parent": "react-native"
-	},
-	{
-		"title": "React Native Integration Test Guide",
-		"slug": "integration-test-guide",
-		"markdown_source": "../docs/contributors/code/react-native/integration-test-guide.md",
-		"parent": "react-native"
-	},
-	{
-		"title": "React Native Internationalization Guide",
-		"slug": "internationalization-guide",
-		"markdown_source": "../docs/contributors/code/react-native/internationalization-guide.md",
-		"parent": "react-native"
 	},
 	{
 		"title": "Backward Compatibility",

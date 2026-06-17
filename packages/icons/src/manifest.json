@@ -1579,11 +1579,6 @@
 		"public": true
 	},
 	{
-		"slug": "tab",
-		"label": "Tab",
-		"filePath": "library/tab.svg"
-	},
-	{
 		"slug": "tab-list",
 		"label": "Tab List",
 		"filePath": "library/tab-list.svg"

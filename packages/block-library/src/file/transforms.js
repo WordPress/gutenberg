@@ -5,7 +5,11 @@ import { createBlobURL } from '@wordpress/blob';
 import { createBlock } from '@wordpress/blocks';
 import { select } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { _x } from '@wordpress/i18n';
 import { getFilename } from '@wordpress/url';
+
+// Transforms bypass the default variation, so set the localized default here.
+const downloadButtonText = _x( 'Download', 'button label' );
 
 const transforms = {
 	from: [
@@ -47,6 +51,7 @@ const transforms = {
 							createBlock( 'core/file', {
 								blob: blobURL,
 								fileName: file.name,
+								downloadButtonText,
 							} )
 						);
 					}
@@ -65,6 +70,7 @@ const transforms = {
 					textLinkHref: attributes.src,
 					id: attributes.id,
 					anchor: attributes.anchor,
+					downloadButtonText,
 				} );
 			},
 		},
@@ -78,6 +84,7 @@ const transforms = {
 					textLinkHref: attributes.src,
 					id: attributes.id,
 					anchor: attributes.anchor,
+					downloadButtonText,
 				} );
 			},
 		},
@@ -92,6 +99,7 @@ const transforms = {
 					textLinkHref: attributes.url,
 					id: attributes.id,
 					anchor: attributes.anchor,
+					downloadButtonText,
 				} );
 			},
 		},

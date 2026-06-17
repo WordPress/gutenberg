@@ -67,7 +67,7 @@ export default function Root() {
 			<Tooltip.Provider>
 				<ThemeProvider
 					isRoot
-					color={ { ...themeColors, bg: '#f8f8f8' } }
+					color={ { ...themeColors, background: '#f8f8f8' } }
 				>
 					<ThemeProvider color={ themeColors }>
 						<div
@@ -155,7 +155,10 @@ export default function Root() {
 							) }
 							<div className="boot-layout__surfaces">
 								<ThemeProvider
-									color={ { ...themeColors, bg: '#ffffff' } }
+									color={ {
+										...themeColors,
+										background: '#ffffff',
+									} }
 								>
 									<Outlet />
 									{ /* Render Canvas in Root to prevent remounting on route changes */ }

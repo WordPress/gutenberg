@@ -3,7 +3,7 @@
 // - align footer actions to the right.
 .dataviews-picker-footer__bulk-selection {
 	align-self: flex-start;
-	height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
+	height: var(--wpds-dimension-size-md);
 }
 .dataviews-picker-footer__actions {
 	align-self: flex-end;
