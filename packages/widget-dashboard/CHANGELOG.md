@@ -6,11 +6,10 @@
 
 -   Initial experimental release.
 -   `<WidgetDashboard>`: stateless compound component that renders an
-    editable grid of widget instances, with staging of in-progress
-    edits and a set of composable overlays that ship in the default
-    composition (`Widgets`, `WidgetChrome`, `Actions`, `NoWidgetsState`,
-    `Commands`, `LayoutSettingsDrawer`, `WidgetInserter`,
-    `WidgetSettingsDrawer`).
+    editable grid of widget instances, with staging of in-progress edits.
+    Composable parts ship in the default composition (`Actions`, `Widgets`,
+    `WidgetChrome`, `NoWidgetsState`, `Commands`); the inserter and the
+    layout/widget settings overlays are mounted by the engine.
 -   Grid-settings kit for host-side persistence: `WidgetGridSettings`,
     `DEFAULT_GRID`, `normalizeGridSettings`, `ROW_HEIGHT_PRESETS`,
     `DEFAULT_ROW_HEIGHT`, and `WIDGET_DASHBOARD_COLUMN_COUNT`.
