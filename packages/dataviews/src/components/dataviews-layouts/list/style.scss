@@ -4,7 +4,9 @@
 // `--wpds-dimension-size-md` token; these larger densities have no matching
 // token, so they're kept as local constants. The field wrapper reuses the
 // same value as its `min-height` to keep the title centered against the media.
-$media-size: 52px;
+// TODO: Replace with `--wpds-dimension-size-*` tokens if 48px and 64px are
+// added to the WPDS element size scale.
+$media-size: 48px;
 $media-size-comfortable: 64px;
 
 div.dataviews-view-list {
