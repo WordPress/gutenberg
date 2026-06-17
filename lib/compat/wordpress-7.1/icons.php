@@ -70,17 +70,6 @@ if ( ! function_exists( 'wp_get_icon' ) ) {
 			$processor->set_attribute( 'focusable', 'false' );
 		}
 
-		$html = $processor->get_updated_html();
-
-		/**
-		 * Filters the SVG markup returned by wp_get_icon().
-		 *
-		 * @since 7.1.0
-		 *
-		 * @param string $html The SVG markup.
-		 * @param string $name The namespaced icon name.
-		 * @param array  $args The arguments passed to wp_get_icon().
-		 */
-		return apply_filters( 'wp_icon_html', $html, $name, $args );
+		return $processor->get_updated_html();
 	}
 }
