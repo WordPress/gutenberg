@@ -574,4 +574,116 @@ describe( 'ColorPicker', () => {
 			expect( alphaInput ).toHaveValue( 75 );
 		} );
 	} );
+
+	describe( 'async prop round-trip', () => {
+		const getHexInput = async (
+			user: ReturnType< typeof userEvent.setup >
+		) => {
+			const formatSelector = screen.getByRole( 'combobox' );
+			await user.selectOptions( formatSelector, 'hex' );
+			return screen.getByRole( 'textbox' );
+		};
+
+		it( 'ignores stale prop renders while waiting for its own echo', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+
+			const { rerender } = render(
+				<ColorPicker
+					color="#aaaaaa"
+					onChange={ onChange }
+					enableAlpha={ false }
+				/>
+			);
+
+			const hexInput = await getHexInput( user );
+			await user.clear( hexInput );
+			await user.paste( 'bbbbbb' );
+
+			const changeCountAfterEdit = onChange.mock.calls.length;
+			expect( onChange ).toHaveBeenLastCalledWith( '#bbbbbb' );
+
+			rerender(
+				<ColorPicker
+					color="#aaaaaa"
+					onChange={ onChange }
+					enableAlpha={ false }
+				/>
+			);
+
+			expect( hexInput ).toHaveValue( 'BBBBBB' );
+			expect( onChange ).toHaveBeenCalledTimes( changeCountAfterEdit );
+
+			rerender(
+				<ColorPicker
+					color="#bbbbbb"
+					onChange={ onChange }
+					enableAlpha={ false }
+				/>
+			);
+
+			expect( hexInput ).toHaveValue( 'BBBBBB' );
+			expect( onChange ).toHaveBeenCalledTimes( changeCountAfterEdit );
+
+			rerender(
+				<ColorPicker
+					color="#123456"
+					onChange={ onChange }
+					enableAlpha={ false }
+				/>
+			);
+
+			await waitFor( () => expect( hexInput ).toHaveValue( '123456' ) );
+		} );
+
+		it( 'survives rapid updates with interleaved stale prop renders', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+
+			const { rerender } = render(
+				<ColorPicker
+					color="#aaaaaa"
+					onChange={ onChange }
+					enableAlpha={ false }
+				/>
+			);
+
+			const hexInput = await getHexInput( user );
+			await user.clear( hexInput );
+			await user.paste( 'bbbbbb' );
+			await user.clear( hexInput );
+			await user.paste( 'cccccc' );
+
+			const changeCountAfterEdits = onChange.mock.calls.length;
+			expect( onChange ).toHaveBeenLastCalledWith( '#cccccc' );
+
+			rerender(
+				<ColorPicker
+					color="#aaaaaa"
+					onChange={ onChange }
+					enableAlpha={ false }
+				/>
+			);
+			expect( hexInput ).toHaveValue( 'CCCCCC' );
+
+			rerender(
+				<ColorPicker
+					color="#bbbbbb"
+					onChange={ onChange }
+					enableAlpha={ false }
+				/>
+			);
+			expect( hexInput ).toHaveValue( 'CCCCCC' );
+
+			rerender(
+				<ColorPicker
+					color="#cccccc"
+					onChange={ onChange }
+					enableAlpha={ false }
+				/>
+			);
+			expect( hexInput ).toHaveValue( 'CCCCCC' );
+			expect( onChange ).toHaveBeenCalledTimes( changeCountAfterEdits );
+		} );
+	} );
 } );

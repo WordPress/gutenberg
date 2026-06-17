@@ -94,24 +94,35 @@ const UnconnectedColorPicker = (
 		...safeColordColor.toHsl(),
 	} ) );
 
-	// Track the last hex we produced so the sync effect can
-	// distinguish our own updates from external prop changes.
-	const lastProducedHexRef = useRef( safeColordColor.toHex() );
+	// Hex values we sent via onChange but haven't seen echoed back in `color` yet.
+	// Helps the sync effect ignore our own updates.
+	const producedHexesRef = useRef< string[] >( [ safeColordColor.toHex() ] );
+	const MAX_PRODUCED_QUEUE = 20;
+
+	const pushProducedHex = useCallback( ( nextHex: string ) => {
+		const produced = producedHexesRef.current;
+		produced.push( nextHex );
+		while ( produced.length > MAX_PRODUCED_QUEUE ) {
+			produced.shift();
+		}
+	}, [] );
 
 	// Sync internalHSLA when the color prop changes externally (e.g.
 	// parent passes a new color that wasn't produced by our onChange).
 	useEffect( () => {
 		const incomingHex = safeColordColor.toHex();
+		const produced = producedHexesRef.current;
+		const matchIndex = produced.indexOf( incomingHex );
 
-		// If this hex matches what we last produced, it's our own
-		// update arriving back — skip the sync to avoid overwriting
-		// internalHSLA with lossy round-tripped values.
-		if ( incomingHex === lastProducedHexRef.current ) {
+		if ( matchIndex !== -1 ) {
+			// Our own update arriving back. Consume it and everything older,
+			// but keep newer in-flight values for recognition.
+			produced.splice( 0, matchIndex + 1 );
 			return;
 		}
 
-		// Genuinely external change — sync internalHSLA.
-		lastProducedHexRef.current = incomingHex;
+		// External change — sync state and reset the pending queue.
+		producedHexesRef.current = [ incomingHex ];
 		const externalHSLA = safeColordColor.toHsl();
 		setInternalHSLA( ( prev ) => mergeHSLA( externalHSLA, prev ) );
 	}, [ safeColordColor ] );
@@ -128,17 +139,18 @@ const UnconnectedColorPicker = (
 			// No mergeHSLA here — this handler receives the user's explicit
 			// choice from the picker or HSL inputs, with no lossy conversion.
 			setInternalHSLA( nextHSLA );
-			const previousHex = lastProducedHexRef.current;
+			const previousHex =
+				producedHexesRef.current.at( -1 ) ?? safeColordColor.toHex();
 			const nextHex = colord( nextHSLA ).toHex();
 			// Only notify parent when the hex actually changes. This
 			// avoids firing onChange for H/S changes on achromatic
 			// colors (e.g. adjusting hue on pure white).
 			if ( nextHex !== previousHex ) {
-				lastProducedHexRef.current = nextHex;
+				pushProducedHex( nextHex );
 				setColor( nextHex );
 			}
 		},
-		[ setColor ]
+		[ setColor, pushProducedHex, safeColordColor ]
 	);
 
 	// Handler for components that provide Colord values (RGB, Hex inputs).
@@ -148,10 +160,10 @@ const UnconnectedColorPicker = (
 			const nextHSLA = nextValue.toHsl();
 			setInternalHSLA( ( prev ) => mergeHSLA( nextHSLA, prev ) );
 			const nextHex = nextValue.toHex();
-			lastProducedHexRef.current = nextHex;
+			pushProducedHex( nextHex );
 			debouncedSetColor( nextHex );
 		},
-		[ debouncedSetColor ]
+		[ debouncedSetColor, pushProducedHex ]
 	);
 
 	const [ colorType, setColorType ] = useState< ColorType >(
