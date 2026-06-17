@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1010" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#5b6473"/>
+    </marker>
+    <style>
+      .title { font-size: 21px; font-weight: 700; fill: #1a1a1a; }
+      .zone  { font-size: 13px; font-weight: 700; letter-spacing: 1.5px; }
+      .bt    { font-size: 14.5px; font-weight: 700; }
+      .bl    { font-size: 12.5px; }
+      .mono  { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+      .badge { font-size: 14px; font-weight: 700; fill: #fff; }
+      .conn  { stroke: #5b6473; stroke-width: 2; fill: none; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="1010" fill="#ffffff"/>
+  <text x="600" y="40" text-anchor="middle" class="title">Field Collections — data flow</text>
+  <text x="600" y="64" text-anchor="middle" class="bl" fill="#666">One field is defined in two halves, collocated per collection; they re-converge in the client.</text>
+
+  <!-- ===== Column zones ===== -->
+  <rect x="48"  y="86" width="500" height="556" rx="14" fill="#eaf1fb" stroke="#c7d8f2"/>
+  <rect x="652" y="86" width="500" height="556" rx="14" fill="#f2ecfb" stroke="#dccdf3"/>
+  <text x="68"  y="110" class="zone" fill="#2a5599">SERVER · PHP (serializable)</text>
+  <text x="672" y="110" class="zone" fill="#6b4ea0">CLIENT · JavaScript (non-serializable)</text>
+
+  <!-- ===== Stage 1: authoring ===== -->
+  <!-- left: fields.php -->
+  <rect x="78" y="128" width="440" height="118" rx="10" fill="#fff" stroke="#2a5599" stroke-width="1.5"/>
+  <circle cx="100" cy="150" r="13" fill="#2a5599"/><text x="100" y="155" text-anchor="middle" class="badge">1</text>
+  <text x="124" y="155" class="bt mono" fill="#2a5599">fields.php</text>
+  <text x="98" y="182" class="bl">Serializable field definition</text>
+  <text x="98" y="202" class="bl mono">type · label · placeholder · filterBy</text>
+  <text x="98" y="220" class="bl mono">enableSorting · readOnly · elements</text>
+  <text x="98" y="238" class="bl" fill="#666">→ plain, JSON-encodable data</text>
+
+  <!-- right: extensions.ts -->
+  <rect x="682" y="128" width="440" height="118" rx="10" fill="#fff" stroke="#6b4ea0" stroke-width="1.5"/>
+  <circle cx="704" cy="150" r="13" fill="#6b4ea0"/><text x="704" y="155" text-anchor="middle" class="badge">1</text>
+  <text x="728" y="155" class="bt mono" fill="#6b4ea0">extensions.ts</text>
+  <text x="702" y="182" class="bl">Non-serializable extensions</text>
+  <text x="702" y="202" class="bl mono">getValue · render · Edit · isVisible · sort</text>
+  <text x="702" y="220" class="bl" fill="#666">functions &amp; React components</text>
+  <text x="702" y="238" class="bl" fill="#666">reuse canonical @wordpress/fields objects</text>
+
+  <!-- ===== Stage 2 ===== -->
+  <rect x="78" y="288" width="440" height="124" rx="10" fill="#fff" stroke="#2a5599" stroke-width="1.5"/>
+  <circle cx="100" cy="310" r="13" fill="#2a5599"/><text x="100" y="315" text-anchor="middle" class="badge">2</text>
+  <text x="124" y="315" class="bt" fill="#2a5599">Register the collection</text>
+  <text x="98" y="342" class="bl mono">gutenberg_register_field_collection(</text>
+  <text x="98" y="360" class="bl mono">  id, kind, name, fields[], fields_module )</text>
+  <text x="98" y="382" class="bl">stored in $gutenberg_field_collections (global)</text>
+  <text x="98" y="402" class="bl" fill="#666">post types auto-generated from <tspan class="mono">supports</tspan></text>
+
+  <rect x="682" y="288" width="440" height="124" rx="10" fill="#fff" stroke="#6b4ea0" stroke-width="1.5"/>
+  <circle cx="704" cy="310" r="13" fill="#6b4ea0"/><text x="704" y="315" text-anchor="middle" class="badge">2</text>
+  <text x="728" y="315" class="bt" fill="#6b4ea0">Built as a Script Module</text>
+  <text x="702" y="342" class="bl mono">@wordpress/field-collections/postType-*</text>
+  <text x="702" y="364" class="bl">default export: <tspan class="mono">Partial&lt;Field&gt;[]</tspan> keyed by id</text>
+  <text x="702" y="386" class="bl">added to the import map as a</text>
+  <text x="702" y="404" class="bl">dynamic dependency (via the loader module)</text>
+
+  <!-- ===== Stage 3 ===== -->
+  <rect x="78" y="454" width="440" height="118" rx="10" fill="#fff" stroke="#2a5599" stroke-width="1.5"/>
+  <circle cx="100" cy="476" r="13" fill="#2a5599"/><text x="100" y="481" text-anchor="middle" class="badge">3</text>
+  <text x="124" y="481" class="bt" fill="#2a5599">Exposed via REST</text>
+  <text x="98" y="508" class="bl mono">GET /wp/v2/field-collections</text>
+  <text x="98" y="526" class="bl mono">    ?kind=postType&amp;name=attachment</text>
+  <text x="98" y="548" class="bl">returns serializable <tspan class="mono">fields[]</tspan></text>
+  <text x="98" y="566" class="bl">+ <tspan class="mono">fields_modules[]</tspan> (module handles to load)</text>
+
+  <rect x="682" y="454" width="440" height="118" rx="10" fill="#fff" stroke="#6b4ea0" stroke-width="1.5"/>
+  <circle cx="704" cy="476" r="13" fill="#6b4ea0"/><text x="704" y="481" text-anchor="middle" class="badge">3</text>
+  <text x="728" y="481" class="bt" fill="#6b4ea0">Importable, not yet loaded</text>
+  <text x="702" y="508" class="bl">present in the page's import map</text>
+  <text x="702" y="530" class="bl">fetched only on demand</text>
+  <text x="702" y="552" class="bl" fill="#666">— not bundled upfront</text>
+
+  <!-- vertical connectors within columns -->
+  <path class="conn" d="M298 246 L298 288" marker-end="url(#arrow)"/>
+  <path class="conn" d="M298 412 L298 454" marker-end="url(#arrow)"/>
+  <path class="conn" d="M902 246 L902 288" marker-end="url(#arrow)"/>
+  <path class="conn" d="M902 412 L902 454" marker-end="url(#arrow)"/>
+
+  <!-- converging arrows into merge -->
+  <path class="conn" d="M298 572 L298 690 L470 690 L470 718" marker-end="url(#arrow)"/>
+  <path class="conn" d="M902 572 L902 690 L730 690 L730 718" marker-end="url(#arrow)"/>
+
+  <!-- ===== Stage 4: merge ===== -->
+  <rect x="250" y="720" width="700" height="148" rx="12" fill="#e4f5f0" stroke="#1a7f6b" stroke-width="1.8"/>
+  <circle cx="278" cy="746" r="13" fill="#1a7f6b"/><text x="278" y="751" text-anchor="middle" class="badge">4</text>
+  <text x="302" y="751" class="bt" fill="#136053">useFieldCollections( kind, name )  — client merge</text>
+  <text x="276" y="784" class="bl"><tspan font-weight="700">1.</tspan> store fetches REST  →  serializable <tspan class="mono">fields[]</tspan></text>
+  <text x="276" y="810" class="bl"><tspan font-weight="700">2.</tspan> dynamically <tspan class="mono">import()</tspan> each <tspan class="mono">fields_modules</tspan> handle  →  JS extensions</text>
+  <text x="276" y="836" class="bl"><tspan font-weight="700">3.</tspan> merge by field <tspan class="mono">id</tspan>  (later module wins, property by property)</text>
+  <text x="276" y="858" class="bl" fill="#136053" font-weight="700">→ complete Field[] ready for DataViews</text>
+
+  <path class="conn" d="M600 868 L600 912" marker-end="url(#arrow)"/>
+
+  <!-- ===== Stage 5: screens ===== -->
+  <rect x="330" y="914" width="540" height="80" rx="12" fill="#fdf0e0" stroke="#c2680f" stroke-width="1.8"/>
+  <circle cx="358" cy="940" r="13" fill="#c2680f"/><text x="358" y="945" text-anchor="middle" class="badge">5</text>
+  <text x="382" y="945" class="bt" fill="#9a510b">Screens consume the merged fields</text>
+  <text x="356" y="976" class="bl">DataViews list views · Editor fields panel · inspector</text>
+</svg>

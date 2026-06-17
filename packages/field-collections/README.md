@@ -5,6 +5,11 @@ Client store and React hook for **entity field collections** — sets of fields
 server-side for a given entity (`postType`, `taxonomy`, `user`, …) and exposed
 through `GET /wp/v2/field-collections`.
 
+![Field collections data flow: a field is defined in two halves — serializable
+definitions in PHP and non-serializable extensions in JavaScript — that are
+registered server-side, exposed via REST, and re-merged in the client by
+`useFieldCollections` before screens consume them.](./docs/data-flow.png)
+
 The serializable field definitions are registered in PHP via
 `gutenberg_register_field_collection()`. For post types, the default registrar
 (`gutenberg_register_default_post_type_field_collections()`) generates a
