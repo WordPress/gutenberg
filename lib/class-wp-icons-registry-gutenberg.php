@@ -191,10 +191,14 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	 * Overrides the base class to allow stroke-related attributes and inline
 	 * styles required by stroke-based icons.
 	 *
+	 * The signature is intentionally left without type declarations to stay
+	 * compatible with the parent WP_Icons_Registry::sanitize_icon_content()
+	 * shipped in WordPress core, which declares none.
+	 *
 	 * @param string $icon_content The icon SVG content to sanitize.
 	 * @return string The sanitized icon SVG content.
 	 */
-	protected function sanitize_icon_content( string $icon_content ): string {
+	protected function sanitize_icon_content( $icon_content ) {
 		$allowed_tags = array(
 			'svg'     => array(
 				'class'             => true,
