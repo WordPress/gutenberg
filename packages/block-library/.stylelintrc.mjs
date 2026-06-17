@@ -1,4 +1,4 @@
-import baseConfig from '../../.stylelintrc.js';
+import baseConfig from '@wordpress/stylelint-tools/config';
 
 const [ disallowedValues, disallowedValueMessages ] =
 	baseConfig.rules[ 'declaration-property-value-disallowed-list' ];
@@ -9,7 +9,7 @@ const { cursor: _ignoredCursorRule, ...blockLibraryDisallowedValues } =
 
 /** @type {import('stylelint').Config} */
 export default {
-	extends: '../../.stylelintrc.js',
+	extends: '@wordpress/stylelint-tools/config',
 	rules: {
 		'declaration-property-value-disallowed-list': [
 			blockLibraryDisallowedValues,

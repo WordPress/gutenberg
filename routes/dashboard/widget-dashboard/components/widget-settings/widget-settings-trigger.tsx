@@ -7,6 +7,7 @@ import { cog } from '@wordpress/icons';
 // Dashboard is still experimental.
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { IconButton } from '@wordpress/ui';
+import type { WidgetType } from '@wordpress/widget-primitives';
 
 /**
  * Internal dependencies
@@ -14,7 +15,6 @@ import { IconButton } from '@wordpress/ui';
 import { useDashboardUIContext } from '../../context/ui-context';
 import { getAdminMenuInset } from './utils';
 import type { DashboardWidget } from '../../types';
-import type { WidgetType } from '../../../widget-primitives';
 
 export interface WidgetSettingsTriggerProps {
 	/**

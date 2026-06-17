@@ -7,8 +7,7 @@ import type {
 	WidgetGridModel,
 	WidgetGridSettings,
 } from '../../types';
-
-const DEFAULT_FIXED_COLUMNS = 6;
+import { WIDGET_DASHBOARD_COLUMN_COUNT } from '../../types';
 
 export function getGridModel( settings: WidgetGridSettings ): WidgetGridModel {
 	return settings.model ?? 'grid';
@@ -43,7 +42,7 @@ export function computeGridModelChange( {
 
 	return {
 		layout: migrateLayout( layout, currentModel, targetModel, {
-			columns: gridSettings.columns ?? DEFAULT_FIXED_COLUMNS,
+			columns: WIDGET_DASHBOARD_COLUMN_COUNT,
 		} ),
 		gridSettings: {
 			...gridSettings,

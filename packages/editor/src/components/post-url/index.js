@@ -58,7 +58,7 @@ export default function PostURL( { onClose } ) {
 			postSlug: safeDecodeURIComponent(
 				select( editorStore ).getEditedPostSlug()
 			),
-			viewPostLabel: postType?.labels.view_item,
+			viewPostLabel: postType?.labels?.view_item,
 			postLink: post.link,
 			permalinkPrefix: permalinkParts?.prefix,
 			permalinkSuffix: permalinkParts?.suffix,

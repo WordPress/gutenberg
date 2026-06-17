@@ -5,7 +5,6 @@ import { addFilter } from '@wordpress/hooks';
 import { TextControl, ExternalLink } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { hasBlockSupport } from '@wordpress/blocks';
-import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -53,8 +52,6 @@ function BlockEditAnchorControlPure( { anchor, setAttributes } ) {
 		return null;
 	}
 
-	const isWeb = Platform.OS === 'web';
-
 	return (
 		<InspectorControls group="advanced">
 			<TextControl
@@ -65,23 +62,18 @@ function BlockEditAnchorControlPure( { anchor, setAttributes } ) {
 					<>
 						{ __(
 							'Enter a word or two—without spaces—to make a unique web address just for this block, called an “anchor”. Then, you’ll be able to link directly to this section of your page.'
-						) }
-						{ isWeb && (
-							<>
-								{ ' ' }
-								<ExternalLink
-									href={ __(
-										'https://wordpress.org/documentation/article/page-jumps/'
-									) }
-								>
-									{ __( 'Learn more about anchors' ) }
-								</ExternalLink>
-							</>
-						) }
+						) }{ ' ' }
+						<ExternalLink
+							href={ __(
+								'https://wordpress.org/documentation/article/page-jumps/'
+							) }
+						>
+							{ __( 'Learn more about anchors' ) }
+						</ExternalLink>
 					</>
 				}
 				value={ anchor || '' }
-				placeholder={ ! isWeb ? __( 'Add an anchor' ) : null }
+				placeholder={ null }
 				onChange={ ( nextValue ) => {
 					nextValue = nextValue.replace( ANCHOR_REGEX, '-' );
 					setAttributes( {

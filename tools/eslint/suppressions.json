@@ -522,11 +522,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/utils/waveform-player.js": {
-		"react-hooks/refs": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/video/tracks-editor.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
@@ -820,11 +815,6 @@
 			"count": 2
 		}
 	},
-	"packages/edit-post/src/components/init-pattern-modal/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
 	"packages/edit-post/src/components/welcome-guide/default.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -1088,11 +1078,6 @@
 			"count": 1
 		}
 	},
-	"packages/editor/src/components/post-taxonomies/flat-term-selector.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/editor/src/components/post-template/create-new-template-modal.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
@@ -1109,11 +1094,6 @@
 		}
 	},
 	"packages/editor/src/components/post-visibility/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/editor/src/components/revision-created-panel/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		}
@@ -1280,24 +1260,13 @@
 		}
 	},
 	"packages/format-library/src/image/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		},
 		"react-hooks/refs": {
 			"count": 2
 		}
 	},
 	"packages/format-library/src/language/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		},
 		"react-hooks/refs": {
 			"count": 2
-		}
-	},
-	"packages/format-library/src/link/css-classes-setting.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
 		}
 	},
 	"packages/format-library/src/link/inline.js": {
@@ -1306,17 +1275,11 @@
 		}
 	},
 	"packages/format-library/src/math/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
 		"react-hooks/refs": {
 			"count": 2
 		}
 	},
 	"packages/format-library/src/text-color/inline.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
 		"react-hooks/refs": {
 			"count": 2
 		}
@@ -1617,16 +1580,6 @@
 	"packages/rich-text/src/hook/index.js": {
 		"react-hooks/refs": {
 			"count": 12
-		}
-	},
-	"packages/server-side-render/src/server-side-render.js": {
-		"react-hooks/refs": {
-			"count": 3
-		}
-	},
-	"packages/theme/src/stories/index.story.tsx": {
-		"react-hooks/refs": {
-			"count": 5
 		}
 	},
 	"packages/ui/src/alert-dialog/root.tsx": {
