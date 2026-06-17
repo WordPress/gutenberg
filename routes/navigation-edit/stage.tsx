@@ -15,7 +15,6 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import NavigationMenuEditor from './editor';
-import AddMenuItemsModal from './add-menu-items-modal';
 
 const NAVIGATION_POST_TYPE = 'wp_navigation';
 
@@ -23,7 +22,6 @@ function NavigationEditStage() {
 	const { id } = useParams( { from: '/navigation/edit/$id' } );
 	const navigationId = parseInt( id );
 	const [ isAddingItems, setIsAddingItems ] = useState( false );
-	const [ editorVersion, setEditorVersion ] = useState( 0 );
 	const { navigationMenu } = useSelect(
 		( select ) => {
 			const { getEntityRecord } = select( coreStore );
@@ -75,19 +73,12 @@ function NavigationEditStage() {
 			}
 		>
 			<NavigationMenuEditor
-				key={ `${ navigationId }-${ editorVersion }` }
 				id={ navigationId }
+				isAddingItems={ isAddingItems }
+				navigationMenu={ navigationMenu }
 				onAddMenuItems={ () => setIsAddingItems( true ) }
+				onCloseAddMenuItems={ () => setIsAddingItems( false ) }
 			/>
-			{ isAddingItems && (
-				<AddMenuItemsModal
-					navigationMenu={ navigationMenu }
-					onClose={ () => setIsAddingItems( false ) }
-					onSaved={ () =>
-						setEditorVersion( ( version ) => version + 1 )
-					}
-				/>
-			) }
 		</Page>
 	);
 }

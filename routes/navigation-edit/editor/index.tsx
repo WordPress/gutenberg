@@ -21,10 +21,26 @@ const noop = () => {};
 
 export default function NavigationMenuEditor( {
 	id,
+	isAddingItems,
+	navigationMenu,
 	onAddMenuItems,
+	onCloseAddMenuItems,
 }: {
 	id: number;
+	isAddingItems: boolean;
+	navigationMenu: {
+		id: number;
+		title?: {
+			raw?: string;
+			rendered?: string;
+		};
+		content?: {
+			raw?: string;
+			rendered?: string;
+		};
+	};
 	onAddMenuItems: () => void;
+	onCloseAddMenuItems: () => void;
 } ) {
 	const { isReady: assetsReady } = useEditorAssets();
 	const { isReady: settingsReady, editorSettings } = useEditorSettings();
@@ -74,7 +90,10 @@ export default function NavigationMenuEditor( {
 			onInput={ noop }
 		>
 			<NavigationMenuContent
+				isAddingItems={ isAddingItems }
+				navigationMenu={ navigationMenu }
 				onAddMenuItems={ onAddMenuItems }
+				onCloseAddMenuItems={ onCloseAddMenuItems }
 				rootClientId={ blocks[ 0 ].clientId }
 			/>
 		</BlockEditorProvider>

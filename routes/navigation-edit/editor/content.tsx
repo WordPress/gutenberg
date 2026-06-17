@@ -28,11 +28,25 @@ import { EmptyState } from '@wordpress/ui';
  * Internal dependencies
  */
 import LeafMoreMenu from './leaf-more-menu';
+import AddMenuItemsModal from '../add-menu-items-modal';
 
 type Block = {
 	clientId: string;
 	name: string;
 	attributes: Record< string, unknown >;
+	innerBlocks?: Block[];
+};
+
+type NavigationMenuRecord = {
+	id: number;
+	title?: {
+		raw?: string;
+		rendered?: string;
+	};
+	content?: {
+		raw?: string;
+		rendered?: string;
+	};
 };
 
 const { PrivateListView } = unlock( blockEditorPrivateApis );
@@ -89,52 +103,62 @@ const PAGES_QUERY = [
 ];
 
 export default function NavigationMenuContent( {
+	isAddingItems,
+	navigationMenu,
 	onAddMenuItems,
+	onCloseAddMenuItems,
 	rootClientId,
 }: {
+	isAddingItems: boolean;
+	navigationMenu: NavigationMenuRecord;
 	onAddMenuItems: () => void;
+	onCloseAddMenuItems: () => void;
 	rootClientId: string;
 } ) {
-	const { hasMenuItems, listViewRootClientId, isLoading } = useSelect(
-		( select ) => {
-			const {
-				areInnerBlocksControlled,
-				getBlockName,
-				getBlockCount,
-				getBlockOrder,
-			} = select( blockEditorStore );
-			const { isResolving } = select( coreStore );
+	const { hasMenuItems, listViewRootClientId, navigationBlocks, isLoading } =
+		useSelect(
+			( select ) => {
+				const {
+					areInnerBlocksControlled,
+					getBlocks,
+					getBlockName,
+					getBlockCount,
+					getBlockOrder,
+				} = select( blockEditorStore );
+				const { isResolving } = select( coreStore );
 
-			const blockClientIds = getBlockOrder( rootClientId );
+				const blockClientIds = getBlockOrder( rootClientId );
 
-			const hasOnlyPageListBlock =
-				blockClientIds.length === 1 &&
-				getBlockName( blockClientIds[ 0 ] ) === 'core/page-list';
-			const pageListHasBlocks =
-				hasOnlyPageListBlock &&
-				getBlockCount( blockClientIds[ 0 ] ) > 0;
+				const hasOnlyPageListBlock =
+					blockClientIds.length === 1 &&
+					getBlockName( blockClientIds[ 0 ] ) === 'core/page-list';
+				const pageListHasBlocks =
+					hasOnlyPageListBlock &&
+					getBlockCount( blockClientIds[ 0 ] ) > 0;
 
-			const isLoadingPages = isResolving(
-				'getEntityRecords',
-				PAGES_QUERY
-			);
-			const _listViewRootClientId = pageListHasBlocks
-				? blockClientIds[ 0 ]
-				: rootClientId;
+				const isLoadingPages = isResolving(
+					'getEntityRecords',
+					PAGES_QUERY
+				);
+				const _listViewRootClientId = pageListHasBlocks
+					? blockClientIds[ 0 ]
+					: rootClientId;
 
-			return {
-				hasMenuItems: getBlockCount( _listViewRootClientId ) > 0,
-				listViewRootClientId: _listViewRootClientId,
-				// This is a small hack to wait for the navigation block
-				// to actually load its inner blocks.
-				isLoading:
-					! areInnerBlocksControlled( rootClientId ) ||
-					isLoadingPages,
-			};
-		},
-		[ rootClientId ]
-	);
+				return {
+					hasMenuItems: getBlockCount( _listViewRootClientId ) > 0,
+					listViewRootClientId: _listViewRootClientId,
+					navigationBlocks: getBlocks( rootClientId ),
+					// This is a small hack to wait for the navigation block
+					// to actually load its inner blocks.
+					isLoading:
+						! areInnerBlocksControlled( rootClientId ) ||
+						isLoadingPages,
+				};
+			},
+			[ rootClientId ]
+		);
 	const {
+		insertBlocks,
 		replaceBlock,
 		updateBlockAttributes,
 		__unstableMarkNextChangeAsNotPersistent,
@@ -205,6 +229,17 @@ export default function NavigationMenuContent( {
 	);
 	const { NavigationLinkControls, NavigationLinkUI } =
 		getBlockLibraryPrivateApis();
+
+	const addMenuItemBlocks = useCallback(
+		( blocks: Block[] ) => {
+			if ( ! blocks.length ) {
+				return;
+			}
+
+			insertBlocks( blocks, undefined, rootClientId, false );
+		},
+		[ insertBlocks, rootClientId ]
+	);
 
 	// The hidden block is needed because it makes block edit side effects trigger.
 	// For example a navigation page list load its items has an effect on edit to load its items.
@@ -277,6 +312,14 @@ export default function NavigationMenuContent( {
 			<div className="navigation-edit-editor__hidden-blocks">
 				<BlockList />
 			</div>
+			{ isAddingItems && (
+				<AddMenuItemsModal
+					navigationBlocks={ navigationBlocks }
+					navigationMenu={ navigationMenu }
+					onAddBlocks={ addMenuItemBlocks }
+					onClose={ onCloseAddMenuItems }
+				/>
+			) }
 		</>
 	);
 }

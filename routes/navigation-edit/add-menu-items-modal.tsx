@@ -9,7 +9,7 @@ import {
 	TextControl,
 } from '@wordpress/components';
 import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import {
 	DataViewsPicker,
 	filterSortAndPaginate,
@@ -21,6 +21,12 @@ import { useCallback, useMemo, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __, sprintf } from '@wordpress/i18n';
 import {
+	createBlock,
+	store as blocksStore,
+	// @ts-expect-error - No type declarations available for @wordpress/blocks
+} from '@wordpress/blocks';
+import {
+	blockDefault,
 	category,
 	customLink,
 	file,
@@ -30,7 +36,6 @@ import {
 } from '@wordpress/icons';
 import { Tabs } from '@wordpress/ui';
 
-const NAVIGATION_POST_TYPE = 'wp_navigation';
 const RESOLVE_BASE = 'https://example.invalid';
 
 const PAGE_QUERY = {
@@ -64,6 +69,11 @@ const POST_TYPES_QUERY = { per_page: -1 };
 const TAXONOMIES_QUERY = { per_page: -1 };
 
 const DEFAULT_GROUP = 'pages';
+const EXCLUDED_BLOCK_INSERTIONS = new Set( [
+	'core/navigation-link',
+	'core/navigation-submenu',
+	'core/home-link',
+] );
 const GROUPS = [
 	{
 		id: 'pages',
@@ -88,6 +98,12 @@ const GROUPS = [
 		title: __( 'Media' ),
 		description: __( 'Media files and downloads.' ),
 		icon: image,
+	},
+	{
+		id: 'blocks',
+		title: __( 'Blocks' ),
+		description: __( 'Blocks that can be inserted into navigation menus.' ),
+		icon: blockDefault,
 	},
 	{
 		id: 'custom',
@@ -180,6 +196,7 @@ interface PickerItem {
 	id: string;
 	title: string;
 	linkLabel: string;
+	description?: string;
 	status?: string;
 	typeLabel: string;
 	group: PickerGroup;
@@ -189,6 +206,14 @@ interface PickerItem {
 	url?: string;
 	inThisMenu: boolean;
 	mediaUrl?: string;
+	blockName?: string;
+	blockIcon?: unknown;
+}
+
+interface NavigationBlock {
+	name: string;
+	attributes: Record< string, unknown >;
+	innerBlocks?: NavigationBlock[];
 }
 
 interface LinkedNavigationState {
@@ -197,9 +222,10 @@ interface LinkedNavigationState {
 }
 
 interface AddMenuItemsModalProps {
+	navigationBlocks: NavigationBlock[];
 	navigationMenu: PostRecord;
 	onClose: () => void;
-	onSaved: () => void;
+	onAddBlocks: ( blocks: NavigationBlock[] ) => void;
 }
 
 const EMPTY_SOURCE_RECORDS: MenuItemSourceRecords = {
@@ -207,6 +233,28 @@ const EMPTY_SOURCE_RECORDS: MenuItemSourceRecords = {
 	termRecords: [],
 	mediaRecords: [],
 };
+
+interface BlockTypeRecord {
+	name: string;
+	title?: string;
+	description?: string;
+	icon?: {
+		src?: unknown;
+	};
+	allowedBlocks?: string[];
+}
+
+function getDefaultFieldsForGroup( group: PickerGroup ) {
+	if ( group === 'pages' ) {
+		return [ 'status', 'inThisMenu' ];
+	}
+
+	if ( group === 'blocks' ) {
+		return [ 'description' ];
+	}
+
+	return [ 'typeLabel', 'linkLabel', 'inThisMenu' ];
+}
 
 function createDefaultView( group: PickerGroup ): View {
 	const isGrid = group === 'pages' || group === 'media';
@@ -219,10 +267,7 @@ function createDefaultView( group: PickerGroup ): View {
 		titleField: 'title',
 		mediaField: 'preview',
 		descriptionField: 'linkLabel',
-		fields:
-			group === 'pages'
-				? [ 'status', 'inThisMenu' ]
-				: [ 'typeLabel', 'linkLabel', 'inThisMenu' ],
+		fields: getDefaultFieldsForGroup( group ),
 		layout: {
 			badgeFields: [ 'typeLabel', 'status', 'inThisMenu' ],
 			previewSize: group === 'media' ? 140 : 160,
@@ -278,6 +323,42 @@ function getLinkedNavigationState( content = '' ): LinkedNavigationState {
 	return { entityKeys, urls };
 }
 
+function getLinkedNavigationStateFromBlocks(
+	blocks: NavigationBlock[] = []
+): LinkedNavigationState {
+	const linkedState: LinkedNavigationState = {
+		entityKeys: new Set< string >(),
+		urls: new Set< string >(),
+	};
+
+	function visitBlock( block: NavigationBlock ) {
+		if (
+			block.name === 'core/navigation-link' ||
+			block.name === 'core/navigation-submenu'
+		) {
+			const attributes = block.attributes || {};
+			if ( typeof attributes.url === 'string' ) {
+				linkedState.urls.add( attributes.url );
+			}
+
+			const entityKey = getEntityKey(
+				attributes.kind as SourceKind,
+				attributes.type as string,
+				attributes.id as number | undefined
+			);
+			if ( entityKey ) {
+				linkedState.entityKeys.add( entityKey );
+			}
+		}
+
+		block.innerBlocks?.forEach( visitBlock );
+	}
+
+	blocks.forEach( visitBlock );
+
+	return linkedState;
+}
+
 function isItemInNavigation(
 	item: Omit< PickerItem, 'inThisMenu' >,
 	linkedState: LinkedNavigationState
@@ -293,17 +374,7 @@ function isItemInNavigation(
 	);
 }
 
-function serializeBlockAttributes( attributes: Record< string, unknown > ) {
-	return JSON.stringify( attributes )
-		.replaceAll( '\\\\', '\\u005c' )
-		.replaceAll( '--', '\\u002d\\u002d' )
-		.replaceAll( '<', '\\u003c' )
-		.replaceAll( '>', '\\u003e' )
-		.replaceAll( '&', '\\u0026' )
-		.replaceAll( '\\"', '\\u0022' );
-}
-
-function getNavigationLinkBlockMarkup( item: PickerItem ) {
+function getNavigationLinkBlock( item: PickerItem ): NavigationBlock {
 	const attributes: Record< string, unknown > = {
 		label: item.title,
 		type: item.sourceType,
@@ -328,9 +399,15 @@ function getNavigationLinkBlockMarkup( item: PickerItem ) {
 		};
 	}
 
-	return `<!-- wp:navigation-link ${ serializeBlockAttributes(
-		attributes
-	) } /-->`;
+	return createBlock( 'core/navigation-link', attributes );
+}
+
+function getNavigationBlock( item: PickerItem ): NavigationBlock {
+	if ( item.group === 'blocks' && item.blockName ) {
+		return createBlock( item.blockName );
+	}
+
+	return getNavigationLinkBlock( item );
 }
 
 function normalizeNavMenuHref( raw: string ) {
@@ -375,10 +452,6 @@ function normalizeNavMenuHref( raw: string ) {
 	} catch {
 		return { ok: false, error: __( 'Enter a valid URL' ) };
 	}
-}
-
-function getErrorMessage( error: unknown ) {
-	return error instanceof Error ? error.message : undefined;
 }
 
 function parseMenuItemSourceRecords( payload: string ): MenuItemSourceRecords {
@@ -441,7 +514,9 @@ function PagePreview( { item }: { item: PickerItem } ) {
 function SourceIcon( { item }: { item: PickerItem } ) {
 	let icon = pageIcon;
 
-	if ( item.group === 'media' ) {
+	if ( item.group === 'blocks' ) {
+		icon = item.blockIcon || blockDefault;
+	} else if ( item.group === 'media' ) {
 		icon = item.mediaUrl ? image : file;
 	} else if ( item.group === 'taxonomy' ) {
 		icon = category;
@@ -481,6 +556,19 @@ const fields: Field< PickerItem >[] = [
 				<span className="navigation-add-items-picker__title">
 					{ item.title }
 				</span>
+			</span>
+		),
+	},
+	{
+		id: 'description',
+		type: 'text',
+		label: __( 'Description' ),
+		enableSorting: false,
+		filterBy: false,
+		enableGlobalSearch: true,
+		render: ( { item } ) => (
+			<span className="navigation-add-items-picker__description">
+				{ item.description || item.typeLabel }
 			</span>
 		),
 	},
@@ -553,9 +641,10 @@ const fields: Field< PickerItem >[] = [
 ];
 
 export default function AddMenuItemsModal( {
+	navigationBlocks,
 	navigationMenu,
+	onAddBlocks,
 	onClose,
-	onSaved,
 }: AddMenuItemsModalProps ) {
 	const [ activeGroup, setActiveGroup ] =
 		useState< PickerGroup >( DEFAULT_GROUP );
@@ -564,13 +653,37 @@ export default function AddMenuItemsModal( {
 		createDefaultView( DEFAULT_GROUP )
 	);
 	const [ error, setError ] = useState< string >();
-	const [ isSaving, setIsSaving ] = useState( false );
 	const [ customUrl, setCustomUrl ] = useState( '' );
 	const [ customLabel, setCustomLabel ] = useState( '' );
-	const { saveEntityRecord } = useDispatch( coreStore );
 
 	const { records: pageRecords, isResolving: isResolvingPages } =
 		useEntityRecords( 'postType', 'page', PAGE_QUERY );
+
+	const blockItems = useSelect( ( select ) => {
+		const { getBlockType } = select( blocksStore );
+		const navigationBlock = getBlockType( 'core/navigation' ) as
+			| BlockTypeRecord
+			| undefined;
+
+		return ( navigationBlock?.allowedBlocks || [] )
+			.filter( ( name ) => ! EXCLUDED_BLOCK_INSERTIONS.has( name ) )
+			.map( ( name ) => getBlockType( name ) as BlockTypeRecord )
+			.filter( Boolean )
+			.map( ( blockType ) => ( {
+				id: `block:${ blockType.name }`,
+				title: blockType.title || blockType.name,
+				description: blockType.description,
+				linkLabel: blockType.name,
+				status: 'publish',
+				typeLabel: __( 'Block' ),
+				group: 'blocks' as const,
+				sourceKind: 'custom' as const,
+				sourceType: blockType.name,
+				inThisMenu: false,
+				blockName: blockType.name,
+				blockIcon: blockType.icon?.src,
+			} ) );
+	}, [] ) as PickerItem[];
 
 	const sourceRecordsPayload = useSelect( ( select ) => {
 		const core = select( coreStore );
@@ -650,8 +763,11 @@ export default function AddMenuItemsModal( {
 
 	const menuContent = navigationMenu.content?.raw || '';
 	const linkedState = useMemo(
-		() => getLinkedNavigationState( menuContent ),
-		[ menuContent ]
+		() =>
+			navigationBlocks.length
+				? getLinkedNavigationStateFromBlocks( navigationBlocks )
+				: getLinkedNavigationState( menuContent ),
+		[ menuContent, navigationBlocks ]
 	);
 
 	const pageItems: PickerItem[] = useMemo(
@@ -769,9 +885,10 @@ export default function AddMenuItemsModal( {
 			content: contentItems,
 			taxonomy: taxonomyItems,
 			media: mediaItems,
+			blocks: blockItems,
 			custom: [],
 		} ),
-		[ contentItems, mediaItems, pageItems, taxonomyItems ]
+		[ blockItems, contentItems, mediaItems, pageItems, taxonomyItems ]
 	);
 
 	const activeGroupConfig =
@@ -782,62 +899,25 @@ export default function AddMenuItemsModal( {
 		[ activeItems, view ]
 	);
 
-	const persistItems = useCallback(
-		async ( items: PickerItem[] ) => {
-			const itemsToAdd = items.filter( ( item ) => ! item.inThisMenu );
-
-			if ( itemsToAdd.length === 0 ) {
-				setError(
-					__(
-						'Select at least one item that is not already in this menu.'
-					)
-				);
+	const addItems = useCallback(
+		( items: PickerItem[] ) => {
+			if ( items.length === 0 ) {
+				setError( __( 'Select at least one item.' ) );
 				return;
 			}
 
-			setIsSaving( true );
-			setError( undefined );
-
-			try {
-				const nextContent = [
-					menuContent.trim(),
-					...itemsToAdd.map( getNavigationLinkBlockMarkup ),
-				]
-					.filter( Boolean )
-					.join( '\n\n' );
-
-				await saveEntityRecord(
-					'postType',
-					NAVIGATION_POST_TYPE,
-					{
-						id: navigationMenu.id,
-						content: nextContent,
-					},
-					{ throwOnError: true }
-				);
-
-				onSaved();
-				onClose();
-			} catch ( saveError ) {
-				setError(
-					getErrorMessage( saveError ) ||
-						__(
-							'The selected items could not be added to this menu.'
-						)
-				);
-			} finally {
-				setIsSaving( false );
-			}
+			onAddBlocks( items.map( getNavigationBlock ) );
+			onClose();
 		},
-		[ menuContent, navigationMenu.id, onClose, onSaved, saveEntityRecord ]
+		[ onAddBlocks, onClose ]
 	);
 
-	const addSelectedItems = useCallback( async () => {
+	const addSelectedItems = useCallback( () => {
 		const selectedIds = new Set( selection );
-		await persistItems(
+		addItems(
 			activeItems.filter( ( item ) => selectedIds.has( item.id ) )
 		);
-	}, [ activeItems, persistItems, selection ] );
+	}, [ activeItems, addItems, selection ] );
 
 	const actions: Action< PickerItem >[] = useMemo(
 		() => [
@@ -865,7 +945,7 @@ export default function AddMenuItemsModal( {
 		setView( createDefaultView( nextGroup ) );
 	}, [] );
 
-	const addCustomLink = useCallback( async () => {
+	const addCustomLink = useCallback( () => {
 		const label = customLabel.trim();
 
 		if ( ! label ) {
@@ -892,8 +972,8 @@ export default function AddMenuItemsModal( {
 			inThisMenu: linkedState.urls.has( normalized.href ),
 		};
 
-		await persistItems( [ item ] );
-	}, [ customLabel, customUrl, linkedState.urls, persistItems ] );
+		addItems( [ item ] );
+	}, [ addItems, customLabel, customUrl, linkedState.urls ] );
 
 	const isLoading = activeGroup === 'pages' ? isResolvingPages : false;
 
@@ -927,10 +1007,15 @@ export default function AddMenuItemsModal( {
 								value={ group.id }
 								className="navigation-add-items-modal__tab"
 							>
-								<span aria-hidden="true">
+								<span
+									className="navigation-add-items-modal__tab-icon"
+									aria-hidden="true"
+								>
 									<WCIcon icon={ group.icon } />
 								</span>
-								<span>{ group.title }</span>
+								<span className="navigation-add-items-modal__tab-label">
+									{ group.title }
+								</span>
 							</Tabs.Tab>
 						) ) }
 					</Tabs.List>
@@ -987,9 +1072,6 @@ export default function AddMenuItemsModal( {
 									<Button
 										variant="primary"
 										onClick={ addCustomLink }
-										disabled={ isSaving }
-										accessibleWhenDisabled
-										aria-busy={ isSaving }
 										__next40pxDefaultSize
 									>
 										{ __( 'Add link' ) }
@@ -1005,7 +1087,7 @@ export default function AddMenuItemsModal( {
 								actions={ actions }
 								selection={ selection }
 								onChangeSelection={ setSelection }
-								isLoading={ isLoading || isSaving }
+								isLoading={ isLoading }
 								paginationInfo={ paginationInfo }
 								defaultLayouts={ {
 									pickerGrid: {
@@ -1039,8 +1121,12 @@ export default function AddMenuItemsModal( {
 										<DataViewsPicker.ViewConfig />
 									</div>
 								</div>
-								<DataViewsPicker.Layout />
-								<DataViewsPicker.Footer />
+								<div className="navigation-add-items-modal__picker-scroll">
+									<DataViewsPicker.Layout />
+								</div>
+								<div className="navigation-add-items-modal__picker-footer">
+									<DataViewsPicker.Footer />
+								</div>
 							</DataViewsPicker>
 						) }
 					</div>
