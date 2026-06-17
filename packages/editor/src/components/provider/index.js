@@ -52,6 +52,7 @@ import {
 	SuggestionStoreInterceptor,
 	SuggestionAnnotations,
 	SuggestionDeletionKeyboard,
+	SuggestionAdditionKeyboard,
 	registerSuggestionOverlayFilter,
 } from '../suggestion-mode';
 import { registerSuggestionFormat } from '../inline-suggestions';
@@ -477,6 +478,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 										<SuggestionAutoSave />
 										<SuggestionAnnotations />
 										<SuggestionDeletionKeyboard />
+										<SuggestionAdditionKeyboard />
 										<MediaEditorModalMount />
 									</>
 								) }

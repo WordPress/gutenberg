@@ -182,3 +182,43 @@ export function insertInlineAddition(
 	);
 	return new RichTextData( formatted );
 }
+
+/**
+ * Extend an existing `add` marker by inserting more proposed text at the
+ * marker's trailing edge and re-stamping the marker format over the *entire*
+ * grown span. Re-stamping the whole span (rather than only the new run) keeps
+ * one format instance across it, so the marker serializes as a single `<mark>`
+ * as the user keeps typing rather than fragmenting into one tag per keystroke.
+ *
+ * Used by the typing-creation trigger to grow a contiguous addition without a
+ * round-trip per character: the caret-driven insertion point is `markerEnd`,
+ * the new span becomes `[markerStart, markerEnd + text.length]`.
+ *
+ * @param {*}      value               Block attribute value (RichTextData or other).
+ * @param {Object} options
+ * @param {string} options.text        Proposed text to append to the marker.
+ * @param {Object} options.attributes  Marker attributes (see `buildSuggestionMarkerAttributes`).
+ * @param {number} options.markerStart Current marker start offset.
+ * @param {number} options.markerEnd   Current marker end offset (insertion point).
+ * @return {*} New RichTextData with the marker grown, or the original value.
+ */
+export function growInlineAddition(
+	value,
+	{ text, attributes, markerStart, markerEnd }
+) {
+	if ( ! ( value instanceof RichTextData ) ) {
+		return value;
+	}
+	if ( ! text ) {
+		return value;
+	}
+	const record = create( { html: value.toHTMLString() } );
+	const inserted = insert( record, text, markerEnd, markerEnd );
+	const formatted = applyFormat(
+		inserted,
+		{ type: SUGGESTION_FORMAT_NAME, attributes },
+		markerStart,
+		markerEnd + text.length
+	);
+	return new RichTextData( formatted );
+}

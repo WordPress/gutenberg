@@ -33,5 +33,6 @@ export {
 	acceptInlineAddition,
 	rejectInlineAddition,
 	insertInlineAddition,
+	growInlineAddition,
 	buildSuggestionMarkerAttributes,
 } from './operations';

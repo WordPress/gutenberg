@@ -17,6 +17,7 @@ import {
 	acceptInlineAddition,
 	rejectInlineAddition,
 	insertInlineAddition,
+	growInlineAddition,
 	buildSuggestionMarkerAttributes,
 } from '../operations';
 import { registerSuggestionFormat, SUGGESTION_FORMAT_NAME } from '../format';
@@ -295,6 +296,75 @@ describe( 'inline addition operations', () => {
 				insertInlineAddition( value, {
 					text: '',
 					attributes: {},
+				} ).toHTMLString()
+			).toBe( 'unchanged' );
+		} );
+	} );
+
+	describe( 'growInlineAddition', () => {
+		const stripTags = ( html ) => html.replace( /<[^>]+>/g, '' );
+		const attrs = buildSuggestionMarkerAttributes( { id: 9, type: 'add' } );
+
+		it( 'appends to the marker and keeps it a single run', () => {
+			// Seed a one-char marker, then grow it one char at a time.
+			let value = insertInlineAddition(
+				RichTextData.fromHTMLString( 'before after' ),
+				{ text: 'N', attributes: attrs, start: 7, end: 7 }
+			);
+			value = growInlineAddition( value, {
+				text: 'E',
+				attributes: attrs,
+				markerStart: 7,
+				markerEnd: 8,
+			} );
+			value = growInlineAddition( value, {
+				text: 'W',
+				attributes: attrs,
+				markerStart: 7,
+				markerEnd: 9,
+			} );
+			const html = value.toHTMLString();
+			expect( stripTags( html ) ).toBe( 'before NEWafter' );
+			// Re-stamping the whole span keeps one <mark>, not one per char.
+			expect( html.match( /<mark/g ) ).toHaveLength( 1 );
+			expect( html ).toContain( 'data-suggestion-id="9"' );
+		} );
+
+		it( 'leaves the grown run reversible via rejectInlineAddition', () => {
+			let value = insertInlineAddition(
+				RichTextData.fromHTMLString( 'x y' ),
+				{ text: 'a', attributes: attrs, start: 2, end: 2 }
+			);
+			value = growInlineAddition( value, {
+				text: 'b',
+				attributes: attrs,
+				markerStart: 2,
+				markerEnd: 3,
+			} );
+			expect( rejectInlineAddition( value, 9 ).toHTMLString() ).toBe(
+				'x y'
+			);
+		} );
+
+		it( 'returns a non-rich-text value unchanged', () => {
+			expect(
+				growInlineAddition( 'plain', {
+					text: 'x',
+					attributes: attrs,
+					markerStart: 0,
+					markerEnd: 0,
+				} )
+			).toBe( 'plain' );
+		} );
+
+		it( 'returns the value unchanged when there is no text', () => {
+			const value = RichTextData.fromHTMLString( 'unchanged' );
+			expect(
+				growInlineAddition( value, {
+					text: '',
+					attributes: attrs,
+					markerStart: 0,
+					markerEnd: 0,
 				} ).toHTMLString()
 			).toBe( 'unchanged' );
 		} );

@@ -15,5 +15,6 @@
 export { findMarkerRange } from './find-marker-range';
 export { wrapInlineMarker } from './wrap-inline-marker';
 export { readInlineSelection } from './read-inline-selection';
+export { readInlineCaret } from './read-inline-caret';
 export { reconcileMarkerRemoval } from './reconcile-marker-removal';
 export { useAnnotateRanges } from './use-annotate-ranges';

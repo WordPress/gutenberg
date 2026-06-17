@@ -21,6 +21,7 @@ export {
 export { default as SuggestionAutoSave } from './auto-save';
 export { default as SuggestionStoreInterceptor } from './store-interceptor';
 export { default as SuggestionDeletionKeyboard } from './suggestion-deletion-keyboard';
+export { default as SuggestionAdditionKeyboard } from './suggestion-addition-keyboard';
 export {
 	default as SuggestionAnnotations,
 	suggestionAnnotations,
