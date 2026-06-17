@@ -19,9 +19,16 @@ Design tokens are delivered as CSS custom properties (e.g. `var(--wpds-color-for
 
 The [`ThemeProvider`](#theme-provider) component can be used to customize token values like colors for a specific part of your application.
 
+#### Delivery model
+
+The design system splits token delivery into two complementary layers:
+
+-   **Static stylesheet (`design-tokens.css`)** — defines the default value for every `--wpds-*` custom property at the document `:root`. Loaded once per document (the main page, _and_ each iframe you render React into). Provides a working baseline even before any JavaScript runs.
+-   **Runtime `<ThemeProvider>`** — applies per-instance overrides for a subtree, on top of the static defaults. Use it to override individual settings (e.g. `color.primary`, `cursor.control`).
+
 #### Within WordPress
 
-Stylesheets are managed on your behalf in a WordPress context, so you don't need to worry about loading them yourself.
+Stylesheets are managed on your behalf in a WordPress context, so you don't need to worry about loading them yourself. The design tokens stylesheet is enqueued automatically on every admin page and inside the block editor's content iframe.
 
 #### Outside WordPress
 
@@ -36,6 +43,8 @@ import '@wordpress/theme/design-tokens.css';
 ```
 
 This stylesheet is universal and does not have a separate RTL version.
+
+If your application renders React content into additional documents (an iframe, a popup window, etc.), each of those documents needs the same stylesheet loaded in its own `<head>`. See [Across documents (iframes and other portals)](#across-documents-iframes-and-other-portals).
 
 ### Developer Tools
 
@@ -126,6 +135,53 @@ The provider can be used recursively to override or modify the theme for a speci
 ```
 
 The `ThemeProvider` redefines some of the design system tokens. Components consuming semantic design system tokens will automatically follow the chosen theme. Note that the tokens are defined and inherited using the CSS cascade, and therefore the DOM tree, not the React tree. This is very important when using React portals.
+
+### `isRoot` and the containing document
+
+By default, the styles a `<ThemeProvider>` emits are scoped to the provider's wrapper `<div>`, so overrides apply only to its subtree.
+
+Setting `isRoot` additionally hoists those overrides to the containing document's `:root`, so anything rendered into that document — including overlays portalled outside the provider's React tree — picks them up.
+
+```tsx
+<ThemeProvider color={ { primary: '#a00' } } isRoot>
+	{ /* …app… */ }
+</ThemeProvider>
+```
+
+Use `isRoot` on the top-level provider for an application or page. It's also the recommended pattern for the topmost provider rendered into a separate document (iframe, popup window). The static design-tokens stylesheet still provides the default values; `isRoot` is only needed when you want a `<ThemeProvider>`'s overrides to reach the whole document.
+
+### Across documents (iframes and other portals)
+
+When you render React content into a different document (typically an iframe), two things must be true for design tokens to work correctly in that document:
+
+1.  **The design-tokens stylesheet is present in the document's `<head>`.** This is the static `:root` block that defines every `--wpds-*` custom property.
+
+    Inside WordPress, this is enqueued automatically for both the admin page and the block editor's content iframe.
+
+    For custom iframes, the consumer is responsible for loading it — either by importing `@wordpress/theme/design-tokens.css` from a stylesheet that the iframe already loads, or by injecting the CSS string directly.
+
+2.  **Dynamically injected component styles are routed to the iframe document.** Some `@wordpress/components` styles are injected into the document at runtime rather than shipped as static CSS — for example Emotion-based styles, and styles from CSS modules built with `@wordpress/build`. `StyleProvider` tells that machinery which document's `<head>` to inject into. Wrap the iframe subtree in `<StyleProvider document={ iframeDocument }>`.
+
+The canonical pattern combines both with a `<ThemeProvider isRoot>` to apply any overrides to the iframe's `:root`:
+
+```tsx
+import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
+import { ThemeProvider } from '@wordpress/theme';
+import { createPortal } from 'react-dom';
+
+function IframeContent( { iframeDocument, children } ) {
+	return createPortal(
+		<StyleProvider document={ iframeDocument }>
+			<ThemeProvider isRoot color={ { primary: '#a00' } }>
+				{ children }
+			</ThemeProvider>
+		</StyleProvider>,
+		iframeDocument.body
+	);
+}
+```
+
+The static stylesheet inside the iframe provides every default; `<ThemeProvider isRoot>` adds (or omits) overrides on top, exactly like in the main document.
 
 ### Building
 

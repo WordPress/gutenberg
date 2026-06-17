@@ -9,13 +9,13 @@ import userEvent from '@testing-library/user-event';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
+import type { WidgetType } from '@wordpress/widget-primitives';
 
 /**
  * Internal dependencies
  */
 import { WidgetDashboard } from '../widget-dashboard';
 import type { DashboardWidget, WidgetGridSettings } from '../types';
-import type { WidgetType } from '../../widget-primitives';
 
 const widgetTypes: WidgetType[] = [];
 

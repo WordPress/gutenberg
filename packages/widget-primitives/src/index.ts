@@ -13,6 +13,7 @@ export { useWidgetTypes } from './hooks';
  */
 export type {
 	WidgetName,
+	WidgetIcon,
 	WidgetType,
 	WidgetRenderProps,
 	ResolveWidgetModule,
