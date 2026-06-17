@@ -1,3 +1,14 @@
+// Side-effect import: registers the inline RichText format types
+// (`gutenberg/suggested-deletion`, `gutenberg/suggested-addition`) consumed
+// by `with-suggestion-overlay.js` to render proposed adds and deletes inside
+// the editor canvas. See #77867.
+import './inline-formats';
+
+export {
+	SUGGESTED_DELETION_FORMAT,
+	SUGGESTED_ADDITION_FORMAT,
+	registerSuggestionFormats,
+} from './inline-formats';
 export {
 	SuggestionOverlayProvider,
 	useSuggestionOverlay,

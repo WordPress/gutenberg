@@ -1,4 +1,19 @@
 /**
+ * Tests for `with-suggestion-overlay.js`. Coverage falls into three groups:
+ *
+ * 1. `withSuggestionOverlay` HOC — pass-through outside Suggest intent;
+ *    in Suggest intent, diversion of `setAttributes` into the overlay,
+ *    rendering the merged overlay-on-baseline value, surviving an overlay
+ *    clear-and-re-edit cycle.
+ * 2. `mergeOverlayAttributes` — replace-vs-deep-merge contract for
+ *    overlapping overlay keys, including the `style`/`metadata` deep merge
+ *    that keeps untouched fields alive.
+ * 3. `applyDiffMarks` / `stripMarksFromIncoming` — the diff/strip round-trip
+ *    that keeps the overlay storing the *clean* proposed value while the
+ *    rendered attributes carry marked HTML.
+ */
+
+/**
  * External dependencies
  */
 import { render, screen, act, fireEvent } from '@testing-library/react';
@@ -19,6 +34,8 @@ import withSuggestionOverlay, {
 	mergeOverlayAttributes,
 	structuralMarkerClass,
 	withSuggestionBlockClassName,
+	applyDiffMarks,
+	stripMarksFromIncoming,
 } from '../with-suggestion-overlay';
 import {
 	SuggestionOverlayProvider,
@@ -584,5 +601,95 @@ describe( 'withSuggestionBlockClassName', () => {
 		expect(
 			screen.getByTestId( 'suggestion-move-ghost' )
 		).toBeInTheDocument();
+	} );
+} );
+
+describe( 'applyDiffMarks', () => {
+	it( 'returns merged unchanged when no baseline is available', () => {
+		// New blocks added during a suggestion session never get a
+		// baseline captured for them — `applyDiffMarks` must be a safe
+		// no-op rather than throw.
+		const merged = { content: 'Hello' };
+		expect( applyDiffMarks( merged, null ) ).toBe( merged );
+	} );
+
+	it( 'returns merged unchanged when the content attribute is unchanged', () => {
+		// Attribute-only suggestions (e.g. heading level) don't touch
+		// `content`; skipping the diff keeps object identity stable so
+		// React's bail-out on unchanged props still fires.
+		const merged = { content: 'Hello', level: 3 };
+		const baseline = { content: 'Hello', level: 2 };
+		expect( applyDiffMarks( merged, baseline ) ).toBe( merged );
+	} );
+
+	it( 'wraps the diff for changed content in del/ins markup', () => {
+		const result = applyDiffMarks(
+			{ content: 'Hello world', level: 2 },
+			{ content: 'Hello', level: 2 }
+		);
+		expect( result.content ).toBe(
+			'Hello' +
+				'<ins class="has-suggestion-addition"> </ins>' +
+				'<ins class="has-suggestion-addition">world</ins>'
+		);
+		// Other attributes pass through untouched.
+		expect( result.level ).toBe( 2 );
+	} );
+
+	it( 'leaves non-rich-text attributes unmarked even when they change', () => {
+		// `align: 'left' -> 'right'` is a primitive change; wrapping it
+		// in HTML would push garbage into a className/string slot. The
+		// block-level outline already signals these changes.
+		const merged = { align: 'right' };
+		const baseline = { align: 'left' };
+		expect( applyDiffMarks( merged, baseline ) ).toBe( merged );
+	} );
+
+	it( 'propagates the suggester avatar color into each marked run', () => {
+		// HOC resolves the suggester via `getAvatarBorderColor` and passes
+		// the hex color through. The marks must carry it inline so two
+		// suggesters' edits read as different colors in the canvas.
+		const result = applyDiffMarks(
+			{ content: 'Hello world' },
+			{ content: 'Hello' },
+			'#b26200'
+		);
+		expect( result.content ).toBe(
+			'Hello' +
+				'<ins class="has-suggestion-addition" style="--suggestion-author-color: #b26200"> </ins>' +
+				'<ins class="has-suggestion-addition" style="--suggestion-author-color: #b26200">world</ins>'
+		);
+	} );
+} );
+
+describe( 'stripMarksFromIncoming', () => {
+	it( 'returns the payload unchanged when no rich-text key is present', () => {
+		// Most attribute-only suggestions land here, so the fast-path
+		// matters for keystroke-rate calls.
+		const payload = { level: 3 };
+		expect( stripMarksFromIncoming( payload ) ).toBe( payload );
+	} );
+
+	it( 'returns the payload unchanged when content has no suggestion marks', () => {
+		// First-time edits send plain text through; the strip should be
+		// a structural no-op so React props stay identity-stable.
+		const payload = { content: 'Hello world' };
+		expect( stripMarksFromIncoming( payload ) ).toBe( payload );
+	} );
+
+	it( 'strips suggestion marks from content before they reach the overlay', () => {
+		// Round-trip case: RichText emits the previously-marked HTML
+		// back through `setAttributes` after the user keeps typing into
+		// a marked block. Storing the marked form in the overlay would
+		// double up the marks on the next render.
+		const result = stripMarksFromIncoming( {
+			content:
+				'Hello' +
+				'<del class="has-suggestion-deletion"> world</del>' +
+				'<ins class="has-suggestion-addition"> there</ins>',
+			level: 2,
+		} );
+		expect( result.content ).toBe( 'Hello there' );
+		expect( result.level ).toBe( 2 );
 	} );
 } );
