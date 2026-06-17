@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { getBlockType } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -46,10 +45,6 @@ function getPseudoStateOptions( name ) {
 
 const DEFAULT_STATE_VALUE = 'default';
 
-function hasStyleAttribute( name ) {
-	return !! getBlockType( name )?.attributes?.style;
-}
-
 /**
  * Renders a pseudo-state selector in the block card header.
  *
@@ -84,10 +79,6 @@ export function BlockStatesControl( { name, value, onChange } ) {
 /**
  * Renders badges for the active style states of a block.
  *
- * When Responsive editing is enabled, a device badge (Desktop/Tablet/Mobile)
- * is shown for blocks that support viewport styles, alongside any selected
- * pseudo-state badge.
- *
  * @param {Object}  props                     Component props.
  * @param {string}  props.name                Block name.
  * @param {Object}  props.value               Currently selected style-state value.
@@ -96,15 +87,14 @@ export function BlockStatesControl( { name, value, onChange } ) {
  */
 export function BlockStateBadges( { name, value, isResponsiveEditing } ) {
 	const pseudoStateOptions = getPseudoStateOptions( name );
-	const showDeviceBadge = isResponsiveEditing && hasStyleAttribute( name );
 
-	if ( ! pseudoStateOptions.length && ! showDeviceBadge ) {
+	if ( ! pseudoStateOptions.length && ! isResponsiveEditing ) {
 		return null;
 	}
 
 	return (
 		<StateControlBadges
-			viewportStates={ showDeviceBadge ? DEVICE_STATE_OPTIONS : [] }
+			viewportStates={ isResponsiveEditing ? DEVICE_STATE_OPTIONS : [] }
 			viewportValue={ value?.viewport ?? DEFAULT_STATE_VALUE }
 			pseudoStates={ pseudoStateOptions }
 			pseudoStateValue={ value?.pseudo ?? DEFAULT_STATE_VALUE }
