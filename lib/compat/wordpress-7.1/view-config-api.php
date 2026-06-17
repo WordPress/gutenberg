@@ -731,9 +731,57 @@ function _gutenberg_get_entity_view_config_post_type_wp_template( $config ) {
 
 	$config['view_list'] = array_merge( $view_list, $registered_authors, $user_authors );
 
+	$config['form'] = array(
+		'layout' => array( 'type' => 'panel' ),
+		'fields' => array(
+			array(
+				'id'     => 'description',
+				'layout' => array(
+					'type'          => 'panel',
+					'labelPosition' => 'top',
+				),
+			),
+			array(
+				'id'     => 'description-readonly',
+				'layout' => array(
+					'type'          => 'regular',
+					'labelPosition' => 'none',
+				),
+			),
+			array(
+				'id'     => 'last_edited_date',
+				'layout' => array(
+					'type'          => 'panel',
+					'labelPosition' => 'none',
+				),
+			),
+		),
+	);
+
 	return $config;
 }
 if ( has_filter( 'get_entity_view_config_postType_wp_template', '_wp_get_entity_view_config_post_type_wp_template' ) ) {
 	remove_filter( 'get_entity_view_config_postType_wp_template', '_wp_get_entity_view_config_post_type_wp_template' );
 }
 add_filter( 'get_entity_view_config_postType_wp_template', '_gutenberg_get_entity_view_config_post_type_wp_template', 10, 1 );
+
+/**
+ * Provides the view configuration for the `site` root entity.
+ *
+ * @param array $config {
+ *     The view configuration for the entity.
+ * }
+ * @return array The filtered view configuration.
+ */
+function _gutenberg_get_entity_view_config_root_site( $config ) {
+	$config['form'] = array(
+		'layout' => array( 'type' => 'panel' ),
+		'fields' => array(
+			'posts_per_page',
+			'default_comment_status',
+		),
+	);
+
+	return $config;
+}
+add_filter( 'get_entity_view_config_root_site', '_gutenberg_get_entity_view_config_root_site', 10, 1 );
