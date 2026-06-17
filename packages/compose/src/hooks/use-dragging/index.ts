@@ -54,7 +54,7 @@ export default function useDragging( {
 		( event: React.MouseEvent ): void => {
 			eventsRef.current.onDragStart?.( event );
 			document.addEventListener( 'mousemove', onMouseMove );
-			document.addEventListener( 'mouseup', endDrag, { once: true } );
+			document.addEventListener( 'mouseup', endDrag );
 			setIsDragging( true );
 		},
 		[ onMouseMove, endDrag ]
