@@ -17,11 +17,22 @@ import {
 	metadata as groupMetadata,
 	settings as groupSettings,
 } from '../../group';
+import {
+	metadata as videoMetadata,
+	settings as videoSettings,
+} from '../../video';
+import {
+	metadata as embedMetadata,
+	settings as embedSettings,
+} from '../../embed';
+import { EMBED_VIDEO_BACKGROUND_TYPE } from '../shared';
 
 describe( 'transforms', () => {
 	beforeAll( () => {
 		registerBlockType( coverMetadata, coverSettings );
 		registerBlockType( groupMetadata, groupSettings );
+		registerBlockType( videoMetadata, videoSettings );
+		registerBlockType( embedMetadata, embedSettings );
 	} );
 
 	afterAll( () => {
@@ -296,6 +307,55 @@ describe( 'transforms', () => {
 			expect( transformedBlocks[ 0 ].attributes ).not.toHaveProperty(
 				'gradient'
 			);
+		} );
+	} );
+
+	describe( 'transform from Cover to Embed', () => {
+		it( 'should transform Cover block with YouTube URL to YouTube Embed block', () => {
+			const youtubeUrl = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+			const block = createBlock( 'core/cover', {
+				url: youtubeUrl,
+				backgroundType: EMBED_VIDEO_BACKGROUND_TYPE,
+			} );
+
+			const transformedBlocks = switchToBlockType( block, 'core/embed' );
+
+			expect( transformedBlocks ).toHaveLength( 1 );
+			expect( transformedBlocks[ 0 ].name ).toBe( 'core/embed' );
+			expect( transformedBlocks[ 0 ].attributes.url ).toBe( youtubeUrl );
+			expect( transformedBlocks[ 0 ].attributes.providerNameSlug ).toBe(
+				'youtube'
+			);
+		} );
+
+		it( 'should transform Cover block with Vimeo URL to Vimeo Embed block', () => {
+			const vimeoUrl = 'https://vimeo.com/1119913385';
+			const block = createBlock( 'core/cover', {
+				url: vimeoUrl,
+				backgroundType: EMBED_VIDEO_BACKGROUND_TYPE,
+			} );
+
+			const transformedBlocks = switchToBlockType( block, 'core/embed' );
+
+			expect( transformedBlocks ).toHaveLength( 1 );
+			expect( transformedBlocks[ 0 ].name ).toBe( 'core/embed' );
+			expect( transformedBlocks[ 0 ].attributes.url ).toBe( vimeoUrl );
+			expect( transformedBlocks[ 0 ].attributes.providerNameSlug ).toBe(
+				'vimeo'
+			);
+		} );
+
+		it( 'should not show Embed transform for Cover with regular video files', () => {
+			const videoUrl = 'https://example.com/video.mp4';
+			const block = createBlock( 'core/cover', {
+				url: videoUrl,
+				backgroundType: 'video',
+			} );
+
+			const transformedBlocks = switchToBlockType( block, 'core/embed' );
+
+			// Should not transform regular video files to embed
+			expect( transformedBlocks ).toBeNull();
 		} );
 	} );
 } );
