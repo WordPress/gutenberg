@@ -28,6 +28,10 @@ export {
 	useAnnotateSuggestionThreads,
 } from './annotate-suggestions';
 export {
+	default as SuggestionAuthorColors,
+	buildSuggestionAuthorColorCss,
+} from './suggestion-author-colors';
+export {
 	useSuggestionsProvider,
 	operationsFromOverlay,
 	applyOperations,

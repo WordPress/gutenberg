@@ -51,6 +51,7 @@ import {
 	SuggestionAutoSave,
 	SuggestionStoreInterceptor,
 	SuggestionAnnotations,
+	SuggestionAuthorColors,
 	SuggestionDeletionKeyboard,
 	SuggestionAdditionKeyboard,
 	registerSuggestionOverlayFilter,
@@ -477,6 +478,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 										<SuggestionStoreInterceptor />
 										<SuggestionAutoSave />
 										<SuggestionAnnotations />
+										<SuggestionAuthorColors />
 										<SuggestionDeletionKeyboard />
 										<SuggestionAdditionKeyboard />
 										<MediaEditorModalMount />
