@@ -2,11 +2,7 @@
  * WordPress dependencies
  */
 import { sprintf, __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import type { WidgetType } from '../../../../widget-primitives';
+import type { WidgetType } from '@wordpress/widget-primitives';
 
 /**
  * Localized "<Widget> settings" label, falling back to a generic title

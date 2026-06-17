@@ -12,17 +12,20 @@
 /**
  * External dependencies
  */
-import type { ComponentProps, ComponentType } from 'react';
+import type { ComponentProps, ComponentType, ReactElement } from 'react';
 import type { Field } from '@wordpress/dataviews';
-import type { Icon } from '@wordpress/ui';
-
-type IconProps = ComponentProps< typeof Icon >;
 
 /**
  * Widget type identifier, structured as `<widget-namespace>/<widget-name>`.
  * Both segments are lowercase, kebab-case.
  */
 export type WidgetName = `${ string }/${ string }`;
+
+/**
+ * Icon for a widget type: a rendered SVG element, typically one from
+ * `@wordpress/icons`. Hosts pass it to their icon primitive as is.
+ */
+export type WidgetIcon = ReactElement< ComponentProps< 'svg' > >;
 
 /**
  * Literal contents of a widget's `widget.json` metadata file.
@@ -47,19 +50,20 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	name: WidgetName;
 
 	/**
-	 * Display title; shown in the inserter.
+	 * Display title; hosts surface it in pickers and chrome.
 	 */
 	title: string;
 
 	/**
-	 * Short description shown in the widget inspector.
+	 * Short description; hosts surface it in pickers and help panels.
 	 */
 	description?: string;
 
 	/**
-	 * Visual identifier shown in the widget header.
+	 * Visual identifier for the widget type; hosts decide where, and
+	 * whether, to render it.
 	 */
-	icon?: IconProps[ 'icon' ];
+	icon?: WidgetIcon;
 
 	/**
 	 * Grouping category. Core provides `dashboard`; plugins and themes may
@@ -73,15 +77,15 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	 *
 	 * - `'framed'` (default when absent): the widget renders its
 	 *   content only.
-	 * - `'content-bleed'`: the header stays visible while the content
-	 *   fills the content area edge-to-edge, with no padding.
+	 * - `'content-bleed'`: the host's chrome stays visible while the
+	 *   content fills the content area edge-to-edge, with no padding.
 	 * - `'full-bleed'`: the widget renders edge-to-edge with no
 	 *   surrounding chrome.
 	 */
 	presentation?: 'framed' | 'content-bleed' | 'full-bleed';
 
 	/**
-	 * Search aliases used to surface the widget from the inserter.
+	 * Search aliases hosts use to match the widget in their pickers.
 	 */
 	keywords?: string[];
 
@@ -108,9 +112,9 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	attributes?: Field< Item >[];
 
 	/**
-	 * Structured example data for the Inspector Help Panel preview, and
-	 * the default attributes applied when a new instance is created
-	 * without initial attributes.
+	 * Structured example data hosts use for previews, and the default
+	 * attributes applied when a new instance is created without initial
+	 * attributes.
 	 */
 	example?: {
 		attributes?: Partial< Item >;

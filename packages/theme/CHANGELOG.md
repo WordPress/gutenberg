@@ -4,8 +4,14 @@
 
 ### New Features
 
+-   Add `--wpds-color-stroke-surface-caution` and `--wpds-color-stroke-surface-caution-strong` so the `caution` tone has the same stroke-surface coverage as the other status tones ([#79198](https://github.com/WordPress/gutenberg/pull/79198)).
 -   Add `--wpds-border-radius-xl` for page and app shell surfaces so nested cards and notices can stay on `--wpds-border-radius-lg` without matching the parent radius ([#78913](https://github.com/WordPress/gutenberg/pull/78913)).
 -   Add `cornerRadius` prop to `ThemeProvider` for configuring the border-radius preset (`none`, `subtle`, `moderate`, `pronounced`) via prebuilt design token modes. [#78816](https://github.com/WordPress/gutenberg/pull/78816).
+-   Add disabled variants for the `brand` and `error` tones of the interactive `background`, `foreground`, and `stroke` color tokens (e.g. `--wpds-color-stroke-interactive-brand-disabled`, `--wpds-color-background-interactive-brand-strong-disabled`), for parity with the existing `neutral` disabled tokens ([#79124](https://github.com/WordPress/gutenberg/pull/79124)).
+
+### Enhancements
+
+-   `ThemeProvider`: forward the `cornerRadius` preset to the document element when `isRoot` is set, matching `color` and `cursor`. [#79153](https://github.com/WordPress/gutenberg/pull/79153).
 
 ### Breaking Changes
 
@@ -15,6 +21,20 @@
 ### Bug Fixes
 
 -   `ThemeProvider`: Strictly enforce the documented seed-color input contract for `color.primary` / `color.background`. Inputs outside sRGB (e.g. `oklch()`), previously accepted incidentally, now throw a clear error ([#79148](https://github.com/WordPress/gutenberg/pull/79148)).
+
+### Internal
+
+-   Add unit tests for `ThemeProvider` and `useThemeProviderStyles` ([#79126](https://github.com/WordPress/gutenberg/pull/79126)).
+
+### Documentation
+
+-   Document the static-stylesheet + `<ThemeProvider>` delivery model, the `isRoot` prop, and the canonical pattern for using `<ThemeProvider>` across documents (iframes and other portals) ([#78664](https://github.com/WordPress/gutenberg/pull/78664)).
+
+### Code Quality
+
+-   Declare `postcss`, `esbuild`, and `vite` as optional peer dependencies for the bundler plugins, and move `@types/react` from `dependencies` to an optional peer dependency ([#79095](https://github.com/WordPress/gutenberg/pull/79095)).
+
+## 0.15.1 (2026-06-16)
 
 ## 0.15.0 (2026-06-10)
 
