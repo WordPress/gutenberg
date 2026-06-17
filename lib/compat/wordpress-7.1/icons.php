@@ -51,9 +51,12 @@ if ( ! function_exists( 'wp_get_icon' ) ) {
 			return '';
 		}
 
-		if ( ! empty( $args['size'] ) ) {
-			$processor->set_attribute( 'width', (string) $args['size'] );
-			$processor->set_attribute( 'height', (string) $args['size'] );
+		if ( is_numeric( $args['size'] ) ) {
+			$size = absint( $args['size'] );
+			if ( $size ) {
+				$processor->set_attribute( 'width', (string) $size );
+				$processor->set_attribute( 'height', (string) $size );
+			}
 		}
 
 		if ( ! empty( $args['class'] ) ) {
