@@ -323,15 +323,18 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				$core_attributes,
 				$aria_attributes,
 				$presentation_attributes,
-				array(
-					'xmlns'               => true,
-					'xmlns:xlink'         => true,
-					'width'               => true,
-					'height'              => true,
-					'viewbox'             => true,
-					'preserveaspectratio' => true,
-					'x'                   => true,
-					'y'                   => true,
+				array_fill_keys(
+					array(
+						'xmlns',
+						'xmlns:xlink',
+						'width',
+						'height',
+						'viewbox',
+						'preserveaspectratio',
+						'x',
+						'y',
+					),
+					true
 				)
 			),
 			// Basic shape elements (with markers).
@@ -340,9 +343,12 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				$aria_attributes,
 				$presentation_attributes,
 				$marker_attributes,
-				array(
-					'd'          => true,
-					'pathlength' => true,
+				array_fill_keys(
+					array(
+						'd',
+						'pathlength',
+					),
+					true
 				)
 			),
 			'circle'              => array_merge(
@@ -350,10 +356,13 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				$aria_attributes,
 				$presentation_attributes,
 				$marker_attributes,
-				array(
-					'cx' => true,
-					'cy' => true,
-					'r'  => true,
+				array_fill_keys(
+					array(
+						'cx',
+						'cy',
+						'r',
+					),
+					true
 				)
 			),
 			'ellipse'             => array_merge(
@@ -361,11 +370,14 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				$aria_attributes,
 				$presentation_attributes,
 				$marker_attributes,
-				array(
-					'cx' => true,
-					'cy' => true,
-					'rx' => true,
-					'ry' => true,
+				array_fill_keys(
+					array(
+						'cx',
+						'cy',
+						'rx',
+						'ry',
+					),
+					true
 				)
 			),
 			'line'                => array_merge(
@@ -373,11 +385,14 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				$aria_attributes,
 				$presentation_attributes,
 				$marker_attributes,
-				array(
-					'x1' => true,
-					'x2' => true,
-					'y1' => true,
-					'y2' => true,
+				array_fill_keys(
+					array(
+						'x1',
+						'x2',
+						'y1',
+						'y2',
+					),
+					true
 				)
 			),
 			'polygon'             => array_merge(
@@ -385,8 +400,11 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				$aria_attributes,
 				$presentation_attributes,
 				$marker_attributes,
-				array(
-					'points' => true,
+				array_fill_keys(
+					array(
+						'points',
+					),
+					true
 				)
 			),
 			'polyline'            => array_merge(
@@ -394,8 +412,11 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				$aria_attributes,
 				$presentation_attributes,
 				$marker_attributes,
-				array(
-					'points' => true,
+				array_fill_keys(
+					array(
+						'points',
+					),
+					true
 				)
 			),
 			'rect'                => array_merge(
@@ -403,13 +424,16 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				$aria_attributes,
 				$presentation_attributes,
 				$marker_attributes,
-				array(
-					'x'      => true,
-					'y'      => true,
-					'width'  => true,
-					'height' => true,
-					'rx'     => true,
-					'ry'     => true,
+				array_fill_keys(
+					array(
+						'x',
+						'y',
+						'width',
+						'height',
+						'rx',
+						'ry',
+					),
+					true
 				)
 			),
 			// Grouping and structural elements.
@@ -421,37 +445,46 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			'defs'                => $core_attributes,
 			'view'                => array_merge(
 				$core_attributes,
-				array(
-					'viewbox'             => true,
-					'preserveaspectratio' => true,
-					'zoomandpan'          => true,
-					'viewtarget'          => true,
+				array_fill_keys(
+					array(
+						'viewbox',
+						'preserveaspectratio',
+						'zoomandpan',
+						'viewtarget',
+					),
+					true
 				)
 			),
 			'symbol'              => array_merge(
 				$core_attributes,
 				$aria_attributes,
 				$container_attributes,
-				array(
-					'viewbox'             => true,
-					'preserveaspectratio' => true,
-					'x'                   => true,
-					'y'                   => true,
-					'width'               => true,
-					'height'              => true,
+				array_fill_keys(
+					array(
+						'viewbox',
+						'preserveaspectratio',
+						'x',
+						'y',
+						'width',
+						'height',
+					),
+					true
 				)
 			),
 			'use'                 => array_merge(
 				$core_attributes,
 				$aria_attributes,
 				$presentation_attributes,
-				array(
-					'href'       => true,
-					'xlink:href' => true,
-					'x'          => true,
-					'y'          => true,
-					'width'      => true,
-					'height'     => true,
+				array_fill_keys(
+					array(
+						'href',
+						'xlink:href',
+						'x',
+						'y',
+						'width',
+						'height',
+					),
+					true
 				)
 			),
 			'switch'              => array_merge(
@@ -465,320 +498,425 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				$aria_attributes,
 				$presentation_attributes,
 				$container_attributes,
-				array(
-					'href'       => true,
-					'xlink:href' => true,
-					'target'     => true,
-					'rel'        => true,
-					'type'       => true,
+				array_fill_keys(
+					array(
+						'href',
+						'xlink:href',
+						'target',
+						'rel',
+						'type',
+					),
+					true
 				)
 			),
 			'clippath'            => array_merge(
 				$core_attributes,
-				array(
-					'clippathunits' => true,
-					'transform'     => true,
+				array_fill_keys(
+					array(
+						'clippathunits',
+						'transform',
+					),
+					true
 				)
 			),
 			'mask'                => array_merge(
 				$core_attributes,
-				array(
-					'x'                => true,
-					'y'                => true,
-					'width'            => true,
-					'height'           => true,
-					'maskunits'        => true,
-					'maskcontentunits' => true,
+				array_fill_keys(
+					array(
+						'x',
+						'y',
+						'width',
+						'height',
+						'maskunits',
+						'maskcontentunits',
+					),
+					true
 				)
 			),
 			// Gradient elements.
 			'lineargradient'      => array_merge(
 				$core_attributes,
-				array(
-					'x1'                => true,
-					'x2'                => true,
-					'y1'                => true,
-					'y2'                => true,
-					'gradientunits'     => true,
-					'gradienttransform' => true,
-					'spreadmethod'      => true,
-					'href'              => true,
-					'xlink:href'        => true,
+				array_fill_keys(
+					array(
+						'x1',
+						'x2',
+						'y1',
+						'y2',
+						'gradientunits',
+						'gradienttransform',
+						'spreadmethod',
+						'href',
+						'xlink:href',
+					),
+					true
 				)
 			),
 			'radialgradient'      => array_merge(
 				$core_attributes,
-				array(
-					'cx'                => true,
-					'cy'                => true,
-					'r'                 => true,
-					'fx'                => true,
-					'fy'                => true,
-					'fr'                => true,
-					'gradientunits'     => true,
-					'gradienttransform' => true,
-					'spreadmethod'      => true,
-					'href'              => true,
-					'xlink:href'        => true,
+				array_fill_keys(
+					array(
+						'cx',
+						'cy',
+						'r',
+						'fx',
+						'fy',
+						'fr',
+						'gradientunits',
+						'gradienttransform',
+						'spreadmethod',
+						'href',
+						'xlink:href',
+					),
+					true
 				)
 			),
 			'stop'                => array_merge(
 				$core_attributes,
-				array(
-					'offset'       => true,
-					'stop-color'   => true,
-					'stop-opacity' => true,
+				array_fill_keys(
+					array(
+						'offset',
+						'stop-color',
+						'stop-opacity',
+					),
+					true
 				)
 			),
 			// Pattern element.
 			'pattern'             => array_merge(
 				$core_attributes,
-				array(
-					'x'                   => true,
-					'y'                   => true,
-					'width'               => true,
-					'height'              => true,
-					'patternunits'        => true,
-					'patterncontentunits' => true,
-					'patterntransform'    => true,
-					'viewbox'             => true,
-					'preserveaspectratio' => true,
-					'href'                => true,
-					'xlink:href'          => true,
+				array_fill_keys(
+					array(
+						'x',
+						'y',
+						'width',
+						'height',
+						'patternunits',
+						'patterncontentunits',
+						'patterntransform',
+						'viewbox',
+						'preserveaspectratio',
+						'href',
+						'xlink:href',
+					),
+					true
 				)
 			),
 			// Filter elements.
 			'filter'              => array_merge(
 				$core_attributes,
-				array(
-					'x'              => true,
-					'y'              => true,
-					'width'          => true,
-					'height'         => true,
-					'filterunits'    => true,
-					'primitiveunits' => true,
+				array_fill_keys(
+					array(
+						'x',
+						'y',
+						'width',
+						'height',
+						'filterunits',
+						'primitiveunits',
+					),
+					true
 				)
 			),
-			'feblend'             => array(
-				'in'     => true,
-				'in2'    => true,
-				'mode'   => true,
-				'result' => true,
+			'feblend'             => array_fill_keys(
+				array(
+					'in',
+					'in2',
+					'mode',
+					'result',
+				),
+				true
 			),
-			'fecolormatrix'       => array(
-				'in'     => true,
-				'type'   => true,
-				'values' => true,
-				'result' => true,
+			'fecolormatrix'       => array_fill_keys(
+				array(
+					'in',
+					'type',
+					'values',
+					'result',
+				),
+				true
 			),
-			'fecomponenttransfer' => array(
-				'in'     => true,
-				'result' => true,
+			'fecomponenttransfer' => array_fill_keys(
+				array(
+					'in',
+					'result',
+				),
+				true
 			),
-			'fecomposite'         => array(
-				'in'       => true,
-				'in2'      => true,
-				'operator' => true,
-				'k1'       => true,
-				'k2'       => true,
-				'k3'       => true,
-				'k4'       => true,
-				'result'   => true,
+			'fecomposite'         => array_fill_keys(
+				array(
+					'in',
+					'in2',
+					'operator',
+					'k1',
+					'k2',
+					'k3',
+					'k4',
+					'result',
+				),
+				true
 			),
-			'feconvolvematrix'    => array(
-				'in'            => true,
-				'order'         => true,
-				'kernelmatrix'  => true,
-				'divisor'       => true,
-				'bias'          => true,
-				'targetx'       => true,
-				'targety'       => true,
-				'edgemode'      => true,
-				'preservealpha' => true,
-				'result'        => true,
+			'feconvolvematrix'    => array_fill_keys(
+				array(
+					'in',
+					'order',
+					'kernelmatrix',
+					'divisor',
+					'bias',
+					'targetx',
+					'targety',
+					'edgemode',
+					'preservealpha',
+					'result',
+				),
+				true
 			),
-			'fediffuselighting'   => array(
-				'in'              => true,
-				'surfacescale'    => true,
-				'diffuseconstant' => true,
-				'result'          => true,
+			'fediffuselighting'   => array_fill_keys(
+				array(
+					'in',
+					'surfacescale',
+					'diffuseconstant',
+					'result',
+				),
+				true
 			),
-			'fedisplacementmap'   => array(
-				'in'               => true,
-				'in2'              => true,
-				'scale'            => true,
-				'xchannelselector' => true,
-				'ychannelselector' => true,
-				'result'           => true,
+			'fedisplacementmap'   => array_fill_keys(
+				array(
+					'in',
+					'in2',
+					'scale',
+					'xchannelselector',
+					'ychannelselector',
+					'result',
+				),
+				true
 			),
-			'fedistantlight'      => array(
-				'azimuth'   => true,
-				'elevation' => true,
+			'fedistantlight'      => array_fill_keys(
+				array(
+					'azimuth',
+					'elevation',
+				),
+				true
 			),
-			'feflood'             => array(
-				'flood-color'   => true,
-				'flood-opacity' => true,
-				'result'        => true,
+			'feflood'             => array_fill_keys(
+				array(
+					'flood-color',
+					'flood-opacity',
+					'result',
+				),
+				true
 			),
-			'fegaussianblur'      => array(
-				'in'           => true,
-				'stddeviation' => true,
-				'edgemode'     => true,
-				'result'       => true,
+			'fegaussianblur'      => array_fill_keys(
+				array(
+					'in',
+					'stddeviation',
+					'edgemode',
+					'result',
+				),
+				true
 			),
-			'feimage'             => array(
-				'href'                => true,
-				'xlink:href'          => true,
-				'preserveaspectratio' => true,
-				'result'              => true,
+			'feimage'             => array_fill_keys(
+				array(
+					'href',
+					'xlink:href',
+					'preserveaspectratio',
+					'result',
+				),
+				true
 			),
-			'femerge'             => array(
-				'result' => true,
+			'femerge'             => array_fill_keys(
+				array(
+					'result',
+				),
+				true
 			),
-			'femergenode'         => array(
-				'in' => true,
+			'femergenode'         => array_fill_keys(
+				array(
+					'in',
+				),
+				true
 			),
-			'femorphology'        => array(
-				'in'       => true,
-				'operator' => true,
-				'radius'   => true,
-				'result'   => true,
+			'femorphology'        => array_fill_keys(
+				array(
+					'in',
+					'operator',
+					'radius',
+					'result',
+				),
+				true
 			),
-			'feoffset'            => array(
-				'in'     => true,
-				'dx'     => true,
-				'dy'     => true,
-				'result' => true,
+			'feoffset'            => array_fill_keys(
+				array(
+					'in',
+					'dx',
+					'dy',
+					'result',
+				),
+				true
 			),
-			'fepointlight'        => array(
-				'x' => true,
-				'y' => true,
-				'z' => true,
+			'fepointlight'        => array_fill_keys(
+				array(
+					'x',
+					'y',
+					'z',
+				),
+				true
 			),
-			'fespecularlighting'  => array(
-				'in'               => true,
-				'surfacescale'     => true,
-				'specularconstant' => true,
-				'specularexponent' => true,
-				'result'           => true,
+			'fespecularlighting'  => array_fill_keys(
+				array(
+					'in',
+					'surfacescale',
+					'specularconstant',
+					'specularexponent',
+					'result',
+				),
+				true
 			),
-			'fespotlight'         => array(
-				'x'                 => true,
-				'y'                 => true,
-				'z'                 => true,
-				'pointsatx'         => true,
-				'pointsaty'         => true,
-				'pointsatz'         => true,
-				'specularexponent'  => true,
-				'limitingconeangle' => true,
+			'fespotlight'         => array_fill_keys(
+				array(
+					'x',
+					'y',
+					'z',
+					'pointsatx',
+					'pointsaty',
+					'pointsatz',
+					'specularexponent',
+					'limitingconeangle',
+				),
+				true
 			),
-			'fetile'              => array(
-				'in'     => true,
-				'result' => true,
+			'fetile'              => array_fill_keys(
+				array(
+					'in',
+					'result',
+				),
+				true
 			),
-			'feturbulence'        => array(
-				'basefrequency' => true,
-				'numoctaves'    => true,
-				'seed'          => true,
-				'stitchtiles'   => true,
-				'type'          => true,
-				'result'        => true,
+			'feturbulence'        => array_fill_keys(
+				array(
+					'basefrequency',
+					'numoctaves',
+					'seed',
+					'stitchtiles',
+					'type',
+					'result',
+				),
+				true
 			),
-			'fefunca'             => array(
-				'type'        => true,
-				'tablevalues' => true,
-				'slope'       => true,
-				'intercept'   => true,
-				'amplitude'   => true,
-				'exponent'    => true,
-				'offset'      => true,
+			'fefunca'             => array_fill_keys(
+				array(
+					'type',
+					'tablevalues',
+					'slope',
+					'intercept',
+					'amplitude',
+					'exponent',
+					'offset',
+				),
+				true
 			),
-			'fefuncb'             => array(
-				'type'        => true,
-				'tablevalues' => true,
-				'slope'       => true,
-				'intercept'   => true,
-				'amplitude'   => true,
-				'exponent'    => true,
-				'offset'      => true,
+			'fefuncb'             => array_fill_keys(
+				array(
+					'type',
+					'tablevalues',
+					'slope',
+					'intercept',
+					'amplitude',
+					'exponent',
+					'offset',
+				),
+				true
 			),
-			'fefuncg'             => array(
-				'type'        => true,
-				'tablevalues' => true,
-				'slope'       => true,
-				'intercept'   => true,
-				'amplitude'   => true,
-				'exponent'    => true,
-				'offset'      => true,
+			'fefuncg'             => array_fill_keys(
+				array(
+					'type',
+					'tablevalues',
+					'slope',
+					'intercept',
+					'amplitude',
+					'exponent',
+					'offset',
+				),
+				true
 			),
-			'fefuncr'             => array(
-				'type'        => true,
-				'tablevalues' => true,
-				'slope'       => true,
-				'intercept'   => true,
-				'amplitude'   => true,
-				'exponent'    => true,
-				'offset'      => true,
+			'fefuncr'             => array_fill_keys(
+				array(
+					'type',
+					'tablevalues',
+					'slope',
+					'intercept',
+					'amplitude',
+					'exponent',
+					'offset',
+				),
+				true
 			),
 			// Text elements.
 			'text'                => array_merge(
 				$core_attributes,
 				$aria_attributes,
 				$presentation_attributes,
-				array(
-					'x'                  => true,
-					'y'                  => true,
-					'dx'                 => true,
-					'dy'                 => true,
-					'rotate'             => true,
-					'textlength'         => true,
-					'lengthadjust'       => true,
-					'text-anchor'        => true,
-					'font-family'        => true,
-					'font-size'          => true,
-					'font-weight'        => true,
-					'font-style'         => true,
-					'font-variant'       => true,
-					'text-decoration'    => true,
-					'writing-mode'       => true,
-					'letter-spacing'     => true,
-					'word-spacing'       => true,
-					'dominant-baseline'  => true,
-					'alignment-baseline' => true,
-					'baseline-shift'     => true,
+				array_fill_keys(
+					array(
+						'x',
+						'y',
+						'dx',
+						'dy',
+						'rotate',
+						'textlength',
+						'lengthadjust',
+						'text-anchor',
+						'font-family',
+						'font-size',
+						'font-weight',
+						'font-style',
+						'font-variant',
+						'text-decoration',
+						'writing-mode',
+						'letter-spacing',
+						'word-spacing',
+						'dominant-baseline',
+						'alignment-baseline',
+						'baseline-shift',
+					),
+					true
 				)
 			),
 			'tspan'               => array_merge(
 				$core_attributes,
 				$aria_attributes,
 				$presentation_attributes,
-				array(
-					'x'               => true,
-					'y'               => true,
-					'dx'              => true,
-					'dy'              => true,
-					'rotate'          => true,
-					'textlength'      => true,
-					'lengthadjust'    => true,
-					'text-anchor'     => true,
-					'font-family'     => true,
-					'font-size'       => true,
-					'font-weight'     => true,
-					'font-style'      => true,
-					'text-decoration' => true,
+				array_fill_keys(
+					array(
+						'x',
+						'y',
+						'dx',
+						'dy',
+						'rotate',
+						'textlength',
+						'lengthadjust',
+						'text-anchor',
+						'font-family',
+						'font-size',
+						'font-weight',
+						'font-style',
+						'text-decoration',
+					),
+					true
 				)
 			),
 			'textpath'            => array_merge(
 				$core_attributes,
 				$aria_attributes,
 				$presentation_attributes,
-				array(
-					'href'        => true,
-					'xlink:href'  => true,
-					'startoffset' => true,
-					'method'      => true,
-					'spacing'     => true,
-					'text-anchor' => true,
+				array_fill_keys(
+					array(
+						'href',
+						'xlink:href',
+						'startoffset',
+						'method',
+						'spacing',
+						'text-anchor',
+					),
+					true
 				)
 			),
 			// Descriptive elements.
@@ -790,97 +928,115 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				$core_attributes,
 				$aria_attributes,
 				$presentation_attributes,
-				array(
-					'x'                   => true,
-					'y'                   => true,
-					'width'               => true,
-					'height'              => true,
-					'href'                => true,
-					'xlink:href'          => true,
-					'preserveaspectratio' => true,
+				array_fill_keys(
+					array(
+						'x',
+						'y',
+						'width',
+						'height',
+						'href',
+						'xlink:href',
+						'preserveaspectratio',
+					),
+					true
 				)
 			),
 			// Marker element.
 			'marker'              => array_merge(
 				$core_attributes,
-				array(
-					'markerunits'         => true,
-					'refx'                => true,
-					'refy'                => true,
-					'markerwidth'         => true,
-					'markerheight'        => true,
-					'orient'              => true,
-					'preserveaspectratio' => true,
-					'viewbox'             => true,
+				array_fill_keys(
+					array(
+						'markerunits',
+						'refx',
+						'refy',
+						'markerwidth',
+						'markerheight',
+						'orient',
+						'preserveaspectratio',
+						'viewbox',
+					),
+					true
 				)
 			),
 			// Animation elements.
 			'animate'             => array_merge(
 				$core_attributes,
-				array(
-					'attributename' => true,
-					'from'          => true,
-					'to'            => true,
-					'dur'           => true,
-					'repeatcount'   => true,
-					'begin'         => true,
-					'end'           => true,
-					'values'        => true,
-					'keytimes'      => true,
-					'keysplines'    => true,
-					'calcmode'      => true,
-					'additive'      => true,
-					'accumulate'    => true,
+				array_fill_keys(
+					array(
+						'attributename',
+						'from',
+						'to',
+						'dur',
+						'repeatcount',
+						'begin',
+						'end',
+						'values',
+						'keytimes',
+						'keysplines',
+						'calcmode',
+						'additive',
+						'accumulate',
+					),
+					true
 				)
 			),
 			'animatemotion'       => array_merge(
 				$core_attributes,
-				array(
-					'path'        => true,
-					'keypoints'   => true,
-					'rotate'      => true,
-					'keytimes'    => true,
-					'keysplines'  => true,
-					'calcmode'    => true,
-					'from'        => true,
-					'to'          => true,
-					'values'      => true,
-					'dur'         => true,
-					'repeatcount' => true,
-					'begin'       => true,
-					'end'         => true,
-					'additive'    => true,
-					'accumulate'  => true,
+				array_fill_keys(
+					array(
+						'path',
+						'keypoints',
+						'rotate',
+						'keytimes',
+						'keysplines',
+						'calcmode',
+						'from',
+						'to',
+						'values',
+						'dur',
+						'repeatcount',
+						'begin',
+						'end',
+						'additive',
+						'accumulate',
+					),
+					true
 				)
 			),
 			'animatetransform'    => array_merge(
 				$core_attributes,
-				array(
-					'attributename' => true,
-					'type'          => true,
-					'from'          => true,
-					'to'            => true,
-					'dur'           => true,
-					'repeatcount'   => true,
-					'begin'         => true,
-					'end'           => true,
-					'values'        => true,
-					'keytimes'      => true,
-					'keysplines'    => true,
-					'calcmode'      => true,
-					'additive'      => true,
-					'accumulate'    => true,
+				array_fill_keys(
+					array(
+						'attributename',
+						'type',
+						'from',
+						'to',
+						'dur',
+						'repeatcount',
+						'begin',
+						'end',
+						'values',
+						'keytimes',
+						'keysplines',
+						'calcmode',
+						'additive',
+						'accumulate',
+					),
+					true
 				)
 			),
 			'set'                 => array_merge(
 				$core_attributes,
-				array(
-					'attributename' => true,
-					'to'            => true,
-					'begin'         => true,
-					'dur'           => true,
-					'end'           => true,
-					'repeatcount'   => true,
+				array_fill_keys(
+					array(
+						'attributename',
+						'to',
+						'begin',
+						'dur',
+						'end',
+						'repeatcount',
+					),
+					true
 				)
 			),
 		);
