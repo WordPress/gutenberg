@@ -179,10 +179,14 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	 * content would terminate the SVG element when parsed as HTML, and ensures
 	 * proper handling of SVG structure including self-closing tags.
 	 *
+	 * The parameter is intentionally left untyped to stay signature-compatible
+	 * with the parent WP_Icons_Registry::sanitize_icon_content() shipped in
+	 * WordPress core, which declares no parameter type.
+	 *
 	 * @param string $icon_content The icon SVG content to sanitize.
 	 * @return string|null The sanitized icon SVG content, or null on failure.
 	 */
-	protected function sanitize_icon_content( string $icon_content ): ?string {
+	protected function sanitize_icon_content( $icon_content ): ?string {
 		// Core attributes applicable to most elements. `data-*` is a wildcard
 		// supported by wp_kses() and matches any data attribute.
 		$core_attributes = array_fill_keys(
