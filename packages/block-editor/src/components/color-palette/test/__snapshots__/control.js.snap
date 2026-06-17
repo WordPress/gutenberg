@@ -51,75 +51,6 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
 }
 
 .emotion-8 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-align-items: stretch;
-  -webkit-box-align: stretch;
-  -ms-flex-align: stretch;
-  align-items: stretch;
-  -webkit-flex-direction: column;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  gap: calc(4px * 3);
-  -webkit-box-pack: center;
-  -ms-flex-pack: center;
-  -webkit-justify-content: center;
-  justify-content: center;
-}
-
-.emotion-8>* {
-  min-height: 0;
-}
-
-.emotion-10 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-align-items: stretch;
-  -webkit-box-align: stretch;
-  -ms-flex-align: stretch;
-  align-items: stretch;
-  -webkit-flex-direction: column;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  gap: 0;
-  -webkit-box-pack: center;
-  -ms-flex-pack: center;
-  -webkit-justify-content: center;
-  justify-content: center;
-}
-
-.emotion-10>* {
-  min-height: 0;
-}
-
-.emotion-12 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-align-items: stretch;
-  -webkit-box-align: stretch;
-  -ms-flex-align: stretch;
-  align-items: stretch;
-  -webkit-flex-direction: column;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  gap: calc(4px * 0.5);
-  -webkit-box-pack: center;
-  -ms-flex-pack: center;
-  -webkit-justify-content: center;
-  justify-content: center;
-}
-
-.emotion-12>* {
-  min-height: 0;
-}
-
-.emotion-14 {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -156,46 +87,54 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
             class="block-editor-color-gradient-control__panel"
           >
             <div
-              class="components-flex components-h-stack components-v-stack emotion-8 emotion-5"
-              data-wp-c16t="true"
-              data-wp-component="VStack"
+              style="gap: var(--wpds-dimension-gap-md); flex-direction: column;"
             >
               <div
                 class="components-dropdown"
                 tabindex="-1"
               >
                 <div
-                  class="components-flex components-h-stack components-v-stack components-color-palette__custom-color-wrapper emotion-10 emotion-5"
-                  data-wp-c16t="true"
-                  data-wp-component="VStack"
+                  class="components-color-palette__custom-color-wrapper"
+                  style="flex-direction: column;"
                 >
                   <button
                     aria-expanded="false"
-                    aria-haspopup="true"
+                    aria-haspopup="dialog"
                     aria-label="Custom color picker. The currently selected color is called "red" and has a value of "#f00"."
                     class="components-color-palette__custom-color-button"
                     style="background: rgb(255, 0, 0);"
                     type="button"
                   />
                   <div
-                    class="components-flex components-h-stack components-v-stack components-color-palette__custom-color-text-wrapper emotion-12 emotion-5"
-                    data-wp-c16t="true"
-                    data-wp-component="VStack"
+                    class="components-color-palette__custom-color-text-wrapper"
+                    style="gap: var(--wpds-dimension-gap-xs); flex-direction: column;"
                   >
-                    <span
-                      class="components-truncate components-color-palette__custom-color-name emotion-14 emotion-5"
-                      data-wp-c16t="true"
-                      data-wp-component="Truncate"
+                    <div
+                      class="components-color-palette__info-row"
+                      style="gap: var(--wpds-dimension-gap-sm); align-items: center; flex-direction: row;"
                     >
-                      red
-                    </span>
-                    <span
-                      class="components-truncate components-color-palette__custom-color-value components-color-palette__custom-color-value--is-hex emotion-14 emotion-5"
-                      data-wp-c16t="true"
-                      data-wp-component="Truncate"
-                    >
-                      #f00
-                    </span>
+                      <div
+                        class="components-color-palette__info-row-text"
+                        style="gap: var(--wpds-dimension-gap-xs); flex-direction: column;"
+                      >
+                        <span
+                          class="components-truncate components-color-palette__custom-color-name emotion-8 emotion-5"
+                          data-wp-c16t="true"
+                          data-wp-component="Truncate"
+                          title="red"
+                        >
+                          red
+                        </span>
+                        <span
+                          class="components-truncate components-color-palette__custom-color-value components-color-palette__custom-color-value--is-hex emotion-8 emotion-5"
+                          data-wp-c16t="true"
+                          data-wp-component="Truncate"
+                          title="#f00"
+                        >
+                          #f00
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
