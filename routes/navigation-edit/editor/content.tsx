@@ -7,12 +7,22 @@ import {
 	BlockList,
 	// @ts-expect-error - No type declarations available for @wordpress/block-editor
 } from '@wordpress/block-editor';
+import { Button, Popover } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 // @ts-expect-error - No type declarations available for @wordpress/blocks
 import { createBlock } from '@wordpress/blocks';
-import { useCallback } from '@wordpress/element';
+import {
+	type ComponentType,
+	useCallback,
+	useLayoutEffect,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { unlock } from '@wordpress/routes-lock-unlock';
+import { navigation as navigationIcon } from '@wordpress/icons';
+import { __ } from '@wordpress/i18n';
+import { EmptyState } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -26,6 +36,41 @@ type Block = {
 };
 
 const { PrivateListView } = unlock( blockEditorPrivateApis );
+
+type NavigationLinkControlsProps = {
+	attributes: Record< string, unknown >;
+	setAttributes: ( attributes: Record< string, unknown > ) => void;
+	clientId: string;
+	isContentOnly?: boolean;
+};
+
+type BlockLibraryPrivateApis = {
+	NavigationLinkControls?: ComponentType< NavigationLinkControlsProps >;
+	NavigationLinkUI?: ComponentType;
+};
+
+function getBlockLibraryPrivateApis(): BlockLibraryPrivateApis {
+	const blockLibrary = (
+		window as Window & {
+			wp?: {
+				blockLibrary?: {
+					privateApis?: Parameters< typeof unlock >[ 0 ];
+				};
+			};
+		}
+	 ).wp?.blockLibrary;
+
+	if ( ! blockLibrary?.privateApis ) {
+		return {};
+	}
+
+	return unlock< BlockLibraryPrivateApis >( blockLibrary.privateApis );
+}
+
+const BLOCKS_WITH_LINK_UI_SUPPORT = [
+	'core/navigation-link',
+	'core/navigation-submenu',
+];
 
 // Needs to be kept in sync with the query used at packages/block-library/src/page-list/edit.js.
 const MAX_PAGE_COUNT = 100;
@@ -44,11 +89,13 @@ const PAGES_QUERY = [
 ];
 
 export default function NavigationMenuContent( {
+	onAddMenuItems,
 	rootClientId,
 }: {
+	onAddMenuItems: () => void;
 	rootClientId: string;
 } ) {
-	const { listViewRootClientId, isLoading } = useSelect(
+	const { hasMenuItems, listViewRootClientId, isLoading } = useSelect(
 		( select ) => {
 			const {
 				areInnerBlocksControlled,
@@ -71,11 +118,13 @@ export default function NavigationMenuContent( {
 				'getEntityRecords',
 				PAGES_QUERY
 			);
+			const _listViewRootClientId = pageListHasBlocks
+				? blockClientIds[ 0 ]
+				: rootClientId;
 
 			return {
-				listViewRootClientId: pageListHasBlocks
-					? blockClientIds[ 0 ]
-					: rootClientId,
+				hasMenuItems: getBlockCount( _listViewRootClientId ) > 0,
+				listViewRootClientId: _listViewRootClientId,
 				// This is a small hack to wait for the navigation block
 				// to actually load its inner blocks.
 				isLoading:
@@ -85,8 +134,43 @@ export default function NavigationMenuContent( {
 		},
 		[ rootClientId ]
 	);
-	const { replaceBlock, __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
+	const {
+		replaceBlock,
+		updateBlockAttributes,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
+	const [ editingBlockClientId, setEditingBlockClientId ] = useState<
+		string | null
+	>( null );
+	const [ anchorElement, setAnchorElement ] = useState< Element | null >(
+		null
+	);
+	const listViewRef = useRef< HTMLDivElement >( null );
+
+	const editingBlockAttributes = useSelect(
+		( select ) => {
+			if ( ! editingBlockClientId ) {
+				return null;
+			}
+
+			return select( blockEditorStore ).getBlockAttributes(
+				editingBlockClientId
+			);
+		},
+		[ editingBlockClientId ]
+	);
+
+	useLayoutEffect( () => {
+		if ( ! editingBlockClientId || ! listViewRef.current ) {
+			setAnchorElement( null );
+			return;
+		}
+
+		const element = listViewRef.current.querySelector(
+			`[data-block="${ editingBlockClientId }"]`
+		);
+		setAnchorElement( element ?? null );
+	}, [ editingBlockClientId ] );
 
 	const offCanvasOnselect = useCallback(
 		( block: Block ) => {
@@ -104,19 +188,92 @@ export default function NavigationMenuContent( {
 		[ __unstableMarkNextChangeAsNotPersistent, replaceBlock ]
 	);
 
+	const handleSelect = useCallback(
+		( block: Block ) => {
+			if (
+				BLOCKS_WITH_LINK_UI_SUPPORT.includes( block.name ) &&
+				block.attributes.url
+			) {
+				setEditingBlockClientId( block.clientId );
+				return;
+			}
+
+			setEditingBlockClientId( null );
+			offCanvasOnselect( block );
+		},
+		[ offCanvasOnselect ]
+	);
+	const { NavigationLinkControls, NavigationLinkUI } =
+		getBlockLibraryPrivateApis();
+
 	// The hidden block is needed because it makes block edit side effects trigger.
 	// For example a navigation page list load its items has an effect on edit to load its items.
 	return (
 		<>
 			{ ! isLoading && (
-				<PrivateListView
-					rootClientId={ listViewRootClientId }
-					onSelect={ offCanvasOnselect }
-					blockSettingsMenu={ LeafMoreMenu }
-					showAppender={ false }
-					isExpanded
-				/>
+				<>
+					{ hasMenuItems ? (
+						<div ref={ listViewRef }>
+							<PrivateListView
+								rootClientId={ listViewRootClientId }
+								onSelect={ handleSelect }
+								blockSettingsMenu={ LeafMoreMenu }
+								showAppender
+								additionalBlockContent={ NavigationLinkUI }
+								isExpanded
+							/>
+						</div>
+					) : (
+						<EmptyState.Root>
+							<EmptyState.Icon icon={ navigationIcon } />
+							<EmptyState.Title>
+								{ __( 'No menu items yet' ) }
+							</EmptyState.Title>
+							<EmptyState.Description>
+								{ __(
+									'Add pages, links, or other content to start building this navigation menu.'
+								) }
+							</EmptyState.Description>
+							<EmptyState.Actions>
+								<Button
+									variant="primary"
+									onClick={ onAddMenuItems }
+									__next40pxDefaultSize
+								>
+									{ __( 'Add menu items' ) }
+								</Button>
+							</EmptyState.Actions>
+						</EmptyState.Root>
+					) }
+				</>
 			) }
+			{ editingBlockClientId &&
+				editingBlockAttributes &&
+				anchorElement &&
+				NavigationLinkControls && (
+					<Popover
+						anchor={ anchorElement }
+						placement="right-start"
+						onClose={ () => setEditingBlockClientId( null ) }
+						className="navigation-edit-editor__link-controls"
+					>
+						<div style={ { width: '280px' } }>
+							<NavigationLinkControls
+								attributes={ editingBlockAttributes }
+								setAttributes={ (
+									newAttributes: Record< string, unknown >
+								) =>
+									updateBlockAttributes(
+										editingBlockClientId,
+										newAttributes
+									)
+								}
+								clientId={ editingBlockClientId }
+								isContentOnly
+							/>
+						</div>
+					</Popover>
+				) }
 			<div className="navigation-edit-editor__hidden-blocks">
 				<BlockList />
 			</div>

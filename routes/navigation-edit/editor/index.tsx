@@ -7,6 +7,7 @@ import { BlockEditorProvider } from '@wordpress/block-editor';
 // @ts-expect-error - No type declarations available for @wordpress/blocks
 import { createBlock } from '@wordpress/blocks';
 import { Spinner } from '@wordpress/components';
+import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wordpress/core-data';
 import { useEditorAssets, useEditorSettings } from '@wordpress/lazy-editor';
 
 /**
@@ -18,9 +19,29 @@ import NavigationMenuContent from './content';
 
 const noop = () => {};
 
-export default function NavigationMenuEditor( { id }: { id: number } ) {
+export default function NavigationMenuEditor( {
+	id,
+	onAddMenuItems,
+}: {
+	id: number;
+	onAddMenuItems: () => void;
+} ) {
 	const { isReady: assetsReady } = useEditorAssets();
 	const { isReady: settingsReady, editorSettings } = useEditorSettings();
+
+	const settings = useMemo( () => {
+		if ( ! editorSettings ) {
+			return editorSettings;
+		}
+
+		return {
+			...editorSettings,
+			__experimentalFetchLinkSuggestions: (
+				search: string,
+				searchOptions: Record< string, unknown >
+			) => fetchLinkSuggestions( search, searchOptions, editorSettings ),
+		};
+	}, [ editorSettings ] );
 
 	const blocks = useMemo( () => {
 		if ( ! assetsReady || ! settingsReady || ! id ) {
@@ -47,12 +68,15 @@ export default function NavigationMenuEditor( { id }: { id: number } ) {
 
 	return (
 		<BlockEditorProvider
-			settings={ editorSettings }
+			settings={ settings }
 			value={ blocks }
 			onChange={ noop }
 			onInput={ noop }
 		>
-			<NavigationMenuContent rootClientId={ blocks[ 0 ].clientId } />
+			<NavigationMenuContent
+				onAddMenuItems={ onAddMenuItems }
+				rootClientId={ blocks[ 0 ].clientId }
+			/>
 		</BlockEditorProvider>
 	);
 }

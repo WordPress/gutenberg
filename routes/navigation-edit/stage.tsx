@@ -77,6 +77,7 @@ function NavigationEditStage() {
 			<NavigationMenuEditor
 				key={ `${ navigationId }-${ editorVersion }` }
 				id={ navigationId }
+				onAddMenuItems={ () => setIsAddingItems( true ) }
 			/>
 			{ isAddingItems && (
 				<AddMenuItemsModal
