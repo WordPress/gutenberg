@@ -1,8 +1,9 @@
 /**
  * External dependencies
  */
-import { render, screen, waitFor } from '@testing-library/react';
-import { press, click, hover, type } from '@ariakit/test';
+import { act, render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { press, click, hover } from '@ariakit/test';
 
 /**
  * WordPress dependencies
@@ -14,10 +15,6 @@ import { useState } from '@wordpress/element';
  */
 import { Menu } from '..';
 
-const delay = ( delayInMs: number ) => {
-	return new Promise( ( resolve ) => setTimeout( resolve, delayInMs ) );
-};
-
 const waitForFocusedMenu = () =>
 	waitFor( () => expect( screen.getByRole( 'menu' ) ).toHaveFocus() );
 
@@ -25,6 +22,10 @@ const waitForFocusedMenuItem = ( name: string ) =>
 	waitFor( () =>
 		expect( screen.getByRole( 'menuitem', { name } ) ).toHaveFocus()
 	);
+
+const resetTypeahead = () => {
+	act( () => jest.advanceTimersByTime( 500 ) );
+};
 
 // Open dropdown => open menu
 // Submenu trigger item => open submenu
@@ -1047,6 +1048,19 @@ describe( 'Menu', () => {
 	} );
 
 	describe( 'typeahead', () => {
+		let user: ReturnType< typeof userEvent.setup >;
+
+		beforeEach( () => {
+			jest.useFakeTimers();
+			user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+		} );
+
+		afterEach( () => {
+			jest.useRealTimers();
+		} );
+
 		it( 'should highlight matching item', async () => {
 			render(
 				<Menu>
@@ -1059,7 +1073,7 @@ describe( 'Menu', () => {
 			);
 
 			// Click to open the menu
-			await click(
+			await user.click(
 				screen.getByRole( 'button', {
 					name: 'Open dropdown',
 				} )
@@ -1067,17 +1081,22 @@ describe( 'Menu', () => {
 			await waitForFocusedMenu();
 
 			// Type "tw", it should match and focus the item with content "Two"
-			await type( 'tw' );
+			await user.type( screen.getByRole( 'menu' ), 'tw', {
+				skipClick: true,
+			} );
 			expect(
 				screen.getByRole( 'menuitem', { name: 'Two' } )
 			).toHaveFocus();
 
-			// Wait for the typeahead timer to reset and interpret
-			// the next keystrokes as a new search
-			await delay( 500 );
+			// Reset the typeahead search so the next keystrokes start a new query.
+			resetTypeahead();
 
 			// Type "on", it should match and focus the item with content "One"
-			await type( 'on' );
+			await user.type(
+				screen.getByRole( 'menuitem', { name: 'Two' } ),
+				'on',
+				{ skipClick: true }
+			);
 			expect(
 				screen.getByRole( 'menuitem', { name: 'One' } )
 			).toHaveFocus();
@@ -1095,7 +1114,7 @@ describe( 'Menu', () => {
 			);
 
 			// Click to open the menu
-			await click(
+			await user.click(
 				screen.getByRole( 'button', {
 					name: 'Open dropdown',
 				} )
@@ -1103,35 +1122,44 @@ describe( 'Menu', () => {
 			await waitForFocusedMenu();
 
 			// Type a string that doesn't match any items. Focus shouldn't move.
-			await type( 'abc' );
+			await user.type( screen.getByRole( 'menu' ), 'abc', {
+				skipClick: true,
+			} );
 			expect( screen.getByRole( 'menu' ) ).toHaveFocus();
 
-			// Wait for the typeahead timer to reset and interpret
-			// the next keystrokes as a new search
-			await delay( 500 );
+			// Reset the typeahead search so the next keystrokes start a new query.
+			resetTypeahead();
 
 			// Type "on", it should match and focus the item with content "One"
-			await type( 'on' );
+			await user.type( screen.getByRole( 'menu' ), 'on', {
+				skipClick: true,
+			} );
 			expect(
 				screen.getByRole( 'menuitem', { name: 'One' } )
 			).toHaveFocus();
 
-			// Wait for the typeahead timer to reset and interpret
-			// the next keystrokes as a new search
-			await delay( 500 );
+			// Reset the typeahead search so the next keystrokes start a new query.
+			resetTypeahead();
 
 			// Type a string that doesn't match any items. Focus shouldn't move.
-			await type( 'abc' );
+			await user.type(
+				screen.getByRole( 'menuitem', { name: 'One' } ),
+				'abc',
+				{ skipClick: true }
+			);
 			expect(
 				screen.getByRole( 'menuitem', { name: 'One' } )
 			).toHaveFocus();
 
-			// Wait for the typeahead timer to reset and interpret
-			// the next keystrokes as a new search
-			await delay( 500 );
+			// Reset the typeahead search so the next keystrokes start a new query.
+			resetTypeahead();
 
 			// Type "tw", it should match and focus the item with content "Two"
-			await type( 'tw' );
+			await user.type(
+				screen.getByRole( 'menuitem', { name: 'One' } ),
+				'tw',
+				{ skipClick: true }
+			);
 			expect(
 				screen.getByRole( 'menuitem', { name: 'Two' } )
 			).toHaveFocus();
