@@ -3089,7 +3089,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						'core/group' => array(
 							'elements' => array(
 								'link' => array(
-									'color'  => array(
+									'color'   => array(
 										'text' => 'var:preset|color|dark-gray',
 									),
 									'@mobile' => array(
@@ -3117,7 +3117,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'core/group' => array(
 						'elements' => array(
 							'link' => array(
-								'color'  => array(
+								'color'   => array(
 									'text' => 'var(--wp--preset--color--dark-gray)',
 								),
 								'@mobile' => array(
