@@ -79,14 +79,6 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	const handleDevicePreviewChange = ( newDeviceType ) => {
 		setDeviceType( newDeviceType );
 		resetZoomLevel();
-
-		// While Responsive editing is enabled, the device preview also drives
-		// which viewport block style edits are applied to.
-		if ( isResponsiveEditing ) {
-			setStyleStateViewport(
-				VIEWPORT_STATE_BY_DEVICE_TYPE[ newDeviceType ] ?? 'default'
-			);
-		}
 	};
 
 	const handleResponsiveEditingChange = () => {

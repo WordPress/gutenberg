@@ -90,6 +90,48 @@ describe( 'Post actions', () => {
 		} );
 	} );
 
+	describe( 'setCanvasWidth', () => {
+		it( 'syncs the viewport style state while Responsive editing is enabled', () => {
+			const registry = createRegistryWithStores();
+			const getViewport = () =>
+				unlock(
+					registry.select( blockEditorStore )
+				).getStyleStateViewport();
+			const setCanvasWidth = ( width ) =>
+				unlock( registry.dispatch( editorStore ) ).setCanvasWidth(
+					width
+				);
+
+			unlock( registry.dispatch( editorStore ) ).setResponsiveEditing(
+				true
+			);
+
+			// A tablet-sized canvas selects the tablet viewport.
+			setCanvasWidth( 600 );
+			expect( getViewport() ).toBe( 'tablet' );
+
+			// A mobile-sized canvas selects the mobile viewport.
+			setCanvasWidth( 400 );
+			expect( getViewport() ).toBe( 'mobile' );
+
+			// A full-width (desktop) canvas resets to the default viewport.
+			setCanvasWidth( undefined );
+			expect( getViewport() ).toBe( 'default' );
+		} );
+
+		it( 'leaves the viewport style state untouched while Responsive editing is disabled', () => {
+			const registry = createRegistryWithStores();
+			const getViewport = () =>
+				unlock(
+					registry.select( blockEditorStore )
+				).getStyleStateViewport();
+
+			unlock( registry.dispatch( editorStore ) ).setCanvasWidth( 400 );
+
+			expect( getViewport() ).toBe( 'default' );
+		} );
+	} );
+
 	describe( 'savePost()', () => {
 		it( 'saves a modified post', async () => {
 			const post = {
