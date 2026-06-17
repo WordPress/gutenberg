@@ -82,7 +82,7 @@ test.describe( 'Navigation passive rendering', () => {
 		await requestUtils.createTemplate( 'wp_template_part', {
 			slug: 'header',
 			title: 'Header',
-			content: `<!-- wp:navigation {"ref":${ menu.id },"overlayMenu":"off","submenuVisibility":"always"} /-->`,
+			content: `<!-- wp:navigation {"ref":${ menu.id },"overlayMenu":"never","submenuVisibility":"always"} /-->`,
 		} );
 
 		await requestUtils.createTemplate( 'wp_template', {
@@ -114,6 +114,11 @@ test.describe( 'Navigation passive rendering', () => {
 				name: 'Block: Page List',
 			} )
 		).toBeVisible();
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Navigation' } )
+			.click();
+		await expect.poll( () => getDirtyEntityRecords( page ) ).toEqual( [] );
 
 		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )

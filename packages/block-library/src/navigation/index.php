@@ -41,6 +41,28 @@ function block_core_navigation_get_submenu_visibility( $attributes ) {
 }
 
 /**
+ * Returns navigation attributes with impossible submenu settings coerced for rendering.
+ *
+ * Horizontal navigation menus cannot display always-open submenus. Older content may
+ * still contain that combination, so render it as the horizontal default without
+ * writing the repaired values back to the entity.
+ *
+ * @param array $attributes Block attributes.
+ * @return array Attributes to use for render behavior and block context.
+ */
+function block_core_navigation_get_effective_submenu_attributes( $attributes ) {
+	$orientation        = $attributes['layout']['orientation'] ?? 'horizontal';
+	$submenu_visibility = block_core_navigation_get_submenu_visibility( $attributes );
+
+	if ( 'horizontal' === $orientation && 'always' === $submenu_visibility ) {
+		$attributes['submenuVisibility'] = 'hover';
+		$attributes['showSubmenuIcon']   = true;
+	}
+
+	return $attributes;
+}
+
+/**
  * Helper functions used to render the navigation block.
  *
  * @since 6.5.0
@@ -474,10 +496,22 @@ class WP_Navigation_Block_Renderer {
 	 *
 	 * @param array    $attributes The block attributes.
 	 * @param WP_Block $block The parsed block.
+	 * @param bool     $use_effective_context Whether to rebuild inline inner blocks with effective block context.
 	 * @return WP_Block_List Returns the inner blocks for the navigation block.
 	 */
-	private static function get_inner_blocks( $attributes, $block ) {
-		$inner_blocks = $block->inner_blocks;
+	private static function get_inner_blocks(
+		$attributes,
+		$block,
+		$use_effective_context = false
+	) {
+		$use_parsed_inner_blocks = $use_effective_context &&
+			! empty( $block->parsed_block['innerBlocks'] );
+		$inner_blocks            = $use_parsed_inner_blocks
+			? new WP_Block_List(
+				$block->parsed_block['innerBlocks'],
+				$attributes
+			)
+			: $block->inner_blocks;
 
 		// Ensure that blocks saved with the legacy ref attribute name (navigationMenuId) continue to render.
 		if ( array_key_exists( 'navigationMenuId', $attributes ) ) {
@@ -991,7 +1025,11 @@ class WP_Navigation_Block_Renderer {
 
 		unset( $attributes['rgbTextColor'], $attributes['rgbBackgroundColor'] );
 
-		$inner_blocks = static::get_inner_blocks( $attributes, $block );
+		$effective_attributes  = block_core_navigation_get_effective_submenu_attributes( $attributes );
+		$use_effective_context = $effective_attributes !== $attributes;
+		$attributes            = $effective_attributes;
+
+		$inner_blocks = static::get_inner_blocks( $attributes, $block, $use_effective_context );
 		// Prevent navigation blocks referencing themselves from rendering.
 		if ( block_core_navigation_block_tree_has_block_type(
 			$inner_blocks,

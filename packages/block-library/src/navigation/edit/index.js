@@ -22,6 +22,7 @@ import {
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 	useBlockEditingMode,
 	BlockControls,
+	BlockContextProvider,
 } from '@wordpress/block-editor';
 import {
 	EntityProvider,
@@ -362,28 +363,14 @@ function Navigation( {
 		innerBlocks,
 	} = useInnerBlocks( clientId );
 
-	// Reset submenuVisibility to default if orientation changes to horizontal
-	// while "always" is selected, but only when the Navigation block or one
-	// of its inner blocks is being edited. Rendering related template parts
-	// should not mark them dirty.
-	useEffect( () => {
-		if (
-			( isSelected || isInnerBlockSelected ) &&
-			orientation === 'horizontal' &&
-			submenuVisibility === 'always'
-		) {
-			setAttributes( {
-				submenuVisibility: 'hover',
-				showSubmenuIcon: true,
-			} );
-		}
-	}, [
-		isSelected,
-		isInnerBlockSelected,
+	const {
+		submenuVisibility: effectiveSubmenuVisibility,
+		showSubmenuIcon: effectiveShowSubmenuIcon,
+	} = getEffectiveSubmenuSettings( {
 		orientation,
 		submenuVisibility,
-		setAttributes,
-	] );
+		showSubmenuIcon,
+	} );
 
 	// Use a ref to store whether we've confirmed a page-list has submenus.
 	// Once confirmed, we don't need to keep checking the page-list blocks.
@@ -766,9 +753,9 @@ function Navigation( {
 	);
 
 	const submenuAccessibilityNotice =
-		! showSubmenuIcon &&
-		submenuVisibility !== 'click' &&
-		submenuVisibility !== 'always'
+		! effectiveShowSubmenuIcon &&
+		effectiveSubmenuVisibility !== 'click' &&
+		effectiveSubmenuVisibility !== 'always'
 			? __(
 					'The current menu options offer reduced accessibility for users and are not recommended. Enabling either "Open on Click" or "Show arrow" offers enhanced accessibility by allowing keyboard users to browse submenus selectively.'
 			  )
@@ -813,7 +800,7 @@ function Navigation( {
 								</h3>
 								<ToolsPanelItem
 									hasValue={ () =>
-										submenuVisibility !== 'hover'
+										effectiveSubmenuVisibility !== 'hover'
 									}
 									label={ __( 'Submenu Visibility' ) }
 									onDeselect={ () =>
@@ -826,7 +813,7 @@ function Navigation( {
 									<ToggleGroupControl
 										__next40pxDefaultSize
 										label={ __( 'Submenu Visibility' ) }
-										value={ submenuVisibility }
+										value={ effectiveSubmenuVisibility }
 										onChange={ ( value ) => {
 											const newAttributes = {
 												submenuVisibility: value,
@@ -867,7 +854,9 @@ function Navigation( {
 								</ToolsPanelItem>
 
 								<ToolsPanelItem
-									hasValue={ () => ! showSubmenuIcon }
+									hasValue={ () =>
+										! effectiveShowSubmenuIcon
+									}
 									label={ __( 'Show arrow' ) }
 									onDeselect={ () =>
 										setAttributes( {
@@ -875,21 +864,24 @@ function Navigation( {
 										} )
 									}
 									isDisabled={
-										submenuVisibility === 'click' ||
-										submenuVisibility === 'always'
+										effectiveSubmenuVisibility ===
+											'click' ||
+										effectiveSubmenuVisibility === 'always'
 									}
 									isShownByDefault
 								>
 									<ToggleControl
-										checked={ showSubmenuIcon }
+										checked={ effectiveShowSubmenuIcon }
 										onChange={ ( value ) => {
 											setAttributes( {
 												showSubmenuIcon: value,
 											} );
 										} }
 										disabled={
-											submenuVisibility === 'click' ||
-											submenuVisibility === 'always'
+											effectiveSubmenuVisibility ===
+												'click' ||
+											effectiveSubmenuVisibility ===
+												'always'
 										}
 										label={ __( 'Show arrow' ) }
 									/>
@@ -998,11 +990,20 @@ function Navigation( {
 						overlay={ overlay }
 						onNavigateToEntityRecord={ onNavigateToEntityRecord }
 					>
-						<UnsavedInnerBlocks
-							createNavigationMenu={ createNavigationMenu }
-							blocks={ uncontrolledInnerBlocks }
-							hasSelection={ isSelected || isInnerBlockSelected }
-						/>
+						<BlockContextProvider
+							value={ {
+								submenuVisibility: effectiveSubmenuVisibility,
+								showSubmenuIcon: effectiveShowSubmenuIcon,
+							} }
+						>
+							<UnsavedInnerBlocks
+								createNavigationMenu={ createNavigationMenu }
+								blocks={ uncontrolledInnerBlocks }
+								hasSelection={
+									isSelected || isInnerBlockSelected
+								}
+							/>
+						</BlockContextProvider>
 					</ResponsiveWrapper>
 				</TagName>
 			</>
@@ -1167,16 +1168,25 @@ function Navigation( {
 										onNavigateToEntityRecord
 									}
 								>
-									{ isEntityAvailable && (
-										<NavigationInnerBlocks
-											clientId={ clientId }
-											hasCustomPlaceholder={
-												!! CustomPlaceholder
-											}
-											templateLock={ templateLock }
-											orientation={ orientation }
-										/>
-									) }
+									<BlockContextProvider
+										value={ {
+											submenuVisibility:
+												effectiveSubmenuVisibility,
+											showSubmenuIcon:
+												effectiveShowSubmenuIcon,
+										} }
+									>
+										{ isEntityAvailable && (
+											<NavigationInnerBlocks
+												clientId={ clientId }
+												hasCustomPlaceholder={
+													!! CustomPlaceholder
+												}
+												templateLock={ templateLock }
+												orientation={ orientation }
+											/>
+										) }
+									</BlockContextProvider>
 								</ResponsiveWrapper>
 							</>
 						) }
@@ -1193,3 +1203,30 @@ export default withColors(
 	{ overlayBackgroundColor: 'color' },
 	{ overlayTextColor: 'color' }
 )( Navigation );
+
+function getEffectiveSubmenuSettings( {
+	orientation,
+	submenuVisibility,
+	showSubmenuIcon,
+} ) {
+	const resolvedSubmenuVisibility = submenuVisibility ?? 'hover';
+	const resolvedShowSubmenuIcon = showSubmenuIcon ?? true;
+
+	// Horizontal navigation menus cannot display always-open submenus. Treat
+	// older content with that combination as the horizontal default without
+	// writing the repaired values back to the entity.
+	if (
+		orientation === 'horizontal' &&
+		resolvedSubmenuVisibility === 'always'
+	) {
+		return {
+			submenuVisibility: 'hover',
+			showSubmenuIcon: true,
+		};
+	}
+
+	return {
+		submenuVisibility: resolvedSubmenuVisibility,
+		showSubmenuIcon: resolvedShowSubmenuIcon,
+	};
+}
