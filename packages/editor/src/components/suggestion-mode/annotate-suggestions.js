@@ -92,9 +92,38 @@ export function suggestionAnnotations( threads, getBlockAttributes ) {
  */
 export function useAnnotateSuggestionThreads( threads ) {
 	const { getBlockAttributes } = useSelect( blockEditorStore );
+
+	// Reactive signature of the resolved ranges. Computed inside `useSelect`
+	// so it recomputes whenever a tracked block's content changes (a marker's
+	// derived range can move), not only when `threads` changes. Without this,
+	// a marker written straight to content *after* its comment already exists
+	// (the suggest-delete flow: create comment, then wrap the range) would not
+	// be decorated until the next unrelated `threads` update or a remount —
+	// which is why the strikethrough only appeared after toggling the code
+	// editor. Notes avoids this because it keeps a stored-offset fallback;
+	// suggestion markers are content-only, so the range must be re-derived
+	// reactively. Mirrors the `moveSignature` pattern in `overlay-context.js`.
+	const signature = useSelect(
+		( select ) =>
+			suggestionAnnotations(
+				threads,
+				select( blockEditorStore ).getBlockAttributes
+			)
+				.map(
+					( range ) =>
+						`${ range.id }:${ range.clientId }:${ range.attributeKey }:${ range.start }:${ range.end }`
+				)
+				.join( '|' ),
+		[ threads ]
+	);
+
 	const annotations = useMemo(
 		() => suggestionAnnotations( threads, getBlockAttributes ),
-		[ threads, getBlockAttributes ]
+		// `signature` fully determines the ranges; `threads` and
+		// `getBlockAttributes` are read through it. Depending on them directly
+		// would recompute on every block-editor store tick.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[ signature ]
 	);
 	useAnnotateSuggestions( annotations );
 }
