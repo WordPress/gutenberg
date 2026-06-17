@@ -3,6 +3,8 @@
  */
 import {
 	RichTextData,
+	create,
+	applyFormat,
 	registerFormatType,
 	unregisterFormatType,
 	store as richTextStore,
@@ -15,6 +17,7 @@ import { select } from '@wordpress/data';
 import {
 	findNoteRange,
 	findNoteInBlock,
+	applyNoteFormat,
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
 	removeNoteIdFromMetadata,
@@ -704,5 +707,123 @@ describe( 'findNoteInBlock', () => {
 			start: 0,
 			end: 1,
 		} );
+	} );
+} );
+
+describe( 'applyNoteFormat', () => {
+	const FORMAT_NAME = 'core/note';
+
+	const isRegistered = () =>
+		!! select( richTextStore ).getFormatType( FORMAT_NAME );
+
+	beforeAll( () => {
+		if ( ! isRegistered() ) {
+			registerFormatType( FORMAT_NAME, {
+				title: 'Note',
+				tagName: 'mark',
+				className: 'wp-note',
+				attributes: { 'data-id': 'data-id' },
+				edit: () => null,
+			} );
+		}
+		if ( ! select( richTextStore ).getFormatType( 'core/bold' ) ) {
+			registerFormatType( 'core/bold', {
+				title: 'Bold',
+				tagName: 'strong',
+				className: null,
+				edit: () => null,
+			} );
+		}
+	} );
+
+	afterAll( () => {
+		if ( isRegistered() ) {
+			unregisterFormatType( FORMAT_NAME );
+		}
+		if ( select( richTextStore ).getFormatType( 'core/bold' ) ) {
+			unregisterFormatType( 'core/bold' );
+		}
+	} );
+
+	const note = ( id ) => ( {
+		type: FORMAT_NAME,
+		attributes: { 'data-id': String( id ) },
+	} );
+
+	// Apply a sequence of [ id, start, end ] notes, then round-trip through HTML
+	// to a normalised value (matching how wrapInlineNote stores the result).
+	const applyAll = ( html, ops ) => {
+		let record = create( { html } );
+		for ( const [ id, start, end ] of ops ) {
+			record = applyNoteFormat( record, note( id ), start, end );
+		}
+		return RichTextData.fromHTMLString(
+			new RichTextData( record ).toHTMLString()
+		);
+	};
+
+	it( 'adds a single marker over plain text', () => {
+		const value = applyAll( 'the quick brown fox', [ [ 7, 4, 9 ] ] );
+		expect( value.toHTMLString() ).toBe(
+			'the <mark data-id="7" class="wp-note">quick</mark> brown fox'
+		);
+	} );
+
+	it( 'nests a contained note inside its parent (outer applied first)', () => {
+		const value = applyAll( 'the quick brown fox jumps over', [
+			[ 2, 0, 29 ],
+			[ 1, 16, 22 ],
+		] );
+		expect( value.toHTMLString() ).toBe(
+			'<mark data-id="2" class="wp-note">the quick brown <mark data-id="1" class="wp-note">fox ju</mark>mps ove</mark>r'
+		);
+	} );
+
+	it( 'nests the same regardless of application order (inner applied first)', () => {
+		const value = applyAll( 'the quick brown fox jumps over', [
+			[ 1, 16, 22 ],
+			[ 2, 0, 29 ],
+		] );
+		expect( value.toHTMLString() ).toBe(
+			'<mark data-id="2" class="wp-note">the quick brown <mark data-id="1" class="wp-note">fox ju</mark>mps ove</mark>r'
+		);
+	} );
+
+	it( 'keeps both notes when a larger note covers an existing one (no clobber)', () => {
+		const value = applyAll( 'the quick brown fox jumps over', [
+			[ 1, 16, 22 ],
+			[ 2, 0, 29 ],
+		] );
+		expect( findNoteRange( value, 1 ) ).toEqual( { start: 16, end: 22 } );
+		expect( findNoteRange( value, 2 ) ).toEqual( { start: 0, end: 29 } );
+	} );
+
+	it( 'preserves both full ranges across a partial (crossing) overlap', () => {
+		const value = applyAll( 'the quick brown fox jumps over', [
+			[ 1, 0, 18 ],
+			[ 2, 10, 30 ],
+		] );
+		expect( findNoteRange( value, 1 ) ).toEqual( { start: 0, end: 18 } );
+		expect( findNoteRange( value, 2 ) ).toEqual( { start: 10, end: 30 } );
+	} );
+
+	it( 'keeps disjoint notes separate', () => {
+		const value = applyAll( 'the quick brown fox jumps over', [
+			[ 1, 0, 9 ],
+			[ 2, 16, 25 ],
+		] );
+		expect( value.toHTMLString() ).toBe(
+			'<mark data-id="1" class="wp-note">the quick</mark> brown <mark data-id="2" class="wp-note">fox jumps</mark> over'
+		);
+	} );
+
+	it( 'preserves the note range when wrapping already-formatted text', () => {
+		let record = create( { html: 'the quick brown fox jumps over' } );
+		record = applyFormat( record, { type: 'core/bold' }, 4, 9 );
+		record = applyNoteFormat( record, note( 1 ), 0, 18 );
+		const value = RichTextData.fromHTMLString(
+			new RichTextData( record ).toHTMLString()
+		);
+		expect( findNoteRange( value, 1 ) ).toEqual( { start: 0, end: 18 } );
 	} );
 } );

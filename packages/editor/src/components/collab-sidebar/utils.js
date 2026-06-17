@@ -208,6 +208,84 @@ export function findNoteInBlock( attributes, noteId ) {
 }
 
 /**
+ * Apply a `core/note` marker across `[start, end)` without removing notes
+ * already present in that range.
+ *
+ * Rich-text's `applyFormat` strips any existing format of the same type before
+ * applying, so two `core/note` markers can't coexist - a note drawn over an
+ * existing one would wipe it in the overlap. This keeps every overlapping note
+ * and orders the markers outermost-first by span, so a note fully contained in
+ * another nests inside it (`<mark><mark>…</mark></mark>`). Crossing (partial)
+ * overlaps can't nest in HTML and serialize as split runs, but each note keeps
+ * its full range. The returned record is not normalised; callers should
+ * round-trip it (e.g. through `RichTextData`) before storing.
+ *
+ * @param {Object} record A rich-text record (`{ text, formats, … }`).
+ * @param {Object} format The `core/note` format to add (`{ type, attributes }`).
+ * @param {number} start  Range start (inclusive).
+ * @param {number} end    Range end (exclusive).
+ * @return {Object} A new record with the note applied.
+ */
+export function applyNoteFormat( record, format, start, end ) {
+	const formats = record.formats.slice();
+	for ( let i = start; i < end; i++ ) {
+		const stack = formats[ i ] ? formats[ i ].slice() : [];
+		stack.push( format );
+		formats[ i ] = stack;
+	}
+
+	// Measure each note's full span so containment can order the markers.
+	const spans = new Map();
+	for ( let i = 0; i < formats.length; i++ ) {
+		const stack = formats[ i ];
+		if ( ! stack ) {
+			continue;
+		}
+		for ( const fmt of stack ) {
+			if ( fmt.type !== NOTE_FORMAT_TYPE ) {
+				continue;
+			}
+			const id = fmt.attributes?.[ 'data-id' ];
+			const span = spans.get( id );
+			if ( span ) {
+				span.end = i;
+			} else {
+				spans.set( id, { start: i, end: i } );
+			}
+		}
+	}
+	const sizeOf = ( id ) => {
+		const span = spans.get( id );
+		return span ? span.end - span.start : 0;
+	};
+
+	// Order markers outermost-first (widest span) so `toTree` nests them rather
+	// than splitting an outer note around an inner one. Notes sort ahead of
+	// other formats so a note wraps the formatted text it spans.
+	for ( let i = 0; i < formats.length; i++ ) {
+		const stack = formats[ i ];
+		if ( ! stack || stack.length < 2 ) {
+			continue;
+		}
+		const notes = stack.filter( ( fmt ) => fmt.type === NOTE_FORMAT_TYPE );
+		if ( notes.length === 0 ) {
+			continue;
+		}
+		if ( notes.length > 1 ) {
+			notes.sort(
+				( a, b ) =>
+					sizeOf( b.attributes?.[ 'data-id' ] ) -
+					sizeOf( a.attributes?.[ 'data-id' ] )
+			);
+		}
+		const others = stack.filter( ( fmt ) => fmt.type !== NOTE_FORMAT_TYPE );
+		formats[ i ] = [ ...notes, ...others ];
+	}
+
+	return { ...record, formats };
+}
+
+/**
  * Picks the most relevant thread from a list: first unresolved, else first.
  *
  * @param {Array} threads Ordered list of thread objects.

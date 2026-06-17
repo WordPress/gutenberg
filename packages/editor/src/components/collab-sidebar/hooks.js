@@ -20,7 +20,7 @@ import { getScrollContainer } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as annotationsStore } from '@wordpress/annotations';
-import { RichTextData, applyFormat, create } from '@wordpress/rich-text';
+import { RichTextData, create } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -31,6 +31,7 @@ import { unlock } from '../../lock-unlock';
 import { createBoardStore } from './board-store';
 import { NOTE_FORMAT_NAME } from './format';
 import {
+	applyNoteFormat,
 	calculateNotePositions,
 	findNoteInBlock,
 	getNoteIdsFromMetadata,
@@ -241,13 +242,17 @@ function wrapInlineNote( value, id, start, end ) {
 	if ( ! ( value instanceof RichTextData ) ) {
 		return null;
 	}
-	const record = applyFormat(
+	const record = applyNoteFormat(
 		create( { html: value.toHTMLString() } ),
 		{ type: NOTE_FORMAT_NAME, attributes: { 'data-id': String( id ) } },
 		start,
 		end
 	);
-	return new RichTextData( record );
+	// Round-trip through HTML to normalise format references (applyNoteFormat
+	// leaves them un-normalised) so the stored value matches a fresh reload.
+	return RichTextData.fromHTMLString(
+		new RichTextData( record ).toHTMLString()
+	);
 }
 
 export function useNoteActions() {
