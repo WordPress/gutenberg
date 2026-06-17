@@ -30,5 +30,8 @@ export { useAnnotateSuggestions } from './use-annotate-suggestions';
 export {
 	acceptInlineDeletion,
 	rejectInlineDeletion,
+	acceptInlineAddition,
+	rejectInlineAddition,
+	insertInlineAddition,
 	buildSuggestionMarkerAttributes,
 } from './operations';

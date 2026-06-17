@@ -20,6 +20,8 @@ import {
 import {
 	acceptInlineDeletion,
 	rejectInlineDeletion,
+	acceptInlineAddition,
+	rejectInlineAddition,
 } from '../inline-suggestions';
 
 /**
@@ -683,7 +685,7 @@ export function useSuggestionsProvider() {
 					selectBlockAttributes( targetClientId )?.[ attributeKey ];
 				const nextValue =
 					inlineOp.suggestionType === 'add'
-						? rejectInlineDeletion( originalValue, commentId )
+						? acceptInlineAddition( originalValue, commentId )
 						: acceptInlineDeletion( originalValue, commentId );
 				try {
 					requestInterceptorBypass( targetClientId );
@@ -992,7 +994,7 @@ export function useSuggestionsProvider() {
 						];
 					const nextValue =
 						inlineOp.suggestionType === 'add'
-							? acceptInlineDeletion( value, commentId )
+							? rejectInlineAddition( value, commentId )
 							: rejectInlineDeletion( value, commentId );
 					requestInterceptorBypass( targetClientId );
 					clearOverlay( targetClientId );
