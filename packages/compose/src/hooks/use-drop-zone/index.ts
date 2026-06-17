@@ -3,41 +3,7 @@
  */
 import useRefEffect from '../use-ref-effect';
 import useEvent from '../use-event';
-
-interface UseDropZoneProps {
-	/**
-	 * Optional element to be used as the drop zone.
-	 */
-	dropZoneElement?: HTMLElement | null;
-	/**
-	 * Whether or not to disable the drop zone.
-	 */
-	isDisabled?: boolean;
-	/**
-	 * Called when dragging has started.
-	 */
-	onDragStart?: ( e: DragEvent ) => void;
-	/**
-	 *  Called when the zone is entered.
-	 */
-	onDragEnter?: ( e: DragEvent ) => void;
-	/**
-	 * Called when the zone is moved within.
-	 */
-	onDragOver?: ( e: DragEvent ) => void;
-	/**
-	 * Called when the zone is left.
-	 */
-	onDragLeave?: ( e: DragEvent ) => void;
-	/**
-	 * Called when dragging has ended.
-	 */
-	onDragEnd?: ( e: MouseEvent ) => void;
-	/**
-	 * Called when dropping in the zone.
-	 */
-	onDrop?: ( e: DragEvent ) => void;
-}
+import type { UseDropZoneProps } from './types';
 
 /**
  * A hook to facilitate drag and drop handling.
@@ -68,10 +34,22 @@ export default function useDropZone( {
 				return;
 			}
 
+			// If a custom dropZoneRef is passed, use that instead of the element.
+			// This allows the dropzone to cover an expanded area, rather than
+			// be restricted to the area of the ref returned by this hook.
 			const element = dropZoneElement ?? elem;
+
 			let isDragging = false;
+
 			const { ownerDocument } = element;
 
+			/**
+			 * Checks if an element is in the drop zone.
+			 *
+			 * @param {EventTarget|null} targetToCheck
+			 *
+			 * @return {boolean} True if in drop zone, false if not.
+			 */
 			function isElementInZone(
 				targetToCheck: EventTarget | null
 			): boolean {
@@ -104,6 +82,10 @@ export default function useDropZone( {
 
 				isDragging = true;
 
+				// Note that `dragend` doesn't fire consistently for file and
+				// HTML drag events where the drag origin is outside the browser
+				// window. In Firefox it may also not fire if the originating
+				// node is removed.
 				ownerDocument.addEventListener( 'dragend', maybeDragEnd );
 				ownerDocument.addEventListener( 'mousemove', maybeDragEnd );
 
@@ -115,6 +97,10 @@ export default function useDropZone( {
 			function onDragEnter( event: DragEvent ): void {
 				event.preventDefault();
 
+				// The `dragenter` event will also fire when entering child
+				// elements, but we only want to call `onDragEnter` when
+				// entering the drop zone, which means the `relatedTarget`
+				// (element that has been left) should be outside the drop zone.
 				if ( element.contains( event.relatedTarget as Node ) ) {
 					return;
 				}
@@ -133,6 +119,14 @@ export default function useDropZone( {
 			}
 
 			function onDragLeave( event: DragEvent ): void {
+				// The `dragleave` event will also fire when leaving child
+				// elements, but we only want to call `onDragLeave` when
+				// leaving the drop zone, which means the `relatedTarget`
+				// (element that has been entered) should be outside the drop
+				// zone.
+				// Note: This is not entirely reliable in Safari due to this bug
+				// https://bugs.webkit.org/show_bug.cgi?id=66547
+
 				if ( isElementInZone( event.relatedTarget ) ) {
 					return;
 				}
@@ -143,12 +137,18 @@ export default function useDropZone( {
 			}
 
 			function onDrop( event: DragEvent ): void {
+				// Don't handle drop if an inner drop zone already handled it.
 				if ( event.defaultPrevented ) {
 					return;
 				}
 
+				// Prevent the browser default while also signalling to parent
+				// drop zones that `onDrop` is already handled.
 				event.preventDefault();
 
+				// This seemingly useless line has been shown to resolve a
+				// Safari issue where files dragged directly from the dock are
+				// not recognized.
 				// eslint-disable-next-line no-unused-expressions
 				event.dataTransfer && event.dataTransfer.files.length;
 
@@ -179,6 +179,8 @@ export default function useDropZone( {
 			element.addEventListener( 'dragenter', onDragEnter );
 			element.addEventListener( 'dragover', onDragOver );
 			element.addEventListener( 'dragleave', onDragLeave );
+			// The `dragstart` event doesn't fire if the drag started outside
+			// the document.
 			ownerDocument.addEventListener( 'dragenter', maybeDragStart );
 
 			return () => {
@@ -195,6 +197,6 @@ export default function useDropZone( {
 				);
 			};
 		},
-		[ isDisabled, dropZoneElement ]
+		[ isDisabled, dropZoneElement ] // Refresh when the passed in dropZoneElement changes.
 	);
 }
