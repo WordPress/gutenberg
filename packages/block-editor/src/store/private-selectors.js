@@ -1172,18 +1172,22 @@ export function getStyleStateViewport( state ) {
  *
  * @return {Object} The selected block style state.
  */
-export function getSelectedBlockStyleState( state, clientId ) {
-	const viewport = getStyleStateViewport( state );
-	const perBlockState =
-		state.selectedBlockStyleState?.clientId === clientId
-			? state.selectedBlockStyleState.value ?? DEFAULT_BLOCK_STYLE_STATE
-			: DEFAULT_BLOCK_STYLE_STATE;
+export const getSelectedBlockStyleState = createSelector(
+	( state, clientId ) => {
+		const viewport = getStyleStateViewport( state );
+		const perBlockState =
+			state.selectedBlockStyleState?.clientId === clientId
+				? state.selectedBlockStyleState.value ??
+				  DEFAULT_BLOCK_STYLE_STATE
+				: DEFAULT_BLOCK_STYLE_STATE;
 
-	return {
-		...perBlockState,
-		viewport,
-	};
-}
+		return {
+			...perBlockState,
+			viewport,
+		};
+	},
+	( state ) => [ state.styleStateViewport, state.selectedBlockStyleState ]
+);
 
 /**
  * Returns whether a non-default style state is selected for a block.
