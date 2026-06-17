@@ -7,7 +7,16 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
+import {
+	ToolbarButton,
+	ToolbarGroup,
+	ToggleControl,
+	Notice,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+} from '@wordpress/components';
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 import {
@@ -22,7 +31,7 @@ import {
 	getColorClassName,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
-import { useState, useEffect, useRef } from '@wordpress/element';
+import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { link as linkIcon, removeSubmenu } from '@wordpress/icons';
 import { speak } from '@wordpress/a11y';
 import { createBlock } from '@wordpress/blocks';
@@ -48,6 +57,7 @@ import {
 	getNavigationChildBlockProps,
 } from '../navigation/edit/utils';
 import { DEFAULT_BLOCK } from '../navigation/constants';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const ALLOWED_BLOCKS = [
 	'core/navigation-link',
@@ -85,8 +95,12 @@ export default function NavigationSubmenuEdit( {
 } ) {
 	const { label, url, description, kind, type, id } = attributes;
 
-	const { showSubmenuIcon, maxNestingLevel, submenuVisibility } = context;
+	const { showSubmenuIcon, maxNestingLevel, submenuVisibility, layout } =
+		context;
 	const blockEditingMode = useBlockEditingMode();
+
+	// Get orientation from layout context
+	const orientation = layout?.orientation || 'horizontal';
 
 	// Force click-only behavior in contentOnly mode to prevent hover dropdowns
 	const openSubmenusOnClick =
@@ -108,6 +122,35 @@ export default function NavigationSubmenuEdit( {
 
 	const { __unstableMarkNextChangeAsNotPersistent, replaceBlock } =
 		useDispatch( blockEditorStore );
+
+	// Get the parent navigation block's clientId
+	const parentNavigationBlockClientId = useSelect(
+		( select ) => {
+			const { getBlockParentsByBlockName } = select( blockEditorStore );
+			const parentBlocks = getBlockParentsByBlockName(
+				clientId,
+				'core/navigation'
+			);
+			// Return the immediate parent navigation block
+			return parentBlocks?.[ 0 ];
+		},
+		[ clientId ]
+	);
+
+	// Function to update parent navigation block attributes
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const updateParentNavigationAttributes = useCallback(
+		( newAttributes ) => {
+			if ( parentNavigationBlockClientId ) {
+				updateBlockAttributes(
+					parentNavigationBlockClientId,
+					newAttributes
+				);
+			}
+		},
+		[ parentNavigationBlockClientId, updateBlockAttributes ]
+	);
+
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
@@ -312,6 +355,25 @@ export default function NavigationSubmenuEdit( {
 	const canConvertToLink =
 		! selectedBlockHasChildren || onlyDescendantIsEmptyLink;
 
+	const submenuAccessibilityNotice =
+		! showSubmenuIcon &&
+		submenuVisibility !== 'click' &&
+		submenuVisibility !== 'always'
+			? __(
+					'The current menu options offer reduced accessibility for users and are not recommended. Enabling either "Open on Click" or "Show arrow" offers enhanced accessibility by allowing keyboard users to browse submenus selectively.'
+			  )
+			: '';
+
+	const isFirstRender = useRef( true ); // Don't speak on first render.
+	useEffect( () => {
+		if ( ! isFirstRender.current && submenuAccessibilityNotice ) {
+			speak( submenuAccessibilityNotice );
+		}
+		isFirstRender.current = false;
+	}, [ submenuAccessibilityNotice ] );
+
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
 	return (
 		<>
 			<BlockControls>
@@ -345,6 +407,130 @@ export default function NavigationSubmenuEdit( {
 					clientId={ clientId }
 					isLinkEditable={ ! openSubmenusOnClick }
 				/>
+			</InspectorControls>
+			<InspectorControls>
+				{ hasChildren && (
+					<ToolsPanel
+						label={ __( 'Settings' ) }
+						resetAll={ () => {
+							updateParentNavigationAttributes( {
+								showSubmenuIcon: true,
+								submenuVisibility: 'hover',
+								overlayMenu: 'mobile',
+								hasIcon: true,
+								icon: 'handle',
+							} );
+						} }
+						dropdownMenuProps={ dropdownMenuProps }
+					>
+						<div style={ { gridColumn: '1 / -1' } }>
+							<Notice
+								spokenMessage={ null }
+								status="info"
+								isDismissible={ false }
+								className="wp-block-navigation-submenu__global-settings-notice"
+								style={ { margin: 0 } }
+							>
+								{ __(
+									'These settings apply to all submenus within this navigation block.'
+								) }
+							</Notice>
+						</div>
+						<ToolsPanelItem
+							hasValue={ () => submenuVisibility !== 'hover' }
+							label={ __( 'Submenu Visibility' ) }
+							onDeselect={ () =>
+								updateParentNavigationAttributes( {
+									submenuVisibility: 'hover',
+								} )
+							}
+							isShownByDefault
+						>
+							<ToggleGroupControl
+								__next40pxDefaultSize
+								label={ __( 'Submenu Visibility' ) }
+								value={ submenuVisibility }
+								onChange={ ( value ) => {
+									const newAttributes = {
+										submenuVisibility: value,
+									};
+									const prevSubmenuVisibility =
+										submenuVisibility;
+									// If "always" is selected, hide the arrow
+									if ( value === 'always' ) {
+										newAttributes.showSubmenuIcon = false;
+									} else if (
+										value === 'click' ||
+										prevSubmenuVisibility === 'always'
+									) {
+										// When switching to "click" or away from "always", show the arrow
+										newAttributes.showSubmenuIcon = true;
+									}
+
+									updateParentNavigationAttributes(
+										newAttributes
+									);
+								} }
+								isBlock
+							>
+								<ToggleGroupControlOption
+									value="hover"
+									label={ __( 'Hover' ) }
+								/>
+								<ToggleGroupControlOption
+									value="click"
+									label={ __( 'Click' ) }
+								/>
+								{ orientation === 'vertical' && (
+									<ToggleGroupControlOption
+										value="always"
+										label={ __( 'Always' ) }
+									/>
+								) }
+							</ToggleGroupControl>
+						</ToolsPanelItem>
+
+						<ToolsPanelItem
+							hasValue={ () => ! showSubmenuIcon }
+							label={ __( 'Show arrow' ) }
+							onDeselect={ () =>
+								updateParentNavigationAttributes( {
+									showSubmenuIcon: true,
+								} )
+							}
+							isDisabled={
+								submenuVisibility === 'click' ||
+								submenuVisibility === 'always'
+							}
+							isShownByDefault
+						>
+							<ToggleControl
+								checked={ showSubmenuIcon }
+								onChange={ ( value ) => {
+									updateParentNavigationAttributes( {
+										showSubmenuIcon: value,
+									} );
+								} }
+								disabled={
+									submenuVisibility === 'click' ||
+									submenuVisibility === 'always'
+								}
+								label={ __( 'Show arrow' ) }
+							/>
+						</ToolsPanelItem>
+
+						{ submenuAccessibilityNotice && (
+							<Notice
+								spokenMessage={ null }
+								status="warning"
+								isDismissible={ false }
+								className="wp-block-navigation__submenu-accessibility-notice"
+							>
+								{ submenuAccessibilityNotice }
+							</Notice>
+						) }
+					</ToolsPanel>
+				) }
 			</InspectorControls>
 			<div { ...blockProps }>
 				<ParentElement className="wp-block-navigation-item__content">
