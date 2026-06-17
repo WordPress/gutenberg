@@ -9,7 +9,7 @@ import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
 
-function FullscreenModeClose( { showTooltip, href, initialPost } ) {
+function FullscreenModeClose( { showTooltip, icon, href, initialPost } ) {
 	const postType = useSelect(
 		( select ) => {
 			const { getCurrentPostType } = select( editorStore );
@@ -42,7 +42,9 @@ function FullscreenModeClose( { showTooltip, href, initialPost } ) {
 				tooltipPosition="bottom"
 			/>
 			<div className="edit-post-fullscreen-mode-close__back-icon">
-				<WCIcon icon={ isRTL() ? chevronRight : chevronLeft } />
+				<WCIcon
+					icon={ icon ?? ( isRTL() ? chevronRight : chevronLeft ) }
+				/>
 			</div>
 		</div>
 	);
