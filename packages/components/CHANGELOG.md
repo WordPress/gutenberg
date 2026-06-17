@@ -10,11 +10,13 @@
 ### Bug Fixes
 
 -   `SandBox`: Fix the viewport-unit (`vh`, `vw`, etc.) stripping so user-supplied HTML using these units in `width`/`height` no longer triggers a runaway resize loop in the preview ([#78677](https://github.com/WordPress/gutenberg/pull/78677)).
+-   `ColorPicker`: Fix value flicker when changing colors rapidly, most noticeable in Firefox ([#79266](https://github.com/WordPress/gutenberg/pull/79266)).
 
 ### Internal
 
 -   Adopt `--wpds-dimension-size-*` design tokens [#79093](https://github.com/WordPress/gutenberg/pull/79093).
 -   Point the legacy `--wp-components-*` color fallbacks at the design system tokens (`--wpds-*` / `--wp-admin-theme-color*`), so component styles get sensible defaults from the prebuilt token stylesheet without a runtime `<ThemeProvider>` ([#78664](https://github.com/WordPress/gutenberg/pull/78664)).
+-   `ColorPalette`: Add a private API for inline palette color editing. ([#79266](https://github.com/WordPress/gutenberg/pull/79266)).
 
 ### Code Quality
 

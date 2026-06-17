@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Edit palette colors from the block inspector: Change values for theme and default swatches. Add, rename, and delete for custom colors. Changes are saved to global styles ([#79266](https://github.com/WordPress/gutenberg/pull/79266)).
+
 ## 14.48.1 (2026-06-16)
 
 ## 14.48.0 (2026-06-10)
