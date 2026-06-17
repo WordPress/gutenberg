@@ -95,8 +95,8 @@ export function BlockStateBadges( { name, value, isResponsiveEditing } ) {
 	return (
 		<StateControlBadges
 			viewportStates={ isResponsiveEditing ? DEVICE_STATE_OPTIONS : [] }
-			viewportValue={ value?.viewport ?? DEFAULT_STATE_VALUE }
 			pseudoStates={ pseudoStateOptions }
+			viewportValue={ value?.viewport ?? DEFAULT_STATE_VALUE }
 			pseudoStateValue={ value?.pseudo ?? DEFAULT_STATE_VALUE }
 		/>
 	);
