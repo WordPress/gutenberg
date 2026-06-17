@@ -43,6 +43,9 @@ function buildImageBlockAttributes( media, galleryAttributes ) {
 		...getHrefAndDestination( media, linkTo ),
 		...getUpdatedLinkTargetSettings( linkTarget, galleryAttributes ),
 		sizeSlug,
+		// Raw caption, mirroring the frontend (`index.php`). Gap: the REST API
+		// exposes no caption run through `wp_get_attachment_caption`, so neither
+		// side applies that filter.
 		caption: media.caption?.raw || '',
 		alt: media.alt_text || '',
 		aspectRatio: aspectRatio === 'auto' ? undefined : aspectRatio,

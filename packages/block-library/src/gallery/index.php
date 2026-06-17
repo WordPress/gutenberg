@@ -213,8 +213,13 @@ function block_core_gallery_render_dynamic_image( $attachment_id, $attributes, $
 		);
 	}
 
-	$caption = wp_get_attachment_caption( $attachment_id );
-	if ( $caption ) {
+	// Use the raw caption (`post_excerpt`) so the frontend mirrors the editor
+	// preview, which builds the caption from the REST `caption.raw` value. Gap:
+	// the REST API exposes no caption run through `wp_get_attachment_caption`, so
+	// that filter isn't applied here either.
+	$attachment = get_post( $attachment_id );
+	$caption    = $attachment ? $attachment->post_excerpt : '';
+	if ( '' !== $caption ) {
 		$image_markup .= sprintf(
 			'<figcaption class="wp-element-caption">%s</figcaption>',
 			wp_kses_post( $caption )

@@ -154,6 +154,58 @@ class Tests_Blocks_Render_Gallery extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'wp-image-' . $attachment_id, $output );
 	}
 
+	public function test_dynamic_caption_mirrors_raw_excerpt_and_ignores_filter() {
+		$attachment_id = self::$attachment_ids[0];
+
+		// Give the attachment a raw caption (`post_excerpt`).
+		wp_update_post(
+			array(
+				'ID'           => $attachment_id,
+				'post_excerpt' => 'Raw caption text',
+			)
+		);
+
+		// The editor preview builds the image caption from the REST `caption.raw`
+		// value and cannot see PHP filters, so a `wp_get_attachment_caption` filter
+		// must NOT influence the rendered figcaption — otherwise the frontend would
+		// diverge from the preview.
+		$filter = static function () {
+			return 'Filtered caption text';
+		};
+		add_filter( 'wp_get_attachment_caption', $filter );
+
+		try {
+			$output = $this->render_in_loop(
+				'<!-- wp:gallery {"dynamicContent":{"source":"core/attached-media"}} --><figure class="wp-block-gallery has-nested-images columns-default is-cropped"></figure><!-- /wp:gallery -->'
+			);
+		} finally {
+			remove_filter( 'wp_get_attachment_caption', $filter );
+			// Reset so the shared fixture doesn't leak into other tests.
+			wp_update_post(
+				array(
+					'ID'           => $attachment_id,
+					'post_excerpt' => '',
+				)
+			);
+		}
+
+		$this->assertStringContainsString(
+			'wp-element-caption',
+			$output,
+			'Dynamic render should output a caption element.'
+		);
+		$this->assertStringContainsString(
+			'Raw caption text',
+			$output,
+			'Dynamic render should use the raw attachment caption, mirroring the editor preview.'
+		);
+		$this->assertStringNotContainsString(
+			'Filtered caption text',
+			$output,
+			'The wp_get_attachment_caption filter must not affect the dynamic render; it cannot be mirrored in the editor preview.'
+		);
+	}
+
 	public function test_dynamic_lightbox_link_adds_interactivity_directives() {
 		$output = $this->render_in_loop(
 			'<!-- wp:gallery {"dynamicContent":{"source":"core/attached-media"},"linkTo":"lightbox"} --><figure class="wp-block-gallery has-nested-images columns-default is-cropped"></figure><!-- /wp:gallery -->'
