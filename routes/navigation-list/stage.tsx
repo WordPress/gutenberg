@@ -20,6 +20,8 @@ import { unlock } from '@wordpress/routes-lock-unlock';
 import { getDefaultView } from './view-utils';
 import { useEditNavigationAction } from './actions/edit-navigation';
 import { AddNavigationModal } from './add-navigation';
+import useNavigationStatus from './use-navigation-status';
+import { createUsageField } from './fields/usage';
 
 /**
  * Style dependencies
@@ -86,6 +88,19 @@ function NavigationList() {
 	const fields = usePostFields( {
 		postType: NAVIGATION_POST_TYPE,
 	} );
+	const { statusMap, isResolving: isResolvingUsage } = useNavigationStatus();
+	const usageField = useMemo(
+		() =>
+			createUsageField( {
+				statusMap,
+				isResolving: isResolvingUsage,
+			} ),
+		[ statusMap, isResolvingUsage ]
+	);
+	const navigationFields = useMemo(
+		() => ( fields ? [ ...fields, usageField ] : fields ),
+		[ fields, usageField ]
+	);
 	const [ showAddModal, setShowAddModal ] = useState( false );
 
 	const editAction = useEditNavigationAction();
@@ -146,10 +161,10 @@ function NavigationList() {
 			>
 				<DataViews
 					data={ navigationMenus }
-					fields={ fields }
+					fields={ navigationFields }
 					view={ view }
 					onChangeView={ updateView }
-					isLoading={ isResolving || ! fields }
+					isLoading={ isResolving || ! navigationFields }
 					actions={ actions }
 					paginationInfo={ {
 						totalItems,

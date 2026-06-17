@@ -9,6 +9,7 @@
 	"dependencies": {
 		"@wordpress/admin-ui": "file:../../packages/admin-ui",
 		"@wordpress/base-styles": "file:../../packages/base-styles",
+		"@wordpress/blocks": "file:../../packages/blocks",
 		"@wordpress/components": "file:../../packages/components",
 		"@wordpress/core-data": "file:../../packages/core-data",
 		"@wordpress/data": "file:../../packages/data",
@@ -18,6 +19,7 @@
 		"@wordpress/html-entities": "file:../../packages/html-entities",
 		"@wordpress/i18n": "file:../../packages/i18n",
 		"@wordpress/icons": "file:../../packages/icons",
+		"@wordpress/lazy-editor": "file:../../packages/lazy-editor",
 		"@wordpress/routes-lock-unlock": "file:../lock-unlock",
 		"@wordpress/notices": "file:../../packages/notices",
 		"@wordpress/route": "file:../../packages/route",

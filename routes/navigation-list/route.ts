@@ -8,12 +8,25 @@ import { __ } from '@wordpress/i18n';
 import { menu } from '@wordpress/icons';
 
 const NAVIGATION_POST_TYPE = 'wp_navigation';
+const TEMPLATE_PART_POST_TYPE = 'wp_template_part';
 
 const PRELOADED_NAVIGATION_MENUS_QUERY = {
 	per_page: -1,
 	status: [ 'publish', 'draft' ],
 	order: 'desc',
 	orderby: 'date',
+};
+
+const PRELOADED_TEMPLATE_PARTS_QUERY = {
+	per_page: -1,
+};
+
+const PRELOADED_FALLBACK_NAVIGATION_QUERY = {
+	per_page: 1,
+	orderby: 'date',
+	order: 'desc',
+	status: 'publish',
+	_fields: 'id',
 };
 
 type NavigationRecord = {
@@ -131,6 +144,18 @@ export const route = {
 			resolveSelect( coreStore ).getEntityRecords( 'root', 'user', {
 				per_page: -1,
 			} ),
+			// Preload template parts and fallback navigation data used to show
+			// whether each navigation menu is active on the site.
+			resolveSelect( coreStore ).getEntityRecords(
+				'postType',
+				TEMPLATE_PART_POST_TYPE,
+				PRELOADED_TEMPLATE_PARTS_QUERY
+			),
+			resolveSelect( coreStore ).getEntityRecords(
+				'postType',
+				NAVIGATION_POST_TYPE,
+				PRELOADED_FALLBACK_NAVIGATION_QUERY
+			),
 		] );
 	},
 };
