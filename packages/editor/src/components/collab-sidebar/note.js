@@ -68,6 +68,28 @@ export function Note( {
 	const [ actionState, setActionState ] = useState( null );
 	const actionButtonRef = useRef( null );
 
+	const commentRef = useRef( null );
+	const rawContent = note?.content?.raw;
+	const [ prevContent, setPrevContent ] = useState( rawContent );
+	const [ isExpanded, setIsExpanded ] = useState( false );
+	const [ isOverflowing, setIsOverflowing ] = useState( false );
+
+	// Collapse whenever the content changes so it can be re-measured.
+	if ( prevContent !== rawContent ) {
+		setPrevContent( rawContent );
+		setIsExpanded( false );
+	}
+
+	// Measure the (clamped) content to decide whether the toggle is needed.
+	useLayoutEffect( () => {
+		const commentElement = commentRef.current;
+		if ( commentElement ) {
+			setIsOverflowing(
+				commentElement.scrollHeight > commentElement.clientHeight
+			);
+		}
+	}, [ rawContent ] );
+
 	const canResolve = note.parent === 0;
 	const isResolutionNote =
 		note.type === 'note' &&
@@ -106,28 +128,6 @@ export function Note( {
 					"Are you sure you want to delete this note? This will also delete all of this note's replies."
 			  )
 			: __( 'Are you sure you want to delete this reply?' );
-
-	const commentRef = useRef( null );
-	const rawContent = note?.content?.raw;
-	const [ prevContent, setPrevContent ] = useState( rawContent );
-	const [ isExpanded, setIsExpanded ] = useState( false );
-	const [ isOverflowing, setIsOverflowing ] = useState( false );
-
-	// Collapse whenever the content changes so it can be re-measured.
-	if ( prevContent !== rawContent ) {
-		setPrevContent( rawContent );
-		setIsExpanded( false );
-	}
-
-	// Measure the (clamped) content to decide whether the toggle is needed.
-	useLayoutEffect( () => {
-		const commentElement = commentRef.current;
-		if ( commentElement ) {
-			setIsOverflowing(
-				commentElement.scrollHeight > commentElement.clientHeight
-			);
-		}
-	}, [ rawContent ] );
 
 	const handleCancel = () => {
 		setActionState( null );
