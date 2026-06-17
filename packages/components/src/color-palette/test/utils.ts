@@ -3,7 +3,9 @@
  */
 import {
 	extractColorNameFromCurrentValue,
+	findSelectedColorEntry,
 	normalizeColorValue,
+	slugifyCustomColorName,
 } from '../utils';
 
 describe( 'ColorPalette: Utils', () => {
@@ -75,6 +77,73 @@ describe( 'ColorPalette: Utils', () => {
 		} );
 		test( 'should return the value if the element argument is null', () => {
 			expect( normalizeColorValue( '#ff0000', null ) ).toBe( '#ff0000' );
+		} );
+	} );
+
+	describe( 'slugifyCustomColorName', () => {
+		test( 'kebab-cases the name and prefixes it with `custom-`', () => {
+			expect( slugifyCustomColorName( 'Brand Red' ) ).toBe(
+				'custom-brand-red'
+			);
+		} );
+
+		test( 'normalises the name the same way WP core does for theme.json slugs', () => {
+			// The slug is produced by the same `kebabCase` helper used to
+			// register palette entries in `palette-edit`, so the resulting
+			// CSS variable name stays in sync with whatever WordPress core
+			// would emit for the same display name.
+			expect( slugifyCustomColorName( 'Brand! Red?' ) ).toBe(
+				'custom-brand-red'
+			);
+		} );
+
+		test( 'collapses multiple separators', () => {
+			expect( slugifyCustomColorName( '  Mixed--Case 123  ' ) ).toBe(
+				'custom-mixed-case-123'
+			);
+		} );
+
+		test( 'handles an empty name', () => {
+			expect( slugifyCustomColorName( '' ) ).toBe( 'custom-' );
+		} );
+	} );
+
+	describe( 'findSelectedColorEntry', () => {
+		const PALETTES = [
+			{
+				name: 'Theme',
+				slug: 'theme',
+				colors: [ { name: 'Brand', slug: 'brand', color: '#0073aa' } ],
+			},
+			{
+				name: 'Custom',
+				slug: 'custom',
+				colors: [
+					{
+						name: 'My Red',
+						slug: 'custom-my-red',
+						color: '#ff0000',
+					},
+				],
+			},
+		];
+
+		test( 'returns the matching entry and its palette slug by hex', () => {
+			const result = findSelectedColorEntry( '#ff0000', PALETTES );
+			expect( result?.color.name ).toBe( 'My Red' );
+			expect( result?.paletteSlug ).toBe( 'custom' );
+		} );
+
+		test( 'returns the matching entry by selectedSlug', () => {
+			const result = findSelectedColorEntry( '#000', PALETTES, 'brand' );
+			expect( result?.color.slug ).toBe( 'brand' );
+			expect( result?.paletteSlug ).toBe( 'theme' );
+		} );
+
+		test( 'returns undefined when nothing matches', () => {
+			expect(
+				findSelectedColorEntry( '#abcdef', PALETTES )
+			).toBeUndefined();
 		} );
 	} );
 } );
