@@ -18,9 +18,9 @@ import {
 	reconcileInlineNoteMarker,
 } from '../hooks';
 
-// `findNoteRange`, which getInlineMarkerStart delegates to, walks rich-text
-// values and needs the `core/note` format registered to recognize the marker
-// elements the tests construct below.
+// `findNoteInBlock` (which getInlineMarkerStart and reconcileInlineNoteMarker
+// delegate to) walks rich-text values and needs the `core/note` format
+// registered to recognize the marker elements the tests construct below.
 const FORMAT_NAME = 'core/note';
 
 const isRegistered = () =>
@@ -45,16 +45,12 @@ afterAll( () => {
 } );
 
 describe( 'getInlineMarkerStart', () => {
-	it( 'returns the block-level sentinel when the thread has no inline selection meta', () => {
-		const thread = { id: 1, meta: {} };
-		expect( getInlineMarkerStart( thread, { content: 'hi' } ) ).toBe(
-			BLOCK_LEVEL_NOTE_START
-		);
-	} );
-
-	it( 'returns the block-level sentinel when meta is an empty array (WordPress empty-object serialization)', () => {
-		const thread = { id: 1, meta: { _wp_note_selection: [] } };
-		expect( getInlineMarkerStart( thread, { content: 'hi' } ) ).toBe(
+	it( 'returns the block-level sentinel when the block carries no marker for the note', () => {
+		const attributes = {
+			content: RichTextData.fromHTMLString( 'hello world' ),
+		};
+		const thread = { id: 1 };
+		expect( getInlineMarkerStart( thread, attributes ) ).toBe(
 			BLOCK_LEVEL_NOTE_START
 		);
 	} );
@@ -65,68 +61,27 @@ describe( 'getInlineMarkerStart', () => {
 				'hello <mark class="wp-note" data-id="7">marked</mark> world'
 			),
 		};
-		const thread = {
-			id: 7,
-			meta: { _wp_note_selection: { attributeKey: 'content' } },
-		};
-		expect( getInlineMarkerStart( thread, attributes ) ).toBe( 6 );
+		expect( getInlineMarkerStart( { id: 7 }, attributes ) ).toBe( 6 );
 	} );
 
-	it( 'falls back to the stored offset when the marker has been stripped from content', () => {
+	it( 'discovers the marker in a non-primary rich-text attribute', () => {
 		const attributes = {
-			content: RichTextData.fromHTMLString( 'hello world' ),
+			content: RichTextData.fromHTMLString( 'no marker here' ),
+			caption: RichTextData.fromHTMLString(
+				'xx <mark class="wp-note" data-id="7">y</mark>'
+			),
 		};
-		const thread = {
-			id: 7,
-			meta: {
-				_wp_note_selection: {
-					attributeKey: 'content',
-					start: 4,
-					end: 8,
-				},
-			},
-		};
-		expect( getInlineMarkerStart( thread, attributes ) ).toBe( 4 );
+		expect( getInlineMarkerStart( { id: 7 }, attributes ) ).toBe( 3 );
 	} );
 
-	it( 'falls back to the block-level sentinel when neither marker nor stored offset is available', () => {
-		const attributes = {
-			content: RichTextData.fromHTMLString( 'hello world' ),
-		};
-		const thread = {
-			id: 7,
-			meta: { _wp_note_selection: { attributeKey: 'content' } },
-		};
-		// No marker for id 7 in content and no stored offset → block-level.
-		expect( getInlineMarkerStart( thread, attributes ) ).toBe(
+	it( 'returns the block-level sentinel when block attributes are empty', () => {
+		expect( getInlineMarkerStart( { id: 7 }, {} ) ).toBe(
 			BLOCK_LEVEL_NOTE_START
 		);
 	} );
 
-	it( 'returns the block-level sentinel when the named attribute is missing on the block', () => {
-		const thread = {
-			id: 7,
-			meta: {
-				_wp_note_selection: {
-					attributeKey: 'content',
-					start: 2,
-					end: 5,
-				},
-			},
-		};
-		// Empty attributes object — attributeKey resolves to undefined.
-		// The stored offset is a fallback, so we still get a real number.
-		expect( getInlineMarkerStart( thread, {} ) ).toBe( 2 );
-	} );
-
-	it( 'returns the block-level sentinel when block attributes themselves are null', () => {
-		const thread = {
-			id: 7,
-			meta: {
-				_wp_note_selection: { attributeKey: 'content' },
-			},
-		};
-		expect( getInlineMarkerStart( thread, null ) ).toBe(
+	it( 'returns the block-level sentinel when block attributes are null', () => {
+		expect( getInlineMarkerStart( { id: 7 }, null ) ).toBe(
 			BLOCK_LEVEL_NOTE_START
 		);
 	} );
@@ -138,21 +93,12 @@ describe( 'getInlineMarkerStart', () => {
 			),
 		};
 		const threads = [
-			// Block-level note — should sort first.
-			{ id: 99, meta: {} },
+			// Block-level note (no marker) — should sort first.
+			{ id: 99 },
 			// Inline notes — should sort by marker offset, then id.
-			{
-				id: 1,
-				meta: { _wp_note_selection: { attributeKey: 'content' } },
-			},
-			{
-				id: 2,
-				meta: { _wp_note_selection: { attributeKey: 'content' } },
-			},
-			{
-				id: 3,
-				meta: { _wp_note_selection: { attributeKey: 'content' } },
-			},
+			{ id: 1 },
+			{ id: 2 },
+			{ id: 3 },
 		];
 		const sorted = [ ...threads ].sort( ( a, b ) => {
 			const aStart = getInlineMarkerStart( a, attributes );
@@ -167,11 +113,7 @@ describe( 'getInlineMarkerStart', () => {
 } );
 
 describe( 'reconcileInlineNoteMarker', () => {
-	const inlineThread = {
-		id: 7,
-		blockClientId: 'abc',
-		meta: { _wp_note_selection: { attributeKey: 'content' } },
-	};
+	const inlineThread = { id: 7, blockClientId: 'abc' };
 	const withMarker = {
 		content: RichTextData.fromHTMLString(
 			'hello <mark class="wp-note" data-id="7">marked</mark> world'
@@ -197,40 +139,21 @@ describe( 'reconcileInlineNoteMarker', () => {
 		).toBe( 'delete' );
 	} );
 
-	it( 'returns "skip" when the marker is gone but was never observed (legacy/never-anchored note)', () => {
+	it( 'returns "skip" when the marker is gone but was never observed (never-anchored note)', () => {
 		expect(
 			reconcileInlineNoteMarker( inlineThread, withoutMarker, new Set() )
 		).toBe( 'skip' );
 	} );
 
-	it( 'returns "skip" for a block-level note (no inline selection meta)', () => {
-		const blockLevel = { id: 7, blockClientId: 'abc', meta: {} };
+	it( 'returns "skip" for a block-level note (no marker, never anchored)', () => {
+		const blockLevel = { id: 5, blockClientId: 'abc' };
 		expect(
-			reconcileInlineNoteMarker(
-				blockLevel,
-				withMarker,
-				new Set( [ 7 ] )
-			)
-		).toBe( 'skip' );
-	} );
-
-	it( 'returns "skip" when meta is an empty array (WordPress empty-object serialization)', () => {
-		const thread = {
-			id: 7,
-			blockClientId: 'abc',
-			meta: { _wp_note_selection: [] },
-		};
-		expect(
-			reconcileInlineNoteMarker( thread, withoutMarker, new Set( [ 7 ] ) )
+			reconcileInlineNoteMarker( blockLevel, withMarker, new Set() )
 		).toBe( 'skip' );
 	} );
 
 	it( 'returns "skip" for an orphan thread with no blockClientId', () => {
-		const orphan = {
-			id: 7,
-			blockClientId: null,
-			meta: { _wp_note_selection: { attributeKey: 'content' } },
-		};
+		const orphan = { id: 7, blockClientId: null };
 		expect(
 			reconcileInlineNoteMarker( orphan, withMarker, new Set( [ 7 ] ) )
 		).toBe( 'skip' );

@@ -198,6 +198,30 @@ export function findNoteRange( value, noteId ) {
 }
 
 /**
+ * Locate a note's in-content `core/note` marker across all of a block's
+ * attributes. The marker (carrying `data-id`) is the single source of truth for
+ * an inline note's anchor: a note is inline iff a marker with its id exists in
+ * the block, and the attribute that holds it is discovered here rather than
+ * stored separately. Returns the matching attribute key and the marker range.
+ *
+ * @param {?Object}       attributes Block attributes, or null/undefined when unloaded.
+ * @param {number|string} noteId     Note id to search for.
+ * @return {?{attributeKey: string, start: number, end: number}} Anchor or null when no marker is found.
+ */
+export function findNoteInBlock( attributes, noteId ) {
+	if ( ! attributes ) {
+		return null;
+	}
+	for ( const attributeKey of Object.keys( attributes ) ) {
+		const range = findNoteRange( attributes[ attributeKey ], noteId );
+		if ( range ) {
+			return { attributeKey, start: range.start, end: range.end };
+		}
+	}
+	return null;
+}
+
+/**
  * Picks the most relevant thread from a list: first unresolved, else first.
  *
  * @param {Array} threads Ordered list of thread objects.
