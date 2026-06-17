@@ -5,7 +5,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useCallback, useEffect } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
-import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -21,23 +20,17 @@ import {
 } from '../inline-suggestions';
 
 /**
- * Resolve the document that owns a block's DOM node. The editor canvas is
- * usually rendered in an iframe, and native `keydown` events do not cross the
- * iframe boundary, so a listener has to be attached to the canvas document
- * rather than the top document. Falls back to the top document for the
- * non-iframed canvas (e.g. the widgets screen).
+ * Collect every document the editor canvas might live in: the top document and
+ * the contents of each (same-origin) iframe. The canvas is usually iframed and
+ * native input events don't cross that boundary, so the listener has to be
+ * attached to the canvas document directly. The handler's own guards keep it
+ * from acting on edits outside a block's rich text, so attaching broadly is
+ * safe.
  *
- * @param {string} clientId Block whose owning document to find.
- * @return {?Document} The owning document, or null when the node isn't mounted.
+ * @return {Document[]} Candidate documents.
  */
-function getBlockDocument( clientId ) {
-	if ( ! clientId ) {
-		return null;
-	}
-	const selector = `[data-block="${ clientId }"]`;
-	if ( document.querySelector( selector ) ) {
-		return document;
-	}
+function getCandidateDocuments() {
+	const docs = [ document ];
 	for ( const iframe of document.querySelectorAll( 'iframe' ) ) {
 		let doc = null;
 		try {
@@ -46,30 +39,34 @@ function getBlockDocument( clientId ) {
 			// Cross-origin iframe — not the editor canvas; skip.
 			doc = null;
 		}
-		if ( doc?.querySelector( selector ) ) {
-			return doc;
+		if ( doc && ! docs.includes( doc ) ) {
+			docs.push( doc );
 		}
 	}
-	return null;
+	return docs;
 }
 
 /**
  * Turn deletion of a selected run of text into an inline deletion suggestion.
  *
  * In Suggest mode every ordinary edit is a suggestion, so removing selected
- * text should not delete it — it should mark it as proposed for deletion.
- * This component listens (capture phase, so it runs before RichText's own
- * delete handler, which bails on `event.defaultPrevented`) for Backspace /
- * Delete while a non-collapsed selection sits inside a single rich-text
- * attribute. It prevents the removal and instead wraps the range in an
- * in-content `core/suggestion` `<mark data-suggestion-type="del">` marker
- * (Option B) keyed to a freshly-created suggestion note.
+ * text should not delete it — it should mark it as proposed for deletion. This
+ * intercepts `beforeinput` (capture phase) for any delete input type while a
+ * non-collapsed selection sits inside a single rich-text attribute, prevents
+ * the removal, and instead wraps the range in an in-content `core/suggestion`
+ * `<mark data-suggestion-type="del">` marker (Option B) keyed to a freshly-
+ * created suggestion note.
+ *
+ * `beforeinput` (rather than `keydown`) is the reliable interception point:
+ * browsers apply a partial-selection deletion through `beforeinput`, and
+ * `preventDefault` there cancels the edit — a `keydown` `preventDefault` does
+ * not consistently stop it, which would let the deletion fall through to the
+ * old overlay path.
  *
  * Out of scope for now (left to the existing path until additions land):
- * collapsed-cursor deletion (a single character with no selection) and typing
- * over a selection. Block-level and cross-block selections fall through too —
- * `readInlineSelection` returns null for anything that isn't a single-attribute
- * range.
+ * collapsed-cursor deletion (a single character with no selection). Block-level
+ * and cross-block selections fall through too — `readInlineSelection` returns
+ * null for anything that isn't a single-attribute range.
  *
  * @return {null} Renders nothing.
  */
@@ -97,14 +94,15 @@ export default function SuggestionDeletionKeyboard() {
 	const { createSuggestion } = useSuggestionsProvider();
 	const { requestInterceptorBypass } = useSuggestionOverlay();
 
-	const onKeyDown = useCallback(
+	const onBeforeInput = useCallback(
 		async ( event ) => {
-			if ( event.keyCode !== BACKSPACE && event.keyCode !== DELETE ) {
+			// Only delete operations (Backspace, Delete, cut, word delete) of a
+			// selected range concern us; everything else passes through.
+			if ( ! event.inputType?.startsWith( 'delete' ) ) {
 				return;
 			}
-			// Only intercept while editing rich text. Guards the non-iframed
-			// canvas, where the document-level listener would otherwise also
-			// see Backspace/Delete in unrelated inputs (sidebar fields, etc.).
+			// Only intercept while editing rich text, so the document-level
+			// listener never touches unrelated inputs (sidebar fields, etc.).
 			if ( ! event.target?.isContentEditable ) {
 				return;
 			}
@@ -119,8 +117,9 @@ export default function SuggestionDeletionKeyboard() {
 			}
 			const { clientId, attributeKey, start, end } = selection;
 
-			// We own this deletion — stop RichText and the browser from
-			// removing the text. Must happen synchronously, before the save.
+			// We own this deletion — cancel the removal. Cancelling `beforeinput`
+			// reliably stops the browser from mutating the content; must happen
+			// synchronously, before the async save below.
 			event.preventDefault();
 
 			const value = getBlockAttributes( clientId )?.[ attributeKey ];
@@ -184,16 +183,20 @@ export default function SuggestionDeletionKeyboard() {
 		if ( ! isSuggestMode ) {
 			return undefined;
 		}
-		const doc = getBlockDocument( selectedBlockClientId );
-		if ( ! doc ) {
-			return undefined;
+		const docs = getCandidateDocuments();
+		const listener = ( event ) => onBeforeInput( event );
+		// Capture phase so we cancel the edit before RichText/the browser apply
+		// it. `selectedBlockClientId` is in the deps so the listener re-attaches
+		// once the canvas iframe (and its document) has mounted.
+		for ( const doc of docs ) {
+			doc.addEventListener( 'beforeinput', listener, true );
 		}
-		const listener = ( event ) => onKeyDown( event );
-		// Capture phase: run before RichText's delegated keydown handler so our
-		// `preventDefault` makes it bail (`delete.js` checks defaultPrevented).
-		doc.addEventListener( 'keydown', listener, true );
-		return () => doc.removeEventListener( 'keydown', listener, true );
-	}, [ isSuggestMode, selectedBlockClientId, onKeyDown ] );
+		return () => {
+			for ( const doc of docs ) {
+				doc.removeEventListener( 'beforeinput', listener, true );
+			}
+		};
+	}, [ isSuggestMode, selectedBlockClientId, onBeforeInput ] );
 
 	return null;
 }
