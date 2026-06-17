@@ -277,6 +277,21 @@ export function renderingMode( state = 'post-only', action ) {
 }
 
 /**
+ * Reducer for the canvas width.
+ *
+ * @param {number} state  Current state.
+ * @param {Object} action Dispatched action.
+ * @return {number} Updated state.
+ */
+export function canvasWidth( state = undefined, action ) {
+	switch ( action.type ) {
+		case 'SET_CANVAS_WIDTH':
+			return action.width;
+	}
+	return state;
+}
+
+/**
  * Reducer storing the list of all programmatically removed panels.
  *
  * @param {Array}  state  Current state.
@@ -397,21 +412,6 @@ export function showStylebook( state = false, action ) {
 			return action.show;
 		case 'RESET_STYLES_NAVIGATION':
 			return false;
-	}
-	return state;
-}
-
-/**
- * Reducer for the canvas width.
- *
- * @param {number} state  Current state.
- * @param {Object} action Dispatched action.
- * @return {number} Updated state.
- */
-export function canvasWidth( state = undefined, action ) {
-	switch ( action.type ) {
-		case 'SET_CANVAS_WIDTH':
-			return action.width;
 	}
 	return state;
 }
