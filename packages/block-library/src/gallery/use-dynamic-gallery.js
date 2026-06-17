@@ -1,0 +1,205 @@
+/**
+ * WordPress dependencies
+ */
+import { useMemo } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
+import { createBlock } from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import { pickRelevantMediaFiles } from './shared';
+import { getHrefAndDestination } from './utils';
+import { getUpdatedLinkTargetSettings } from '../image/utils';
+import {
+	getSourceQuery,
+	DEFAULT_ORDERBY,
+	DEFAULT_ORDER,
+} from './dynamic-source';
+
+const EMPTY_ARRAY = [];
+
+/**
+ * Builds the attributes for a `core/image` block from a media (attachment)
+ * record, applying the gallery-wide settings that affect how the image renders.
+ *
+ * Used to construct the (non-persisted) image blocks previewed in dynamic mode,
+ * and the real image blocks created when a dynamic gallery is converted
+ * ("pinned") back to individual images. The frontend equivalent is
+ * `block_core_gallery_render_dynamic_image()` in `index.php`.
+ *
+ * @param {Object} media             A media object as returned by the REST API.
+ * @param {Object} galleryAttributes The gallery block's attributes.
+ * @return {Object} Attributes to pass to `createBlock( 'core/image', ... )`.
+ */
+function buildImageBlockAttributes( media, galleryAttributes ) {
+	const { sizeSlug, linkTo, linkTarget, aspectRatio } = galleryAttributes;
+
+	return {
+		id: media.id,
+		...pickRelevantMediaFiles( media, sizeSlug ),
+		...getHrefAndDestination( media, linkTo ),
+		...getUpdatedLinkTargetSettings( linkTarget, galleryAttributes ),
+		sizeSlug,
+		caption: media.caption?.raw || '',
+		alt: media.alt_text || '',
+		aspectRatio: aspectRatio === 'auto' ? undefined : aspectRatio,
+	};
+}
+
+/**
+ * Bundles the Gallery block's "dynamic mode" source resolution and actions.
+ *
+ * Dynamic mode resolves the gallery's images from a configured source
+ * (`attributes.dynamicContent`) instead of from manually-added inner image
+ * blocks. This hook centralizes the shared, single-instance pieces — the source
+ * resolution (one `getEntityRecords`), the editor-preview blocks, and the
+ * mode/ordering actions — out of the block's `edit` component. Transient UI
+ * concerns (e.g. the convert-to-dynamic confirmation) live in the components
+ * that own them.
+ *
+ * @param {Object}   options
+ * @param {Object}   options.attributes    The gallery block attributes.
+ * @param {Function} options.setAttributes The block's `setAttributes`.
+ * @param {string}   options.clientId      The block client ID.
+ * @param {?number}  options.postId        The current post ID (from block context).
+ * @return {Object} Dynamic-mode source data and actions.
+ */
+export default function useDynamicGallery( {
+	attributes,
+	setAttributes,
+	clientId,
+	postId,
+} ) {
+	const { dynamicContent } = attributes;
+
+	// Current source ordering, falling back to the shared defaults when unset.
+	const sourceOrderby = dynamicContent?.args?.orderBy ?? DEFAULT_ORDERBY;
+	const sourceOrder = dynamicContent?.args?.order ?? DEFAULT_ORDER;
+
+	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
+
+	// Resolve the configured source to a media query. `null` (static mode, or an
+	// unresolvable source) short-circuits the select below so no request fires.
+	const query = useMemo(
+		() =>
+			dynamicContent
+				? getSourceQuery( dynamicContent, { postId } )
+				: null,
+		[ dynamicContent, postId ]
+	);
+
+	const { dynamicMedia, isResolvingDynamic } = useSelect(
+		( select ) => {
+			if ( ! query ) {
+				return { dynamicMedia: EMPTY_ARRAY, isResolvingDynamic: false };
+			}
+			const selectorArgs = [ 'postType', 'attachment', query ];
+			return {
+				dynamicMedia:
+					select( coreStore ).getEntityRecords( ...selectorArgs ) ??
+					EMPTY_ARRAY,
+				isResolvingDynamic: ! select( coreStore ).hasFinishedResolution(
+					'getEntityRecords',
+					selectorArgs
+				),
+			};
+		},
+		[ query ]
+	);
+
+	// The (non-persisted) `core/image` blocks used for the editor preview.
+	// Rebuilt when the resolved media or any gallery setting changes.
+	const dynamicImageBlocks = useMemo(
+		() =>
+			dynamicMedia.map( ( mediaItem ) =>
+				createBlock(
+					'core/image',
+					buildImageBlockAttributes( mediaItem, attributes )
+				)
+			),
+		[ dynamicMedia, attributes ]
+	);
+
+	// Context the gallery provides to its (previewed) image blocks.
+	const galleryContext = useMemo(
+		() => ( {
+			allowResize: attributes.allowResize ?? false,
+			imageCrop: attributes.imageCrop,
+			fixedHeight: attributes.fixedHeight,
+			navigationButtonType: attributes.navigationButtonType,
+		} ),
+		[
+			attributes.allowResize,
+			attributes.imageCrop,
+			attributes.fixedHeight,
+			attributes.navigationButtonType,
+		]
+	);
+
+	// Switches the gallery into dynamic mode, displaying images attached to the
+	// current post. Any manually-added image blocks are removed.
+	function enableDynamicMode() {
+		setAttributes( { dynamicContent: { source: 'core/attached-media' } } );
+		replaceInnerBlocks( clientId, [] );
+	}
+
+	// "Pins" a dynamic gallery: materializes the currently-resolved media as
+	// real, editable image blocks and leaves dynamic mode.
+	function convertToStatic() {
+		const blocks = dynamicMedia.map( ( mediaItem ) =>
+			createBlock(
+				'core/image',
+				buildImageBlockAttributes( mediaItem, attributes )
+			)
+		);
+		replaceInnerBlocks( clientId, blocks );
+		setAttributes( { dynamicContent: undefined } );
+	}
+
+	// Updates the source ordering within `dynamicContent.args`. Passing
+	// `undefined` (or the default order) strips the keys so they aren't
+	// persisted redundantly and the ToolsPanel item reads as unset.
+	function setSourceOrder( nextOrderby, nextOrder ) {
+		const nextArgs = { ...dynamicContent?.args };
+		delete nextArgs.orderBy;
+		delete nextArgs.order;
+		if (
+			nextOrderby !== undefined &&
+			( nextOrderby !== DEFAULT_ORDERBY || nextOrder !== DEFAULT_ORDER )
+		) {
+			nextArgs.orderBy = nextOrderby;
+			nextArgs.order = nextOrder;
+		}
+		const nextSource = { ...dynamicContent };
+		if ( Object.keys( nextArgs ).length ) {
+			nextSource.args = nextArgs;
+		} else {
+			delete nextSource.args;
+		}
+		setAttributes( { dynamicContent: nextSource } );
+	}
+
+	// Resets the source to its bare form: keeps the source kind, drops its args.
+	function resetSource() {
+		setAttributes( {
+			dynamicContent: { source: dynamicContent.source },
+		} );
+	}
+
+	return {
+		dynamicContent,
+		sourceOrderby,
+		sourceOrder,
+		dynamicMedia,
+		dynamicImageBlocks,
+		isResolvingDynamic,
+		galleryContext,
+		enableDynamicMode,
+		convertToStatic,
+		setSourceOrder,
+		resetSource,
+	};
+}

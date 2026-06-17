@@ -17,6 +17,7 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	ToolbarDropdownMenu,
+	Button,
 } from '@wordpress/components';
 import {
 	store as blockEditorStore,
@@ -65,6 +66,8 @@ import useImageSizes from './use-image-sizes';
 import useGetNewImages from './use-get-new-images';
 import useGetMedia from './use-get-media';
 import GapStyles from './gap-styles';
+import useDynamicGallery from './use-dynamic-gallery';
+import { GallerySourcePanel, GalleryDynamicView } from './dynamic-gallery';
 
 const MAX_COLUMNS = 8;
 const LINK_OPTIONS = [
@@ -126,7 +129,11 @@ export default function GalleryEdit( props ) {
 		isSelected,
 		insertBlocksAfter,
 		isContentLocked,
+		context,
+		__unstableLayoutClassNames: layoutClassNames,
 	} = props;
+
+	const postId = context?.postId;
 
 	const [ lightboxSetting, defaultRatios, themeRatios, showDefaultRatios ] =
 		useSettings(
@@ -143,6 +150,7 @@ export default function GalleryEdit( props ) {
 		: LINK_OPTIONS;
 
 	const {
+		align,
 		navigationButtonType,
 		columns,
 		imageCrop,
@@ -205,15 +213,43 @@ export default function GalleryEdit( props ) {
 
 	const newImages = useGetNewImages( images, imageData );
 
-	// Check if there is at least one image with lightbox enabled
-	const hasLightboxImages = lightboxSetting?.enabled
-		? images.filter(
+	const hasImages = !! images.length;
+	const isDynamic = !! attributes.dynamicContent;
+
+	// Dynamic mode (resolving images from a source instead of inner blocks):
+	// source resolution, the editor-preview blocks, and the mode/ordering
+	// actions.
+	const dynamic = useDynamicGallery( {
+		attributes,
+		setAttributes,
+		clientId,
+		postId,
+	} );
+
+	// State that drives counts/size options should reflect the dynamic media
+	// when the gallery is in dynamic mode.
+	const displayedImageCount = isDynamic
+		? dynamic.dynamicMedia.length
+		: images.length;
+
+	// Check if there is at least one image with lightbox enabled. In dynamic
+	// mode the images inherit the gallery's link setting, so the lightbox is on
+	// when the gallery links images to the lightbox.
+	let hasLightboxImages;
+	if ( isDynamic ) {
+		hasLightboxImages = linkTo === LINK_DESTINATION_LIGHTBOX;
+	} else if ( lightboxSetting?.enabled ) {
+		hasLightboxImages =
+			images.filter(
 				( image ) =>
 					image.attributes?.lightbox?.enabled === undefined ||
 					image.attributes?.lightbox?.enabled === true
-		  ).length > 0
-		: images.filter( ( image ) => image.attributes.lightbox?.enabled )
+			).length > 0;
+	} else {
+		hasLightboxImages =
+			images.filter( ( image ) => image.attributes.lightbox?.enabled )
 				.length > 0;
+	}
 
 	const themeOptions = themeRatios?.map( ( { name, ratio } ) => ( {
 		label: name,
@@ -248,7 +284,7 @@ export default function GalleryEdit( props ) {
 	}, [ newImages ] );
 
 	const imageSizeOptions = useImageSizes(
-		imageData,
+		isDynamic ? dynamic.dynamicMedia : imageData,
 		isSelected,
 		getSettings
 	);
@@ -566,7 +602,6 @@ export default function GalleryEdit( props ) {
 		}
 	}, [ linkTo ] );
 
-	const hasImages = !! images.length;
 	const hasImageIds = hasImages && images.some( ( image ) => !! image.id );
 	const imagesUploading = images.some(
 		( img ) => ! img.id && img.url?.indexOf( 'blob:' ) === 0
@@ -594,7 +629,25 @@ export default function GalleryEdit( props ) {
 	);
 
 	const blockProps = useBlockProps( {
-		className: clsx( className, 'has-nested-images' ),
+		className: clsx(
+			className,
+			'has-nested-images',
+			// In dynamic mode there are no inner blocks and the gallery isn't
+			// rendered through the `Gallery` component, so the classes that
+			// component normally composes onto the `<figure>` (see `gallery.js`)
+			// must be added here to keep the preview's flex/crop layout matching
+			// the static gallery and the frontend.
+			isDynamic && [
+				layoutClassNames,
+				'blocks-gallery-grid',
+				{
+					[ `align${ align }` ]: align,
+					[ `columns-${ columns }` ]: columns !== undefined,
+					'columns-default': columns === undefined,
+					'is-cropped': imageCrop,
+				},
+			]
+		),
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
@@ -602,15 +655,46 @@ export default function GalleryEdit( props ) {
 		directInsert: true,
 		orientation: 'horizontal',
 		renderAppender: false,
+		// In dynamic mode nothing may be inserted: the images are resolved from
+		// the source, not authored as inner blocks. `allowedBlocks: []` enforces
+		// this in every context — unlike `templateLock: 'all'`, it isn't relaxed
+		// to `contentOnly` by a content-locked ancestor — so it blocks insertion
+		// and drag-and-drop (via `canInsertBlockType`). It's also what opts the
+		// gallery out of the List View: a block that can't be inserted into and
+		// has no inner blocks has nothing to navigate or add (see
+		// `shouldRenderBlockListView`). This reaches the block's list settings
+		// only while the inner blocks are mounted, which is why the dynamic view
+		// still renders the (empty) inner blocks.
+		allowedBlocks: isDynamic ? EMPTY_ARRAY : undefined,
 	} );
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	if ( ! hasImages ) {
+	if ( ! hasImages && ! isDynamic ) {
 		return (
 			<div { ...innerBlocksProps }>
 				{ innerBlocksProps.children }
-				{ mediaPlaceholder }
+				<MediaPlaceholder
+					handleUpload={ false }
+					icon={ sharedIcon }
+					labels={ {
+						title: __( 'Gallery' ),
+						instructions: PLACEHOLDER_TEXT,
+					} }
+					onSelect={ updateImages }
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					multiple
+					onError={ onUploadError }
+					{ ...mediaPlaceholderProps }
+				>
+					<Button
+						__next40pxDefaultSize
+						variant="secondary"
+						onClick={ dynamic.enableDynamicMode }
+					>
+						{ __( 'Use images attached to the post' ) }
+					</Button>
+				</MediaPlaceholder>
 			</div>
 		);
 	}
@@ -620,6 +704,11 @@ export default function GalleryEdit( props ) {
 	return (
 		<>
 			<InspectorControls>
+				<GallerySourcePanel
+					dynamic={ dynamic }
+					dropdownMenuProps={ dropdownMenuProps }
+					hasImages={ hasImages }
+				/>
 				<ToolsPanel
 					label={ __( 'Settings' ) }
 					resetAll={ () => {
@@ -642,12 +731,12 @@ export default function GalleryEdit( props ) {
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
-					{ images.length > 1 && (
+					{ displayedImageCount > 1 && (
 						<ToolsPanelItem
 							isShownByDefault
 							label={ __( 'Columns' ) }
 							hasValue={ () =>
-								!! columns && columns !== images.length
+								!! columns && columns !== displayedImageCount
 							}
 							onDeselect={ () => setColumnsNumber( undefined ) }
 						>
@@ -656,11 +745,16 @@ export default function GalleryEdit( props ) {
 								value={
 									columns
 										? columns
-										: defaultColumnsNumber( images.length )
+										: defaultColumnsNumber(
+												displayedImageCount
+										  )
 								}
 								onChange={ setColumnsNumber }
 								min={ 1 }
-								max={ Math.min( MAX_COLUMNS, images.length ) }
+								max={ Math.min(
+									MAX_COLUMNS,
+									displayedImageCount
+								) }
 								required
 							/>
 						</ToolsPanelItem>
@@ -825,7 +919,7 @@ export default function GalleryEdit( props ) {
 				</ToolbarDropdownMenu>
 			</BlockControls>
 			<>
-				{ ! multiGallerySelection && (
+				{ ! multiGallerySelection && ! isDynamic && (
 					<BlockControls group="other">
 						<MediaReplaceFlow
 							allowedTypes={ ALLOWED_MEDIA_TYPES }
@@ -846,15 +940,25 @@ export default function GalleryEdit( props ) {
 					clientId={ clientId }
 				/>
 			</>
-			<Gallery
-				{ ...props }
-				isContentLocked={ isContentLocked }
-				images={ images }
-				mediaPlaceholder={ ! hasImages ? mediaPlaceholder : undefined }
-				blockProps={ innerBlocksProps }
-				insertBlocksAfter={ insertBlocksAfter }
-				multiGallerySelection={ multiGallerySelection }
-			/>
+			{ isDynamic ? (
+				<GalleryDynamicView
+					dynamic={ dynamic }
+					blockProps={ blockProps }
+					innerBlocksProps={ innerBlocksProps }
+				/>
+			) : (
+				<Gallery
+					{ ...props }
+					isContentLocked={ isContentLocked }
+					images={ images }
+					mediaPlaceholder={
+						! hasImages ? mediaPlaceholder : undefined
+					}
+					blockProps={ innerBlocksProps }
+					insertBlocksAfter={ insertBlocksAfter }
+					multiGallerySelection={ multiGallerySelection }
+				/>
+			) }
 		</>
 	);
 }
