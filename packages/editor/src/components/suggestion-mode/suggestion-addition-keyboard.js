@@ -50,32 +50,32 @@ function getCandidateDocuments() {
 }
 
 /**
- * Turn typing in Suggest mode into an inline addition suggestion.
+ * Turn typing (and simple paste) in Suggest mode into an inline addition
+ * suggestion.
  *
- * In Suggest mode every ordinary edit is a suggestion, so newly typed text
- * should not land as permanent content — it should be wrapped in an in-content
+ * In Suggest mode every ordinary edit is a suggestion, so newly entered text
+ * should not land as permanent content — it is wrapped in an in-content
  * `core/suggestion` `<mark data-suggestion-type="add">` marker (Option B) keyed
  * to a freshly created suggestion note. The front-end render-strip then hides
  * the proposed text until the suggestion is accepted.
  *
- * This intercepts `beforeinput` (capture phase) for `insertText` at a collapsed
- * caret, prevents the native insertion, and writes the marked text into content
- * itself. A contiguous run of typing grows a single marker:
- *
- * - The first character of a run creates the suggestion note (async). While the
- *   note id is in flight, further characters are buffered and flushed together
- *   once it resolves — a brief one-time hitch at the start of a run, after which
- *   typing applies synchronously.
- * - Each subsequent contiguous character re-stamps the whole marker span so it
- *   stays one `<mark>` rather than fragmenting per keystroke
- *   (`growInlineAddition`).
- *
- * Type-over (typing with a non-collapsed selection) is handled here too: it
- * proposes deleting the selected text (a `del` marker) and adds the replacement
- * (an `add` run at the selection end), as two independent notes.
+ * - Typing intercepts `beforeinput` `insertText` (capture phase), cancels the
+ *   native insertion, and writes the marked text itself, advancing the caret
+ *   via `selectionChange`. A contiguous run grows one marker: the first
+ *   character opens the note (async; characters typed meanwhile buffer and
+ *   flush once the id resolves), and each subsequent character re-stamps the
+ *   whole marker span so it stays one `<mark>` (`growInlineAddition`).
+ * - Type-over (entering text with a non-collapsed selection) proposes deleting
+ *   the selected text (a `del` marker) and adds the replacement (an `add` run
+ *   at the selection end), as two independent notes.
+ * - A simple single-line paste is handled on the `paste` event (capture phase,
+ *   ahead of the editor's own paste pipeline) and inserted exactly like typed
+ *   text; over a selection it is a type-over. Multi-line / block-level paste is
+ *   left to the editor's paste pipeline.
  *
  * Out of scope for now (left to the existing overlay/diff path): IME
- * composition and paste.
+ * composition, and rich/inline formatting carried by a paste (the pasted text
+ * is inserted as a plain `add` run).
  *
  * @return {null} Renders nothing.
  */
@@ -93,21 +93,18 @@ export default function SuggestionAdditionKeyboard() {
 		( select ) => select( coreStore ).getCurrentUser()?.id ?? null,
 		[]
 	);
-	const {
-		getSelectionStart,
-		getSelectionEnd,
-		getBlockAttributes,
-		getBlockName,
-	} = useSelect( blockEditorStore );
+	const { getSelectionStart, getSelectionEnd, getBlockAttributes } =
+		useSelect( blockEditorStore );
 	const { updateBlockAttributes, selectionChange } =
 		useDispatch( blockEditorStore );
 	const { createSuggestion } = useSuggestionsProvider();
+	const { getBlockName } = useSelect( blockEditorStore );
 	const { requestInterceptorBypass } = useSuggestionOverlay();
 
 	// The in-progress addition run. `id` is null while the suggestion note is
-	// being created; characters typed in that window queue in `pending` and are
-	// flushed when the id resolves. `start`/`end` track the marker's live span;
-	// the caret sits at `end`.
+	// being created; characters entered in that window queue in `pending` and
+	// are flushed when the id resolves. `start`/`end` track the marker's live
+	// span; the caret sits at `end`.
 	const runRef = useRef( null );
 
 	const resetRun = useCallback( () => {
@@ -146,61 +143,26 @@ export default function SuggestionAdditionKeyboard() {
 		[ createSuggestion, getBlockName ]
 	);
 
-	const onBeforeInput = useCallback(
-		async ( event ) => {
-			// Only plain text insertion concerns us. Composition and paste are
-			// handled elsewhere (or left to the default path); a deletion event
-			// resets any open run so the next typing burst starts fresh.
-			if ( event.inputType !== 'insertText' ) {
-				resetRun();
-				return;
-			}
-			const text = event.data;
-			if ( ! text ) {
-				return;
-			}
-			if ( ! event.target?.isContentEditable ) {
-				resetRun();
-				return;
-			}
-
-			// We own insertion in Suggest mode — cancel the native edit. Must be
-			// synchronous, before any async work below.
-			event.preventDefault();
-
-			// A note request for the open run is still in flight: buffer the
-			// character regardless of where the caret reads right now (during a
-			// type-over the selection hasn't collapsed yet) and let the flush
-			// apply it once the id lands.
-			const inFlight = runRef.current;
-			if ( inFlight && inFlight.id === null ) {
-				inFlight.pending += text;
-				return;
-			}
-
-			const caret = readInlineCaret( getSelectionStart, getSelectionEnd );
-			if ( ! caret ) {
-				// Block-level / cross-attribute selection: nothing to anchor to.
-				resetRun();
-				return;
-			}
-			const { clientId, attributeKey, start, end } = caret;
-
-			// Type-over: typing with a non-collapsed selection. In Suggest mode
-			// that proposes removing the selected text (a `del` marker) and
-			// adding the replacement (an `add` run starting at the selection
-			// end). Two independent notes so each side resolves on its own.
-			if ( start !== end ) {
-				const run = {
-					clientId,
-					attributeKey,
-					id: null,
-					start: end,
-					end,
-					pending: text,
-				};
-				runRef.current = run;
-				try {
+	// Start a fresh addition run: open the note(s), write the marker(s), and
+	// flush any characters buffered while the request was in flight. A
+	// non-collapsed range is a type-over (propose deleting the selected text,
+	// then add the replacement at the selection end); a collapsed range is a
+	// plain insertion. The run stays open so contiguous typing can grow it.
+	const beginInsertion = useCallback(
+		async ( clientId, attributeKey, start, end, text ) => {
+			const isTypeOver = start !== end;
+			const markerStart = isTypeOver ? end : start;
+			const run = {
+				clientId,
+				attributeKey,
+				id: null,
+				start: markerStart,
+				end: markerStart,
+				pending: text,
+			};
+			runRef.current = run;
+			try {
+				if ( isTypeOver ) {
 					const baseValue =
 						getBlockAttributes( clientId )?.[ attributeKey ];
 					const delId = await openInlineNote(
@@ -231,60 +193,91 @@ export default function SuggestionAdditionKeyboard() {
 							[ attributeKey ]: deleted,
 						} );
 					}
-
-					const addId = await openInlineNote(
-						clientId,
-						attributeKey,
-						SUGGESTION_TYPE_ADDITION
-					);
-					if ( runRef.current !== run ) {
-						return;
-					}
-					if ( ! addId ) {
-						resetRun();
-						return;
-					}
-					const buffered = run.pending;
-					run.id = addId;
-					run.pending = '';
-					// Wrapping the selection in the `del` marker doesn't change
-					// the text length, so `end` is still the offset right after
-					// it — insert the replacement there.
-					const current =
-						getBlockAttributes( clientId )?.[ attributeKey ];
-					const inserted = insertInlineAddition( current, {
-						text: buffered,
-						attributes: buildSuggestionMarkerAttributes( {
-							id: addId,
-							type: SUGGESTION_TYPE_ADDITION,
-							authorId,
-						} ),
-						start: end,
-						end,
-					} );
-					run.start = end;
-					run.end = end + buffered.length;
-					commit( clientId, attributeKey, inserted, run.end );
-				} catch {
-					if ( runRef.current === run ) {
-						resetRun();
-					}
 				}
+
+				const addId = await openInlineNote(
+					clientId,
+					attributeKey,
+					SUGGESTION_TYPE_ADDITION
+				);
+				// The run may have been abandoned (caret moved, mode change)
+				// while the request was in flight.
+				if ( runRef.current !== run ) {
+					return;
+				}
+				if ( ! addId ) {
+					resetRun();
+					return;
+				}
+				const buffered = run.pending;
+				run.id = addId;
+				run.pending = '';
+				// Wrapping a type-over selection in the `del` marker doesn't
+				// change the text length, so `markerStart` (the selection end)
+				// is still the insertion point for the replacement.
+				const value = getBlockAttributes( clientId )?.[ attributeKey ];
+				const inserted = insertInlineAddition( value, {
+					text: buffered,
+					attributes: buildSuggestionMarkerAttributes( {
+						id: addId,
+						type: SUGGESTION_TYPE_ADDITION,
+						authorId,
+					} ),
+					start: run.start,
+					end: run.start,
+				} );
+				run.end = run.start + buffered.length;
+				commit( clientId, attributeKey, inserted, run.end );
+			} catch {
+				// `createSuggestion` already surfaces a notice on failure; drop
+				// the run so the next edit starts clean.
+				if ( runRef.current === run ) {
+					resetRun();
+				}
+			}
+		},
+		[
+			getBlockAttributes,
+			openInlineNote,
+			updateBlockAttributes,
+			requestInterceptorBypass,
+			commit,
+			resetRun,
+			authorId,
+		]
+	);
+
+	// Route a unit of inserted text (a typed character or a pasted run) to the
+	// right place: buffer it while a note request is in flight, grow the open
+	// marker when the caret is still at its trailing edge, or start a new run.
+	// `allowGrow` is false for paste so a pasted run is always its own marker.
+	const insertText = useCallback(
+		( text, allowGrow ) => {
+			const inFlight = runRef.current;
+			if ( inFlight && inFlight.id === null ) {
+				// A note request is still in flight: buffer regardless of where
+				// the caret reads now (during a type-over the selection hasn't
+				// collapsed yet) and let the flush apply it.
+				inFlight.pending += text;
 				return;
 			}
-
-			// Collapsed caret from here on.
-			const pos = start;
+			const caret = readInlineCaret( getSelectionStart, getSelectionEnd );
+			if ( ! caret ) {
+				// Block-level / cross-attribute selection: nothing to anchor to.
+				resetRun();
+				return;
+			}
+			const { clientId, attributeKey, start, end } = caret;
 			const run = runRef.current;
 			const isContiguous =
+				allowGrow &&
+				start === end &&
 				run &&
 				run.id !== null &&
 				run.clientId === clientId &&
 				run.attributeKey === attributeKey &&
-				run.end === pos;
+				run.end === start;
 
-			// Active run with a resolved id, caret still at its trailing edge:
-			// grow the existing marker synchronously.
 			if ( isContiguous ) {
 				const value = getBlockAttributes( clientId )?.[ attributeKey ];
 				const grown = growInlineAddition( value, {
@@ -302,68 +295,64 @@ export default function SuggestionAdditionKeyboard() {
 				return;
 			}
 
-			// New run: open a note and start a fresh marker. Buffer characters
-			// typed before the id resolves, then flush them in one insertion.
-			const newRun = {
-				clientId,
-				attributeKey,
-				id: null,
-				start: pos,
-				end: pos,
-				pending: text,
-			};
-			runRef.current = newRun;
-
-			try {
-				const addId = await openInlineNote(
-					clientId,
-					attributeKey,
-					SUGGESTION_TYPE_ADDITION
-				);
-				// The run may have been abandoned (caret moved, mode change)
-				// while the request was in flight.
-				if ( runRef.current !== newRun ) {
-					return;
-				}
-				if ( ! addId ) {
-					resetRun();
-					return;
-				}
-				const buffered = newRun.pending;
-				newRun.id = addId;
-				newRun.pending = '';
-				const value = getBlockAttributes( clientId )?.[ attributeKey ];
-				const inserted = insertInlineAddition( value, {
-					text: buffered,
-					attributes: buildSuggestionMarkerAttributes( {
-						id: addId,
-						type: SUGGESTION_TYPE_ADDITION,
-						authorId,
-					} ),
-					start: newRun.start,
-					end: newRun.start,
-				} );
-				newRun.end = newRun.start + buffered.length;
-				commit( clientId, attributeKey, inserted, newRun.end );
-			} catch {
-				// `createSuggestion` already surfaces a notice on failure;
-				// drop the run so the next keystroke starts clean.
-				if ( runRef.current === newRun ) {
-					resetRun();
-				}
-			}
+			beginInsertion( clientId, attributeKey, start, end, text );
 		},
 		[
 			getSelectionStart,
 			getSelectionEnd,
 			getBlockAttributes,
-			openInlineNote,
-			updateBlockAttributes,
-			requestInterceptorBypass,
+			beginInsertion,
 			commit,
 			resetRun,
 			authorId,
 		]
+	);
+
+	const onBeforeInput = useCallback(
+		( event ) => {
+			// Plain typing only. Composition, paste, deletions, and formatting
+			// commands reset any open run and fall through to their own paths.
+			if ( event.inputType !== 'insertText' ) {
+				resetRun();
+				return;
+			}
+			const text = event.data;
+			if ( ! text ) {
+				return;
+			}
+			if ( ! event.target?.isContentEditable ) {
+				resetRun();
+				return;
+			}
+			// We own insertion in Suggest mode — cancel the native edit.
+			event.preventDefault();
+			insertText( text, true );
+		},
+		[ insertText, resetRun ]
+	);
+
+	const onPaste = useCallback(
+		( event ) => {
+			if ( ! event.target?.isContentEditable ) {
+				return;
+			}
+			const plain = event.clipboardData?.getData?.( 'text/plain' ) ?? '';
+			// Only own simple inline paste: a single line of text. Multi-line or
+			// block-level clipboard content is left to the editor's paste
+			// pipeline (which may create blocks / transform markup), so do NOT
+			// preventDefault for it.
+			if ( ! plain || /[\r\n]/.test( plain ) ) {
+				resetRun();
+				return;
+			}
+			// Stop the editor's own paste handling so this paste becomes a
+			// suggestion marker instead of permanent content. `paste` fires
+			// ahead of `beforeinput`, so cancelling here is the reliable point.
+			event.preventDefault();
+			event.stopImmediatePropagation();
+			insertText( plain, false );
+		},
+		[ insertText, resetRun ]
 	);
 
 	useEffect( () => {
@@ -372,19 +361,32 @@ export default function SuggestionAdditionKeyboard() {
 			return undefined;
 		}
 		const docs = getCandidateDocuments();
-		const listener = ( event ) => onBeforeInput( event );
+		const beforeInputListener = ( event ) => onBeforeInput( event );
+		const pasteListener = ( event ) => onPaste( event );
 		// Capture phase so we cancel the edit before RichText/the browser apply
-		// it. `selectedBlockClientId` is in the deps so the listener re-attaches
+		// it. `selectedBlockClientId` is in the deps so the listeners re-attach
 		// once the canvas iframe (and its document) has mounted.
 		for ( const doc of docs ) {
-			doc.addEventListener( 'beforeinput', listener, true );
+			doc.addEventListener( 'beforeinput', beforeInputListener, true );
+			doc.addEventListener( 'paste', pasteListener, true );
 		}
 		return () => {
 			for ( const doc of docs ) {
-				doc.removeEventListener( 'beforeinput', listener, true );
+				doc.removeEventListener(
+					'beforeinput',
+					beforeInputListener,
+					true
+				);
+				doc.removeEventListener( 'paste', pasteListener, true );
 			}
 		};
-	}, [ isSuggestMode, selectedBlockClientId, onBeforeInput, resetRun ] );
+	}, [
+		isSuggestMode,
+		selectedBlockClientId,
+		onBeforeInput,
+		onPaste,
+		resetRun,
+	] );
 
 	return null;
 }
