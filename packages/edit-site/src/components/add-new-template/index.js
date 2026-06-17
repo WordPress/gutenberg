@@ -474,6 +474,7 @@ function useMissingTemplates(
 	const onClickPostFormatMenuItem = useCallback(
 		( { postFormats } ) => {
 			setPostFormats( postFormats );
+			onClickPostFormats?.();
 		},
 		[ setPostFormats, onClickPostFormats ]
 	);
