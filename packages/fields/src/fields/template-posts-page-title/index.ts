@@ -9,7 +9,7 @@ import { __ } from '@wordpress/i18n';
  */
 import type { HomeTemplateData } from '../../types';
 
-const postsPageTitleField: Field< HomeTemplateData > = {
+const templatePostsPageTitleField: Field< HomeTemplateData > = {
 	id: 'posttype_page_title',
 	type: 'text',
 	label: __( 'Blog title' ),
@@ -39,4 +39,4 @@ const postsPageTitleField: Field< HomeTemplateData > = {
 /**
  * Posts page title field for the `home`/`index` template summary.
  */
-export default postsPageTitleField;
+export default templatePostsPageTitleField;

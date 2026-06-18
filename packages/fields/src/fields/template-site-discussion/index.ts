@@ -9,7 +9,7 @@ import { __ } from '@wordpress/i18n';
  */
 import type { HomeTemplateData } from '../../types';
 
-const siteDiscussionField: Field< HomeTemplateData > = {
+const templateSiteDiscussionField: Field< HomeTemplateData > = {
 	id: 'default_comment_status',
 	type: 'text',
 	label: __( 'Discussion' ),
@@ -47,6 +47,6 @@ const siteDiscussionField: Field< HomeTemplateData > = {
 };
 
 /**
- * Site discussion field for the `home`/`index` template summary.
+ * Discussion field for the `home`/`index` template summary.
  */
-export default siteDiscussionField;
+export default templateSiteDiscussionField;

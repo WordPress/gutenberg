@@ -9,7 +9,7 @@ import { __ } from '@wordpress/i18n';
  */
 import type { HomeTemplateData } from '../../types';
 
-const postsPerPageField: Field< HomeTemplateData > = {
+const templatePostsPerPageField: Field< HomeTemplateData > = {
 	id: 'posts_per_page',
 	type: 'integer',
 	label: __( 'Posts per page' ),
@@ -31,4 +31,4 @@ const postsPerPageField: Field< HomeTemplateData > = {
 /**
  * Posts per page field for the `home`/`index` template summary.
  */
-export default postsPerPageField;
+export default templatePostsPerPageField;
