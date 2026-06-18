@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { camelCase } from 'change-case';
-import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 
 /**
  * WordPress dependencies
@@ -27,6 +26,7 @@ import {
 	isNumericID,
 	normalizeQueryForResolution,
 	saveCRDTDoc,
+	clearUnchangedEdits,
 } from './utils';
 import { fetchBlockPatterns } from './fetch';
 import { restoreSelection, getSelectionHistory } from './utils/crdt-selection';
@@ -208,41 +208,23 @@ export const getEntityRecord =
 								return;
 							}
 
-							// Clear edits that match the persisted record
-							// so the entity is no longer dirty after undo.
 							const persistedRecord = select.getEntityRecord(
 								kind,
 								name,
 								key
 							);
-							if ( persistedRecord ) {
-								edits = Object.fromEntries(
-									Object.entries( edits ).map(
-										( [ editKey, editValue ] ) => {
-											const persisted =
-												persistedRecord[ editKey ]
-													?.raw ??
-												persistedRecord[ editKey ];
-											return [
-												editKey,
-												fastDeepEqual(
-													editValue,
-													persisted
-												)
-													? undefined
-													: editValue,
-											];
-										}
-									)
-								);
-							}
 
 							dispatch( {
 								type: 'EDIT_ENTITY_RECORD',
 								kind,
 								name,
 								recordId: key,
-								edits,
+								// Clear edits that match the persisted record
+								// so the entity is no longer dirty after undo.
+								edits: clearUnchangedEdits(
+									edits,
+									persistedRecord
+								),
 								meta: {
 									undo: undefined,
 								},
