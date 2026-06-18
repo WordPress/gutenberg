@@ -17,12 +17,15 @@ const variations = [
 		// the specific source or options, so the variation's title and
 		// description describe the block whenever it runs in dynamic mode.
 		isActive: ( blockAttributes ) => !! blockAttributes.dynamicContent,
-		// `inserter` only: the variation appears as its own inserter entry, but
-		// is deliberately omitted from `transform` so the block toolbar's
-		// "Transform to variation" switcher isn't exposed (the inspector toggle
-		// is the intended way to switch modes). `isActive` still drives the
-		// block card's title/description regardless of scope.
-		scope: [ 'inserter' ],
+		// No scopes for now. While dynamic mode only supports the "attached to the
+		// current post" source, `'inserter'` is intentionally omitted: a dedicated
+		// inserter entry would surface in post-less contexts (templates, template
+		// parts, synced patterns) where there's no post to resolve images from. The
+		// entry point is instead the inspector toggle on a regular Gallery.
+		// `isActive` still relabels the block card to "Dynamic Gallery" regardless
+		// of scope. Revisit adding `'inserter'` in a follow-up as the feature grows
+		// beyond the post-attached source.
+		scope: [],
 	},
 ];
 
