@@ -632,23 +632,9 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 7.1.0
 	 * @var array
 	 */
-	const VIEWPORT_BREAKPOINTS = array(
+	const DEFAULT_VIEWPORT_BREAKPOINTS = array(
 		'mobile' => '480px',
 		'tablet' => '782px',
-	);
-
-	/**
-	 * Responsive breakpoint state keys and their corresponding CSS media queries.
-	 * These are available for all blocks and wrap their styles in the given media query.
-	 *
-	 * @deprecated Use get_responsive_media_queries() instead.
-	 *
-	 * @since 7.1.0
-	 * @var array
-	 */
-	const RESPONSIVE_BREAKPOINTS = array(
-		'@mobile' => '@media (width <= 480px)',
-		'@tablet' => '@media (480px < width <= 782px)',
 	);
 
 	/**
@@ -660,12 +646,12 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return array Viewport breakpoint sizes.
 	 */
 	public static function get_viewport_breakpoints( $viewport_settings = null ) {
-		$breakpoints = static::VIEWPORT_BREAKPOINTS;
+		$breakpoints = static::DEFAULT_VIEWPORT_BREAKPOINTS;
 		if ( ! is_array( $viewport_settings ) ) {
 			return $breakpoints;
 		}
 
-		foreach ( array_keys( static::VIEWPORT_BREAKPOINTS ) as $breakpoint ) {
+		foreach ( array_keys( static::DEFAULT_VIEWPORT_BREAKPOINTS ) as $breakpoint ) {
 			if (
 				isset( $viewport_settings[ $breakpoint ] ) &&
 				static::is_valid_viewport_breakpoint_size( $viewport_settings[ $breakpoint ] )
@@ -675,7 +661,7 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		if ( ! static::is_valid_viewport_breakpoint_order( $breakpoints ) ) {
-			return static::VIEWPORT_BREAKPOINTS;
+			return static::DEFAULT_VIEWPORT_BREAKPOINTS;
 		}
 
 		return $breakpoints;
@@ -760,7 +746,7 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		$sanitized = array();
-		foreach ( array_keys( static::VIEWPORT_BREAKPOINTS ) as $breakpoint ) {
+		foreach ( array_keys( static::DEFAULT_VIEWPORT_BREAKPOINTS ) as $breakpoint ) {
 			if (
 				isset( $viewport_settings[ $breakpoint ] ) &&
 				static::is_valid_viewport_breakpoint_size( $viewport_settings[ $breakpoint ] )
@@ -773,7 +759,7 @@ class WP_Theme_JSON_Gutenberg {
 			return $sanitized;
 		}
 
-		$breakpoints = static::VIEWPORT_BREAKPOINTS;
+		$breakpoints = static::DEFAULT_VIEWPORT_BREAKPOINTS;
 		foreach ( $sanitized as $breakpoint => $value ) {
 			$breakpoints[ $breakpoint ] = $value;
 		}
