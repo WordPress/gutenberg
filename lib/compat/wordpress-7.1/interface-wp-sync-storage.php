@@ -1,13 +1,18 @@
 <?php
 /**
- * WP_Sync_Storage interface
+ * WP_Sync_Storage_Gutenberg interface
+ *
+ * Gutenberg's override of the core WP_Sync_Storage interface. Named distinctly
+ * so the plugin's real-time collaboration stack fully replaces core's, rather
+ * than deferring to whichever class WordPress core happens to load first. At
+ * merge time the `_Gutenberg` suffix is dropped.
  *
  * @package gutenberg
  */
 
-if ( ! interface_exists( 'WP_Sync_Storage' ) ) {
+if ( ! interface_exists( 'WP_Sync_Storage_Gutenberg' ) ) {
 
-	interface WP_Sync_Storage {
+	interface WP_Sync_Storage_Gutenberg {
 		/**
 		 * Adds a sync update to a given room.
 		 *

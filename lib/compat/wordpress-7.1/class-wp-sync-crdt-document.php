@@ -49,7 +49,7 @@ if ( ! class_exists( 'WP_Sync_CRDT_Document' ) ) {
 					continue;
 				}
 
-				if ( WP_HTTP_Polling_Sync_Server::UPDATE_TYPE_SYNC_STEP1 === $update['type'] ) {
+				if ( WP_HTTP_Polling_Sync_Server_Gutenberg::UPDATE_TYPE_SYNC_STEP1 === $update['type'] ) {
 					continue;
 				}
 
@@ -69,12 +69,12 @@ if ( ! class_exists( 'WP_Sync_CRDT_Document' ) ) {
 		 */
 		public function apply_polling_update( string $base64, string $type ): void {
 			switch ( $type ) {
-				case WP_HTTP_Polling_Sync_Server::UPDATE_TYPE_COMPACTION:
-				case WP_HTTP_Polling_Sync_Server::UPDATE_TYPE_UPDATE:
+				case WP_HTTP_Polling_Sync_Server_Gutenberg::UPDATE_TYPE_COMPACTION:
+				case WP_HTTP_Polling_Sync_Server_Gutenberg::UPDATE_TYPE_UPDATE:
 					Yjs\applyUpdateV2( $this->doc, Yjs\Lib0\Buffer::fromBase64( $base64 ), 'server-polling-update' );
 					return;
 
-				case WP_HTTP_Polling_Sync_Server::UPDATE_TYPE_SYNC_STEP2:
+				case WP_HTTP_Polling_Sync_Server_Gutenberg::UPDATE_TYPE_SYNC_STEP2:
 					$this->read_sync_message(
 						$base64,
 						Yjs\Protocols\Sync::MESSAGE_YJS_SYNC_STEP2,

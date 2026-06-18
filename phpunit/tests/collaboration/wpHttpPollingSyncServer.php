@@ -1,6 +1,6 @@
 <?php
 /**
- * Tests for the WP_HTTP_Polling_Sync_Server REST endpoint.
+ * Tests for the WP_HTTP_Polling_Sync_Server_Gutenberg REST endpoint.
  *
  * @package gutenberg
  * @subpackage Collaboration
@@ -46,7 +46,7 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 		update_option( 'wp_collaboration_enabled', 1 );
 
 		// Reset storage post ID cache to ensure clean state after transaction rollback.
-		$reflection = new ReflectionProperty( 'WP_Sync_Post_Meta_Storage', 'storage_post_ids' );
+		$reflection = new ReflectionProperty( 'WP_Sync_Post_Meta_Storage_Gutenberg', 'storage_post_ids' );
 		if ( PHP_VERSION_ID < 80100 ) {
 			$reflection->setAccessible( true );
 		}
@@ -96,16 +96,6 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 	 */
 	private function get_post_room() {
 		return 'postType/post:' . self::$post_id;
-	}
-
-	/**
-	 * Skips tests that need Gutenberg's compatibility implementation.
-	 */
-	private function skip_if_sync_server_class_is_provided_by_wordpress_core(): void {
-		$reflection = new ReflectionClass( 'WP_HTTP_Polling_Sync_Server' );
-		if ( false === strpos( $reflection->getFileName(), '/wp-content/plugins/' ) ) {
-			$this->markTestSkipped( 'The active WP_HTTP_Polling_Sync_Server class is provided by WordPress core, not Gutenberg.' );
-		}
 	}
 
 	/**
@@ -224,6 +214,34 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
 		$this->assertArrayHasKey( '/wp-sync/v1/updates', $routes );
+	}
+
+	/**
+	 * The plugin must override core's registration of the sync route so that
+	 * the Gutenberg server (with the YPHP document and server-side compaction)
+	 * handles requests. If this fails, the plugin's code is not running and the
+	 * rest of this suite would silently exercise core's implementation instead.
+	 */
+	public function test_sync_route_is_served_by_gutenberg_server() {
+		$endpoints = rest_get_server()->get_routes()['/wp-sync/v1/updates'];
+
+		$handlers = array();
+		foreach ( $endpoints as $endpoint ) {
+			if ( isset( $endpoint['callback'][0] ) && is_object( $endpoint['callback'][0] ) ) {
+				$handlers[] = get_class( $endpoint['callback'][0] );
+			}
+		}
+
+		$this->assertContains(
+			'WP_HTTP_Polling_Sync_Server_Gutenberg',
+			$handlers,
+			'The Gutenberg sync server must handle the route, overriding any core registration.'
+		);
+		$this->assertNotContains(
+			'WP_HTTP_Polling_Sync_Server',
+			$handlers,
+			"Core's sync server must not remain registered for the route after the plugin override."
+		);
 	}
 
 	/**
@@ -371,8 +389,6 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 	 * @ticket 77243
 	 */
 	public function test_sync_permission_checked_per_room() {
-		$this->skip_if_sync_server_class_is_provided_by_wordpress_core();
-
 		wp_set_current_user( self::$editor_id );
 
 		$forbidden_rooms = array(
@@ -620,7 +636,7 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 		wp_set_current_user( self::$editor_id );
 
 		$rooms = array();
-		for ( $i = 0; $i < WP_HTTP_Polling_Sync_Server::MAX_ROOMS_PER_REQUEST + 1; $i++ ) {
+		for ( $i = 0; $i < WP_HTTP_Polling_Sync_Server_Gutenberg::MAX_ROOMS_PER_REQUEST + 1; $i++ ) {
 			$rooms[] = $this->build_room( 'root/site', $i + 1 );
 		}
 
@@ -637,7 +653,7 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 	public function test_sync_rejects_update_data_exceeding_max_length(): void {
 		wp_set_current_user( self::$editor_id );
 
-		$oversized_data = str_repeat( 'a', WP_HTTP_Polling_Sync_Server::MAX_UPDATE_DATA_SIZE + 1 );
+		$oversized_data = str_repeat( 'a', WP_HTTP_Polling_Sync_Server_Gutenberg::MAX_UPDATE_DATA_SIZE + 1 );
 
 		$request = new WP_REST_Request( 'POST', '/wp-sync/v1/updates' );
 		$request->set_body_params(
@@ -684,7 +700,7 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 		);
 
 		// Set an oversized raw body to trigger the route-level validate_callback.
-		$request->set_body( str_repeat( 'x', WP_HTTP_Polling_Sync_Server::MAX_BODY_SIZE + 1 ) );
+		$request->set_body( str_repeat( 'x', WP_HTTP_Polling_Sync_Server_Gutenberg::MAX_BODY_SIZE + 1 ) );
 
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertErrorResponse( 'rest_sync_body_too_large', $response, 413 );
@@ -803,8 +819,6 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 	}
 
 	public function test_sync_step1_returns_server_sync_step2_without_storing_step1() {
-		$this->skip_if_sync_server_class_is_provided_by_wordpress_core();
-
 		wp_set_current_user( self::$editor_id );
 
 		$room   = $this->get_post_room();
@@ -840,8 +854,6 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 	}
 
 	public function test_legacy_sync_step2_is_stored_as_regular_update() {
-		$this->skip_if_sync_server_class_is_provided_by_wordpress_core();
-
 		wp_set_current_user( self::$editor_id );
 
 		$room       = $this->get_post_room();
@@ -876,8 +888,6 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 	}
 
 	public function test_server_sync_step2_can_hydrate_client_from_stored_v2_updates() {
-		$this->skip_if_sync_server_class_is_provided_by_wordpress_core();
-
 		wp_set_current_user( self::$editor_id );
 
 		$room   = $this->get_post_room();
@@ -921,12 +931,10 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 	}
 
 	public function test_historical_sync_step1_rows_are_filtered_from_responses() {
-		$this->skip_if_sync_server_class_is_provided_by_wordpress_core();
-
 		wp_set_current_user( self::$editor_id );
 
 		$room    = $this->get_post_room();
-		$storage = new WP_Sync_Post_Meta_Storage();
+		$storage = new WP_Sync_Post_Meta_Storage_Gutenberg();
 
 		$this->assertTrue(
 			$storage->add_update(
@@ -954,12 +962,10 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 	}
 
 	public function test_historical_sync_step2_rows_are_applied_during_reconstruction() {
-		$this->skip_if_sync_server_class_is_provided_by_wordpress_core();
-
 		wp_set_current_user( self::$editor_id );
 
 		$room       = $this->get_post_room();
-		$storage    = new WP_Sync_Post_Meta_Storage();
+		$storage    = new WP_Sync_Post_Meta_Storage_Gutenberg();
 		$source_doc = $this->create_yjs_doc_with_text( 'historical step2', 203 );
 
 		$this->assertTrue(
@@ -1002,8 +1008,6 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 	}
 
 	public function test_sync_rejects_malformed_yjs_update_without_storing_payload() {
-		$this->skip_if_sync_server_class_is_provided_by_wordpress_core();
-
 		wp_set_current_user( self::$editor_id );
 
 		$room     = $this->get_post_room();
@@ -1038,8 +1042,6 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 	}
 
 	public function test_sync_multiple_updates_in_single_request() {
-		$this->skip_if_sync_server_class_is_provided_by_wordpress_core();
-
 		wp_set_current_user( self::$editor_id );
 
 		$room    = $this->get_post_room();
@@ -1155,8 +1157,6 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 	 */
 
 	public function test_sync_response_omits_should_compact_field() {
-		$this->skip_if_sync_server_class_is_provided_by_wordpress_core();
-
 		wp_set_current_user( self::$editor_id );
 
 		$room   = $this->get_post_room();
@@ -1178,8 +1178,6 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 	}
 
 	public function test_sync_server_does_not_compact_at_or_below_threshold() {
-		$this->skip_if_sync_server_class_is_provided_by_wordpress_core();
-
 		wp_set_current_user( self::$editor_id );
 
 		$room    = $this->get_post_room();
@@ -1203,8 +1201,6 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 	}
 
 	public function test_sync_server_compacts_above_threshold() {
-		$this->skip_if_sync_server_class_is_provided_by_wordpress_core();
-
 		wp_set_current_user( self::$editor_id );
 
 		$room        = $this->get_post_room();
@@ -1255,8 +1251,6 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 	}
 
 	public function test_sync_stale_compaction_is_stored_as_update_when_newer_compaction_exists() {
-		$this->skip_if_sync_server_class_is_provided_by_wordpress_core();
-
 		wp_set_current_user( self::$editor_id );
 
 		$room   = $this->get_post_room();

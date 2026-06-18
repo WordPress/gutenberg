@@ -1,11 +1,15 @@
 <?php
 /**
- * WP_Sync_Post_Meta_Storage class
+ * WP_Sync_Post_Meta_Storage_Gutenberg class
+ *
+ * Gutenberg's override of the core WP_Sync_Post_Meta_Storage class. Named
+ * distinctly so the plugin's real-time collaboration stack fully replaces
+ * core's. At merge time the `_Gutenberg` suffix is dropped.
  *
  * @package gutenberg
  */
 
-if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
+if ( ! class_exists( 'WP_Sync_Post_Meta_Storage_Gutenberg' ) ) {
 
 	/**
 	 * Core class that provides an interface for storing and retrieving sync
@@ -17,7 +21,7 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 	 *
 	 * @access private
 	 */
-	class WP_Sync_Post_Meta_Storage implements WP_Sync_Storage {
+	class WP_Sync_Post_Meta_Storage_Gutenberg implements WP_Sync_Storage_Gutenberg {
 		/**
 		 * Post type for sync storage.
 		 *

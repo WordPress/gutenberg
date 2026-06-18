@@ -12,12 +12,16 @@ if ( file_exists( $gutenberg_composer_autoload ) ) {
 	require_once $gutenberg_composer_autoload;
 }
 
-if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
-	require_once __DIR__ . '/interface-wp-sync-storage.php';
-	require_once __DIR__ . '/class-wp-sync-post-meta-storage.php';
-	require_once __DIR__ . '/class-wp-sync-crdt-document.php';
-	require_once __DIR__ . '/class-wp-http-polling-sync-server.php';
-}
+/*
+ * Load the plugin's real-time collaboration classes unconditionally. They are
+ * named with a `_Gutenberg` suffix so they coexist with (and override) any
+ * same-purpose classes WordPress core ships, rather than deferring to core via
+ * a class_exists guard. See gutenberg_register_collaboration_rest_routes().
+ */
+require_once __DIR__ . '/interface-wp-sync-storage.php';
+require_once __DIR__ . '/class-wp-sync-post-meta-storage-gutenberg.php';
+require_once __DIR__ . '/class-wp-sync-crdt-document.php';
+require_once __DIR__ . '/class-wp-http-polling-sync-server-gutenberg.php';
 require_once __DIR__ . '/class-wp-sync-save-server.php';
 
 if ( ! function_exists( 'gutenberg_register_sync_storage_post_type' ) ) {
@@ -65,14 +69,19 @@ if ( ! function_exists( 'gutenberg_register_collaboration_rest_routes' ) ) {
 	 * Registers REST API routes for collaborative editing.
 	 */
 	function gutenberg_register_collaboration_rest_routes(): void {
-		$sync_storage = new WP_Sync_Post_Meta_Storage();
-		$sync_server  = new WP_HTTP_Polling_Sync_Server( $sync_storage );
+		$sync_storage = new WP_Sync_Post_Meta_Storage_Gutenberg();
+		$sync_server  = new WP_HTTP_Polling_Sync_Server_Gutenberg( $sync_storage );
 		$sync_server->register_routes();
 
 		$sync_save_server = new WP_Sync_Save_Server();
 		$sync_save_server->register_routes();
 	}
-	add_action( 'rest_api_init', 'gutenberg_register_collaboration_rest_routes' );
+	/*
+	 * Priority 100 runs after core registers its own sync routes via
+	 * create_initial_rest_routes() (priority 99), so the plugin's registration
+	 * (which passes override = true) replaces core's for the shared route.
+	 */
+	add_action( 'rest_api_init', 'gutenberg_register_collaboration_rest_routes', 100 );
 }
 
 if ( ! function_exists( 'wp_collaboration_register_meta' ) ) {

@@ -1,6 +1,11 @@
 <?php
 /**
- * WP_HTTP_Polling_Sync_Server class
+ * WP_HTTP_Polling_Sync_Server_Gutenberg class
+ *
+ * Gutenberg's override of the core WP_HTTP_Polling_Sync_Server class. Named
+ * distinctly so the plugin's real-time collaboration server fully replaces
+ * core's, and its route registration (see collaboration.php) overrides core's.
+ * At merge time the `_Gutenberg` suffix is dropped.
  *
  * @package gutenberg
  */
@@ -13,7 +18,7 @@ if ( ! class_exists( 'WP_Sync_CRDT_Document' ) ) {
 	require_once __DIR__ . '/class-wp-sync-crdt-document.php';
 }
 
-if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
+if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server_Gutenberg' ) ) {
 
 	/**
 	 * Core class that contains an HTTP server used for collaborative editing.
@@ -21,7 +26,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 	 * @since 7.0.0
 	 * @access private
 	 */
-	class WP_HTTP_Polling_Sync_Server {
+	class WP_HTTP_Polling_Sync_Server_Gutenberg {
 		/**
 		 * REST API namespace.
 		 *
@@ -120,7 +125,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		 *
 		 * @since 7.0.0
 		 */
-		private WP_Sync_Storage $storage;
+		private WP_Sync_Storage_Gutenberg $storage;
 
 		/**
 		 * Factory used to reconstruct a CRDT document from stored updates.
@@ -135,10 +140,10 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		 *
 		 * @since 7.0.0
 		 *
-		 * @param WP_Sync_Storage $storage               Storage backend for sync updates.
-		 * @param callable|null   $crdt_document_factory Optional CRDT document factory for tests.
+		 * @param WP_Sync_Storage_Gutenberg $storage               Storage backend for sync updates.
+		 * @param callable|null             $crdt_document_factory Optional CRDT document factory for tests.
 		 */
-		public function __construct( WP_Sync_Storage $storage, ?callable $crdt_document_factory = null ) {
+		public function __construct( WP_Sync_Storage_Gutenberg $storage, ?callable $crdt_document_factory = null ) {
 			$this->storage               = $storage;
 			$this->crdt_document_factory = $crdt_document_factory ?? array( 'WP_Sync_CRDT_Document', 'from_update_snapshot' );
 		}
@@ -218,7 +223,10 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 							'type'     => 'array',
 						),
 					),
-				)
+				),
+				// Override core's registration of this route so the plugin's
+				// real-time collaboration server handles requests, not core's.
+				true
 			);
 		}
 
