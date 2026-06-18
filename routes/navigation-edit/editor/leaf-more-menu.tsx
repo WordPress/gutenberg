@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { chevronDown, chevronUp, moreVertical } from '@wordpress/icons';
+import {
+	addSubmenu,
+	chevronDown,
+	chevronUp,
+	moreVertical,
+} from '@wordpress/icons';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
@@ -9,6 +14,7 @@ import { __, sprintf } from '@wordpress/i18n';
 // @ts-expect-error - No type declarations available for @wordpress/block-editor
 import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
 import {
+	createBlock,
 	hasBlockSupport,
 	store as blocksStore,
 	// @ts-expect-error - No type declarations available for @wordpress/blocks
@@ -18,6 +24,10 @@ const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
 	placement: 'bottom-start',
 };
+
+function getBlockListRootClientId( clientId?: string | null ) {
+	return clientId || '';
+}
 
 export default function LeafMoreMenu( {
 	block,
@@ -41,6 +51,8 @@ export default function LeafMoreMenu( {
 		duplicateBlocks,
 		insertBeforeBlock,
 		insertAfterBlock,
+		replaceInnerBlocks,
+		selectBlock,
 	} = useDispatch( blockEditorStore );
 
 	const firstBlockTitle = BlockTitle( {
@@ -63,8 +75,11 @@ export default function LeafMoreMenu( {
 		rootClientId,
 		canDuplicate,
 		canInsertBlock,
+		canConvertToSubmenu,
 		canMove,
 		canRemove,
+		convertedSiblingBlocks,
+		firstConvertedSubmenuClientId,
 		isFirst,
 		isLast,
 	} = useSelect(
@@ -77,6 +92,7 @@ export default function LeafMoreMenu( {
 				getBlockCount,
 				getBlockIndex,
 				getBlockRootClientId,
+				getBlocks,
 				getBlocksByClientId,
 				getDirectInsertBlock,
 			} = select( blockEditorStore );
@@ -95,6 +111,36 @@ export default function LeafMoreMenu( {
 				( clientId ) =>
 					getBlockRootClientId( clientId ) === _rootClientId
 			);
+			const selectedClientIdsSet = new Set( selectedClientIds );
+			const canConvertSelectedBlocksToSubmenu =
+				selectionIsSameParent &&
+				blocks.every(
+					( selectedBlock ) =>
+						selectedBlock?.name === 'core/navigation-link'
+				);
+			let firstConvertedClientId: string | undefined;
+			const _convertedSiblingBlocks = canConvertSelectedBlocksToSubmenu
+				? getBlocks( getBlockListRootClientId( _rootClientId ) ).map(
+						( siblingBlock ) => {
+							if (
+								! selectedClientIdsSet.has(
+									siblingBlock.clientId
+								)
+							) {
+								return siblingBlock;
+							}
+
+							const convertedBlock = createBlock(
+								'core/navigation-submenu',
+								siblingBlock.attributes,
+								siblingBlock.innerBlocks
+							);
+							firstConvertedClientId ??= convertedBlock.clientId;
+
+							return convertedBlock;
+						}
+				  )
+				: [];
 
 			return {
 				rootClientId: _rootClientId,
@@ -121,9 +167,12 @@ export default function LeafMoreMenu( {
 						getBlock( firstClientId )?.name,
 						_rootClientId
 					),
+				canConvertToSubmenu: canConvertSelectedBlocksToSubmenu,
 				canMove:
 					selectionIsSameParent && canMoveBlocks( selectedClientIds ),
 				canRemove: canRemoveBlocks( selectedClientIds ),
+				convertedSiblingBlocks: _convertedSiblingBlocks,
+				firstConvertedSubmenuClientId: firstConvertedClientId,
 				isFirst: getBlockIndex( firstClientId ) === 0,
 				isLast:
 					getBlockIndex( lastClientId ) ===
@@ -199,6 +248,34 @@ export default function LeafMoreMenu( {
 									{ __( 'Add after' ) }
 								</MenuItem>
 							</>
+						) }
+						{ canConvertToSubmenu && (
+							<MenuItem
+								icon={ addSubmenu }
+								onClick={ () => {
+									/*
+									 * This route edits the wp_navigation block list
+									 * directly. Use replaceInnerBlocks here instead
+									 * of replaceBlock so Navigation Submenu is not
+									 * rejected for lacking a synthetic core/navigation
+									 * parent in this editor.
+									 */
+									replaceInnerBlocks(
+										getBlockListRootClientId(
+											rootClientId
+										),
+										convertedSiblingBlocks,
+										false
+									);
+									selectBlock(
+										firstConvertedSubmenuClientId,
+										null
+									);
+									onClose();
+								} }
+							>
+								{ __( 'Convert to Submenu' ) }
+							</MenuItem>
 						) }
 					</MenuGroup>
 					<MenuGroup>
