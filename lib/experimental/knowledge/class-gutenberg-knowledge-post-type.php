@@ -125,20 +125,20 @@ class Gutenberg_Knowledge_Post_Type {
 
 				'rest_controller_class' => Gutenberg_Knowledge_REST_Controller::class,
 
-				// "knowledge" is a mass noun, so the singular and plural bases
-				// must differ: with both set to `knowledge`, the generated
-				// per-post meta caps (`edit_knowledge_item`) would collide with
-				// the primitive caps (`edit_knowledge`). The `*_knowledge_item`
-				// forms are never granted; `map_meta_cap()` resolves them onto
-				// the primitives.
-				'capability_type'       => array( 'knowledge_item', 'knowledge' ),
+				// The primitive capabilities follow the standard plural form
+				// (`edit_knowledge_items`) while the per-post meta capabilities
+				// keep the singular form (`edit_knowledge_item`) — the same
+				// primitive/meta split WordPress uses for posts (`edit_posts` vs
+				// `edit_post`). The `*_knowledge_item` forms are never granted;
+				// `map_meta_cap()` resolves them onto the primitives.
+				'capability_type'       => array( 'knowledge_item', 'knowledge_items' ),
 				'map_meta_cap'          => true,
 				// `read` is remapped so Subscribers (who hold the base `read`
 				// cap) are blocked at the post-type door. Every other primitive
-				// defaults to a knowledge-prefixed cap synthesized by
+				// defaults to a knowledge_items-suffixed cap synthesized by
 				// `wp_maybe_grant_knowledge_caps()`.
 				'capabilities'          => array(
-					'read' => 'read_knowledge',
+					'read' => 'read_knowledge_items',
 				),
 				'supports'              => array( 'title', 'editor', 'excerpt', 'author', 'revisions' ),
 				'hierarchical'          => false,
@@ -182,26 +182,31 @@ class Gutenberg_Knowledge_Post_Type {
 					'update_item'           => __( 'Update Guideline Type', 'gutenberg' ),
 					'view_item'             => __( 'View Guideline Type', 'gutenberg' ),
 				),
+				/*
+				 * Editing and assigning terms reuse the `wp_knowledge` primitive
+				 * `edit_knowledge_items` so that anyone who can edit a knowledge
+				 * row can also lazily create and assign its type. Managing or
+				 * deleting the type vocabulary itself stays an administrator task.
+				 */
 				'capabilities'       => array(
 					'manage_terms' => 'manage_options',
-					'edit_terms'   => 'edit_knowledge',
+					'edit_terms'   => 'edit_knowledge_items',
 					'delete_terms' => 'manage_options',
-					'assign_terms' => 'edit_knowledge',
+					'assign_terms' => 'edit_knowledge_items',
 				),
 				'query_var'          => false,
 				'rewrite'            => false,
 				// Headless, like the post type: knowledge type terms are managed
 				// through the REST API, not a wp-admin taxonomy screen.
 				'show_ui'            => false,
-				'show_admin_column'  => true,
 				'show_in_nav_menus'  => false,
 				'show_in_rest'       => true,
 			)
 		);
 
 		add_filter( 'user_has_cap', 'wp_maybe_grant_knowledge_caps', 1, 4 );
-		add_action( 'save_post_' . self::POST_TYPE, '_wp_knowledge_ensure_default_type_term' );
-		add_filter( 'wp_insert_term_data', '_wp_knowledge_maybe_map_term_label', 10, 2 );
+		add_action( 'save_post_' . self::POST_TYPE, 'wp_knowledge_ensure_default_type_term' );
+		add_filter( 'wp_insert_term_data', 'wp_knowledge_maybe_map_term_label', 10, 2 );
 	}
 
 	/**

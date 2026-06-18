@@ -4,7 +4,7 @@
  * lib/experimental/knowledge/knowledge.php.
  *
  * Covers the wp_knowledge_types() registry and its filter, plus the
- * _wp_knowledge_maybe_map_term_label() label-mapping filter (both as a
+ * wp_knowledge_maybe_map_term_label() label-mapping filter (both as a
  * direct unit and end-to-end through wp_set_object_terms()).
  *
  * @package gutenberg
@@ -71,7 +71,7 @@ class Knowledge_Test extends WP_UnitTestCase {
 			'name' => 'note',
 			'slug' => 'note',
 		);
-		$output = _wp_knowledge_maybe_map_term_label( $input, 'category' );
+		$output = wp_knowledge_maybe_map_term_label( $input, 'category' );
 
 		$this->assertSame( $input, $output );
 	}
@@ -84,7 +84,7 @@ class Knowledge_Test extends WP_UnitTestCase {
 			'name' => 'My Custom Note',
 			'slug' => 'note',
 		);
-		$output = _wp_knowledge_maybe_map_term_label( $input, 'wp_knowledge_type' );
+		$output = wp_knowledge_maybe_map_term_label( $input, 'wp_knowledge_type' );
 
 		$this->assertSame( $input, $output );
 	}
@@ -97,7 +97,7 @@ class Knowledge_Test extends WP_UnitTestCase {
 			'name' => 'unknown',
 			'slug' => 'unknown',
 		);
-		$output = _wp_knowledge_maybe_map_term_label( $input, 'wp_knowledge_type' );
+		$output = wp_knowledge_maybe_map_term_label( $input, 'wp_knowledge_type' );
 
 		$this->assertSame( $input, $output );
 	}

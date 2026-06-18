@@ -58,7 +58,7 @@ if ( ! function_exists( 'wp_knowledge_types' ) ) {
 	}
 }
 
-if ( ! function_exists( '_wp_knowledge_ensure_default_type_term' ) ) {
+if ( ! function_exists( 'wp_knowledge_ensure_default_type_term' ) ) {
 	/**
 	 * Hook callback for the `save_post_wp_knowledge` action that assigns the
 	 * `note` fallback term when a knowledge post is saved without a type
@@ -70,7 +70,7 @@ if ( ! function_exists( '_wp_knowledge_ensure_default_type_term' ) ) {
 	 *
 	 * @param int $post_id Saved post ID.
 	 */
-	function _wp_knowledge_ensure_default_type_term( int $post_id ): void {
+	function wp_knowledge_ensure_default_type_term( int $post_id ): void {
 		if ( wp_is_post_revision( $post_id ) ) {
 			return;
 		}
@@ -103,9 +103,9 @@ if ( ! function_exists( 'wp_maybe_grant_knowledge_caps' ) ) {
 	 * is granted dynamically rather than stored on roles. Administrators (users
 	 * with `manage_options`) receive every knowledge capability. Contributors,
 	 * authors, and editors (users with `edit_posts`) may list and create knowledge
-	 * rows and fully manage their own private rows; publishing knowledge and acting
+	 * rows and fully manage their own private rows. Publishing knowledge and acting
 	 * on other users' rows is reserved for administrators. Subscribers receive
-	 * nothing and are stopped at the post-type door by the `read_knowledge` mapping.
+	 * nothing and are stopped at the post-type door by the `read_knowledge_items` mapping.
 	 *
 	 * @param bool[]   $allcaps An array of all the user's capabilities.
 	 * @param string[] $caps    Required primitive capabilities for the requested capability.
@@ -113,19 +113,19 @@ if ( ! function_exists( 'wp_maybe_grant_knowledge_caps' ) ) {
 	 * @param WP_User  $user    The user object.
 	 * @return bool[] Filtered array of the user's capabilities.
 	 */
-	function wp_maybe_grant_knowledge_caps( array $allcaps, array $caps, array $args, WP_User $user ): array {
+	function wp_maybe_grant_knowledge_caps( $allcaps, $caps, $args, $user ) {
 		if ( ! empty( $allcaps['manage_options'] ) ) {
-			$allcaps['read_knowledge']             = true;
-			$allcaps['edit_knowledge']             = true;
-			$allcaps['edit_others_knowledge']      = true;
-			$allcaps['edit_published_knowledge']   = true;
-			$allcaps['edit_private_knowledge']     = true;
-			$allcaps['publish_knowledge']          = true;
-			$allcaps['delete_knowledge']           = true;
-			$allcaps['delete_others_knowledge']    = true;
-			$allcaps['delete_published_knowledge'] = true;
-			$allcaps['delete_private_knowledge']   = true;
-			$allcaps['read_private_knowledge']     = true;
+			$allcaps['read_knowledge_items']             = true;
+			$allcaps['edit_knowledge_items']             = true;
+			$allcaps['edit_others_knowledge_items']      = true;
+			$allcaps['edit_published_knowledge_items']   = true;
+			$allcaps['edit_private_knowledge_items']     = true;
+			$allcaps['publish_knowledge_items']          = true;
+			$allcaps['delete_knowledge_items']           = true;
+			$allcaps['delete_others_knowledge_items']    = true;
+			$allcaps['delete_published_knowledge_items'] = true;
+			$allcaps['delete_private_knowledge_items']   = true;
+			$allcaps['read_private_knowledge_items']     = true;
 			return $allcaps;
 		}
 
@@ -133,12 +133,12 @@ if ( ! function_exists( 'wp_maybe_grant_knowledge_caps' ) ) {
 			return $allcaps;
 		}
 
-		// Ambient floor for Contributor+: `read_knowledge` clears the
-		// post-type read check; `edit_knowledge` clears the create and
+		// Ambient floor for Contributor+: `read_knowledge_items` clears the
+		// post-type read check; `edit_knowledge_items` clears the create and
 		// ownership checks that don't pass a post ID. Per-post primitives
 		// are granted only in the per-post branch below.
-		$allcaps['read_knowledge'] = true;
-		$allcaps['edit_knowledge'] = true;
+		$allcaps['read_knowledge_items'] = true;
+		$allcaps['edit_knowledge_items'] = true;
 
 		if ( ! isset( $args[0], $args[2] ) ) {
 			return $allcaps;
@@ -152,22 +152,37 @@ if ( ! function_exists( 'wp_maybe_grant_knowledge_caps' ) ) {
 		if (
 			! $post instanceof WP_Post ||
 			'wp_knowledge' !== $post->post_type ||
-			(int) $post->post_author !== (int) $user->ID ||
-			'private' !== $post->post_status
+			(int) $post->post_author !== (int) $user->ID
 		) {
 			return $allcaps;
 		}
 
-		$allcaps['edit_private_knowledge']   = true;
-		$allcaps['delete_knowledge']         = true;
-		$allcaps['delete_private_knowledge'] = true;
-		$allcaps['read_private_knowledge']   = true;
+		/*
+		 * A trashed row keeps its pre-trash status in `_wp_trash_meta_status`.
+		 * Resolve that effective status so the author keeps the ability to
+		 * restore or permanently delete their own row once it is in the trash. A
+		 * row trashed from a non-private status (only reachable for
+		 * administrators) still falls outside the grant.
+		 */
+		$status = $post->post_status;
+		if ( 'trash' === $status ) {
+			$status = get_post_meta( $post->ID, '_wp_trash_meta_status', true );
+		}
+
+		if ( 'private' !== $status ) {
+			return $allcaps;
+		}
+
+		$allcaps['edit_private_knowledge_items']   = true;
+		$allcaps['delete_knowledge_items']         = true;
+		$allcaps['delete_private_knowledge_items'] = true;
+		$allcaps['read_private_knowledge_items']   = true;
 
 		return $allcaps;
 	}
 }
 
-if ( ! function_exists( '_wp_knowledge_maybe_map_term_label' ) ) {
+if ( ! function_exists( 'wp_knowledge_maybe_map_term_label' ) ) {
 	/**
 	 * Hook callback for the `wp_insert_term_data` filter that swaps a
 	 * raw knowledge-type slug for its human-readable label when WordPress
@@ -186,7 +201,7 @@ if ( ! function_exists( '_wp_knowledge_maybe_map_term_label' ) ) {
 	 * @param string $taxonomy Taxonomy slug.
 	 * @return array Possibly modified term data.
 	 */
-	function _wp_knowledge_maybe_map_term_label( array $data, string $taxonomy ): array {
+	function wp_knowledge_maybe_map_term_label( array $data, string $taxonomy ): array {
 		if ( 'wp_knowledge_type' !== $taxonomy ) {
 			return $data;
 		}

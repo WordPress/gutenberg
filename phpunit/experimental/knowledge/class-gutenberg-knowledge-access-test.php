@@ -77,17 +77,17 @@ class Gutenberg_Knowledge_Access_Test extends WP_UnitTestCase {
 		$admin = $this->user( 'administrator' );
 
 		foreach ( array(
-			'read_knowledge',
-			'edit_knowledge',
-			'edit_others_knowledge',
-			'edit_published_knowledge',
-			'edit_private_knowledge',
-			'publish_knowledge',
-			'delete_knowledge',
-			'delete_others_knowledge',
-			'delete_published_knowledge',
-			'delete_private_knowledge',
-			'read_private_knowledge',
+			'read_knowledge_items',
+			'edit_knowledge_items',
+			'edit_others_knowledge_items',
+			'edit_published_knowledge_items',
+			'edit_private_knowledge_items',
+			'publish_knowledge_items',
+			'delete_knowledge_items',
+			'delete_others_knowledge_items',
+			'delete_published_knowledge_items',
+			'delete_private_knowledge_items',
+			'read_private_knowledge_items',
 		) as $cap ) {
 			$this->assertTrue( $admin->has_cap( $cap ), "Administrator should hold {$cap} ambiently" );
 		}
@@ -95,27 +95,27 @@ class Gutenberg_Knowledge_Access_Test extends WP_UnitTestCase {
 
 	/**
 	 * Editor, Author, and Contributor hold the post-type read floor
-	 * (`read_knowledge`) and the namespace-wide ownership cap
-	 * (`edit_knowledge`) ambiently. Publish, private, and others-scoped
+	 * (`read_knowledge_items`) and the namespace-wide ownership cap
+	 * (`edit_knowledge_items`) ambiently. Publish, private, and others-scoped
 	 * primitives are not granted without a post context.
 	 */
 	public function test_contributor_plus_ambient_caps() {
 		foreach ( array( 'editor', 'author', 'contributor' ) as $role ) {
 			$user = $this->user( $role );
 
-			foreach ( array( 'read_knowledge', 'edit_knowledge' ) as $cap ) {
+			foreach ( array( 'read_knowledge_items', 'edit_knowledge_items' ) as $cap ) {
 				$this->assertTrue( $user->has_cap( $cap ), "{$role} should hold {$cap} ambiently" );
 			}
 
 			foreach ( array(
-				'publish_knowledge',
-				'read_private_knowledge',
-				'edit_others_knowledge',
-				'delete_others_knowledge',
-				'edit_private_knowledge',
-				'edit_published_knowledge',
-				'delete_private_knowledge',
-				'delete_published_knowledge',
+				'publish_knowledge_items',
+				'read_private_knowledge_items',
+				'edit_others_knowledge_items',
+				'delete_others_knowledge_items',
+				'edit_private_knowledge_items',
+				'edit_published_knowledge_items',
+				'delete_private_knowledge_items',
+				'delete_published_knowledge_items',
 			) as $cap ) {
 				$this->assertFalse( $user->has_cap( $cap ), "{$role} must not hold {$cap} ambiently" );
 			}
@@ -129,17 +129,17 @@ class Gutenberg_Knowledge_Access_Test extends WP_UnitTestCase {
 		$subscriber = $this->user( 'subscriber' );
 
 		foreach ( array(
-			'read_knowledge',
-			'edit_knowledge',
-			'edit_others_knowledge',
-			'edit_published_knowledge',
-			'edit_private_knowledge',
-			'publish_knowledge',
-			'delete_knowledge',
-			'delete_others_knowledge',
-			'delete_published_knowledge',
-			'delete_private_knowledge',
-			'read_private_knowledge',
+			'read_knowledge_items',
+			'edit_knowledge_items',
+			'edit_others_knowledge_items',
+			'edit_published_knowledge_items',
+			'edit_private_knowledge_items',
+			'publish_knowledge_items',
+			'delete_knowledge_items',
+			'delete_others_knowledge_items',
+			'delete_published_knowledge_items',
+			'delete_private_knowledge_items',
+			'read_private_knowledge_items',
 		) as $cap ) {
 			$this->assertFalse( $subscriber->has_cap( $cap ), "Subscriber must not hold {$cap}" );
 		}
@@ -228,6 +228,25 @@ class Gutenberg_Knowledge_Access_Test extends WP_UnitTestCase {
 			}
 		}
 		return $cases;
+	}
+
+	/**
+	 * A Contributor keeps control of their own row after trashing it.
+	 *
+	 * Trashing flips the status to `trash`, but the pre-trash `private` status is
+	 * preserved in `_wp_trash_meta_status`, so the per-post grant must still apply
+	 * and let the author permanently delete (or restore) their own trashed row.
+	 */
+	public function test_contributor_can_delete_own_trashed_row() {
+		wp_set_current_user( self::$users['contributor'] );
+
+		$post_id = $this->create_knowledge_post( 'contributor', 'private' );
+
+		wp_trash_post( $post_id );
+		$this->assertSame( 'trash', get_post_status( $post_id ) );
+
+		$this->assertTrue( current_user_can( 'delete_post', $post_id ) );
+		$this->assertTrue( current_user_can( 'edit_post', $post_id ) );
 	}
 
 	/**

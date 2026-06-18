@@ -74,13 +74,23 @@ class Gutenberg_Knowledge_REST_Controller_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * The standard collection and single-item routes are registered.
+	 * The standard collection and single-item routes are registered, along with
+	 * the revisions routes. Autosave support is removed, so the autosaves routes
+	 * are not registered.
 	 */
 	public function test_register_routes(): void {
 		$routes = rest_get_server()->get_routes();
 
 		$this->assertArrayHasKey( self::REST_BASE, $routes, 'Collection route not registered.' );
 		$this->assertArrayHasKey( self::REST_BASE . '/(?P<id>[\d]+)', $routes, 'Single item route not registered.' );
+
+		// Revisions are supported.
+		$this->assertArrayHasKey( self::REST_BASE . '/(?P<parent>[\d]+)/revisions', $routes, 'Revisions collection route not registered.' );
+		$this->assertArrayHasKey( self::REST_BASE . '/(?P<parent>[\d]+)/revisions/(?P<id>[\d]+)', $routes, 'Revision single item route not registered.' );
+
+		// Autosave support is removed, so the autosaves routes are not registered.
+		$this->assertArrayNotHasKey( self::REST_BASE . '/(?P<id>[\d]+)/autosaves', $routes, 'Autosaves collection route should not be registered.' );
+		$this->assertArrayNotHasKey( self::REST_BASE . '/(?P<parent>[\d]+)/autosaves/(?P<id>[\d]+)', $routes, 'Autosave single item route should not be registered.' );
 	}
 
 	/**
@@ -191,7 +201,7 @@ class Gutenberg_Knowledge_REST_Controller_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Anonymous reads of the collection are rejected with `rest_forbidden`.
+	 * Anonymous reads of the collection are rejected with `rest_cannot_read`.
 	 */
 	public function test_get_items_blocks_anonymous(): void {
 		$this->create_knowledge_post( 'administrator', 'publish' );
@@ -202,7 +212,7 @@ class Gutenberg_Knowledge_REST_Controller_Test extends WP_UnitTestCase {
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertSame( 401, $response->get_status() );
-		$this->assertSame( 'rest_forbidden', $response->get_data()['code'] );
+		$this->assertSame( 'rest_cannot_read', $response->get_data()['code'] );
 	}
 
 	/**

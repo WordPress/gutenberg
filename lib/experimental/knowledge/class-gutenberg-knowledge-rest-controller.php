@@ -28,7 +28,7 @@ class Gutenberg_Knowledge_REST_Controller extends WP_REST_Posts_Controller {
 		$post_type = get_post_type_object( $this->post_type );
 		if ( ! current_user_can( $post_type->cap->read ) ) {
 			return new WP_Error(
-				'rest_forbidden',
+				'rest_cannot_read',
 				__( 'Sorry, you are not allowed to view knowledge.', 'gutenberg' ),
 				array( 'status' => rest_authorization_required_code() )
 			);

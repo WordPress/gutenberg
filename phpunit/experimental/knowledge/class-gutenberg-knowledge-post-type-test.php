@@ -59,33 +59,33 @@ class Gutenberg_Knowledge_Post_Type_Test extends WP_UnitTestCase {
 	 * The post type exposes a self-contained, knowledge-prefixed capability
 	 * namespace. The CPT-level `read` is remapped to keep Subscribers blocked
 	 * at the post-type door; every other primitive is auto-derived from the
-	 * plural base of `capability_type = array( 'knowledge_item', 'knowledge' )`
+	 * plural base of `capability_type = array( 'knowledge_item', 'knowledge_items' )`
 	 * and granted at runtime via the `user_has_cap` synthesis filter.
 	 */
 	public function test_post_type_uses_knowledge_prefixed_capabilities() {
 		$post_type = get_post_type_object( Gutenberg_Knowledge_Post_Type::POST_TYPE );
 
 		$this->assertNotFalse( $post_type );
-		$this->assertSame( 'read_knowledge', $post_type->cap->read );
-		$this->assertSame( 'edit_knowledge', $post_type->cap->create_posts );
-		$this->assertSame( 'edit_knowledge', $post_type->cap->edit_posts );
-		$this->assertSame( 'publish_knowledge', $post_type->cap->publish_posts );
-		$this->assertSame( 'read_private_knowledge', $post_type->cap->read_private_posts );
-		$this->assertSame( 'edit_private_knowledge', $post_type->cap->edit_private_posts );
-		$this->assertSame( 'edit_published_knowledge', $post_type->cap->edit_published_posts );
-		$this->assertSame( 'delete_private_knowledge', $post_type->cap->delete_private_posts );
-		$this->assertSame( 'delete_published_knowledge', $post_type->cap->delete_published_posts );
-		$this->assertSame( 'delete_knowledge', $post_type->cap->delete_posts );
-		$this->assertSame( 'edit_others_knowledge', $post_type->cap->edit_others_posts );
-		$this->assertSame( 'delete_others_knowledge', $post_type->cap->delete_others_posts );
+		$this->assertSame( 'read_knowledge_items', $post_type->cap->read );
+		$this->assertSame( 'edit_knowledge_items', $post_type->cap->create_posts );
+		$this->assertSame( 'edit_knowledge_items', $post_type->cap->edit_posts );
+		$this->assertSame( 'publish_knowledge_items', $post_type->cap->publish_posts );
+		$this->assertSame( 'read_private_knowledge_items', $post_type->cap->read_private_posts );
+		$this->assertSame( 'edit_private_knowledge_items', $post_type->cap->edit_private_posts );
+		$this->assertSame( 'edit_published_knowledge_items', $post_type->cap->edit_published_posts );
+		$this->assertSame( 'delete_private_knowledge_items', $post_type->cap->delete_private_posts );
+		$this->assertSame( 'delete_published_knowledge_items', $post_type->cap->delete_published_posts );
+		$this->assertSame( 'delete_knowledge_items', $post_type->cap->delete_posts );
+		$this->assertSame( 'edit_others_knowledge_items', $post_type->cap->edit_others_posts );
+		$this->assertSame( 'delete_others_knowledge_items', $post_type->cap->delete_others_posts );
 	}
 
 	/**
-	 * "knowledge" is a mass noun, so the singular capability base must differ
-	 * from the plural: with both set to `knowledge`, the per-post meta caps
-	 * would collide with the primitives above and `map_meta_cap()` would treat
-	 * primitive-intent checks like `current_user_can( 'edit_knowledge' )` as
-	 * per-post checks missing a post ID.
+	 * The per-post meta capabilities (derived from the singular `knowledge_item`
+	 * base) must not collide with the primitive capabilities (derived from the
+	 * plural `knowledge_items` base). A collision would make `map_meta_cap()`
+	 * treat primitive-intent checks like `current_user_can( 'edit_knowledge_items' )`
+	 * as per-post checks missing a post ID.
 	 */
 	public function test_post_type_meta_caps_do_not_collide_with_primitives() {
 		$post_type = get_post_type_object( Gutenberg_Knowledge_Post_Type::POST_TYPE );
@@ -240,7 +240,7 @@ class Gutenberg_Knowledge_Post_Type_Test extends WP_UnitTestCase {
 		$this->assertIsInt( $revision_id );
 		$this->assertGreaterThan( 0, $revision_id );
 
-		_wp_knowledge_ensure_default_type_term( $revision_id );
+		wp_knowledge_ensure_default_type_term( $revision_id );
 
 		$terms = wp_get_object_terms( $revision_id, Gutenberg_Knowledge_Post_Type::TAXONOMY );
 		$this->assertSame( array(), $terms );
