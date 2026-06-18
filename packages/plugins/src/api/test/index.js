@@ -54,7 +54,7 @@ describe( 'registerPlugin', () => {
 	it( 'fails to register a plugin without a render function', () => {
 		registerPlugin( 'another-plugin', {} );
 		expect( console ).toHaveErroredWith(
-			'The "render" property must be specified and must be a valid function.'
+			'The "render" property must be specified and must be a valid component.'
 		);
 	} );
 
