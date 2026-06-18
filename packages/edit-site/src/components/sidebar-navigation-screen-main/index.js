@@ -27,13 +27,6 @@ export function MainSidebarNavigationContent( { isBlockBasedTheme = true } ) {
 		<ItemGroup className="edit-site-sidebar-navigation-screen-main">
 			{ isBlockBasedTheme && (
 				<>
-					<SidebarNavigationItemGlobalStyles
-						to="/styles"
-						uid="global-styles-navigation-item"
-						icon={ styles }
-					>
-						{ __( 'Styles' ) }
-					</SidebarNavigationItemGlobalStyles>
 					<SidebarNavigationItemIdentity
 						to="/identity"
 						uid="identity-navigation-item"
@@ -41,14 +34,13 @@ export function MainSidebarNavigationContent( { isBlockBasedTheme = true } ) {
 					>
 						{ _x( 'Identity', 'site identity' ) }
 					</SidebarNavigationItemIdentity>
-					<SidebarNavigationItem
-						uid="navigation-navigation-item"
-						to="/navigation"
-						withChevron
-						icon={ navigation }
+					<SidebarNavigationItemGlobalStyles
+						to="/styles"
+						uid="global-styles-navigation-item"
+						icon={ styles }
 					>
-						{ __( 'Navigation' ) }
-					</SidebarNavigationItem>
+						{ __( 'Styles' ) }
+					</SidebarNavigationItemGlobalStyles>
 					<SidebarNavigationItem
 						uid="page-navigation-item"
 						to="/page"
@@ -58,12 +50,12 @@ export function MainSidebarNavigationContent( { isBlockBasedTheme = true } ) {
 						{ __( 'Pages' ) }
 					</SidebarNavigationItem>
 					<SidebarNavigationItem
-						uid="template-navigation-item"
-						to="/template"
+						uid="navigation-navigation-item"
+						to="/navigation"
 						withChevron
-						icon={ layout }
+						icon={ navigation }
 					>
-						{ __( 'Templates' ) }
+						{ __( 'Navigation' ) }
 					</SidebarNavigationItem>
 				</>
 			) }
@@ -85,6 +77,16 @@ export function MainSidebarNavigationContent( { isBlockBasedTheme = true } ) {
 			>
 				{ __( 'Patterns' ) }
 			</SidebarNavigationItem>
+			{ isBlockBasedTheme && (
+				<SidebarNavigationItem
+					uid="template-navigation-item"
+					to="/template"
+					withChevron
+					icon={ layout }
+				>
+					{ __( 'Templates' ) }
+				</SidebarNavigationItem>
+			) }
 		</ItemGroup>
 	);
 }
