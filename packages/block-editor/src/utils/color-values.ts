@@ -8,11 +8,14 @@
  * Returns `undefined` for plain values, non-strings, or any other
  * unrecognised format.
  *
- * @param {*}                  rawValue Raw style value stored in the style object.
- * @param {'color'|'gradient'} type     Preset type, e.g. `'color'` or `'gradient'`.
- * @return {string|undefined} The palette slug, or undefined.
+ * @param rawValue Raw style value stored in the style object.
+ * @param type     Preset type, e.g. `'color'` or `'gradient'`.
+ * @return The palette slug, or undefined.
  */
-export function extractPresetSlug( rawValue, type ) {
+export function extractPresetSlug(
+	rawValue: unknown,
+	type: 'color' | 'gradient'
+) {
 	if ( typeof rawValue !== 'string' ) {
 		return undefined;
 	}
