@@ -8,7 +8,7 @@
 /**
  * Render callback for core/tab-panel.
  *
- * @since 7.0.0
+ * @since 7.1.0
  *
  * @param array     $attributes Block attributes.
  * @param string    $content    Block content.
@@ -75,7 +75,7 @@ function block_core_tab_panel_render( array $attributes, string $content, \WP_Bl
  *
  * @hook init
  *
- * @since 7.0.0
+ * @since 7.1.0
  */
 function register_block_core_tab_panel() {
 	register_block_type_from_metadata(

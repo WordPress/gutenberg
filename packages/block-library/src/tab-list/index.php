@@ -13,7 +13,7 @@
  * tab-specific attributes (id, aria-controls, context) and interactivity
  * directives using data from the tabs-list context.
  *
- * @since 7.0.0
+ * @since 7.1.0
  *
  * @param array     $attributes Block attributes.
  * @param string    $content    Block content (rendered buttons from save.js).
@@ -58,7 +58,7 @@ function block_core_tab_list_render_callback( array $attributes, string $content
 /**
  * Registers the `core/tab-list` block on the server.
  *
- * @since 7.0.0
+ * @since 7.1.0
  */
 function register_block_core_tab_list() {
 	register_block_type_from_metadata(
