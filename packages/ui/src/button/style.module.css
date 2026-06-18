@@ -241,7 +241,7 @@
 			}
 
 			@media ( forced-colors: active ) {
-				color: Canvas;
+				color: ButtonFace;
 			}
 
 			* {
