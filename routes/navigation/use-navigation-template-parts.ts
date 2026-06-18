@@ -36,6 +36,8 @@ const FALLBACK_NAVIGATION_QUERY = {
 
 export default function useNavigationTemplateParts(): {
 	partMenuRefs: TemplatePartMenuRef[];
+	templateParts: TemplatePartRecord[];
+	editedContentByPartId: Record< string, string | { raw?: string } >;
 	isResolving: boolean;
 } {
 	const { isReady: areEditorAssetsReady } = useEditorAssets();
@@ -115,6 +117,8 @@ export default function useNavigationTemplateParts(): {
 
 	return {
 		partMenuRefs,
+		templateParts: ( templateParts as TemplatePartRecord[] ) ?? [],
+		editedContentByPartId,
 		isResolving:
 			isResolvingTemplateParts ||
 			isResolvingFallbackMenu ||

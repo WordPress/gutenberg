@@ -27,25 +27,41 @@
 }
 
 .routes-navigation-locations-canvas__toolbar {
-	align-items: flex-start;
+	align-items: center;
 	border-bottom: 1px solid #e0e0e0;
 	display: flex;
 	gap: 24px;
 	justify-content: space-between;
 	margin-bottom: 24px;
-	padding-bottom: 16px;
+	padding-bottom: 20px;
 }
 
 .routes-navigation-locations-canvas__toolbar-copy {
 	display: grid;
-	gap: 4px;
+	gap: 6px;
+	min-width: 0;
+}
+
+.routes-navigation-locations-canvas__title {
+	margin: 0;
+}
+
+.routes-navigation-locations-canvas__actions {
+	align-items: center;
+	display: flex;
+	flex-shrink: 0;
+	gap: 8px;
+	justify-content: flex-end;
 }
 
 .routes-navigation-locations-canvas__switcher {
 	display: flex;
-	flex-wrap: wrap;
-	gap: 8px;
 	justify-content: flex-end;
+	min-width: 220px;
+}
+
+.routes-navigation-locations-canvas__switcher .components-input-control__container {
+	min-width: 180px;
 }
 
 .routes-navigation-locations-canvas__previews {
@@ -81,4 +97,89 @@
 	padding: 0;
 	text-align: initial;
 	width: 100%;
+}
+
+.routes-navigation-choose-location-modal {
+	height: min(720px, calc(100vh - 48px));
+	width: min(900px, calc(100vw - 48px));
+}
+
+.routes-navigation-choose-location-modal .components-modal__content {
+	display: flex;
+	flex-direction: column;
+	margin-bottom: 0;
+	overflow: hidden;
+}
+
+.routes-navigation-choose-location-modal .components-modal__children-container {
+	display: flex;
+	flex: 1;
+	min-height: 0;
+}
+
+.routes-navigation-choose-location-modal__content {
+	display: flex;
+	flex: 1;
+	min-height: 0;
+	width: 100%;
+}
+
+.routes-navigation-choose-location-modal .dataviews-wrapper {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	min-height: 0;
+}
+
+.routes-navigation-choose-location-modal__controls {
+	display: grid;
+	flex-shrink: 0;
+	gap: 8px;
+	padding: 0 var(--wpds-dimension-padding-2xl) var(--wpds-dimension-padding-lg);
+}
+
+.routes-navigation-choose-location-modal__toolbar {
+	align-items: center;
+	display: flex;
+	gap: 12px;
+	justify-content: flex-start;
+	min-height: 40px;
+}
+
+.routes-navigation-choose-location-modal__filters {
+	width: fit-content;
+}
+
+.routes-navigation-choose-location-modal__grid {
+	flex: 1;
+	min-height: 0;
+	overflow: auto;
+}
+
+.routes-navigation-choose-location-modal__grid .dataviews-view-grid__media-actions {
+	display: none;
+}
+
+.routes-navigation-choose-location-modal__preview {
+	aspect-ratio: 16 / 9;
+	background: #f6f7f7;
+	overflow: hidden;
+}
+
+.routes-navigation-choose-location-modal__footer {
+	align-items: center;
+	background: #fff;
+	border-top: 1px solid #e0e0e0;
+	display: flex;
+	flex-shrink: 0;
+	gap: 16px;
+	justify-content: space-between;
+	margin-top: auto;
+	padding-top: 16px;
+}
+
+.routes-navigation-choose-location-modal__empty-state {
+	inline-size: min(100%, 420px);
+	margin: auto;
+	text-align: center;
 }

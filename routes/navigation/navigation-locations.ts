@@ -4,12 +4,13 @@
 import { decodeEntities } from '@wordpress/html-entities';
 import { __, sprintf } from '@wordpress/i18n';
 // @ts-expect-error - No type declarations available for @wordpress/blocks.
-import { parse } from '@wordpress/blocks';
+import { parse, serialize } from '@wordpress/blocks';
 
 type ParsedBlock = {
 	name?: string;
 	attributes?: {
 		ref?: number | string;
+		__unstableLocation?: string;
 	};
 	innerBlocks?: ParsedBlock[];
 };
@@ -48,6 +49,29 @@ export type TemplatePartMenuRef = {
 	menuIds: number[];
 };
 
+const EXPLICITLY_UNASSIGNED_NAVIGATION_LOCATION = 'rsm-unassigned';
+
+function getTemplatePartAreaPriority( part: TemplatePartRecord ) {
+	switch ( part.area ) {
+		case 'header':
+			return 0;
+		case 'footer':
+			return 1;
+		default:
+			return 2;
+	}
+}
+
+export function compareTemplatePartsByArea(
+	firstPart: TemplatePartRecord,
+	secondPart: TemplatePartRecord
+) {
+	return (
+		getTemplatePartAreaPriority( firstPart ) -
+		getTemplatePartAreaPriority( secondPart )
+	);
+}
+
 export function getTemplatePartTitle( part: TemplatePartRecord ) {
 	const title =
 		typeof part.title === 'string'
@@ -58,6 +82,12 @@ export function getTemplatePartTitle( part: TemplatePartRecord ) {
 }
 
 export function getLocationLabel( part: TemplatePartRecord ) {
+	const title = getTemplatePartTitle( part );
+
+	if ( title ) {
+		return title;
+	}
+
 	switch ( part.area ) {
 		case 'header':
 			return __( 'Header' );
@@ -99,7 +129,7 @@ export function getLocationsSummary( locations: NavigationLocation[] ) {
 	);
 }
 
-function getRawContent(
+export function getTemplatePartRawContent(
 	part: TemplatePartRecord,
 	editedContent?: string | { raw?: string }
 ) {
@@ -110,6 +140,113 @@ function getRawContent(
 	}
 
 	return typeof part.content === 'string' ? part.content : part.content?.raw;
+}
+
+function isNavigationBlock( block: ParsedBlock ) {
+	return block.name === 'core/navigation';
+}
+
+function hasNavigationBlockInTree( blocks: ParsedBlock[] ) {
+	const stack = [ ...blocks ];
+
+	while ( stack.length ) {
+		const { innerBlocks = [], ...block } = stack.shift() ?? {};
+
+		if ( innerBlocks.length ) {
+			stack.unshift( ...innerBlocks );
+		}
+
+		if ( isNavigationBlock( block ) ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+function assignFirstNavigationBlockRef(
+	blocks: ParsedBlock[],
+	navigationId: number
+) {
+	for ( const block of blocks ) {
+		if ( isNavigationBlock( block ) ) {
+			const attributes = { ...( block.attributes ?? {} ) };
+			delete attributes.__unstableLocation;
+
+			block.attributes = {
+				...attributes,
+				ref: navigationId,
+			};
+
+			return true;
+		}
+
+		if (
+			block.innerBlocks?.length &&
+			assignFirstNavigationBlockRef( block.innerBlocks, navigationId )
+		) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+function markFirstNavigationBlockAsUnassigned( blocks: ParsedBlock[] ) {
+	for ( const block of blocks ) {
+		if ( isNavigationBlock( block ) ) {
+			const { ref, ...attributes } = block.attributes ?? {};
+
+			// A Navigation block without a ref can fall back to a menu
+			// automatically. Marking it as explicitly unassigned lets this
+			// editor UI distinguish "no menu here" from "use the fallback".
+			block.attributes = {
+				...attributes,
+				__unstableLocation: EXPLICITLY_UNASSIGNED_NAVIGATION_LOCATION,
+			};
+
+			return true;
+		}
+
+		if (
+			block.innerBlocks?.length &&
+			markFirstNavigationBlockAsUnassigned( block.innerBlocks )
+		) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+function removeNavigationBlockRef(
+	blocks: ParsedBlock[],
+	navigationId: number
+) {
+	for ( const block of blocks ) {
+		if (
+			isNavigationBlock( block ) &&
+			Number( block.attributes?.ref ) === navigationId
+		) {
+			const { ref, ...attributes } = block.attributes ?? {};
+
+			block.attributes = {
+				...attributes,
+				__unstableLocation: EXPLICITLY_UNASSIGNED_NAVIGATION_LOCATION,
+			};
+
+			return true;
+		}
+
+		if (
+			block.innerBlocks?.length &&
+			removeNavigationBlockRef( block.innerBlocks, navigationId )
+		) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 function getReferencedMenuIds(
@@ -130,6 +267,13 @@ function getReferencedMenuIds(
 			continue;
 		}
 
+		if (
+			block.attributes?.__unstableLocation ===
+			EXPLICITLY_UNASSIGNED_NAVIGATION_LOCATION
+		) {
+			continue;
+		}
+
 		if ( block.attributes?.ref ) {
 			const menuId = Number( block.attributes.ref );
 
@@ -147,6 +291,62 @@ function getReferencedMenuIds(
 	return menuIds;
 }
 
+export function templatePartHasNavigationBlock(
+	part: TemplatePartRecord,
+	editedContent?: string | { raw?: string }
+) {
+	const rawContent = getTemplatePartRawContent( part, editedContent );
+
+	if ( ! rawContent ) {
+		return false;
+	}
+
+	return hasNavigationBlockInTree( parse( rawContent ) );
+}
+
+export function assignNavigationMenuToFirstBlock(
+	part: TemplatePartRecord,
+	navigationId: number,
+	editedContent?: string | { raw?: string }
+) {
+	const rawContent = getTemplatePartRawContent( part, editedContent );
+
+	if ( ! rawContent ) {
+		return;
+	}
+
+	const blocks = parse( rawContent );
+
+	if ( ! assignFirstNavigationBlockRef( blocks, navigationId ) ) {
+		return;
+	}
+
+	return serialize( blocks );
+}
+
+export function removeNavigationMenuFromFirstBlock(
+	part: TemplatePartRecord,
+	navigationId: number,
+	editedContent?: string | { raw?: string }
+) {
+	const rawContent = getTemplatePartRawContent( part, editedContent );
+
+	if ( ! rawContent ) {
+		return;
+	}
+
+	const blocks = parse( rawContent );
+
+	if (
+		! removeNavigationBlockRef( blocks, navigationId ) &&
+		! markFirstNavigationBlockAsUnassigned( blocks )
+	) {
+		return;
+	}
+
+	return serialize( blocks );
+}
+
 export function getTemplatePartMenuRefs(
 	templateParts: TemplatePartRecord[] | undefined,
 	fallbackMenuId?: number,
@@ -158,7 +358,7 @@ export function getTemplatePartMenuRefs(
 
 	return templateParts.reduce(
 		( accumulator: TemplatePartMenuRef[], part ) => {
-			const rawContent = getRawContent(
+			const rawContent = getTemplatePartRawContent(
 				part,
 				editedContentByPartId[ String( part.id ) ]
 			);
@@ -173,7 +373,14 @@ export function getTemplatePartMenuRefs(
 			);
 
 			if ( menuIds.length ) {
-				accumulator.push( { part, menuIds } );
+				accumulator.push( {
+					part: {
+						...part,
+						content: rawContent,
+						blocks: undefined,
+					},
+					menuIds,
+				} );
 			}
 
 			return accumulator;
@@ -210,6 +417,15 @@ export function buildNavigationLocationsMap(
 				},
 			];
 		}
+	}
+
+	for ( const menuId of Object.keys( map ) ) {
+		map[ Number( menuId ) ].sort( ( firstLocation, secondLocation ) =>
+			compareTemplatePartsByArea(
+				firstLocation.part,
+				secondLocation.part
+			)
+		);
 	}
 
 	return map;

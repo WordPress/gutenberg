@@ -10,6 +10,7 @@
 		"@wordpress/blocks": "file:../../packages/blocks",
 		"@wordpress/components": "file:../../packages/components",
 		"@wordpress/core-data": "file:../../packages/core-data",
+		"@wordpress/dataviews": "file:../../packages/dataviews",
 		"@wordpress/data": "file:../../packages/data",
 		"@wordpress/element": "file:../../packages/element",
 		"@wordpress/html-entities": "file:../../packages/html-entities",

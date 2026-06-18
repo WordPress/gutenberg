@@ -24,16 +24,17 @@ type NavigationRecord = {
 
 function Canvas() {
 	const searchParams = useSearch( { from: '/navigation/list' } );
+	const selectedSearchId = searchParams.ids?.[ 0 ];
 	const { records: navigationMenus } = useEntityRecords(
 		'postType',
 		NAVIGATION_POST_TYPE,
 		NAVIGATION_MENUS_QUERY
 	);
-	const selectedId = searchParams.ids?.[ 0 ]
-		? Number( searchParams.ids[ 0 ] )
+	const selectedNavigationId = selectedSearchId
+		? Number.parseInt( selectedSearchId.toString(), 10 )
 		: ( navigationMenus as NavigationRecord[] | undefined )?.[ 0 ]?.id;
 
-	return <NavigationLocationsCanvas navigationId={ selectedId } />;
+	return <NavigationLocationsCanvas navigationId={ selectedNavigationId } />;
 }
 
 export const canvas = Canvas;
