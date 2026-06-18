@@ -6,6 +6,7 @@ import * as Tooltip from '../';
 const meta: Meta< typeof Tooltip.Root > = {
 	title: 'Design System/Components/Tooltip',
 	component: Tooltip.Root,
+	tags: [ 'manifest' ],
 	subcomponents: {
 		'Tooltip.Provider': Tooltip.Provider,
 		'Tooltip.Trigger': Tooltip.Trigger,
@@ -15,9 +16,8 @@ const meta: Meta< typeof Tooltip.Root > = {
 	},
 	parameters: {
 		componentStatus: {
-			status: 'use-with-caution',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of overlays compatibility. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };

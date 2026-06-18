@@ -6,9 +6,14 @@
 
 - `DataViewsPicker`: `DataViewsPicker.BulkActionToolbar` now renders only the bulk-selection info and action buttons, without pagination, matching `DataViews.BulkActionToolbar`. The full footer it previously rendered (including pagination) is now exposed as `DataViewsPicker.Footer`, matching `DataViews.Footer`. [#79180](https://github.com/WordPress/gutenberg/pull/79180)
 
+### Bug Fix
+
+- DataForm panel layout: use `overflow: clip` on field controls so focus rings of inner elements are no longer clipped. [#79275](https://github.com/WordPress/gutenberg/pull/79275)
+
 ### Code Quality
 
 - Move `@types/react` from `dependencies` to an optional peer dependency so consumers' React type version is used [#79095](https://github.com/WordPress/gutenberg/pull/79095).
+- DataForm panel layout: remove button/dropdown-specific overrides from `.dataforms-layouts-panel__field-control`; those overrides are no longer needed. [#79275](https://github.com/WordPress/gutenberg/pull/79275)
 
 ### Internal
 

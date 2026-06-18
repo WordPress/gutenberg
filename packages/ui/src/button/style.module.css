@@ -10,7 +10,7 @@
 
 		.button {
 			/* Internal variables */
-			--wp-ui-button-font-weight: 499;
+			--wp-ui-button-font-weight: var(--wpds-typography-font-weight-medium);
 
 			--wp-ui-button-background-color: var(--wpds-color-background-interactive-brand-strong);
 			--wp-ui-button-background-color-active: var(--wpds-color-background-interactive-brand-strong-active);
