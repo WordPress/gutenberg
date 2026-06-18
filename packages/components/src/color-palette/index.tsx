@@ -33,6 +33,7 @@ import type {
 	CustomColorPickerDropdownProps,
 	MultiplePalettesProps,
 	PaletteObject,
+	PrivateColorPaletteProps,
 	SinglePaletteProps,
 } from './types';
 import type { WordPressComponentProps } from '../context';
@@ -187,7 +188,7 @@ export function CustomColorPickerDropdown( {
 }
 
 function UnforwardedColorPalette(
-	props: WordPressComponentProps< ColorPaletteProps, 'div' >,
+	props: WordPressComponentProps< PrivateColorPaletteProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {
@@ -367,6 +368,30 @@ function UnforwardedColorPalette(
 }
 
 /**
+ * Private `ColorPalette` variant that additionally supports rendering a
+ * contextual `Notice` via `noticeProps`. Exposed to Core through the components
+ * package's private APIs; not part of the public component surface.
+ */
+export const PrivateColorPalette = forwardRef( UnforwardedColorPalette );
+PrivateColorPalette.displayName = 'ColorPalette';
+
+function UnforwardedPublicColorPalette(
+	props: WordPressComponentProps< ColorPaletteProps, 'div' >,
+	forwardedRef: ForwardedRef< any >
+) {
+	// The `noticeProps` API is intentionally limited to the private variant.
+	// Force it off here so it can never be injected through the public
+	// component, even by untyped (JS) callers spreading arbitrary props.
+	return (
+		<PrivateColorPalette
+			ref={ forwardedRef }
+			{ ...props }
+			noticeProps={ undefined }
+		/>
+	);
+}
+
+/**
  * Allows the user to pick a color from a list of pre-defined color entries.
  *
  * ```jsx
@@ -390,7 +415,7 @@ function UnforwardedColorPalette(
  * } );
  * ```
  */
-export const ColorPalette = forwardRef( UnforwardedColorPalette );
+export const ColorPalette = forwardRef( UnforwardedPublicColorPalette );
 ColorPalette.displayName = 'ColorPalette';
 
 export default ColorPalette;

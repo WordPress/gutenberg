@@ -10,7 +10,6 @@ import { __ } from '@wordpress/i18n';
 import {
 	BaseControl,
 	__experimentalVStack as VStack,
-	ColorPalette,
 	GradientPicker,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
@@ -21,7 +20,7 @@ import {
 import { useSettings } from '../use-settings';
 import { unlock } from '../../lock-unlock';
 
-const { Tabs } = unlock( componentsPrivateApis );
+const { ColorPalette, Tabs } = unlock( componentsPrivateApis );
 const colorsAndGradientKeys = [
 	'colors',
 	'disableCustomColors',

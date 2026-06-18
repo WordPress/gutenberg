@@ -10,7 +10,6 @@
 
 -   `BaseControl`: Apply `text-wrap: pretty` to help text to avoid typographic widows ([#79112](https://github.com/WordPress/gutenberg/pull/79112)).
 -   `Button`, `DropdownMenu`, `FormToggle`, `Modal`, `Panel`, `RadioControl`, `Toolbar`: Migrate hardcoded border and stroke colors to WPDS tokens ([#79244](https://github.com/WordPress/gutenberg/pull/79244)).
--   `ColorPalette`: Add support for rendering a `Notice` between the custom color picker and the color options via the new `noticeProps` prop ([#77279](https://github.com/WordPress/gutenberg/pull/77279)).
 
 ### Bug Fixes
 
