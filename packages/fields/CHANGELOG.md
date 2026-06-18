@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Enhancements
-
-- Fields: The `title` field now uses the DataViews `richtext` control, removing the dependency on `@wordpress/rich-text-control`. [#78825](https://github.com/WordPress/gutenberg/pull/78825)
-
 ## 0.40.1 (2026-06-16)
 
 ## 0.40.0 (2026-06-10)
