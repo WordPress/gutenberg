@@ -10,17 +10,17 @@ import userEvent from '@testing-library/user-event';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
+import type {
+	ResolveWidgetModule,
+	WidgetRenderProps,
+	WidgetType,
+} from '@wordpress/widget-primitives';
 
 /**
  * Internal dependencies
  */
 import { WidgetDashboard } from '../widget-dashboard';
-import type {
-	ResolveWidgetModule,
-	DashboardWidget,
-	WidgetRenderProps,
-	WidgetType,
-} from '../types';
+import type { DashboardWidget } from '../types';
 
 type Attrs = { greeting: string };
 
