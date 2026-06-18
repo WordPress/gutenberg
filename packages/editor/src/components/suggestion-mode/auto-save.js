@@ -90,23 +90,26 @@ export default function SuggestionAutoSave() {
 	// Refs are read from inside async callbacks so a save always operates on
 	// the latest overlay state, not the values captured when the timer was
 	// scheduled. This avoids stale-closure pitfalls (e.g. acting on a null
-	// commentId after the previous save just set one).
+	// commentId after the previous save just set one). Provider callbacks are
+	// captured for the same reason: they change reference whenever
+	// `postModified` updates, but the in-flight queue should always call the
+	// latest version. The refs are synced from an effect rather than during
+	// render so the rule against accessing refs while rendering is satisfied.
 	const entriesRef = useRef( entries );
-	entriesRef.current = entries;
-
-	// Provider callbacks are captured in refs for the same reason: they
-	// change reference whenever `postModified` updates, but the in-flight
-	// queue should always call the latest version.
 	const createRef = useRef( createSuggestion );
-	createRef.current = createSuggestion;
 	const updateRef = useRef( updateSuggestion );
-	updateRef.current = updateSuggestion;
 	const deleteRef = useRef( deleteSuggestion );
-	deleteRef.current = deleteSuggestion;
 	const setCommentIdRef = useRef( setCommentId );
-	setCommentIdRef.current = setCommentId;
 	const setSyncedOpsKeyRef = useRef( setSyncedOpsKey );
-	setSyncedOpsKeyRef.current = setSyncedOpsKey;
+
+	useEffect( () => {
+		entriesRef.current = entries;
+		createRef.current = createSuggestion;
+		updateRef.current = updateSuggestion;
+		deleteRef.current = deleteSuggestion;
+		setCommentIdRef.current = setCommentId;
+		setSyncedOpsKeyRef.current = setSyncedOpsKey;
+	} );
 
 	// Per-clientId debounce timer.
 	const timersRef = useRef( new Map() );
