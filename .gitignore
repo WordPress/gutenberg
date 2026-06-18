@@ -48,7 +48,6 @@ phpcs.xml
 phpunit.xml
 phpunit-watcher.yml
 .tool-versions
-test-results/
 test/storybook-playwright/test-results
 test/storybook-playwright/specs/__snapshots__
 test/storybook-playwright/specs/*-snapshots/**
