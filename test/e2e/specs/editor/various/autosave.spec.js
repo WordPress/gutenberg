@@ -293,7 +293,8 @@ test.describe( 'Autosave', () => {
 			name: 'Block: Paragraph',
 		} );
 		await paragraph.click();
-		await page.keyboard.type( ' after save' );
+		// Type slowly to ensure that autosave happens more than 1s after publish.
+		await page.keyboard.type( ' after save', { delay: 100 } );
 
 		// Trigger remote autosave.
 		await page.evaluate( () =>
