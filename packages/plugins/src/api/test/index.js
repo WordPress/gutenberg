@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import { memo } from '@wordpress/element';
 import { registerPlugin, unregisterPlugin, getPlugin, getPlugins } from '../';
 
 describe( 'registerPlugin', () => {
@@ -23,6 +24,24 @@ describe( 'registerPlugin', () => {
 		expect( getPlugin( name ) ).toEqual( {
 			name,
 			render: Component,
+			icon,
+		} );
+	} );
+
+	it( 'successfully registers a plugin with a memoized render', () => {
+		const name = 'plugin';
+		const icon = 'smiley';
+		const Component = () => 'plugin content';
+		const MemoizedComponent = memo( Component );
+
+		registerPlugin( name, {
+			render: MemoizedComponent,
+			icon,
+		} );
+
+		expect( getPlugin( name ) ).toEqual( {
+			name,
+			render: MemoizedComponent,
 			icon,
 		} );
 	} );

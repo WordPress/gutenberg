@@ -4,6 +4,7 @@
  */
 import type { ComponentType } from 'react';
 import { isValidElementType } from 'react-is';
+
 /**
  * WordPress dependencies
  */
