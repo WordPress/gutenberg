@@ -8,7 +8,7 @@ import { humanTimeDiff } from '@wordpress/date';
 /**
  * Internal dependencies
  */
-import type { BasePost } from '../../../types';
+import type { BasePost } from '../../types';
 
 export default function LastEditedDateView( { item }: { item: BasePost } ) {
 	if ( ! item.modified ) {

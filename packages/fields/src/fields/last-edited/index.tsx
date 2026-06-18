@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type { BasePost } from '../../../types';
+import type { BasePost } from '../../types';
 import LastEditedDateView from './last-edited-date-view';
 
 const lastEditedDateField: Field< BasePost > = {

@@ -762,6 +762,7 @@ function _gutenberg_get_entity_view_config_post_type_wp_template( $config ) {
 			'posttype_page_title',
 			'posts_per_page',
 			'default_comment_status',
+			'revisions',
 		),
 	);
 

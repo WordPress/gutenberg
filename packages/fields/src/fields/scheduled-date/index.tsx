@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type { BasePost } from '../../../types';
+import type { BasePost } from '../../types';
 
 const scheduledDateField: Field< BasePost > = {
 	id: 'scheduled_date',
