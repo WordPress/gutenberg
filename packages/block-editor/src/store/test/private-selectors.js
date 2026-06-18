@@ -27,6 +27,7 @@ import {
 	getSelectedBlockStyleState,
 	hasSelectedStyleState,
 	isSelectedBlockStyleStateShownOnCanvas,
+	shouldRenderBlockListView,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
 import { deviceTypeKey } from '../private-keys';
@@ -72,6 +73,143 @@ describe( 'private selectors', () => {
 				'123456',
 				'78910',
 			] );
+		} );
+	} );
+
+	describe( 'shouldRenderBlockListView', () => {
+		const blockWithListViewSupport = 'core/test-list-view-support';
+		const blockWithoutListViewSupport = 'core/test-no-list-view-support';
+
+		const createState = (
+			blockName,
+			{ allowedBlocks, innerBlocks = [] } = {}
+		) => {
+			const blockListSettings = new Map();
+			if ( allowedBlocks !== undefined ) {
+				blockListSettings.set( 'client-1', { allowedBlocks } );
+			}
+
+			return {
+				blocks: {
+					byClientId: new Map( [
+						[ 'client-1', { name: blockName } ],
+					] ),
+					order: new Map( [ [ 'client-1', innerBlocks ] ] ),
+					parents: new Map(),
+				},
+				blockListSettings,
+			};
+		};
+
+		beforeAll( () => {
+			registerBlockType( blockWithListViewSupport, {
+				apiVersion: 3,
+				title: 'List View support',
+				category: 'text',
+				supports: {
+					listView: true,
+				},
+			} );
+			registerBlockType( blockWithoutListViewSupport, {
+				apiVersion: 3,
+				title: 'No List View support',
+				category: 'text',
+			} );
+		} );
+
+		afterAll( () => {
+			unregisterBlockType( blockWithListViewSupport );
+			unregisterBlockType( blockWithoutListViewSupport );
+		} );
+
+		it( 'returns true for blocks with list view support', () => {
+			const state = createState( blockWithListViewSupport );
+
+			expect( shouldRenderBlockListView( state, 'client-1' ) ).toBe(
+				true
+			);
+		} );
+
+		it( 'returns false when empty and insertion is disallowed via `allowedBlocks: []`', () => {
+			const state = createState( blockWithListViewSupport, {
+				allowedBlocks: [],
+			} );
+
+			expect( shouldRenderBlockListView( state, 'client-1' ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'returns false when empty and insertion is disallowed via `allowedBlocks: false`', () => {
+			const state = createState( blockWithListViewSupport, {
+				allowedBlocks: false,
+			} );
+
+			expect( shouldRenderBlockListView( state, 'client-1' ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'returns true when empty but insertion is allowed', () => {
+			// e.g. a static, still-empty gallery: nothing yet, but the user can
+			// start inserting, so its List View stays available.
+			const state = createState( blockWithListViewSupport, {
+				allowedBlocks: [ 'core/image' ],
+			} );
+
+			expect( shouldRenderBlockListView( state, 'client-1' ) ).toBe(
+				true
+			);
+		} );
+
+		it( 'returns true when empty with no allowedBlocks restriction', () => {
+			const state = createState( blockWithListViewSupport );
+
+			expect( shouldRenderBlockListView( state, 'client-1' ) ).toBe(
+				true
+			);
+		} );
+
+		it( 'returns true when insertion is disallowed but the block still has inner blocks', () => {
+			const state = createState( blockWithListViewSupport, {
+				allowedBlocks: [],
+				innerBlocks: [ 'child-1' ],
+			} );
+
+			expect( shouldRenderBlockListView( state, 'client-1' ) ).toBe(
+				true
+			);
+		} );
+
+		it( 'does not grant list view support to unsupported block types', () => {
+			const state = createState( blockWithoutListViewSupport, {
+				allowedBlocks: [],
+			} );
+
+			expect( shouldRenderBlockListView( state, 'client-1' ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'preserves the navigation block special case', () => {
+			const state = createState( 'core/navigation' );
+
+			expect( shouldRenderBlockListView( state, 'client-1' ) ).toBe(
+				true
+			);
+		} );
+
+		it( 'keeps navigation in list view even when empty and insertion is disallowed', () => {
+			// The navigation special case takes precedence over the
+			// `allowedBlocks` exclusion: even with nothing to show and no
+			// insertion allowed, navigation still participates in List View.
+			const state = createState( 'core/navigation', {
+				allowedBlocks: [],
+			} );
+
+			expect( shouldRenderBlockListView( state, 'client-1' ) ).toBe(
+				true
+			);
 		} );
 	} );
 

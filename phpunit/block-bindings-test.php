@@ -391,4 +391,152 @@ HTML;
 			'The block content should show the filtered value.'
 		);
 	}
+
+	/**
+	 * Renders a list item with a source value bound to its content attribute.
+	 *
+	 * @param mixed  $source_value  The source value.
+	 * @param string $block_content The block content.
+	 * @return string Rendered block content.
+	 */
+	private function render_list_item_with_source_value( $source_value, $block_content ) {
+		register_block_bindings_source(
+			self::SOURCE_NAME,
+			array(
+				'label'              => self::SOURCE_LABEL,
+				'get_value_callback' => function () use ( $source_value ) {
+					return $source_value;
+				},
+			)
+		);
+
+		$parsed_blocks = parse_blocks( $block_content );
+		$block         = new WP_Block( $parsed_blocks[0] );
+		return trim( $block->render() );
+	}
+
+	/**
+	 * Tests if list item content is updated with a plain text value returned by the source.
+	 *
+	 * @covers WP_Block::render
+	 */
+	public function test_update_list_item_with_plain_text_value_from_source() {
+		$block_content = <<<HTML
+<!-- wp:list-item {"metadata":{"bindings":{"content":{"source":"test/source"}}}} -->
+<li>This should not appear</li>
+<!-- /wp:list-item -->
+HTML;
+		$result        = $this->render_list_item_with_source_value( 'test source value', $block_content );
+
+		$this->assertSame(
+			'<li>test source value</li>',
+			$result,
+			'The list item content should be replaced by the source text.'
+		);
+	}
+	/**
+	 * Tests if raw nested list markup is replaced when it is not a list inner block.
+	 *
+	 * @covers WP_Block::render
+	 */
+	public function test_update_list_item_with_raw_nested_list_markup_without_inner_block_replaces_markup() {
+		$block_content = <<<HTML
+<!-- wp:list-item {"metadata":{"bindings":{"content":{"source":"test/source"}}}} -->
+<li>Default content<ul><li>Raw nested list should be replaced</li></ul></li>
+<!-- /wp:list-item -->
+HTML;
+		$result        = $this->render_list_item_with_source_value( 'Bound text', $block_content );
+
+		$this->assertSame(
+			'<li>Bound text</li>',
+			$result,
+			'Raw nested list markup should be replaced with the rest of the list item content.'
+		);
+	}
+
+	/**
+	 * Tests if source image markup renders after post KSES sanitization.
+	 *
+	 * @covers WP_Block::render
+	 */
+	public function test_update_list_item_source_image_renders_after_kses() {
+		$block_content = <<<HTML
+<!-- wp:list-item {"metadata":{"bindings":{"content":{"source":"test/source"}}}} -->
+<li>This should not appear</li>
+<!-- /wp:list-item -->
+HTML;
+		$result        = $this->render_list_item_with_source_value(
+			'Bound <img class="wp-image-42" src="https://example.com/inline-image.jpg" alt="Inline image" />',
+			$block_content
+		);
+
+		$this->assertMatchesRegularExpression(
+			'#<li>Bound <img[^>]*class="wp-image-42"[^>]*src="https://example\.com/inline-image\.jpg"[^>]*alt="Inline image"[^>]*/?></li>#',
+			$result,
+			'The source image should render in the list item content after sanitization.'
+		);
+	}
+
+	/**
+	 * Tests if unsafe source markup is sanitized from list item content.
+	 *
+	 * @covers WP_Block::render
+	 */
+	public function test_update_list_item_unsafe_source_markup_is_sanitized() {
+		$block_content = <<<HTML
+<!-- wp:list-item {"metadata":{"bindings":{"content":{"source":"test/source"}}}} -->
+<li>This should not appear</li>
+<!-- /wp:list-item -->
+HTML;
+		$result        = $this->render_list_item_with_source_value(
+			'Bound <img src="https://example.com/inline-image.jpg" alt="Inline image" onerror="alert(1)" /> <script>alert("Unsafe HTML")</script>',
+			$block_content
+		);
+
+		$this->assertStringNotContainsString(
+			'<script',
+			$result,
+			'Script tags should be stripped from list item source content.'
+		);
+		$this->assertStringNotContainsString(
+			'onerror',
+			$result,
+			'Event handler attributes should be stripped from list item source content.'
+		);
+		$this->assertMatchesRegularExpression(
+			'#<img[^>]*src="https://example\.com/inline-image\.jpg"[^>]*alt="Inline image"[^>]*/?>#',
+			$result,
+			'Safe image markup should remain after sanitization.'
+		);
+	}
+
+	/**
+	 * Tests if original inline images are replaced by bound list item text.
+	 *
+	 * @covers WP_Block::render
+	 */
+	public function test_update_list_item_original_inline_image_is_replaced_by_source_text() {
+		$block_content = <<<HTML
+<!-- wp:list-item {"metadata":{"bindings":{"content":{"source":"test/source"}}}} -->
+<li>Original <img src="https://example.com/original-image.jpg" alt="Original inline image" /> content</li>
+<!-- /wp:list-item -->
+HTML;
+		$result        = $this->render_list_item_with_source_value( 'Bound text', $block_content );
+
+		$this->assertSame(
+			'<li>Bound text</li>',
+			$result,
+			'The original inline image should be replaced with the rest of the list item content.'
+		);
+		$this->assertStringNotContainsString(
+			'original-image.jpg',
+			$result,
+			'The original inline image source should not remain after binding replacement.'
+		);
+		$this->assertStringNotContainsString(
+			'Original inline image',
+			$result,
+			'The original inline image alt text should not remain after binding replacement.'
+		);
+	}
 }

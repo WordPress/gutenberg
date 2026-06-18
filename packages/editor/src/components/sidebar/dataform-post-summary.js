@@ -18,6 +18,7 @@ import { store as editorStore } from '../../store';
 import PostTrash from '../post-trash';
 import usePostFields from '../post-fields';
 import { usePostTemplatePanelMode } from '../post-template/hooks';
+import revisionsField from '../../dataviews/fields/revisions';
 
 const EMPTY_FORM = { layout: { type: 'panel' }, fields: [] };
 
@@ -107,7 +108,10 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 					}
 					return field;
 				} )
-				.filter( Boolean ),
+				.filter( Boolean )
+				// Editor-only field, injected here rather than registered
+				// so it never leaks into the site editor list / quick-edit fields.
+				.concat( revisionsField ),
 		[ _fields, templatePanelMode, availableTemplates ]
 	);
 

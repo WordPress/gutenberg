@@ -11,8 +11,8 @@ import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * "Remove Tab" button in the block toolbar for the tabs block.
- * Removes the currently active core/tab-panel and its corresponding
- * core/tab, keeping both in sync.
+ * Removes the currently active core/tab-panel. The tab-list items
+ * attribute is kept in sync automatically via useTabListItemsSync.
  *
  * @param {Object} props
  * @param {string} props.tabsClientId The client ID of the parent tabs block.
@@ -28,17 +28,17 @@ export default function RemoveTabToolbarControl( { tabsClientId } ) {
 
 	const {
 		activeTabPanelClientId,
-		activeTabClientId,
 		tabCount,
 		editorActiveTabIndex,
+		tabListClientId,
 	} = useSelect(
 		( select ) => {
 			if ( ! tabsClientId ) {
 				return {
 					activeTabPanelClientId: null,
-					activeTabClientId: null,
 					tabCount: 0,
 					editorActiveTabIndex: 0,
+					tabListClientId: null,
 				};
 			}
 			const { getBlocks, getBlockAttributes } =
@@ -56,15 +56,13 @@ export default function RemoveTabToolbarControl( { tabsClientId } ) {
 				( block ) => block.name === 'core/tab-list'
 			);
 			const tabPanelBlocks = tabPanels?.innerBlocks || [];
-			const tabs = tabList?.innerBlocks || [];
 			const activeTabPanel = tabPanelBlocks[ activeIndex ];
-			const activeTab = tabs[ activeIndex ];
 
 			return {
 				activeTabPanelClientId: activeTabPanel?.clientId || null,
-				activeTabClientId: activeTab?.clientId || null,
-				tabCount: tabs.length,
+				tabCount: tabPanelBlocks.length,
 				editorActiveTabIndex: activeIndex,
+				tabListClientId: tabList?.clientId || null,
 			};
 		},
 		[ tabsClientId ]
@@ -86,14 +84,12 @@ export default function RemoveTabToolbarControl( { tabsClientId } ) {
 			editorActiveTabIndex: newActiveIndex,
 		} );
 
-		// Remove the tab panel and corresponding tab
+		// Remove the tab panel.
 		removeBlock( activeTabPanelClientId, false );
-		if ( activeTabClientId ) {
-			removeBlock( activeTabClientId, false );
-		}
 
-		if ( tabsClientId ) {
-			selectBlock( tabsClientId );
+		// Select the tab-list so focus moves to the new active tab button.
+		if ( tabListClientId ) {
+			selectBlock( tabListClientId );
 		}
 	};
 
