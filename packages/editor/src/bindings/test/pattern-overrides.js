@@ -49,17 +49,22 @@ describe( 'pattern-overrides bindings', () => {
 			expect( values ).toEqual( { content: 'overridden' } );
 		} );
 
-		it( 'does not throw when block attributes are unavailable', () => {
-			expect( () =>
-				patternOverridesBindings.getValues( {
-					select: makeSelect( null ),
-					clientId: 'missing-client-id',
-					context: {},
-					bindings: {
-						__default: { source: 'core/pattern-overrides' },
-					},
-				} )
-			).not.toThrow();
+		it( 'uses the provided client ID when block attributes are unavailable', () => {
+			const getBlockAttributes = jest.fn( () => null );
+			const select = () => ( { getBlockAttributes } );
+			const values = patternOverridesBindings.getValues( {
+				select,
+				clientId: 'missing-client-id',
+				context: {},
+				bindings: {
+					content: { source: 'core/pattern-overrides' },
+				},
+			} );
+
+			expect( values ).toEqual( { content: undefined } );
+			expect( getBlockAttributes ).toHaveBeenCalledWith(
+				'missing-client-id'
+			);
 		} );
 	} );
 } );

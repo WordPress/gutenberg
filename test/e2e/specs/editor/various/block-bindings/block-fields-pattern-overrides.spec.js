@@ -29,6 +29,7 @@ test.describe( 'Block Fields with pattern overrides bindings', () => {
 
 	test( 'renders the panel for a `__default` binding without crashing', async ( {
 		editor,
+		page,
 	} ) => {
 		await editor.insertBlock( {
 			name: 'core/paragraph',
@@ -49,12 +50,16 @@ test.describe( 'Block Fields with pattern overrides bindings', () => {
 		await paragraph.click();
 		await editor.openDocumentSettingsSidebar();
 
+		await expect(
+			page.locator( '.block-editor-content-only-controls__rich-text' )
+		).toHaveText( 'Overridable paragraph' );
 		// The canvas keeps rendering the block: no crash boundary fallback.
 		await expect( paragraph ).toHaveText( 'Overridable paragraph' );
 	} );
 
 	test( 'renders the panel for an expanded binding without crashing', async ( {
 		editor,
+		page,
 	} ) => {
 		await editor.insertBlock( {
 			name: 'core/paragraph',
@@ -75,6 +80,9 @@ test.describe( 'Block Fields with pattern overrides bindings', () => {
 		await paragraph.click();
 		await editor.openDocumentSettingsSidebar();
 
+		await expect(
+			page.locator( '.block-editor-content-only-controls__rich-text' )
+		).toHaveText( 'Expanded binding paragraph' );
 		await expect( paragraph ).toHaveText( 'Expanded binding paragraph' );
 	} );
 } );
