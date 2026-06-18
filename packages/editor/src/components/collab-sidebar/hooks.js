@@ -613,22 +613,30 @@ export function useAnnotateBlocks( threads ) {
  * Decide what to do with an inline note based on whether its in-content marker
  * is still present. Pure so it can be unit-tested without React/stores.
  *
+ * The marker presence is resolved by the caller and passed in as a tristate so
+ * the expensive content scan (`findNoteInBlock`) can be memoized upstream rather
+ * than re-run on every render:
+ *
+ * - `true`: the block is loaded and its marker is present.
+ * - `false`: the block is loaded but the marker is gone.
+ * - `null`: the block (or its attributes) isn't loaded yet, so presence is
+ *   unknown and the note must not be touched.
+ *
  * - `'anchor'`: the marker is present; record that we've seen it this session.
  * - `'delete'`: the marker was seen earlier this session but is now gone (the
  *   user removed the marked text), so the note should be deleted.
  * - `'skip'`: the block isn't loaded yet, the note is block-level (no marker),
  *   or the marker is absent for a note we never saw anchored this session.
  *
- * @param {Object}  thread     Materialized thread record (with `.id`, `.blockClientId`).
- * @param {?Object} attributes Block attributes for the thread's block, or null/undefined when unloaded.
- * @param {Set}     anchored   Ids whose marker has been observed present this session.
+ * @param {Object}       thread   Materialized thread record (with `.id`, `.blockClientId`).
+ * @param {boolean|null} present  Marker presence: `true`/`false` when loaded, `null` when unloaded.
+ * @param {Set}          anchored Ids whose marker has been observed present this session.
  * @return {'anchor'|'delete'|'skip'} The action to take.
  */
-export function reconcileInlineNoteMarker( thread, attributes, anchored ) {
-	if ( ! thread?.blockClientId || ! attributes ) {
+export function reconcileInlineNoteMarker( thread, present, anchored ) {
+	if ( ! thread?.blockClientId || present === null ) {
 		return 'skip';
 	}
-	const present = !! findNoteInBlock( attributes, thread.id );
 	if ( present ) {
 		return 'anchor';
 	}
@@ -651,8 +659,28 @@ export function useReconcileRemovedInlineNotes( threads ) {
 	const { onDelete } = useNoteActions();
 	const anchoredRef = useRef();
 
-	useEffect( () => {
+	// Resolve each thread's marker presence once, memoized like
+	// `useAnnotateBlocks`. The scan (`findNoteInBlock`) parses block content, so
+	// it must only re-run when the threads or their attributes change - not on
+	// every render. Presence is a tristate: `null` when the block isn't loaded
+	// (presence unknown), otherwise a boolean.
+	const reconciliation = useMemo( () => {
 		if ( ! threads?.length ) {
+			return [];
+		}
+		return threads.map( ( thread ) => {
+			const attributes = thread.blockClientId
+				? getBlockAttributes( thread.blockClientId )
+				: null;
+			const present = attributes
+				? !! findNoteInBlock( attributes, thread.id )
+				: null;
+			return { thread, present };
+		} );
+	}, [ threads, getBlockAttributes ] );
+
+	useEffect( () => {
+		if ( ! reconciliation.length ) {
 			return;
 		}
 		// Lazily seed the session set inside the effect; refs must not be
@@ -661,12 +689,10 @@ export function useReconcileRemovedInlineNotes( threads ) {
 			anchoredRef.current = new Set();
 		}
 		const anchored = anchoredRef.current;
-		for ( const thread of threads ) {
+		for ( const { thread, present } of reconciliation ) {
 			const action = reconcileInlineNoteMarker(
 				thread,
-				thread.blockClientId
-					? getBlockAttributes( thread.blockClientId )
-					: null,
+				present,
 				anchored
 			);
 			if ( action === 'anchor' ) {
@@ -679,5 +705,5 @@ export function useReconcileRemovedInlineNotes( threads ) {
 				onDelete( thread );
 			}
 		}
-	}, [ threads, getBlockAttributes, onDelete ] );
+	}, [ reconciliation, onDelete ] );
 }
