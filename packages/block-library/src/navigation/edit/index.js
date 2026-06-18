@@ -288,16 +288,6 @@ function Navigation( {
 		[ setAttributes ]
 	);
 
-	// Reset submenuVisibility to default if orientation changes to horizontal while "always" is selected
-	useEffect( () => {
-		if ( orientation === 'horizontal' && submenuVisibility === 'always' ) {
-			setAttributes( {
-				submenuVisibility: 'hover',
-				showSubmenuIcon: true,
-			} );
-		}
-	}, [ orientation, submenuVisibility, setAttributes ] );
-
 	const recursionId = `navigationMenu/${ ref }`;
 
 	// Skip recursion check when in preview mode.
@@ -371,6 +361,29 @@ function Navigation( {
 		isInnerBlockSelected,
 		innerBlocks,
 	} = useInnerBlocks( clientId );
+
+	// Reset submenuVisibility to default if orientation changes to horizontal
+	// while "always" is selected, but only when the Navigation block or one
+	// of its inner blocks is being edited. Rendering related template parts
+	// should not mark them dirty.
+	useEffect( () => {
+		if (
+			( isSelected || isInnerBlockSelected ) &&
+			orientation === 'horizontal' &&
+			submenuVisibility === 'always'
+		) {
+			setAttributes( {
+				submenuVisibility: 'hover',
+				showSubmenuIcon: true,
+			} );
+		}
+	}, [
+		isSelected,
+		isInnerBlockSelected,
+		orientation,
+		submenuVisibility,
+		setAttributes,
+	] );
 
 	// Use a ref to store whether we've confirmed a page-list has submenus.
 	// Once confirmed, we don't need to keep checking the page-list blocks.
