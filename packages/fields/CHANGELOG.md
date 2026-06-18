@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `postsPageTitleField`, and make `postsPerPageField` and `siteDiscussionField` read/write their value through a `${ kind }_${ name }` namespace so the `home`/`index` template summary can edit several entities from a single DataForm.
+
 ## 0.40.1 (2026-06-16)
 
 ## 0.40.0 (2026-06-10)

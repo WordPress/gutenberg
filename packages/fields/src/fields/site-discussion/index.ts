@@ -7,22 +7,26 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type { SiteSettings } from '../../types';
+import type { HomeTemplateData } from '../../types';
 
-const siteDiscussionField: Field< SiteSettings > = {
+const siteDiscussionField: Field< HomeTemplateData > = {
 	id: 'default_comment_status',
 	type: 'text',
 	label: __( 'Discussion' ),
 	Edit: 'radio',
-	getValue: ( { item } ) => item.default_comment_status || '',
+	// The value lives in the `root/site` entity, merged into the form data under
+	// the `root_site` namespace by the editor. Edits are routed back to that
+	// entity by the editor.
+	getValue: ( { item } ) => item.root_site?.default_comment_status || '',
 	setValue: ( { value } ) => ( {
-		default_comment_status: value || null,
+		root_site: { default_comment_status: value || null },
 	} ),
 	render: ( { item } ) => {
-		return item.default_comment_status === 'open'
+		return item.root_site?.default_comment_status === 'open'
 			? __( 'Comments open' )
 			: __( 'Comments closed' );
 	},
+	isVisible: ( item ) => [ 'home', 'index' ].includes( item.slug ?? '' ),
 	elements: [
 		{
 			value: 'open',
@@ -43,6 +47,6 @@ const siteDiscussionField: Field< SiteSettings > = {
 };
 
 /**
- * Site discussion field for SiteSettings.
+ * Site discussion field for the `home`/`index` template summary.
  */
 export default siteDiscussionField;

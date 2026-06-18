@@ -168,9 +168,13 @@ Ping status field for BasePost.
 
 Post content information field for BasePost.
 
+### postsPageTitleField
+
+Posts page title field for the `home`/`index` template summary.
+
 ### postsPerPageField
 
-Posts per page field for SiteSettings.
+Posts per page field for the `home`/`index` template summary.
 
 ### PostType
 
@@ -206,7 +210,7 @@ ScheduledDate Field.
 
 ### siteDiscussionField
 
-Site discussion field for SiteSettings.
+Site discussion field for the `home`/`index` template summary.
 
 ### slugField
 

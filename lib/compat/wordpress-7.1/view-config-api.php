@@ -755,6 +755,13 @@ function _gutenberg_get_entity_view_config_post_type_wp_template( $config ) {
 					'labelPosition' => 'none',
 				),
 			),
+			// The following fields are only meaningful in the `home`/`index`
+			// template summary; they hide themselves on every other template.
+			// They edit other entities (`root/site` and the posts page), which
+			// the editor merges into the form data under a namespace.
+			'posttype_page_title',
+			'posts_per_page',
+			'default_comment_status',
 		),
 	);
 

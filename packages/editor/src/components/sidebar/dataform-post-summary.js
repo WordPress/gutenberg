@@ -19,9 +19,35 @@ import PostTrash from '../post-trash';
 import usePostFields from '../post-fields';
 import { usePostTemplatePanelMode } from '../post-template/hooks';
 import revisionsField from '../../dataviews/fields/revisions';
-import TemplateHomeSettings from './template-home-settings';
 
 const EMPTY_FORM = { layout: { type: 'panel' }, fields: [] };
+
+// Some post types expose summary fields that edit entities other than the one
+// being edited. Keyed by the post type that needs them, the related records are
+// merged into the form data under a `${ kind }_${ name }` namespace key so that
+// a single DataForm can read and write all of them, and edits to those keys are
+// routed back to their entity.
+//
+// Currently only `wp_template` uses this, for the `home`/`index` template
+// summary: `posts_per_page` and `default_comment_status` target `root/site`,
+// and `posttype_page_title` targets the posts page (the `page` assigned as
+// `page_for_posts`). The fields themselves hide on every other template via
+// their `isVisible` callback.
+const ENTITIES = {
+	wp_template: {
+		root_site: {
+			kind: 'root',
+			name: 'site',
+		},
+		posttype_page: {
+			kind: 'postType',
+			name: 'page',
+			getId: ( select ) =>
+				select( coreDataStore ).getEditedEntityRecord( 'root', 'site' )
+					?.page_for_posts,
+		},
+	},
+};
 
 export default function DataFormPostSummary( { onActionPerformed } ) {
 	const { postType, postId } = useSelect( ( select ) => {
@@ -52,25 +78,66 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 
 	const templatePanelMode = usePostTemplatePanelMode();
 
-	const availableTemplates = useSelect( ( select ) => {
-		if ( select( coreDataStore ).getCurrentTheme()?.is_block_theme ) {
-			return null;
-		}
-		return (
-			select( editorStore ).getEditorSettings().availableTemplates ?? {}
-		);
-	}, [] );
+	// Assemble every piece of supplementary data merged into the form `data`
+	// alongside the post record: read-only editor data that the post's own
+	// fields consume (e.g. the `template` field's `available_templates` in
+	// classic themes), and the records of other entities targeted by namespaced
+	// fields (keyed by `${ kind }_${ name }`) together with the id used to
+	// persist edits back to each one.
+	const { entityData, entityIds, availableTemplates } = useSelect(
+		( select ) => {
+			const { getEditedEntityRecord, canUser, getCurrentTheme } =
+				select( coreDataStore );
 
-	// Augment record only when needed(not a block theme with available templates).
-	const augmentedRecord = useMemo( () => {
-		if ( ! record || ! availableTemplates ) {
+			const _availableTemplates = getCurrentTheme()?.is_block_theme
+				? null
+				: select( editorStore ).getEditorSettings()
+						.availableTemplates ?? {};
+
+			const extra = {};
+			const ids = {};
+
+			// Other entities the current post type needs merged into its form.
+			for ( const [ key, entity ] of Object.entries(
+				ENTITIES[ postType ] ?? {}
+			) ) {
+				if (
+					! canUser( 'read', {
+						kind: entity.kind,
+						name: entity.name,
+					} )
+				) {
+					continue;
+				}
+				const id = entity.getId ? entity.getId( select ) : undefined;
+				// Entities resolved through another record need a valid id.
+				if ( entity.getId && ! id ) {
+					continue;
+				}
+				extra[ key ] = getEditedEntityRecord(
+					entity.kind,
+					entity.name,
+					id
+				);
+				ids[ key ] = id;
+			}
+
+			return {
+				entityData: extra,
+				entityIds: ids,
+				availableTemplates: _availableTemplates,
+			};
+		},
+		[ postType ]
+	);
+
+	// Merge the supplementary data onto the record only when there is any.
+	const data = useMemo( () => {
+		if ( ! record || ! Object.keys( entityData ).length ) {
 			return record;
 		}
-		return {
-			...record,
-			available_templates: availableTemplates,
-		};
-	}, [ record, availableTemplates ] );
+		return { ...record, ...entityData };
+	}, [ record, entityData ] );
 
 	const { editEntityRecord } = useDispatch( coreDataStore );
 
@@ -117,19 +184,45 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 	);
 
 	const onChange = ( edits ) => {
+		// Route edits that target another entity (merged in under a namespace)
+		// back to that entity; collect the rest for the post being edited.
+		const entities = ENTITIES[ postType ] ?? {};
+		const baseEdits = {};
+		for ( const [ key, value ] of Object.entries( edits ) ) {
+			const entity = entities[ key ];
+			if ( entity ) {
+				editEntityRecord(
+					entity.kind,
+					entity.name,
+					entityIds[ key ],
+					value
+				);
+			} else {
+				baseEdits[ key ] = value;
+			}
+		}
+
+		if ( ! Object.keys( baseEdits ).length ) {
+			return;
+		}
+
 		if (
-			edits.status &&
-			edits.status !== 'future' &&
+			baseEdits.status &&
+			baseEdits.status !== 'future' &&
 			record?.status === 'future' &&
 			new Date( record.date ) > new Date()
 		) {
-			edits.date = null;
+			baseEdits.date = null;
 		}
-		if ( edits.status && edits.status === 'private' && record?.password ) {
-			edits.password = '';
+		if (
+			baseEdits.status &&
+			baseEdits.status === 'private' &&
+			record?.password
+		) {
+			baseEdits.password = '';
 		}
 
-		editEntityRecord( 'postType', postType, postId, edits );
+		editEntityRecord( 'postType', postType, postId, baseEdits );
 	};
 	return (
 		<PostPanelSection className="editor-post-summary">
@@ -140,12 +233,11 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 					onActionPerformed={ onActionPerformed }
 				/>
 				<DataForm
-					data={ augmentedRecord }
+					data={ data }
 					fields={ fields }
 					form={ form }
 					onChange={ onChange }
 				/>
-				<TemplateHomeSettings postType={ postType } />
 				<PostTrash onActionPerformed={ onActionPerformed } />
 			</VStack>
 		</PostPanelSection>
