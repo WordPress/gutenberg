@@ -167,7 +167,6 @@ export default function SummaryButton< Item >( {
 				<Button
 					className="dataforms-layouts-panel__field-trigger-icon"
 					label={ ariaLabel }
-					showTooltip={ false }
 					icon={ pencil }
 					size="small"
 					aria-expanded={ ariaExpanded }
