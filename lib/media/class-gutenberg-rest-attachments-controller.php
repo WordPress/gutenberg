@@ -13,6 +13,27 @@
  */
 class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controller {
 	/**
+	 * Image size token for the source-format original preserved alongside a
+	 * client-generated derivative (e.g. the HEIC file kept next to its JPEG).
+	 *
+	 * Used both in the `/sideload` route schema and when dispatching the
+	 * sideloaded file to its metadata key, so the two never drift apart.
+	 *
+	 * @var string
+	 */
+	const IMAGE_SIZE_SOURCE_ORIGINAL = 'original-heic';
+
+	/**
+	 * Metadata key holding the basename of the source-format original.
+	 *
+	 * Deliberately specific so it never collides with the generic `original`
+	 * or `original_image` keys other flows write to.
+	 *
+	 * @var string
+	 */
+	const META_KEY_SOURCE_IMAGE = 'source_image';
+
+	/**
 	 * Registers the routes for attachments.
 	 *
 	 * @see register_rest_route()
@@ -50,7 +71,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 							'validate_callback' => static function ( $value, $request, $param ) {
 								$valid_sizes   = array_keys( wp_get_registered_image_subsizes() );
 								$valid_sizes[] = 'original';
-								$valid_sizes[] = 'original-heic';
+								$valid_sizes[] = self::IMAGE_SIZE_SOURCE_ORIGINAL;
 								$valid_sizes[] = 'animated-video';
 								$valid_sizes[] = 'animated-video-poster';
 								$valid_sizes[] = 'scaled';
@@ -486,13 +507,13 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 			if ( 'original' === $image_size ) {
 				$metadata['original_image'] = $sub_size['file'];
-			} elseif ( 'original-heic' === $image_size ) {
-				// HEIC companion original: stored under its own meta key so
-				// the scaled-sideload flow (which writes 'original_image')
-				// cannot clobber it. 'original_image' keeps pointing at the
+			} elseif ( self::IMAGE_SIZE_SOURCE_ORIGINAL === $image_size ) {
+				// Source-format original: stored under its own meta key so the
+				// scaled-sideload flow (which writes 'original_image') cannot
+				// clobber it. 'original_image' keeps pointing at the
 				// web-viewable JPEG derivative. Cleanup on attachment delete
 				// is handled by a delete_attachment hook that reads this key.
-				$metadata['original'] = $sub_size['file'];
+				$metadata[ self::META_KEY_SOURCE_IMAGE ] = $sub_size['file'];
 			} elseif ( 'animated-video' === $image_size ) {
 				// Converted video companion of an animated GIF. Stored
 				// under its own key; the GIF stays the attachment. The
@@ -652,8 +673,8 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			return true;
 		}
 
-		// 'original-heic' companion file: no dimension constraint.
-		if ( 'original-heic' === $image_size ) {
+		// Source-format original companion file: no dimension constraint.
+		if ( self::IMAGE_SIZE_SOURCE_ORIGINAL === $image_size ) {
 			return true;
 		}
 
@@ -865,7 +886,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		// `image_size` may be a single string or an array of names that share the
 		// same dimensions and therefore reuse a single sideloaded file. Arrays
 		// only carry regular sub-sizes; the special keys below ('original',
-		// 'scaled', 'original-heic') are always scalar strings.
+		// 'scaled', and the source-format original) are always scalar strings.
 		$sub_size_data = array(
 			'image_size' => $image_size,
 		);
@@ -878,11 +899,12 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			$sub_size_data['filesize']  = wp_filesize( $path );
 		} elseif ( 'original' === $image_size ) {
 			$sub_size_data['file'] = wp_basename( $path );
-		} elseif ( 'original-heic' === $image_size ) {
-			// HEIC companion original. finalize_item() writes the filename to
-			// $metadata['original'] (separate from 'original_image', which the
-			// scaled-sideload flow owns). Cleanup on attachment delete is
-			// handled by a delete_attachment hook that reads this key.
+		} elseif ( self::IMAGE_SIZE_SOURCE_ORIGINAL === $image_size ) {
+			// Source-format original. finalize_item() writes the filename to
+			// $metadata[ self::META_KEY_SOURCE_IMAGE ] (separate from
+			// 'original_image', which the scaled-sideload flow owns). Cleanup on
+			// attachment delete is handled by a delete_attachment hook that reads
+			// this key.
 			$sub_size_data['file'] = wp_basename( $path );
 		} elseif ( 'animated-video' === $image_size ) {
 			// Converted animated-GIF video companion. finalize_item()

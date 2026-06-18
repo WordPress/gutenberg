@@ -1,0 +1,25 @@
+/* Translucent surface so the gear stays legible over any widget background. */
+.widgetSettingsToolbar {
+	background: color-mix(in srgb, var(--wpds-color-background-surface-neutral) 40%, transparent);
+	opacity: 0;
+	pointer-events: none;
+}
+
+/*
+ * Revealed on tile hover or focus. Hidden with opacity, not display, so the
+ * gear stays in the tab order and `:focus-within` surfaces it for keyboard
+ * users. The matched ancestor is the grid item, shared by the slot and card.
+ */
+:global([data-wp-grid-item-key]):hover .widgetSettingsToolbar,
+:global([data-wp-grid-item-key]):focus-within .widgetSettingsToolbar {
+	opacity: 1;
+	pointer-events: auto;
+}
+
+@media not ( prefers-reduced-motion ) {
+	.widgetSettingsToolbar {
+		transition:
+			opacity var(--wpds-motion-duration-sm)
+			var(--wpds-motion-easing-subtle);
+	}
+}

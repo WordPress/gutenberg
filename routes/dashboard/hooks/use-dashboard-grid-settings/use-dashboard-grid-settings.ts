@@ -8,30 +8,15 @@ import fastDeepEqual from 'fast-deep-equal/es6/index.js';
  */
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
-import type { WidgetGridSettings } from '../../widget-dashboard/types';
-import { WIDGET_DASHBOARD_COLUMN_COUNT } from '../../widget-dashboard/types';
-import { normalizeGridSettings } from '../../widget-dashboard/utils/normalize-grid-settings';
-import { DEFAULT_ROW_HEIGHT } from '../../widget-dashboard/utils/row-height-presets';
+import {
+	DEFAULT_GRID,
+	DEFAULT_ROW_HEIGHT,
+	normalizeGridSettings,
+} from '@wordpress/widget-dashboard';
+import type { WidgetGridSettings } from '@wordpress/widget-dashboard';
 
 const SCOPE = 'core/dashboard';
 const KEY = 'dashboardGridSettings';
-
-/**
- * Default grid settings applied when the preferences store has no
- * entry yet, and the value `resetGridSettings` writes back when the
- * user requests a reset. Kept aligned with the in-component default
- * in `WidgetDashboardProvider` so consumers see consistent values
- * whether or not they wire up this hook.
- */
-const DEFAULT_GRID_SETTINGS: WidgetGridSettings = {
-	model: 'grid',
-	columns: WIDGET_DASHBOARD_COLUMN_COUNT,
-	rowHeight: DEFAULT_ROW_HEIGHT,
-};
 
 /**
  * Hook for managing dashboard grid-settings preferences.
@@ -55,7 +40,7 @@ export function useDashboardGridSettings(): [
 			| WidgetGridSettings
 			| undefined;
 		return normalizeGridSettings(
-			stored ?? DEFAULT_GRID_SETTINGS,
+			stored ?? DEFAULT_GRID,
 			DEFAULT_ROW_HEIGHT
 		);
 	}, [] );
@@ -68,7 +53,7 @@ export function useDashboardGridSettings(): [
 		// default and the value can never drift. Reset routes through here (the
 		// drawer commit fires the setter with the default), so this is what makes
 		// Reset + Save truly clear the stored preference.
-		if ( fastDeepEqual( next, DEFAULT_GRID_SETTINGS ) ) {
+		if ( fastDeepEqual( next, DEFAULT_GRID ) ) {
 			void set( SCOPE, KEY, null );
 			return;
 		}

@@ -48,7 +48,7 @@ export function PostPublishButton( {
 			isPublishable: store.isEditedPostPublishable(),
 			isPublished: store.isCurrentPostPublished(),
 			hasPublishAction:
-				store.getCurrentPost()._links?.[ 'wp:action-publish' ] ?? false,
+				!! store.getCurrentPost()?._links?.[ 'wp:action-publish' ],
 			postType: store.getCurrentPostType(),
 			postId: store.getCurrentPostId(),
 			postStatus: store.getEditedPostAttribute( 'status' ),
@@ -103,18 +103,21 @@ export function PostPublishButton( {
 
 	const isButtonDisabled =
 		isPostSavingLocked ||
+		// Disable while a non-post entity (e.g. a newly created term) is mid-save.
+		isSavingNonPostEntityChanges ||
 		( ( isSaving ||
 			! isSaveable ||
 			( ! isPublishable && ! forceIsDirty ) ) &&
-			( ! hasNonPostEntityChanges || isSavingNonPostEntityChanges ) );
+			! hasNonPostEntityChanges );
 
 	const isToggleDisabled =
 		isPostSavingLocked ||
+		isSavingNonPostEntityChanges ||
 		( ( isPublished ||
 			isSaving ||
 			! isSaveable ||
 			( ! isPublishable && ! forceIsDirty ) ) &&
-			( ! hasNonPostEntityChanges || isSavingNonPostEntityChanges ) );
+			! hasNonPostEntityChanges );
 
 	// If the new status has not changed explicitly, we derive it from
 	// other factors, like having a publish action, etc.. We need to preserve

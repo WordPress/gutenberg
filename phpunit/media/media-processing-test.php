@@ -233,7 +233,7 @@ HTML;
 	}
 
 	/**
-	 * Tests that the 6.9 compat REST controller is used when filter disables client-side media.
+	 * Tests that the 7.1 compat REST controller is used when filter disables client-side media.
 	 *
 	 * @covers ::gutenberg_override_attachments_rest_controller
 	 */
@@ -245,13 +245,13 @@ HTML;
 		remove_filter( 'wp_client_side_media_processing_enabled', '__return_false' );
 
 		$this->assertSame(
-			array( 'rest_controller_class' => 'Gutenberg_REST_Attachments_Controller_6_9' ),
+			array( 'rest_controller_class' => 'Gutenberg_REST_Attachments_Controller_7_1' ),
 			$result
 		);
 	}
 
 	/**
-	 * Tests that the 6.9 compat REST controller is not used when filter is enabled.
+	 * Tests that the 7.1 compat REST controller is not used when filter is enabled.
 	 *
 	 * @covers ::gutenberg_override_attachments_rest_controller
 	 */
