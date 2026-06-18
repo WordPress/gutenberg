@@ -75,6 +75,5 @@
 			"padding": ".wp-block-tab-list button"
 		}
 	},
-	"editorStyle": "wp-block-tab-list-editor",
 	"style": "wp-block-tab-list"
 }
