@@ -66,6 +66,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
       >
         <svg
           aria-hidden="true"
+          fill="currentColor"
           focusable="false"
           height="24"
           viewBox="0 0 24 24"
@@ -168,6 +169,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
               </span>
               <svg
                 aria-hidden="true"
+                fill="currentColor"
                 focusable="false"
                 height="24"
                 viewBox="0 0 24 24"
@@ -291,6 +293,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
       >
         <svg
           aria-hidden="true"
+          fill="currentColor"
           focusable="false"
           height="24"
           viewBox="0 0 24 24"
@@ -521,6 +524,7 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is 
           <svg
             aria-hidden="true"
             class="components-site-icon"
+            fill="currentColor"
             focusable="false"
             height="36px"
             viewBox="-2 -2 24 24"
@@ -675,6 +679,7 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
           <svg
             aria-hidden="true"
             class="components-site-icon"
+            fill="currentColor"
             focusable="false"
             height="36px"
             viewBox="-2 -2 24 24"
