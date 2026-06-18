@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Breaking Changes
-
--   `Button`: Button children are now wrapped in an inner `<span>`. Custom CSS or event handling that relies on direct-child selectors, such as `.my-button > svg`, or on `event.target` pointing to a child element may need updating. The wrapper layout and loading-content hiding styles only apply to styled variants; `variant="unstyled"` receives the wrapper DOM without the styled wrapper layout, and its loading content is no longer hidden ([#78820](https://github.com/WordPress/gutenberg/pull/78820)).
-
 ### Enhancements
 
 -   `Field.Description`: Apply `text-wrap: pretty` to description text to avoid typographic widows ([#79143](https://github.com/WordPress/gutenberg/pull/79143)).
@@ -19,7 +15,7 @@
 
 ### Bug Fixes
 
--   `Button`: Hide loading content for styled variants and keep the loading spinner visually animated in forced colors mode ([#78820](https://github.com/WordPress/gutenberg/pull/78820)).
+-   `Button`: Fix `loading` state in forced colors mode ([#78820](https://github.com/WordPress/gutenberg/pull/78820)).
 
 ### Internal
 
