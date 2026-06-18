@@ -216,6 +216,23 @@ describe( 'apiFetch', () => {
 		await expect( apiFetch( { path: '/random' } ) ).resolves.toBe( null );
 	} );
 
+	it( 'should return null for a 200 response with an empty body', async () => {
+		globalThis.fetch.mockResolvedValue( {
+			ok: true,
+			status: 200,
+			// An empty body is not valid JSON, so `json()` rejects.
+			json: () =>
+				Promise.reject(
+					new SyntaxError( 'Unexpected end of JSON input' )
+				),
+			clone() {
+				return { text: () => Promise.resolve( '' ) };
+			},
+		} );
+
+		await expect( apiFetch( { path: '/random' } ) ).resolves.toBe( null );
+	} );
+
 	it( 'should not try to parse the response', async () => {
 		const mockResponse = {
 			ok: true,

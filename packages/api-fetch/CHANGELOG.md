@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Resolve to `null` for a `200` response with an empty body instead of throwing an `invalid_json` error. ([#79325](https://github.com/WordPress/gutenberg/pull/79325))
+
 ## 7.54.0 (2026-08-26)
 
 ### Internal
