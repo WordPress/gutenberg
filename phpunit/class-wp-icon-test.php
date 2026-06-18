@@ -34,8 +34,8 @@ class WP_Icon_Test extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'height="32"', $output );
 	}
 
-	public function test_size_zero_leaves_dimensions_untouched() {
-		$output = wp_get_icon( 'core/plus', array( 'size' => 0 ) );
+	public function test_size_null_leaves_dimensions_untouched() {
+		$output = wp_get_icon( 'core/plus', array( 'size' => null ) );
 		$this->assertStringNotContainsString( 'width=', $output );
 		$this->assertStringNotContainsString( 'height=', $output );
 	}

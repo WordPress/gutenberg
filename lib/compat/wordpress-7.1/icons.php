@@ -16,13 +16,13 @@ if ( ! function_exists( 'wp_get_icon' ) ) {
 	 * @param array  $args {
 	 *     Optional. Arguments for the icon.
 	 *
-	 *     @type int    $size  Width and height in pixels. Pass 0 to leave the
-	 *                         SVG's intrinsic dimensions untouched. Default 24.
-	 *     @type string $class Additional CSS class names. Multiple classes may be
-	 *                         provided as a space-separated string.
-	 *     @type string $label Accessible label. If provided, the SVG gets
-	 *                         role="img" and aria-label. If omitted, the SVG
-	 *                         gets aria-hidden="true" and focusable="false".
+	 *     @type int|null $size  Width and height in pixels. Pass null to leave the
+	 *                           SVG's intrinsic dimensions untouched. Default 24.
+	 *     @type string   $class Additional CSS class names. Multiple classes may be
+	 *                           provided as a space-separated string.
+	 *     @type string   $label Accessible label. If provided, the SVG gets
+	 *                           role="img" and aria-label. If omitted, the SVG
+	 *                           gets aria-hidden="true" and focusable="false".
 	 * }
 	 * @return string SVG markup for the icon, or empty string if not found.
 	 */
