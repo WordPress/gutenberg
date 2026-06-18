@@ -63,8 +63,7 @@ function block_core_tabs_generate_tabs_list( array $innerblocks = array(), strin
 function block_core_tabs_provide_context( array $context, array $parsed_block ): array {
 	if ( 'core/tabs' === $parsed_block['blockName'] ) {
 		// Generate a unique ID for the tabs instance first, so it can be used
-		// to derive stable tab IDs. Used for 3rd party extensibility to identify
-		// the tabs instance.
+		// to derive stable tab IDs.
 		$tabs_id                   = $parsed_block['attrs']['anchor'] ?? wp_unique_id( 'tabs_' );
 		$tabs_list                 = block_core_tabs_generate_tabs_list( $parsed_block['innerBlocks'] ?? array(), $tabs_id );
 		$context['core/tabs-list'] = $tabs_list;
@@ -99,7 +98,7 @@ function block_core_tabs_render_block_callback( array $attributes, string $conte
 	$tag_processor = new WP_HTML_Tag_Processor( $content );
 
 	$tag_processor->next_tag( array( 'class_name' => 'wp-block-tabs' ) );
-	$tag_processor->set_attribute( 'data-wp-interactive', 'core/tabs/private' );
+	$tag_processor->set_attribute( 'data-wp-interactive', 'core/tabs' );
 
 	$tag_processor->set_attribute(
 		'data-wp-context',
@@ -116,12 +115,11 @@ function block_core_tabs_render_block_callback( array $attributes, string $conte
 	$output = $tag_processor->get_updated_html();
 
 	/**
-	 * Builds a client side state for just this tabs instance.
-	 * This allows 3rd party extensibility of tabs while retaining
-	 * client side state management per core/tabs instance, like context.
+	 * Builds a client side state for just this tabs instance, so each
+	 * core/tabs block manages its own state, like context.
 	 */
 	wp_interactivity_state(
-		'core/tabs/private',
+		'core/tabs',
 		array(
 			$tabs_id => $tabs_list,
 		)

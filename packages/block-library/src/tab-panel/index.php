@@ -46,7 +46,7 @@ function block_core_tab_panel_render( array $attributes, string $content, \WP_Bl
 	 */
 	$tag_processor->set_attribute(
 		'data-wp-interactive',
-		'core/tabs/private'
+		'core/tabs'
 	);
 	$tag_processor->set_attribute(
 		'data-wp-context',
