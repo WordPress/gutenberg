@@ -64,6 +64,10 @@ function gutenberg_site_editor_enable_admin_bar() {
 	wp_enqueue_style( 'colors' );
 
 	$css = <<<CSS
+#wpadminbar {
+	display: block;
+}
+
 #site-editor-v2-app {
 	position: fixed;
 	top: var(--wp-admin--admin-bar--height, 0);
