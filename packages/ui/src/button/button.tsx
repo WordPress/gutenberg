@@ -55,7 +55,7 @@ export const Button = forwardRef< HTMLButtonElement, ButtonProps >(
 				disabled={ disabled ?? loading }
 				{ ...props }
 			>
-				<span className={ styles.content }>{ children }</span>
+				{ children }
 			</_Button>
 		);
 	}

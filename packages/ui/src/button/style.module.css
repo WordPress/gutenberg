@@ -10,7 +10,7 @@
 
 		.button {
 			/* Internal variables */
-			--wp-ui-button-font-weight: 499;
+			--wp-ui-button-font-weight: var(--wpds-typography-font-weight-medium);
 
 			--wp-ui-button-background-color: var(--wpds-color-background-interactive-brand-strong);
 			--wp-ui-button-background-color-active: var(--wpds-color-background-interactive-brand-strong-active);
@@ -39,6 +39,9 @@
 			/* Styles */
 			position: relative;
 			display: inline-flex;
+			justify-content: center;
+			align-items: center;
+			gap: var(--wpds-dimension-gap-sm);
 			aspect-ratio: var(--wp-ui-button-aspect-ratio);
 			min-width: var(--wp-ui-button-min-width);
 			max-width: 100%;
@@ -67,7 +70,7 @@
 			@media not ( prefers-reduced-motion ) {
 				transition: color 0.1s ease-out;
 
-				&:not(.is-unstyled) .content {
+				* {
 					transition: opacity 0.1s ease-out;
 				}
 			}
@@ -133,22 +136,7 @@
 				@media not ( prefers-reduced-motion ) {
 					transition: opacity 0.1s ease-out;
 				}
-
-				@media ( forced-colors: active ) {
-					border-color: currentColor;
-					border-block-end-style: none;
-					border-inline-start-style: none;
-				}
 			}
-		}
-
-		.button:not(.is-unstyled) .content {
-			display: inline-flex;
-			flex: 1 1 auto;
-			justify-content: center;
-			align-items: center;
-			gap: var(--wpds-dimension-gap-sm);
-			min-width: 0;
 		}
 
 		.is-small {
@@ -238,7 +226,15 @@
 		}
 
 		.is-loading {
-			&:not(.is-unstyled) .content {
+			color: transparent;
+
+			/* Keep text transparent when a loading button is hovered — needed because
+			 the hover state now sets `color` as a property declaration. */
+			&:not([data-disabled]):is(:hover, :active, :focus) {
+				color: transparent;
+			}
+
+			* {
 				opacity: 0;
 			}
 
