@@ -28,7 +28,7 @@ export default function SaveHub() {
 		};
 	}, [] );
 	return (
-		<Stack className="edit-site-save-hub" direction="row" gap={ 4 }>
+		<Stack className="edit-site-save-hub" gap="lg">
 			<SaveButton
 				className="edit-site-save-hub__button"
 				variant={ isDisabled && ! isSaving ? null : 'primary' }
