@@ -4,7 +4,9 @@
 
 ### New Features
 
--   Initial experimental release.
+-   Initial experimental release. Depends on WordPress core-private APIs and is
+    intended to run inside WordPress core; not yet safe to consume as a
+    standalone npm dependency from an external plugin.
 -   `<WidgetDashboard>`: stateless compound component that renders an
     editable grid of widget instances, with staging of in-progress edits.
     Composable parts ship in the default composition (`Actions`, `Widgets`,

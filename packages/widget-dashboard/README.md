@@ -2,6 +2,8 @@
 
 <div class="callout callout-alert">
 This package is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes. While it is published as 0.x, breaking changes may ship in minor releases.
+
+This prerelease depends on WordPress core-private APIs and is built to run inside WordPress core. It is not yet safe to install and run as a standalone npm dependency from an external plugin.
 </div>
 
 Stateless rendering engine for widget dashboards. `WidgetDashboard` renders an editable grid of widget instances behind a consumer-controlled edit mode: drag-to-reorder, resize, a modal inserter, per-widget and grid-level settings, and command-palette integration.
@@ -93,7 +95,7 @@ Called when the user commits in-progress edits via the Done action. Receives the
 
 #### `onLayoutReset`: `() => void`
 
-Optional. Reset action surfaced by `<WidgetDashboard.Actions />` and the command palette. When omitted, the reset entry points are hidden.
+Optional. Reset action surfaced by `<WidgetDashboard.Actions />` and the command palette. When omitted, the reset entry points are disabled.
 
 #### `widgetTypes`: `WidgetType[]`
 
