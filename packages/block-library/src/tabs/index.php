@@ -13,7 +13,7 @@
  * @param array  $innerblocks Parsed inner blocks of tabs block.
  * @param string $tabs_id     Unique ID for the tabs instance, used to generate tab IDs.
  *
- * @return array List of tabs with id, label, index.
+ * @return array List of tab IDs.
  */
 function block_core_tabs_generate_tabs_list( array $innerblocks = array(), string $tabs_id = '' ): array {
 	$tabs_list = array();
@@ -24,8 +24,7 @@ function block_core_tabs_generate_tabs_list( array $innerblocks = array(), strin
 			$tab_index = 0;
 			foreach ( $inner_block['innerBlocks'] ?? array() as $tab_block ) {
 				if ( 'core/tab-panel' === ( $tab_block['blockName'] ?? '' ) ) {
-					$attrs     = $tab_block['attrs'] ?? array();
-					$tab_label = $attrs['label'] ?? '';
+					$attrs = $tab_block['attrs'] ?? array();
 
 					$tab_id = ! empty( $attrs['anchor'] )
 						? $attrs['anchor']
@@ -33,11 +32,7 @@ function block_core_tabs_generate_tabs_list( array $innerblocks = array(), strin
 							? $tabs_id . '-tab-' . $tab_index
 							: 'tab-' . $tab_index );
 
-					$tabs_list[] = array(
-						'id'    => esc_attr( $tab_id ),
-						'label' => $tab_label,
-						'index' => $tab_index,
-					);
+					$tabs_list[] = esc_attr( $tab_id );
 					++$tab_index;
 				}
 			}

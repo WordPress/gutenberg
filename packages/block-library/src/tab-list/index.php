@@ -32,13 +32,11 @@ function block_core_tab_list_render_callback( array $attributes, string $content
 	$tab_index     = 0;
 
 	while ( $tag_processor->next_tag( 'button' ) ) {
-		$tab = $tabs_list[ $tab_index ] ?? null;
+		$tab_id = $tabs_list[ $tab_index ] ?? null;
 
-		if ( null === $tab ) {
+		if ( null === $tab_id ) {
 			break;
 		}
-
-		$tab_id = $tab['id'] ?? 'tab-' . $tab_index;
 
 		$tag_processor->set_attribute( 'id', 'tab__' . $tab_id );
 		$tag_processor->set_attribute( 'aria-controls', $tab_id );

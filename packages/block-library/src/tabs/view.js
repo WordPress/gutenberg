@@ -36,7 +36,7 @@ const { actions, state } = store(
 					return null;
 				}
 				const { tabsList } = state;
-				const tabIndex = tabsList.findIndex( ( t ) => t.id === tabId );
+				const tabIndex = tabsList.findIndex( ( t ) => t === tabId );
 				return tabIndex;
 			},
 			/**
@@ -112,7 +112,7 @@ const { actions, state } = store(
 					newIndex = 0;
 				}
 
-				const tabId = tabsList[ newIndex ].id;
+				const tabId = tabsList[ newIndex ];
 				const tabElement = document.getElementById( 'tab__' + tabId );
 				if ( tabElement ) {
 					tabElement.focus();
@@ -142,7 +142,7 @@ const { actions, state } = store(
 				context.activeTabIndex = newIndex;
 
 				if ( scrollToTab ) {
-					const tabId = tabsList[ newIndex ].id;
+					const tabId = tabsList[ newIndex ];
 					const tabElement = document.getElementById( tabId );
 					if ( tabElement ) {
 						setTimeout( () => {
@@ -165,7 +165,7 @@ const { actions, state } = store(
 
 				const { hash } = window.location;
 				const tabId = hash.replace( '#', '' );
-				const tabIndex = tabsList.findIndex( ( t ) => t.id === tabId );
+				const tabIndex = tabsList.findIndex( ( t ) => t === tabId );
 				// Check if tabIndex is a positive number and if so we'll auto activate that tab.
 				if ( tabIndex >= 0 ) {
 					actions.setActiveTab( tabIndex, true );
