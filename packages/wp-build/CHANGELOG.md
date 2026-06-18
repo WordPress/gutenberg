@@ -4,7 +4,9 @@
 
 ## 0.16.1 (2026-06-16)
 
-## 0.16.0 (2026-06-10)
+### Enhancements
+
+-   Support `wpEsbuildPlugin` field in package.json to allow packages to provide a custom ESBuild plugin loaded during transpilation ([#79203](https://github.com/WordPress/gutenberg/issues/79203)).
 
 ### Bug Fixes
 

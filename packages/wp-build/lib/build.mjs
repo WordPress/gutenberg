@@ -1373,6 +1373,22 @@ async function transpilePackage( packageName ) {
 			} );
 		},
 	};
+	// Load package-specific ESBuild plugin if configured in package.json.
+	let packageEsbuildPlugin = null;
+	if ( packageJson.wpEsbuildPlugin ) {
+		const pluginPath = path.resolve(
+			packageDir,
+			packageJson.wpEsbuildPlugin
+		);
+		const { default: createPlugin } = await import( pluginPath );
+		packageEsbuildPlugin = createPlugin( {
+			packageDir,
+			isGutenbergPlugin: JSON.parse(
+				baseDefine[ 'globalThis.IS_GUTENBERG_PLUGIN' ]
+			),
+		} );
+	}
+
 	const plugins = [
 		// Note: dsTokenFallbacksJs and emotionPlugin both use esbuild's onLoad
 		// hook, which is non-composable — the first to return contents wins. If a
@@ -1380,6 +1396,7 @@ async function transpilePackage( packageName ) {
 		// Avoid using design tokens in Emotion styles until Emotion is removed.
 		dsTokenFallbacksJs,
 		needsEmotionPlugin && emotionPlugin,
+		packageEsbuildPlugin,
 		wasmInlinePlugin,
 		// CSS modules import @wordpress/style-runtime in generated JS. Resolve
 		// that alias before externalizing imports so the runtime is bundled.
