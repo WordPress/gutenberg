@@ -660,10 +660,6 @@ class WP_Theme_JSON_Gutenberg {
 			}
 		}
 
-		if ( ! static::is_valid_viewport_breakpoint_order( $breakpoints ) ) {
-			return static::DEFAULT_VIEWPORT_BREAKPOINTS;
-		}
-
 		return $breakpoints;
 	}
 
@@ -706,33 +702,6 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Checks whether mobile remains below tablet when both use the same unit.
-	 *
-	 * @since 7.1.0
-	 *
-	 * @param array $breakpoints Viewport breakpoint sizes.
-	 * @return bool Whether the breakpoint order is valid.
-	 */
-	private static function is_valid_viewport_breakpoint_order( $breakpoints ) {
-		$pattern = '/^(\d+|\d*\.\d+)([a-z]+)$/';
-		if (
-			1 !== preg_match( $pattern, $breakpoints['mobile'], $mobile_matches ) ||
-			1 !== preg_match( $pattern, $breakpoints['tablet'], $tablet_matches )
-		) {
-			return true;
-		}
-
-		if (
-			strtolower( $mobile_matches[2] ) === strtolower( $tablet_matches[2] ) &&
-			(float) $mobile_matches[1] >= (float) $tablet_matches[1]
-		) {
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
 	 * Sanitizes viewport breakpoint settings.
 	 *
 	 * @since 7.1.0
@@ -757,15 +726,6 @@ class WP_Theme_JSON_Gutenberg {
 
 		if ( empty( $sanitized ) ) {
 			return $sanitized;
-		}
-
-		$breakpoints = static::DEFAULT_VIEWPORT_BREAKPOINTS;
-		foreach ( $sanitized as $breakpoint => $value ) {
-			$breakpoints[ $breakpoint ] = $value;
-		}
-
-		if ( ! static::is_valid_viewport_breakpoint_order( $breakpoints ) ) {
-			return array();
 		}
 
 		return $sanitized;

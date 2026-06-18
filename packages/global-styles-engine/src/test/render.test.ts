@@ -1126,6 +1126,53 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
+		it( 'uses custom viewport breakpoints without enforcing order', () => {
+			const tree = {
+				settings: {
+					viewport: {
+						mobile: '960px',
+						tablet: '640px',
+					},
+				},
+				styles: {
+					blocks: {
+						'core/button': {
+							mobile: {
+								color: {
+									text: 'blue',
+								},
+							},
+							tablet: {
+								color: {
+									text: 'green',
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				'@media (width <= 960px){:root :where(.wp-block-button){color: blue;}}@media (960px < width <= 640px){:root :where(.wp-block-button){color: green;}}'
+			);
+		} );
+
 		it( 'handles responsive pseudo selector styles', () => {
 			const tree = {
 				styles: {

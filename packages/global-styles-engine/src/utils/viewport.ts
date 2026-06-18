@@ -37,36 +37,6 @@ function isValidViewportSize( value: unknown ): value is string {
 	);
 }
 
-function parseViewportSize( value: string ) {
-	const match = value.match( /^(\d+|\d*\.\d+)([a-z]+)$/ );
-	if ( ! match ) {
-		return null;
-	}
-
-	return {
-		value: Number( match[ 1 ] ),
-		unit: match[ 2 ].toLowerCase(),
-	};
-}
-
-function validateViewportBreakpointOrder(
-	breakpoints: Record< ViewportBreakpoint, string >
-): Record< ViewportBreakpoint, string > {
-	const mobile = parseViewportSize( breakpoints.mobile );
-	const tablet = parseViewportSize( breakpoints.tablet );
-
-	if (
-		mobile &&
-		tablet &&
-		mobile.unit === tablet.unit &&
-		mobile.value >= tablet.value
-	) {
-		return DEFAULT_VIEWPORT_BREAKPOINTS;
-	}
-
-	return breakpoints;
-}
-
 export function getViewportBreakpoints(
 	configOrSettings?: GlobalStylesConfig | ViewportSettings
 ): Record< ViewportBreakpoint, string > {
@@ -81,7 +51,7 @@ export function getViewportBreakpoints(
 		}
 	} );
 
-	return validateViewportBreakpointOrder( breakpoints );
+	return breakpoints;
 }
 
 export function getResponsiveMediaQueries(
