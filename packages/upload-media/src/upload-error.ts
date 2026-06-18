@@ -17,9 +17,6 @@ export enum ErrorCode {
 	IMAGE_ROTATION_ERROR = 'IMAGE_ROTATION_ERROR',
 	MEDIA_TRANSCODING_ERROR = 'MEDIA_TRANSCODING_ERROR',
 
-	// User action
-	ABORTED = 'ABORTED',
-
 	// Generic fallback
 	GENERAL = 'GENERAL',
 }

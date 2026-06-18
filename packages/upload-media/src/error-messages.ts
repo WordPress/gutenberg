@@ -111,14 +111,6 @@ export function getErrorMessage(
 			),
 			action: __( 'The file may be corrupted. Try a different file.' ),
 		},
-		[ ErrorCode.ABORTED ]: {
-			title: __( 'Upload cancelled' ),
-			description: sprintf(
-				/* translators: %s: file name */
-				__( 'The upload of "%s" was cancelled.' ),
-				fileName
-			),
-		},
 		[ ErrorCode.GENERAL ]: {
 			title: __( 'Upload failed' ),
 			description: sprintf(
