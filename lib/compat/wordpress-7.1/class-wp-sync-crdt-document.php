@@ -128,6 +128,17 @@ if ( ! class_exists( 'WP_Sync_CRDT_Document' ) ) {
 		}
 
 		/**
+		 * Encodes the full document state as a single compaction update.
+		 *
+		 * @since 7.1.0
+		 *
+		 * @return string Base64-encoded V2 full-state update.
+		 */
+		public function encode_state_as_compaction(): string {
+			return Yjs\encodeStateAsUpdateV2( $this->doc )->toBase64();
+		}
+
+		/**
 		 * Checks whether a base64-encoded V2 update contains no structs or deletes.
 		 *
 		 * @since 7.1.0

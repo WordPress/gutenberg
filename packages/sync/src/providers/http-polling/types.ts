@@ -7,7 +7,8 @@ export type AwarenessState = Record< string, LocalAwarenessState >;
  * - sync_step1: State vector announcement
  * - sync_step2: Acknowledgment, missing updates response
  * - update: Regular document update (persisted until save)
- * - compaction: Merged updates using Y.mergeUpdates replacing all prior updates
+ * - compaction: Full document state generated server-side, replacing all prior
+ *   updates. Clients only ever receive and apply these, never generate them.
  */
 export enum SyncUpdateType {
 	COMPACTION = 'compaction',
@@ -31,9 +32,7 @@ interface SyncEnvelopeFromClient {
 
 interface SyncEnvelopeFromServer {
 	awareness: AwarenessState;
-	compaction_request?: SyncUpdate[]; // deprecated
 	end_cursor: number; // use as `after` in next request
-	should_compact?: boolean;
 	room: string;
 	updates: SyncUpdate[];
 }

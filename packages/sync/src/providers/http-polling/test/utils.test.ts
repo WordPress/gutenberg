@@ -492,7 +492,7 @@ describe( 'http-polling utils', () => {
 				expect( result[ 1 ] ).toEqual( existing );
 			} );
 
-			it( 'filters out compaction updates', () => {
+			it( 'restores all updates regardless of type', () => {
 				const queue = createUpdateQueue( [], false );
 				const toRestore = [
 					createSyncUpdate(
@@ -512,9 +512,7 @@ describe( 'http-polling utils', () => {
 				queue.restore( toRestore );
 
 				const result = queue.get();
-				expect( result ).toHaveLength( 2 );
-				expect( result[ 0 ].type ).toBe( SyncUpdateType.UPDATE );
-				expect( result[ 1 ].type ).toBe( SyncUpdateType.UPDATE );
+				expect( result ).toEqual( toRestore );
 			} );
 
 			it( 'handles empty restore array', () => {
@@ -530,8 +528,8 @@ describe( 'http-polling utils', () => {
 				expect( queue.size() ).toBe( 1 );
 			} );
 
-			it( 'handles restore array with only compaction updates', () => {
-				const queue = createUpdateQueue();
+			it( 'restores to the front of the queue', () => {
+				const queue = createUpdateQueue( [], false );
 				const existing = createSyncUpdate(
 					new Uint8Array( [ 1 ] ),
 					SyncUpdateType.UPDATE
@@ -539,15 +537,17 @@ describe( 'http-polling utils', () => {
 				const toRestore = [
 					createSyncUpdate(
 						new Uint8Array( [ 2 ] ),
-						SyncUpdateType.COMPACTION
+						SyncUpdateType.UPDATE
 					),
 				];
 
 				queue.add( existing );
 				queue.restore( toRestore );
 
-				// Only the existing update should remain
-				expect( queue.size() ).toBe( 1 );
+				const result = queue.get();
+				expect( result ).toHaveLength( 2 );
+				expect( result[ 0 ] ).toEqual( toRestore[ 0 ] );
+				expect( result[ 1 ] ).toEqual( existing );
 			} );
 		} );
 

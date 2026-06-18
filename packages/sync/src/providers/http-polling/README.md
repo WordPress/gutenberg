@@ -55,7 +55,7 @@ Updates are tagged with a type to enable different server-side handling:
 | `sync_step1` | State vector announcement    | Stored, delivered to other clients   |
 | `sync_step2` | Missing updates response     | Stored, delivered to other clients   |
 | `update`     | Regular document change      | Stored until compacted               |
-| `compaction` | Full document state via Y.encodeStateAsUpdate | Clears older updates, then stored |
+| `compaction` | Full document state via Y.encodeStateAsUpdate | Generated server-side; clears older updates, then stored. Clients only receive these. |
 
 ## Data Flow
 
@@ -92,7 +92,6 @@ Each poll cycle:
 4. **Receive response** with updates and awareness from other clients
 5. **Process updates** and generate any required responses (e.g., sync_step2)
 6. **Apply to Y.Doc** using the appropriate Yjs method
-7. **Handle compaction request** if server nominates this client
 
 ### Polling Interval Filters
 
@@ -109,13 +108,13 @@ The Yjs sync protocol ensures clients converge to the same state:
 
 ### 4. Compaction
 
-To prevent unbounded message growth, the server coordinates compaction:
+To prevent unbounded message growth, the server compacts each room on its own, without involving clients:
 
-1. **Threshold reached**: Server detects >50 stored updates for a room
-2. **Client selection**: Server nominates the lowest active client ID
-3. **Compaction request**: Server sends `should_compact: true` to the nominated client
-4. **Client encodes**: Uses `Y.encodeStateAsUpdate()` to capture the full document state
-5. **Client sends compaction**: The encoded state replaces older updates on the server
+1. **Threshold reached**: While handling a request, the server detects >100 stored updates for a room
+2. **Server encodes**: It reconstructs the authoritative document and uses `Y.encodeStateAsUpdateV2()` to capture the full document state
+3. **Server compacts**: It stores that full-state update as a `compaction`, then removes every update the snapshot covered
+
+This is lock-free. Deletion is bounded by the snapshot cursor, so updates that arrive concurrently are never removed, while the stored compaction fully represents everything the snapshot covered. Clients only ever receive and apply compaction updates, never generate them.
 
 ### 5. Awareness
 
@@ -163,8 +162,7 @@ Single endpoint for bidirectional sync including awareness. Clients send their u
       },
       "updates": [
         { "type": "update", "data": "base64-encoded-yjs-update" }
-      ],
-      "should_compact": false
+      ]
     }
   ]
 }
@@ -177,7 +175,6 @@ Single endpoint for bidirectional sync including awareness. Clients send their u
 - `after`: Cursor timestamp; only receive updates newer than this
 - `awareness`: Client's awareness state (or null to disconnect)
 - `end_cursor`: New cursor to use in next request
-- `should_compact`: Boolean indicating whether this client should compact
 - `updates`: Array of typed updates with base64-encoded Yjs data
 
 ## Permissions
@@ -226,8 +223,7 @@ array(
 ### Client-Side
 
 - **Exponential backoff**: On HTTP errors, retry interval doubles (max 30s)
-- **Queue restoration**: Failed updates are restored to the front of the queue
-- **Compaction filtering**: Compaction updates are not restored (avoid duplicate compaction)
+- **Queue restoration**: Failed updates are restored to the front of the queue and re-sent. Re-applying an update Yjs already has is a no-op, and any duplicate rows the server stores are bounded by server-side compaction
 - **Automatic recovery**: Polling resumes at normal interval after success
 
 ### Server-Side
@@ -253,6 +249,6 @@ All CRDT operations happen in the browser via Yjs.
 
 Updates are not instant; there's inherent latency from the polling interval (1000ms with collaborators by default). This is acceptable for document editing but may not suit real-time cursor tracking at high fidelity.
 
-### Single Compactor
+### Server-Side Compaction
 
-Only one client performs compaction at a time (the one with the lowest client ID). If that client disconnects before completing compaction, the server will nominate the next-lowest client ID on subsequent polls.
+The server compacts each room on its own once it accumulates more than 100 stored updates, reconstructing the document and replacing the stored updates with a single full-state `compaction`. It is lock-free: deletion is bounded by the snapshot cursor, so concurrently arriving updates are preserved while everything the snapshot covered is represented by the compaction. Clients never generate compactions.

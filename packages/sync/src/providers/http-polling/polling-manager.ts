@@ -79,7 +79,6 @@ interface RegisterRoomOptions {
 
 interface RoomState {
 	clientId: number;
-	createCompactionUpdate: () => SyncUpdate;
 	endCursor: number;
 	isPrimaryRoom: boolean;
 	localAwarenessState: LocalAwarenessState;
@@ -211,33 +210,6 @@ function handleForbiddenError(
 }
 
 const roomStates: Map< string, RoomState > = new Map();
-
-/**
- * Create a compaction update by merging existing updates. This preserves
- * the original operation metadata (client IDs, logical clocks) so that
- * Yjs deduplication works correctly when the compaction is applied.
- *
- * Deprecated: The server is moving towards full state updates for compaction.
- *
- * @param updates The updates to merge
- */
-function createDeprecatedCompactionUpdate( updates: SyncUpdate[] ): SyncUpdate {
-	// Extract only compaction and update types for merging (skip sync-step updates).
-	// Decode base64 updates to Uint8Array for merging.
-	const mergeable = updates
-		.filter( ( u ) =>
-			[ SyncUpdateType.COMPACTION, SyncUpdateType.UPDATE ].includes(
-				u.type
-			)
-		)
-		.map( ( u ) => base64ToUint8Array( u.data ) );
-
-	// Merge all updates while preserving operation metadata.
-	return createSyncUpdate(
-		Y.mergeUpdatesV2( mergeable ),
-		SyncUpdateType.COMPACTION
-	);
-}
 
 /**
  * Create sync step 1 update (announce our state vector).
@@ -771,25 +743,6 @@ function poll(): void {
 				}
 
 				roomState.updateQueue.addBulk( responseUpdates );
-
-				// Respond to compaction requests from server. The server asks only one
-				// client at a time to compact (lowest active client ID). We encode our
-				// full document state to replace all prior updates on the server.
-				if ( room.should_compact ) {
-					roomState.log( 'Server requested compaction update' );
-					roomState.updateQueue.clear();
-					roomState.updateQueue.add(
-						roomState.createCompactionUpdate()
-					);
-				} else if ( room.compaction_request ) {
-					// Deprecated
-					roomState.log( 'Server requested (old) compaction update' );
-					roomState.updateQueue.add(
-						createDeprecatedCompactionUpdate(
-							room.compaction_request
-						)
-					);
-				}
 			} );
 
 			// Recalculate polling interval.
@@ -885,14 +838,10 @@ function poll(): void {
 
 				// Recover from the failed request. We don't know whether the server stored
 				// our updates before the error occurred (e.g. a network timeout after a
-				// successful write). Re-sending the same updates via restore() would
-				// duplicate them on the server and cause unbounded storage growth.
-				//
-				// Instead, for rooms that had outgoing updates, replace the queue with a
-				// single compaction (full document state). This is idempotent: if the
-				// server already stored the updates, the compaction safely supersedes
-				// them; if it didn't, the compaction includes them. Updates not seen by
-				// this client are preserved in both cases.
+				// successful write), so restore the outgoing updates to the front of the
+				// queue to be re-sent. Re-applying an update Yjs already has is a no-op,
+				// and any duplicate rows the server stores are bounded by its periodic
+				// server-side compaction.
 				for ( const room of payload.rooms ) {
 					if ( ! roomStates.has( room.room ) ) {
 						continue;
@@ -900,10 +849,7 @@ function poll(): void {
 
 					const state = roomStates.get( room.room )!;
 
-					if ( room.updates.length > 0 && state.endCursor > 0 ) {
-						state.updateQueue.clear();
-						state.updateQueue.add( state.createCompactionUpdate() );
-					} else if ( room.updates.length > 0 ) {
+					if ( room.updates.length > 0 ) {
 						state.updateQueue.restore( room.updates );
 					}
 
@@ -1041,11 +987,6 @@ function registerRoom( {
 
 	const roomState: RoomState = {
 		clientId: doc.clientID,
-		createCompactionUpdate: () =>
-			createSyncUpdate(
-				Y.encodeStateAsUpdateV2( doc ),
-				SyncUpdateType.COMPACTION
-			),
 		endCursor: 0,
 		isPrimaryRoom,
 		localAwarenessState: awareness.getLocalState() ?? {},

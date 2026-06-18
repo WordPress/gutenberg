@@ -711,7 +711,6 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 		$this->assertArrayHasKey( 'updates', $room_data );
 		$this->assertArrayHasKey( 'end_cursor', $room_data );
 		$this->assertArrayHasKey( 'total_updates', $room_data );
-		$this->assertArrayHasKey( 'should_compact', $room_data );
 	}
 
 	public function test_sync_response_room_matches_request() {
@@ -1155,7 +1154,9 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 	 * Compaction tests.
 	 */
 
-	public function test_sync_should_compact_is_false_below_threshold() {
+	public function test_sync_response_omits_should_compact_field() {
+		$this->skip_if_sync_server_class_is_provided_by_wordpress_core();
+
 		wp_set_current_user( self::$editor_id );
 
 		$room   = $this->get_post_room();
@@ -1164,7 +1165,8 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 			'data' => $this->create_yjs_update( 'compact seed', 501 ),
 		);
 
-		// Client 1 sends a single update.
+		// Compaction is performed server-side, so clients are never asked to
+		// compact and the response carries no should_compact field.
 		$response = $this->dispatch_sync(
 			array(
 				$this->build_room( $room, 1, 0, array( 'user' => 'c1' ), array( $update ) ),
@@ -1172,67 +1174,84 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 		);
 
 		$data = $response->get_data();
-		$this->assertFalse( $data['rooms'][0]['should_compact'] );
+		$this->assertArrayNotHasKey( 'should_compact', $data['rooms'][0] );
 	}
 
-	public function test_sync_should_compact_is_true_above_threshold_for_compactor() {
+	public function test_sync_server_does_not_compact_at_or_below_threshold() {
+		$this->skip_if_sync_server_class_is_provided_by_wordpress_core();
+
 		wp_set_current_user( self::$editor_id );
 
 		$room    = $this->get_post_room();
 		$updates = array();
-		for ( $i = 0; $i < 51; $i++ ) {
+		for ( $i = 0; $i < 100; $i++ ) {
 			$updates[] = array(
 				'type' => 'update',
 				'data' => $this->create_yjs_update( "update-$i", 600 + $i ),
 			);
 		}
 
-		// Client 1 sends enough updates to exceed the compaction threshold.
-		$this->dispatch_sync(
+		// Exactly at the threshold (100): the room is left untouched.
+		$response = $this->dispatch_sync(
 			array(
 				$this->build_room( $room, 1, 0, array( 'user' => 'c1' ), $updates ),
 			)
 		);
 
-		// Client 1 polls again. It is the lowest (only) client, so it is the compactor.
-		$response = $this->dispatch_sync(
-			array(
-				$this->build_room( $room, 1, 0, array( 'user' => 'c1' ) ),
-			)
-		);
-
 		$data = $response->get_data();
-		$this->assertTrue( $data['rooms'][0]['should_compact'] );
+		$this->assertSame( 100, $data['rooms'][0]['total_updates'] );
 	}
 
-	public function test_sync_should_compact_is_false_for_non_compactor() {
+	public function test_sync_server_compacts_above_threshold() {
+		$this->skip_if_sync_server_class_is_provided_by_wordpress_core();
+
 		wp_set_current_user( self::$editor_id );
 
-		$room    = $this->get_post_room();
-		$updates = array();
-		for ( $i = 0; $i < 51; $i++ ) {
-			$updates[] = array(
+		$room        = $this->get_post_room();
+		$updates     = array();
+		$raw_updates = array();
+		for ( $i = 0; $i < 101; $i++ ) {
+			$data          = $this->create_yjs_update( "update-$i ", 600 + $i );
+			$raw_updates[] = $data;
+			$updates[]     = array(
 				'type' => 'update',
-				'data' => $this->create_yjs_update( "update-$i", 700 + $i ),
+				'data' => $data,
 			);
 		}
 
-		// Client 1 sends enough updates to exceed the compaction threshold.
-		$this->dispatch_sync(
+		// Exceeding the threshold (101) triggers a server-side compaction that
+		// collapses every stored update into a single compaction row.
+		$response = $this->dispatch_sync(
 			array(
 				$this->build_room( $room, 1, 0, array( 'user' => 'c1' ), $updates ),
 			)
 		);
 
-		// Client 2 (higher ID than client 1) should not be the compactor.
-		$response = $this->dispatch_sync(
+		$this->assertSame( 1, $response->get_data()['rooms'][0]['total_updates'] );
+
+		// A fresh client polling from cursor 0 receives only the compaction.
+		$observer  = $this->dispatch_sync(
 			array(
-				$this->build_room( $room, 2, 0, array( 'user' => 'c2' ) ),
+				$this->build_room( $room, 999, 0, array( 'user' => 'observer' ) ),
 			)
 		);
+		$delivered = $observer->get_data()['rooms'][0]['updates'];
 
-		$data = $response->get_data();
-		$this->assertFalse( $data['rooms'][0]['should_compact'] );
+		$this->assertCount( 1, $delivered );
+		$this->assertSame( 'compaction', $delivered[0]['type'] );
+
+		// The compaction preserves the full document state.
+		$expected_doc = new Yjs\Doc();
+		foreach ( $raw_updates as $raw ) {
+			Yjs\applyUpdateV2( $expected_doc, Yjs\Lib0\Buffer::fromBase64( $raw ) );
+		}
+
+		$compacted_doc = $this->apply_yjs_update( $delivered[0]['data'] );
+
+		$this->assertSame(
+			$expected_doc->getText( 'text' )->toString(),
+			$compacted_doc->getText( 'text' )->toString()
+		);
 	}
 
 	public function test_sync_stale_compaction_is_stored_as_update_when_newer_compaction_exists() {

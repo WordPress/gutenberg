@@ -1163,7 +1163,7 @@ describe( 'polling-manager', () => {
 			).toBe( false );
 		} );
 
-		it( 'replaces queued updates with a compaction after a poll error', async () => {
+		it( 'restores queued updates after a poll error', async () => {
 			// First poll: succeed with collaborators to resume the queue.
 			const responseWithCollaborator = {
 				rooms: [
@@ -1209,12 +1209,13 @@ describe( 'polling-manager', () => {
 					updates: Array< { type: string } >;
 				} >;
 			};
-			expect(
-				secondCallPayload.rooms[ 0 ].updates.length
-			).toBeGreaterThan( 0 );
+			const failedUpdateTypes = secondCallPayload.rooms[ 0 ].updates.map(
+				( update ) => update.type
+			);
+			expect( failedUpdateTypes.length ).toBeGreaterThan( 0 );
 
-			// Third poll: succeed — verify it sends a compaction instead of
-			// restoring the same updates.
+			// Third poll: succeed. Verify it re-sends the same restored updates
+			// rather than generating a client-side compaction.
 			mockPostSyncUpdate.mockResolvedValueOnce(
 				responseWithCollaborator
 			);
@@ -1230,11 +1231,15 @@ describe( 'polling-manager', () => {
 				} >;
 			};
 			const retryUpdates = thirdCallPayload.rooms[ 0 ].updates;
-			expect( retryUpdates ).toHaveLength( 1 );
-			expect( retryUpdates[ 0 ].type ).toBe( 'compaction' );
+			expect( retryUpdates.map( ( update ) => update.type ) ).toEqual(
+				failedUpdateTypes
+			);
+			expect(
+				retryUpdates.some( ( update ) => update.type === 'compaction' )
+			).toBe( false );
 		} );
 
-		it( 'does not queue a compaction for rooms with no outgoing updates', async () => {
+		it( 'does not queue any updates for rooms with no outgoing updates', async () => {
 			// First poll succeeds (no collaborators, queue stays paused).
 			mockPostSyncUpdate.mockResolvedValueOnce( syncResponse );
 
@@ -1264,7 +1269,7 @@ describe( 'polling-manager', () => {
 			};
 			expect( secondCallPayload.rooms[ 0 ].updates ).toHaveLength( 0 );
 
-			// Third poll: succeed — should still have no updates (no compaction queued).
+			// Third poll: succeed. Should still have no updates to send.
 			// First failure solo: retry in 2000ms (schedule[0]).
 			mockPostSyncUpdate.mockResolvedValueOnce( syncResponse );
 			await jest.advanceTimersByTimeAsync( 2000 );

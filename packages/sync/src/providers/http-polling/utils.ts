@@ -10,7 +10,7 @@ import {
 	type SyncPayload,
 	type SyncResponse,
 	type SyncUpdate,
-	SyncUpdateType,
+	type SyncUpdateType,
 	type UpdateQueue,
 } from './types';
 
@@ -86,16 +86,12 @@ export function createUpdateQueue(
 			return [ ...updates ];
 		},
 		restore( restoredUpdates: SyncUpdate[] ): void {
-			// Restore to front of the queue on failure. Remove compaction updates.
-			const filtered = restoredUpdates.filter(
-				( u ) => u.type !== SyncUpdateType.COMPACTION
-			);
-
-			if ( 0 === filtered.length ) {
+			// Restore to front of the queue on failure.
+			if ( 0 === restoredUpdates.length ) {
 				return;
 			}
 
-			updates.unshift( ...filtered );
+			updates.unshift( ...restoredUpdates );
 		},
 		restoreExact( restoredUpdates: SyncUpdate[] ): void {
 			if ( 0 === restoredUpdates.length ) {

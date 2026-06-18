@@ -40,12 +40,24 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		const AWARENESS_TIMEOUT = 30;
 
 		/**
-		 * Threshold used to signal clients to send a compaction update.
+		 * Number of stored updates above which the server compacts a room into a
+		 * single full-state update.
 		 *
-		 * @since 7.0.0
+		 * @since 7.1.0
 		 * @var int
 		 */
-		const COMPACTION_THRESHOLD = 50;
+		const SERVER_COMPACTION_THRESHOLD = 100;
+
+		/**
+		 * Client ID attributed to server-generated updates such as compactions.
+		 *
+		 * Real clients always use an ID of 1 or greater, so 0 is reserved for the
+		 * server and never collides with a peer.
+		 *
+		 * @since 7.1.0
+		 * @var int
+		 */
+		const SERVER_CLIENT_ID = 0;
 
 		/**
 		 * Maximum total size (in bytes) of the request body.
@@ -320,12 +332,6 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 				// Merge awareness state.
 				$merged_awareness = $this->process_awareness_update( $room, $client_id, $awareness );
 
-				// The lowest client ID is nominated to perform compaction when needed.
-				$is_compactor = false;
-				if ( count( $merged_awareness ) > 0 ) {
-					$is_compactor = min( array_keys( $merged_awareness ) ) === $client_id;
-				}
-
 				$document = $this->create_crdt_document( $room );
 				if ( is_wp_error( $document ) ) {
 					return $document;
@@ -342,8 +348,14 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 					$direct_response_updates = array_merge( $direct_response_updates, $result );
 				}
 
+				// Compact the room server-side once it has accumulated enough updates.
+				$compaction_result = $this->maybe_compact_room( $room );
+				if ( is_wp_error( $compaction_result ) ) {
+					return $compaction_result;
+				}
+
 				// Get stored updates for this client, then append request-local responses.
-				$room_response              = $this->get_updates( $room, $client_id, $cursor, $is_compactor );
+				$room_response              = $this->get_updates( $room, $client_id, $cursor );
 				$room_response['updates']   = array_merge( $room_response['updates'], $direct_response_updates );
 				$room_response['awareness'] = $merged_awareness;
 
@@ -600,16 +612,14 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		 * @param string $room         Room identifier.
 		 * @param int    $client_id    Client identifier.
 		 * @param int    $cursor       Return updates after this cursor.
-		 * @param bool   $is_compactor True if this client is nominated to perform compaction.
 		 * @return array{
 		 *   end_cursor: int,
-		 *   should_compact: bool,
 		 *   room: string,
 		 *   total_updates: int,
 		 *   updates: array<int, array{data: string, type: string}>,
 		 * } Response data for this room.
 		 */
-		private function get_updates( string $room, int $client_id, int $cursor, bool $is_compactor ): array {
+		private function get_updates( string $room, int $client_id, int $cursor ): array {
 			$updates_after_cursor = $this->storage->get_updates_after_cursor( $room, $cursor );
 			$total_updates        = $this->storage->get_update_count( $room );
 
@@ -630,15 +640,72 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 				);
 			}
 
-			$should_compact = $is_compactor && $total_updates > self::COMPACTION_THRESHOLD;
-
 			return array(
-				'end_cursor'     => $this->storage->get_cursor( $room ),
-				'room'           => $room,
-				'should_compact' => $should_compact,
-				'total_updates'  => $total_updates,
-				'updates'        => $typed_updates,
+				'end_cursor'    => $this->storage->get_cursor( $room ),
+				'room'          => $room,
+				'total_updates' => $total_updates,
+				'updates'       => $typed_updates,
 			);
+		}
+
+		/**
+		 * Compacts a room's stored updates into a single full-state update once
+		 * the number of stored updates exceeds the server compaction threshold.
+		 *
+		 * The server reconstructs the authoritative document from a fresh
+		 * snapshot, encodes it as a single full-state update, stores that update,
+		 * and then removes every update covered by the snapshot. This mirrors a
+		 * peer-initiated compaction and is lock-free: the snapshot cursor bounds
+		 * the deletion, so updates that arrive concurrently (with a marker greater
+		 * than the cursor) are never removed, while the stored compaction fully
+		 * represents everything at or below the cursor.
+		 *
+		 * @since 7.1.0
+		 *
+		 * @param string $room Room identifier.
+		 * @return true|WP_Error True on success or when no compaction is needed, WP_Error on failure.
+		 */
+		private function maybe_compact_room( string $room ) {
+			$snapshot = $this->storage->get_update_snapshot( $room );
+
+			if ( $snapshot['total_updates'] <= self::SERVER_COMPACTION_THRESHOLD ) {
+				return true;
+			}
+
+			$cursor  = $snapshot['cursor'];
+			$factory = $this->crdt_document_factory;
+
+			try {
+				$document        = $factory( $snapshot['updates'] );
+				$compaction_data = $document->encode_state_as_compaction();
+			} catch ( Throwable $error ) {
+				return $this->crdt_error_response( $error );
+			}
+
+			/*
+			 * Store the full-state compaction before removing anything so no data
+			 * is dropped if the deletion fails. Its marker is greater than the
+			 * snapshot cursor, so the deletion below never removes it.
+			 */
+			$result = $this->add_update( $room, self::SERVER_CLIENT_ID, self::UPDATE_TYPE_COMPACTION, $compaction_data );
+			if ( is_wp_error( $result ) ) {
+				return $result;
+			}
+
+			/*
+			 * Remove every update covered by the snapshot (marker <= cursor).
+			 * Updates that arrived concurrently keep a marker greater than the
+			 * cursor and are preserved alongside the new compaction.
+			 */
+			if ( ! $this->storage->remove_updates_before_cursor( $room, $cursor + 1 ) ) {
+				return new WP_Error(
+					'rest_sync_storage_error',
+					__( 'Failed to remove updates during compaction.', 'gutenberg' ),
+					array( 'status' => 500 )
+				);
+			}
+
+			return true;
 		}
 	}
 }
