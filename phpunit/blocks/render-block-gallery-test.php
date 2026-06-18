@@ -147,12 +147,16 @@ class Tests_Blocks_Render_Gallery extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_dynamic_unknown_source_renders_no_images() {
+	public function test_dynamic_source_with_no_images_renders_nothing() {
+		// An unrecognized source (like a valid source that resolves to no images)
+		// should render nothing at all — not an empty gallery wrapper.
 		$output = $this->render_in_loop(
 			'<!-- wp:gallery {"dynamicContent":{"source":"notARealSource"}} /-->'
 		);
 
 		$this->assertStringNotContainsString( 'wp-block-image', $output );
+		$this->assertStringNotContainsString( 'wp-block-gallery', $output );
+		$this->assertSame( '', trim( $output ) );
 	}
 
 	public function test_dynamic_gallery_renders_saved_caption_after_images() {

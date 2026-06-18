@@ -254,13 +254,22 @@ function block_core_gallery_render_dynamic_image( $attachment_id, $attributes, $
  * @return string The content of the block being rendered.
  */
 function block_core_gallery_render( $attributes, $content, $block ) {
-	// In dynamic mode the gallery persists no markup (`save.js` returns null);
-	// resolve the configured source to a list of attachments, render an image
-	// block for each, and build the gallery `<figure>` wrapper from scratch. The
-	// existing gap/randomOrder/lightbox post-processing below then runs over the
+	// In dynamic mode the gallery's images are resolved at render time instead of
+	// being authored as inner blocks, so `save.js` persists at most the
+	// gallery-level caption — a bare `<figcaption>`, or nothing when there is no
+	// caption. Resolve the configured source to a list of attachments, render an
+	// image block for each, and build the gallery `<figure>` wrapper from scratch.
+	// The gap/randomOrder/lightbox post-processing below then runs over the
 	// constructed markup unchanged.
 	if ( ! empty( $attributes['dynamicContent'] ) ) {
 		$attachment_ids = block_core_gallery_resolve_dynamic_source( $attributes['dynamicContent'], $block );
+
+		// Nothing resolved — no attachments, or an unrecognized source. Render
+		// nothing rather than an empty gallery wrapper; a saved caption is
+		// meaningless without images, so it is intentionally dropped too.
+		if ( empty( $attachment_ids ) ) {
+			return '';
+		}
 
 		// Expose the gallery's provided context (plus galleryId/postId/postType)
 		// to each image block, since these images are rendered outside the
