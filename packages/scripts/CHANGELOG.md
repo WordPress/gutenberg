@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `lint-style`: Detect .cjs and .mjs config files so the bundled default config is not used when one of these is present ([#79226](https://github.com/WordPress/gutenberg/pull/79226)).
+-   `lint-style`: Use stylelint's `resolveConfig` for config detection instead of a static extension list, supporting all current and future config file formats without manual maintenance overhead ([#79226](https://github.com/WordPress/gutenberg/pull/79226)).
 
 ## 32.4.1 (2026-06-16)
 

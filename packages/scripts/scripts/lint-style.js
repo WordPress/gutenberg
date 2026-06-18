@@ -3,7 +3,7 @@
  */
 const { sync: spawn } = require( 'cross-spawn' );
 const { sync: resolveBin } = require( 'resolve-bin' );
-const { cosmiconfig } = require( 'cosmiconfig' );
+const stylelint = require( 'stylelint' );
 
 /**
  * Internal dependencies
@@ -31,14 +31,21 @@ async function main() {
 		? [ '--ignore-path', fromConfigRoot( '.stylelintignore' ) ]
 		: [];
 
-	// Use cosmiconfig (stylelint's own config resolver) instead of a static
-	// extension list so we automatically support all current and future
-	// stylelint config file names and extensions (.ts, etc.).
-	// The async API is required over cosmiconfigSync because the latter does not search for .mjs config files.
 	// See: https://stylelint.io/user-guide/configure/
 	const hasLintConfig =
 		hasArgInCLI( '--config' ) ||
-		( await cosmiconfig( 'stylelint' ).search( process.cwd() ) ) !== null;
+		( await stylelint
+			.resolveConfig( 'index.css', { cwd: process.cwd() } )
+			.then( ( config ) => config !== undefined )
+			.catch( ( err ) => {
+				// "No configuration provided" means no user config found;
+				// inject the bundled default.
+				// Other errors mean the config exists but is broken; let stylelint report them during linting.
+				if ( err.message?.includes( 'No configuration provided' ) ) {
+					return false;
+				}
+				return true;
+			} ) );
 
 	const defaultConfigArgs = ! hasLintConfig
 		? [ '--config', fromConfigRoot( '.stylelintrc.json' ) ]
