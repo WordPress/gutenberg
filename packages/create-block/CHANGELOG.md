@@ -4,7 +4,7 @@
 
 ### Documentation
 
--   Fix `thats` typo to `that's` in external template documentation.
+-   Fix `thats` typo to `that's` in external template documentation. ([#79331](https://github.com/WordPress/gutenberg/pull/79331))
 
 ## 4.91.1 (2026-06-16)
 

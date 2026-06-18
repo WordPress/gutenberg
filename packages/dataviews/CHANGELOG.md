@@ -18,7 +18,7 @@
 
 ### Documentation
 
-- Fix `overriden` typo to `overridden` in README.
+- Fix `overriden` typo to `overridden` in README. ([#79331](https://github.com/WordPress/gutenberg/pull/79331))
 
 ### Internal
 
