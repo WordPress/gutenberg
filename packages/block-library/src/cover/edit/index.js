@@ -521,22 +521,58 @@ function CoverEdit( {
 			onClose: () => {
 				editMediaButtonRef.current?.focus();
 			},
-			onUpdate: ( { id: newId, url: newUrl } ) => {
+			onUpdate: async ( { id: newId, url: newUrl } ) => {
 				if ( typeof newId !== 'number' ) {
 					return;
 				}
 
-				setAttributes( {
+				const nextAttributes = {
 					id: newId,
 					backgroundType: IMAGE_BACKGROUND_TYPE,
 					...( newUrl ? { url: newUrl } : {} ),
 					...( newId !== id
 						? { sizeSlug: DEFAULT_MEDIA_SIZE_SLUG }
 						: {} ),
-				} );
+				};
+
+				if ( newUrl ) {
+					const averageBackgroundColor =
+						await getMediaColor( newUrl );
+
+					// Read latest values after await to avoid stale closures.
+					const {
+						attributes: currentAttrs,
+						overlayColor: currentOverlay,
+					} = propsRef.current;
+
+					let newOverlayColor = currentOverlay.color;
+					if ( ! currentAttrs.isUserOverlayColor ) {
+						newOverlayColor = averageBackgroundColor;
+						setOverlayColor( newOverlayColor );
+
+						// Make undo revert the next setAttributes and the previous setOverlayColor.
+						__unstableMarkNextChangeAsNotPersistent();
+					}
+
+					nextAttributes.isDark = compositeIsDark(
+						currentAttrs.dimRatio,
+						newOverlayColor,
+						averageBackgroundColor
+					);
+					nextAttributes.isUserOverlayColor =
+						currentAttrs.isUserOverlayColor || false;
+				}
+
+				setAttributes( nextAttributes );
 			},
 		} );
-	}, [ id, openMediaEditorModal, setAttributes ] );
+	}, [
+		id,
+		openMediaEditorModal,
+		setAttributes,
+		setOverlayColor,
+		__unstableMarkNextChangeAsNotPersistent,
+	] );
 
 	const showEditMediaButton =
 		hasNonContentControls &&

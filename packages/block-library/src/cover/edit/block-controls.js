@@ -113,7 +113,7 @@ export default function CoverBlockControls( {
 						<ToolbarButton
 							ref={ editMediaButtonRef }
 							icon={ crop }
-							label={ __( 'Crop' ) }
+							label={ __( 'Crop background image' ) }
 							onClick={ onEditMedia }
 							aria-haspopup="dialog"
 						/>
