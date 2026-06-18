@@ -57,7 +57,7 @@ function render_block_core_comment_author_avatar( $attributes, $content, $block 
 		array(
 			'height'     => $height,
 			'width'      => $width,
-			'extra_attr' => sprintf( 'style="%1$s"', $styles ),
+			'extra_attr' => sprintf( 'style="%s"', $styles ),
 			'class'      => $classes,
 		)
 	);
