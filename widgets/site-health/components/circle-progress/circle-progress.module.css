@@ -6,21 +6,21 @@
 
 .root.success {
 	--site-health-stroke: var(--wpds-color-stroke-surface-success);
-	--site-health-fg: var(--wpds-color-fg-content-success);
+	--site-health-fg: var(--wpds-color-foreground-content-success);
 }
 
 .root.warning {
 	--site-health-stroke: var(--wpds-color-stroke-surface-warning);
-	--site-health-fg: var(--wpds-color-fg-content-warning);
+	--site-health-fg: var(--wpds-color-foreground-content-warning);
 }
 
 .root.error {
 	--site-health-stroke: var(--wpds-color-stroke-surface-error);
-	--site-health-fg: var(--wpds-color-fg-content-error);
+	--site-health-fg: var(--wpds-color-foreground-content-error);
 }
 
 .root circle:first-child {
-	stroke: var(--wpds-color-bg-track-neutral);
+	stroke: var(--wpds-color-background-track-neutral);
 	stroke-width: 12;
 }
 

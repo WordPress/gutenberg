@@ -259,8 +259,9 @@ export default function pluginDsTokenFallbacks( {
 			const overrides: Record< string, string > = {
 				// These foreground tokens sit on a strong brand background.
 				// White is the safest fallback regardless of admin theme color.
-				'--wpds-color-fg-interactive-brand-strong': '#fff',
-				'--wpds-color-fg-interactive-brand-strong-active': '#fff',
+				'--wpds-color-foreground-interactive-brand-strong': '#fff',
+				'--wpds-color-foreground-interactive-brand-strong-active':
+					'#fff',
 				// Prefer the WP admin focus width when available.
 				'--wpds-border-width-focus':
 					'var(--wp-admin-border-width-focus, 2px)',

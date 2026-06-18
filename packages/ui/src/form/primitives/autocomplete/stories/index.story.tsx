@@ -6,7 +6,14 @@ import { Icon } from '../../../../icon';
 import { Input } from '../../input';
 import { InputLayout } from '../../input-layout';
 import { Textarea } from '../../textarea';
-import { COMMANDS, URLS, USERS, type FixtureItem } from './fixtures';
+import {
+	COMMANDS,
+	GROUPED_COMMANDS,
+	URLS,
+	USERS,
+	type FixtureGroup,
+	type FixtureItem,
+} from './fixtures';
 
 const meta: Meta< typeof Autocomplete.Root > = {
 	title: 'Design System/Components/Form/Primitives/Autocomplete',
@@ -20,6 +27,8 @@ const meta: Meta< typeof Autocomplete.Root > = {
 		'Autocomplete.List': Autocomplete.List,
 		'Autocomplete.ListBody': Autocomplete.ListBody,
 		'Autocomplete.Collection': Autocomplete.Collection,
+		'Autocomplete.Group': Autocomplete.Group,
+		'Autocomplete.GroupLabel': Autocomplete.GroupLabel,
 		'Autocomplete.Item': Autocomplete.Item,
 		'Autocomplete.Value': Autocomplete.Value,
 		'Autocomplete.Empty': Autocomplete.Empty,
@@ -435,6 +444,50 @@ export const WithCustomZIndex: Story = {
 									>
 										{ item.value }
 									</Autocomplete.Item>
+								) }
+							</Autocomplete.Collection>
+						</Autocomplete.ListBody>
+					</Autocomplete.List>
+				</Autocomplete.Popup>
+			</>
+		),
+	},
+};
+
+/**
+ * Suggestions can be organized into labeled groups with `Autocomplete.Group`
+ * and `Autocomplete.GroupLabel`.
+ */
+export const Grouped: Story = {
+	args: {
+		items: GROUPED_COMMANDS,
+		children: (
+			<>
+				<Autocomplete.Input placeholder="Type a command" />
+				<Autocomplete.Popup>
+					<Autocomplete.Empty>No matching items.</Autocomplete.Empty>
+					<Autocomplete.List>
+						<Autocomplete.ListBody>
+							<Autocomplete.Collection>
+								{ ( group: FixtureGroup ) => (
+									<Autocomplete.Group
+										key={ group.label }
+										items={ group.items }
+									>
+										<Autocomplete.GroupLabel>
+											{ group.label }
+										</Autocomplete.GroupLabel>
+										<Autocomplete.Collection>
+											{ ( item: FixtureItem ) => (
+												<Autocomplete.Item
+													key={ item.id }
+													value={ item }
+												>
+													{ item.value }
+												</Autocomplete.Item>
+											) }
+										</Autocomplete.Collection>
+									</Autocomplete.Group>
 								) }
 							</Autocomplete.Collection>
 						</Autocomplete.ListBody>

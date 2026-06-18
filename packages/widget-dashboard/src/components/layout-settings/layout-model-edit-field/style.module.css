@@ -1,0 +1,34 @@
+.option {
+	flex: 1;
+	padding: var(--wpds-dimension-padding-md);
+	border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+	border-radius: var(--wpds-border-radius-md);
+	background: transparent;
+	color: inherit;
+	cursor: var(--wpds-cursor-control);
+	text-align: center;
+	transition:
+		border-color var(--wpds-motion-duration-sm) var(--wpds-motion-easing-subtle),
+		background-color var(--wpds-motion-duration-sm) var(--wpds-motion-easing-subtle);
+}
+
+.option:hover {
+	border-color: var(--wpds-color-stroke-surface-neutral-strong);
+}
+
+.optionSelected,
+.optionSelected:hover {
+	border-color: var(--wpds-color-stroke-interactive-brand);
+	background-color: color-mix(in srgb, var(--wpds-color-background-surface-brand) 6%, transparent);
+}
+
+.thumbnail {
+	display: block;
+	inline-size: 100%;
+	block-size: auto;
+	color: var(--wpds-color-foreground-content-neutral-weak);
+}
+
+.optionSelected .thumbnail {
+	color: var(--wpds-color-foreground-interactive-brand);
+}
