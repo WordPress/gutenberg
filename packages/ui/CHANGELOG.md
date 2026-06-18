@@ -16,6 +16,7 @@
 ### Bug Fixes
 
 -   `Button`: Fix `loading` state in forced colors mode ([#78820](https://github.com/WordPress/gutenberg/pull/78820)).
+-   `Button`: Fix `loading` prop affecting `unstyled` variant ([#78820](https://github.com/WordPress/gutenberg/pull/78820)).
 
 ### Internal
 
