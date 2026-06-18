@@ -124,29 +124,16 @@
 	line-height: var(--wpds-typography-line-height-md);
 	display: flex;
 	align-items: center;
-	overflow: hidden;
+	overflow: clip;
+	// padding-inline + negative margin-inline creates room within the
+	// clip boundary for focus rings of inner controls.
+	padding-inline: var(--wpds-border-width-focus);
+	margin-inline: calc(-1 * var(--wpds-border-width-focus));
 	word-break: break-word;
 	font-weight: var(--wpds-typography-font-weight-medium);
 
 	> * {
 		min-width: 0;
-	}
-
-	.components-button {
-		max-width: 100%;
-		text-align: left;
-		white-space: normal;
-		text-wrap: balance; // Fallback for Safari.
-		text-wrap: pretty;
-		min-height: vars.$button-size-compact;
-	}
-
-	&.components-button.is-link[aria-disabled="true"] {
-		text-decoration: none;
-	}
-
-	.components-dropdown {
-		max-width: 100%;
 	}
 }
 
