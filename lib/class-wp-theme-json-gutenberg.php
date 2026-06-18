@@ -646,21 +646,10 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return array Viewport breakpoint sizes.
 	 */
 	public static function get_viewport_breakpoints( $viewport_settings = null ) {
-		$breakpoints = static::DEFAULT_VIEWPORT_BREAKPOINTS;
-		if ( ! is_array( $viewport_settings ) ) {
-			return $breakpoints;
-		}
-
-		foreach ( array_keys( static::DEFAULT_VIEWPORT_BREAKPOINTS ) as $breakpoint ) {
-			if (
-				isset( $viewport_settings[ $breakpoint ] ) &&
-				static::is_valid_viewport_breakpoint_size( $viewport_settings[ $breakpoint ] )
-			) {
-				$breakpoints[ $breakpoint ] = trim( $viewport_settings[ $breakpoint ] );
-			}
-		}
-
-		return $breakpoints;
+		return array_merge(
+			static::DEFAULT_VIEWPORT_BREAKPOINTS,
+			static::sanitize_viewport_settings( $viewport_settings )
+		);
 	}
 
 	/**
@@ -722,10 +711,6 @@ class WP_Theme_JSON_Gutenberg {
 			) {
 				$sanitized[ $breakpoint ] = trim( $viewport_settings[ $breakpoint ] );
 			}
-		}
-
-		if ( empty( $sanitized ) ) {
-			return $sanitized;
 		}
 
 		return $sanitized;
