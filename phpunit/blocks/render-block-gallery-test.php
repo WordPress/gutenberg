@@ -84,8 +84,26 @@ class Tests_Blocks_Render_Gallery extends WP_UnitTestCase {
 
 	public function test_dynamic_attached_to_post_renders_attached_images() {
 		$output = $this->render_in_loop(
-			'<!-- wp:gallery {"dynamicContent":{"source":"core/attached-media"}} --><figure class="wp-block-gallery has-nested-images columns-default is-cropped"></figure><!-- /wp:gallery -->'
+			'<!-- wp:gallery {"dynamicContent":{"source":"core/attached-media"}} /-->'
 		);
+
+		// The gallery wrapper is built from scratch (no markup is persisted in
+		// dynamic mode), so assert it carries the gallery-specific classes plus
+		// the flex layout class added by the layout render filter — i.e. the same
+		// wrapper a static gallery would produce.
+		foreach ( array(
+			'wp-block-gallery',
+			'has-nested-images',
+			'columns-default',
+			'is-cropped',
+			'is-layout-flex',
+		) as $expected_class ) {
+			$this->assertStringContainsString(
+				$expected_class,
+				$output,
+				"Constructed gallery wrapper should include the `$expected_class` class."
+			);
+		}
 
 		// One image figure per attached image.
 		$this->assertSame(
@@ -105,10 +123,10 @@ class Tests_Blocks_Render_Gallery extends WP_UnitTestCase {
 
 	public function test_dynamic_attached_to_post_honours_order() {
 		$asc  = $this->render_in_loop(
-			'<!-- wp:gallery {"dynamicContent":{"source":"core/attached-media","args":{"orderBy":"date","order":"asc"}}} --><figure class="wp-block-gallery has-nested-images columns-default is-cropped"></figure><!-- /wp:gallery -->'
+			'<!-- wp:gallery {"dynamicContent":{"source":"core/attached-media","args":{"orderBy":"date","order":"asc"}}} /-->'
 		);
 		$desc = $this->render_in_loop(
-			'<!-- wp:gallery {"dynamicContent":{"source":"core/attached-media","args":{"orderBy":"date","order":"desc"}}} --><figure class="wp-block-gallery has-nested-images columns-default is-cropped"></figure><!-- /wp:gallery -->'
+			'<!-- wp:gallery {"dynamicContent":{"source":"core/attached-media","args":{"orderBy":"date","order":"desc"}}} /-->'
 		);
 
 		$first  = self::$attachment_ids[0];
@@ -131,10 +149,35 @@ class Tests_Blocks_Render_Gallery extends WP_UnitTestCase {
 
 	public function test_dynamic_unknown_source_renders_no_images() {
 		$output = $this->render_in_loop(
-			'<!-- wp:gallery {"dynamicContent":{"source":"notARealSource"}} --><figure class="wp-block-gallery has-nested-images columns-default"></figure><!-- /wp:gallery -->'
+			'<!-- wp:gallery {"dynamicContent":{"source":"notARealSource"}} /-->'
 		);
 
 		$this->assertStringNotContainsString( 'wp-block-image', $output );
+	}
+
+	public function test_dynamic_gallery_renders_saved_caption_after_images() {
+		// In dynamic mode `save.js` persists only the gallery-level caption, so the
+		// saved content is a bare `<figcaption>`. The render callback builds the
+		// wrapper, injects the resolved images, then appends the caption.
+		$output = $this->render_in_loop(
+			'<!-- wp:gallery {"dynamicContent":{"source":"core/attached-media"}} --><figcaption class="blocks-gallery-caption wp-element-caption">My gallery caption</figcaption><!-- /wp:gallery -->'
+		);
+
+		$this->assertStringContainsString(
+			'<figcaption class="blocks-gallery-caption wp-element-caption">My gallery caption</figcaption>',
+			$output,
+			'The saved gallery caption should be rendered.'
+		);
+
+		// The caption is appended after the images (mirroring a static gallery).
+		$this->assertGreaterThan(
+			strpos( $output, 'wp-image-' . self::$attachment_ids[0] ),
+			strpos( $output, 'blocks-gallery-caption' ),
+			'The gallery caption should render after the images.'
+		);
+
+		// It sits inside the gallery figure, not loose after it.
+		$this->assertStringEndsWith( '</figure>', trim( $output ) );
 	}
 
 	public function test_static_gallery_without_dynamic_source_is_unaffected() {
@@ -176,7 +219,7 @@ class Tests_Blocks_Render_Gallery extends WP_UnitTestCase {
 
 		try {
 			$output = $this->render_in_loop(
-				'<!-- wp:gallery {"dynamicContent":{"source":"core/attached-media"}} --><figure class="wp-block-gallery has-nested-images columns-default is-cropped"></figure><!-- /wp:gallery -->'
+				'<!-- wp:gallery {"dynamicContent":{"source":"core/attached-media"}} /-->'
 			);
 		} finally {
 			remove_filter( 'wp_get_attachment_caption', $filter );
@@ -208,7 +251,7 @@ class Tests_Blocks_Render_Gallery extends WP_UnitTestCase {
 
 	public function test_dynamic_lightbox_link_adds_interactivity_directives() {
 		$output = $this->render_in_loop(
-			'<!-- wp:gallery {"dynamicContent":{"source":"core/attached-media"},"linkTo":"lightbox"} --><figure class="wp-block-gallery has-nested-images columns-default is-cropped"></figure><!-- /wp:gallery -->'
+			'<!-- wp:gallery {"dynamicContent":{"source":"core/attached-media"},"linkTo":"lightbox"} /-->'
 		);
 
 		// Lightbox-enabled images go through the image block's lightbox render,

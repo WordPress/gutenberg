@@ -254,11 +254,11 @@ function block_core_gallery_render_dynamic_image( $attachment_id, $attributes, $
  * @return string The content of the block being rendered.
  */
 function block_core_gallery_render( $attributes, $content, $block ) {
-	// In dynamic mode the gallery has no inner image blocks; resolve the
-	// configured source to a list of attachments and render an image block for
-	// each, injecting them into the (otherwise empty) gallery wrapper. The
+	// In dynamic mode the gallery persists no markup (`save.js` returns null);
+	// resolve the configured source to a list of attachments, render an image
+	// block for each, and build the gallery `<figure>` wrapper from scratch. The
 	// existing gap/randomOrder/lightbox post-processing below then runs over the
-	// generated markup unchanged.
+	// constructed markup unchanged.
 	if ( ! empty( $attributes['dynamicContent'] ) ) {
 		$attachment_ids = block_core_gallery_resolve_dynamic_source( $attributes['dynamicContent'], $block );
 
@@ -280,15 +280,27 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 			$images_markup .= block_core_gallery_render_dynamic_image( $attachment_id, $attributes, $image_context );
 		}
 
-		// Inject the generated images directly after the opening wrapper tag.
-		// The saved content for a dynamic gallery is the bare `<figure>` wrapper
-		// (optionally followed by a gallery `<figcaption>`); attributes on the
-		// wrapper are class/style/id/data-* only, so the first `>` reliably ends
-		// the opening tag.
-		$opening_tag_end = strpos( $content, '>' );
-		if ( false !== $opening_tag_end ) {
-			$content = substr( $content, 0, $opening_tag_end + 1 ) . $images_markup . substr( $content, $opening_tag_end + 1 );
+		// Build the wrapper rather than parsing/splicing saved markup.
+		// `get_block_wrapper_attributes()` supplies the block-support
+		// classes/styles (align, color, border, spacing, anchor id); the layout
+		// render filter adds the flex layout classes downstream — the same way a
+		// static gallery's wrapper is composed (`useBlockProps.save()` plus that
+		// filter). Only the gallery-specific classes are added explicitly, and
+		// they mirror `save.js` (kept in sync deliberately — see that file).
+		$gallery_classes  = 'wp-block-gallery has-nested-images';
+		$gallery_classes .= isset( $attributes['columns'] )
+			? ' columns-' . (int) $attributes['columns']
+			: ' columns-default';
+		if ( $attributes['imageCrop'] ?? true ) {
+			$gallery_classes .= ' is-cropped';
 		}
+		$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $gallery_classes ) );
+
+		// In dynamic mode `save.js` persists only the gallery-level caption, so
+		// `$content` is the saved `<figcaption>` (or empty). Append it after the
+		// resolved images — matching the static gallery's `{images}{caption}`
+		// order — without parsing it.
+		$content = sprintf( '<figure %s>%s%s</figure>', $wrapper_attributes, $images_markup, $content );
 	}
 
 	// Adds a style tag for the --wp--style--unstable-gallery-gap var.
