@@ -147,9 +147,9 @@ function Edit( { attributes, clientId, context } ) {
 						<button
 							key={ tab.clientId || index }
 							type="button"
-							className={ clsx( buttonClassName, {
-								'is-active': isActive,
-							} ) }
+							role="tab"
+							aria-selected={ isActive }
+							className={ buttonClassName || undefined }
 							style={ buttonStyle }
 							tabIndex={ -1 }
 							onClick={ ( event ) => {
