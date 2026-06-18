@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/editor",
-	"version": "14.48.0",
+	"version": "14.48.1",
 	"description": "Enhanced block editor for WordPress posts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -60,6 +60,7 @@
 	],
 	"dependencies": {
 		"@wordpress/a11y": "file:../a11y",
+		"@wordpress/annotations": "file:../annotations",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/blob": "file:../blob",

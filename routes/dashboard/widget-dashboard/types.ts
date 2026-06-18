@@ -3,8 +3,8 @@
  * `WidgetDashboard` prop bag.
  *
  * The widget contract types (`WidgetName`, `WidgetType`, `WidgetRenderProps`,
- * `ResolveWidgetModule`) live in `widget-primitives` and are imported from there
- * directly; this module does not re-export them.
+ * `ResolveWidgetModule`) live in `@wordpress/widget-primitives` and are
+ * imported from there directly; this module does not re-export them.
  */
 
 /**
@@ -19,15 +19,11 @@ import type {
 	DashboardGridLayoutItem,
 	DashboardLanesLayoutItem,
 } from '@wordpress/grid';
-
-/**
- * Internal dependencies
- */
 import type {
 	WidgetName,
 	WidgetType,
 	ResolveWidgetModule,
-} from '../widget-primitives';
+} from '@wordpress/widget-primitives';
 
 export type GridTilePlacement = Omit< DashboardGridLayoutItem, 'key' >;
 export type MasonryTilePlacement = Omit< DashboardLanesLayoutItem, 'key' >;

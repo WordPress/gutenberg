@@ -1,11 +1,15 @@
 /**
+ * WordPress dependencies
+ */
+import type { WidgetType } from '@wordpress/widget-primitives';
+
+/**
  * Internal dependencies
  */
 import { WidgetToolbar } from '../widget-toolbar';
 import { WidgetSettingsTrigger } from './widget-settings-trigger';
 import styles from './widget-settings-toolbar.module.css';
 import type { DashboardWidget } from '../../types';
-import type { WidgetType } from '../../../widget-primitives';
 
 export interface WidgetSettingsToolbarProps {
 	/** The instance whose settings this toolbar configures. */

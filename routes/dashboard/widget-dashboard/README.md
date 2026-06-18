@@ -142,4 +142,4 @@ interface WidgetRenderProps< Item = unknown > {
 - `ResolveWidgetModule` — module resolver signature.
 - `WidgetGridSettings` — grid configuration.
 
-The widget contract types (`WidgetName`, `WidgetType`, `WidgetRenderProps`, `ResolveWidgetModule`) are defined in `widget-primitives` and imported from there directly; this engine does not re-export them.
+The widget contract types (`WidgetName`, `WidgetType`, `WidgetRenderProps`, `ResolveWidgetModule`) are defined in `@wordpress/widget-primitives` and imported from there directly; this engine does not re-export them.

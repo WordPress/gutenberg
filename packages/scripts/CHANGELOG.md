@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `lint-style`: Detect .cjs and .mjs config files so the bundled default config is not used when one of these is present ([#79226](https://github.com/WordPress/gutenberg/pull/79226)).
+
+## 32.4.1 (2026-06-16)
+
 ## 32.4.0 (2026-06-10)
 
 ## 32.3.0 (2026-05-27)

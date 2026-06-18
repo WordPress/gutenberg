@@ -6,6 +6,8 @@
 
 -   Remove implicit dependency on `storybook` in TypeScript types ([#79132](https://github.com/WordPress/gutenberg/pull/79132)).
 
+## 0.5.1 (2026-06-16)
+
 ## 0.5.0 (2026-06-10)
 
 ## 0.4.0 (2026-05-27)

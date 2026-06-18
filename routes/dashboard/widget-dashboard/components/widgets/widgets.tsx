@@ -14,6 +14,7 @@ import type {
 	DragPreviewRenderProps,
 	ResizeHandleRenderProps,
 } from '@wordpress/grid';
+import type { WidgetName } from '@wordpress/widget-primitives';
 
 /**
  * Internal dependencies
@@ -30,7 +31,6 @@ import type {
 	GridTilePlacement,
 	MasonryTilePlacement,
 } from '../../types';
-import type { WidgetName } from '../../../widget-primitives';
 
 function toGridLayout( widgets: DashboardWidget[] ): DashboardGridLayoutItem[] {
 	return widgets.map( ( w ) => ( {
