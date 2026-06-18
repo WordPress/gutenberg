@@ -162,6 +162,7 @@
 	/* stylelint-disable-next-line property-no-unknown -- TODO: Update stylelint to support a fresh list of https://github.com/known-css/known-css-properties */
 	field-sizing: content;
 	max-height: 420px;
+	resize: none;
 }
 
 // Visually hidden until focused (skip link pattern)
