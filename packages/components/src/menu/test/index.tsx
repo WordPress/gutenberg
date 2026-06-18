@@ -3,7 +3,6 @@
  */
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { press } from '@ariakit/test';
 
 /**
  * WordPress dependencies
@@ -32,6 +31,22 @@ const resetTypeahead = () => {
 
 describe( 'Menu', () => {
 	let user: ReturnType< typeof userEvent.setup >;
+	let originalGetClientRects: () => DOMRectList;
+
+	beforeAll( () => {
+		// Code that considers focusability considers rects in whether the
+		// element is visible, but since jsdom does not simulate layout, we
+		// need to fake it. This should ideally be a global test mock to
+		// faithfully emulate a true browser environment.
+		originalGetClientRects = window.Element.prototype.getClientRects;
+		window.Element.prototype.getClientRects = jest.fn(
+			() => [ { width: 1, height: 1 } ] as unknown as DOMRectList
+		);
+	} );
+
+	afterAll( () => {
+		window.Element.prototype.getClientRects = originalGetClientRects;
+	} );
 
 	beforeEach( () => {
 		user = userEvent.setup();
@@ -149,14 +164,14 @@ describe( 'Menu', () => {
 			} );
 
 			// Move focus on the toggle
-			await press.Tab();
+			await user.tab();
 
 			expect( toggleButton ).toHaveFocus();
 
 			// Menu closed
 			expect( screen.queryByRole( 'menuitem' ) ).not.toBeInTheDocument();
 
-			await press.ArrowDown();
+			await user.keyboard( '{ArrowDown}' );
 
 			// Menu open, focus is on the first focusable item
 			// (disabled items are still focusable and accessible)
@@ -180,7 +195,7 @@ describe( 'Menu', () => {
 			} );
 
 			// Move focus on the toggle
-			await press.Tab();
+			await user.tab();
 
 			expect( toggleButton ).toHaveFocus();
 
@@ -189,7 +204,7 @@ describe( 'Menu', () => {
 
 			// Keyboard-triggered clicks have `detail: 0`, which Ariakit uses to
 			// distinguish keyboard activation from pointer activation.
-			await press.Space( toggleButton, { detail: 0 } );
+			await user.keyboard( ' ' );
 
 			await waitFor( () =>
 				expect( toggleButton ).toHaveAttribute(
@@ -221,9 +236,11 @@ describe( 'Menu', () => {
 			await waitForFocusedMenu();
 
 			// Pressing esc will close the menu and move focus to the toggle
-			await press.Escape();
+			await user.keyboard( '{Escape}' );
 
-			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
+			await waitFor( () =>
+				expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument()
+			);
 
 			await waitFor( () =>
 				expect(
@@ -369,57 +386,53 @@ describe( 'Menu', () => {
 				</Menu>
 			);
 
-			// The menu is focused automatically when `defaultOpen` is set.
-			await waitForFocusedMenu();
+			// The first menu item is focused automatically when `defaultOpen` is
+			// set and jsdom reports visible elements as focusable.
+			await waitForFocusedMenuItem( 'Menu item 1' );
 
 			// Arrow up/down selects menu items
 			// The selection wraps around from last to first and viceversa
-			await press.ArrowDown();
-			expect(
-				screen.getByRole( 'menuitem', { name: 'Menu item 1' } )
-			).toHaveFocus();
-
-			await press.ArrowDown();
+			await user.keyboard( '{ArrowDown}' );
 			expect(
 				screen.getByRole( 'menuitem', { name: 'Menu item 2' } )
 			).toHaveFocus();
 
-			await press.ArrowDown();
+			await user.keyboard( '{ArrowDown}' );
 			expect(
 				screen.getByRole( 'menuitem', { name: 'Submenu trigger item' } )
 			).toHaveFocus();
 
-			await press.ArrowDown();
+			await user.keyboard( '{ArrowDown}' );
 			expect(
 				screen.getByRole( 'menuitem', { name: 'Menu item 3' } )
 			).toHaveFocus();
 
-			await press.ArrowDown();
+			await user.keyboard( '{ArrowDown}' );
 			expect(
 				screen.getByRole( 'menuitem', { name: 'Menu item 1' } )
 			).toHaveFocus();
 
-			await press.ArrowUp();
+			await user.keyboard( '{ArrowUp}' );
 			expect(
 				screen.getByRole( 'menuitem', { name: 'Menu item 3' } )
 			).toHaveFocus();
 
-			await press.ArrowUp();
+			await user.keyboard( '{ArrowUp}' );
 			expect(
 				screen.getByRole( 'menuitem', { name: 'Submenu trigger item' } )
 			).toHaveFocus();
 
 			// Arrow right/left can be used to enter/leave submenus
 			// (focus crosses menu contexts, so wait for it to settle)
-			await press.ArrowRight();
+			await user.keyboard( '{ArrowRight}' );
 			await waitForFocusedMenuItem( 'Submenu item 1' );
 
-			await press.ArrowDown();
+			await user.keyboard( '{ArrowDown}' );
 			expect(
 				screen.getByRole( 'menuitem', { name: 'Submenu item 2' } )
 			).toHaveFocus();
 
-			await press.ArrowLeft();
+			await user.keyboard( '{ArrowLeft}' );
 			expect(
 				screen.getByRole( 'menuitem', {
 					name: 'Submenu trigger item',
@@ -427,20 +440,20 @@ describe( 'Menu', () => {
 			).toHaveFocus();
 
 			// Spacebar or enter key can also be used to enter a submenu
-			await press.Enter();
+			await user.keyboard( '{Enter}' );
 			await waitForFocusedMenuItem( 'Submenu item 1' );
 
-			await press.ArrowLeft();
+			await user.keyboard( '{ArrowLeft}' );
 			expect(
 				screen.getByRole( 'menuitem', {
 					name: 'Submenu trigger item',
 				} )
 			).toHaveFocus();
 
-			await press.Space();
+			await user.keyboard( ' ' );
 			await waitForFocusedMenuItem( 'Submenu item 1' );
 
-			await press.ArrowLeft();
+			await user.keyboard( '{ArrowLeft}' );
 			expect(
 				screen.getByRole( 'menuitem', {
 					name: 'Submenu trigger item',
@@ -933,9 +946,11 @@ describe( 'Menu', () => {
 
 			// The outer button can be focused by pressing tab. Doing so will cause
 			// the Menu to close.
-			await press.Tab();
+			await user.tab();
 			expect( outerButton ).toBeVisible();
-			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
+			await waitFor( () =>
+				expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument()
+			);
 		} );
 	} );
 
