@@ -16,7 +16,7 @@ import {
 	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useMemo, useCallback, useEffect, useRef } from '@wordpress/element';
+import { useCallback, useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -52,9 +52,7 @@ function Edit( { attributes, clientId, context } ) {
 		[ clientId ]
 	);
 
-	const effectiveActiveIndex = useMemo( () => {
-		return editorActiveTabIndex ?? activeTabIndex;
-	}, [ editorActiveTabIndex, activeTabIndex ] );
+	const effectiveActiveIndex = editorActiveTabIndex ?? activeTabIndex;
 
 	const { __unstableMarkNextChangeAsNotPersistent, updateBlockAttributes } =
 		useDispatch( blockEditorStore );
