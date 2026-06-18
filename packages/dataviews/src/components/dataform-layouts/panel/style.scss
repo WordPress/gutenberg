@@ -124,10 +124,11 @@
 	line-height: var(--wpds-typography-line-height-md);
 	display: flex;
 	align-items: center;
-	overflow: hidden; // Fallback for browsers that don't support `overflow: clip`.
 	overflow: clip;
-	// Leave room so the focus ring of an inner control isn't clipped.
-	overflow-clip-margin: var(--wpds-border-width-focus);
+	// padding-inline + negative margin-inline creates room within the
+	// clip boundary for focus rings of inner controls.
+	padding-inline: var(--wpds-border-width-focus);
+	margin-inline: calc(-1 * var(--wpds-border-width-focus));
 	word-break: break-word;
 	font-weight: var(--wpds-typography-font-weight-medium);
 
