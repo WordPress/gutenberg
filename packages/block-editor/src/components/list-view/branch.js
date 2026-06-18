@@ -285,7 +285,9 @@ function ListViewBranch( props ) {
 					}
 					isExpanded
 				>
-					<TreeGridCell>
+					<TreeGridCell
+						colSpan={ shouldShowNestedAppender ? 2 : undefined }
+					>
 						{ ( treeGridCellProps ) => (
 							<Appender
 								clientId={ parentId }

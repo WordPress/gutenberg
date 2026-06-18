@@ -13,11 +13,12 @@
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
-	gap: 12px;
-	min-height: 128px;
-	margin-block: 8px 12px;
+	gap: 8px;
+	min-height: 0;
+	margin-block: 8px;
 	margin-inline: 52px 64px;
-	padding: 16px 20px;
+	padding-block: 8px 12px;
+	padding-inline: 0;
 	border: 0;
 	background: transparent;
 	color: #757575;
@@ -26,10 +27,6 @@
 
 .navigation-edit-editor__empty-submenu .components-dropdown-menu {
 	flex-shrink: 0;
-}
-
-.navigation-edit-editor__empty-submenu .block-editor-inserter__toggle {
-	margin-inline-start: 0;
 }
 
 .navigation-edit-editor__list-view .block-editor-list-view-submenu-appender td {
@@ -46,6 +43,13 @@
 .block-editor-list-view-submenu-appender
 .block-editor-inserter__toggle {
 	margin-inline-start: 52px;
+}
+
+.navigation-edit-editor__list-view
+.block-editor-list-view-submenu-appender
+.navigation-edit-editor__empty-submenu
+.block-editor-inserter__toggle {
+	margin-inline-start: 0;
 }
 
 .navigation-edit-editor__label-only-submenu-form {
