@@ -328,21 +328,6 @@ test.describe( 'Autosave', () => {
 		await page.reload();
 		await page.waitForFunction( () => window?.wp?.data );
 
-		// FIXME: Occasionally, upon reload, there is no server-provided
-		// autosave value available, despite our having previously explicitly
-		// autosaved. The reasons for this are still unknown. Since this is
-		// unrelated to *local* autosave, until we can understand them, we'll
-		// drop this test's expectations if we don't have an autosave object
-		// available.
-		const stillHasRemoteAutosave = await page.evaluate(
-			() =>
-				window.wp.data.select( 'core/editor' ).getEditorSettings()
-					.autosave
-		);
-		if ( ! stillHasRemoteAutosave ) {
-			return;
-		}
-
 		// Only remote autosave notice should be applied.
 		await expect(
 			page.locator( '.components-notice__content' )
