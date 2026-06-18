@@ -202,8 +202,8 @@ describe( 'Menu', () => {
 			// Menu closed
 			expect( screen.queryByRole( 'menuitem' ) ).not.toBeInTheDocument();
 
-			// Keyboard-triggered clicks have `detail: 0`, which Ariakit uses to
-			// distinguish keyboard activation from pointer activation.
+			// Use keyboard activation so the synthetic click has `detail: 0`,
+			// which Ariakit uses to distinguish it from pointer activation.
 			await user.keyboard( ' ' );
 
 			await waitFor( () =>
