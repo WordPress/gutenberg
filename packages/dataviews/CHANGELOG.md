@@ -14,6 +14,7 @@
 
 - Move `@types/react` from `dependencies` to an optional peer dependency so consumers' React type version is used [#79095](https://github.com/WordPress/gutenberg/pull/79095).
 - DataForm panel layout: remove button/dropdown-specific overrides from `.dataforms-layouts-panel__field-control`; those overrides are no longer needed. [#79275](https://github.com/WordPress/gutenberg/pull/79275)
+- DataForm panel layout: align `label-side` gap with the regular layout by using `--wpds-dimension-gap-sm` (8px). [#](https://github.com/WordPress/gutenberg/pull/)
 
 ### Internal
 
