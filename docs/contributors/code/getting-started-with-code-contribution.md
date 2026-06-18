@@ -208,12 +208,76 @@ You can also test Storybook for the current `trunk` branch on GitHub Pages: [htt
 
 We recommend configuring your editor to automatically check for syntax and lint errors. This will help you save time as you develop by automatically fixing minor formatting issues. Here are some directions for setting up Visual Studio Code, a popular editor used by many of the core developers, these tools are also available for other editors.
 
-### VS Code workspace settings
+### Visual Studio Code
 
-If you use Visual Studio Code, the repository ships a managed workspace configuration so you don't have to wire up the recommended extensions and settings by hand. The first time you open the folder, VS Code prompts you to install the recommended extensions and to allow an automatic task that copies the recommended settings into place. Allow both and you're set up.
+If you use Visual Studio Code, the following extensions and workspace settings can help the editor use the same linting, formatting, PHP, and TypeScript tooling as the Gutenberg repository. These settings are optional and should live in your local `.vscode/settings.json` file. Do not commit your personal workspace settings; add `.vscode/settings.json` to your [global gitignore file](https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files#configuring-ignored-files-for-all-repositories-on-your-computer) if needed.
 
-The installer will NOT overwrite a `settings.json` you have customised, and you can re-run it manually at any time from the Command Palette via **Tasks: Run Task → Install VS Code settings**.
+Recommended extensions:
 
+-   [EditorConfig for VS Code](https://marketplace.visualstudio.com/items?itemName=editorconfig.editorconfig)
+-   [PHP Intelephense](https://marketplace.visualstudio.com/items?itemName=bmewburn.vscode-intelephense-client)
+-   [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
+-   [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
+-   [PHP_CodeSniffer](https://marketplace.visualstudio.com/items?itemName=obliviousharmony.vscode-php-codesniffer)
+-   [Stylelint](https://marketplace.visualstudio.com/items?itemName=stylelint.vscode-stylelint)
+-   [Native TypeScript Preview](https://marketplace.visualstudio.com/items?itemName=TypeScriptTeam.native-preview)
+
+You can start with this workspace settings file:
+
+```jsonc
+{
+	"search.exclude": {
+		"**/.cache/**": true,
+		"**/build/**": true,
+		"**/build-module/**": true,
+		"**/build-types/**": true,
+		"**/build-styles/**": true,
+		"**/node_modules/**": true,
+		"**/vendor/**": true
+	},
+	"[php]": {
+		"editor.formatOnSave": true,
+		"editor.defaultFormatter": "obliviousharmony.vscode-php-codesniffer"
+	},
+	"intelephense.environment.phpVersion": "7.4.0",
+	"intelephense.files.exclude": [
+		"**/.cache/**",
+		"**/.git/**",
+		"**/.history/**",
+		"**/build/**",
+		"**/build-module/**",
+		"**/build-types/**",
+		"**/build-styles/**",
+		"**/node_modules/**",
+		"**/vendor/**"
+	],
+	"phpCodeSniffer.autoExecutable": true,
+	"phpCodeSniffer.standard": "Automatic",
+	"phpCodeSniffer.exclude": [
+		"**/.git/**",
+		"**/.svn/**",
+		"**/.hg/**",
+		"**/.cache/**",
+		"**/build/**",
+		"**/node_modules/**",
+		"**/vendor/**"
+	],
+	"[javascript][javascriptreact][typescript][typescriptreact]": {
+		"editor.formatOnSave": false,
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"editor.codeActionsOnSave": {
+		"source.fixAll.eslint": "explicit",
+		"source.fixAll.stylelint": "explicit"
+	},
+	"[css][scss][sass]": {
+		"editor.formatOnSave": false,
+		"editor.defaultFormatter": "stylelint.vscode-stylelint"
+	},
+	"stylelint.validate": [ "css", "scss" ],
+	"js/ts.experimental.useTsgo": true
+}
+```
 
 ### EditorConfig
 
