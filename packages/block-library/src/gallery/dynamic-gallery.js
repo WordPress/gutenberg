@@ -105,6 +105,7 @@ export function GallerySourcePanel( {
 		convertToStatic,
 		enableDynamicMode,
 		resetSource,
+		isResolvingDynamic,
 	} = dynamic;
 	const isDynamic = !! dynamicContent;
 
@@ -135,6 +136,11 @@ export function GallerySourcePanel( {
 						__next40pxDefaultSize
 						variant="secondary"
 						onClick={ convertToStatic }
+						// Guard the race where the media is still resolving:
+						// converting now would map over an incomplete (or empty)
+						// list and produce a gallery missing images.
+						disabled={ isResolvingDynamic }
+						accessibleWhenDisabled
 					>
 						{ __( 'Convert to individual images' ) }
 					</Button>
@@ -278,7 +284,14 @@ export function GalleryDynamicView( {
 		<>
 			{ blockEditingMode === 'default' && (
 				<BlockControls group="other">
-					<ToolbarButton onClick={ convertToStatic }>
+					<ToolbarButton
+						onClick={ convertToStatic }
+						// Same guard as the inspector's "Convert to individual
+						// images": both call `convertToStatic`, which would map over
+						// a still-resolving (or empty) media list. (`ToolbarButton`
+						// stays focusable when disabled by default.)
+						disabled={ isResolvingDynamic }
+					>
 						{ __( 'Edit images' ) }
 					</ToolbarButton>
 				</BlockControls>
