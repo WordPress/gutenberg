@@ -23,15 +23,10 @@ import HtmlRenderer from './utils/html-renderer';
 /**
  * Internal dependencies
  */
-// When IS_GUTENBERG_PLUGIN is set to false, imports of experimental blocks
-// are transformed by packages/block-library/src/index.js as follows:
-//    import * as experimentalBlock from './experimental-block'
-// becomes
-//    const experimentalBlock = null;
-// This enables webpack to eliminate the experimental blocks code from the
-// production build to make the final bundle smaller.
-//
-// See https://github.com/WordPress/gutenberg/pull/40655 for more context.
+// Experimental blocks are only registered in the Gutenberg plugin (see
+// `__experimentalRegisterExperimentalCoreBlocks`). `registerCoreBlocks`
+// filters them out via `isBlockMetadataExperimental`, so they are never
+// available in WordPress core regardless of what ends up in the bundle.
 import * as accordion from './accordion';
 import * as accordionItem from './accordion-item';
 import * as accordionHeading from './accordion-heading';

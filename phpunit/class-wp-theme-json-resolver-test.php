@@ -75,11 +75,15 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		static::$property_blocks_cache = new ReflectionProperty( WP_Theme_JSON_Resolver_Gutenberg::class, 'blocks_cache' );
-		static::$property_blocks_cache->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			static::$property_blocks_cache->setAccessible( true );
+		}
 		static::$property_blocks_cache_orig_value = static::$property_blocks_cache->getValue();
 
 		static::$property_core = new ReflectionProperty( WP_Theme_JSON_Resolver_Gutenberg::class, 'core' );
-		static::$property_core->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			static::$property_core->setAccessible( true );
+		}
 		static::$property_core_orig_value = static::$property_core->getValue();
 	}
 
@@ -285,7 +289,9 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	 */
 	public function test_has_same_registered_blocks_when_all_blocks_not_cached( $origin, array $cache = array() ) {
 		$has_same_registered_blocks = new ReflectionMethod( WP_Theme_JSON_Resolver_Gutenberg::class, 'has_same_registered_blocks' );
-		$has_same_registered_blocks->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$has_same_registered_blocks->setAccessible( true );
+		}
 		$expected_cache = $this->get_registered_block_names();
 
 		// Set up the blocks cache for the origin.
@@ -358,7 +364,9 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	 */
 	public function test_has_same_registered_blocks_when_all_blocks_are_cached( $origin ) {
 		$has_same_registered_blocks = new ReflectionMethod( WP_Theme_JSON_Resolver_Gutenberg::class, 'has_same_registered_blocks' );
-		$has_same_registered_blocks->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$has_same_registered_blocks->setAccessible( true );
+		}
 		$expected_cache = $this->get_registered_block_names();
 
 		// Set up the cache with all registered blocks.
@@ -798,7 +806,9 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 
 		// Force-unset $i18n_schema property to "unload" translation schema.
 		$property = new ReflectionProperty( $theme_json_resolver, 'i18n_schema' );
-		$property->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$property->setAccessible( true );
+		}
 		$property->setValue( null, null );
 
 		// A completely empty theme.json data set still has the 'version' key when parsed.

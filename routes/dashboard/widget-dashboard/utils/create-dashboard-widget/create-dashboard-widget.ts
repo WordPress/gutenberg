@@ -4,10 +4,14 @@
 import { v4 as uuid } from 'uuid';
 
 /**
+ * WordPress dependencies
+ */
+import type { WidgetType } from '@wordpress/widget-primitives';
+
+/**
  * Internal dependencies
  */
 import type { DashboardWidget, GridTilePlacement } from '../../types';
-import type { WidgetType } from '../../../widget-primitives';
 
 const DEFAULT_PLACEMENT: GridTilePlacement = {
 	width: 1,

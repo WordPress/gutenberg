@@ -8,6 +8,7 @@ import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as viewportStore } from '@wordpress/viewport';
+import { useWidgetTypes } from '@wordpress/widget-primitives';
 
 /**
  * Internal dependencies
@@ -15,7 +16,6 @@ import { store as viewportStore } from '@wordpress/viewport';
 import { useDashboardGridSettings, useDashboardLayout } from './hooks';
 import { WidgetDashboard } from './widget-dashboard';
 import type { DashboardWidget } from './widget-dashboard';
-import { useWidgetTypes } from './widget-primitives';
 
 function Dashboard() {
 	const [ layout, setLayout, resetLayout ] = useDashboardLayout(

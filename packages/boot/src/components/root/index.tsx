@@ -19,7 +19,6 @@ import { menu } from '@wordpress/icons';
 import { useState, useEffect, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Page, getAdminThemeColors } from '@wordpress/admin-ui';
-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
 import { Tooltip } from '@wordpress/ui';
 import { privateApis as themePrivateApis } from '@wordpress/theme';
 

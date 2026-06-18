@@ -352,8 +352,6 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 			$hook_suffix = 'block-editor-assets';
 
 			// Remove unwanted scripts/styles.
-			remove_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_command_palette_assets', 9 );
-			remove_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_command_palette_assets' );
 			remove_action( 'admin_enqueue_scripts', 'wp_auth_check_load' );
 			remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
 			remove_action( 'admin_print_styles', 'print_emoji_styles' );

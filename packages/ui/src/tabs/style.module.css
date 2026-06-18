@@ -91,7 +91,7 @@
 				width: 100%;
 				height: var(--active-tab-height);
 				translate: -50% var(--active-tab-top);
-				background-color: var(--wpds-color-bg-interactive-neutral-weak-active);
+				background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 			}
 
 			.tablist[data-select-on-move="true"]:has(:focus-visible)
@@ -99,7 +99,7 @@
 				box-sizing: border-box;
 				border:
 					var(--wpds-border-width-focus) solid
-					var(--wpds-color-stroke-focus-brand);
+					var(--wpds-color-stroke-focus);
 			}
 		}
 
@@ -131,11 +131,11 @@
 
 			line-height: 1.2;
 			font-weight: 400;
-			color: var(--wpds-color-fg-interactive-neutral);
+			color: var(--wpds-color-foreground-interactive-neutral);
 
 			&[data-disabled] {
 				cursor: default;
-				color: var(--wpds-color-fg-interactive-neutral-disabled);
+				color: var(--wpds-color-foreground-interactive-neutral-disabled);
 
 				@media ( forced-colors: active ) {
 					color: GrayText;
@@ -143,7 +143,7 @@
 			}
 
 			&:not([data-disabled]):is(:hover, :focus-visible) {
-				color: var(--wpds-color-fg-interactive-neutral-active);
+				color: var(--wpds-color-foreground-interactive-neutral-active);
 			}
 
 			/* Focus indicator. */
@@ -155,7 +155,7 @@
 				/* Outline works for Windows high contrast mode as well. */
 				outline:
 					var(--wpds-border-width-focus) solid
-					var(--wpds-color-stroke-focus-brand);
+					var(--wpds-color-stroke-focus);
 				border-radius: var(--wpds-border-radius-sm);
 
 				/* Animation */
@@ -196,7 +196,7 @@
 
 			[data-orientation="vertical"] & {
 				padding: var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-md);
-				min-height: 40px;  /* TODO: use semantic size/height tokens when available */
+				min-height: var(--wpds-dimension-size-lg);
 			}
 
 			[data-orientation="vertical"][data-select-on-move="false"] &::after {

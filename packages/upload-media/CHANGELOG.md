@@ -12,6 +12,8 @@
 
 -   `uploadItem` no longer dispatches `finishOperation` twice when both `onFileChange` and `onSuccess` fire for the same attachment ([#74917](https://github.com/WordPress/gutenberg/pull/74917)).
 
+## 0.33.1 (2026-06-16)
+
 ## 0.33.0 (2026-06-10)
 
 ### Enhancement
