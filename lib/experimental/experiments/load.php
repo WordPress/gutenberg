@@ -133,7 +133,7 @@ function gutenberg_initialize_experiments_settings() {
 				array(
 					'id'          => 'gutenberg-omnibar',
 					'label'       => __( 'Omnipresent Toolbar', 'gutenberg' ),
-					'description' => __( 'Improves the toolbar as navigation layer, including showing the toolbar in the fullscreen Post and Site Editor.', 'gutenberg' ),
+					'description' => __( 'Enables a new, redesigned toolbar that is visually consistent everywhere.', 'gutenberg' ),
 				),
 				array(
 					'id'          => 'gutenberg-react-19',
