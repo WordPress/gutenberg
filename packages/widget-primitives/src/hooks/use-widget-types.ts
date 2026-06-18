@@ -1,39 +1,24 @@
 /**
  * WordPress dependencies
  */
-import { dispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useEffect, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import type { WidgetName, WidgetType, WidgetTypeMetadata } from '../types';
+import type {
+	UseWidgetTypesOptions,
+	WidgetName,
+	WidgetType,
+	WidgetTypeMetadata,
+} from '../types';
 
 /**
- * Registers the `widgetModule` core-data entity at module load.
- *
- * Scoped to this experimental feature: the entity lives here instead of
- * the static `rootEntitiesConfig` array, so WP installs that never load
- * this package never see it.
- */
-dispatch( coreStore ).addEntities( [
-	{
-		name: 'widgetModule',
-		kind: 'root',
-		key: 'name',
-		baseURL: '/wp/v2/widget-modules',
-		plural: 'widgetModules',
-		label: __( 'Widget modules' ),
-		supportsPagination: false,
-	},
-] );
-
-/**
- * Shape returned by the `/wp/v2/widget-modules` REST endpoint. PHP keeps
- * snake_case (project convention); the camelCase mapping happens here at
- * the JS boundary.
+ * Shape returned by a widget-modules REST endpoint. PHP keeps snake_case
+ * (project convention); the camelCase mapping happens here at the JS
+ * boundary.
  */
 interface WidgetModuleRecord {
 	name: string;
@@ -53,22 +38,37 @@ type UseWidgetTypesResult = readonly [ WidgetType[], boolean ];
  * Returns the registered widget types, with each record's metadata
  * resolved from its `widget_module` script module.
  *
- * The list of records is read from the `widgetModule` core-data entity,
- * which fetches `/wp/v2/widget-modules` on first selector resolution.
- * For each record this hook dynamically imports `widget_module` and
- * merges the module's default export with the runtime fields (`name`,
- * `renderModule`).
+ * The records are read from the core-data entity identified by
+ * ( `kind`, `name` ). The host registers that entity, with its own
+ * `baseURL`, before rendering, so discovery is not bound to a single
+ * endpoint. When no entity is registered for that pair, the hook resolves
+ * to an empty list. For each record this hook dynamically imports
+ * `widget_module` and merges the module's default export with the runtime
+ * fields (`name`, `renderModule`).
  *
  * Consumers do not register or dispatch anything; the data layer owns
  * caching and invalidation.
+ *
+ * @param {UseWidgetTypesOptions} Coordinates of the widget-modules entity to read.
  */
-export function useWidgetTypes(): UseWidgetTypesResult {
+export function useWidgetTypes( {
+	kind,
+	name,
+}: UseWidgetTypesOptions ): UseWidgetTypesResult {
 	const records = useSelect(
 		( select ) =>
-			select( coreStore ).getEntityRecords( 'root', 'widgetModule' ) as
+			select( coreStore ).getEntityRecords( kind, name ) as
 				| WidgetModuleRecord[]
 				| null,
-		[]
+		[ kind, name ]
+	);
+
+	/* Whether the host registered the ( kind, name ) entity. Without it
+	   there is nothing to resolve, so the hook degrades to an empty list
+	   rather than waiting on records that never arrive. */
+	const hasEntity = useSelect(
+		( select ) => !! select( coreStore ).getEntityConfig( kind, name ),
+		[ kind, name ]
 	);
 
 	const [ widgetTypes, setWidgetTypes ] = useState< WidgetType[] >( [] );
@@ -76,6 +76,12 @@ export function useWidgetTypes(): UseWidgetTypesResult {
 		useState( true );
 
 	useEffect( () => {
+		if ( ! hasEntity ) {
+			setWidgetTypes( [] );
+			setIsResolvingWidgetTypes( false );
+			return;
+		}
+
 		if ( records === null ) {
 			setIsResolvingWidgetTypes( true );
 			return;
@@ -131,7 +137,7 @@ export function useWidgetTypes(): UseWidgetTypesResult {
 		return () => {
 			cancelled = true;
 		};
-	}, [ records ] );
+	}, [ hasEntity, records ] );
 
 	return [ widgetTypes, isResolvingWidgetTypes ];
 }

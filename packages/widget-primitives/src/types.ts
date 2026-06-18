@@ -178,3 +178,20 @@ export interface WidgetModule {
 export type ResolveWidgetModule = (
 	moduleId: string
 ) => Promise< WidgetModule >;
+
+/**
+ * Coordinates of the core-data entity a host registers for its
+ * widget-modules source. `useWidgetTypes` reads records by ( `kind`,
+ * `name` ), the same pair core-data keys entities on.
+ */
+export interface UseWidgetTypesOptions {
+	/**
+	 * core-data entity kind, e.g. `'root'`.
+	 */
+	kind: string;
+
+	/**
+	 * core-data entity name the host registered.
+	 */
+	name: string;
+}
