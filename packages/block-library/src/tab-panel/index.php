@@ -41,24 +41,6 @@ function block_core_tab_panel_render( array $attributes, string $content, \WP_Bl
 		$tag_processor->set_attribute( 'id', $tab_id );
 	}
 
-	/**
-	 * Add interactivity to the tab element.
-	 */
-	$tag_processor->set_attribute(
-		'data-wp-interactive',
-		'core/tabs'
-	);
-	$tag_processor->set_attribute(
-		'data-wp-context',
-		wp_json_encode(
-			array(
-				'tab' => array(
-					'id' => $tab_id,
-				),
-			)
-		)
-	);
-
 	$tag_processor->set_attribute( 'aria-labelledby', 'tab__' . $tab_id );
 	$tag_processor->set_attribute( 'data-wp-bind--hidden', '!state.isActiveTab' );
 
