@@ -2420,7 +2420,14 @@ class WP_Theme_JSON_Gutenberg {
 			if ( ! isset( $preset_per_origin[ $origin ] ) ) {
 				continue;
 			}
-			foreach ( $preset_per_origin[ $origin ] as $preset ) {
+			$presets_for_origin = $preset_per_origin[ $origin ];
+			if ( ! is_array( $presets_for_origin ) ) {
+				continue;
+			}
+			foreach ( $presets_for_origin as $preset ) {
+				if ( ! is_array( $preset ) || ! isset( $preset['slug'] ) ) {
+					continue;
+				}
 				$slug = _wp_to_kebab_case( $preset['slug'] );
 
 				$value = '';
@@ -2466,7 +2473,14 @@ class WP_Theme_JSON_Gutenberg {
 			if ( ! isset( $preset_per_origin[ $origin ] ) ) {
 				continue;
 			}
-			foreach ( $preset_per_origin[ $origin ] as $preset ) {
+			$presets_for_origin = $preset_per_origin[ $origin ];
+			if ( ! is_array( $presets_for_origin ) ) {
+				continue;
+			}
+			foreach ( $presets_for_origin as $preset ) {
+				if ( ! is_array( $preset ) || ! isset( $preset['slug'] ) ) {
+					continue;
+				}
 				$slug = _wp_to_kebab_case( $preset['slug'] );
 
 				// Use the array as a set so we don't get duplicates.
@@ -4113,7 +4127,13 @@ class WP_Theme_JSON_Gutenberg {
 				if ( ! isset( $duotone_presets[ $origin ] ) ) {
 					continue;
 				}
+				if ( ! is_array( $duotone_presets[ $origin ] ) ) {
+					continue;
+				}
 				foreach ( $duotone_presets[ $origin ] as $duotone_preset ) {
+					if ( ! is_array( $duotone_preset ) ) {
+						continue;
+					}
 					$filters .= wp_get_duotone_filter_svg( $duotone_preset );
 				}
 			}

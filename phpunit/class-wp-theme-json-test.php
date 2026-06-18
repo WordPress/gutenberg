@@ -766,6 +766,41 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_get_stylesheet_ignores_malformed_preset_origins() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'color' => array(
+						'palette' => array(
+							'default' => array(
+								'malformed' => true,
+							),
+							'theme'   => true,
+							'custom'  => array(
+								array(
+									'name'  => 'Assembler Primary',
+									'slug'  => 'assembler-primary',
+									'color' => '#123456',
+								),
+							),
+						),
+					),
+				),
+			),
+			'custom'
+		);
+
+		$this->assertSameCSS(
+			':root{--wp--preset--color--assembler-primary: #123456;}',
+			$theme_json->get_stylesheet( array( 'variables' ) )
+		);
+		$this->assertSameCSS(
+			'.has-assembler-primary-color{color: var(--wp--preset--color--assembler-primary) !important;}.has-assembler-primary-background-color{background-color: var(--wp--preset--color--assembler-primary) !important;}.has-assembler-primary-border-color{border-color: var(--wp--preset--color--assembler-primary) !important;}',
+			$theme_json->get_stylesheet( array( 'presets' ) )
+		);
+	}
+
 	public function test_get_stylesheet_preset_css_vars_use_feature_selector() {
 		register_block_type(
 			'test/feature-selector',
