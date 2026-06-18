@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { __experimentalHStack as HStack } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { store as coreStore } from '@wordpress/core-data';
 import { check } from '@wordpress/icons';
 
@@ -28,7 +28,7 @@ export default function SaveHub() {
 		};
 	}, [] );
 	return (
-		<HStack className="edit-site-save-hub" alignment="right" spacing={ 4 }>
+		<Stack className="edit-site-save-hub" direction="row" gap={ 4 }>
 			<SaveButton
 				className="edit-site-save-hub__button"
 				variant={ isDisabled && ! isSaving ? null : 'primary' }
@@ -37,6 +37,6 @@ export default function SaveHub() {
 				showReviewMessage
 				__next40pxDefaultSize
 			/>
-		</HStack>
+		</Stack>
 	);
 }
