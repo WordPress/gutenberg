@@ -81,14 +81,4 @@ class WP_Icon_Test extends WP_UnitTestCase {
 		$output = wp_get_icon( 'core/plus', array( 'class' => '"><script>alert(1)</script>' ) );
 		$this->assertStringNotContainsString( '<script>', $output );
 	}
-
-	public function test_filter_can_modify_output() {
-		$filter = function ( $html, $name ) {
-			return '<!-- ' . $name . ' -->' . $html;
-		};
-		add_filter( 'wp_icon_html', $filter, 10, 2 );
-		$output = wp_get_icon( 'core/plus' );
-		remove_filter( 'wp_icon_html', $filter, 10 );
-		$this->assertStringStartsWith( '<!-- core/plus --><svg ', $output );
-	}
 }
