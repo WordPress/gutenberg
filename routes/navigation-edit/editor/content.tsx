@@ -302,7 +302,7 @@ function NavigationTreeAppender( {
 										setIsChoosingSubmenuType( true )
 									}
 								>
-									{ __( 'Drop-down' ) }
+									{ __( 'Submenu' ) }
 								</MenuItem>
 							</MenuGroup>
 							<MenuGroup>
