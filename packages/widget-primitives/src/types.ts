@@ -180,18 +180,29 @@ export type ResolveWidgetModule = (
 ) => Promise< WidgetModule >;
 
 /**
- * Coordinates of the core-data entity a host registers for its
- * widget-modules source. `useWidgetTypes` reads records by ( `kind`,
- * `name` ), the same pair core-data keys entities on.
+ * A widget-module record: the per-widget data a host feeds to
+ * `useWidgetTypes`. Mirrors the `/wp/v2/widget-modules` REST shape, so a
+ * WordPress host can pass core-data records unchanged; snake_case is the
+ * wire format and the hook maps it to the camelCase `WidgetType`.
  */
-export interface UseWidgetTypesOptions {
+export interface WidgetModuleRecord {
 	/**
-	 * core-data entity kind, e.g. `'root'`.
-	 */
-	kind: string;
-
-	/**
-	 * core-data entity name the host registered.
+	 * Stable widget type identifier.
 	 */
 	name: string;
+
+	/**
+	 * Script-module id resolved to the render component at render time.
+	 */
+	render_module?: string | null;
+
+	/**
+	 * Script-module id dynamically imported for the widget's live metadata.
+	 */
+	widget_module?: string | null;
+
+	/**
+	 * Authoring presentation hint; overrides the metadata module's value.
+	 */
+	presentation?: WidgetTypeMetadata[ 'presentation' ] | null;
 }

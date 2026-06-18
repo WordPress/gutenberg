@@ -4,10 +4,5 @@
 	"compilerOptions": {
 		"types": [ "style-imports" ]
 	},
-	"references": [
-		{ "path": "../core-data" },
-		{ "path": "../data" },
-		{ "path": "../dataviews" },
-		{ "path": "../element" }
-	]
+	"references": [ { "path": "../dataviews" }, { "path": "../element" } ]
 }

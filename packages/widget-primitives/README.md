@@ -27,22 +27,20 @@ in your code._
 This package ships no stylesheets and injects no styles; there is nothing
 to enqueue or import.
 
-The contract types and `<WidgetRender>` work in any React application. The
-`useWidgetTypes( { kind, name } )` hook reads a `@wordpress/core-data`
-entity that the host registers, so the package is not bound to any single
-endpoint. 
+The contract types, `<WidgetRender>`, and `useWidgetTypes()` work in any
+React application. `useWidgetTypes( records )` is data-source agnostic: it
+never reaches for a store or an endpoint. The host fetches the
+widget-module records however it wants and passes them in; the hook imports
+each record's metadata module and returns the resolved `WidgetType[]`.
 
-The host registers an entity (via `core-data`'s `addEntities`)
-pointing at its own widget-modules REST source, then passes that entity's
-`( kind, name )` to the hook.
+On a WordPress site the records come from the `/wp/v2/widget-modules` REST
+endpoint, exposed while the `gutenberg-dashboard-widgets` experiment is
+enabled. The dashboard reads it through a `@wordpress/core-data` entity and
+passes the records to the hook.
 
-The Gutenberg plugin registers a `widgetModule` root entity backed by the
-`/wp/v2/widget-modules` endpoint while the `gutenberg-dashboard-widgets`
-experiment is enabled.
-
-When no entity is registered for the given `( kind, name )`, or it resolves
-to no records, `useWidgetTypes()` returns an empty list; the contract types and
- `<WidgetRender>` do not depend on any entity and work regardless.
+With no records, or an empty list, `useWidgetTypes()` returns an empty list;
+the contract types and `<WidgetRender>` do not depend on any data source and
+work regardless.
 
 ## Public API
 
@@ -51,12 +49,12 @@ to no records, `useWidgetTypes()` returns an empty list; the contract types and
     and mounts the resulting component with the standard `attributes` plus
     `setAttributes` render contract. Suspense, error handling, and chrome are
     host concerns and live outside the package.
--   `useWidgetTypes( { kind, name } )` → `[ widgetTypes, isResolvingWidgetTypes ]`:
-    reads the widget-modules entity the host registered at `( kind, name )` and
-    returns the `WidgetType[]` available on the current page, plus a flag that is
-    true while they are still resolving.
+-   `useWidgetTypes( records )` → `[ widgetTypes, isResolvingWidgetTypes ]`:
+    takes host-supplied widget-module records (`WidgetModuleRecord[]`, or `null`
+    while loading), imports each record's metadata, and returns the resolved
+    `WidgetType[]` plus a flag that is true while they are still resolving.
 -   Contract types: `WidgetType`, `WidgetName`, `WidgetIcon`,
-    `WidgetRenderProps`, `ResolveWidgetModule`, `UseWidgetTypesOptions`.
+    `WidgetRenderProps`, `ResolveWidgetModule`, `WidgetModuleRecord`.
     `WidgetIcon` is a rendered SVG element (typically one from
     `@wordpress/icons`); hosts pass it to their icon primitive as is.
 

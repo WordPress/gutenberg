@@ -44,8 +44,6 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@wordpress/core-data": "file:../core-data",
-		"@wordpress/data": "file:../data",
 		"@wordpress/dataviews": "file:../dataviews",
 		"@wordpress/element": "file:../element"
 	},
