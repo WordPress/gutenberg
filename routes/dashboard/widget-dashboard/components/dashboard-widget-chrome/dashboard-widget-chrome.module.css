@@ -53,10 +53,8 @@
 
 /*
  * Bleed block edges: zero the content's block padding so the body fills the
- * card top to bottom. The top is ours to flush (a full-bleed widget hides its
- * header in a position:absolute VisuallyHidden node that stays the card's
- * :first-child and blocks Card.FullBleed's top-flush rule). The bottom pairs
- * with the `margin-block-end: 0` on the bleed scroll wrapper below.
+ * card top to bottom. The top is ours to flush. The bottom pairs with the
+ * `margin-block-end: 0` on the bleed scroll wrapper below.
  */
 .widgetChromeContentBleed {
 	padding-block: 0;

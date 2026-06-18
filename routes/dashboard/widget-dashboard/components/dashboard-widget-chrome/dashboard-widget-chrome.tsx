@@ -17,7 +17,7 @@ import {
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { plugins } from '@wordpress/icons';
-import { Card, Icon, Stack, Notice, Text, VisuallyHidden } from '@wordpress/ui';
+import { Card, Icon, Stack, Notice, Text } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -199,11 +199,9 @@ export const DashboardWidgetChrome = forwardRef<
 		);
 	}
 
-	// `presentation` encodes two independent axes. `full-bleed` hides
-	// the header; both `full-bleed` and `content-bleed` let the body
-	// break out of the content padding.
+	// `presentation` encodes two independent axes. both `full-bleed` and
+	// `content-bleed` let the body break out of the content padding.
 	const { presentation } = widgetType;
-	const isHeaderHidden = presentation === 'full-bleed';
 	const isBodyBleeding =
 		presentation === 'full-bleed' || presentation === 'content-bleed';
 	const header = <Header titleId={ titleId } widgetType={ widgetType } />;
@@ -228,12 +226,7 @@ export const DashboardWidgetChrome = forwardRef<
 				aria-labelledby={ widgetType.title ? titleId : undefined }
 				inert={ editMode ? 'true' : undefined }
 			>
-				{ isHeaderHidden ? (
-					<VisuallyHidden>{ header }</VisuallyHidden>
-				) : (
-					header
-				) }
-
+				{ header }
 				<Card.Content
 					className={ clsx(
 						styles.widgetChromeContent,

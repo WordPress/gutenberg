@@ -73,10 +73,9 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	 *
 	 * - `'framed'` (default when absent): the widget renders its
 	 *   content only.
-	 * - `'content-bleed'`: the header stays visible while the content
-	 *   fills the content area edge-to-edge, with no padding.
-	 * - `'full-bleed'`: the widget renders edge-to-edge with no
-	 *   surrounding chrome.
+	 * - `'content-bleed'`: the content fills the content area edge-to-edge,
+	 *   with no padding.
+	 * - `'full-bleed'`: the widget renders edge-to-edge.
 	 */
 	presentation?: 'framed' | 'content-bleed' | 'full-bleed';
 

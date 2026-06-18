@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { wordpress } from '@wordpress/icons';
 
 const widget = {
 	apiVersion: 1,
@@ -10,7 +11,7 @@ const widget = {
 	description: __(
 		'Displays a welcome panel to introduce users to WordPress.'
 	),
-	icon: 'wordpress',
+	icon: wordpress,
 	category: 'dashboard',
 };
 
