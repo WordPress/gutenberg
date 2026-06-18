@@ -14,7 +14,6 @@
 		{ "path": "../preferences" },
 		{ "path": "../private-apis" },
 		{ "path": "../url" },
-		{ "path": "../vips" },
-		{ "path": "../warning" }
+		{ "path": "../vips" }
 	]
 }
