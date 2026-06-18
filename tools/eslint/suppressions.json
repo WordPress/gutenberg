@@ -950,6 +950,11 @@
 			"count": 1
 		}
 	},
+	"packages/editor/src/components/collab-sidebar/suggestion-actions.js": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
+	},
 	"packages/editor/src/components/document-bar/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -1093,11 +1098,6 @@
 			"count": 1
 		}
 	},
-	"packages/editor/src/components/revision-created-panel/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/editor/src/components/sidebar/dataform-post-summary.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -1130,6 +1130,21 @@
 	},
 	"packages/editor/src/components/style-book/index.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/suggestion-mode/suggestion-diff.js": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/suggestion-mode/suggestion-summary.js": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/suggestion-mode/test/auto-save.js": {
+		"react-hooks/globals": {
 			"count": 1
 		}
 	},
@@ -1272,16 +1287,10 @@
 	"packages/format-library/src/image/index.js": {
 		"react-hooks/refs": {
 			"count": 2
-		},
-		"@wordpress/use-recommended-components": {
-			"count": 3
 		}
 	},
 	"packages/format-library/src/language/index.js": {
 		"react-hooks/refs": {
-			"count": 2
-		},
-		"@wordpress/use-recommended-components": {
 			"count": 2
 		}
 	},
@@ -1293,9 +1302,6 @@
 	"packages/format-library/src/math/index.js": {
 		"react-hooks/refs": {
 			"count": 2
-		},
-		"@wordpress/use-recommended-components": {
-			"count": 1
 		}
 	},
 	"packages/format-library/src/text-color/inline.js": {
@@ -1601,11 +1607,6 @@
 			"count": 12
 		}
 	},
-	"packages/server-side-render/src/server-side-render.js": {
-		"react-hooks/refs": {
-			"count": 3
-		}
-	},
 	"packages/theme/src/stories/index.story.tsx": {
 		"react-hooks/refs": {
 			"count": 5
@@ -1870,99 +1871,6 @@
 	},
 	"widgets/site-preview/render.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-card/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		}
-	},
-	"packages/block-editor/src/components/global-styles/advanced-panel.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/layouts/constrained.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/layouts/grid.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/cover/edit/inspector-controls.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/editor/src/components/collab-sidebar/suggestion-actions.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/editor/src/components/post-taxonomies/flat-term-selector.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/editor/src/components/suggestion-mode/suggestion-diff.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/format-library/src/link/css-classes-setting.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/utils/waveform-player.js": {
-		"react-hooks/refs": {
-			"count": 1
-		}
-	},
-	"packages/components/src/navigation/index.tsx": {
-		"react-hooks/refs": {
-			"count": 3
-		}
-	},
-	"packages/edit-post/src/components/layout/index.js": {
-		"react-hooks/immutability": {
-			"count": 2
-		},
-		"react-hooks/refs": {
-			"count": 3
-		}
-	},
-	"packages/grid/src/grid.tsx": {
-		"react-hooks/refs": {
-			"count": 13
-		}
-	},
-	"packages/grid/src/resize-handle.tsx": {
-		"react-hooks/immutability": {
-			"count": 1
-		}
-	},
-	"packages/media-editor/src/image-editor/react/hooks/use-cropper-state.ts": {
-		"react-hooks/refs": {
-			"count": 2
-		}
-	},
-	"packages/editor/src/components/suggestion-mode/suggestion-summary.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/editor/src/components/suggestion-mode/auto-save.js": {
-		"react-hooks/refs": {
-			"count": 6
-		}
-	},
-	"packages/editor/src/components/suggestion-mode/test/auto-save.js": {
-		"react-hooks/globals": {
 			"count": 1
 		}
 	}
