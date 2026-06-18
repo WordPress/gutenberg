@@ -22,9 +22,19 @@
  *     trashes the note.
  *   - **Collaboration**: the linked comment can be resolved by another peer
  *     mid-session (their accept/reject flips its `status`). Before each
- *     update we re-read the comment via core-data; if the linkage is stale
- *     we orphan it and create a fresh note. PR #75147 widened
- *     `metadata.noteId` to an array so multiple notes can coexist on a block.
+ *     update we force a fresh read of the note (via the note collection
+ *     endpoint, the path a non-moderator suggester is allowed to read)
+ *     rather than trusting this tab's possibly-stale cache; if the linkage is
+ *     stale (resolved, or the note was deleted) we orphan it and create a
+ *     fresh note. The fresh record is mirrored back into core-data so the
+ *     sidebar stays in sync. PR #75147 widened `metadata.noteId` to an array
+ *     so multiple notes can coexist on a block.
+ *   - **In-flight id propagation**: the comment id learned by a create is
+ *     recorded in a synchronous ref map (`commentIdsRef`) the instant it
+ *     resolves, not only via React state. A save chained behind an in-flight
+ *     one runs before React commits the new id, so reading it from state
+ *     there would see `null` and POST a duplicate; the ref map closes that
+ *     window.
  *
  * Refs are used heavily because:
  *   - The provider callbacks (`createSuggestion`, `updateSuggestion`,
@@ -40,6 +50,8 @@
 import { useRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useCallback, useEffect, useRef } from '@wordpress/element';
+import apiFetch from '@wordpress/api-fetch';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -81,11 +93,13 @@ export default function SuggestionAutoSave() {
 		useSuggestionsProvider();
 	const registry = useRegistry();
 
-	const isSuggestMode = useSelect(
-		( select ) =>
-			select( EDITOR_STORE_NAME ).getEditorIntent() === SUGGEST_INTENT,
-		[]
-	);
+	const { isSuggestMode, postId } = useSelect( ( select ) => {
+		const editor = select( EDITOR_STORE_NAME );
+		return {
+			isSuggestMode: editor.getEditorIntent() === SUGGEST_INTENT,
+			postId: editor.getCurrentPostId?.() ?? null,
+		};
+	}, [] );
 
 	// Refs are read from inside async callbacks so a save always operates on
 	// the latest overlay state, not the values captured when the timer was
@@ -101,6 +115,7 @@ export default function SuggestionAutoSave() {
 	const deleteRef = useRef( deleteSuggestion );
 	const setCommentIdRef = useRef( setCommentId );
 	const setSyncedOpsKeyRef = useRef( setSyncedOpsKey );
+	const postIdRef = useRef( postId );
 
 	useEffect( () => {
 		entriesRef.current = entries;
@@ -109,6 +124,7 @@ export default function SuggestionAutoSave() {
 		deleteRef.current = deleteSuggestion;
 		setCommentIdRef.current = setCommentId;
 		setSyncedOpsKeyRef.current = setSyncedOpsKey;
+		postIdRef.current = postId;
 	} );
 
 	// Per-clientId debounce timer.
@@ -118,6 +134,22 @@ export default function SuggestionAutoSave() {
 	// no duplicate POSTs, and no dropped work when the user keeps typing
 	// during a slow network call.
 	const queuesRef = useRef( new Map() );
+	// Authoritative, synchronously-updated linkage for in-flight saves.
+	//
+	// The overlay's `commentId` / `syncedOpsKey` are also mirrored into React
+	// state (so they survive a remount), but that round-trip is asynchronous:
+	// `setCommentId` schedules a re-render, and `entriesRef` is only refreshed
+	// from the follow-up effect. When the user keeps typing through a slow
+	// save, the next save is chained directly behind the in-flight one and
+	// runs as a microtask the instant it resolves — before React has committed
+	// the new id. Reading the id back from `entriesRef` there would see `null`
+	// and POST a duplicate note. These ref maps are written the moment a save
+	// learns the id, so the queued save always sees it regardless of render
+	// timing. The maps are seeded from overlay state on first touch so a
+	// remount (which resets the refs but not the persisted state) re-links
+	// instead of orphaning.
+	const commentIdsRef = useRef( new Map() );
+	const syncedKeysRef = useRef( new Map() );
 
 	const syncOnce = useCallback(
 		async ( clientId ) => {
@@ -130,26 +162,83 @@ export default function SuggestionAutoSave() {
 				entry.overlayAttributes
 			);
 			const fingerprint = fingerprintOperations( operations );
-			if ( fingerprint === entry.syncedOpsKey ) {
+			// Prefer the synchronously-tracked key over the (asynchronously
+			// mirrored) overlay state so a save chained behind an in-flight one
+			// doesn't re-run work the previous save already persisted.
+			const lastSyncedKey = syncedKeysRef.current.has( clientId )
+				? syncedKeysRef.current.get( clientId )
+				: entry.syncedOpsKey;
+			if ( fingerprint === lastSyncedKey ) {
 				return;
 			}
 
-			// The overlay's `commentId` reference can outlive the note it
-			// points at: another collaborator may have accepted or rejected
-			// the suggestion mid-session, flipping the comment's status from
-			// `hold` to `approved`. Updating that comment would clobber its
+			// Read the linked comment id from the synchronous map (set the
+			// instant the creating save resolved); fall back to overlay state
+			// on first touch / after a remount.
+			let commentId = commentIdsRef.current.has( clientId )
+				? commentIdsRef.current.get( clientId )
+				: entry.commentId;
+
+			// The linked comment can outlive the note it points at: another
+			// collaborator may have accepted or rejected the suggestion
+			// mid-session, flipping the comment's status from `hold` to
+			// `approved`/`spam`/etc. Updating that comment would clobber its
 			// payload (and the resolved status header) with the user's new,
-			// unrelated edit. Treat a resolved link as if there were none so
-			// the next save creates a fresh note that coexists with the
-			// resolved one — this only works because PR #75147 lets a block
-			// hold multiple note ids in `metadata.noteId`.
-			let commentId = entry.commentId;
-			if ( commentId ) {
-				const linkedComment = registry
-					.select( coreStore )
-					.getEntityRecord( 'root', 'comment', commentId );
+			// unrelated edit. A plain `select` would only see whatever this tab
+			// has already cached, which may pre-date the peer's action — so
+			// force a fresh GET below before deciding whether it is still live.
+			// A resolved link is treated as if there were none, so the next
+			// save creates a fresh note that coexists with the resolved one —
+			// this only works because PR #75147 lets a block hold multiple
+			// note ids in `metadata.noteId`.
+			const currentPostId = postIdRef.current;
+			if ( commentId && currentPostId ) {
+				let linkedComment;
+				try {
+					// Query the note collection (filtered to this id) rather
+					// than `GET /comments/<id>`: the note REST controller only
+					// grants the single-item edit context to comment
+					// moderators, but lets anyone with `edit_post` read a
+					// post's notes through the collection — the same path the
+					// sidebar's thread list uses. A cached `select` is avoided
+					// so a peer's accept/reject is always seen. The fresh record
+					// is mirrored back into core-data so the sidebar reflects
+					// the new status too.
+					const matches = await apiFetch( {
+						path: addQueryArgs( '/wp/v2/comments', {
+							post: currentPostId,
+							type: 'note',
+							status: 'all',
+							include: [ commentId ],
+							per_page: 1,
+							context: 'edit',
+						} ),
+					} );
+					linkedComment = Array.isArray( matches )
+						? matches[ 0 ]
+						: null;
+					if ( linkedComment ) {
+						registry
+							.dispatch( coreStore )
+							.receiveEntityRecords( 'root', 'comment', [
+								linkedComment,
+							] );
+					}
+				} catch {
+					// A transient failure shouldn't strand the save; fall back
+					// to the cached record and let the next edit re-check.
+					linkedComment = registry
+						.select( coreStore )
+						.getEntityRecord( 'root', 'comment', commentId );
+				}
+				// A non-`hold` status means a peer resolved the note; orphan the
+				// link so the next save spawns a fresh note instead of clobbering
+				// the resolved one. An empty/unknown result is left alone — the
+				// update will surface a server error if the note is truly gone,
+				// and the next edit re-checks.
 				if ( linkedComment && linkedComment.status !== 'hold' ) {
 					commentId = null;
+					commentIdsRef.current.set( clientId, null );
 					setCommentIdRef.current( clientId, null );
 				}
 			}
@@ -158,6 +247,7 @@ export default function SuggestionAutoSave() {
 				if ( operations.length === 0 ) {
 					if ( commentId ) {
 						await deleteRef.current( { commentId } );
+						commentIdsRef.current.set( clientId, null );
 						setCommentIdRef.current( clientId, null );
 					}
 				} else if ( commentId ) {
@@ -173,9 +263,14 @@ export default function SuggestionAutoSave() {
 						operations,
 					} );
 					if ( saved?.id ) {
+						// Record the new id synchronously so a save already
+						// queued behind this one updates the same note instead
+						// of creating a second.
+						commentIdsRef.current.set( clientId, saved.id );
 						setCommentIdRef.current( clientId, saved.id );
 					}
 				}
+				syncedKeysRef.current.set( clientId, fingerprint );
 				setSyncedOpsKeyRef.current( clientId, fingerprint );
 			} catch {
 				// Error notice is surfaced inside the provider. The next overlay
@@ -216,7 +311,10 @@ export default function SuggestionAutoSave() {
 				entry.overlayAttributes
 			);
 			const fingerprint = fingerprintOperations( operations );
-			if ( fingerprint === entry.syncedOpsKey ) {
+			const lastSyncedKey = syncedKeysRef.current.has( clientId )
+				? syncedKeysRef.current.get( clientId )
+				: entry.syncedOpsKey;
+			if ( fingerprint === lastSyncedKey ) {
 				continue;
 			}
 
@@ -228,6 +326,19 @@ export default function SuggestionAutoSave() {
 				enqueueSync( clientId );
 			}, AUTOSAVE_DEBOUNCE_MS );
 			timers.set( clientId, timer );
+		}
+
+		// Drop the synchronous linkage for blocks whose overlay has been
+		// cleared (suggestion applied/rejected, or reverted and re-captured).
+		// Without this a clientId reused by a fresh capture would inherit the
+		// previous note id from the ref and update the old note instead of
+		// creating a new one.
+		for ( const map of [ commentIdsRef.current, syncedKeysRef.current ] ) {
+			for ( const clientId of map.keys() ) {
+				if ( ! entries[ clientId ] ) {
+					map.delete( clientId );
+				}
+			}
 		}
 
 		return undefined;
