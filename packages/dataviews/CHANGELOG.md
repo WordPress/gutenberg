@@ -12,6 +12,10 @@
 -   DataViews: Add Shift+Click range selection through a shared `useSelectionProps` hook that layouts can adopt, wired up in the table and grid layouts.[#80046](https://github.com/WordPress/gutenberg/pull/80046)
 -   DataViewsPicker: Add Shift+Click range selection to the `picker-table`, `picker-grid`, and `picker-activity` layouts. [#80413](https://github.com/WordPress/gutenberg/pull/80413)
 
+### Enhancements
+
+- DataViews Grid: Add an `aspectRatio` layout option so consumers can configure the aspect ratio of grid item previews, instead of the hard-coded square. Defaults to `1/1`, so existing consumers are unaffected. [#79329](https://github.com/WordPress/gutenberg/pull/79329)
+
 ### Bug Fix
 
 -   DataViews: Render the filter chip for an incomplete `between` range as if no value were set — matching how the filter itself does not apply — instead of showing a dangling bound or the literal string "undefined". A `null` bound, produced when an unfilled bound round-trips through JSON persistence, is now treated as unfilled too. [#80830](https://github.com/WordPress/gutenberg/pull/80830)

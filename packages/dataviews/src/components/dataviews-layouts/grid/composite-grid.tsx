@@ -2,7 +2,12 @@
  * External dependencies
  */
 import clsx from 'clsx';
-import type { ComponentProps, ReactElement, HTMLAttributes } from 'react';
+import type {
+	ComponentProps,
+	ReactElement,
+	HTMLAttributes,
+	CSSProperties,
+} from 'react';
 
 /**
  * WordPress dependencies
@@ -364,6 +369,14 @@ export default function CompositeGrid< Item >( {
 	const { paginationInfo, resizeObserverRef } =
 		useContext( DataViewsContext );
 	const gridColumns = useGridColumns();
+	// Optional consumer-configured aspect ratio for item previews, surfaced to
+	// CSS as a custom property the media field's stylesheet reads (falling back
+	// to the default square `1/1` when unset).
+	const gridStyle: CSSProperties | undefined = view.layout?.aspectRatio
+		? ( {
+				'--dataviews-grid-media-aspect-ratio': view.layout.aspectRatio,
+		  } as CSSProperties )
+		: undefined;
 	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
 	const titleField = fields.find(
 		( field ) => field.id === view?.titleField
@@ -432,6 +445,7 @@ export default function CompositeGrid< Item >( {
 									}
 								) }
 								previewSize={ view.layout?.previewSize }
+								style={ gridStyle }
 								aria-busy={ isLoading }
 								ref={ resizeObserverRef }
 							/>
@@ -523,6 +537,7 @@ export default function CompositeGrid< Item >( {
 				! isInfiniteScroll && (
 					<Composite
 						role="grid"
+						style={ gridStyle }
 						className={ clsx( 'dataviews-view-grid', className, {
 							[ `has-${ view.layout?.density }-density` ]:
 								view.layout?.density &&

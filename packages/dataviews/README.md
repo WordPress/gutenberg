@@ -257,6 +257,7 @@ Properties:
 | `styles`       | ✓       | ✓             |        |              |        |            |
 | `badgeFields`  |         |               | ✓      | ✓            |        |            |
 | `previewSize`  |         |               | ✓      | ✓            |        |            |
+| `aspectRatio`  |         |               | ✓      |              |        |            |
 
 `table` and `pickerTable` layouts:
 
@@ -272,6 +273,7 @@ Right-align (`'end'`) whenever the cell value is fundamentally quantitative—nu
 -   `badgeFields`: a list of field's `id` to render without label and styled as badges.
 -   `density`: one of `comfortable`, `balanced`, or `compact`. Configures the gap between items in the grid.
 -   `previewSize`: a `number` representing the size of the preview.
+-   `aspectRatio` (`grid` only): a fixed CSS [`aspect-ratio`](https://developer.mozilla.org/en-US/docs/Web/CSS/aspect-ratio) value (e.g. `'1/1'`, `'16/9'`, `'4/3'`) applied uniformly to every item preview, keeping rows aligned. Defaults to `'1/1'`.
 
 `list` layout:
 

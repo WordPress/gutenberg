@@ -297,6 +297,13 @@ export interface ViewGrid extends ViewBase {
 		 * The density of the grid layout.
 		 */
 		density?: Density;
+
+		/**
+		 * A fixed aspect ratio for the grid item previews (the media field), as
+		 * a CSS `aspect-ratio` value (e.g. `'1/1'`, `'16/9'`, `'4/3'`). Applied
+		 * uniformly to every item so rows stay aligned. Defaults to `'1/1'`.
+		 */
+		aspectRatio?: string;
 	};
 }
 
