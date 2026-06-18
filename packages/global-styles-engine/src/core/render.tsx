@@ -59,7 +59,7 @@ interface PresetMetadata {
  * Preset collection by origin
  */
 interface PresetsByOrigin {
-	[ origin: string ]: any[];
+	[ origin: string ]: unknown;
 }
 
 /**
@@ -236,6 +236,8 @@ const RESPONSIVE_BREAKPOINTS: Record< string, string > = {
 	tablet: '@media (480px < width <= 782px)',
 };
 
+const PRESET_ORIGINS = [ 'default', 'theme', 'custom' ];
+
 /**
  * Transform given preset tree into a set of preset class declarations.
  *
@@ -261,34 +263,32 @@ function getPresetsClasses(
 				path,
 				[]
 			) as PresetsByOrigin;
-			[ 'default', 'theme', 'custom' ].forEach( ( origin ) => {
-				if ( presetByOrigin[ origin ] ) {
-					presetByOrigin[ origin ].forEach(
-						( { slug }: { slug: string } ) => {
-							classes!.forEach(
-								( {
-									classSuffix,
-									propertyName,
-								}: CSSClassConfig ) => {
-									const classSelectorToUse = `.has-${ kebabCase(
-										slug
-									) }-${ classSuffix }`;
-									const selectorToUse = blockSelector
-										.split( ',' ) // Selector can be "h1, h2, h3"
-										.map(
-											( selector ) =>
-												`${ selector }${ classSelectorToUse }`
-										)
-										.join( ',' );
-									const value = `var(--wp--preset--${ cssVarInfix }--${ kebabCase(
-										slug
-									) })`;
-									declarations += `${ selectorToUse }{${ propertyName }: ${ value } !important;}`;
-								}
-							);
+			PRESET_ORIGINS.forEach( ( origin ) => {
+				const presets = presetByOrigin?.[ origin ];
+				if ( ! Array.isArray( presets ) ) {
+					return;
+				}
+
+				presets.forEach( ( { slug }: { slug: string } ) => {
+					classes!.forEach(
+						( { classSuffix, propertyName }: CSSClassConfig ) => {
+							const classSelectorToUse = `.has-${ kebabCase(
+								slug
+							) }-${ classSuffix }`;
+							const selectorToUse = blockSelector
+								.split( ',' ) // Selector can be "h1, h2, h3"
+								.map(
+									( selector ) =>
+										`${ selector }${ classSelectorToUse }`
+								)
+								.join( ',' );
+							const value = `var(--wp--preset--${ cssVarInfix }--${ kebabCase(
+								slug
+							) })`;
+							declarations += `${ selectorToUse }{${ propertyName }: ${ value } !important;}`;
 						}
 					);
-				}
+				} );
 			} );
 			return declarations;
 		},
@@ -309,15 +309,19 @@ function getPresetsSvgFilters(
 			{}
 		) as PresetsByOrigin;
 		return [ 'default', 'theme' ]
-			.filter( ( origin ) => presetByOrigin[ origin ] )
-			.flatMap( ( origin ) =>
-				presetByOrigin[ origin ].map( ( preset: any ) =>
+			.flatMap( ( origin ) => {
+				const presets = presetByOrigin?.[ origin ];
+				if ( ! Array.isArray( presets ) ) {
+					return [];
+				}
+
+				return presets.map( ( preset: any ) =>
 					getDuotoneFilter(
 						`wp-duotone-${ preset.slug }`,
 						preset.colors
 					)
-				)
-			)
+				);
+			} )
 			.join( '' );
 	} );
 }
@@ -1441,11 +1445,13 @@ function getPresetVarDeclarations(
 	) as PresetsByOrigin;
 
 	const declarations: string[] = [];
-	for ( const origin of [ 'default', 'theme', 'custom' ] ) {
-		if ( ! presetByOrigin[ origin ] ) {
+	for ( const origin of PRESET_ORIGINS ) {
+		const presetsForOrigin = presetByOrigin?.[ origin ];
+		if ( ! Array.isArray( presetsForOrigin ) ) {
 			continue;
 		}
-		for ( const value of presetByOrigin[ origin ] ) {
+
+		for ( const value of presetsForOrigin ) {
 			const slug = kebabCase( value.slug );
 			if ( valueKey && ! valueFunc ) {
 				declarations.push(

@@ -393,6 +393,29 @@ describe( 'global styles renderer', () => {
 				':root{--wp--preset--color--white: white;--wp--preset--color--black: black;--wp--preset--color--white-2-black: value;--wp--custom--white-2-black: value;--wp--custom--font-primary: value;--wp--custom--line-height--body: 1.7;--wp--custom--line-height--heading: 1.3;}h1,h2,h3,h4,h5,h6{--wp--preset--font-size--small: 12px;--wp--preset--font-size--medium: 23px;}'
 			);
 		} );
+
+		it( 'should ignore malformed preset origins when generating custom properties', () => {
+			const tree = {
+				settings: {
+					color: {
+						palette: {
+							default: {},
+							custom: [
+								{
+									name: 'Assembler Primary',
+									slug: 'assembler-primary',
+									color: '#123456',
+								},
+							],
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			expect( generateCustomProperties( tree, {} ) ).toEqual(
+				':root{--wp--preset--color--assembler-primary: #123456;}'
+			);
+		} );
 	} );
 
 	describe( 'transformToStyles', () => {
@@ -1259,6 +1282,44 @@ describe( 'global styles renderer', () => {
 				transformToStyles( Object.freeze( tree ), 'body' )
 			).toEqual(
 				':root { --wp--style--global--content-size: 840px; --wp--style--global--wide-size: 1100px;}:where(body) {margin: 0;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }'
+			);
+		} );
+
+		it( 'should ignore malformed preset origins when generating preset classes', () => {
+			const tree = {
+				settings: {
+					color: {
+						palette: {
+							default: {},
+							theme: {},
+							custom: [
+								{
+									name: 'Assembler Primary',
+									slug: 'assembler-primary',
+									color: '#123456',
+								},
+							],
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const styles = transformToStyles(
+				tree,
+				{},
+				false,
+				false,
+				true,
+				true,
+				{
+					...minimalStyleOptions,
+					blockStyles: false,
+					presets: true,
+				}
+			);
+
+			expect( styles ).toEqual(
+				'.has-assembler-primary-color{color: var(--wp--preset--color--assembler-primary) !important;}.has-assembler-primary-background-color{background-color: var(--wp--preset--color--assembler-primary) !important;}.has-assembler-primary-border-color{border-color: var(--wp--preset--color--assembler-primary) !important;}'
 			);
 		} );
 	} );
