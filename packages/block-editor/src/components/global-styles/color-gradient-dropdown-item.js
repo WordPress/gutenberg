@@ -149,6 +149,8 @@ function ColorGradientTab( {
 							children: contrastWarning,
 							status: 'warning',
 							spokenMessage: null,
+							className:
+								'block-editor-panel-color-gradient-settings__contrast-notice',
 					  }
 					: undefined
 			}

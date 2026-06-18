@@ -126,9 +126,13 @@ export type ColorPaletteProps = Pick<
 	 * messages about the current selection, such as a contrast warning.
 	 *
 	 * The notice is rendered as non-dismissible: provide the message via
-	 * `children`, and optionally set the `status` and `spokenMessage`.
+	 * `children`, and optionally set the `status`, `spokenMessage`, and
+	 * `className`.
 	 */
-	noticeProps?: Pick< NoticeProps, 'children' | 'status' | 'spokenMessage' >;
+	noticeProps?: Pick<
+		NoticeProps,
+		'children' | 'status' | 'spokenMessage' | 'className'
+	>;
 } & (
 		| {
 				/**
