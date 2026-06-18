@@ -942,9 +942,11 @@ export default function GalleryEdit( props ) {
 			</>
 			{ isDynamic ? (
 				<GalleryDynamicView
+					{ ...props }
 					dynamic={ dynamic }
 					blockProps={ blockProps }
 					innerBlocksProps={ innerBlocksProps }
+					multiGallerySelection={ multiGallerySelection }
 				/>
 			) : (
 				<Gallery
