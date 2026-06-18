@@ -14,7 +14,6 @@ import TitleView from './view';
 const titleField: Field< CommonPost > = {
 	type: 'text',
 	id: 'title',
-	Edit: 'richtext',
 	label: __( 'Title' ),
 	placeholder: __( 'No title' ),
 	getValue: ( { item } ) => getItemTitle( item ),
