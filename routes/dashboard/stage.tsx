@@ -3,7 +3,7 @@
  */
 import { Page } from '@wordpress/admin-ui';
 import { store as coreStore } from '@wordpress/core-data';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { dispatch, useDispatch, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
@@ -17,6 +17,21 @@ import { useDashboardGridSettings, useDashboardLayout } from './hooks';
 import { WidgetDashboard } from './widget-dashboard';
 import type { DashboardWidget } from './widget-dashboard';
 
+/* Register the widget-modules discovery entity for this host before the
+   dashboard renders. The route module loads only when the dashboard page
+   does, so this runs gated and ahead of the `useWidgetTypes` read below. */
+dispatch( coreStore ).addEntities( [
+	{
+		name: 'widgetModule',
+		kind: 'root',
+		key: 'name',
+		baseURL: '/wp/v2/widget-modules',
+		plural: 'widgetModules',
+		label: __( 'Widget modules' ),
+		supportsPagination: false,
+	},
+] );
+
 function Dashboard() {
 	const [ layout, setLayout, resetLayout ] = useDashboardLayout(
 		'gutenberg_dashboard'
@@ -24,7 +39,10 @@ function Dashboard() {
 
 	const [ gridSettings, setGridSettings ] = useDashboardGridSettings();
 
-	const [ widgetTypes, isResolving ] = useWidgetTypes();
+	const [ widgetTypes, isResolving ] = useWidgetTypes( {
+		kind: 'root',
+		name: 'widgetModule',
+	} );
 
 	const [ editMode, setEditMode ] = useState( false );
 
