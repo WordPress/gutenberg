@@ -983,4 +983,87 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 
 		$this->assertSame( 'color: red;margin: 0;', $compiled_css );
 	}
+
+	/**
+	 * Tests that compile_css_rules() keeps its sanitized output by default.
+	 *
+	 * @covers WP_Style_Engine_Gutenberg::compile_css_rules
+	 */
+	public function test_compile_css_rules_sanitizes_declarations_by_default() {
+		$compiled_css = WP_Style_Engine_Gutenberg::compile_css_rules(
+			array(
+				array(
+					'selector'     => '.test',
+					'declarations' => array(
+						'color'  => 'red',
+						'margin' => '0',
+					),
+				),
+			),
+			array( 'prettify' => false )
+		);
+
+		$this->assertSame( '.test{color:red;margin:0;}', $compiled_css );
+	}
+
+	/**
+	 * Tests that trusted compile_css_rules() preserves Theme JSON rule and declaration order.
+	 *
+	 * @covers WP_Style_Engine_Gutenberg::compile_css_rules
+	 */
+	public function test_compile_css_rules_serializes_trusted_theme_json_rules() {
+		$compiled_css = WP_Style_Engine_Gutenberg::compile_css_rules(
+			array(
+				array(
+					'selector'     => '.first',
+					'declarations' => array(
+						array(
+							'name'  => 'color',
+							'value' => 'red',
+						),
+						array(
+							'name'  => 'color',
+							'value' => 'blue',
+						),
+						array(
+							'name'  => 'margin',
+							'value' => 0,
+						),
+						array(
+							'name'  => 'padding',
+							'value' => false,
+						),
+					),
+				),
+				array(
+					'selector'     => '.second',
+					'declarations' => array(
+						'display' => 'flex',
+					),
+				),
+				array(
+					'selector'     => '.empty',
+					'declarations' => array(
+						array(
+							'name'  => 'gap',
+							'value' => array(),
+						),
+					),
+				),
+				array(
+					'selector'     => '.third',
+					'rules_group'  => '@media (min-width: 600px)',
+					'declarations' => array(
+						array(
+							'name'  => 'display',
+							'value' => 'grid',
+						),
+					),
+				),
+			),
+			array( 'sanitize' => false )
+		);
+
+		$this->assertSame( '.first{color: red;color: blue;margin: 0;}.second{display: flex;}@media (min-width: 600px){.third{display: grid;}}', $compiled_css );
+	}
 }

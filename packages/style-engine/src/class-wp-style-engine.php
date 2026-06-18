@@ -739,6 +739,60 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		}
 
 		/**
+		 * Compiles an ordered list of CSS rules.
+		 *
+		 * @param array $css_rules An ordered list of CSS rules. Each rule accepts:
+		 *                         - `selector`: CSS selector.
+		 *                         - `declarations`: CSS declarations. Can be an associative property/value array,
+		 *                           or an ordered Theme JSON declaration list with `name` and `value` keys.
+		 *                         - `rules_group`: Optional parent CSS selector or nested @rule.
+		 * @param array $options   {
+		 *     Optional. An array of options. Default empty array.
+		 *
+		 *     @type bool $sanitize Whether to sanitize the CSS output. Default true.
+		 *     @type bool $optimize Whether to optimize the CSS output, e.g., combine rules. Default false.
+		 *     @type bool $prettify Whether to add new lines and indents to output. Default depends on `SCRIPT_DEBUG`.
+		 * }
+		 * @return string A compiled CSS stylesheet.
+		 */
+		public static function compile_css_rules( $css_rules, $options = array() ) {
+			if ( empty( $css_rules ) || ! is_array( $css_rules ) ) {
+				return '';
+			}
+
+			$options = wp_parse_args(
+				$options,
+				array(
+					'sanitize' => true,
+				)
+			);
+
+			if ( ! $options['sanitize'] ) {
+				return static::compile_rules_unfiltered( $css_rules );
+			}
+
+			$css_rule_objects = array();
+			foreach ( $css_rules as $css_rule ) {
+				if ( ! static::is_css_rule_shape_valid( $css_rule ) ) {
+					continue;
+				}
+
+				$rules_group        = isset( $css_rule['rules_group'] ) && is_string( $css_rule['rules_group'] ) ? $css_rule['rules_group'] : '';
+				$css_rule_objects[] = new WP_Style_Engine_CSS_Rule(
+					$css_rule['selector'],
+					$css_rule['declarations'],
+					$rules_group
+				);
+			}
+
+			if ( empty( $css_rule_objects ) ) {
+				return '';
+			}
+
+			return static::compile_stylesheet_from_css_rules( $css_rule_objects, $options );
+		}
+
+		/**
 		 * Normalizes CSS declarations to an ordered declaration list.
 		 *
 		 * This accepts Style Engine's associative property/value declarations and Theme JSON's
@@ -790,9 +844,10 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 *
 		 * @param array  $css_declarations CSS declarations.
 		 * @param string $css_selector     Optional. CSS selector.
+		 * @param string $rules_group      Optional. A parent CSS selector or nested @rule.
 		 * @return string A compiled CSS string.
 		 */
-		private static function compile_declarations_unfiltered( $css_declarations, $css_selector = '' ) {
+		private static function compile_declarations_unfiltered( $css_declarations, $css_selector = '', $rules_group = '' ) {
 			$declarations      = static::normalize_declarations( $css_declarations );
 			$declaration_block = '';
 
@@ -800,11 +855,66 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 				$declaration_block .= $declaration['property'] . ': ' . $declaration['value'] . ';';
 			}
 
+			if ( empty( $declaration_block ) ) {
+				return '';
+			}
+
 			if ( $css_selector ) {
-				return $css_selector . '{' . $declaration_block . '}';
+				$css_rule = $css_selector . '{' . $declaration_block . '}';
+
+				if ( $rules_group ) {
+					return $rules_group . '{' . $css_rule . '}';
+				}
+
+				return $css_rule;
 			}
 
 			return $declaration_block;
+		}
+
+		/**
+		 * Compiles trusted CSS rules without sanitizing.
+		 *
+		 * This path is intended for internally generated CSS, such as Theme JSON output.
+		 *
+		 * @param array $css_rules CSS rules.
+		 * @return string A compiled CSS stylesheet.
+		 */
+		private static function compile_rules_unfiltered( $css_rules ) {
+			$stylesheet = '';
+
+			foreach ( $css_rules as $css_rule ) {
+				if ( ! static::is_css_rule_shape_valid( $css_rule ) ) {
+					continue;
+				}
+
+				$rules_group = isset( $css_rule['rules_group'] ) && is_string( $css_rule['rules_group'] ) ? $css_rule['rules_group'] : '';
+				$stylesheet .= static::compile_declarations_unfiltered(
+					$css_rule['declarations'],
+					$css_rule['selector'],
+					$rules_group
+				);
+			}
+
+			return $stylesheet;
+		}
+
+		/**
+		 * Returns whether a value has the CSS rule shape required for compilation.
+		 *
+		 * This does not sanitize the selector or declarations.
+		 *
+		 * @param mixed $css_rule CSS rule.
+		 * @return bool Whether the CSS rule can be compiled.
+		 */
+		private static function is_css_rule_shape_valid( $css_rule ) {
+			return (
+				is_array( $css_rule ) &&
+				! empty( $css_rule['selector'] ) &&
+				is_string( $css_rule['selector'] ) &&
+				! empty( $css_rule['declarations'] ) &&
+				is_array( $css_rule['declarations'] )
+			);
 		}
 
 		/**
