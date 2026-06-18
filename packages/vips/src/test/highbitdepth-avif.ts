@@ -21,7 +21,6 @@ import { join } from 'node:path';
  * AVIF images (kleisauke/wasm-vips#118). Earlier builds threw "error in tile"
  * decode failures on the same files.
  */
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 const Vips = require( 'wasm-vips' );
 
 const FIXTURES = join( __dirname, 'fixtures' );
