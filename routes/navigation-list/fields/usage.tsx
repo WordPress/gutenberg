@@ -46,7 +46,9 @@ export function createLocationsField( {
 					{ getLocationsSummary( locations ) }
 				</WCBadge>
 			) : (
-				<WCBadge intent="default">{ __( 'Not shown' ) }</WCBadge>
+				<WCBadge intent="default">
+					{ getLocationsSummary( locations ) }
+				</WCBadge>
 			);
 		},
 	};

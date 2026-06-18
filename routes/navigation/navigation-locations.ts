@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { decodeEntities } from '@wordpress/html-entities';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 // @ts-expect-error - No type declarations available for @wordpress/blocks.
 import { parse, serialize } from '@wordpress/blocks';
 
@@ -102,29 +102,12 @@ export function getLocationLabel( part: TemplatePartRecord ) {
 
 export function getLocationsSummary( locations: NavigationLocation[] ) {
 	if ( locations.length === 0 ) {
-		return __( 'Not shown' );
-	}
-
-	const uniqueLabels = Array.from(
-		new Set( locations.map( ( location ) => location.label ) )
-	);
-
-	if ( locations.length === 1 ) {
-		return uniqueLabels[ 0 ];
-	}
-
-	if ( locations.length === 2 && uniqueLabels.length === 2 ) {
-		return sprintf(
-			/* translators: 1: First location name, 2: second location name. */
-			__( '%1$s and %2$s' ),
-			uniqueLabels[ 0 ],
-			uniqueLabels[ 1 ]
-		);
+		return __( 'Not used' );
 	}
 
 	return sprintf(
 		/* translators: %d: Number of locations where this navigation menu is shown. */
-		__( '%d locations' ),
+		_n( '%d location', '%d locations', locations.length ),
 		locations.length
 	);
 }
