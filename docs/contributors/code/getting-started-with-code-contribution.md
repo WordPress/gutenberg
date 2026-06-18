@@ -285,40 +285,17 @@ You can start with this workspace settings file:
 
 ### ESLint
 
-[ESLint](https://eslint.org/) statically analyzes the code to find problems. The lint rules are integrated in the continuous integration process and must pass to be able to commit. You should install the [ESLint Extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) for Visual Studio Code, see eslint docs for [more editor integrations](https://eslint.org/docs/user-guide/integrations).
+[ESLint](https://eslint.org/) statically analyzes the code to find problems. The lint rules are integrated in the continuous integration process and must pass to be able to commit. With an editor integration enabled, ESLint will use the [eslint.config.cjs](https://github.com/WordPress/gutenberg/blob/HEAD/eslint.config.cjs) file in the root of the Gutenberg repository to highlight issues as you develop.
 
-With the extension installed, ESLint will use the [eslint.config.cjs](https://github.com/WordPress/gutenberg/blob/HEAD/eslint.config.cjs) file in the root of the Gutenberg repository for formatting rules. It will highlight issues as you develop, you can also set the following preference to fix lint rules on save.
-
-```json
-    "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": "explicit"
-    },
-```
+If you use Visual Studio Code, use the extension and settings listed in the [Visual Studio Code](#visual-studio-code) section above. For other editors, see the [ESLint editor integration docs](https://eslint.org/docs/user-guide/integrations).
 
 ### Prettier
 
-[Prettier](https://prettier.io/) is a tool that allows you to define an opinionated format, and automate fixing the code to match that format. Prettier and ESlint are similar, Prettier is more about formatting and style, while ESlint is for detecting coding errors.
+[Prettier](https://prettier.io/) is a tool that allows you to define an opinionated format, and automate fixing the code to match that format. Prettier and ESLint are similar, Prettier is more about formatting and style, while ESLint is for detecting coding errors.
 
-To use Prettier with Visual Studio Code, you should install the [Prettier - Code formatter extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode). You can then configure it to be the default formatter and to automatically fix issues on save, by adding the following to your settings. **_Note_: depending on where you are viewing this document, the brackets may show as double, the proper format is just a single bracket.**
+Editor integrations use the `prettier.config.mjs` file included in the root of the Gutenberg repository. The config is included from the [@wordpress/prettier-config](/packages/prettier-config/README.md) package. If you use Visual Studio Code, use the extension and settings listed in the [Visual Studio Code](#visual-studio-code) section above.
 
-```json
-"[[javascript]]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true
-},
-"[[markdown]]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true
-},
-```
-
-This will use the `prettier.config.mjs` file included in the root of the Gutenberg repository. The config is included from the [@wordpress/prettier-config](/packages/prettier-config/README.md) package.
-
-If you only want to use this configuration with the Gutenberg project, create a directory called `.vscode` at the top-level of Gutenberg (if it doesn't exist yet), and place your settings in a `settings.json` there. Visual Studio Code refers to this as Workspace Settings, and only apply to the project.
-
-After you create a `.vscode/settings.json` file in your repository, you probably want to add it to your [global gitignore file](https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files#configuring-ignored-files-for-all-repositories-on-your-computer) so that it stays private for you and is not committed to the repository.
-
-For other editors, see [Prettier's Editor Integration docs](https://prettier.io/docs/en/editors.html)
+For other editors, see [Prettier's Editor Integration docs](https://prettier.io/docs/en/editors.html).
 
 ### TypeScript
 
