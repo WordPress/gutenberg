@@ -79,10 +79,23 @@ export const route = {
 		};
 	} ) => {
 		const navigationId = parseInt( params.id );
-		await resolveSelect( coreStore ).getEntityRecord(
-			'postType',
-			NAVIGATION_POST_TYPE,
-			navigationId
-		);
+		const resolver = resolveSelect( coreStore );
+
+		await Promise.all( [
+			resolver.getEntityRecord(
+				'postType',
+				NAVIGATION_POST_TYPE,
+				navigationId
+			),
+			// The Navigation block hydrates its controlled inner blocks from
+			// `useEntityBlockEditor`, which reads `getEditedEntityRecord`.
+			// Preloading only `getEntityRecord` can leave the tree looking empty
+			// on first visit until a later resolver pass fills the edited record.
+			resolver.getEditedEntityRecord(
+				'postType',
+				NAVIGATION_POST_TYPE,
+				navigationId
+			),
+		] );
 	},
 };

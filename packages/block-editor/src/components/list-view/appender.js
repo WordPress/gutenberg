@@ -18,7 +18,10 @@ import AriaReferencedText from './aria-referenced-text';
 import { unlock } from '../../lock-unlock';
 
 export const Appender = forwardRef(
-	( { nestingLevel, blockCount, clientId, ...props }, ref ) => {
+	(
+		{ nestingLevel, blockCount, clientId, renderAppender, ...props },
+		ref
+	) => {
 		const { insertedBlock, setInsertedBlock } = useListViewContext();
 
 		const instanceId = useInstanceId( Appender );
@@ -80,22 +83,36 @@ export const Appender = forwardRef(
 
 		return (
 			<div className="list-view-appender">
-				<Inserter
-					ref={ ref }
-					rootClientId={ clientId }
-					position="bottom right"
-					isAppender
-					selectBlockOnInsert={ false }
-					shouldDirectInsert={ directInsert }
-					__experimentalIsQuick
-					{ ...props }
-					toggleProps={ { 'aria-describedby': descriptionId } }
-					onSelectOrClose={ ( maybeInsertedBlock ) => {
-						if ( maybeInsertedBlock?.clientId ) {
-							setInsertedBlock( maybeInsertedBlock );
-						}
-					} }
-				/>
+				{ renderAppender ? (
+					// Private escape hatch for specialized list views that need
+					// the appender row/focus semantics without the generic Inserter UI.
+					renderAppender( {
+						clientId,
+						nestingLevel,
+						blockCount,
+						descriptionId,
+						ref,
+						setInsertedBlock,
+						...props,
+					} )
+				) : (
+					<Inserter
+						ref={ ref }
+						rootClientId={ clientId }
+						position="bottom right"
+						isAppender
+						selectBlockOnInsert={ false }
+						shouldDirectInsert={ directInsert }
+						__experimentalIsQuick
+						{ ...props }
+						toggleProps={ { 'aria-describedby': descriptionId } }
+						onSelectOrClose={ ( maybeInsertedBlock ) => {
+							if ( maybeInsertedBlock?.clientId ) {
+								setInsertedBlock( maybeInsertedBlock );
+							}
+						} }
+					/>
+				) }
 				<AriaReferencedText id={ descriptionId }>
 					{ description }
 				</AriaReferencedText>

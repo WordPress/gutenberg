@@ -84,6 +84,7 @@ export default function NavigationMenuEditor( {
 
 	return (
 		<BlockEditorProvider
+			key={ id }
 			settings={ settings }
 			value={ blocks }
 			onChange={ noop }

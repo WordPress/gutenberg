@@ -1028,11 +1028,7 @@ export default function AddMenuItemsModal( {
 	return (
 		<Modal
 			className="navigation-add-items-modal"
-			title={ sprintf(
-				/* translators: %s: navigation menu title. */
-				__( 'Add items to %s' ),
-				getPostTitle( navigationMenu )
-			) }
+			title={ __( 'Add menu items' ) }
 			onRequestClose={ onClose }
 			size="fill"
 		>

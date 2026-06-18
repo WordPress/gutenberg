@@ -7,12 +7,19 @@ import {
 	BlockList,
 	// @ts-expect-error - No type declarations available for @wordpress/block-editor
 } from '@wordpress/block-editor';
-import { Button, Popover } from '@wordpress/components';
+import {
+	Button,
+	DropdownMenu,
+	MenuGroup,
+	MenuItem,
+	Popover,
+} from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 // @ts-expect-error - No type declarations available for @wordpress/blocks
 import { createBlock } from '@wordpress/blocks';
 import {
 	type ComponentType,
+	type Ref,
 	useCallback,
 	useLayoutEffect,
 	useRef,
@@ -20,7 +27,14 @@ import {
 } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { unlock } from '@wordpress/routes-lock-unlock';
-import { navigation as navigationIcon } from '@wordpress/icons';
+import {
+	addSubmenu as addSubmenuIcon,
+	link as linkIcon,
+	navigation as navigationIcon,
+	page,
+	postCategories,
+	plus,
+} from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { EmptyState } from '@wordpress/ui';
 
@@ -65,10 +79,34 @@ type NavigationLinkUIProps = {
 	showBlockInserter?: boolean;
 };
 
+type NavigationTreeAppenderProps = {
+	clientId: string;
+	descriptionId: string;
+	ref?: Ref< HTMLButtonElement >;
+	setInsertedBlock: ( block: Block | null ) => void;
+	onAddExistingPage: (
+		parentClientId: string,
+		setInsertedBlock: ( block: Block | null ) => void
+	) => void;
+	onAddCustomLink: (
+		parentClientId: string,
+		setInsertedBlock: ( block: Block | null ) => void
+	) => void;
+	onAddSubmenu: (
+		parentClientId: string,
+		setInsertedBlock: ( block: Block | null ) => void
+	) => void;
+	onAddMenuItems: () => void;
+} & Record< string, unknown >;
+
 type BlockLibraryPrivateApis = {
 	NavigationLinkControls?: ComponentType< NavigationLinkControlsProps >;
 	NavigationLinkUI?: ComponentType< NavigationLinkUIProps >;
 };
+
+function deferUntilDropdownCloses( callback: () => void ) {
+	window.requestAnimationFrame( callback );
+}
 
 function getBlockLibraryPrivateApis(): BlockLibraryPrivateApis {
 	const blockLibrary = (
@@ -88,10 +126,98 @@ function getBlockLibraryPrivateApis(): BlockLibraryPrivateApis {
 	return unlock< BlockLibraryPrivateApis >( blockLibrary.privateApis );
 }
 
-const BLOCKS_WITH_LINK_UI_SUPPORT = [
-	'core/navigation-link',
-	'core/navigation-submenu',
-];
+function NavigationTreeAppender( {
+	clientId,
+	descriptionId,
+	ref: buttonRef,
+	setInsertedBlock,
+	onAddExistingPage,
+	onAddCustomLink,
+	onAddSubmenu,
+	onAddMenuItems,
+	...treeGridCellProps
+}: NavigationTreeAppenderProps ) {
+	const toggleClassName = [
+		typeof treeGridCellProps.className === 'string'
+			? treeGridCellProps.className
+			: '',
+		'block-editor-inserter__toggle',
+	]
+		.filter( Boolean )
+		.join( ' ' );
+
+	return (
+		<DropdownMenu
+			icon={ plus }
+			label={ __( 'Add menu item' ) }
+			popoverProps={ { placement: 'bottom-start' } }
+			toggleProps={ {
+				...treeGridCellProps,
+				ref: buttonRef,
+				className: toggleClassName,
+				__next40pxDefaultSize: true,
+				'aria-describedby': descriptionId,
+			} }
+		>
+			{ ( { onClose } ) => (
+				<>
+					<MenuGroup>
+						<MenuItem
+							icon={ page }
+							onClick={ () => {
+								onClose();
+								deferUntilDropdownCloses( () =>
+									onAddExistingPage(
+										clientId,
+										setInsertedBlock
+									)
+								);
+							} }
+						>
+							{ __( 'Add existing page' ) }
+						</MenuItem>
+						<MenuItem
+							icon={ linkIcon }
+							onClick={ () => {
+								onClose();
+								deferUntilDropdownCloses( () =>
+									onAddCustomLink(
+										clientId,
+										setInsertedBlock
+									)
+								);
+							} }
+						>
+							{ __( 'Custom link' ) }
+						</MenuItem>
+						<MenuItem
+							icon={ addSubmenuIcon }
+							onClick={ () => {
+								onClose();
+								deferUntilDropdownCloses( () =>
+									onAddSubmenu( clientId, setInsertedBlock )
+								);
+							} }
+						>
+							{ __( 'Submenu' ) }
+						</MenuItem>
+					</MenuGroup>
+					<MenuGroup>
+						<MenuItem
+							icon={ postCategories }
+							onClick={ () => {
+								onAddMenuItems();
+								onClose();
+							} }
+						>
+							{ __( 'More…' ) }
+						</MenuItem>
+					</MenuGroup>
+				</>
+			) }
+		</DropdownMenu>
+	);
+}
 
 // Needs to be kept in sync with the query used at packages/block-library/src/page-list/edit.js.
 const MAX_PAGE_COUNT = 100;
@@ -122,6 +248,7 @@ export default function NavigationMenuContent( {
 	onCloseAddMenuItems: () => void;
 	rootClientId: string;
 } ) {
+	const navigationMenuId = navigationMenu.id;
 	const { hasMenuItems, listViewRootClientId, navigationBlocks, isLoading } =
 		useSelect(
 			( select ) => {
@@ -132,9 +259,36 @@ export default function NavigationMenuContent( {
 					getBlockCount,
 					getBlockOrder,
 				} = select( blockEditorStore );
-				const { isResolving } = select( coreStore );
+				const {
+					getEditedEntityRecord,
+					hasFinishedResolution,
+					isResolving,
+				} = select( coreStore );
 
 				const blockClientIds = getBlockOrder( rootClientId );
+				const blockCount = getBlockCount( rootClientId );
+				const navigationEntityArgs = [
+					'postType',
+					'wp_navigation',
+					navigationMenuId,
+				];
+				const editedNavigationMenu = getEditedEntityRecord(
+					...navigationEntityArgs
+				);
+				const hasResolvedEditedNavigationMenu = hasFinishedResolution(
+					'getEditedEntityRecord',
+					navigationEntityArgs
+				);
+				const editedContent = editedNavigationMenu?.content;
+				const editedBlocks = editedNavigationMenu?.blocks;
+				const editedContentString =
+					typeof editedContent === 'string'
+						? editedContent
+						: editedContent?.raw;
+				const editedMenuHasSavedBlocks = Array.isArray( editedBlocks )
+					? editedBlocks.length > 0
+					: typeof editedContentString === 'string' &&
+					  editedContentString.includes( '<!-- wp:' );
 
 				const hasOnlyPageListBlock =
 					blockClientIds.length === 1 &&
@@ -158,14 +312,17 @@ export default function NavigationMenuContent( {
 					// This is a small hack to wait for the navigation block
 					// to actually load its inner blocks.
 					isLoading:
+						! hasResolvedEditedNavigationMenu ||
 						! areInnerBlocksControlled( rootClientId ) ||
-						isLoadingPages,
+						isLoadingPages ||
+						( editedMenuHasSavedBlocks && blockCount === 0 ),
 				};
 			},
-			[ rootClientId ]
+			[ navigationMenuId, rootClientId ]
 		);
 	const {
 		insertBlocks,
+		insertBlock,
 		replaceBlock,
 		updateBlockAttributes,
 		__unstableMarkNextChangeAsNotPersistent,
@@ -201,7 +358,7 @@ export default function NavigationMenuContent( {
 			`[data-block="${ editingBlockClientId }"]`
 		);
 		setAnchorElement( element ?? null );
-	}, [ editingBlockClientId ] );
+	}, [ editingBlockClientId, navigationBlocks ] );
 
 	const offCanvasOnselect = useCallback(
 		( block: Block ) => {
@@ -222,8 +379,9 @@ export default function NavigationMenuContent( {
 	const handleSelect = useCallback(
 		( block: Block ) => {
 			if (
-				BLOCKS_WITH_LINK_UI_SUPPORT.includes( block.name ) &&
-				block.attributes.url
+				block.name === 'core/navigation-submenu' ||
+				( block.name === 'core/navigation-link' &&
+					block.attributes.url )
 			) {
 				setEditingBlockClientId( block.clientId );
 				return;
@@ -255,6 +413,64 @@ export default function NavigationMenuContent( {
 		[ insertBlocks, rootClientId ]
 	);
 
+	const addExistingPage = useCallback(
+		(
+			parentClientId: string,
+			setInsertedBlock: ( block: Block | null ) => void
+		) => {
+			const block = createBlock( 'core/navigation-link', {
+				kind: 'post-type',
+				type: 'page',
+			} );
+
+			insertBlock( block, undefined, parentClientId, false );
+			setEditingBlockClientId( null );
+			setInsertedBlock( block );
+		},
+		[ insertBlock ]
+	);
+
+	const addCustomLink = useCallback(
+		(
+			parentClientId: string,
+			setInsertedBlock: ( block: Block | null ) => void
+		) => {
+			const block = createBlock( 'core/navigation-link' );
+
+			insertBlock( block, undefined, parentClientId, false );
+			setEditingBlockClientId( null );
+			setInsertedBlock( block );
+		},
+		[ insertBlock ]
+	);
+
+	const addSubmenu = useCallback(
+		(
+			parentClientId: string,
+			setInsertedBlock: ( block: Block | null ) => void
+		) => {
+			const block = createBlock( 'core/navigation-submenu' );
+
+			insertBlock( block, undefined, parentClientId, false );
+			setEditingBlockClientId( null );
+			setInsertedBlock( block );
+		},
+		[ insertBlock ]
+	);
+
+	const renderNavigationTreeAppender = useCallback(
+		( props: NavigationTreeAppenderProps ) => (
+			<NavigationTreeAppender
+				{ ...props }
+				onAddExistingPage={ addExistingPage }
+				onAddCustomLink={ addCustomLink }
+				onAddSubmenu={ addSubmenu }
+				onAddMenuItems={ onAddMenuItems }
+			/>
+		),
+		[ addCustomLink, addExistingPage, addSubmenu, onAddMenuItems ]
+	);
+
 	// The hidden block is needed because it makes block edit side effects trigger.
 	// For example a navigation page list load its items has an effect on edit to load its items.
 	return (
@@ -268,6 +484,7 @@ export default function NavigationMenuContent( {
 								onSelect={ handleSelect }
 								blockSettingsMenu={ LeafMoreMenu }
 								showAppender
+								renderAppender={ renderNavigationTreeAppender }
 								additionalBlockContent={
 									InsertedNavigationLinkUI
 								}
