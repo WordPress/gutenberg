@@ -30,7 +30,7 @@ const toolsPanelGrid = {
 	},
 };
 
-// TODO: should use the `--wpds-color-stroke-surface-neutral` token when refactored to SCSS modules
+// TODO: should use the `stroke-surface-neutral` WPDS token when refactored to SCSS modules
 export const ToolsPanel = ( columns: number ) => css`
 	${ toolsPanelGrid.columns( columns ) }
 	${ toolsPanelGrid.spacing }

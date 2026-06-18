@@ -321,14 +321,14 @@
 	}
 
 	&.is-small {
-		height: $button-size-small;
+		height: var(--wpds-dimension-size-sm);
 		line-height: 22px;
 		padding: 0 8px;
 		font-size: 11px;
 
 		&.has-icon:not(.has-text) {
 			padding: 0;
-			min-width: $button-size-small;
+			min-width: var(--wpds-dimension-size-sm);
 		}
 	}
 
