@@ -742,7 +742,7 @@ function _gutenberg_get_entity_view_config_post_type_wp_template( $config ) {
 				),
 			),
 			array(
-				'id'     => 'description-readonly',
+				'id'     => 'description_readonly',
 				'layout' => array(
 					'type'          => 'regular',
 					'labelPosition' => 'none',

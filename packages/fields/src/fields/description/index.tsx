@@ -47,7 +47,7 @@ const descriptionField: Field< Template > = {
  * read-only and is only visible when a description exists.
  */
 export const readOnlyDescriptionField: Field< Template > = {
-	id: 'description-readonly',
+	id: 'description_readonly',
 	type: 'text',
 	label: __( 'Description' ),
 	getValue,
