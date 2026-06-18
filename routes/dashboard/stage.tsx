@@ -11,6 +11,7 @@ import { store as viewportStore } from '@wordpress/viewport';
 import { WidgetDashboard } from '@wordpress/widget-dashboard';
 import type { DashboardWidget } from '@wordpress/widget-dashboard';
 import { useWidgetTypes } from '@wordpress/widget-primitives';
+import type { WidgetModuleRecord } from '@wordpress/widget-primitives';
 
 /**
  * Internal dependencies
@@ -24,10 +25,15 @@ function Dashboard() {
 
 	const [ gridSettings, setGridSettings ] = useDashboardGridSettings();
 
-	const [ widgetTypes, isResolving ] = useWidgetTypes( {
-		kind: 'root',
-		name: 'widgetModule',
-	} );
+	const records = useSelect(
+		( select ) =>
+			select( coreStore ).getEntityRecords( 'root', 'widgetModule' ) as
+				| WidgetModuleRecord[]
+				| null,
+		[]
+	);
+
+	const [ widgetTypes, isResolving ] = useWidgetTypes( records );
 
 	const [ editMode, setEditMode ] = useState( false );
 
