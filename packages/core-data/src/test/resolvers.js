@@ -25,7 +25,6 @@ import {
 	getAutosaves,
 	getCurrentUser,
 } from '../resolvers';
-import { saveEntityRecord } from '../actions';
 import { RECEIVE_INTERMEDIATE_RESULTS } from '../utils';
 
 describe( 'getEntityRecord', () => {
@@ -58,6 +57,7 @@ describe( 'getEntityRecord', () => {
 
 		syncManager = {
 			load: jest.fn(),
+			update: jest.fn(),
 		};
 		getSyncManager.mockImplementation( () => syncManager );
 	} );
@@ -224,7 +224,7 @@ describe( 'getEntityRecord', () => {
 		).toHaveBeenCalledWith( { hasRedo: false, hasUndo: true } );
 	} );
 
-	it( 'persistCRDTDoc fetches edited record and does not save full entity record when the entity does not support meta', async () => {
+	it( 'persistCRDTDoc fetches edited post record and does not save when the entity does not support meta', async () => {
 		const ENTITY_RECORD = { id: 1, title: 'Test Record' };
 		const EDITED_RECORD = { id: 1, title: 'Edited Record' };
 		const ENTITY_RESPONSE = {
@@ -232,15 +232,16 @@ describe( 'getEntityRecord', () => {
 		};
 		const ENTITIES_WITH_SYNC = [
 			{
-				name: 'bar',
-				kind: 'foo',
-				baseURL: '/wp/v2/foo',
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
 				baseURLParams: { context: 'edit' },
-				syncConfig: {},
+				syncConfig: { supportsPersistence: true },
 			},
 		];
 
 		dispatch.saveEntityRecord = jest.fn();
+		syncManager.createPersistedCRDTDoc = jest.fn();
 
 		const resolveSelectWithSync = {
 			getEntitiesConfig: jest.fn( () => ENTITIES_WITH_SYNC ),
@@ -252,8 +253,8 @@ describe( 'getEntityRecord', () => {
 		triggerFetch.mockImplementation( () => ENTITY_RESPONSE );
 
 		await getEntityRecord(
-			'foo',
-			'bar',
+			'postType',
+			'post',
 			1
 		)( {
 			dispatch,
@@ -265,19 +266,20 @@ describe( 'getEntityRecord', () => {
 		const handlers = syncManager.load.mock.calls[ 0 ][ 4 ];
 
 		// Call persistCRDTDoc and wait for the internal promise chain.
-		handlers.persistCRDTDoc();
-		await resolveSelectWithSync.getEditedEntityRecord();
+		await handlers.persistCRDTDoc();
 
 		// Should have fetched the full edited entity record.
 		expect(
 			resolveSelectWithSync.getEditedEntityRecord
-		).toHaveBeenCalledWith( 'foo', 'bar', 1 );
+		).toHaveBeenCalledWith( 'postType', 'post', 1 );
 
 		// Should not have called saveEntityRecord.
 		expect( dispatch.saveEntityRecord ).not.toHaveBeenCalled();
+		expect( syncManager.createPersistedCRDTDoc ).not.toHaveBeenCalled();
 	} );
 
-	it( 'persistCRDTDoc saves only the entity ID and omits REST-invalid fields', async () => {
+	it( 'persistCRDTDoc saves post CRDT docs through the sync endpoint', async () => {
+		const SERIALIZED_DOC = 'serialized-crdt-doc';
 		const POST_RECORD = { id: 1, title: 'Test Post', meta: {} };
 		const EDITED_RECORD = {
 			id: 1,
@@ -294,11 +296,14 @@ describe( 'getEntityRecord', () => {
 				kind: 'postType',
 				baseURL: '/wp/v2/posts',
 				baseURLParams: { context: 'edit' },
-				syncConfig: {},
+				syncConfig: { supportsPersistence: true },
 			},
 		];
 
 		dispatch.saveEntityRecord = jest.fn();
+		syncManager.createPersistedCRDTDoc = jest.fn( () =>
+			Promise.resolve( SERIALIZED_DOC )
+		);
 
 		const resolveSelectWithSync = {
 			getEntitiesConfig: jest.fn( () => ENTITIES_WITH_SYNC ),
@@ -307,7 +312,9 @@ describe( 'getEntityRecord', () => {
 			),
 		};
 
-		triggerFetch.mockImplementation( () => POST_RESPONSE );
+		triggerFetch
+			.mockImplementationOnce( () => POST_RESPONSE )
+			.mockImplementationOnce( () => [] );
 
 		await getEntityRecord(
 			'postType',
@@ -323,25 +330,31 @@ describe( 'getEntityRecord', () => {
 		const handlers = syncManager.load.mock.calls[ 0 ][ 4 ];
 
 		// Call persistCRDTDoc and wait for the internal promise chain.
-		handlers.persistCRDTDoc();
-		await resolveSelectWithSync.getEditedEntityRecord();
+		await handlers.persistCRDTDoc();
 
 		// Should have fetched the full edited entity record.
 		expect(
 			resolveSelectWithSync.getEditedEntityRecord
 		).toHaveBeenCalledWith( 'postType', 'post', 1 );
 
-		// Should only send the entity ID. The pre-persist hook creates the
-		// persisted CRDT meta without round-tripping the full edited record.
-		expect( dispatch.saveEntityRecord ).toHaveBeenCalledWith(
-			'postType',
-			'post',
-			{ id: 1 },
-			{ __unstableSkipSyncUpdate: true }
+		expect( syncManager.createPersistedCRDTDoc ).toHaveBeenCalledWith(
+			'postType/post',
+			1
 		);
+		expect( triggerFetch ).toHaveBeenLastCalledWith( {
+			path: '/wp-sync/v1/save',
+			method: 'POST',
+			data: {
+				room: 'postType/post:1',
+				doc: SERIALIZED_DOC,
+			},
+		} );
+		expect( syncManager.update ).not.toHaveBeenCalled();
+		expect( dispatch.saveEntityRecord ).not.toHaveBeenCalled();
 	} );
 
-	it( 'persistCRDTDoc saves even when there are no unsaved edits', async () => {
+	it( 'persistCRDTDoc persists post CRDT docs even when there are no unsaved edits', async () => {
+		const SERIALIZED_DOC = 'serialized-crdt-doc';
 		const POST_RECORD = { id: 1, title: 'Test Post', meta: {} };
 		const POST_RESPONSE = {
 			json: () => Promise.resolve( POST_RECORD ),
@@ -352,11 +365,14 @@ describe( 'getEntityRecord', () => {
 				kind: 'postType',
 				baseURL: '/wp/v2/posts',
 				baseURLParams: { context: 'edit' },
-				syncConfig: {},
+				syncConfig: { supportsPersistence: true },
 			},
 		];
 
 		dispatch.saveEntityRecord = jest.fn();
+		syncManager.createPersistedCRDTDoc = jest.fn( () =>
+			Promise.resolve( SERIALIZED_DOC )
+		);
 
 		// Return the same record (no edits) from getEditedEntityRecord.
 		const resolveSelectWithSync = {
@@ -366,7 +382,9 @@ describe( 'getEntityRecord', () => {
 			),
 		};
 
-		triggerFetch.mockImplementation( () => POST_RESPONSE );
+		triggerFetch
+			.mockImplementationOnce( () => POST_RESPONSE )
+			.mockImplementationOnce( () => [] );
 
 		await getEntityRecord(
 			'postType',
@@ -381,95 +399,55 @@ describe( 'getEntityRecord', () => {
 		const handlers = syncManager.load.mock.calls[ 0 ][ 4 ];
 
 		// Call persistCRDTDoc and wait for the internal promise chain.
-		handlers.persistCRDTDoc();
-		await resolveSelectWithSync.getEditedEntityRecord();
+		await handlers.persistCRDTDoc();
 
-		// Should save only the entity ID even with no edits.
-		expect( dispatch.saveEntityRecord ).toHaveBeenCalledWith(
-			'postType',
-			'post',
-			{ id: 1 },
-			{ __unstableSkipSyncUpdate: true }
-		);
+		expect( triggerFetch ).toHaveBeenLastCalledWith( {
+			path: '/wp-sync/v1/save',
+			method: 'POST',
+			data: {
+				room: 'postType/post:1',
+				doc: SERIALIZED_DOC,
+			},
+		} );
+		expect( syncManager.update ).not.toHaveBeenCalled();
+		expect( dispatch.saveEntityRecord ).not.toHaveBeenCalled();
 	} );
 
-	it( 'persistCRDTDoc does not replay a stale save response into the sync document', async () => {
-		const INITIAL_TITLE = 'Initial Title';
-		const SYNCED_TITLE = 'Synced Title';
-		const POST_RECORD = { id: 1, title: INITIAL_TITLE, meta: {} };
-		const EDITED_RECORD = { id: 1, title: SYNCED_TITLE, meta: {} };
-		const STALE_SAVE_RESPONSE = {
+	it( 'persistCRDTDoc does not persist entities whose sync config does not support persistence', async () => {
+		const TERM_RECORD = { id: 1, name: 'Category', meta: {} };
+		const EDITED_RECORD = {
 			id: 1,
-			title: INITIAL_TITLE,
-			meta: { _crdt_document: 'serialized-crdt-doc' },
+			name: 'Edited Category',
+			description: '',
+			meta: {},
 		};
-		const liveSyncState = {
-			isSaved: false,
-			title: SYNCED_TITLE,
-		};
-		const POST_RESPONSE = {
-			json: () => Promise.resolve( POST_RECORD ),
+		const TERM_RESPONSE = {
+			json: () => Promise.resolve( TERM_RECORD ),
 		};
 		const ENTITIES_WITH_SYNC = [
 			{
-				name: 'post',
-				kind: 'postType',
-				baseURL: '/wp/v2/posts',
+				name: 'category',
+				kind: 'taxonomy',
+				baseURL: '/wp/v2/categories',
 				baseURLParams: { context: 'edit' },
 				syncConfig: {},
-				__unstablePrePersist: jest.fn( async () => ( {
-					meta: { _crdt_document: 'serialized-crdt-doc' },
-				} ) ),
 			},
 		];
 
-		const select = {
-			getEditedEntityRecord: jest.fn( () => EDITED_RECORD ),
-			getRawEntityRecord: jest.fn( () => POST_RECORD ),
-		};
 		const resolveSelectWithSync = {
 			getEntitiesConfig: jest.fn( () => ENTITIES_WITH_SYNC ),
 			getEditedEntityRecord: jest.fn( () =>
 				Promise.resolve( EDITED_RECORD )
 			),
 		};
-		let savePromise;
+		dispatch.saveEntityRecord = jest.fn();
+		syncManager.createPersistedCRDTDoc = jest.fn();
 
-		syncManager.update = jest.fn(
-			( _objectType, _objectId, changes, _origin, options ) => {
-				if (
-					Object.prototype.hasOwnProperty.call( changes, 'title' )
-				) {
-					liveSyncState.title = changes.title;
-				}
-				if ( options?.isSave ) {
-					liveSyncState.isSaved = true;
-				}
-			}
-		);
-		dispatch.saveEntityRecord = jest.fn(
-			( kind, name, record, options ) => {
-				savePromise = saveEntityRecord(
-					kind,
-					name,
-					record,
-					options
-				)( {
-					select,
-					dispatch,
-					resolveSelect: resolveSelectWithSync,
-				} );
-				return savePromise;
-			}
-		);
-
-		triggerFetch
-			.mockImplementationOnce( () => POST_RESPONSE )
-			.mockImplementationOnce( () => STALE_SAVE_RESPONSE );
+		triggerFetch.mockImplementation( () => TERM_RESPONSE );
 
 		await getEntityRecord(
-			'postType',
-			'post',
+			'taxonomy',
+			'category',
 			1
 		)( {
 			dispatch,
@@ -479,27 +457,13 @@ describe( 'getEntityRecord', () => {
 
 		const handlers = syncManager.load.mock.calls[ 0 ][ 4 ];
 
-		handlers.persistCRDTDoc();
-		await Promise.resolve();
-		await savePromise;
+		await handlers.persistCRDTDoc();
 
-		expect( dispatch.saveEntityRecord ).toHaveBeenCalledWith(
-			'postType',
-			'post',
-			{ id: 1 },
-			{ __unstableSkipSyncUpdate: true }
-		);
-		expect( syncManager.update ).toHaveBeenCalledWith(
-			'postType/post',
-			1,
-			{},
-			'local-undo-ignored',
-			{ isSave: true }
-		);
-		expect( liveSyncState ).toEqual( {
-			isSaved: true,
-			title: SYNCED_TITLE,
-		} );
+		expect(
+			resolveSelectWithSync.getEditedEntityRecord
+		).not.toHaveBeenCalled();
+		expect( dispatch.saveEntityRecord ).not.toHaveBeenCalled();
+		expect( syncManager.createPersistedCRDTDoc ).not.toHaveBeenCalled();
 	} );
 
 	it( 'provides transient properties when read/write config is supplied', async () => {

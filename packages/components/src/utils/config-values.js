@@ -66,8 +66,8 @@ export default Object.assign( {}, CONTROL_PROPS, {
 	surfaceBackgroundTertiaryColor: COLORS.white,
 	surfaceColor: COLORS.white,
 	// Modal exit animation: `use-modal-exit-animation` parses this for the
-	// `animationend` timeout race; keep the numeric duration equal to
-	// `--wpds-motion-duration-md` on `.components-modal__frame` in modal/style.scss.
+	// `animationend` timeout race; keep the numeric duration equal to the WPDS
+	// `motion-duration-md` token on `.components-modal__frame` in modal/style.scss.
 	transitionDuration: '200ms',
 	transitionDurationFast: '160ms',
 	transitionDurationFaster: '120ms',

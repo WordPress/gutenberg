@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Export the `Style`, `StyleOptions`, and `GeneratedCSSRule` TypeScript types so that consumers of the public API can type their usage of `compileCSS` and `getCSSRules`.
+
+## 2.48.1 (2026-06-16)
+
+## 2.48.0 (2026-06-10)
+
 ### Code Quality
 
 -   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).

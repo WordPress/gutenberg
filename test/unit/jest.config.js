@@ -67,15 +67,13 @@ module.exports = {
 		'<rootDir>/.*/build-module/',
 		'<rootDir>/.*/build-types/',
 		'<rootDir>/.+.d.ts$',
-		'<rootDir>/.+.native.js$',
-		'/packages/react-native-*',
 	],
 	resolver: '<rootDir>/test/unit/scripts/resolver.js',
 	transform: {
 		'^.+\\.m?[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
 	},
 	transformIgnorePatterns: [
-		'/node_modules/(?!(docker-compose|yaml|preact|@preact|parsel-js|comctx|uuid)/)',
+		'/node_modules/(?!(docker-compose|yaml|preact|@preact|parsel-js|comctx|uuid|marked)/)',
 		'\\.pnp\\.[^\\/]+$',
 	],
 	snapshotSerializers: [
