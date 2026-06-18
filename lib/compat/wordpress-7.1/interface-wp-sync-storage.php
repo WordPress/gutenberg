@@ -53,6 +53,20 @@ if ( ! interface_exists( 'WP_Sync_Storage' ) ) {
 		public function get_update_count( string $room ): int;
 
 		/**
+		 * Returns a stable room update snapshot in meta_id ASC order.
+		 *
+		 * @since 7.1.0
+		 *
+		 * @param string $room Room identifier.
+		 * @return array{
+		 *   cursor: int,
+		 *   total_updates: int,
+		 *   updates: array<int, mixed>
+		 * } Room update snapshot.
+		 */
+		public function get_update_snapshot( string $room ): array;
+
+		/**
 		 * Retrieves sync updates from a room for a given client and cursor. Updates
 		 * from the specified client should be excluded.
 		 *

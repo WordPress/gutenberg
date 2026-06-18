@@ -34,6 +34,13 @@
 	"repositories": [
 		{
 			"type": "path",
+			"url": "../../../yjs/y-php",
+			"options": {
+				"symlink": false
+			}
+		},
+		{
+			"type": "path",
 			"url": "./test/php/gutenberg-coding-standards",
 			"options": {
 				"symlink": false
@@ -42,7 +49,8 @@
 	],
 	"require": {
 		"php": ">=7.4",
-		"composer/installers": "^1.0 || ^2.0"
+		"composer/installers": "^1.0 || ^2.0",
+		"yjs/y-php": "dev-main"
 	},
 	"scripts": {
 		"format": "phpcbf --standard=phpcs.xml.dist --report-summary --report-source",

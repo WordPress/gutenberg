@@ -6,9 +6,16 @@
  */
 
 require_once __DIR__ . '/class-wp-sync-config.php';
+
+$gutenberg_composer_autoload = dirname( __DIR__, 3 ) . '/vendor/autoload.php';
+if ( file_exists( $gutenberg_composer_autoload ) ) {
+	require_once $gutenberg_composer_autoload;
+}
+
 if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 	require_once __DIR__ . '/interface-wp-sync-storage.php';
 	require_once __DIR__ . '/class-wp-sync-post-meta-storage.php';
+	require_once __DIR__ . '/class-wp-sync-crdt-document.php';
 	require_once __DIR__ . '/class-wp-http-polling-sync-server.php';
 }
 require_once __DIR__ . '/class-wp-sync-save-server.php';

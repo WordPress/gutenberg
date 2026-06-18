@@ -98,6 +98,122 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 		return 'postType/post:' . self::$post_id;
 	}
 
+	/**
+	 * Skips tests that need Gutenberg's compatibility implementation.
+	 */
+	private function skip_if_sync_server_class_is_provided_by_wordpress_core(): void {
+		$reflection = new ReflectionClass( 'WP_HTTP_Polling_Sync_Server' );
+		if ( false === strpos( $reflection->getFileName(), '/wp-content/plugins/' ) ) {
+			$this->markTestSkipped( 'The active WP_HTTP_Polling_Sync_Server class is provided by WordPress core, not Gutenberg.' );
+		}
+	}
+
+	/**
+	 * Creates a Yjs document with text content used by sync tests.
+	 *
+	 * @param string $text      Text content.
+	 * @param int    $client_id Yjs client ID.
+	 * @return Yjs\Doc Yjs document.
+	 */
+	private function create_yjs_doc_with_text( string $text = '', int $client_id = 1 ) {
+		$doc = new Yjs\Doc();
+		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- External y-php API uses clientID.
+		$doc->clientID = $client_id;
+
+		if ( '' !== $text ) {
+			$doc->getText( 'text' )->insert( 0, $text );
+		}
+
+		return $doc;
+	}
+
+	/**
+	 * Creates a base64-encoded Yjs V2 update.
+	 *
+	 * @param string $text      Text content.
+	 * @param int    $client_id Yjs client ID.
+	 * @return string Base64-encoded update.
+	 */
+	private function create_yjs_update( string $text = 'test', int $client_id = 1 ): string {
+		return Yjs\encodeStateAsUpdateV2( $this->create_yjs_doc_with_text( $text, $client_id ) )->toBase64();
+	}
+
+	/**
+	 * Creates a base64-encoded y-protocols sync_step1 frame.
+	 *
+	 * @param Yjs\Doc|null $doc Yjs document.
+	 * @return string Base64-encoded sync_step1 frame.
+	 */
+	private function create_yjs_sync_step1( $doc = null ): string {
+		$encoder = Yjs\Lib0\Encoding::createEncoder();
+		Yjs\Protocols\Sync::writeSyncStep1( $encoder, $doc ?? new Yjs\Doc() );
+		return Yjs\Lib0\Encoding::toUint8Array( $encoder )->toBase64();
+	}
+
+	/**
+	 * Creates a base64-encoded y-protocols sync_step2 frame.
+	 *
+	 * @param Yjs\Doc      $source_doc Source document.
+	 * @param Yjs\Doc|null $target_doc Target document.
+	 * @return string Base64-encoded sync_step2 frame.
+	 */
+	private function create_yjs_sync_step2( $source_doc, $target_doc = null ): string {
+		$encoder      = Yjs\Lib0\Encoding::createEncoder();
+		$state_vector = null === $target_doc ? null : Yjs\encodeStateVector( $target_doc );
+		Yjs\Protocols\Sync::writeSyncStep2( $encoder, $source_doc, $state_vector );
+		return Yjs\Lib0\Encoding::toUint8Array( $encoder )->toBase64();
+	}
+
+	/**
+	 * Applies a base64-encoded sync_step2 frame to an empty Yjs document.
+	 *
+	 * @param string $base64 Base64-encoded sync_step2 frame.
+	 * @return Yjs\Doc Hydrated Yjs document.
+	 */
+	private function apply_yjs_sync_step2( string $base64 ) {
+		$doc           = new Yjs\Doc();
+		$reply_encoder = Yjs\Lib0\Encoding::createEncoder();
+		$message_type  = Yjs\Protocols\Sync::readSyncMessage(
+			Yjs\Lib0\Decoding::createDecoder( Yjs\Lib0\Buffer::fromBase64( $base64 ) ),
+			$reply_encoder,
+			$doc,
+			'test'
+		);
+
+		$this->assertSame( Yjs\Protocols\Sync::MESSAGE_YJS_SYNC_STEP2, $message_type );
+
+		return $doc;
+	}
+
+	/**
+	 * Applies a base64-encoded Yjs V2 update to an empty Yjs document.
+	 *
+	 * @param string $base64 Base64-encoded update.
+	 * @return Yjs\Doc Hydrated Yjs document.
+	 */
+	private function apply_yjs_update( string $base64 ) {
+		$doc = new Yjs\Doc();
+		Yjs\applyUpdateV2( $doc, Yjs\Lib0\Buffer::fromBase64( $base64 ) );
+		return $doc;
+	}
+
+	/**
+	 * Returns the first update with a given type.
+	 *
+	 * @param array  $updates Response updates.
+	 * @param string $type    Update type.
+	 * @return array|null Matching update.
+	 */
+	private function get_first_update_of_type( array $updates, string $type ): ?array {
+		foreach ( $updates as $update ) {
+			if ( $type === $update['type'] ) {
+				return $update;
+			}
+		}
+
+		return null;
+	}
+
 	/*
 	 * Required abstract method implementations.
 	 *
@@ -255,6 +371,8 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 	 * @ticket 77243
 	 */
 	public function test_sync_permission_checked_per_room() {
+		$this->skip_if_sync_server_class_is_provided_by_wordpress_core();
+
 		wp_set_current_user( self::$editor_id );
 
 		$forbidden_rooms = array(
@@ -636,7 +754,7 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 		$room   = $this->get_post_room();
 		$update = array(
 			'type' => 'update',
-			'data' => 'dGVzdCBkYXRh',
+			'data' => $this->create_yjs_update( 'test data', 101 ),
 		);
 
 		// Client 1 sends an update.
@@ -668,7 +786,7 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 		$room   = $this->get_post_room();
 		$update = array(
 			'type' => 'update',
-			'data' => 'b3duIGRhdGE=',
+			'data' => $this->create_yjs_update( 'own data', 102 ),
 		);
 
 		// Client 1 sends an update.
@@ -685,23 +803,32 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 		$this->assertEmpty( $updates );
 	}
 
-	public function test_sync_step1_update_stored_and_returned() {
+	public function test_sync_step1_returns_server_sync_step2_without_storing_step1() {
+		$this->skip_if_sync_server_class_is_provided_by_wordpress_core();
+
 		wp_set_current_user( self::$editor_id );
 
 		$room   = $this->get_post_room();
 		$update = array(
 			'type' => 'sync_step1',
-			'data' => 'c3RlcDE=',
+			'data' => $this->create_yjs_sync_step1(),
 		);
 
-		// Client 1 sends sync_step1.
-		$this->dispatch_sync(
+		// Client 1 sends sync_step1 and receives a direct server response.
+		$response = $this->dispatch_sync(
 			array(
 				$this->build_room( $room, 1, 0, array( 'user' => 'client1' ), array( $update ) ),
 			)
 		);
 
-		// Client 2 should see the sync_step1 update.
+		$data         = $response->get_data();
+		$room_updates = $data['rooms'][0]['updates'];
+
+		$this->assertSame( 0, $data['rooms'][0]['total_updates'] );
+		$this->assertCount( 1, $room_updates );
+		$this->assertSame( 'sync_step2', $room_updates[0]['type'] );
+
+		// Client 2 should not see the sync_step1 request.
 		$response = $this->dispatch_sync(
 			array(
 				$this->build_room( $room, 2, 0 ),
@@ -710,26 +837,109 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 
 		$data  = $response->get_data();
 		$types = wp_list_pluck( $data['rooms'][0]['updates'], 'type' );
-		$this->assertContains( 'sync_step1', $types );
+		$this->assertNotContains( 'sync_step1', $types );
 	}
 
-	public function test_sync_step2_update_stored_and_returned() {
+	public function test_legacy_sync_step2_is_stored_as_regular_update() {
+		$this->skip_if_sync_server_class_is_provided_by_wordpress_core();
+
+		wp_set_current_user( self::$editor_id );
+
+		$room       = $this->get_post_room();
+		$source_doc = $this->create_yjs_doc_with_text( 'legacy step2', 201 );
+		$update     = array(
+			'type' => 'sync_step2',
+			'data' => $this->create_yjs_sync_step2( $source_doc, new Yjs\Doc() ),
+		);
+
+		// Client 1 sends legacy sync_step2.
+		$this->dispatch_sync(
+			array(
+				$this->build_room( $room, 1, 0, array( 'user' => 'client1' ), array( $update ) ),
+			)
+		);
+
+		// Client 2 should see a regular update, not the raw sync_step2 frame.
+		$response = $this->dispatch_sync(
+			array(
+				$this->build_room( $room, 2, 0 ),
+			)
+		);
+
+		$data  = $response->get_data();
+		$types = wp_list_pluck( $data['rooms'][0]['updates'], 'type' );
+		$this->assertContains( 'update', $types );
+		$this->assertNotContains( 'sync_step2', $types );
+
+		$normalized_update = $this->get_first_update_of_type( $data['rooms'][0]['updates'], 'update' );
+		$hydrated_doc      = $this->apply_yjs_update( $normalized_update['data'] );
+		$this->assertSame( 'legacy step2', $hydrated_doc->getText( 'text' )->toString() );
+	}
+
+	public function test_server_sync_step2_can_hydrate_client_from_stored_v2_updates() {
+		$this->skip_if_sync_server_class_is_provided_by_wordpress_core();
+
 		wp_set_current_user( self::$editor_id );
 
 		$room   = $this->get_post_room();
 		$update = array(
-			'type' => 'sync_step2',
-			'data' => 'c3RlcDI=',
+			'type' => 'update',
+			'data' => $this->create_yjs_update( 'stored content', 202 ),
 		);
 
-		// Client 1 sends sync_step2.
-		$this->dispatch_sync(
+		$seed_response = $this->dispatch_sync(
 			array(
 				$this->build_room( $room, 1, 0, array( 'user' => 'client1' ), array( $update ) ),
 			)
 		);
+		$cursor        = $seed_response->get_data()['rooms'][0]['end_cursor'];
 
-		// Client 2 should see the sync_step2 update.
+		$response = $this->dispatch_sync(
+			array(
+				$this->build_room(
+					$room,
+					2,
+					$cursor,
+					array( 'user' => 'client2' ),
+					array(
+						array(
+							'type' => 'sync_step1',
+							'data' => $this->create_yjs_sync_step1(),
+						),
+					)
+				),
+			)
+		);
+
+		$data       = $response->get_data();
+		$sync_step2 = $this->get_first_update_of_type( $data['rooms'][0]['updates'], 'sync_step2' );
+
+		$this->assertNotNull( $sync_step2 );
+		$this->assertCount( 1, $data['rooms'][0]['updates'] );
+
+		$hydrated_doc = $this->apply_yjs_sync_step2( $sync_step2['data'] );
+		$this->assertSame( 'stored content', $hydrated_doc->getText( 'text' )->toString() );
+	}
+
+	public function test_historical_sync_step1_rows_are_filtered_from_responses() {
+		$this->skip_if_sync_server_class_is_provided_by_wordpress_core();
+
+		wp_set_current_user( self::$editor_id );
+
+		$room    = $this->get_post_room();
+		$storage = new WP_Sync_Post_Meta_Storage();
+
+		$this->assertTrue(
+			$storage->add_update(
+				$room,
+				array(
+					'client_id' => 1,
+					'type'      => 'sync_step1',
+					'data'      => $this->create_yjs_sync_step1(),
+				)
+			)
+		);
+
 		$response = $this->dispatch_sync(
 			array(
 				$this->build_room( $room, 2, 0 ),
@@ -738,32 +948,128 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 
 		$data  = $response->get_data();
 		$types = wp_list_pluck( $data['rooms'][0]['updates'], 'type' );
-		$this->assertContains( 'sync_step2', $types );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 1, $data['rooms'][0]['total_updates'] );
+		$this->assertNotContains( 'sync_step1', $types );
+	}
+
+	public function test_historical_sync_step2_rows_are_applied_during_reconstruction() {
+		$this->skip_if_sync_server_class_is_provided_by_wordpress_core();
+
+		wp_set_current_user( self::$editor_id );
+
+		$room       = $this->get_post_room();
+		$storage    = new WP_Sync_Post_Meta_Storage();
+		$source_doc = $this->create_yjs_doc_with_text( 'historical step2', 203 );
+
+		$this->assertTrue(
+			$storage->add_update(
+				$room,
+				array(
+					'client_id' => 1,
+					'type'      => 'sync_step2',
+					'data'      => $this->create_yjs_sync_step2( $source_doc, new Yjs\Doc() ),
+				)
+			)
+		);
+
+		$storage->get_updates_after_cursor( $room, 0 );
+		$cursor = $storage->get_cursor( $room );
+
+		$response = $this->dispatch_sync(
+			array(
+				$this->build_room(
+					$room,
+					2,
+					$cursor,
+					array( 'user' => 'client2' ),
+					array(
+						array(
+							'type' => 'sync_step1',
+							'data' => $this->create_yjs_sync_step1(),
+						),
+					)
+				),
+			)
+		);
+
+		$sync_step2 = $this->get_first_update_of_type( $response->get_data()['rooms'][0]['updates'], 'sync_step2' );
+
+		$this->assertNotNull( $sync_step2 );
+
+		$hydrated_doc = $this->apply_yjs_sync_step2( $sync_step2['data'] );
+		$this->assertSame( 'historical step2', $hydrated_doc->getText( 'text' )->toString() );
+	}
+
+	public function test_sync_rejects_malformed_yjs_update_without_storing_payload() {
+		$this->skip_if_sync_server_class_is_provided_by_wordpress_core();
+
+		wp_set_current_user( self::$editor_id );
+
+		$room     = $this->get_post_room();
+		$response = $this->dispatch_sync(
+			array(
+				$this->build_room(
+					$room,
+					1,
+					0,
+					array( 'user' => 'client1' ),
+					array(
+						array(
+							'type' => 'update',
+							'data' => 'not-base64!',
+						),
+					)
+				),
+			)
+		);
+
+		$this->assertErrorResponse( 'rest_sync_malformed_update', $response, 400 );
+
+		$response = $this->dispatch_sync(
+			array(
+				$this->build_room( $room, 2, 0 ),
+			)
+		);
+
+		$data = $response->get_data();
+		$this->assertSame( 0, $data['rooms'][0]['total_updates'] );
+		$this->assertEmpty( $data['rooms'][0]['updates'] );
 	}
 
 	public function test_sync_multiple_updates_in_single_request() {
+		$this->skip_if_sync_server_class_is_provided_by_wordpress_core();
+
 		wp_set_current_user( self::$editor_id );
 
 		$room    = $this->get_post_room();
 		$updates = array(
 			array(
 				'type' => 'sync_step1',
-				'data' => 'c3RlcDE=',
+				'data' => $this->create_yjs_sync_step1(),
 			),
 			array(
 				'type' => 'update',
-				'data' => 'dXBkYXRl',
+				'data' => $this->create_yjs_update( 'local update', 301 ),
 			),
 		);
 
 		// Client 1 sends multiple updates.
-		$this->dispatch_sync(
+		$response = $this->dispatch_sync(
 			array(
 				$this->build_room( $room, 1, 0, array( 'user' => 'client1' ), $updates ),
 			)
 		);
 
-		// Client 2 should see both updates.
+		$data                 = $response->get_data();
+		$direct_sync_response = $this->get_first_update_of_type( $data['rooms'][0]['updates'], 'sync_step2' );
+		$hydrated_doc         = $this->apply_yjs_sync_step2( $direct_sync_response['data'] );
+
+		$this->assertSame( '', $hydrated_doc->getText( 'text' )->toString() );
+		$this->assertSame( 1, $data['rooms'][0]['total_updates'] );
+
+		// Client 2 should see only the stored content update.
 		$response = $this->dispatch_sync(
 			array(
 				$this->build_room( $room, 2, 0 ),
@@ -773,8 +1079,9 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 		$data         = $response->get_data();
 		$room_updates = $data['rooms'][0]['updates'];
 
-		$this->assertCount( 2, $room_updates );
-		$this->assertSame( 2, $data['rooms'][0]['total_updates'] );
+		$this->assertCount( 1, $room_updates );
+		$this->assertSame( 'update', $room_updates[0]['type'] );
+		$this->assertSame( 1, $data['rooms'][0]['total_updates'] );
 	}
 
 	public function test_sync_update_data_preserved() {
@@ -783,7 +1090,7 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 		$room   = $this->get_post_room();
 		$update = array(
 			'type' => 'update',
-			'data' => 'cHJlc2VydmVkIGRhdGE=',
+			'data' => $this->create_yjs_update( 'preserved data', 401 ),
 		);
 
 		// Client 1 sends an update.
@@ -803,7 +1110,7 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 		$data         = $response->get_data();
 		$room_updates = $data['rooms'][0]['updates'];
 
-		$this->assertSame( 'cHJlc2VydmVkIGRhdGE=', $room_updates[0]['data'] );
+		$this->assertSame( $update['data'], $room_updates[0]['data'] );
 		$this->assertSame( 'update', $room_updates[0]['type'] );
 	}
 
@@ -813,7 +1120,7 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 		$room   = $this->get_post_room();
 		$update = array(
 			'type' => 'update',
-			'data' => 'dGVzdA==',
+			'data' => $this->create_yjs_update( 'test', 402 ),
 		);
 
 		// Send three updates from different clients.
@@ -854,7 +1161,7 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 		$room   = $this->get_post_room();
 		$update = array(
 			'type' => 'update',
-			'data' => 'dGVzdA==',
+			'data' => $this->create_yjs_update( 'compact seed', 501 ),
 		);
 
 		// Client 1 sends a single update.
@@ -876,7 +1183,7 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 		for ( $i = 0; $i < 51; $i++ ) {
 			$updates[] = array(
 				'type' => 'update',
-				'data' => base64_encode( "update-$i" ),
+				'data' => $this->create_yjs_update( "update-$i", 600 + $i ),
 			);
 		}
 
@@ -906,7 +1213,7 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 		for ( $i = 0; $i < 51; $i++ ) {
 			$updates[] = array(
 				'type' => 'update',
-				'data' => base64_encode( "update-$i" ),
+				'data' => $this->create_yjs_update( "update-$i", 700 + $i ),
 			);
 		}
 
@@ -929,12 +1236,14 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 	}
 
 	public function test_sync_stale_compaction_is_stored_as_update_when_newer_compaction_exists() {
+		$this->skip_if_sync_server_class_is_provided_by_wordpress_core();
+
 		wp_set_current_user( self::$editor_id );
 
 		$room   = $this->get_post_room();
 		$update = array(
 			'type' => 'update',
-			'data' => 'dGVzdA==',
+			'data' => $this->create_yjs_update( 'seed before compaction', 801 ),
 		);
 
 		// Client 1 sends an update to seed the room.
@@ -949,7 +1258,7 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 		// Client 2 sends a compaction at the current cursor.
 		$compaction = array(
 			'type' => 'compaction',
-			'data' => 'Y29tcGFjdGVk',
+			'data' => $this->create_yjs_update( 'compacted', 802 ),
 		);
 
 		$this->dispatch_sync(
@@ -966,7 +1275,7 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 		// clients via Yjs state-as-update merging.
 		$stale_compaction = array(
 			'type' => 'compaction',
-			'data' => 'c3RhbGU=',
+			'data' => $this->create_yjs_update( 'stale', 803 ),
 		);
 		$response         = $this->dispatch_sync(
 			array(
@@ -987,12 +1296,12 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 		$updates  = $response->get_data()['rooms'][0]['updates'];
 
 		$update_data = wp_list_pluck( $updates, 'data' );
-		$this->assertContains( 'Y29tcGFjdGVk', $update_data, 'The newer compaction should be preserved.' );
-		$this->assertContains( 'c3RhbGU=', $update_data, 'The stale compaction bytes should be stored so client 3\'s operations propagate.' );
+		$this->assertContains( $compaction['data'], $update_data, 'The newer compaction should be preserved.' );
+		$this->assertContains( $stale_compaction['data'], $update_data, 'The stale compaction bytes should be stored so client 3\'s operations propagate.' );
 
 		$stale_entry = null;
 		foreach ( $updates as $entry ) {
-			if ( 'c3RhbGU=' === $entry['data'] ) {
+			if ( $stale_compaction['data'] === $entry['data'] ) {
 				$stale_entry = $entry;
 				break;
 			}
@@ -1134,7 +1443,7 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 
 		$update = array(
 			'type' => 'update',
-			'data' => 'cm9vbTEgb25seQ==',
+			'data' => $this->create_yjs_update( 'room1 only', 901 ),
 		);
 
 		// Client 1 sends an update to room 1 only.

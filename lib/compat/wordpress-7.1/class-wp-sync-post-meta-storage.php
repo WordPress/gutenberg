@@ -403,6 +403,83 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		}
 
 		/**
+		 * Returns a stable room update snapshot in meta_id ASC order.
+		 *
+		 * @since 7.1.0
+		 *
+		 * @global wpdb $wpdb WordPress database abstraction object.
+		 *
+		 * @param string $room Room identifier.
+		 * @return array{
+		 *   cursor: int,
+		 *   total_updates: int,
+		 *   updates: array<int, mixed>
+		 * } Room update snapshot.
+		 */
+		public function get_update_snapshot( string $room ): array {
+			global $wpdb;
+
+			$post_id = $this->get_storage_post_id( $room );
+			if ( null === $post_id ) {
+				return array(
+					'cursor'        => 0,
+					'total_updates' => 0,
+					'updates'       => array(),
+				);
+			}
+
+			$stats = $wpdb->get_row(
+				$wpdb->prepare(
+					"SELECT COUNT(*) AS total_updates, MAX(meta_id) AS max_meta_id FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = %s",
+					$post_id,
+					self::SYNC_UPDATE_META_KEY
+				)
+			);
+
+			$total_updates = $stats ? (int) $stats->total_updates : 0;
+			$max_meta_id   = $stats ? (int) $stats->max_meta_id : 0;
+
+			if ( 0 === $max_meta_id ) {
+				return array(
+					'cursor'        => 0,
+					'total_updates' => $total_updates,
+					'updates'       => array(),
+				);
+			}
+
+			$rows = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = %s AND meta_id <= %d ORDER BY meta_id ASC",
+					$post_id,
+					self::SYNC_UPDATE_META_KEY,
+					$max_meta_id
+				)
+			);
+
+			if ( ! $rows ) {
+				return array(
+					'cursor'        => $max_meta_id,
+					'total_updates' => $total_updates,
+					'updates'       => array(),
+				);
+			}
+
+			$updates = array();
+			foreach ( $rows as $row ) {
+				$decoded = json_decode( $row->meta_value, true );
+				if ( null !== $decoded ) {
+					$updates[] = $decoded;
+				}
+			}
+
+			return array(
+				'cursor'        => $max_meta_id,
+				'total_updates' => $total_updates,
+				'updates'       => $updates,
+			);
+		}
+
+		/**
 		 * Retrieves sync updates from a room after the given cursor.
 		 *
 		 * @since 7.0.0
@@ -426,7 +503,7 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 			// Capture the current room state first so the returned cursor is race-safe.
 			$stats = $wpdb->get_row(
 				$wpdb->prepare(
-					"SELECT COUNT(*) AS total_updates, COALESCE( MAX(meta_id), 0 ) AS max_meta_id FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = %s",
+					"SELECT COUNT(*) AS total_updates, MAX(meta_id) AS max_meta_id FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = %s",
 					$post_id,
 					self::SYNC_UPDATE_META_KEY
 				)

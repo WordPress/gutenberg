@@ -9,6 +9,10 @@ if ( ! class_exists( 'WP_Sync_Config' ) ) {
 	require_once __DIR__ . '/class-wp-sync-config.php';
 }
 
+if ( ! class_exists( 'WP_Sync_CRDT_Document' ) ) {
+	require_once __DIR__ . '/class-wp-sync-crdt-document.php';
+}
+
 if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 
 	/**
@@ -107,14 +111,24 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		private WP_Sync_Storage $storage;
 
 		/**
+		 * Factory used to reconstruct a CRDT document from stored updates.
+		 *
+		 * @since 7.1.0
+		 * @var callable
+		 */
+		private $crdt_document_factory;
+
+		/**
 		 * Constructor.
 		 *
 		 * @since 7.0.0
 		 *
-		 * @param WP_Sync_Storage $storage Storage backend for sync updates.
+		 * @param WP_Sync_Storage $storage               Storage backend for sync updates.
+		 * @param callable|null   $crdt_document_factory Optional CRDT document factory for tests.
 		 */
-		public function __construct( WP_Sync_Storage $storage ) {
-			$this->storage = $storage;
+		public function __construct( WP_Sync_Storage $storage, ?callable $crdt_document_factory = null ) {
+			$this->storage               = $storage;
+			$this->crdt_document_factory = $crdt_document_factory ?? array( 'WP_Sync_CRDT_Document', 'from_update_snapshot' );
 		}
 
 		/**
@@ -312,22 +326,74 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 					$is_compactor = min( array_keys( $merged_awareness ) ) === $client_id;
 				}
 
+				$document = $this->create_crdt_document( $room );
+				if ( is_wp_error( $document ) ) {
+					return $document;
+				}
+
+				$direct_response_updates = array();
+
 				// Process each update according to its type.
 				foreach ( $room_request['updates'] as $update ) {
-					$result = $this->process_sync_update( $room, $client_id, $cursor, $update );
+					$result = $this->process_sync_update( $room, $client_id, $cursor, $update, $document );
 					if ( is_wp_error( $result ) ) {
 						return $result;
 					}
+					$direct_response_updates = array_merge( $direct_response_updates, $result );
 				}
 
-				// Get updates for this client.
+				// Get stored updates for this client, then append request-local responses.
 				$room_response              = $this->get_updates( $room, $client_id, $cursor, $is_compactor );
+				$room_response['updates']   = array_merge( $room_response['updates'], $direct_response_updates );
 				$room_response['awareness'] = $merged_awareness;
 
 				$response['rooms'][] = $room_response;
 			}
 
 			return new WP_REST_Response( $response, 200 );
+		}
+
+		/**
+		 * Reconstructs the authoritative CRDT document for a room.
+		 *
+		 * @since 7.1.0
+		 *
+		 * @param string $room Room identifier.
+		 * @return object|WP_Error CRDT document helper or error.
+		 */
+		private function create_crdt_document( string $room ) {
+			$snapshot = $this->storage->get_update_snapshot( $room );
+			$factory  = $this->crdt_document_factory;
+
+			try {
+				return $factory( $snapshot['updates'] );
+			} catch ( Throwable $error ) {
+				return $this->crdt_error_response( $error );
+			}
+		}
+
+		/**
+		 * Converts CRDT decoding exceptions to REST errors.
+		 *
+		 * @since 7.1.0
+		 *
+		 * @param Throwable $error CRDT decoding error.
+		 * @return WP_Error REST error.
+		 */
+		private function crdt_error_response( Throwable $error ): WP_Error {
+			if ( $error instanceof RuntimeException && false !== strpos( $error->getMessage(), 'yjs/y-php' ) ) {
+				return new WP_Error(
+					'rest_sync_yjs_unavailable',
+					__( 'The Yjs PHP runtime is not available.', 'gutenberg' ),
+					array( 'status' => 500 )
+				);
+			}
+
+			return new WP_Error(
+				'rest_sync_malformed_update',
+				__( 'Malformed Yjs sync update.', 'gutenberg' ),
+				array( 'status' => 400 )
+			);
 		}
 
 		/**
@@ -390,66 +456,101 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		 * @param int                               $client_id Client identifier.
 		 * @param int                               $cursor    Client cursor (marker of last seen update).
 		 * @param array{data: string, type: string} $update    Sync update.
-		 * @return true|WP_Error True on success, WP_Error on storage failure.
+		 * @param object                            $document  CRDT document helper.
+		 * @return array<int, array{data: string, type: string}>|WP_Error Direct response updates on success, WP_Error on failure.
 		 */
-		private function process_sync_update( string $room, int $client_id, int $cursor, array $update ) {
+		private function process_sync_update( string $room, int $client_id, int $cursor, array $update, $document ) {
 			$data = $update['data'];
 			$type = $update['type'];
 
-			switch ( $type ) {
-				case self::UPDATE_TYPE_COMPACTION:
-					/*
-					 * Compaction replaces updates the client has already seen. Only remove
-					 * updates with markers before the client's cursor to preserve updates
-					 * that arrived since the client's last sync.
-					 *
-					 * Check for a newer compaction update first. If one exists, skip this
-					 * compaction to avoid overwriting it.
-					 */
-					$updates_after_cursor = $this->storage->get_updates_after_cursor( $room, $cursor );
-					$has_newer_compaction = false;
+			try {
+				switch ( $type ) {
+					case self::UPDATE_TYPE_SYNC_STEP1:
+						return array(
+							array(
+								'data' => $document->create_sync_step2_response( $data ),
+								'type' => self::UPDATE_TYPE_SYNC_STEP2,
+							),
+						);
 
-					foreach ( $updates_after_cursor as $existing ) {
-						if ( self::UPDATE_TYPE_COMPACTION === $existing['type'] ) {
-							$has_newer_compaction = true;
-							break;
-						}
-					}
+					case self::UPDATE_TYPE_SYNC_STEP2:
+						$state_vector_before = $document->state_vector();
+						$document->apply_polling_update( $data, $type );
+						$normalized_update = $document->encode_diff( $state_vector_before );
 
-					if ( ! $has_newer_compaction ) {
-						if ( ! $this->storage->remove_updates_before_cursor( $room, $cursor ) ) {
-							return new WP_Error(
-								'rest_sync_storage_error',
-								__( 'Failed to remove updates during compaction.', 'gutenberg' ),
-								array( 'status' => 500 )
-							);
+						if ( ! $document->is_empty_update( $normalized_update ) ) {
+							$result = $this->add_update( $room, $client_id, self::UPDATE_TYPE_UPDATE, $normalized_update );
+							if ( is_wp_error( $result ) ) {
+								return $result;
+							}
 						}
 
-						return $this->add_update( $room, $client_id, $type, $data );
-					}
+						return array();
 
-					/*
-					 * A newer compaction already advanced the cursor, but we
-					 * can not safely drop an update. The incoming bytes still encode
-					 * operations other clients may not have seen, so store them as a
-					 * regular update. Y.applyUpdateV2 merges state-as-update blobs
-					 * idempotently, so overlap with the existing compaction is safe.
-					 */
-					return $this->add_update( $room, $client_id, self::UPDATE_TYPE_UPDATE, $data );
+					case self::UPDATE_TYPE_COMPACTION:
+						$document->apply_polling_update( $data, $type );
 
-				case self::UPDATE_TYPE_SYNC_STEP1:
-				case self::UPDATE_TYPE_SYNC_STEP2:
-				case self::UPDATE_TYPE_UPDATE:
-					/*
-					 * Sync step 1 announces a client's state vector. Other clients need
-					 * to see it so they can respond with sync_step2 containing missing
-					 * updates. The cursor-based filtering prevents re-delivery.
-					 *
-					 * Sync step 2 contains updates for a specific client.
-					 *
-					 * All updates are stored persistently.
-					 */
-					return $this->add_update( $room, $client_id, $type, $data );
+						/*
+						 * Compaction replaces updates the client has already seen. Only remove
+						 * updates with markers before the client's cursor to preserve updates
+						 * that arrived since the client's last sync.
+						 *
+						 * Check for a newer compaction update first. If one exists, skip this
+						 * compaction to avoid overwriting it.
+						 */
+						$updates_after_cursor = $this->storage->get_updates_after_cursor( $room, $cursor );
+						$has_newer_compaction = false;
+
+						foreach ( $updates_after_cursor as $existing ) {
+							if ( self::UPDATE_TYPE_COMPACTION === $existing['type'] ) {
+								$has_newer_compaction = true;
+								break;
+							}
+						}
+
+						if ( ! $has_newer_compaction ) {
+							if ( ! $this->storage->remove_updates_before_cursor( $room, $cursor ) ) {
+								return new WP_Error(
+									'rest_sync_storage_error',
+									__( 'Failed to remove updates during compaction.', 'gutenberg' ),
+									array( 'status' => 500 )
+								);
+							}
+
+							$result = $this->add_update( $room, $client_id, $type, $data );
+							if ( is_wp_error( $result ) ) {
+								return $result;
+							}
+
+							return array();
+						}
+
+						/*
+						 * A newer compaction already advanced the cursor, but we
+						 * can not safely drop an update. The incoming bytes still encode
+						 * operations other clients may not have seen, so store them as a
+						 * regular update. Y.applyUpdateV2 merges state-as-update blobs
+						 * idempotently, so overlap with the existing compaction is safe.
+						 */
+						$result = $this->add_update( $room, $client_id, self::UPDATE_TYPE_UPDATE, $data );
+						if ( is_wp_error( $result ) ) {
+							return $result;
+						}
+
+						return array();
+
+					case self::UPDATE_TYPE_UPDATE:
+						$document->apply_polling_update( $data, $type );
+
+						$result = $this->add_update( $room, $client_id, $type, $data );
+						if ( is_wp_error( $result ) ) {
+							return $result;
+						}
+
+						return array();
+				}
+			} catch ( Throwable $error ) {
+				return $this->crdt_error_response( $error );
 			}
 
 			return new WP_Error(
@@ -515,6 +616,10 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 			// Filter out this client's updates, except compaction updates.
 			$typed_updates = array();
 			foreach ( $updates_after_cursor as $update ) {
+				if ( self::UPDATE_TYPE_SYNC_STEP1 === $update['type'] ) {
+					continue;
+				}
+
 				if ( $client_id === $update['client_id'] && self::UPDATE_TYPE_COMPACTION !== $update['type'] ) {
 					continue;
 				}
