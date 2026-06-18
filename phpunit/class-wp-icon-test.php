@@ -40,6 +40,12 @@ class WP_Icon_Test extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'height=', $output );
 	}
 
+	public function test_size_zero_outputs_zero_dimensions() {
+		$output = wp_get_icon( 'core/plus', array( 'size' => 0 ) );
+		$this->assertStringContainsString( 'width="0"', $output );
+		$this->assertStringContainsString( 'height="0"', $output );
+	}
+
 	public function test_custom_class() {
 		$output = wp_get_icon( 'core/plus', array( 'class' => 'my-button-icon' ) );
 		$this->assertStringContainsString( 'class="my-button-icon"', $output );

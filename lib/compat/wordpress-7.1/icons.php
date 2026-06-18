@@ -53,10 +53,8 @@ if ( ! function_exists( 'wp_get_icon' ) ) {
 
 		if ( is_numeric( $args['size'] ) ) {
 			$size = absint( $args['size'] );
-			if ( $size ) {
-				$processor->set_attribute( 'width', (string) $size );
-				$processor->set_attribute( 'height', (string) $size );
-			}
+			$processor->set_attribute( 'width', (string) $size );
+			$processor->set_attribute( 'height', (string) $size );
 		}
 
 		if ( ! empty( $args['class'] ) ) {
