@@ -68,7 +68,10 @@ export const Appender = forwardRef(
 			);
 		}, [ insertedBlockTitle ] );
 
-		if ( hideInserter ) {
+		// The generic inserter must respect template locks and zoom-out mode,
+		// but private List View consumers can provide a custom appender that
+		// handles its own insertion rules. Do not suppress that escape hatch.
+		if ( hideInserter && ! renderAppender ) {
 			return null;
 		}
 

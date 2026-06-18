@@ -23,7 +23,6 @@ export default function NavigationMenuEditor( {
 	id,
 	isAddingItems,
 	navigationMenu,
-	onAddMenuItems,
 	onCloseAddMenuItems,
 }: {
 	id: number;
@@ -39,7 +38,6 @@ export default function NavigationMenuEditor( {
 			rendered?: string;
 		};
 	};
-	onAddMenuItems: () => void;
 	onCloseAddMenuItems: () => void;
 } ) {
 	const { isReady: assetsReady } = useEditorAssets();
@@ -93,7 +91,6 @@ export default function NavigationMenuEditor( {
 			<NavigationMenuContent
 				isAddingItems={ isAddingItems }
 				navigationMenu={ navigationMenu }
-				onAddMenuItems={ onAddMenuItems }
 				onCloseAddMenuItems={ onCloseAddMenuItems }
 				rootClientId={ blocks[ 0 ].clientId }
 			/>

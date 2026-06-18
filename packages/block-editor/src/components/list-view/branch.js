@@ -100,6 +100,7 @@ function ListViewBranch( props ) {
 		isSyncedBranch = false,
 		showAppender: showAppenderProp = true,
 		renderAppender,
+		appenderParentClientId,
 	} = props;
 
 	const parentBlockInformation = useBlockDisplayInformation( parentId );
@@ -130,8 +131,18 @@ function ListViewBranch( props ) {
 		return null;
 	}
 
-	// Only show the appender at the first level.
-	const showAppender = showAppenderProp && level === 1;
+	const shouldShowNestedAppender =
+		!! parentId && parentId === appenderParentClientId;
+	const shouldHideCurrentAppender = level === 1 && !! appenderParentClientId;
+	// List View normally shows the appender only at the first level. The
+	// optional explicit parent id lets specialized private List View consumers
+	// expose an appender for one nested branch, such as the selected Navigation
+	// submenu. An id is more reliable than deriving this from selection inside
+	// every recursive branch, because empty branches still need to be mounted.
+	const showAppender =
+		showAppenderProp &&
+		! shouldHideCurrentAppender &&
+		( level === 1 || shouldShowNestedAppender );
 	const filteredBlocks = blocks.filter( Boolean );
 	const blockCount = filteredBlocks.length;
 	// The appender means an extra row in List View, so add 1 to the row count.
@@ -190,6 +201,8 @@ function ListViewBranch( props ) {
 				);
 				const isSelectedBranch =
 					isBranchSelected || ( isSelected && hasNestedBlocks );
+				const shouldShowChildAppender =
+					clientId === appenderParentClientId;
 
 				// To avoid performance issues, we only render blocks that are in view,
 				// or blocks that are selected or dragged. If a block is selected,
@@ -234,22 +247,29 @@ function ListViewBranch( props ) {
 								<td className="block-editor-list-view-placeholder" />
 							</tr>
 						) }
-						{ hasNestedBlocks && shouldExpand && ! isDragged && (
-							<ListViewBranch
-								parentId={ clientId }
-								blocks={ innerBlocks }
-								selectBlock={ selectBlock }
-								showBlockMovers={ showBlockMovers }
-								level={ level + 1 }
-								path={ updatedPath }
-								listPosition={ nextPositionRef.current + 1 }
-								fixedListWindow={ fixedListWindow }
-								isBranchSelected={ isSelectedBranch }
-								selectedClientIds={ selectedClientIds }
-								isExpanded={ isExpanded }
-								isSyncedBranch={ syncedBranch }
-							/>
-						) }
+						{ ( ( hasNestedBlocks && shouldExpand ) ||
+							shouldShowChildAppender ) &&
+							! isDragged && (
+								<ListViewBranch
+									parentId={ clientId }
+									blocks={ innerBlocks || [] }
+									selectBlock={ selectBlock }
+									showBlockMovers={ showBlockMovers }
+									level={ level + 1 }
+									path={ updatedPath }
+									listPosition={ nextPositionRef.current + 1 }
+									fixedListWindow={ fixedListWindow }
+									isBranchSelected={ isSelectedBranch }
+									selectedClientIds={ selectedClientIds }
+									isExpanded={ isExpanded }
+									isSyncedBranch={ syncedBranch }
+									showAppender={ showAppenderProp }
+									renderAppender={ renderAppender }
+									appenderParentClientId={
+										appenderParentClientId
+									}
+								/>
+							) }
 					</AsyncModeProvider>
 				);
 			} ) }
@@ -258,6 +278,11 @@ function ListViewBranch( props ) {
 					level={ level }
 					setSize={ rowCount }
 					positionInSet={ rowCount }
+					className={
+						shouldShowNestedAppender
+							? 'block-editor-list-view-submenu-appender'
+							: undefined
+					}
 					isExpanded
 				>
 					<TreeGridCell>

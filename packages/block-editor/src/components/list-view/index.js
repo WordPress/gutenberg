@@ -84,6 +84,7 @@ export const BLOCK_LIST_ITEM_HEIGHT = 32;
  * @param {?Function}      props.renderAppender         Optional private appender substitution for specialized list views.
  *                                                      This is intentionally private because custom appenders need to
  *                                                      preserve List View tree semantics while replacing Inserter UI.
+ * @param {?string}        props.appenderParentClientId Optional private target for showing the appender on a nested branch.
  * @param {Ref}            ref                          Forwarded ref
  */
 function ListViewComponent(
@@ -100,6 +101,7 @@ function ListViewComponent(
 		onSelect,
 		additionalBlockContent: AdditionalBlockContent,
 		renderAppender,
+		appenderParentClientId,
 	},
 	ref
 ) {
@@ -400,6 +402,7 @@ function ListViewComponent(
 						isExpanded={ isExpanded }
 						showAppender={ showAppender }
 						renderAppender={ renderAppender }
+						appenderParentClientId={ appenderParentClientId }
 					/>
 				</ListViewContext.Provider>
 			</TreeGrid>

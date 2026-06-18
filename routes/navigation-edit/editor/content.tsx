@@ -13,6 +13,7 @@ import {
 	MenuGroup,
 	MenuItem,
 	Popover,
+	TextControl,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 // @ts-expect-error - No type declarations available for @wordpress/blocks
@@ -29,6 +30,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import {
 	addSubmenu as addSubmenuIcon,
+	chevronLeft,
 	link as linkIcon,
 	navigation as navigationIcon,
 	page,
@@ -63,6 +65,8 @@ type NavigationMenuRecord = {
 	};
 };
 
+type SubmenuParentMode = 'page' | 'custom';
+
 const { PrivateListView } = unlock( blockEditorPrivateApis );
 
 type NavigationLinkControlsProps = {
@@ -77,11 +81,17 @@ type NavigationLinkUIProps = {
 	insertedBlock?: Block | null;
 	setInsertedBlock: ( block: Block | null ) => void;
 	showBlockInserter?: boolean;
+	onComplete?: (
+		block: Block | null | undefined,
+		attributes: Record< string, unknown >
+	) => void;
+	onCancel?: ( block: Block | null | undefined ) => void;
 };
 
 type NavigationTreeAppenderProps = {
 	clientId: string;
 	descriptionId: string;
+	blockCount?: number;
 	ref?: Ref< HTMLButtonElement >;
 	setInsertedBlock: ( block: Block | null ) => void;
 	onAddExistingPage: (
@@ -94,14 +104,22 @@ type NavigationTreeAppenderProps = {
 	) => void;
 	onAddSubmenu: (
 		parentClientId: string,
-		setInsertedBlock: ( block: Block | null ) => void
+		setInsertedBlock: ( block: Block | null ) => void,
+		mode?: SubmenuParentMode
 	) => void;
-	onAddMenuItems: () => void;
+	onAddLabelOnlySubmenu: ( parentClientId: string ) => void;
+	onAddMenuItems: ( parentClientId: string ) => void;
+	isEmptyBranch?: boolean;
 } & Record< string, unknown >;
 
 type BlockLibraryPrivateApis = {
 	NavigationLinkControls?: ComponentType< NavigationLinkControlsProps >;
 	NavigationLinkUI?: ComponentType< NavigationLinkUIProps >;
+};
+
+type NavigationTreeAdditionalContentProps = NavigationLinkUIProps & {
+	NavigationLinkUI?: ComponentType< NavigationLinkUIProps >;
+	onInsertedSubmenuComplete: ( block: Block | null | undefined ) => void;
 };
 
 function deferUntilDropdownCloses( callback: () => void ) {
@@ -129,14 +147,30 @@ function getBlockLibraryPrivateApis(): BlockLibraryPrivateApis {
 function NavigationTreeAppender( {
 	clientId,
 	descriptionId,
+	blockCount,
 	ref: buttonRef,
 	setInsertedBlock,
 	onAddExistingPage,
 	onAddCustomLink,
 	onAddSubmenu,
+	onAddLabelOnlySubmenu,
 	onAddMenuItems,
+	isEmptyBranch,
 	...treeGridCellProps
 }: NavigationTreeAppenderProps ) {
+	const [ isChoosingSubmenuType, setIsChoosingSubmenuType ] =
+		useState( false );
+	const isSubmenuAppender = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getBlockName( clientId ) ===
+			'core/navigation-submenu',
+		[ clientId ]
+	);
+	const appenderLabel = isSubmenuAppender
+		? __( 'Add to submenu' )
+		: __( 'Add menu item' );
+	const shouldShowEmptySubmenu =
+		isEmptyBranch || ( isSubmenuAppender && blockCount === 0 );
 	const toggleClassName = [
 		typeof treeGridCellProps.className === 'string'
 			? treeGridCellProps.className
@@ -146,11 +180,16 @@ function NavigationTreeAppender( {
 		.filter( Boolean )
 		.join( ' ' );
 
-	return (
+	const dropdown = (
 		<DropdownMenu
 			icon={ plus }
-			label={ __( 'Add menu item' ) }
+			label={ appenderLabel }
 			popoverProps={ { placement: 'bottom-start' } }
+			onToggle={ ( isOpen: boolean ) => {
+				if ( ! isOpen ) {
+					setIsChoosingSubmenuType( false );
+				}
+			} }
 			toggleProps={ {
 				...treeGridCellProps,
 				ref: buttonRef,
@@ -161,61 +200,155 @@ function NavigationTreeAppender( {
 		>
 			{ ( { onClose } ) => (
 				<>
-					<MenuGroup>
-						<MenuItem
-							icon={ page }
-							onClick={ () => {
-								onClose();
-								deferUntilDropdownCloses( () =>
-									onAddExistingPage(
-										clientId,
-										setInsertedBlock
-									)
-								);
-							} }
-						>
-							{ __( 'Add existing page' ) }
-						</MenuItem>
-						<MenuItem
-							icon={ linkIcon }
-							onClick={ () => {
-								onClose();
-								deferUntilDropdownCloses( () =>
-									onAddCustomLink(
-										clientId,
-										setInsertedBlock
-									)
-								);
-							} }
-						>
-							{ __( 'Custom link' ) }
-						</MenuItem>
-						<MenuItem
-							icon={ addSubmenuIcon }
-							onClick={ () => {
-								onClose();
-								deferUntilDropdownCloses( () =>
-									onAddSubmenu( clientId, setInsertedBlock )
-								);
-							} }
-						>
-							{ __( 'Submenu' ) }
-						</MenuItem>
-					</MenuGroup>
-					<MenuGroup>
-						<MenuItem
-							icon={ postCategories }
-							onClick={ () => {
-								onAddMenuItems();
-								onClose();
-							} }
-						>
-							{ __( 'More…' ) }
-						</MenuItem>
-					</MenuGroup>
+					{ isChoosingSubmenuType ? (
+						<>
+							<MenuGroup>
+								<MenuItem
+									icon={ chevronLeft }
+									onClick={ () =>
+										setIsChoosingSubmenuType( false )
+									}
+								>
+									{ __( 'Back' ) }
+								</MenuItem>
+							</MenuGroup>
+							<MenuGroup>
+								<MenuItem
+									icon={ page }
+									onClick={ () => {
+										onClose();
+										setIsChoosingSubmenuType( false );
+										deferUntilDropdownCloses( () =>
+											onAddSubmenu(
+												clientId,
+												setInsertedBlock
+											)
+										);
+									} }
+								>
+									{ __( 'Existing page' ) }
+								</MenuItem>
+								<MenuItem
+									icon={ linkIcon }
+									onClick={ () => {
+										onClose();
+										setIsChoosingSubmenuType( false );
+										deferUntilDropdownCloses( () =>
+											onAddSubmenu(
+												clientId,
+												setInsertedBlock,
+												'custom'
+											)
+										);
+									} }
+								>
+									{ __( 'Custom link' ) }
+								</MenuItem>
+								<MenuItem
+									icon={ addSubmenuIcon }
+									onClick={ () => {
+										onClose();
+										setIsChoosingSubmenuType( false );
+										deferUntilDropdownCloses( () =>
+											onAddLabelOnlySubmenu( clientId )
+										);
+									} }
+								>
+									{ __( 'Label only' ) }
+								</MenuItem>
+							</MenuGroup>
+						</>
+					) : (
+						<>
+							<MenuGroup>
+								<MenuItem
+									icon={ page }
+									onClick={ () => {
+										onClose();
+										deferUntilDropdownCloses( () =>
+											onAddExistingPage(
+												clientId,
+												setInsertedBlock
+											)
+										);
+									} }
+								>
+									{ __( 'Add existing page' ) }
+								</MenuItem>
+								<MenuItem
+									icon={ linkIcon }
+									onClick={ () => {
+										onClose();
+										deferUntilDropdownCloses( () =>
+											onAddCustomLink(
+												clientId,
+												setInsertedBlock
+											)
+										);
+									} }
+								>
+									{ __( 'Custom link' ) }
+								</MenuItem>
+								<MenuItem
+									icon={ addSubmenuIcon }
+									onClick={ () =>
+										setIsChoosingSubmenuType( true )
+									}
+								>
+									{ __( 'Drop-down' ) }
+								</MenuItem>
+							</MenuGroup>
+							<MenuGroup>
+								<MenuItem
+									icon={ postCategories }
+									onClick={ () => {
+										onAddMenuItems( clientId );
+										onClose();
+									} }
+								>
+									{ __( 'More…' ) }
+								</MenuItem>
+							</MenuGroup>
+						</>
+					) }
 				</>
 			) }
 		</DropdownMenu>
+	);
+
+	if ( ! shouldShowEmptySubmenu ) {
+		return dropdown;
+	}
+
+	return (
+		<div className="navigation-edit-editor__empty-submenu">
+			<span>{ __( 'This submenu is empty.' ) }</span>
+			{ dropdown }
+		</div>
+	);
+}
+
+function NavigationTreeAdditionalContent( {
+	block,
+	insertedBlock,
+	setInsertedBlock,
+	NavigationLinkUI,
+	onInsertedSubmenuComplete,
+}: NavigationTreeAdditionalContentProps ) {
+	return (
+		<>
+			{ NavigationLinkUI && (
+				<NavigationLinkUI
+					block={ block }
+					insertedBlock={ insertedBlock }
+					setInsertedBlock={ setInsertedBlock }
+					showBlockInserter={ false }
+					onComplete={ ( completedBlock ) =>
+						onInsertedSubmenuComplete( completedBlock )
+					}
+				/>
+			) }
+		</>
 	);
 }
 
@@ -238,17 +371,19 @@ const PAGES_QUERY = [
 export default function NavigationMenuContent( {
 	isAddingItems,
 	navigationMenu,
-	onAddMenuItems,
 	onCloseAddMenuItems,
 	rootClientId,
 }: {
 	isAddingItems: boolean;
 	navigationMenu: NavigationMenuRecord;
-	onAddMenuItems: () => void;
 	onCloseAddMenuItems: () => void;
 	rootClientId: string;
 } ) {
 	const navigationMenuId = navigationMenu.id;
+	const savedNavigationContent =
+		typeof navigationMenu.content?.raw === 'string'
+			? navigationMenu.content.raw
+			: '';
 	const { hasMenuItems, listViewRootClientId, navigationBlocks, isLoading } =
 		useSelect(
 			( select ) => {
@@ -285,10 +420,12 @@ export default function NavigationMenuContent( {
 					typeof editedContent === 'string'
 						? editedContent
 						: editedContent?.raw;
-				const editedMenuHasSavedBlocks = Array.isArray( editedBlocks )
-					? editedBlocks.length > 0
-					: typeof editedContentString === 'string' &&
-					  editedContentString.includes( '<!-- wp:' );
+				const editedMenuHasSavedBlocks =
+					( Array.isArray( editedBlocks ) &&
+						editedBlocks.length > 0 ) ||
+					( typeof editedContentString === 'string' &&
+						editedContentString.includes( '<!-- wp:' ) ) ||
+					savedNavigationContent.includes( '<!-- wp:' );
 
 				const hasOnlyPageListBlock =
 					blockClientIds.length === 1 &&
@@ -318,21 +455,31 @@ export default function NavigationMenuContent( {
 						( editedMenuHasSavedBlocks && blockCount === 0 ),
 				};
 			},
-			[ navigationMenuId, rootClientId ]
+			[ navigationMenuId, rootClientId, savedNavigationContent ]
 		);
 	const {
 		insertBlocks,
 		insertBlock,
+		removeBlock,
 		replaceBlock,
+		selectBlock,
 		updateBlockAttributes,
 		__unstableMarkNextChangeAsNotPersistent,
 	} = useDispatch( blockEditorStore );
 	const [ editingBlockClientId, setEditingBlockClientId ] = useState<
 		string | null
 	>( null );
+	const [ labelOnlySubmenuClientId, setLabelOnlySubmenuClientId ] = useState<
+		string | null
+	>( null );
+	const [ labelOnlySubmenuLabel, setLabelOnlySubmenuLabel ] = useState( '' );
+	const [ addMenuItemsParentClientId, setAddMenuItemsParentClientId ] =
+		useState< string | null >( null );
 	const [ anchorElement, setAnchorElement ] = useState< Element | null >(
 		null
 	);
+	const [ labelOnlyAnchorElement, setLabelOnlyAnchorElement ] =
+		useState< Element | null >( null );
 	const listViewRef = useRef< HTMLDivElement >( null );
 
 	const editingBlockAttributes = useSelect(
@@ -343,6 +490,42 @@ export default function NavigationMenuContent( {
 
 			return select( blockEditorStore ).getBlockAttributes(
 				editingBlockClientId
+			);
+		},
+		[ editingBlockClientId ]
+	);
+	const activeSubmenuClientId = useSelect(
+		( select ) => {
+			const {
+				getSelectedBlockClientIds,
+				getBlock,
+				getBlockName,
+				getBlockParents,
+			} = select( blockEditorStore );
+			const [ selectedClientId ] = getSelectedBlockClientIds();
+			const findSubmenuClientId = ( clientId?: string | null ) => {
+				if ( ! clientId ) {
+					return null;
+				}
+
+				const block = getBlock( clientId );
+
+				if ( block?.name === 'core/navigation-submenu' ) {
+					return clientId;
+				}
+
+				return (
+					getBlockParents( clientId ).find(
+						( parentClientId: string ) =>
+							getBlockName( parentClientId ) ===
+							'core/navigation-submenu'
+					) || null
+				);
+			};
+
+			return (
+				findSubmenuClientId( selectedClientId ) ||
+				findSubmenuClientId( editingBlockClientId )
 			);
 		},
 		[ editingBlockClientId ]
@@ -359,6 +542,18 @@ export default function NavigationMenuContent( {
 		);
 		setAnchorElement( element ?? null );
 	}, [ editingBlockClientId, navigationBlocks ] );
+
+	useLayoutEffect( () => {
+		if ( ! labelOnlySubmenuClientId || ! listViewRef.current ) {
+			setLabelOnlyAnchorElement( null );
+			return;
+		}
+
+		const element = listViewRef.current.querySelector(
+			`[data-block="${ labelOnlySubmenuClientId }"]`
+		);
+		setLabelOnlyAnchorElement( element ?? null );
+	}, [ labelOnlySubmenuClientId, navigationBlocks ] );
 
 	const offCanvasOnselect = useCallback(
 		( block: Block ) => {
@@ -394,24 +589,43 @@ export default function NavigationMenuContent( {
 	);
 	const { NavigationLinkControls, NavigationLinkUI } =
 		getBlockLibraryPrivateApis();
-	const InsertedNavigationLinkUI = useCallback(
-		( props: NavigationLinkUIProps ) =>
-			NavigationLinkUI ? (
-				<NavigationLinkUI { ...props } showBlockInserter={ false } />
-			) : null,
-		[ NavigationLinkUI ]
-	);
+	const selectInsertedSubmenu = useCallback(
+		( block: Block | null | undefined ) => {
+			if ( block?.name !== 'core/navigation-submenu' ) {
+				return;
+			}
 
+			setEditingBlockClientId( null );
+			selectBlock( block.clientId, null );
+		},
+		[ selectBlock ]
+	);
 	const addMenuItemBlocks = useCallback(
 		( blocks: Block[] ) => {
 			if ( ! blocks.length ) {
 				return;
 			}
 
-			insertBlocks( blocks, undefined, rootClientId, false );
+			insertBlocks(
+				blocks,
+				undefined,
+				addMenuItemsParentClientId || rootClientId,
+				false
+			);
 		},
-		[ insertBlocks, rootClientId ]
+		[ addMenuItemsParentClientId, insertBlocks, rootClientId ]
 	);
+
+	const openAddMenuItemsModal = useCallback( ( parentClientId: string ) => {
+		setAddMenuItemsParentClientId( parentClientId );
+	}, [] );
+
+	const closeAddMenuItemsModal = useCallback( () => {
+		setAddMenuItemsParentClientId( null );
+		if ( isAddingItems ) {
+			onCloseAddMenuItems();
+		}
+	}, [ isAddingItems, onCloseAddMenuItems ] );
 
 	const addExistingPage = useCallback(
 		(
@@ -447,9 +661,18 @@ export default function NavigationMenuContent( {
 	const addSubmenu = useCallback(
 		(
 			parentClientId: string,
-			setInsertedBlock: ( block: Block | null ) => void
+			setInsertedBlock: ( block: Block | null ) => void,
+			mode: SubmenuParentMode = 'page'
 		) => {
-			const block = createBlock( 'core/navigation-submenu' );
+			const block = createBlock(
+				'core/navigation-submenu',
+				mode === 'page'
+					? {
+							kind: 'post-type',
+							type: 'page',
+					  }
+					: undefined
+			);
 
 			insertBlock( block, undefined, parentClientId, false );
 			setEditingBlockClientId( null );
@@ -458,6 +681,46 @@ export default function NavigationMenuContent( {
 		[ insertBlock ]
 	);
 
+	const addLabelOnlySubmenu = useCallback(
+		( parentClientId: string ) => {
+			const block = createBlock( 'core/navigation-submenu' );
+
+			insertBlock( block, undefined, parentClientId, false );
+			setEditingBlockClientId( null );
+			setLabelOnlySubmenuClientId( block.clientId );
+			setLabelOnlySubmenuLabel( '' );
+		},
+		[ insertBlock ]
+	);
+
+	const cancelLabelOnlySubmenu = useCallback( () => {
+		if ( labelOnlySubmenuClientId ) {
+			removeBlock( labelOnlySubmenuClientId, false );
+		}
+		setLabelOnlySubmenuClientId( null );
+		setLabelOnlySubmenuLabel( '' );
+	}, [ labelOnlySubmenuClientId, removeBlock ] );
+
+	const saveLabelOnlySubmenu = useCallback( () => {
+		const label = labelOnlySubmenuLabel.trim();
+		if ( ! label || ! labelOnlySubmenuClientId ) {
+			return;
+		}
+
+		updateBlockAttributes( labelOnlySubmenuClientId, {
+			label,
+			url: '#',
+		} );
+		selectBlock( labelOnlySubmenuClientId, null );
+		setLabelOnlySubmenuClientId( null );
+		setLabelOnlySubmenuLabel( '' );
+	}, [
+		labelOnlySubmenuClientId,
+		labelOnlySubmenuLabel,
+		selectBlock,
+		updateBlockAttributes,
+	] );
+
 	const renderNavigationTreeAppender = useCallback(
 		( props: NavigationTreeAppenderProps ) => (
 			<NavigationTreeAppender
@@ -465,10 +728,27 @@ export default function NavigationMenuContent( {
 				onAddExistingPage={ addExistingPage }
 				onAddCustomLink={ addCustomLink }
 				onAddSubmenu={ addSubmenu }
-				onAddMenuItems={ onAddMenuItems }
+				onAddLabelOnlySubmenu={ addLabelOnlySubmenu }
+				onAddMenuItems={ openAddMenuItemsModal }
 			/>
 		),
-		[ addCustomLink, addExistingPage, addSubmenu, onAddMenuItems ]
+		[
+			addCustomLink,
+			addExistingPage,
+			addLabelOnlySubmenu,
+			addSubmenu,
+			openAddMenuItemsModal,
+		]
+	);
+	const renderNavigationTreeAdditionalContent = useCallback(
+		( props: NavigationLinkUIProps ) => (
+			<NavigationTreeAdditionalContent
+				{ ...props }
+				NavigationLinkUI={ NavigationLinkUI }
+				onInsertedSubmenuComplete={ selectInsertedSubmenu }
+			/>
+		),
+		[ NavigationLinkUI, selectInsertedSubmenu ]
 	);
 
 	// The hidden block is needed because it makes block edit side effects trigger.
@@ -478,15 +758,19 @@ export default function NavigationMenuContent( {
 			{ ! isLoading && (
 				<>
 					{ hasMenuItems ? (
-						<div ref={ listViewRef }>
+						<div
+							ref={ listViewRef }
+							className="navigation-edit-editor__list-view"
+						>
 							<PrivateListView
 								rootClientId={ listViewRootClientId }
 								onSelect={ handleSelect }
 								blockSettingsMenu={ LeafMoreMenu }
 								showAppender
 								renderAppender={ renderNavigationTreeAppender }
+								appenderParentClientId={ activeSubmenuClientId }
 								additionalBlockContent={
-									InsertedNavigationLinkUI
+									renderNavigationTreeAdditionalContent
 								}
 								isExpanded
 							/>
@@ -505,7 +789,9 @@ export default function NavigationMenuContent( {
 							<EmptyState.Actions>
 								<Button
 									variant="primary"
-									onClick={ onAddMenuItems }
+									onClick={ () =>
+										openAddMenuItemsModal( rootClientId )
+									}
 									__next40pxDefaultSize
 								>
 									{ __( 'Add menu items' ) }
@@ -542,15 +828,57 @@ export default function NavigationMenuContent( {
 						</div>
 					</Popover>
 				) }
+			{ labelOnlySubmenuClientId && labelOnlyAnchorElement && (
+				<Popover
+					anchor={ labelOnlyAnchorElement }
+					placement="right-start"
+					onClose={ cancelLabelOnlySubmenu }
+					className="navigation-edit-editor__label-only-submenu"
+				>
+					<form
+						className="navigation-edit-editor__label-only-submenu-form"
+						onSubmit={ ( event ) => {
+							event.preventDefault();
+							saveLabelOnlySubmenu();
+						} }
+					>
+						<TextControl
+							label={ __( 'Drop-down label' ) }
+							value={ labelOnlySubmenuLabel }
+							onChange={ setLabelOnlySubmenuLabel }
+							autoComplete="off"
+							__next40pxDefaultSize
+						/>
+						<div className="navigation-edit-editor__label-only-submenu-actions">
+							<Button
+								variant="tertiary"
+								onClick={ cancelLabelOnlySubmenu }
+								__next40pxDefaultSize
+							>
+								{ __( 'Cancel' ) }
+							</Button>
+							<Button
+								type="submit"
+								variant="primary"
+								disabled={ ! labelOnlySubmenuLabel.trim() }
+								accessibleWhenDisabled
+								__next40pxDefaultSize
+							>
+								{ __( 'Add drop-down' ) }
+							</Button>
+						</div>
+					</form>
+				</Popover>
+			) }
 			<div className="navigation-edit-editor__hidden-blocks">
 				<BlockList />
 			</div>
-			{ isAddingItems && (
+			{ ( isAddingItems || addMenuItemsParentClientId ) && (
 				<AddMenuItemsModal
 					navigationBlocks={ navigationBlocks }
 					navigationMenu={ navigationMenu }
 					onAddBlocks={ addMenuItemBlocks }
-					onClose={ onCloseAddMenuItems }
+					onClose={ closeAddMenuItemsModal }
 				/>
 			) }
 		</>

@@ -233,7 +233,6 @@ function NavigationEditStage() {
 					id={ navigationId }
 					isAddingItems={ isAddingItems }
 					navigationMenu={ navigationMenu }
-					onAddMenuItems={ () => setIsAddingItems( true ) }
 					onCloseAddMenuItems={ () => setIsAddingItems( false ) }
 				/>
 			</Page>

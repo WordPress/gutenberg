@@ -23,6 +23,8 @@ export function NavigationLinkUI( {
 	insertedBlock,
 	setInsertedBlock,
 	showBlockInserter,
+	onComplete,
+	onCancel,
 } ) {
 	const { updateBlockAttributes, removeBlock } =
 		useDispatch( blockEditorStore );
@@ -60,6 +62,7 @@ export function NavigationLinkUI( {
 			// Remove the block entirely to avoid poor UX
 			// This matches the Navigation Link block's behavior
 			removeBlock( insertedBlock.clientId, shouldAutoSelectBlock );
+			onCancel?.( insertedBlock );
 		}
 		setInsertedBlock( null );
 	};
@@ -115,6 +118,7 @@ export function NavigationLinkUI( {
 				}
 
 				setInsertedBlock( null );
+				onComplete?.( insertedBlock, updatedAttributes );
 			} }
 		/>
 	);
