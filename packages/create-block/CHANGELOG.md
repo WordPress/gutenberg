@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Documentation
+
+-   Fix `thats` typo to `that's` in external template documentation.
+
 ## 4.91.1 (2026-06-16)
 
 ## 4.91.0 (2026-06-10)

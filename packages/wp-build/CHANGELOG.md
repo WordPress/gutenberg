@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Documentation
+
+-   Fix `genereated` typo to `generated` in README.
+
 ## 0.16.1 (2026-06-16)
 
 ## 0.16.0 (2026-06-10)
