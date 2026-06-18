@@ -34,12 +34,19 @@ const DEFAULT_PREVIEW_WIDTH_BY_VIEWPORT: Record< string, number > = {
 	'@mobile': 480,
 };
 
+// We assume a default font size of 16px when calculating preview widths.
+const DEFAULT_FONT_SIZE = 16;
+
 function getPixelValue( value: string ) {
-	if ( ! value.endsWith( 'px' ) ) {
+	const match = value.match( /^(\d+|\d*\.\d+)(px|em|rem)$/ );
+	if ( ! match ) {
 		return undefined;
 	}
 
-	return Number.parseFloat( value );
+	const numericValue = Number.parseFloat( match[ 1 ] );
+	const unit = match[ 2 ];
+
+	return unit === 'px' ? numericValue : numericValue * DEFAULT_FONT_SIZE;
 }
 
 function getPreviewWidthByViewport(
