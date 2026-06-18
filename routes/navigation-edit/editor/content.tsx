@@ -4,7 +4,6 @@
 import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
-	BlockList,
 	// @ts-expect-error - No type declarations available for @wordpress/block-editor
 } from '@wordpress/block-editor';
 import {
@@ -15,7 +14,7 @@ import {
 	Popover,
 	TextControl,
 } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 // @ts-expect-error - No type declarations available for @wordpress/blocks
 import { createBlock } from '@wordpress/blocks';
 import {
@@ -26,7 +25,6 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { store as coreStore } from '@wordpress/core-data';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import {
 	addSubmenu as addSubmenuIcon,
@@ -59,13 +57,17 @@ type NavigationMenuRecord = {
 		raw?: string;
 		rendered?: string;
 	};
-	content?: {
-		raw?: string;
-		rendered?: string;
-	};
+	content?:
+		| string
+		| {
+				raw?: string;
+				rendered?: string;
+		  };
+	blocks?: Block[];
 };
 
 type SubmenuParentMode = 'page' | 'custom';
+type ClientId = string | null | undefined;
 
 const { PrivateListView } = unlock( blockEditorPrivateApis );
 
@@ -89,26 +91,26 @@ type NavigationLinkUIProps = {
 };
 
 type NavigationTreeAppenderProps = {
-	clientId: string;
+	clientId: ClientId;
 	descriptionId: string;
 	blockCount?: number;
 	ref?: Ref< HTMLButtonElement >;
 	setInsertedBlock: ( block: Block | null ) => void;
 	onAddExistingPage: (
-		parentClientId: string,
+		parentClientId: ClientId,
 		setInsertedBlock: ( block: Block | null ) => void
 	) => void;
 	onAddCustomLink: (
-		parentClientId: string,
+		parentClientId: ClientId,
 		setInsertedBlock: ( block: Block | null ) => void
 	) => void;
 	onAddSubmenu: (
-		parentClientId: string,
+		parentClientId: ClientId,
 		setInsertedBlock: ( block: Block | null ) => void,
 		mode?: SubmenuParentMode
 	) => void;
-	onAddLabelOnlySubmenu: ( parentClientId: string ) => void;
-	onAddMenuItems: ( parentClientId: string ) => void;
+	onAddLabelOnlySubmenu: ( parentClientId: ClientId ) => void;
+	onAddMenuItems: ( parentClientId: ClientId ) => void;
 	isEmptyBranch?: boolean;
 } & Record< string, unknown >;
 
@@ -144,6 +146,10 @@ function getBlockLibraryPrivateApis(): BlockLibraryPrivateApis {
 	return unlock< BlockLibraryPrivateApis >( blockLibrary.privateApis );
 }
 
+function getBlockListRootClientId( clientId: ClientId ) {
+	return clientId || '';
+}
+
 function NavigationTreeAppender( {
 	clientId,
 	descriptionId,
@@ -162,8 +168,9 @@ function NavigationTreeAppender( {
 		useState( false );
 	const isSubmenuAppender = useSelect(
 		( select ) =>
+			!! clientId &&
 			select( blockEditorStore ).getBlockName( clientId ) ===
-			'core/navigation-submenu',
+				'core/navigation-submenu',
 		[ clientId ]
 	);
 	const appenderLabel = isSubmenuAppender
@@ -352,116 +359,27 @@ function NavigationTreeAdditionalContent( {
 	);
 }
 
-// Needs to be kept in sync with the query used at packages/block-library/src/page-list/edit.js.
-const MAX_PAGE_COUNT = 100;
-const PAGES_QUERY = [
-	'postType',
-	'page',
-	{
-		per_page: MAX_PAGE_COUNT,
-		_fields: [ 'id', 'link', 'menu_order', 'parent', 'title', 'type' ],
-		// TODO: When https://core.trac.wordpress.org/ticket/39037 REST API support for multiple orderby
-		// values is resolved, update 'orderby' to [ 'menu_order', 'post_title' ] to provide a consistent
-		// sort.
-		orderby: 'menu_order',
-		order: 'asc',
-	},
-];
-
 export default function NavigationMenuContent( {
 	isAddingItems,
 	navigationMenu,
 	onCloseAddMenuItems,
-	rootClientId,
 }: {
 	isAddingItems: boolean;
 	navigationMenu: NavigationMenuRecord;
 	onCloseAddMenuItems: () => void;
-	rootClientId: string;
 } ) {
-	const navigationMenuId = navigationMenu.id;
-	const savedNavigationContent =
-		typeof navigationMenu.content?.raw === 'string'
-			? navigationMenu.content.raw
-			: '';
-	const { hasMenuItems, listViewRootClientId, navigationBlocks, isLoading } =
-		useSelect(
-			( select ) => {
-				const {
-					areInnerBlocksControlled,
-					getBlocks,
-					getBlockName,
-					getBlockCount,
-					getBlockOrder,
-				} = select( blockEditorStore );
-				const {
-					getEditedEntityRecord,
-					hasFinishedResolution,
-					isResolving,
-				} = select( coreStore );
+	const registry = useRegistry();
+	const { hasMenuItems, navigationBlocks } = useSelect( ( select ) => {
+		const { getBlocks, getBlockCount } = select( blockEditorStore );
 
-				const blockClientIds = getBlockOrder( rootClientId );
-				const blockCount = getBlockCount( rootClientId );
-				const navigationEntityArgs = [
-					'postType',
-					'wp_navigation',
-					navigationMenuId,
-				];
-				const editedNavigationMenu = getEditedEntityRecord(
-					...navigationEntityArgs
-				);
-				const hasResolvedEditedNavigationMenu = hasFinishedResolution(
-					'getEditedEntityRecord',
-					navigationEntityArgs
-				);
-				const editedContent = editedNavigationMenu?.content;
-				const editedBlocks = editedNavigationMenu?.blocks;
-				const editedContentString =
-					typeof editedContent === 'string'
-						? editedContent
-						: editedContent?.raw;
-				const editedMenuHasSavedBlocks =
-					( Array.isArray( editedBlocks ) &&
-						editedBlocks.length > 0 ) ||
-					( typeof editedContentString === 'string' &&
-						editedContentString.includes( '<!-- wp:' ) ) ||
-					savedNavigationContent.includes( '<!-- wp:' );
-
-				const hasOnlyPageListBlock =
-					blockClientIds.length === 1 &&
-					getBlockName( blockClientIds[ 0 ] ) === 'core/page-list';
-				const pageListHasBlocks =
-					hasOnlyPageListBlock &&
-					getBlockCount( blockClientIds[ 0 ] ) > 0;
-
-				const isLoadingPages = isResolving(
-					'getEntityRecords',
-					PAGES_QUERY
-				);
-				const _listViewRootClientId = pageListHasBlocks
-					? blockClientIds[ 0 ]
-					: rootClientId;
-
-				return {
-					hasMenuItems: getBlockCount( _listViewRootClientId ) > 0,
-					listViewRootClientId: _listViewRootClientId,
-					navigationBlocks: getBlocks( rootClientId ),
-					// This is a small hack to wait for the navigation block
-					// to actually load its inner blocks.
-					isLoading:
-						! hasResolvedEditedNavigationMenu ||
-						! areInnerBlocksControlled( rootClientId ) ||
-						isLoadingPages ||
-						( editedMenuHasSavedBlocks && blockCount === 0 ),
-				};
-			},
-			[ navigationMenuId, rootClientId, savedNavigationContent ]
-		);
+		return {
+			hasMenuItems: getBlockCount( null ) > 0,
+			navigationBlocks: getBlocks( null ),
+		};
+	}, [] );
 	const {
-		insertBlocks,
-		insertBlock,
 		removeBlock,
-		replaceBlock,
+		replaceInnerBlocks,
 		selectBlock,
 		updateBlockAttributes,
 		__unstableMarkNextChangeAsNotPersistent,
@@ -473,8 +391,8 @@ export default function NavigationMenuContent( {
 		string | null
 	>( null );
 	const [ labelOnlySubmenuLabel, setLabelOnlySubmenuLabel ] = useState( '' );
-	const [ addMenuItemsParentClientId, setAddMenuItemsParentClientId ] =
-		useState< string | null >( null );
+	const [ addMenuItemsTargetClientId, setAddMenuItemsTargetClientId ] =
+		useState< ClientId >( undefined );
 	const [ anchorElement, setAnchorElement ] = useState< Element | null >(
 		null
 	);
@@ -555,20 +473,82 @@ export default function NavigationMenuContent( {
 		setLabelOnlyAnchorElement( element ?? null );
 	}, [ labelOnlySubmenuClientId, navigationBlocks ] );
 
+	const replaceBlockList = useCallback(
+		( parentClientId: ClientId, blocks: Block[], isPersistent = true ) => {
+			const rootClientId = getBlockListRootClientId( parentClientId );
+
+			if ( ! isPersistent ) {
+				__unstableMarkNextChangeAsNotPersistent();
+			}
+
+			replaceInnerBlocks( rootClientId, blocks, false );
+		},
+		[ __unstableMarkNextChangeAsNotPersistent, replaceInnerBlocks ]
+	);
+
+	const appendBlocksToBlockList = useCallback(
+		( parentClientId: ClientId, blocks: Block[] ) => {
+			if ( ! blocks.length ) {
+				return;
+			}
+
+			/*
+			 * This route edits the saved `wp_navigation` block list directly
+			 * rather than rendering a synthetic `core/navigation` wrapper.
+			 * Using `insertBlock(s)` would re-run normal inserter checks, where
+			 * Navigation Link/Submenu are rejected because their block metadata
+			 * says they require a `core/navigation` parent. The saved entity
+			 * shape is still the same list of navigation item blocks, so append
+			 * by replacing the relevant root/submenu block list instead.
+			 */
+			const rootClientId = getBlockListRootClientId( parentClientId );
+			const currentBlocks = registry
+				.select( blockEditorStore )
+				.getBlocks( rootClientId ) as Block[];
+
+			replaceBlockList( parentClientId, [ ...currentBlocks, ...blocks ] );
+		},
+		[ registry, replaceBlockList ]
+	);
+
+	const replaceBlockInBlockList = useCallback(
+		( clientId: string, replacementBlock: Block, isPersistent = true ) => {
+			const blockEditor = registry.select( blockEditorStore );
+			const rootClientId = blockEditor.getBlockRootClientId(
+				clientId
+			) as ClientId;
+			const currentBlocks = blockEditor.getBlocks(
+				getBlockListRootClientId( rootClientId )
+			) as Block[];
+
+			replaceBlockList(
+				rootClientId,
+				currentBlocks.map( ( block ) =>
+					block.clientId === clientId ? replacementBlock : block
+				),
+				isPersistent
+			);
+		},
+		[ registry, replaceBlockList ]
+	);
+
 	const offCanvasOnselect = useCallback(
 		( block: Block ) => {
 			if (
 				block.name === 'core/navigation-link' &&
 				! block.attributes.url
 			) {
-				__unstableMarkNextChangeAsNotPersistent();
-				replaceBlock(
+				replaceBlockInBlockList(
 					block.clientId,
-					createBlock( 'core/navigation-link', block.attributes )
+					createBlock(
+						'core/navigation-link',
+						block.attributes
+					) as Block,
+					false
 				);
 			}
 		},
-		[ __unstableMarkNextChangeAsNotPersistent, replaceBlock ]
+		[ replaceBlockInBlockList ]
 	);
 
 	const handleSelect = useCallback(
@@ -606,22 +586,17 @@ export default function NavigationMenuContent( {
 				return;
 			}
 
-			insertBlocks(
-				blocks,
-				undefined,
-				addMenuItemsParentClientId || rootClientId,
-				false
-			);
+			appendBlocksToBlockList( addMenuItemsTargetClientId, blocks );
 		},
-		[ addMenuItemsParentClientId, insertBlocks, rootClientId ]
+		[ addMenuItemsTargetClientId, appendBlocksToBlockList ]
 	);
 
-	const openAddMenuItemsModal = useCallback( ( parentClientId: string ) => {
-		setAddMenuItemsParentClientId( parentClientId );
+	const openAddMenuItemsModal = useCallback( ( parentClientId: ClientId ) => {
+		setAddMenuItemsTargetClientId( parentClientId || null );
 	}, [] );
 
 	const closeAddMenuItemsModal = useCallback( () => {
-		setAddMenuItemsParentClientId( null );
+		setAddMenuItemsTargetClientId( undefined );
 		if ( isAddingItems ) {
 			onCloseAddMenuItems();
 		}
@@ -629,7 +604,7 @@ export default function NavigationMenuContent( {
 
 	const addExistingPage = useCallback(
 		(
-			parentClientId: string,
+			parentClientId: ClientId,
 			setInsertedBlock: ( block: Block | null ) => void
 		) => {
 			const block = createBlock( 'core/navigation-link', {
@@ -637,30 +612,30 @@ export default function NavigationMenuContent( {
 				type: 'page',
 			} );
 
-			insertBlock( block, undefined, parentClientId, false );
+			appendBlocksToBlockList( parentClientId, [ block as Block ] );
 			setEditingBlockClientId( null );
-			setInsertedBlock( block );
+			setInsertedBlock( block as Block );
 		},
-		[ insertBlock ]
+		[ appendBlocksToBlockList ]
 	);
 
 	const addCustomLink = useCallback(
 		(
-			parentClientId: string,
+			parentClientId: ClientId,
 			setInsertedBlock: ( block: Block | null ) => void
 		) => {
 			const block = createBlock( 'core/navigation-link' );
 
-			insertBlock( block, undefined, parentClientId, false );
+			appendBlocksToBlockList( parentClientId, [ block as Block ] );
 			setEditingBlockClientId( null );
-			setInsertedBlock( block );
+			setInsertedBlock( block as Block );
 		},
-		[ insertBlock ]
+		[ appendBlocksToBlockList ]
 	);
 
 	const addSubmenu = useCallback(
 		(
-			parentClientId: string,
+			parentClientId: ClientId,
 			setInsertedBlock: ( block: Block | null ) => void,
 			mode: SubmenuParentMode = 'page'
 		) => {
@@ -674,23 +649,23 @@ export default function NavigationMenuContent( {
 					: undefined
 			);
 
-			insertBlock( block, undefined, parentClientId, false );
+			appendBlocksToBlockList( parentClientId, [ block as Block ] );
 			setEditingBlockClientId( null );
-			setInsertedBlock( block );
+			setInsertedBlock( block as Block );
 		},
-		[ insertBlock ]
+		[ appendBlocksToBlockList ]
 	);
 
 	const addLabelOnlySubmenu = useCallback(
-		( parentClientId: string ) => {
+		( parentClientId: ClientId ) => {
 			const block = createBlock( 'core/navigation-submenu' );
 
-			insertBlock( block, undefined, parentClientId, false );
+			appendBlocksToBlockList( parentClientId, [ block as Block ] );
 			setEditingBlockClientId( null );
 			setLabelOnlySubmenuClientId( block.clientId );
 			setLabelOnlySubmenuLabel( '' );
 		},
-		[ insertBlock ]
+		[ appendBlocksToBlockList ]
 	);
 
 	const cancelLabelOnlySubmenu = useCallback( () => {
@@ -751,55 +726,47 @@ export default function NavigationMenuContent( {
 		[ NavigationLinkUI, selectInsertedSubmenu ]
 	);
 
-	// The hidden block is needed because it makes block edit side effects trigger.
-	// For example a navigation page list load its items has an effect on edit to load its items.
 	return (
 		<>
-			{ ! isLoading && (
-				<>
-					{ hasMenuItems ? (
-						<div
-							ref={ listViewRef }
-							className="navigation-edit-editor__list-view"
+			{ hasMenuItems ? (
+				<div
+					ref={ listViewRef }
+					className="navigation-edit-editor__list-view"
+				>
+					<PrivateListView
+						rootClientId={ null }
+						onSelect={ handleSelect }
+						blockSettingsMenu={ LeafMoreMenu }
+						showAppender
+						renderAppender={ renderNavigationTreeAppender }
+						appenderParentClientId={ activeSubmenuClientId }
+						additionalBlockContent={
+							renderNavigationTreeAdditionalContent
+						}
+						isExpanded
+					/>
+				</div>
+			) : (
+				<EmptyState.Root>
+					<EmptyState.Icon icon={ navigationIcon } />
+					<EmptyState.Title>
+						{ __( 'No menu items yet' ) }
+					</EmptyState.Title>
+					<EmptyState.Description>
+						{ __(
+							'Add pages, links, or other content to start building this navigation menu.'
+						) }
+					</EmptyState.Description>
+					<EmptyState.Actions>
+						<Button
+							variant="primary"
+							onClick={ () => openAddMenuItemsModal( null ) }
+							__next40pxDefaultSize
 						>
-							<PrivateListView
-								rootClientId={ listViewRootClientId }
-								onSelect={ handleSelect }
-								blockSettingsMenu={ LeafMoreMenu }
-								showAppender
-								renderAppender={ renderNavigationTreeAppender }
-								appenderParentClientId={ activeSubmenuClientId }
-								additionalBlockContent={
-									renderNavigationTreeAdditionalContent
-								}
-								isExpanded
-							/>
-						</div>
-					) : (
-						<EmptyState.Root>
-							<EmptyState.Icon icon={ navigationIcon } />
-							<EmptyState.Title>
-								{ __( 'No menu items yet' ) }
-							</EmptyState.Title>
-							<EmptyState.Description>
-								{ __(
-									'Add pages, links, or other content to start building this navigation menu.'
-								) }
-							</EmptyState.Description>
-							<EmptyState.Actions>
-								<Button
-									variant="primary"
-									onClick={ () =>
-										openAddMenuItemsModal( rootClientId )
-									}
-									__next40pxDefaultSize
-								>
-									{ __( 'Add menu items' ) }
-								</Button>
-							</EmptyState.Actions>
-						</EmptyState.Root>
-					) }
-				</>
+							{ __( 'Add menu items' ) }
+						</Button>
+					</EmptyState.Actions>
+				</EmptyState.Root>
 			) }
 			{ editingBlockClientId &&
 				editingBlockAttributes &&
@@ -870,10 +837,7 @@ export default function NavigationMenuContent( {
 					</form>
 				</Popover>
 			) }
-			<div className="navigation-edit-editor__hidden-blocks">
-				<BlockList />
-			</div>
-			{ ( isAddingItems || addMenuItemsParentClientId ) && (
+			{ ( isAddingItems || addMenuItemsTargetClientId !== undefined ) && (
 				<AddMenuItemsModal
 					navigationBlocks={ navigationBlocks }
 					navigationMenu={ navigationMenu }

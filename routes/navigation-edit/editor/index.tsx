@@ -4,10 +4,11 @@
 import { useMemo } from '@wordpress/element';
 // @ts-expect-error - No type declarations available for @wordpress/block-editor
 import { BlockEditorProvider } from '@wordpress/block-editor';
-// @ts-expect-error - No type declarations available for @wordpress/blocks
-import { createBlock } from '@wordpress/blocks';
 import { Spinner } from '@wordpress/components';
-import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wordpress/core-data';
+import {
+	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
+	useEntityBlockEditor,
+} from '@wordpress/core-data';
 import { useEditorAssets, useEditorSettings } from '@wordpress/lazy-editor';
 
 /**
@@ -16,8 +17,6 @@ import { useEditorAssets, useEditorSettings } from '@wordpress/lazy-editor';
 // eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import './style.scss';
 import NavigationMenuContent from './content';
-
-const noop = () => {};
 
 export default function NavigationMenuEditor( {
 	id,
@@ -42,6 +41,15 @@ export default function NavigationMenuEditor( {
 } ) {
 	const { isReady: assetsReady } = useEditorAssets();
 	const { isReady: settingsReady, editorSettings } = useEditorSettings();
+	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
+		'postType',
+		'wp_navigation',
+		{ id }
+	) as [
+		unknown[] | undefined,
+		( blocks: unknown[], options?: Record< string, unknown > ) => void,
+		( blocks: unknown[], options?: Record< string, unknown > ) => void,
+	];
 
 	const settings = useMemo( () => {
 		if ( ! editorSettings ) {
@@ -57,15 +65,7 @@ export default function NavigationMenuEditor( {
 		};
 	}, [ editorSettings ] );
 
-	const blocks = useMemo( () => {
-		if ( ! assetsReady || ! settingsReady || ! id ) {
-			return [];
-		}
-
-		return [ createBlock( 'core/navigation', { ref: id } ) ];
-	}, [ assetsReady, id, settingsReady ] );
-
-	if ( ! assetsReady || ! settingsReady || ! blocks.length ) {
+	if ( ! assetsReady || ! settingsReady || ! blocks ) {
 		return (
 			<div
 				style={ {
@@ -85,14 +85,13 @@ export default function NavigationMenuEditor( {
 			key={ id }
 			settings={ settings }
 			value={ blocks }
-			onChange={ noop }
-			onInput={ noop }
+			onChange={ onChange }
+			onInput={ onInput }
 		>
 			<NavigationMenuContent
 				isAddingItems={ isAddingItems }
 				navigationMenu={ navigationMenu }
 				onCloseAddMenuItems={ onCloseAddMenuItems }
-				rootClientId={ blocks[ 0 ].clientId }
 			/>
 		</BlockEditorProvider>
 	);

@@ -87,10 +87,9 @@ export const route = {
 				NAVIGATION_POST_TYPE,
 				navigationId
 			),
-			// The Navigation block hydrates its controlled inner blocks from
-			// `useEntityBlockEditor`, which reads `getEditedEntityRecord`.
-			// Preloading only `getEntityRecord` can leave the tree looking empty
-			// on first visit until a later resolver pass fills the edited record.
+			// The menu tree edits the wp_navigation entity's blocks directly
+			// through `useEntityBlockEditor`, which reads the edited record.
+			// Preloading it avoids an empty first render on direct route loads.
 			resolver.getEditedEntityRecord(
 				'postType',
 				NAVIGATION_POST_TYPE,
