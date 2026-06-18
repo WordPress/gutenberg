@@ -82,7 +82,8 @@ function render_block_core_icon( $attributes ) {
 	$svg = wp_get_icon(
 		$attributes['icon'],
 		array(
-			'size'  => 0,
+			// Width is applied via the dimensions block support styles below.
+			'size'  => null,
 			'class' => $styles['classnames'] ?? '',
 			'label' => $attributes['ariaLabel'] ?? '',
 		)
