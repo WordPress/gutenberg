@@ -59,13 +59,8 @@ function block_core_tab_panel_render( array $attributes, string $content, \WP_Bl
 		)
 	);
 
-	/**
-	 * Process accessibility and interactivity attributes.
-	 */
-	$tag_processor->set_attribute( 'role', 'tabpanel' );
 	$tag_processor->set_attribute( 'aria-labelledby', 'tab__' . $tab_id );
 	$tag_processor->set_attribute( 'data-wp-bind--hidden', '!state.isActiveTab' );
-	$tag_processor->set_attribute( 'tabindex', 0 );
 
 	return (string) $tag_processor->get_updated_html();
 }
