@@ -319,62 +319,10 @@ ${ jsxContent }
 `;
 }
 
-// Idempotent one-off helper to ensure every source SVG in `src/library`
-// self-declares its colour via `fill="currentColor"` on the outer `<svg>`.
-//
-// Not wired into `main()` — this is a manual maintenance tool. Invoke with:
-//
-//   node -e "require('./packages/icons/lib/generate-library.cjs').normalizeSourceIcons()"
-//
-// Skips any SVG that already sets `fill=` as an attribute, or declares `fill`
-// inside a `style` attribute on the outer `<svg>` (e.g. stroke-based icons
-// that use `style="fill: none"` to defeat 3rd-party CSS overrides).
-async function normalizeSourceIcons() {
-	const svgFiles = ( await readdir( ICON_LIBRARY_DIR ) ).filter( ( file ) =>
-		file.match( /^[a-z0-9--]+\.svg$/ )
-	);
-
-	let modifiedCount = 0;
-	let skippedCount = 0;
-
-	await Promise.all(
-		svgFiles.map( async ( svgFile ) => {
-			const svgPath = path.join( ICON_LIBRARY_DIR, svgFile );
-			const original = await readFile( svgPath, 'utf8' );
-
-			const updated = original.replace(
-				/^(<svg\b)([^>]*)>/,
-				( match, openTag, attrs ) => {
-					if ( /\sfill\s*=/.test( attrs ) ) {
-						return match;
-					}
-					if ( /\sstyle\s*=\s*"[^"]*\bfill\b/.test( attrs ) ) {
-						return match;
-					}
-					return `${ openTag }${ attrs } fill="currentColor">`;
-				}
-			);
-
-			if ( updated !== original ) {
-				await writeFile( svgPath, updated );
-				modifiedCount++;
-			} else {
-				skippedCount++;
-			}
-		} )
-	);
-
-	// eslint-disable-next-line no-console
-	console.log(
-		`normalizeSourceIcons: modified ${ modifiedCount }, skipped ${ skippedCount }.`
-	);
-}
-
 if ( module === require.main ) {
 	main();
 }
 
 module.exports = {
 	generateTsxFiles,
-	normalizeSourceIcons,
 };
