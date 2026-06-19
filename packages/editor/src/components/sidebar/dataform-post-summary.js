@@ -43,6 +43,8 @@ const ENTITIES = {
 			kind: 'root',
 			name: 'site',
 			fields: [ 'posts_per_page', 'default_comment_status' ],
+			isVisible: ( item ) =>
+				[ 'home', 'index' ].includes( item.slug ?? '' ),
 		},
 		posttype_page: {
 			kind: 'postType',
@@ -51,6 +53,8 @@ const ENTITIES = {
 				select( coreDataStore ).getEditedEntityRecord( 'root', 'site' )
 					?.page_for_posts,
 			fields: [ 'posts_page_title' ],
+			isVisible: ( item ) =>
+				[ 'home', 'index' ].includes( item.slug ?? '' ),
 		},
 	},
 };
@@ -61,9 +65,11 @@ const ENTITIES = {
 // `getValue`/`setValue`/`render` here, and the rest indirectly because they all
 // funnel through the (remapped) `getValue` (default `render`, `getValueFormatted`
 // and `isValid` range/`custom` validation). Edits are wrapped back under the
-// namespace key, and `isVisible` only shows the field where its record is
-// present (the `home`/`index` template summary).
-function bindFieldToNamespace( field, namespace ) {
+// namespace key. The caller-supplied `isVisible` encodes entity-specific
+// conditions (e.g. only for `home`/`index` templates); the generic guard
+// `!! item[ namespace ]` ensures the field is hidden when the sub-record
+// hasn't been fetched.
+function bindFieldToNamespace( field, namespace, isVisible = () => true ) {
 	const subItem = ( item ) => item?.[ namespace ] ?? {};
 	return {
 		...field,
@@ -78,9 +84,7 @@ function bindFieldToNamespace( field, namespace ) {
 			? ( props ) =>
 					field.render( { ...props, item: subItem( props.item ) } )
 			: undefined,
-		isVisible: ( item ) =>
-			[ 'home', 'index' ].includes( item.slug ?? '' ) &&
-			!! item[ namespace ],
+		isVisible: ( item ) => isVisible( item ) && !! item[ namespace ],
 	};
 }
 
@@ -196,7 +200,11 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 				?.map( ( field ) => {
 					const namespace = fieldNamespaces[ field.id ];
 					if ( namespace ) {
-						return bindFieldToNamespace( field, namespace );
+						return bindFieldToNamespace(
+							field,
+							namespace,
+							ENTITIES[ postType ]?.[ namespace ]?.isVisible
+						);
 					}
 					if ( field.id === 'status' ) {
 						return {
@@ -232,7 +240,13 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 				// Editor-only field, injected here rather than registered
 				// so it never leaks into the site editor list / quick-edit fields.
 				.concat( revisionsField ),
-		[ _fields, templatePanelMode, availableTemplates, fieldNamespaces ]
+		[
+			_fields,
+			templatePanelMode,
+			availableTemplates,
+			fieldNamespaces,
+			postType,
+		]
 	);
 
 	const onChange = ( edits ) => {
