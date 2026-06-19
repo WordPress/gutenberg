@@ -30,7 +30,7 @@ export const FillColor: StoryFn< typeof Icon > = ( args ) => {
 	return (
 		<div
 			style={ {
-				fill: 'blue',
+				color: 'blue',
 			} }
 		>
 			<Icon { ...args } />
