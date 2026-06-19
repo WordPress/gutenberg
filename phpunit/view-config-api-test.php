@@ -220,5 +220,4 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 		$this->assertSame( self::DEFAULT_VIEW_LIST, $config['view_list'] );
 		$this->assertSame( self::DEFAULT_FORM, $config['form'] );
 	}
-
 }
