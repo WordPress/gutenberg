@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/env",
-	"version": "11.8.1",
+	"version": "11.8.2-next.v.202606191442.0+17fe7db8a",
 	"description": "A zero-config, self contained local WordPress environment for development and testing.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

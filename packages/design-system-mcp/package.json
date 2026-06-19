@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/design-system-mcp",
-	"version": "0.5.2-prerelease",
+	"version": "0.5.3-next.v.202606191442.0+17fe7db8a",
 	"description": "MCP server for the WordPress Design System.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
