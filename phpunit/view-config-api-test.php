@@ -23,13 +23,13 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 	const DEFAULT_VIEW = array(
 		'type'       => 'table',
 		'filters'    => array(),
-		'perPage'    => 20,
 		'sort'       => array(
 			'field'     => 'title',
 			'direction' => 'asc',
 		),
-		'titleField' => 'title',
+		'perPage'    => 20,
 		'fields'     => array( 'author', 'status' ),
+		'titleField' => 'title',
 	);
 
 	/**

@@ -31,13 +31,13 @@ function gutenberg_get_entity_view_config( $kind, $name ) {
 	$default_view    = array(
 		'type'       => 'table',
 		'filters'    => array(),
-		'perPage'    => 20,
 		'sort'       => array(
 			'field'     => 'title',
 			'direction' => 'asc',
 		),
-		'titleField' => 'title',
+		'perPage'    => 20,
 		'fields'     => array( 'author', 'status' ),
+		'titleField' => 'title',
 	);
 	$default_layouts = array(
 		'table' => array(),

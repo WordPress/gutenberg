@@ -129,9 +129,10 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 					'readonly'    => true,
 					'properties'  => array_merge(
 						array(
-							'type' => array(
+							'type'   => array(
 								'type' => 'string',
 							),
+							'layout' => $this->get_combined_layout_schema(),
 						),
 						$view_base_properties
 					),
@@ -427,7 +428,8 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 			'type'       => 'object',
 			'properties' => array_merge(
 				$this->get_table_layout_schema()['properties'],
-				$this->get_grid_layout_schema()['properties']
+				$this->get_grid_layout_schema()['properties'],
+				$this->get_list_layout_schema()['properties']
 			),
 		);
 	}
