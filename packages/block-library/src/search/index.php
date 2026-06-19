@@ -192,7 +192,7 @@ function render_block_core_search( $attributes ) {
 	}
 
 	return sprintf(
-		'<form role="search" method="get" action="%1s" %2s %3s>%4s</form>',
+		'<form role="search" method="get" action="%1$s" %2$s %3$s>%4$s</form>',
 		esc_url( home_url( '/' ) ),
 		$wrapper_attributes,
 		$form_directives,
