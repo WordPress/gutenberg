@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -14,13 +15,21 @@ import { useBorderPanelLabel } from '../../hooks/border';
 import { useBlockSettings } from '../../hooks/utils';
 import { store as blockEditorStore } from '../../store';
 import { ElementsEdit } from '../../hooks/elements';
+import { TypographyPanel } from '../../hooks/typography';
+import { BackgroundImagePanel } from '../../hooks/background';
 import { ColorToolsPanel } from '../global-styles/color-panel';
+import { TypographyToolsPanel } from '../global-styles/typography-panel';
+import { BackgroundToolsPanel } from '../global-styles/background-panel';
 
-function SectionBlockColorControls( {
-	blockName,
-	clientId,
-	contentClientIds,
-} ) {
+// Section blocks present a curated subset of the normal block style panels.
+// Their block-support fills are gated off by editing mode (see
+// `BlockStyleControls` in hooks/style.js), so each panel is direct-rendered
+// here rather than via the inspector slots, with settings restricted to the
+// supports a section should expose:
+// - Typography: text color only (font controls disabled).
+// - Background: color + gradient only (image controls disabled).
+// - Elements: link/heading/button/caption colors (unchanged).
+function SectionStyleControls( { blockName, clientId, contentClientIds } ) {
 	const settings = useBlockSettings( blockName );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
@@ -42,19 +51,51 @@ function SectionBlockColorControls( {
 		updateBlockAttributes( clientId, newAttributes );
 	};
 
+	const typographySettings = useMemo(
+		() => ( { ...settings, typography: {} } ),
+		[ settings ]
+	);
+	const backgroundSettings = useMemo(
+		() => ( {
+			...settings,
+			background: {
+				...settings.background,
+				backgroundImage: false,
+				backgroundSize: false,
+			},
+		} ),
+		[ settings ]
+	);
+
 	return (
-		<ElementsEdit
-			clientId={ clientId }
-			name={ blockName }
-			settings={ settings }
-			setAttributes={ setAttributes }
-			asWrapper={ ColorToolsPanel }
-			label={ __( 'Elements' ) }
-			defaultControls={ {
-				button: hasButtons,
-				heading: hasHeading,
-			} }
-		/>
+		<>
+			<TypographyPanel
+				clientId={ clientId }
+				name={ blockName }
+				settings={ typographySettings }
+				setAttributes={ setAttributes }
+				asWrapper={ TypographyToolsPanel }
+			/>
+			<BackgroundImagePanel
+				clientId={ clientId }
+				name={ blockName }
+				settings={ backgroundSettings }
+				setAttributes={ setAttributes }
+				asWrapper={ BackgroundToolsPanel }
+			/>
+			<ElementsEdit
+				clientId={ clientId }
+				name={ blockName }
+				settings={ settings }
+				setAttributes={ setAttributes }
+				asWrapper={ ColorToolsPanel }
+				label={ __( 'Elements' ) }
+				defaultControls={ {
+					button: hasButtons,
+					heading: hasHeading,
+				} }
+			/>
+		</>
 	);
 }
 
@@ -70,27 +111,18 @@ const StylesTab = ( {
 	return (
 		<>
 			{ hasBlockStyles && <BlockStyles clientId={ clientId } /> }
-			{ isSectionBlock && (
-				<>
-					<SectionBlockColorControls
-						blockName={ blockName }
-						clientId={ clientId }
-						contentClientIds={ contentClientIds }
-					/>
-					<InspectorControls.Slot
-						group="background"
-						label={ __( 'Background' ) }
-						className="background-block-support-panel__inner-wrapper"
-					/>
-					<InspectorControls.Slot
-						group="typography"
-						label={ __( 'Typography' ) }
-					/>
-				</>
+			{ isSectionBlock && blockName !== 'core/template-part' && (
+				<SectionStyleControls
+					blockName={ blockName }
+					clientId={ clientId }
+					contentClientIds={ contentClientIds }
+				/>
 			) }
 			{
 				// Extenders have in the past always been allowed to add controls to group
-				// the restrictions are lessened for that block.
+				// the restrictions are lessened for that block. Template parts are
+				// excluded from the curated section controls above and fall through
+				// to the full panel set here.
 			 }
 			{ ( ! isSectionBlock || blockName === 'core/template-part' ) && (
 				<>

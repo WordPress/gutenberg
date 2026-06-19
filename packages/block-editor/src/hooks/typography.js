@@ -138,7 +138,16 @@ function TypographyInspectorControl( { children, resetAllFilter } ) {
 	);
 }
 
-export function TypographyPanel( { clientId, name, setAttributes, settings } ) {
+export function TypographyPanel( {
+	clientId,
+	name,
+	setAttributes,
+	settings,
+	// Allows rendering outside the `typography` inspector group (e.g. section
+	// blocks direct-render this panel because their support fills are gated
+	// off by editing mode). Defaults to the slot-based wrapper.
+	asWrapper,
+} ) {
 	const selectedState = useBlockStyleState();
 	const isEnabled = useHasTypographyPanel( settings );
 
@@ -241,9 +250,11 @@ export function TypographyPanel( { clientId, name, setAttributes, settings } ) {
 		textColor: colorDefaultControls?.text,
 	};
 
+	const Wrapper = asWrapper || TypographyInspectorControl;
+
 	return (
 		<StylesTypographyPanel
-			as={ TypographyInspectorControl }
+			as={ Wrapper }
 			panelId={ clientId }
 			settings={ settings }
 			value={ value }

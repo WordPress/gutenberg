@@ -125,7 +125,7 @@ export function hasLegacyColorGradientValue( style ) {
 	return !! style?.color?.gradient;
 }
 
-function BackgroundToolsPanel( {
+export function BackgroundToolsPanel( {
 	resetAllFilter,
 	onChange,
 	value,

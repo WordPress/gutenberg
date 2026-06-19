@@ -151,7 +151,7 @@ function getMergedFontSizes( settings ) {
 	];
 }
 
-function TypographyToolsPanel( {
+export function TypographyToolsPanel( {
 	resetAllFilter,
 	onChange,
 	value,

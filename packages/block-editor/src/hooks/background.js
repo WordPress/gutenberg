@@ -175,6 +175,10 @@ export function BackgroundImagePanel( {
 	name,
 	setAttributes,
 	settings,
+	// Allows rendering outside the `background` inspector group (e.g. section
+	// blocks direct-render this panel because their support fills are gated
+	// off by editing mode). Defaults to the slot-based wrapper.
+	asWrapper,
 } ) {
 	const selectedState = useBlockStyleState();
 	const { style, className, backgroundColor, gradient, inheritedValue } =
@@ -204,7 +208,7 @@ export function BackgroundImagePanel( {
 	// Must be declared before the early return to follow Rules of Hooks.
 	// Passes backgroundGradientSupported so that "Reset All" also clears
 	// the legacy color.gradient value when background.gradient is supported.
-	const as = useCallback(
+	const defaultWrapper = useCallback(
 		( { children } ) => (
 			<BackgroundInspectorControl
 				backgroundGradientSupported={ backgroundGradientSupported }
@@ -396,10 +400,12 @@ export function BackgroundImagePanel( {
 			colorDefaultControls?.background,
 	};
 
+	const Wrapper = asWrapper || defaultWrapper;
+
 	return (
 		<StylesBackgroundPanel
 			inheritedValue={ inheritedValue }
-			as={ as }
+			as={ Wrapper }
 			panelId={ clientId }
 			defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
 			settings={ updatedSettings }
