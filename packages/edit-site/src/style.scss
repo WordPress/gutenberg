@@ -57,11 +57,13 @@ body.js.site-editor-php {
 body.js.site-editor-php {
 	background: var(--wpds-color-background-surface-neutral-weak);
 
-	&:has(.editor-editor-interface.is-distraction-free) {
-		--wp-admin--admin-bar--height: 0;
+	@include break-medium {
+		&:has(.editor-editor-interface.is-distraction-free) {
+			--wp-admin--admin-bar--height: 0;
 
-		#wpadminbar {
-			display: none;
+			#wpadminbar {
+				display: none;
+			}
 		}
 	}
 }
