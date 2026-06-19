@@ -895,17 +895,7 @@
 			"count": 4
 		}
 	},
-	"packages/edit-site/src/components/save-hub/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/edit-site/src/components/sidebar-global-styles/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/edit-site/src/components/sidebar-navigation-item/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		}
@@ -1615,11 +1605,6 @@
 		},
 		"@wordpress/use-recommended-components": {
 			"count": 3
-		}
-	},
-	"routes/dashboard/widget-dashboard/components/dashboard-widget-chrome/dashboard-widget-chrome.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
 		}
 	},
 	"routes/experiments-home/stage.tsx": {

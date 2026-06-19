@@ -31,13 +31,13 @@ function gutenberg_get_entity_view_config( $kind, $name ) {
 	$default_view    = array(
 		'type'       => 'table',
 		'filters'    => array(),
-		'perPage'    => 20,
 		'sort'       => array(
 			'field'     => 'title',
 			'direction' => 'asc',
 		),
-		'titleField' => 'title',
+		'perPage'    => 20,
 		'fields'     => array( 'author', 'status' ),
+		'titleField' => 'title',
 	);
 	$default_layouts = array(
 		'table' => array(),
@@ -294,15 +294,12 @@ function _gutenberg_get_entity_view_config_post_type_page( $config ) {
 			),
 			'parent',
 			'format',
+			'revisions',
 		),
 	);
 
 	return $config;
 }
-if ( has_filter( 'get_entity_view_config_postType_page', '_wp_get_entity_view_config_post_type_page' ) ) {
-	remove_filter( 'get_entity_view_config_postType_page', '_wp_get_entity_view_config_post_type_page' );
-}
-add_filter( 'get_entity_view_config_postType_page', '_gutenberg_get_entity_view_config_post_type_page', 10, 1 );
 
 /**
  * Provides the view configuration for the `post` post type.
@@ -373,15 +370,12 @@ function _gutenberg_get_entity_view_config_post_type_post( $config ) {
 			),
 			'parent',
 			'format',
+			'revisions',
 		),
 	);
 
 	return $config;
 }
-if ( has_filter( 'get_entity_view_config_postType_post', '_wp_get_entity_view_config_post_type_post' ) ) {
-	remove_filter( 'get_entity_view_config_postType_post', '_wp_get_entity_view_config_post_type_post' );
-}
-add_filter( 'get_entity_view_config_postType_post', '_gutenberg_get_entity_view_config_post_type_post', 10, 1 );
 
 /**
  * Provides the view configuration for the `wp_block` post type.
@@ -470,10 +464,6 @@ function _gutenberg_get_entity_view_config_post_type_wp_block( $config ) {
 
 	return $config;
 }
-if ( has_filter( 'get_entity_view_config_postType_wp_block', '_wp_get_entity_view_config_post_type_wp_block' ) ) {
-	remove_filter( 'get_entity_view_config_postType_wp_block', '_wp_get_entity_view_config_post_type_wp_block' );
-}
-add_filter( 'get_entity_view_config_postType_wp_block', '_gutenberg_get_entity_view_config_post_type_wp_block', 10, 1 );
 
 /**
  * Provides the view configuration for the `wp_template_part` post type.
@@ -554,10 +544,6 @@ function _gutenberg_get_entity_view_config_post_type_wp_template_part( $config )
 
 	return $config;
 }
-if ( has_filter( 'get_entity_view_config_postType_wp_template_part', '_wp_get_entity_view_config_post_type_wp_template_part' ) ) {
-	remove_filter( 'get_entity_view_config_postType_wp_template_part', '_wp_get_entity_view_config_post_type_wp_template_part' );
-}
-add_filter( 'get_entity_view_config_postType_wp_template_part', '_gutenberg_get_entity_view_config_post_type_wp_template_part', 10, 1 );
 
 /**
  * Provides the view configuration for the `wp_template` post type.
@@ -729,9 +715,69 @@ function _gutenberg_get_entity_view_config_post_type_wp_template( $config ) {
 
 	$config['view_list'] = array_merge( $view_list, $registered_authors, $user_authors );
 
+	$config['form'] = array(
+		'layout' => array( 'type' => 'panel' ),
+		'fields' => array(
+			array(
+				'id'     => 'description',
+				'layout' => array(
+					'type'          => 'panel',
+					'labelPosition' => 'top',
+				),
+			),
+			array(
+				'id'     => 'description_readonly',
+				'layout' => array(
+					'type'          => 'regular',
+					'labelPosition' => 'none',
+				),
+			),
+			array(
+				'id'     => 'last_edited_date',
+				'layout' => array(
+					'type'          => 'panel',
+					'labelPosition' => 'none',
+				),
+			),
+			'revisions',
+			// The following fields are only meaningful in the `home`/`index`
+			// template summary. They edit other entities (`root/site` and the
+			// posts page); the editor merges those records into the form data
+			// under a namespace and controls when the fields are shown.
+			'posts_page_title',
+			'posts_per_page',
+			'default_comment_status',
+		),
+	);
+
 	return $config;
 }
-if ( has_filter( 'get_entity_view_config_postType_wp_template', '_wp_get_entity_view_config_post_type_wp_template' ) ) {
-	remove_filter( 'get_entity_view_config_postType_wp_template', '_wp_get_entity_view_config_post_type_wp_template' );
+
+/**
+ * Registers the Gutenberg entity view configuration filters, overriding any
+ * defaults that WordPress core may have already registered.
+ *
+ * Core registers its own `_wp_get_entity_view_config_post_type_*` callbacks on
+ * the shared `get_entity_view_config_{$kind}_{$name}` hooks. The Gutenberg
+ * plugin always ships the newest configuration, so it removes the core defaults
+ * and installs its own `_gutenberg_*` callbacks instead.
+ *
+ * This runs on `init` rather than at file include time so that the core
+ * defaults are guaranteed to be registered first, regardless of whether core
+ * registers them at include time or lazily on a hook.
+ */
+function gutenberg_register_entity_view_config_filters() {
+	$post_types = array( 'page', 'post', 'wp_block', 'wp_template_part', 'wp_template' );
+
+	foreach ( $post_types as $post_type ) {
+		$hook        = "get_entity_view_config_postType_{$post_type}";
+		$wp_callback = "_wp_get_entity_view_config_post_type_{$post_type}";
+		$gb_callback = "_gutenberg_get_entity_view_config_post_type_{$post_type}";
+
+		if ( has_filter( $hook, $wp_callback ) ) {
+			remove_filter( $hook, $wp_callback );
+		}
+		add_filter( $hook, $gb_callback, 10, 1 );
+	}
 }
-add_filter( 'get_entity_view_config_postType_wp_template', '_gutenberg_get_entity_view_config_post_type_wp_template', 10, 1 );
+add_action( 'init', 'gutenberg_register_entity_view_config_filters' );

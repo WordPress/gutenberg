@@ -8,7 +8,7 @@
 -   `<WidgetRender>`: host entry point that resolves a widget's render
     module and mounts it with the `attributes` / `setAttributes` render
     contract.
--   `useWidgetTypes()`: discovery hook returning the widget types
-    registered on the current site.
+-   `useWidgetTypes( records )`: data-source-agnostic discovery hook that
+    resolves widget types from host-supplied `WidgetModuleRecord[]`.
 -   Contract types: `WidgetType`, `WidgetName`, `WidgetIcon`,
-    `WidgetRenderProps`, `ResolveWidgetModule`.
+    `WidgetRenderProps`, `ResolveWidgetModule`, `WidgetModuleRecord`.
