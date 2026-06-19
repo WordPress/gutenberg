@@ -79,7 +79,9 @@ function NotesSidebar( { postId } ) {
 			isDistractionFree: get( 'core', 'distractionFree' ),
 		};
 	}, [] );
-	const selectedNote = useSelect(
+	// `getSelectedNote` returns the selected note *id* (a number), `'new'`, or
+	// undefined - not a note object.
+	const selectedNoteId = useSelect(
 		( select ) => unlock( select( editorStore ) ).getSelectedNote(),
 		[]
 	);
@@ -95,7 +97,7 @@ function NotesSidebar( { postId } ) {
 	const showAllNotesSidebar = notes.length > 0 || ! showFloatingSidebar;
 	useEnableFloatingSidebar(
 		showFloatingSidebar &&
-			( unresolvedNotes.length > 0 || selectedNote !== undefined )
+			( unresolvedNotes.length > 0 || selectedNoteId !== undefined )
 	);
 
 	async function focusNote( {
@@ -181,7 +183,7 @@ function NotesSidebar( { postId } ) {
 		<>
 			<NoteHighlightStyles
 				threads={ unresolvedNotes }
-				selectedId={ selectedNote?.id }
+				selectedId={ selectedNoteId }
 			/>
 			{ !! currentThread && (
 				<NoteAvatarIndicator

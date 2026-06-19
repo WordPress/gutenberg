@@ -1147,23 +1147,40 @@ test.describe( 'Block Notes', () => {
 			const mark = editor.canvas.locator( 'mark.wp-note' ).first();
 			await expect( mark ).toBeVisible();
 
+			// Creating a note auto-selects it, which renders the marker at the
+			// active opacity. Move focus to the title to deselect so the marker
+			// settles back to its rest tint.
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.click();
+
 			// Browsers report the per-author tint as an rgba() value with
-			// alpha ≈ 0x40/255. Allow a small alpha tolerance (browsers
-			// round differently) but require an exact RGB match — the prior
-			// admin-theme fallback can never satisfy this assertion.
-			const bg = await mark.evaluate(
-				( el ) => window.getComputedStyle( el ).backgroundColor
-			);
-			const match = bg.match(
-				/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/
-			);
-			expect( match ).not.toBeNull();
-			expect( Number( match[ 1 ] ) ).toBe( r );
-			expect( Number( match[ 2 ] ) ).toBe( g );
-			expect( Number( match[ 3 ] ) ).toBe( b );
-			const alpha = match[ 4 ] ? Number( match[ 4 ] ) : 1;
-			expect( alpha ).toBeGreaterThan( 0.2 );
-			expect( alpha ).toBeLessThan( 0.35 );
+			// alpha ≈ 0x40/255. Require an exact RGB match (the prior
+			// admin-theme fallback can never satisfy it) with a small alpha
+			// tolerance, and poll since the tint transitions over ~0.1s.
+			await expect
+				.poll( async () => {
+					const bg = await mark.evaluate(
+						( el ) => window.getComputedStyle( el ).backgroundColor
+					);
+					const m = bg.match(
+						/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/
+					);
+					if ( ! m ) {
+						return bg;
+					}
+					const alpha = m[ 4 ] ? Number( m[ 4 ] ) : 1;
+					const isRest =
+						Number( m[ 1 ] ) === r &&
+						Number( m[ 2 ] ) === g &&
+						Number( m[ 3 ] ) === b &&
+						alpha > 0.2 &&
+						alpha < 0.35;
+					return isRest
+						? 'rest'
+						: `${ m[ 1 ] },${ m[ 2 ] },${ m[ 3 ] } a=${ alpha }`;
+				} )
+				.toBe( 'rest' );
 		} );
 
 		test( 'keeps the inline marker highlighted after a code-editor round-trip', async ( {
@@ -1210,6 +1227,169 @@ test.describe( 'Block Notes', () => {
 			await expect(
 				editor.canvas.locator( 'mark.wp-note' ).first()
 			).toBeVisible();
+		} );
+
+		test( 'deletes the note when its inline marker is removed', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Delete my marker.' },
+			} );
+
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await paragraph.click();
+			await page.keyboard.press( 'ControlOrMeta+a' );
+
+			await page
+				.getByRole( 'button', { name: 'More', exact: true } )
+				.click();
+			await page.getByRole( 'menuitem', { name: 'Add note' } ).click();
+			await page
+				.getByRole( 'textbox', { name: 'New note', exact: true } )
+				.fill( 'Anchored to text' );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
+
+			// The marker is written into the content once the note is saved;
+			// `useReconcileRemovedInlineNotes` observes it present here, which
+			// arms the later delete (the hook guards against false deletes by
+			// only acting on markers it has seen anchored earlier in the
+			// session).
+			await expect(
+				editor.canvas.locator( 'mark.wp-note' ).first()
+			).toBeVisible();
+
+			const thread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', { name: 'Note: Anchored to text' } );
+			await expect( thread ).toBeVisible();
+
+			// Remove the marked text. With the marker gone, the note is deleted
+			// rather than silently downgraded to a block-level note.
+			await paragraph.click();
+			await page.keyboard.press( 'ControlOrMeta+a' );
+			await page.keyboard.press( 'Delete' );
+
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
+				0
+			);
+
+			await expect( thread ).toBeHidden();
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Note deleted.' } )
+			).toBeVisible();
+		} );
+
+		test( 'anchors the marker to only the selected text', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Hello brave new world.' },
+			} );
+
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+
+			// Select just the word "brave" (offsets 6-11) so the inline note
+			// wraps a sub-range rather than the whole block. Collapse a
+			// select-all to the start with ArrowLeft (cross-platform; `Home`
+			// does not move the caret on macOS), then walk into the word.
+			await paragraph.click();
+			await page.keyboard.press( 'ControlOrMeta+a' );
+			await page.keyboard.press( 'ArrowLeft' );
+			for ( let i = 0; i < 6; i++ ) {
+				await page.keyboard.press( 'ArrowRight' );
+			}
+			for ( let i = 0; i < 5; i++ ) {
+				await page.keyboard.press( 'Shift+ArrowRight' );
+			}
+
+			await page
+				.getByRole( 'button', { name: 'More', exact: true } )
+				.click();
+			await page.getByRole( 'menuitem', { name: 'Add note' } ).click();
+			await page
+				.getByRole( 'textbox', { name: 'New note', exact: true } )
+				.fill( 'Just this word' );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
+
+			// The marker wraps only "brave", and the rest of the sentence stays
+			// outside it.
+			const mark = editor.canvas.locator( 'mark.wp-note' );
+			await expect( mark ).toHaveCount( 1 );
+			await expect( mark ).toHaveText( 'brave' );
+			await expect( paragraph ).toHaveText( 'Hello brave new world.' );
+		} );
+
+		test( 'boosts the marker opacity when its note is selected', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Select my note.' },
+			} );
+
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await paragraph.click();
+			await page.keyboard.press( 'ControlOrMeta+a' );
+
+			await page
+				.getByRole( 'button', { name: 'More', exact: true } )
+				.click();
+			await page.getByRole( 'menuitem', { name: 'Add note' } ).click();
+			await page
+				.getByRole( 'textbox', { name: 'New note', exact: true } )
+				.fill( 'Pick me' );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
+
+			const mark = editor.canvas.locator( 'mark.wp-note' ).first();
+			await expect( mark ).toBeVisible();
+
+			const alphaOf = async () => {
+				const bg = await mark.evaluate(
+					( el ) => window.getComputedStyle( el ).backgroundColor
+				);
+				const match = bg.match(
+					/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/
+				);
+				return match && match[ 4 ] ? Number( match[ 4 ] ) : 1;
+			};
+
+			// Deselect the freshly added note (focus the title) so the marker
+			// drops to its rest tint (≈0x40/255).
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.click();
+			await expect.poll( alphaOf ).toBeLessThan( 0.35 );
+
+			// Selecting the note from the sidebar promotes its marker to the
+			// stronger active alpha (≈0x80/255) via the selected-note rule.
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', { name: 'Note: Pick me' } )
+				.click();
+
+			await expect.poll( alphaOf ).toBeGreaterThan( 0.4 );
 		} );
 	} );
 } );

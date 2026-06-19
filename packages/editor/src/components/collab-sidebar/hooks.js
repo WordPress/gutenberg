@@ -540,29 +540,63 @@ export function useFloatingBoard( {
  * @param {Array} threads Inline note threads (unresolved roots) to reconcile.
  */
 export function useReconcileRemovedInlineNotes( threads ) {
-	const { getBlockAttributes } = useSelect( blockEditorStore );
 	const { onDelete } = useNoteActions();
 	const anchoredRef = useRef();
 
-	// Resolve each thread's marker presence once, memoized like
-	// `useAnnotateBlocks`. The scan (`findNoteInBlock`) parses block content, so
-	// it must only re-run when the threads or their attributes change - not on
-	// every render. Presence is a tristate: `null` when the block isn't loaded
-	// (presence unknown), otherwise a boolean.
+	// Resolve each thread's marker presence via `useSelect` so it re-runs when
+	// block content changes - removing the marked text is a block edit, not a
+	// `threads` change, so a plain `useMemo` over the (stable) selectors would
+	// never observe the marker disappear. Returning a compact string signature
+	// (rather than an array) keeps the subscription cheap: it only triggers a
+	// re-render when a marker's presence actually flips, not on every keystroke
+	// elsewhere in the document. Presence is a tristate encoded per thread as
+	// `id:1` (present), `id:0` (absent), or `id:?` (block not loaded, unknown).
+	const presenceKey = useSelect(
+		( select ) => {
+			if ( ! threads?.length ) {
+				return '';
+			}
+			const { getBlockAttributes } = select( blockEditorStore );
+			return threads
+				.map( ( thread ) => {
+					const attributes = thread.blockClientId
+						? getBlockAttributes( thread.blockClientId )
+						: null;
+					let state = '?';
+					if ( attributes ) {
+						state = findNoteInBlock( attributes, thread.id )
+							? '1'
+							: '0';
+					}
+					return `${ thread.id }:${ state }`;
+				} )
+				.join( ',' );
+		},
+		[ threads ]
+	);
+
+	// Pair each thread back up with its presence for the reconciling effect.
+	// `null` means unknown (block not loaded); otherwise a boolean.
 	const reconciliation = useMemo( () => {
 		if ( ! threads?.length ) {
 			return [];
 		}
+		const presence = new Map(
+			presenceKey
+				.split( ',' )
+				.filter( Boolean )
+				.map( ( entry ) => {
+					const [ id, state ] = entry.split( ':' );
+					return [ id, state ];
+				} )
+		);
 		return threads.map( ( thread ) => {
-			const attributes = thread.blockClientId
-				? getBlockAttributes( thread.blockClientId )
-				: null;
-			const present = attributes
-				? !! findNoteInBlock( attributes, thread.id )
-				: null;
+			const state = presence.get( String( thread.id ) );
+			const present =
+				state === undefined || state === '?' ? null : state === '1';
 			return { thread, present };
 		} );
-	}, [ threads, getBlockAttributes ] );
+	}, [ threads, presenceKey ] );
 
 	useEffect( () => {
 		if ( ! reconciliation.length ) {
