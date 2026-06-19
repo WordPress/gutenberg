@@ -9,20 +9,23 @@ import {
 	type CropBounds,
 	type ResizeDragState,
 } from '../stencil-math';
-import { MIN_CROP_PIXELS, MIN_CROP_SCREEN_PX } from '../constants';
+import {
+	DEFAULT_KEYBOARD_STEP,
+	MIN_CROP_PIXELS,
+	MIN_CROP_SCREEN_PX,
+} from '../constants';
 import type { Size } from '../types';
 
 describe( 'getMinCropPixels — operable on-screen floor', () => {
 	it( 'returns the source-pixel hard floor when the image is shown large enough', () => {
-		// displayScale = 2 CSS px per source px (zoomed in). The usability
-		// term is 44 / 2 = 22 px, below the 24-source-px hard floor, so the
-		// hard floor wins.
-		expect( getMinCropPixels( 2 ) ).toBe( MIN_CROP_PIXELS );
+		const displayScale = ( MIN_CROP_SCREEN_PX / MIN_CROP_PIXELS ) * 1.1;
+
+		expect( getMinCropPixels( displayScale ) ).toBe( MIN_CROP_PIXELS );
 	} );
 
 	it( 'raises the floor so the crop stays operable when the image is shown small', () => {
 		// A large image fit into a small window: ~0.2 CSS px per source px.
-		// 24 source px would render as ~4.8 px on screen — unusable. The
+		// The source-pixel floor would render too small on screen. The
 		// usability term (44 / 0.2 = 220 source px) must win.
 		expect( getMinCropPixels( 0.2 ) ).toBeCloseTo(
 			MIN_CROP_SCREEN_PX / 0.2,
@@ -149,6 +152,117 @@ describe( 'computeLockedResizeRect — driver-axis selection', () => {
 		expect( pixelW / pixelH ).toBeCloseTo( 1, 5 );
 		expect( pixelW ).toBeCloseTo( 200, 5 );
 		expect( pixelH ).toBeCloseTo( 200, 5 );
+	} );
+
+	it( 'keeps pointer resize continuous near the pixel-motion threshold', () => {
+		const originalImageSize: Size = { width: 600, height: 400 };
+		const fullImageCrop = { x: 0, y: 0, width: 1, height: 1 };
+		const drag: ResizeDragState = {
+			handle: 'nw',
+			startX: 0,
+			startY: 0,
+			startRect: fullImageCrop,
+		};
+
+		const beforeThreshold = computeLockedResizeRect(
+			drag,
+			60,
+			-39.6,
+			originalImageSize,
+			FULL_BOUNDS,
+			1
+		);
+		const afterThreshold = computeLockedResizeRect(
+			drag,
+			60,
+			-40.4,
+			originalImageSize,
+			FULL_BOUNDS,
+			1
+		);
+
+		expect(
+			Math.abs( beforeThreshold.width - afterThreshold.width )
+		).toBeLessThan( 0.01 );
+		expect(
+			Math.abs( beforeThreshold.height - afterThreshold.height )
+		).toBeLessThan( 0.01 );
+	} );
+
+	it( 'shrinks a locked-ratio crop from horizontal keyboard movement', () => {
+		const squareImageSize: Size = { width: 500, height: 500 };
+		const lockedStartRect = { x: 0.1, y: 0.1, width: 0.8, height: 0.8 };
+		const drag: ResizeDragState = {
+			handle: 'nw',
+			startX: 0,
+			startY: 0,
+			startRect: lockedStartRect,
+		};
+		const rect = computeLockedResizeRect(
+			drag,
+			DEFAULT_KEYBOARD_STEP * squareImageSize.width,
+			0,
+			squareImageSize,
+			FULL_BOUNDS,
+			1,
+			undefined,
+			'width'
+		);
+
+		expect( rect.x ).toBeCloseTo(
+			lockedStartRect.x + DEFAULT_KEYBOARD_STEP,
+			5
+		);
+		expect( rect.y ).toBeCloseTo(
+			lockedStartRect.y + DEFAULT_KEYBOARD_STEP,
+			5
+		);
+		expect( rect.width ).toBeCloseTo(
+			lockedStartRect.width - DEFAULT_KEYBOARD_STEP,
+			5
+		);
+		expect( rect.height ).toBeCloseTo(
+			lockedStartRect.height - DEFAULT_KEYBOARD_STEP,
+			5
+		);
+	} );
+
+	it( 'shrinks a locked-ratio crop from vertical keyboard movement', () => {
+		const squareImageSize: Size = { width: 500, height: 500 };
+		const lockedStartRect = { x: 0.1, y: 0.1, width: 0.8, height: 0.8 };
+		const drag: ResizeDragState = {
+			handle: 'nw',
+			startX: 0,
+			startY: 0,
+			startRect: lockedStartRect,
+		};
+		const rect = computeLockedResizeRect(
+			drag,
+			0,
+			DEFAULT_KEYBOARD_STEP * squareImageSize.height,
+			squareImageSize,
+			FULL_BOUNDS,
+			1,
+			undefined,
+			'height'
+		);
+
+		expect( rect.x ).toBeCloseTo(
+			lockedStartRect.x + DEFAULT_KEYBOARD_STEP,
+			5
+		);
+		expect( rect.y ).toBeCloseTo(
+			lockedStartRect.y + DEFAULT_KEYBOARD_STEP,
+			5
+		);
+		expect( rect.width ).toBeCloseTo(
+			lockedStartRect.width - DEFAULT_KEYBOARD_STEP,
+			5
+		);
+		expect( rect.height ).toBeCloseTo(
+			lockedStartRect.height - DEFAULT_KEYBOARD_STEP,
+			5
+		);
 	} );
 } );
 

@@ -79,7 +79,11 @@ const StylesTab = ( {
 					contentClientIds={ contentClientIds }
 				/>
 			) }
-			{ ! isSectionBlock && (
+			{
+				// Extenders have in the past always been allowed to add controls to group
+				// the restrictions are lessened for that block.
+			 }
+			{ ( ! isSectionBlock || blockName === 'core/template-part' ) && (
 				<>
 					<InspectorControls.Slot
 						group="color"

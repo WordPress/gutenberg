@@ -2532,6 +2532,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/grid",
+		"slug": "packages-grid",
+		"markdown_source": "../packages/grid/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/hooks",
 		"slug": "packages-hooks",
 		"markdown_source": "../packages/hooks/README.md",
@@ -2892,6 +2898,18 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/widget-dashboard",
+		"slug": "packages-widget-dashboard",
+		"markdown_source": "../packages/widget-dashboard/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/widget-primitives",
+		"slug": "packages-widget-primitives",
+		"markdown_source": "../packages/widget-primitives/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/widgets",
 		"slug": "packages-widgets",
 		"markdown_source": "../packages/widgets/README.md",
@@ -3081,6 +3099,12 @@
 		"title": "Styles in the Editor",
 		"slug": "styles",
 		"markdown_source": "../docs/explanations/architecture/styles.md",
+		"parent": "architecture"
+	},
+	{
+		"title": "The Dashboard Widget System",
+		"slug": "dashboard-widgets",
+		"markdown_source": "../docs/explanations/architecture/dashboard-widgets.md",
 		"parent": "architecture"
 	},
 	{
