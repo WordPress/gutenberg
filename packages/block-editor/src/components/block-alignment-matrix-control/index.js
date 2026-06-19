@@ -54,7 +54,7 @@ function BlockAlignmentMatrixControl( props ) {
 
 	return (
 		<Dropdown
-			popoverProps={ { placement: 'bottom-start' } }
+			popoverProps={ { placement: 'bottom-start', focusOnMount: false } }
 			renderToggle={ ( { onToggle, isOpen } ) => {
 				const openOnArrowDown = ( event ) => {
 					if ( ! isOpen && event.keyCode === DOWN ) {
@@ -77,7 +77,12 @@ function BlockAlignmentMatrixControl( props ) {
 				);
 			} }
 			renderContent={ () => (
-				<AlignmentMatrixControl onChange={ onChange } value={ value } />
+				<AlignmentMatrixControl
+					// eslint-disable-next-line jsx-a11y/no-autofocus -- To avoid race conditions with matrix initialization, let it focus itself rather than relying on dropdown focusOnMount.
+					autoFocus
+					onChange={ onChange }
+					value={ value }
+				/>
 			) }
 		/>
 	);
