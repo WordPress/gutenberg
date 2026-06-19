@@ -21,7 +21,7 @@ import {
 	resizeImage,
 	rotateImage,
 	hasTransparency,
-	setJxlWasmUrl,
+	setJxlWasm,
 	getUltraHdrInfo,
 } from './index';
 
@@ -35,7 +35,7 @@ const api = {
 	resizeImage,
 	rotateImage,
 	hasTransparency,
-	setJxlWasmUrl,
+	setJxlWasm,
 	getUltraHdrInfo,
 };
 

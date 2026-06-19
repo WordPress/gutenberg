@@ -3,10 +3,10 @@
  */
 import Vips from 'wasm-vips';
 
-// @ts-expect-error - WASM files are inlined as base64 data URLs at build time
+// @ts-expect-error - WASM files are inlined as Uint8Array at build time.
 import VipsModule from 'wasm-vips/vips.wasm';
 
-// @ts-expect-error - WASM files are inlined as base64 data URLs at build time
+// @ts-expect-error - WASM files are inlined as Uint8Array at build time.
 import VipsHeifModule from 'wasm-vips/vips-heif.wasm';
 
 /**
@@ -31,14 +31,15 @@ let cleanup: () => void;
 let vipsPromise: Promise< typeof Vips > | undefined;
 
 /**
- * URL to the lazily loaded vips-jxl.wasm module.
+ * Inlined bytes of the lazily loaded vips-jxl.wasm module.
  *
  * JXL support is loaded on demand the first time a JXL image is processed.
- * The URL is a base64 data URL produced by dynamically importing
- * `wasm-vips/vips-jxl.wasm` in the main thread and sent here via RPC.
- * Kept out of the worker bundle so the worker stays small when JXL is unused.
+ * The bytes are produced by dynamically importing `wasm-vips/vips-jxl.wasm`
+ * in the main thread (where the bundler can split it into its own chunk) and
+ * sent here via RPC. Kept out of the worker bundle so the worker stays small
+ * when JXL is unused.
  */
-let jxlWasmUrl: string | undefined;
+let jxlWasmBytes: Uint8Array< ArrayBuffer > | undefined;
 
 /**
  * Whether the current vips instance was initialized with JXL dynamic library.
@@ -50,16 +51,42 @@ let jxlWasmUrl: string | undefined;
 let vipsInitializedWithJxl = false;
 
 /**
- * Sets the URL to the vips-jxl.wasm module.
+ * Sets the inlined bytes of the vips-jxl.wasm module.
  *
- * Call this from the main thread before processing a JXL image. The URL
- * is expected to be a base64 data URL from the lazily loaded
- * `wasm-vips/vips-jxl.wasm` module.
+ * Call this from the main thread before processing a JXL image. The bytes
+ * are the inlined `Uint8Array` from the lazily loaded `wasm-vips/vips-jxl.wasm`
+ * module; they are wrapped in a Blob URL on demand (see `getWasmUrl`).
  *
- * @param url Data URL to the vips-jxl.wasm module.
+ * @param bytes Inlined bytes of the vips-jxl.wasm module.
  */
-export function setJxlWasmUrl( url: string ): void {
-	jxlWasmUrl = url;
+export function setJxlWasm( bytes: Uint8Array< ArrayBuffer > ): void {
+	jxlWasmBytes = bytes;
+}
+
+/**
+ * Caches Blob URLs created for inlined WASM binaries.
+ *
+ * The WASM binaries are inlined as `Uint8Array` values at build time. wasm-vips
+ * loads them (including the HEIF dynamic library) by fetching a URL, so the
+ * bytes are wrapped in a Blob URL the first time each is requested.
+ */
+const wasmUrls = new WeakMap< Uint8Array< ArrayBuffer >, string >();
+
+/**
+ * Returns a Blob URL for an inlined WASM binary, creating it on first use.
+ *
+ * @param bytes The inlined WASM binary.
+ * @return A Blob URL pointing at the binary.
+ */
+function getWasmUrl( bytes: Uint8Array< ArrayBuffer > ): string {
+	let url = wasmUrls.get( bytes );
+	if ( ! url ) {
+		url = URL.createObjectURL(
+			new Blob( [ bytes ], { type: 'application/wasm' } )
+		);
+		wasmUrls.set( bytes, url );
+	}
+	return url;
 }
 
 /**
@@ -71,7 +98,7 @@ export function setJxlWasmUrl( url: string ): void {
  */
 async function getVips(): Promise< typeof Vips > {
 	// If JXL is now available but vips was initialized without it, re-initialize.
-	if ( jxlWasmUrl && vipsPromise && ! vipsInitializedWithJxl ) {
+	if ( jxlWasmBytes && vipsPromise && ! vipsInitializedWithJxl ) {
 		vipsPromise = undefined;
 	}
 
@@ -80,7 +107,7 @@ async function getVips(): Promise< typeof Vips > {
 	}
 
 	const dynamicLibraries = [ 'vips-heif.wasm' ];
-	if ( jxlWasmUrl ) {
+	if ( jxlWasmBytes ) {
 		dynamicLibraries.push( 'vips-jxl.wasm' );
 		vipsInitializedWithJxl = true;
 	}
@@ -88,19 +115,21 @@ async function getVips(): Promise< typeof Vips > {
 	vipsPromise = Vips( {
 		// Load HEIF dynamic module for HEIF/HEIC and AVIF format support.
 		// JXL is loaded on demand when a JXL image is processed, via
-		// setJxlWasmUrl() which is called from the main thread after the
+		// setJxlWasm() which is called from the main thread after the
 		// `wasm-vips/vips-jxl.wasm` module is dynamically imported.
 		dynamicLibraries,
 		locateFile: ( fileName: string ) => {
-			// WASM files are inlined as base64 data URLs at build time,
-			// eliminating the need for separate file downloads and avoiding
-			// issues with hosts not serving WASM files with correct MIME types.
+			// WASM files are inlined as a Uint8Array at build time and exposed
+			// here as Blob URLs. This eliminates the need for separate file
+			// downloads and avoids issues with hosts not serving WASM files
+			// with correct MIME types, while keeping the inlined bytes
+			// compressible (see the build-time binary encoding).
 			if ( fileName.endsWith( 'vips.wasm' ) ) {
-				return VipsModule;
+				return getWasmUrl( VipsModule );
 			} else if ( fileName.endsWith( 'vips-heif.wasm' ) ) {
-				return VipsHeifModule;
-			} else if ( fileName.endsWith( 'vips-jxl.wasm' ) && jxlWasmUrl ) {
-				return jxlWasmUrl;
+				return getWasmUrl( VipsHeifModule );
+			} else if ( fileName.endsWith( 'vips-jxl.wasm' ) && jxlWasmBytes ) {
+				return getWasmUrl( jxlWasmBytes );
 			}
 			return fileName;
 		},
@@ -726,5 +755,5 @@ export {
 	hasTransparency as vipsHasTransparency,
 	getUltraHdrInfo as vipsGetUltraHdrInfo,
 	cancelOperations as vipsCancelOperations,
-	setJxlWasmUrl as vipsSetJxlWasmUrl,
+	setJxlWasm as vipsSetJxlWasm,
 };

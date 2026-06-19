@@ -19,36 +19,28 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationItem from '../sidebar-navigation-item';
-import { SidebarNavigationItemGlobalStyles } from '../sidebar-navigation-screen-global-styles';
-import { SidebarNavigationItemIdentity } from '../sidebar-navigation-screen-identity';
 
 export function MainSidebarNavigationContent( { isBlockBasedTheme = true } ) {
 	return (
 		<ItemGroup className="edit-site-sidebar-navigation-screen-main">
 			{ isBlockBasedTheme && (
 				<>
-					<SidebarNavigationItemGlobalStyles
-						to="/styles"
-						uid="global-styles-navigation-item"
-						icon={ styles }
-					>
-						{ __( 'Styles' ) }
-					</SidebarNavigationItemGlobalStyles>
 					<SidebarNavigationItem
-						uid="navigation-navigation-item"
-						to="/navigation"
-						withChevron
-						icon={ navigation }
-					>
-						{ __( 'Navigation' ) }
-					</SidebarNavigationItem>
-					<SidebarNavigationItemIdentity
 						to="/identity"
 						uid="identity-navigation-item"
 						icon={ siteLogo }
+						activeOnRouteName="identity"
 					>
 						{ _x( 'Identity', 'site identity' ) }
-					</SidebarNavigationItemIdentity>
+					</SidebarNavigationItem>
+					<SidebarNavigationItem
+						to="/styles"
+						uid="global-styles-navigation-item"
+						icon={ styles }
+						activeOnRouteName="styles"
+					>
+						{ __( 'Styles' ) }
+					</SidebarNavigationItem>
 					<SidebarNavigationItem
 						uid="page-navigation-item"
 						to="/page"
@@ -58,12 +50,12 @@ export function MainSidebarNavigationContent( { isBlockBasedTheme = true } ) {
 						{ __( 'Pages' ) }
 					</SidebarNavigationItem>
 					<SidebarNavigationItem
-						uid="template-navigation-item"
-						to="/template"
+						uid="navigation-navigation-item"
+						to="/navigation"
 						withChevron
-						icon={ layout }
+						icon={ navigation }
 					>
-						{ __( 'Templates' ) }
+						{ __( 'Navigation' ) }
 					</SidebarNavigationItem>
 				</>
 			) }
@@ -85,6 +77,16 @@ export function MainSidebarNavigationContent( { isBlockBasedTheme = true } ) {
 			>
 				{ __( 'Patterns' ) }
 			</SidebarNavigationItem>
+			{ isBlockBasedTheme && (
+				<SidebarNavigationItem
+					uid="template-navigation-item"
+					to="/template"
+					withChevron
+					icon={ layout }
+				>
+					{ __( 'Templates' ) }
+				</SidebarNavigationItem>
+			) }
 		</ItemGroup>
 	);
 }
