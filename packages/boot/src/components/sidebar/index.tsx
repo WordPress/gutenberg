@@ -1,11 +1,21 @@
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import {
+	Button,
+	DropdownMenu,
+	MenuGroup,
+	MenuItem,
+} from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { reset as resetIcon, settings, wordpress } from '@wordpress/icons';
+import {
+	check,
+	reset as resetIcon,
+	settings,
+	wordpress,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -15,7 +25,8 @@ import SaveButton from '../save-button';
 import { STORE_NAME, store as bootStore } from '../../store';
 import CustomizeNavigation from './customize-navigation';
 import { useSidebarNavigationLayout } from '../navigation/use-sidebar-navigation-layout';
-import type { MenuItem } from '../../store/types';
+import { useActiveWorkspace } from '../workspaces';
+import type { MenuItem as SidebarMenuItem } from '../../store/types';
 
 declare global {
 	interface Window {
@@ -28,6 +39,9 @@ function NormalSidebarFooter( { onCustomize }: { onCustomize: () => void } ) {
 		( select ) => select( bootStore ).getDashboardLink(),
 		[]
 	);
+	const { activeWorkspace, setActiveWorkspace, workspaces } =
+		useActiveWorkspace();
+
 	return (
 		<div className="boot-sidebar__footer-content">
 			<div className="boot-sidebar__footer-navigation">
@@ -41,13 +55,54 @@ function NormalSidebarFooter( { onCustomize }: { onCustomize: () => void } ) {
 				>
 					{ __( 'WP Admin' ) }
 				</Button>
-				<Button
-					__next40pxDefaultSize
+				<DropdownMenu
 					icon={ settings }
 					label={ __( 'Customize navigation' ) }
-					onClick={ onCustomize }
-					variant="tertiary"
-				/>
+					popoverProps={ { placement: 'top-end' } }
+					toggleProps={ {
+						__next40pxDefaultSize: true,
+						variant: 'tertiary',
+					} }
+				>
+					{ ( { onClose } ) => (
+						<>
+							<MenuGroup>
+								<MenuItem
+									onClick={ () => {
+										onCustomize();
+										onClose();
+									} }
+								>
+									{ __( 'Customize navigation' ) }
+								</MenuItem>
+							</MenuGroup>
+							<MenuGroup label={ __( 'Workspace' ) }>
+								{ workspaces.map( ( workspace ) => {
+									const isSelected =
+										workspace.id === activeWorkspace.id;
+
+									return (
+										<MenuItem
+											key={ workspace.id }
+											icon={ isSelected ? check : null }
+											iconPosition="left"
+											isSelected={ isSelected }
+											role="menuitemradio"
+											onClick={ () => {
+												setActiveWorkspace(
+													workspace.id
+												);
+												onClose();
+											} }
+										>
+											{ workspace.label }
+										</MenuItem>
+									);
+								} ) }
+							</MenuGroup>
+						</>
+					) }
+				</DropdownMenu>
 			</div>
 			<div className="boot-sidebar__save-button">
 				<SaveButton />
@@ -60,10 +115,11 @@ function CustomizeNavigationFooter( { onDone }: { onDone: () => void } ) {
 	const menuItems = useSelect(
 		( select ) =>
 			// @ts-ignore
-			select( STORE_NAME ).getMenuItems() as MenuItem[],
+			select( STORE_NAME ).getMenuItems() as SidebarMenuItem[],
 		[]
 	);
-	const layout = useSidebarNavigationLayout( menuItems );
+	const { activeWorkspace } = useActiveWorkspace();
+	const layout = useSidebarNavigationLayout( menuItems, activeWorkspace );
 
 	return (
 		<div className="boot-sidebar__footer-actions">

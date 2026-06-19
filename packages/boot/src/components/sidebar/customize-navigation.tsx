@@ -27,6 +27,7 @@ import {
 	useSidebarNavigationLayout,
 	type SidebarNavigationSection,
 } from '../navigation/use-sidebar-navigation-layout';
+import { useActiveWorkspace } from '../workspaces';
 
 type DragState =
 	| {
@@ -82,7 +83,8 @@ export default function CustomizeNavigation() {
 			select( STORE_NAME ).getMenuItems() as MenuItem[],
 		[]
 	);
-	const layout = useSidebarNavigationLayout( menuItems );
+	const { activeWorkspace } = useActiveWorkspace();
+	const layout = useSidebarNavigationLayout( menuItems, activeWorkspace );
 	const dragStateRef = useRef< DragState | undefined >();
 
 	const setCurrentDragState = ( nextDragState: DragState | undefined ) => {

@@ -14,6 +14,7 @@ import DropdownItem from './dropdown-item';
 import NavigationScreen from './navigation-screen';
 import { useSidebarParent } from './use-sidebar-parent';
 import { useSidebarNavigationLayout } from './use-sidebar-navigation-layout';
+import { useActiveWorkspace } from '../workspaces';
 import type { MenuItem } from '../../store/types';
 
 function Navigation( {
@@ -31,7 +32,8 @@ function Navigation( {
 			select( STORE_NAME ).getMenuItems() as MenuItem[],
 		[]
 	);
-	const layout = useSidebarNavigationLayout( menuItems );
+	const { activeWorkspace } = useActiveWorkspace();
+	const layout = useSidebarNavigationLayout( menuItems, activeWorkspace );
 	const [ parentId, setParentId, parentDropdownId, setParentDropdownId ] =
 		useSidebarParent( layout.getNavigationParentId );
 	const parent = useMemo(

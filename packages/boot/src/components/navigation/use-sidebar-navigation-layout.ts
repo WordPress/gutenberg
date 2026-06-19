@@ -11,6 +11,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
  * Internal dependencies
  */
 import type { MenuItem } from '../../store/types';
+import type { WorkspaceConfig } from '../workspaces';
 
 const PREFERENCE_SCOPE = 'wordpress/boot';
 const PREFERENCE_KEY = 'sidebarNavigation';
@@ -19,6 +20,7 @@ const DEFAULT_SECTION_ID = 'default';
 const ADVANCED_SECTION_ID = 'advanced';
 const CUSTOM_SECTION_PREFIX = 'custom:';
 const DEFAULT_SEPARATE_ROOT_SECTIONS = [ 'design', ADVANCED_SECTION_ID ];
+const EMPTY_PROMOTED_ITEM_IDS: string[] = [];
 export const ROOT_NAVIGATION_PARENT = '__root__';
 
 export interface SidebarNavigationPreferenceSection {
@@ -63,6 +65,11 @@ export interface SidebarNavigationLayout {
 	reset: () => void;
 }
 
+type SidebarNavigationLayoutOptions = Pick<
+	WorkspaceConfig,
+	'navigationPreferenceKey' | 'promotedNavigationItemIds'
+>;
+
 function isValidPreference(
 	preference: unknown
 ): preference is SidebarNavigationPreference {
@@ -92,10 +99,34 @@ function createCustomSectionId() {
 	return `${ CUSTOM_SECTION_PREFIX }${ Date.now() }`;
 }
 
+function getEffectiveMenuItems(
+	menuItems: MenuItem[],
+	promotedRootItemIds: string[]
+) {
+	if ( promotedRootItemIds.length === 0 ) {
+		return menuItems;
+	}
+
+	const promotedRootItemIdSet = new Set( promotedRootItemIds );
+
+	return menuItems.map( ( item ) => {
+		if ( ! promotedRootItemIdSet.has( item.id ) ) {
+			return item;
+		}
+
+		return {
+			...item,
+			parent: undefined,
+		};
+	} );
+}
+
 function getDefaultSections(
-	menuItems: MenuItem[]
+	menuItems: MenuItem[],
+	promotedRootItemIds: string[] = EMPTY_PROMOTED_ITEM_IDS
 ): SidebarNavigationPreferenceSection[] {
 	const separateRootSections = new Set( DEFAULT_SEPARATE_ROOT_SECTIONS );
+	const promotedRootItemIdSet = new Set( promotedRootItemIds );
 	const rootItems = menuItems.filter( ( item ) => ! item.parent );
 	const sectionParentIds = rootItems
 		.filter(
@@ -104,11 +135,20 @@ function getDefaultSections(
 				menuItems.some( ( candidate ) => candidate.parent === item.id )
 		)
 		.map( ( item ) => item.id );
-	const rootItemIds = menuItems
+	const baseRootItemIds = menuItems
 		.filter(
 			( item ) => ! item.parent && ! separateRootSections.has( item.id )
 		)
 		.map( ( item ) => item.id );
+	const orderedPromotedRootItemIds = promotedRootItemIds.filter( ( itemId ) =>
+		baseRootItemIds.includes( itemId )
+	);
+	const rootItemIds = uniqueStrings( [
+		...baseRootItemIds.filter(
+			( itemId ) => ! promotedRootItemIdSet.has( itemId )
+		),
+		...orderedPromotedRootItemIds,
+	] );
 	const sections: SidebarNavigationPreferenceSection[] = [
 		{
 			id: DEFAULT_SECTION_ID,
@@ -120,7 +160,11 @@ function getDefaultSections(
 		sections.push( {
 			id: sectionId,
 			itemIds: menuItems
-				.filter( ( item ) => item.parent === sectionId )
+				.filter(
+					( item ) =>
+						item.parent === sectionId &&
+						! promotedRootItemIdSet.has( item.id )
+				)
 				.map( ( item ) => item.id ),
 		} );
 	}
@@ -130,9 +174,13 @@ function getDefaultSections(
 
 function normalizePreference(
 	menuItems: MenuItem[],
-	preference: unknown
+	preference: unknown,
+	promotedRootItemIds: string[] = EMPTY_PROMOTED_ITEM_IDS
 ): SidebarNavigationPreference {
-	const defaultSections = getDefaultSections( menuItems );
+	const defaultSections = getDefaultSections(
+		menuItems,
+		promotedRootItemIds
+	);
 	const rawItemIds = new Set( menuItems.map( ( item ) => item.id ) );
 	const defaultSectionIds = new Set(
 		defaultSections.map( ( section ) => section.id )
@@ -318,21 +366,42 @@ function getSectionNavigationParentId(
 }
 
 export function useSidebarNavigationLayout(
-	menuItems: MenuItem[]
+	menuItems: MenuItem[],
+	options: SidebarNavigationLayoutOptions = {
+		navigationPreferenceKey: PREFERENCE_KEY,
+		promotedNavigationItemIds: EMPTY_PROMOTED_ITEM_IDS,
+	}
 ): SidebarNavigationLayout {
+	const navigationPreferenceKey =
+		options.navigationPreferenceKey ?? PREFERENCE_KEY;
+	const promotedNavigationItemIds =
+		options.promotedNavigationItemIds ?? EMPTY_PROMOTED_ITEM_IDS;
+	const effectiveMenuItems = useMemo(
+		() => getEffectiveMenuItems( menuItems, promotedNavigationItemIds ),
+		[ menuItems, promotedNavigationItemIds ]
+	);
 	const savedPreference = useSelect(
 		( select ) =>
-			select( preferencesStore ).get( PREFERENCE_SCOPE, PREFERENCE_KEY ),
-		[]
+			select( preferencesStore ).get(
+				PREFERENCE_SCOPE,
+				navigationPreferenceKey
+			),
+		[ navigationPreferenceKey ]
 	);
 	const { set } = useDispatch( preferencesStore );
 	const preference = useMemo(
-		() => normalizePreference( menuItems, savedPreference ),
-		[ menuItems, savedPreference ]
+		() =>
+			normalizePreference(
+				effectiveMenuItems,
+				savedPreference,
+				promotedNavigationItemIds
+			),
+		[ effectiveMenuItems, savedPreference, promotedNavigationItemIds ]
 	);
 	const itemById = useMemo(
-		() => new Map( menuItems.map( ( item ) => [ item.id, item ] ) ),
-		[ menuItems ]
+		() =>
+			new Map( effectiveMenuItems.map( ( item ) => [ item.id, item ] ) ),
+		[ effectiveMenuItems ]
 	);
 	const hiddenItemIds = useMemo(
 		() => new Set( preference.hiddenItemIds ),
@@ -346,14 +415,27 @@ export function useSidebarNavigationLayout(
 		) => {
 			set(
 				PREFERENCE_SCOPE,
-				PREFERENCE_KEY,
+				navigationPreferenceKey,
 				normalizePreference(
-					menuItems,
-					updater( normalizePreference( menuItems, savedPreference ) )
+					effectiveMenuItems,
+					updater(
+						normalizePreference(
+							effectiveMenuItems,
+							savedPreference,
+							promotedNavigationItemIds
+						)
+					),
+					promotedNavigationItemIds
 				)
 			);
 		},
-		[ menuItems, savedPreference, set ]
+		[
+			effectiveMenuItems,
+			navigationPreferenceKey,
+			promotedNavigationItemIds,
+			savedPreference,
+			set,
+		]
 	);
 	const isItemVisible = useCallback(
 		( itemId: string ) => ! hiddenItemIds.has( itemId ),
@@ -447,12 +529,18 @@ export function useSidebarNavigationLayout(
 				return section.items;
 			}
 
-			return menuItems.filter(
+			return effectiveMenuItems.filter(
 				( item ) =>
 					item.parent === parentId && ! hiddenItemIds.has( item.id )
 			);
 		},
-		[ menuItems, hiddenItemIds, pinnedRootItems, rootItems, sectionById ]
+		[
+			effectiveMenuItems,
+			hiddenItemIds,
+			pinnedRootItems,
+			rootItems,
+			sectionById,
+		]
 	);
 
 	const getNavigationParentId = useCallback(
@@ -670,8 +758,8 @@ export function useSidebarNavigationLayout(
 	);
 
 	const reset = useCallback( () => {
-		set( PREFERENCE_SCOPE, PREFERENCE_KEY, undefined );
-	}, [ set ] );
+		set( PREFERENCE_SCOPE, navigationPreferenceKey, undefined );
+	}, [ navigationPreferenceKey, set ] );
 
 	return {
 		sections,
