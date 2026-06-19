@@ -16,6 +16,10 @@
 -   Adopt `--wpds-dimension-size-*` design tokens [#79093](https://github.com/WordPress/gutenberg/pull/79093).
 -   Point the legacy `--wp-components-*` color fallbacks at the design system tokens (`--wpds-*` / `--wp-admin-theme-color*`), so component styles get sensible defaults from the prebuilt token stylesheet without a runtime `<ThemeProvider>` ([#78664](https://github.com/WordPress/gutenberg/pull/78664)).
 
+### Documentation
+
+-   `Menu`: Fix `overriden` typo to `overridden` in `CheckboxItemProps` and `RadioItemProps`. ([#79331](https://github.com/WordPress/gutenberg/pull/79331))
+
 ### Code Quality
 
 -   Move `@types/react` from `dependencies` to an optional peer dependency so consumers' React type version is used [#79095](https://github.com/WordPress/gutenberg/pull/79095).
@@ -59,6 +63,7 @@
 
 ### Enhancements
 
+-   `Tooltip`: Mark as not recommended for use in a WordPress environment, in favour of `Tooltip` from `@wordpress/ui` ([#78693](https://github.com/WordPress/gutenberg/pull/78693)).
 -   `Tabs`, `TabPanel`: Align selected tab colors and indicators with `@wordpress/ui` `Tabs` ([#78418](https://github.com/WordPress/gutenberg/pull/78418)).
 -   `NoticeList`: Add vertical spacing between notices in a list.
 -   `Draggable`: Render the drag clone inside the `@wordpress/ui` compat overlay slot so it shares stacking with `@wordpress/ui` overlays opened mid-drag. Auto-enabled in WordPress environments; other hosts can opt in via `useEnableWpCompatOverlaySlot()` ([#78183](https://github.com/WordPress/gutenberg/pull/78183), [#78354](https://github.com/WordPress/gutenberg/pull/78354)).

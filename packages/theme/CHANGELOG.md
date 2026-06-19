@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Rename the `bg` and `fg` design token groups to `background` and `foreground`. All `--wpds-color-bg-*` custom properties are now `--wpds-color-background-*`, and all `--wpds-color-fg-*` custom properties are now `--wpds-color-foreground-*` ([#79098](https://github.com/WordPress/gutenberg/pull/79098)).
+
 ### New Features
 
 -   Add `--wpds-color-stroke-surface-caution` and `--wpds-color-stroke-surface-caution-strong` so the `caution` tone has the same stroke-surface coverage as the other status tones ([#79198](https://github.com/WordPress/gutenberg/pull/79198)).
@@ -13,10 +17,15 @@
 
 -   `ThemeProvider`: forward the `cornerRadius` preset to the document element when `isRoot` is set, matching `color` and `cursor`. [#79153](https://github.com/WordPress/gutenberg/pull/79153).
 
-### Breaking Changes
+### Documentation
 
 -   Rename the `bg` and `fg` design token groups to `background` and `foreground`. All `--wpds-color-bg-*` custom properties are now `--wpds-color-background-*`, and all `--wpds-color-fg-*` custom properties are now `--wpds-color-foreground-*` ([#79098](https://github.com/WordPress/gutenberg/pull/79098)).
 -   Rename the `--wpds-color-stroke-focus-brand` design token to `--wpds-color-stroke-focus` ([#79125](https://github.com/WordPress/gutenberg/pull/79125)).
+-   Added [Design Tokens Maintainer's Guide](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/tokens/README.md) and trimmed maintainer-facing content from package README ([#79157](https://github.com/WordPress/gutenberg/pull/79157)).
+
+### Enhancements
+
+-   Tweak `--wpds-color-foreground-interactive-brand-active` and `--wpds-color-foreground-interactive-error-active` to differentiate them from the non-`active` counterparts ([#79151](https://github.com/WordPress/gutenberg/pull/79151)).
 
 ### Bug Fixes
 
@@ -32,6 +41,7 @@
 
 ### Code Quality
 
+-   `ThemeProvider`: Stop serializing `data-wpds-root-provider="false"` on non-root providers by only setting the attribute when `isRoot` is `true` ([#79253](https://github.com/WordPress/gutenberg/pull/79253)).
 -   Declare `postcss`, `esbuild`, and `vite` as optional peer dependencies for the bundler plugins, and move `@types/react` from `dependencies` to an optional peer dependency ([#79095](https://github.com/WordPress/gutenberg/pull/79095)).
 
 ## 0.15.1 (2026-06-16)
@@ -47,7 +57,8 @@
 -   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
 
 ### Breaking Changes
-- Revert React back to v18 [#78940](https://github.com/WordPress/gutenberg/pull/78940).
+
+-   Revert React back to v18 [#78940](https://github.com/WordPress/gutenberg/pull/78940).
 -   Drop the experimental `density` support from `ThemeProvider`. The `density` prop has been removed, along with the related `data-wpds-density` attribute and the per-density overrides on `--wpds-dimension-padding-*` / `--wpds-dimension-gap-*` tokens ([#78741](https://github.com/WordPress/gutenberg/pull/78741)).
 -   Rename the `color.bg` prop on `ThemeProvider` to `color.background` ([#79007](https://github.com/WordPress/gutenberg/pull/79007)).
 
