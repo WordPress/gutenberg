@@ -163,7 +163,7 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 		 * it. Branch the expectation so the test passes on both the current and
 		 * the previous WordPress version exercised in CI.
 		 *
-		 * @see https://core.trac.wordpress.org/changeset/62492
+		 * @link https://core.trac.wordpress.org/changeset/62492
 		 *
 		 * TODO: Remove this conditional once WordPress 7.0 support is dropped.
 		 */
