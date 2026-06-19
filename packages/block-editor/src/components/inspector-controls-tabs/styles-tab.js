@@ -153,13 +153,13 @@ const StylesTab = ( {
 						group="border"
 						label={ borderPanelLabel }
 					/>
-					<PositionControls />
-					<InspectorControls.Slot group="styles" />
 					<InspectorControls.Slot
 						group="elements"
 						label={ __( 'Elements' ) }
 						className="elements-block-support-panel__inner-wrapper"
 					/>
+					<PositionControls />
+					<InspectorControls.Slot group="styles" />
 				</>
 			) }
 		</>
