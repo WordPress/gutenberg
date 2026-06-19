@@ -21,7 +21,7 @@ function ScreenColorPalette( { name }: { name?: string } ) {
 				) }
 			/>
 			<Tabs.Root defaultValue="color">
-				<Tabs.List className="global-styles-ui-color-palette__tablist">
+				<Tabs.List>
 					<Tabs.Tab value="color">{ __( 'Color' ) }</Tabs.Tab>
 					<Tabs.Tab value="gradient">{ __( 'Gradient' ) }</Tabs.Tab>
 				</Tabs.List>
