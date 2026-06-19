@@ -309,7 +309,9 @@ function gutenberg_set_up_cross_origin_isolation() {
 	// Skip when rendering the classic-theme home route, which shows the site
 	// preview in an iframe and must reach its `contentDocument` to neutralize
 	// interactive elements — DIP would block that.
-	if ( 'site-editor' === $screen->id && ! wp_is_block_theme() && ( ! isset( $_GET['p'] ) || '/' === $_GET['p'] ) ) {
+	global $pagenow;
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	if ( 'site-editor.php' === $pagenow && ! wp_is_block_theme() && ( ! isset( $_GET['p'] ) || '/' === $_GET['p'] ) ) {
 		return;
 	}
 
