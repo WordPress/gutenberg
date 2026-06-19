@@ -73,7 +73,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-rest-view-config-controller-7-1.php';
 	require __DIR__ . '/compat/wordpress-7.1/rest-api.php';
 	require __DIR__ . '/compat/wordpress-7.1/collaboration.php';
-	require __DIR__ . '/compat/wordpress-7.1/block-bindings.php';
 
 	// Plugin specific code.
 	require_once __DIR__ . '/class-wp-rest-global-styles-controller-gutenberg.php';
@@ -103,6 +102,7 @@ require __DIR__ . '/compat/plugin/fonts.php';
 require __DIR__ . '/compat/wordpress-7.0/preload.php';
 require __DIR__ . '/compat/wordpress-7.0/auto-register.php';
 require __DIR__ . '/compat/wordpress-7.0/blocks.php';
+require __DIR__ . '/compat/wordpress-7.0/block-bindings.php';
 require __DIR__ . '/compat/wordpress-7.0/kses.php';
 require __DIR__ . '/compat/wordpress-7.0/command-palette.php';
 require __DIR__ . '/compat/wordpress-7.0/meta-box-rtc-compat.php';

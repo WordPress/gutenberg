@@ -29,6 +29,7 @@ Right now, not all block attributes are compatible with block bindings. There is
 | core/image               | id, url, title, alt, caption      |
 | core/heading             | content                           |
 | core/paragraph           | content                           |
+| core/list-item           | content                           |
 | core/button              | url, text, linkTarget, rel        |
 | core/navigation-link     | url                               |
 | core/navigation-submenu  | url                               |
