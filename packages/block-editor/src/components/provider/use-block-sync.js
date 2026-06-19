@@ -252,6 +252,7 @@ export default function useBlockSync( {
 					cloneBlockWithMapping( block, idMappingRef.current )
 				);
 
+				__unstableMarkNextChangeAsNotPersistent();
 				setHasControlledInnerBlocks( clientId, true );
 
 				if ( subscribedRef.current ) {
@@ -280,10 +281,12 @@ export default function useBlockSync( {
 	const unsetControlledBlocks = () => {
 		__unstableMarkNextChangeAsNotPersistent();
 		if ( clientId ) {
+			__unstableMarkNextChangeAsNotPersistent();
 			setHasControlledInnerBlocks( clientId, false );
 			__unstableMarkNextChangeAsNotPersistent();
 			replaceInnerBlocks( clientId, [] );
 		} else {
+			__unstableMarkNextChangeAsNotPersistent();
 			resetBlocks( [] );
 		}
 	};
