@@ -24,7 +24,7 @@ ruleTester.run( 'use-recommended-components', rule, {
 		"import { Link } from '@wordpress/ui';",
 		"import { Stack } from '@wordpress/ui';",
 		"import { Text } from '@wordpress/ui';",
-		"import { Badge, Icon, Link, Stack, Tabs, Text } from '@wordpress/ui';",
+		"import { Badge, Icon, Link, Stack, Tabs, Text, Tooltip } from '@wordpress/ui';",
 
 		// Unlocked private APIs are only checked for denied names.
 		"import { privateApis } from '@wordpress/components'; import { unlock } from '../../lock-unlock'; const { SomethingElse } = unlock( privateApis );",
@@ -111,6 +111,14 @@ ruleTester.run( 'use-recommended-components', rule, {
 			errors: [
 				{
 					message: 'Use `Tabs` from `@wordpress/ui` instead.',
+				},
+			],
+		},
+		{
+			code: "import { Tooltip } from '@wordpress/components';",
+			errors: [
+				{
+					message: 'Use `Tooltip` from `@wordpress/ui` instead.',
 				},
 			],
 		},
