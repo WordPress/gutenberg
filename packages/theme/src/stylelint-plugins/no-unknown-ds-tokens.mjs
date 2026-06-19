@@ -14,11 +14,11 @@ const DS_TOKEN_PREFIX = 'wpds-';
  * @example
  * extractCSSVariables(
  *   'border: 1px solid var(--wpds-border-radius-sm, var(--wpds-border-radius-md)); ' +
- *   'color: var(--wpds-color-fg-content-neutral, black); ' +
+ *   'color: var(--wpds-color-foreground-content-neutral, black); ' +
  *   'background: var(--unrelated-bg);',
  *   'wpds'
  * );
- * // → Set { '--wpds-border-radius-sm', '--wpds-border-radius-md', '--wpds-color-fg-content-neutral' }
+ * // → Set { '--wpds-border-radius-sm', '--wpds-border-radius-md', '--wpds-color-foreground-content-neutral' }
  */
 function extractCSSVariables( value, prefix = '' ) {
 	const regex = /--[\w-]+/g;

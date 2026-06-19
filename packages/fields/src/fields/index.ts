@@ -13,10 +13,18 @@ export { default as commentStatusField } from './comment-status';
 export { default as pingStatusField } from './ping-status';
 export { default as discussionField } from './discussion';
 export { default as dateField } from './date';
-export { default as scheduledDateField } from './date/scheduled';
+export { default as scheduledDateField } from './scheduled-date';
+export { default as lastEditedDateField } from './last-edited';
 export { default as authorField } from './author';
 export { default as notesField } from './notes';
 export { default as excerptField } from './excerpt';
+export {
+	default as descriptionField,
+	readOnlyDescriptionField,
+} from './description';
 export { default as formatField } from './format';
 export { default as postContentInfoField } from './post-content-info';
 export { default as stickyField } from './sticky';
+export { default as postsPerPageField } from './posts-per-page';
+export { default as siteDiscussionField } from './site-discussion';
+export { default as postsPageTitleField } from './posts-page-title';

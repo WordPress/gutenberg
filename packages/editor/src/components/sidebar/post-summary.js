@@ -43,7 +43,7 @@ export default function PostSummary( { onActionPerformed } ) {
 	);
 	if (
 		window?.__experimentalDataFormInspector &&
-		[ 'page', 'post' ].includes( postType )
+		[ 'page', 'post', 'wp_template' ].includes( postType )
 	) {
 		return <DataFormPostSummary onActionPerformed={ onActionPerformed } />;
 	}
