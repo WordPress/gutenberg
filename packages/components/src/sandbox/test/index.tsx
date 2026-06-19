@@ -110,14 +110,45 @@ describe( 'SandBox', () => {
 		);
 	} );
 
-	it( 'should listen for ready messages in srcdoc', () => {
+	it( 'should resize the iframe in response to a resize message from the sandbox', () => {
 		render( <SandBox html="<p>Hello</p>" title="Resize Test" /> );
 
 		const iframe = screen.getByTitle< HTMLIFrameElement >( 'Resize Test' );
-		const srcDoc = iframe.getAttribute( 'srcdoc' ) ?? '';
 
-		expect( srcDoc ).toContain( 'checkMessageForReady' );
-		expect( srcDoc ).toContain( "'ready'" );
-		expect( srcDoc ).toContain( 'attachIframeLoadListeners' );
+		// The iframe starts collapsed until the sandbox reports its size.
+		expect( iframe ).toHaveAttribute( 'width', '0' );
+		expect( iframe ).toHaveAttribute( 'height', '0' );
+
+		// Simulate the sandbox responding to the parent's "ready" handshake
+		// with its measured dimensions.
+		fireEvent(
+			window,
+			new MessageEvent( 'message', {
+				source: iframe.contentWindow,
+				data: { action: 'resize', width: 320, height: 240 },
+			} )
+		);
+
+		expect( iframe ).toHaveAttribute( 'width', '320' );
+		expect( iframe ).toHaveAttribute( 'height', '240' );
+	} );
+
+	it( 'should ignore resize messages from other sources', () => {
+		render( <SandBox html="<p>Hello</p>" title="Source Test" /> );
+
+		const iframe = screen.getByTitle< HTMLIFrameElement >( 'Source Test' );
+
+		// A message that doesn't originate from this iframe's content window
+		// must not affect its size.
+		fireEvent(
+			window,
+			new MessageEvent( 'message', {
+				source: window,
+				data: { action: 'resize', width: 320, height: 240 },
+			} )
+		);
+
+		expect( iframe ).toHaveAttribute( 'width', '0' );
+		expect( iframe ).toHaveAttribute( 'height', '0' );
 	} );
 } );

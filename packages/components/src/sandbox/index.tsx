@@ -6,7 +6,6 @@ import {
 	useRef,
 	useState,
 	useEffect,
-	useLayoutEffect,
 	useMemo,
 } from '@wordpress/element';
 import { useFocusableIframe, useMergeRefs } from '@wordpress/compose';
@@ -25,30 +24,18 @@ type SandBoxMessage = {
 };
 
 function parseSandBoxMessage( data: unknown ): SandBoxMessage | null {
-	if ( ! data ) {
-		return null;
-	}
-
-	let message = data;
-
-	if ( 'string' === typeof message ) {
-		try {
-			message = JSON.parse( message );
-		} catch {
-			return null;
+	try {
+		// Messages may arrive as an object or, for some embed providers, as a
+		// JSON-encoded string. Lean on the try block to reject anything that
+		// isn't valid.
+		const message = (
+			'string' === typeof data ? JSON.parse( data ) : data
+		) as SandBoxMessage;
+		if ( 'string' === typeof message?.action ) {
+			return message;
 		}
-	}
-
-	if (
-		'object' !== typeof message ||
-		null === message ||
-		! ( 'action' in message ) ||
-		'string' !== typeof ( message as SandBoxMessage ).action
-	) {
-		return null;
-	}
-
-	return message as SandBoxMessage;
+	} catch {}
+	return null;
 }
 
 const observeAndResizeJS = function () {
@@ -71,6 +58,8 @@ const observeAndResizeJS = function () {
 		);
 	}
 
+	// The parent signals readiness with an object message, so we only need to
+	// handle that one shape here.
 	function checkMessageForReady( event: MessageEvent ) {
 		if ( event.source !== window.parent ) {
 			return;
@@ -78,28 +67,23 @@ const observeAndResizeJS = function () {
 
 		const data = event.data || {};
 
-		if ( 'string' === typeof data ) {
-			try {
-				const parsed = JSON.parse( data );
-				if ( 'ready' === parsed.action ) {
-					sendResize();
-				}
-			} catch {}
-			return;
-		}
-
 		if ( 'ready' === data.action ) {
 			sendResize();
 		}
 	}
 
+	// Resize the preview once a nested iframe finishes loading (its height is
+	// only known then). A WeakSet ensures each iframe is wired up just once,
+	// even though new iframes may be added by later DOM mutations.
+	const listeningIframes = new WeakSet();
 	function attachIframeLoadListeners() {
-		Array.prototype.forEach.call(
-			document.querySelectorAll( 'iframe' ),
-			function ( nestedIframe ) {
-				nestedIframe.addEventListener( 'load', sendResize, true );
+		document.querySelectorAll( 'iframe' ).forEach( ( nestedIframe ) => {
+			if ( listeningIframes.has( nestedIframe ) ) {
+				return;
 			}
-		);
+			listeningIframes.add( nestedIframe );
+			nestedIframe.addEventListener( 'load', sendResize, true );
+		} );
 	}
 
 	const observer = new MutationObserver( function () {
@@ -268,7 +252,7 @@ function IsolatedSandBox( {
 		[ html, title, type, styles, scripts ]
 	);
 
-	useLayoutEffect( () => {
+	useEffect( () => {
 		const iframe = ref.current;
 		if ( ! iframe ) {
 			return;
