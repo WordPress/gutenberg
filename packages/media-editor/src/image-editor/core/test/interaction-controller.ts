@@ -829,6 +829,26 @@ describe( 'InteractionController', () => {
 			expect( actionMocks.setPan ).toHaveBeenCalled();
 		} );
 
+		it( 'prevents default on touchmove so the page does not scroll mid-gesture', () => {
+			const state = makeState( { zoom: 2 } );
+			const { controller } = createController( state );
+			const doc = createMockDocument();
+			const rect = createContainerRect();
+
+			controller.handleTouchStart(
+				createTouchEvent( [ { clientX: 100, clientY: 100 } ] ),
+				rect,
+				doc
+			);
+
+			const moveEvent = createTouchEvent( [
+				{ clientX: 150, clientY: 120 },
+			] );
+			doc._fire( 'touchmove', moveEvent );
+
+			expect( moveEvent.preventDefault ).toHaveBeenCalled();
+		} );
+
 		it( 'calls onGestureStart/onGestureEnd for single-finger pan', () => {
 			const state = makeState( { zoom: 2 } );
 			const onGestureStart = jest.fn();

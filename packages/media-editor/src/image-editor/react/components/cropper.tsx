@@ -822,6 +822,12 @@ function CropperInner(
 		clearTimeout( settleTimerRef.current );
 
 		if ( isCancellingForPinch ) {
+			// A pinch took over mid-resize. Tear down resize UI without
+			// settling or firing onGestureEnd: the pinch owns the gesture
+			// boundary and fires the end on its own touchend. The resize and
+			// the pinch therefore collapse into a single undo step, since
+			// `beginGesture` is idempotent and the snapshot captured at resize
+			// start is flushed by the pinch's `endGesture`.
 			isSettlingRef.current = false;
 			setSettling( false );
 			resetViewport();
