@@ -9,15 +9,13 @@ import clsx from 'clsx';
 import {
 	Button,
 	DropZone,
-	Icon,
+	Icon as WCIcon,
 	Spinner,
 	__experimentalText as WCText,
 	__experimentalTruncate as Truncate,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	BaseControl,
-	Tooltip,
-	VisuallyHidden,
 } from '@wordpress/components';
 import { isBlobURL, getBlobTypeByURL } from '@wordpress/blob';
 import { store as coreStore, type Attachment } from '@wordpress/core-data';
@@ -42,6 +40,7 @@ import {
 	chevronLeft,
 	chevronRight,
 } from '@wordpress/icons';
+import { VisuallyHidden, Tooltip } from '@wordpress/ui';
 import {
 	MediaUpload,
 	uploadMedia,
@@ -193,9 +192,10 @@ function MediaPickerButton( {
 		return mediaPickerButton;
 	}
 	return (
-		<Tooltip text={ label } placement="top">
-			{ mediaPickerButton }
-		</Tooltip>
+		<Tooltip.Root>
+			<Tooltip.Trigger render={ mediaPickerButton } />
+			<Tooltip.Popup>{ label }</Tooltip.Popup>
+		</Tooltip.Root>
 	);
 }
 
@@ -291,13 +291,13 @@ function MediaPreview( { attachment }: { attachment: MediaEditAttachment } ) {
 			/>
 		);
 	} else if ( mimeType.startsWith( 'audio' ) ) {
-		return <Icon icon={ audio } />;
+		return <WCIcon icon={ audio } />;
 	} else if ( mimeType.startsWith( 'video' ) ) {
-		return <Icon icon={ video } />;
+		return <WCIcon icon={ video } />;
 	} else if ( archiveMimeTypes.includes( mimeType ) ) {
-		return <Icon icon={ archive } />;
+		return <WCIcon icon={ archive } />;
 	}
-	return <Icon icon={ file } />;
+	return <WCIcon icon={ file } />;
 }
 
 type MediaEditAttachment = Attachment< 'view' > | BlobItem;
@@ -914,7 +914,7 @@ export default function MediaEdit< Item >( {
 							<VStack spacing={ 2 }>
 								{ field.label &&
 									( hideLabelFromVision ? (
-										<VisuallyHidden as="legend">
+										<VisuallyHidden render={ <legend /> }>
 											{ field.label }
 										</VisuallyHidden>
 									) : (
@@ -971,7 +971,7 @@ export default function MediaEdit< Item >( {
 							}
 						) }
 					>
-						<Icon
+						<WCIcon
 							className="components-validated-control__indicator-icon"
 							icon={ errorIcon }
 							size={ 16 }

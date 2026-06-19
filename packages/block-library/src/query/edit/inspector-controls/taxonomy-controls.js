@@ -242,7 +242,7 @@ function TaxonomyItem( {
 				suggestions={ suggestions }
 				displayTransform={ decodeEntities }
 				onChange={ onTermsChange }
-				__experimentalShowHowTo={ false }
+				help=""
 				__next40pxDefaultSize
 			/>
 		</div>

@@ -1,9 +1,11 @@
-import type { ComponentPropsWithoutRef, ReactElement, ReactNode } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import type { Popover as _Popover } from '@base-ui/react/popover';
 
 import type { ComponentProps } from '../utils/types';
 
-export type PortalProps = ComponentPropsWithoutRef< typeof _Popover.Portal >;
+export type PortalProps = ComponentProps< typeof _Popover.Portal >;
+
+export type PositionerProps = ComponentProps< typeof _Popover.Positioner >;
 
 export interface RootProps
 	extends Pick<
@@ -25,31 +27,8 @@ export interface TriggerProps
 	children?: ReactNode;
 }
 
-/**
- * `Popover.Popup` maps to two Base UI elements internally: the
- * **Positioner** (outer, handles fixed positioning and z-index) and the
- * **Popup** (inner, holds content and visual styles).
- *
- * `style` and `className` are forwarded to the **Positioner** so that
- * z-index overrides (`--wp-ui-popover-z-index`) and Base UI CSS variables
- * (`--available-height`, `--available-width`) work correctly. All other
- * HTML attributes are forwarded to the inner **Popup** element.
- */
 export interface PopupProps
 	extends ComponentProps< 'div' >,
-		Pick<
-			_Popover.Positioner.Props,
-			| 'align'
-			| 'alignOffset'
-			| 'anchor'
-			| 'arrowPadding'
-			| 'collisionAvoidance'
-			| 'collisionBoundary'
-			| 'collisionPadding'
-			| 'side'
-			| 'sideOffset'
-			| 'sticky'
-		>,
 		Pick< _Popover.Popup.Props, 'initialFocus' | 'finalFocus' > {
 	/**
 	 * Whether to render a backdrop overlay behind the popover.
@@ -75,6 +54,15 @@ export interface PopupProps
 	 * When omitted, `Popover.Popup` uses `Popover.Portal` with default props.
 	 */
 	portal?: ReactElement< Omit< PortalProps, 'children' > >;
+
+	/**
+	 * Optional positioner element, typically `<Popover.Positioner />` with
+	 * custom positioning props (`side`, `align`, `sideOffset`, collision
+	 * settings, anchor, etc.). When omitted, `Popover.Popup` uses
+	 * `Popover.Positioner` with default props. Do not pass `children` on
+	 * the positioner element; they would be ignored.
+	 */
+	positioner?: ReactElement< Omit< PositionerProps, 'children' > >;
 
 	/**
 	 * The visual style variant of the popup.

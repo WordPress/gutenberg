@@ -14,6 +14,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
 
 import * as actions from '../actions';
 import { store as editorStore } from '..';
+import { unlock } from '../../lock-unlock';
 
 const postId = 44;
 
@@ -63,6 +64,39 @@ const getMethod = ( options ) =>
 	options.headers?.[ 'X-HTTP-Method-Override' ] || options.method || 'GET';
 
 describe( 'Post actions', () => {
+	describe( 'updateDeviceTypeForViewportState', () => {
+		it( 'updates the editor device type for a viewport state', () => {
+			const registry = createRegistryWithStores();
+
+			unlock(
+				registry.dispatch( editorStore )
+			).updateDeviceTypeForViewportState( {
+				viewport: 'mobile',
+				showStateOnCanvas: true,
+			} );
+
+			expect( registry.select( editorStore ).getDeviceType() ).toBe(
+				'Mobile'
+			);
+		} );
+
+		it( 'keeps the editor device type when canvas preview is disabled', () => {
+			const registry = createRegistryWithStores();
+			registry.dispatch( editorStore ).setDeviceType( 'Tablet' );
+
+			unlock(
+				registry.dispatch( editorStore )
+			).updateDeviceTypeForViewportState( {
+				viewport: 'mobile',
+				showStateOnCanvas: false,
+			} );
+
+			expect( registry.select( editorStore ).getDeviceType() ).toBe(
+				'Tablet'
+			);
+		} );
+	} );
+
 	describe( 'savePost()', () => {
 		it( 'saves a modified post', async () => {
 			const post = {

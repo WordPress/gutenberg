@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+## 14.0.1 (2026-06-16)
+
+## 14.0.0 (2026-06-10)
+
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+### Breaking Changes
+
+-   Rename `timeToRead` icon to `time`. ([#78804](https://github.com/WordPress/gutenberg/pull/78804))
+-   Remove `tab` icon. ([#77439](https://github.com/WordPress/gutenberg/pull/77439))
+
+## 13.2.0 (2026-05-27)
+
+## 13.1.0 (2026-05-14)
+
+## 13.0.0 (2026-04-29)
+
 ### Breaking Changes
 
 - Rename Tabs-related icons: `tabs-menu` to `tab-list`, `tabs-menu-item` to `tab`, and `tab` to `tab-panel`. ([#77418](https://github.com/WordPress/gutenberg/pull/77418))

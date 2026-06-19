@@ -15,6 +15,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
+import { Tooltip } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -97,15 +98,22 @@ function DiffMarkerButton( { clientId, status, subscribe } ) {
 	}
 
 	return (
-		<button
-			className={ `revision-diff-marker is-${ status }` }
-			style={ {
-				top: `${ position.top }%`,
-				height: `${ Math.max( position.height, 0.5 ) }%`,
-			} }
-			onClick={ () => blockRef.current?.focus() }
-			aria-label={ STATUS_LABELS[ status ] }
-		/>
+		<Tooltip.Root>
+			<Tooltip.Trigger
+				render={
+					<button
+						className={ `revision-diff-marker is-${ status }` }
+						style={ {
+							top: `${ position.top }%`,
+							height: `${ Math.max( position.height, 0.5 ) }%`,
+						} }
+						onClick={ () => blockRef.current?.focus() }
+						aria-label={ STATUS_LABELS[ status ] }
+					/>
+				}
+			/>
+			<Tooltip.Popup>{ STATUS_LABELS[ status ] }</Tooltip.Popup>
+		</Tooltip.Root>
 	);
 }
 
@@ -145,7 +153,7 @@ export function useDiffMarkers() {
 			key="diff-markers"
 			className="revision-diff-markers"
 			role="navigation"
-			aria-label={ __( 'Diff markers' ) }
+			aria-label={ __( 'Document changes' ) }
 		>
 			{ isMounted &&
 				diffBlocks.map( ( { clientId, status } ) => (

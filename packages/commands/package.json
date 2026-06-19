@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/commands",
-	"version": "1.44.0",
+	"version": "1.48.1",
 	"description": "Handles the commands menu.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -41,7 +41,6 @@
 		"./package.json": "./package.json",
 		"./build-style/": "./build-style/"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"dependencies": {
 		"@wordpress/base-styles": "file:../base-styles",

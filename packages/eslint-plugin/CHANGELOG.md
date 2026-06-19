@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+## 25.4.1 (2026-06-16)
+
+## 25.4.0 (2026-06-10)
+
+## 25.3.0 (2026-05-27)
+
+## 25.2.0 (2026-05-14)
+
+### New Features
+
+-   Added [`no-non-module-stylesheet-imports`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-non-module-stylesheet-imports.md) rule to prevent importing non-module stylesheets from JavaScript files ([#77984](https://github.com/WordPress/gutenberg/pull/77984)).
+
+## 25.1.0 (2026-04-29)
+
 ### New Features
 
 -   Added [`use-import-as`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/use-import-as.md) rule to enforce configured aliases for selected named imports and direct `unlock( privateApis )` destructuring ([#77389](https://github.com/WordPress/gutenberg/pull/77389)).
@@ -10,6 +24,7 @@
 ### Enhancements
 
 -   Improved the Design System token lint rules to recognize CSS declaration strings more accurately, avoiding false bare-token reports for declarations while still flagging invalid token assignments and unknown token names ([#77384](https://github.com/WordPress/gutenberg/pull/77384)).
+-   Update `use-recommended-components` rule to prefer `VisuallyHidden` from `@wordpress/ui` over `@wordpress/components` ([#77575](https://github.com/WordPress/gutenberg/pull/77575)).
 
 ## 25.0.0 (2026-04-15)
 

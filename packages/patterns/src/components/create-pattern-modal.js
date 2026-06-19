@@ -5,10 +5,9 @@ import {
 	Modal,
 	Button,
 	TextControl,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
 	ToggleControl,
 } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { __, _x } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -115,7 +114,7 @@ export function CreatePatternModalContents( {
 				onCreate( title, syncType );
 			} }
 		>
-			<VStack spacing="5">
+			<Stack direction="column" gap="lg">
 				<TextControl
 					label={ __( 'Name' ) }
 					value={ title }
@@ -143,7 +142,7 @@ export function CreatePatternModalContents( {
 						);
 					} }
 				/>
-				<HStack justify="right">
+				<Stack gap="sm" justify="end">
 					<Button
 						__next40pxDefaultSize
 						variant="tertiary"
@@ -154,7 +153,6 @@ export function CreatePatternModalContents( {
 					>
 						{ __( 'Cancel' ) }
 					</Button>
-
 					<Button
 						__next40pxDefaultSize
 						variant="primary"
@@ -164,8 +162,8 @@ export function CreatePatternModalContents( {
 					>
 						{ confirmLabel }
 					</Button>
-				</HStack>
-			</VStack>
+				</Stack>
+			</Stack>
 		</form>
 	);
 }

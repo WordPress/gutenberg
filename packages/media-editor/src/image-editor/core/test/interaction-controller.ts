@@ -1,9 +1,17 @@
 /**
  * Internal dependencies
  */
-import { InteractionController } from '../interaction-controller';
-import type { CropperAction, CropperState, Size } from '../types';
-import { DEFAULT_STATE, MIN_ZOOM, MAX_ZOOM } from '../constants';
+import {
+	InteractionController,
+	type CropperInteractionActions,
+} from '../interaction-controller';
+import type { CropperState, Size } from '../types';
+import {
+	DEFAULT_STATE,
+	DEFAULT_WHEEL_ZOOM_SPEED,
+	MIN_ZOOM,
+	MAX_ZOOM,
+} from '../constants';
 
 // The test environment is Node (not jsdom), so DOM globals like HTMLElement
 // and Element are not available. Provide minimal stubs so that `instanceof`
@@ -62,6 +70,7 @@ function createMockElement(): HTMLElement & {
 } {
 	const listeners: Record< string, EventListener[] > = {};
 	return {
+		focus: jest.fn(),
 		setPointerCapture: jest.fn(),
 		releasePointerCapture: jest.fn(),
 		addEventListener: jest.fn( ( type: string, fn: EventListener ) => {
@@ -202,7 +211,7 @@ function createMockDocument(): Document & {
 describe( 'InteractionController', () => {
 	const containerSize: Size = { width: 500, height: 300 };
 	const imageSize: Size = { width: 500, height: 300 };
-	let dispatchMock: jest.Mock< void, [ CropperAction ] >;
+	let actionMocks: jest.Mocked< CropperInteractionActions >;
 
 	// Store original requestAnimationFrame so we can restore it.
 	const originalRAF = globalThis.requestAnimationFrame;
@@ -223,7 +232,13 @@ describe( 'InteractionController', () => {
 	} );
 
 	beforeEach( () => {
-		dispatchMock = jest.fn();
+		actionMocks = {
+			setPan: jest.fn(),
+			setZoom: jest.fn(),
+			setZoomAtPoint: jest.fn(),
+			snapRotate90: jest.fn(),
+			toggleFlip: jest.fn(),
+		};
 	} );
 
 	/**
@@ -239,7 +254,7 @@ describe( 'InteractionController', () => {
 	) {
 		const opts = {
 			getState: () => state,
-			dispatch: dispatchMock,
+			actions: actionMocks,
 			getContainerSize: () => containerSize,
 			getImageSize: () => imageSize as Size | undefined,
 			...options,
@@ -249,7 +264,7 @@ describe( 'InteractionController', () => {
 	}
 
 	describe( 'pointer drag', () => {
-		it( 'dispatches SET_CROP on pointerdown + pointermove', () => {
+		it( 'calls setPan on pointerdown + pointermove', () => {
 			const state = makeState( { zoom: 2 } );
 			const { controller } = createController( state );
 			const el = createMockElement();
@@ -265,25 +280,47 @@ describe( 'InteractionController', () => {
 				createPointerEvent( { clientX: 150, clientY: 120 } )
 			);
 
-			expect( dispatchMock ).toHaveBeenCalledWith(
-				expect.objectContaining( { type: 'SET_PAN' } )
-			);
+			expect( actionMocks.setPan ).toHaveBeenCalled();
 
-			const setCropCall = dispatchMock.mock.calls.find(
-				( call ) => call[ 0 ].type === 'SET_PAN'
-			);
-			expect( setCropCall ).toBeDefined();
-
-			const payload = setCropCall![ 0 ].payload as {
-				x: number;
-				y: number;
-			};
+			const payload = actionMocks.setPan.mock.calls[ 0 ][ 0 ];
 			// Delta: (150-100)/500 = 0.1 in x, (120-100)/300 = 0.0667 in y.
 			expect( typeof payload.x ).toBe( 'number' );
 			expect( typeof payload.y ).toBe( 'number' );
 
 			// Clean up.
 			el._fire( 'pointerup', createPointerEvent() );
+		} );
+
+		it( 'ignores touch pointerdown so touch gestures own touch input', () => {
+			const state = makeState( { zoom: 2 } );
+			const onGestureStart = jest.fn();
+			const onStatusChange = jest.fn();
+			const { controller } = createController( state, {
+				onGestureStart,
+				onStatusChange,
+			} );
+			const el = createMockElement();
+			const event = createPointerEvent( {
+				clientX: 100,
+				clientY: 100,
+				pointerType: 'touch',
+			} );
+
+			controller.handlePointerDown( event, el );
+
+			expect( event.preventDefault ).not.toHaveBeenCalled();
+			expect( el.focus ).not.toHaveBeenCalled();
+			expect( el.setPointerCapture ).not.toHaveBeenCalled();
+			expect( el.addEventListener ).not.toHaveBeenCalled();
+			expect( onGestureStart ).not.toHaveBeenCalled();
+			expect( onStatusChange ).not.toHaveBeenCalled();
+
+			el._fire(
+				'pointermove',
+				createPointerEvent( { clientX: 150, clientY: 120 } )
+			);
+
+			expect( actionMocks.setPan ).not.toHaveBeenCalled();
 		} );
 
 		it( 'stops dispatching after pointerup', () => {
@@ -299,7 +336,7 @@ describe( 'InteractionController', () => {
 			// Simulate pointerup.
 			el._fire( 'pointerup', createPointerEvent() );
 
-			dispatchMock.mockClear();
+			jest.clearAllMocks();
 
 			// Another pointermove should not dispatch because the listener
 			// was removed after pointerup.
@@ -308,7 +345,10 @@ describe( 'InteractionController', () => {
 				createPointerEvent( { clientX: 200, clientY: 200 } )
 			);
 
-			expect( dispatchMock ).not.toHaveBeenCalled();
+			expect( actionMocks.setPan ).not.toHaveBeenCalled();
+			expect( actionMocks.setZoom ).not.toHaveBeenCalled();
+			expect( actionMocks.setZoomAtPoint ).not.toHaveBeenCalled();
+			expect( actionMocks.snapRotate90 ).not.toHaveBeenCalled();
 		} );
 
 		it( 'calls onGestureStart on pointerdown and onGestureEnd on pointerup', () => {
@@ -329,6 +369,16 @@ describe( 'InteractionController', () => {
 			el._fire( 'pointerup', createPointerEvent() );
 
 			expect( onGestureEnd ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'focuses the element on pointerdown', () => {
+			const state = makeState( { zoom: 2 } );
+			const { controller } = createController( state );
+			const el = createMockElement();
+
+			controller.handlePointerDown( createPointerEvent(), el );
+
+			expect( el.focus ).toHaveBeenCalled();
 		} );
 
 		it( 'reports isDragging via onStatusChange', () => {
@@ -355,7 +405,7 @@ describe( 'InteractionController', () => {
 	} );
 
 	describe( 'wheel zoom', () => {
-		it( 'dispatches SET_ZOOM on wheel without currentTarget element', () => {
+		it( 'calls setZoom on wheel without currentTarget element', () => {
 			const state = makeState( { zoom: 2 } );
 			const { controller } = createController( state );
 
@@ -364,18 +414,16 @@ describe( 'InteractionController', () => {
 				createWheelEvent( { deltaY: -100, currentTarget: null } )
 			);
 
-			expect( dispatchMock ).toHaveBeenCalledWith(
-				expect.objectContaining( { type: 'SET_ZOOM' } )
-			);
+			expect( actionMocks.setZoom ).toHaveBeenCalled();
 
-			const setZoomCall = dispatchMock.mock.calls.find(
-				( call ) => call[ 0 ].type === 'SET_ZOOM'
+			const setZoomCall = actionMocks.setZoom.mock.calls[ 0 ];
+			// deltaY=-100, default zoomSpeed = 0.0025, delta = 0.25.
+			expect( setZoomCall![ 0 ] ).toBeCloseTo(
+				2 + 100 * DEFAULT_WHEEL_ZOOM_SPEED
 			);
-			// deltaY=-100, zoomSpeed=0.01, delta = 1, newZoom = 2+1 = 3.
-			expect( setZoomCall![ 0 ].payload ).toBe( 3 );
 		} );
 
-		it( 'dispatches SET_ZOOM_AT_POINT on wheel with currentTarget element', () => {
+		it( 'calls setZoomAtPoint on wheel with currentTarget element', () => {
 			const state = makeState( { zoom: 2 } );
 			const { controller } = createController( state );
 
@@ -400,15 +448,10 @@ describe( 'InteractionController', () => {
 				} )
 			);
 
-			expect( dispatchMock ).toHaveBeenCalledWith(
-				expect.objectContaining( { type: 'SET_ZOOM_AT_POINT' } )
-			);
-
-			const call = dispatchMock.mock.calls.find(
-				( c ) => c[ 0 ].type === 'SET_ZOOM_AT_POINT'
-			);
-			expect( call ).toBeDefined();
-			expect( ( call![ 0 ].payload as { zoom: number } ).zoom ).toBe( 3 );
+			expect( actionMocks.setZoomAtPoint ).toHaveBeenCalled();
+			expect(
+				actionMocks.setZoomAtPoint.mock.calls[ 0 ][ 0 ]
+			).toBeCloseTo( 2 + 100 * DEFAULT_WHEEL_ZOOM_SPEED );
 		} );
 
 		it( 'clamps to maxZoom on large positive wheel', () => {
@@ -419,11 +462,9 @@ describe( 'InteractionController', () => {
 				createWheelEvent( { deltaY: -500, currentTarget: null } )
 			);
 
-			const setZoomCall = dispatchMock.mock.calls.find(
-				( call ) => call[ 0 ].type === 'SET_ZOOM'
-			);
-			// 9 + 5 = 14, clamped to MAX_ZOOM (10).
-			expect( setZoomCall![ 0 ].payload ).toBe( MAX_ZOOM );
+			const setZoomCall = actionMocks.setZoom.mock.calls[ 0 ];
+			// 9 + 1.25 = 10.25, clamped to MAX_ZOOM (10).
+			expect( setZoomCall![ 0 ] ).toBe( MAX_ZOOM );
 		} );
 
 		it( 'clamps to minZoom on large negative wheel', () => {
@@ -434,11 +475,9 @@ describe( 'InteractionController', () => {
 				createWheelEvent( { deltaY: 500, currentTarget: null } )
 			);
 
-			const setZoomCall = dispatchMock.mock.calls.find(
-				( call ) => call[ 0 ].type === 'SET_ZOOM'
-			);
-			// 2 + (-5) = -3, clamped to MIN_ZOOM (1).
-			expect( setZoomCall![ 0 ].payload ).toBe( MIN_ZOOM );
+			const setZoomCall = actionMocks.setZoom.mock.calls[ 0 ];
+			// 2 + (-1.25) = 0.75, clamped to MIN_ZOOM (1).
+			expect( setZoomCall![ 0 ] ).toBe( MIN_ZOOM );
 		} );
 
 		it( 'respects custom zoomSpeed (read lazily from options)', () => {
@@ -454,11 +493,34 @@ describe( 'InteractionController', () => {
 				createWheelEvent( { deltaY: -100, currentTarget: null } )
 			);
 
-			const setZoomCall = dispatchMock.mock.calls.find(
-				( call ) => call[ 0 ].type === 'SET_ZOOM'
-			);
+			const setZoomCall = actionMocks.setZoom.mock.calls[ 0 ];
 			// deltaY=-100, zoomSpeed=0.02, delta = 2, zoom = 2+2 = 4.
-			expect( setZoomCall![ 0 ].payload ).toBe( 4 );
+			expect( setZoomCall![ 0 ] ).toBe( 4 );
+		} );
+
+		it( 'does not zoom while pointer pan is active', () => {
+			const state = makeState( { zoom: 2 } );
+			const { controller } = createController( state );
+			const el = createMockElement();
+
+			controller.handlePointerDown(
+				createPointerEvent( { clientX: 100, clientY: 100 } ),
+				el
+			);
+
+			jest.clearAllMocks();
+
+			const wheelEvent = createWheelEvent( {
+				deltaY: -100,
+				currentTarget: null,
+			} );
+			controller.handleWheel( wheelEvent );
+
+			expect( wheelEvent.preventDefault ).toHaveBeenCalled();
+			expect( actionMocks.setZoom ).not.toHaveBeenCalled();
+			expect( actionMocks.setZoomAtPoint ).not.toHaveBeenCalled();
+
+			el._fire( 'pointerup', createPointerEvent() );
 		} );
 
 		it( 'calls onGestureStart on first wheel, onGestureEnd after debounce', () => {
@@ -496,119 +558,187 @@ describe( 'InteractionController', () => {
 	} );
 
 	describe( 'keyboard', () => {
-		it( 'dispatches SET_CROP on ArrowUp', () => {
+		it( 'calls setPan on ArrowUp', () => {
 			const state = makeState( { zoom: 2 } );
 			const { controller } = createController( state );
 
 			controller.handleKeyDown( createKeyboardEvent( 'ArrowUp' ) );
 
-			expect( dispatchMock ).toHaveBeenCalledWith(
-				expect.objectContaining( { type: 'SET_PAN' } )
-			);
+			expect( actionMocks.setPan ).toHaveBeenCalled();
 
-			const call = dispatchMock.mock.calls.find(
-				( c ) => c[ 0 ].type === 'SET_PAN'
-			);
-			// ArrowUp decreases y by keyboardStep (0.05 default).
-			expect(
-				( call![ 0 ].payload as { y: number } ).y
-			).toBeLessThanOrEqual( 0 );
+			const call = actionMocks.setPan.mock.calls[ 0 ];
+			// ArrowUp scrolls the viewport up — image moves down, so y increases.
+			expect( call![ 0 ].y ).toBeGreaterThanOrEqual( 0 );
 		} );
 
-		it( 'dispatches SET_CROP on ArrowDown', () => {
+		it( 'calls setPan on ArrowDown', () => {
 			const state = makeState( { zoom: 2 } );
 			const { controller } = createController( state );
 
 			controller.handleKeyDown( createKeyboardEvent( 'ArrowDown' ) );
 
-			expect( dispatchMock ).toHaveBeenCalledWith(
-				expect.objectContaining( { type: 'SET_PAN' } )
-			);
+			expect( actionMocks.setPan ).toHaveBeenCalled();
 		} );
 
-		it( 'dispatches SET_CROP on ArrowLeft', () => {
+		it( 'calls setPan on ArrowLeft', () => {
 			const state = makeState( { zoom: 2 } );
 			const { controller } = createController( state );
 
 			controller.handleKeyDown( createKeyboardEvent( 'ArrowLeft' ) );
 
-			expect( dispatchMock ).toHaveBeenCalledWith(
-				expect.objectContaining( { type: 'SET_PAN' } )
-			);
+			expect( actionMocks.setPan ).toHaveBeenCalled();
 
-			const call = dispatchMock.mock.calls.find(
-				( c ) => c[ 0 ].type === 'SET_PAN'
-			);
-			// ArrowLeft decreases x by keyboardStep.
-			expect(
-				( call![ 0 ].payload as { x: number } ).x
-			).toBeLessThanOrEqual( 0 );
+			const call = actionMocks.setPan.mock.calls[ 0 ];
+			// ArrowLeft scrolls the viewport left — image moves right, so x increases.
+			expect( call![ 0 ].x ).toBeGreaterThanOrEqual( 0 );
 		} );
 
-		it( 'dispatches SET_CROP on ArrowRight', () => {
+		it( 'calls setPan on ArrowRight', () => {
 			const state = makeState( { zoom: 2 } );
 			const { controller } = createController( state );
 
 			controller.handleKeyDown( createKeyboardEvent( 'ArrowRight' ) );
 
-			expect( dispatchMock ).toHaveBeenCalledWith(
-				expect.objectContaining( { type: 'SET_PAN' } )
-			);
+			expect( actionMocks.setPan ).toHaveBeenCalled();
 		} );
 
-		it( 'dispatches SET_ZOOM on + key', () => {
+		it( 'calls setZoom on + key', () => {
 			const state = makeState( { zoom: 2 } );
 			const { controller } = createController( state );
 
 			controller.handleKeyDown( createKeyboardEvent( '+' ) );
 
-			expect( dispatchMock ).toHaveBeenCalledWith(
-				expect.objectContaining( { type: 'SET_ZOOM' } )
-			);
+			expect( actionMocks.setZoom ).toHaveBeenCalled();
 
-			const call = dispatchMock.mock.calls.find(
-				( c ) => c[ 0 ].type === 'SET_ZOOM'
-			);
+			const call = actionMocks.setZoom.mock.calls[ 0 ];
 			// 2 + 0.5 = 2.5.
-			expect( call![ 0 ].payload ).toBe( 2.5 );
+			expect( call![ 0 ] ).toBe( 2.5 );
 		} );
 
-		it( 'dispatches SET_ZOOM on - key', () => {
+		it( 'calls setZoom on - key', () => {
 			const state = makeState( { zoom: 3 } );
 			const { controller } = createController( state );
 
 			controller.handleKeyDown( createKeyboardEvent( '-' ) );
 
-			const call = dispatchMock.mock.calls.find(
-				( c ) => c[ 0 ].type === 'SET_ZOOM'
-			);
+			const call = actionMocks.setZoom.mock.calls[ 0 ];
 			// 3 - 0.5 = 2.5.
-			expect( call![ 0 ].payload ).toBe( 2.5 );
+			expect( call![ 0 ] ).toBe( 2.5 );
 		} );
 
-		it( 'dispatches SNAP_ROTATE_90 on r key', () => {
+		it( 'calls snapRotate90 on r key', () => {
 			const state = makeState( { rotation: 0 } );
 			const { controller } = createController( state );
 
 			controller.handleKeyDown( createKeyboardEvent( 'r' ) );
 
-			expect( dispatchMock ).toHaveBeenCalledWith( {
-				type: 'SNAP_ROTATE_90',
-				payload: { direction: 1 },
-			} );
+			expect( actionMocks.snapRotate90 ).toHaveBeenCalledWith( 1 );
 		} );
 
-		it( 'dispatches SNAP_ROTATE_90 on R key', () => {
+		it( 'calls snapRotate90 on R key', () => {
 			const state = makeState( { rotation: 90 } );
 			const { controller } = createController( state );
 
 			controller.handleKeyDown( createKeyboardEvent( 'R' ) );
 
-			expect( dispatchMock ).toHaveBeenCalledWith( {
-				type: 'SNAP_ROTATE_90',
-				payload: { direction: 1 },
-			} );
+			expect( actionMocks.snapRotate90 ).toHaveBeenCalledWith( 1 );
 		} );
+
+		it( 'calls snapRotate90 counter-clockwise on shift+r', () => {
+			const state = makeState( { rotation: 0 } );
+			const { controller } = createController( state );
+
+			controller.handleKeyDown(
+				createKeyboardEvent( 'r', { shiftKey: true } )
+			);
+
+			expect( actionMocks.snapRotate90 ).toHaveBeenCalledWith( -1 );
+		} );
+
+		it.each( [ 'metaKey', 'ctrlKey', 'altKey' ] )(
+			'does not rotate when %s is held with r',
+			( modifier ) => {
+				const state = makeState( { rotation: 0 } );
+				const { controller } = createController( state );
+
+				controller.handleKeyDown(
+					createKeyboardEvent( 'r', { [ modifier ]: true } )
+				);
+
+				expect( actionMocks.setPan ).not.toHaveBeenCalled();
+				expect( actionMocks.setZoom ).not.toHaveBeenCalled();
+				expect( actionMocks.setZoomAtPoint ).not.toHaveBeenCalled();
+				expect( actionMocks.snapRotate90 ).not.toHaveBeenCalled();
+			}
+		);
+
+		it( 'calls flip horizontal on h key', () => {
+			const state = makeState();
+			const { controller } = createController( state );
+
+			controller.handleKeyDown( createKeyboardEvent( 'h' ) );
+
+			expect( actionMocks.toggleFlip ).toHaveBeenCalledWith(
+				'horizontal'
+			);
+		} );
+
+		it( 'calls flip horizontal on H key', () => {
+			const state = makeState();
+			const { controller } = createController( state );
+
+			controller.handleKeyDown( createKeyboardEvent( 'H' ) );
+
+			expect( actionMocks.toggleFlip ).toHaveBeenCalledWith(
+				'horizontal'
+			);
+		} );
+
+		it( 'calls flip vertical on v key', () => {
+			const state = makeState();
+			const { controller } = createController( state );
+
+			controller.handleKeyDown( createKeyboardEvent( 'v' ) );
+
+			expect( actionMocks.toggleFlip ).toHaveBeenCalledWith( 'vertical' );
+		} );
+
+		it( 'calls flip vertical on V key', () => {
+			const state = makeState();
+			const { controller } = createController( state );
+
+			controller.handleKeyDown( createKeyboardEvent( 'V' ) );
+
+			expect( actionMocks.toggleFlip ).toHaveBeenCalledWith( 'vertical' );
+		} );
+
+		it.each( [ 'metaKey', 'ctrlKey', 'altKey', 'shiftKey' ] )(
+			'does not flip when %s is held with h',
+			( modifier ) => {
+				const state = makeState();
+				const { controller } = createController( state );
+
+				controller.handleKeyDown(
+					createKeyboardEvent( 'h', { [ modifier ]: true } )
+				);
+
+				expect( actionMocks.toggleFlip ).not.toHaveBeenCalled();
+			}
+		);
+
+		it.each( [ 'metaKey', 'ctrlKey', 'altKey', 'shiftKey' ] )(
+			'does not flip when %s is held with v',
+			( modifier ) => {
+				const state = makeState();
+				const { controller } = createController( state );
+
+				controller.handleKeyDown(
+					createKeyboardEvent( 'v', { [ modifier ]: true } )
+				);
+
+				expect( actionMocks.toggleFlip ).not.toHaveBeenCalled();
+			}
+		);
 
 		it( 'respects custom keyboardStep (read lazily)', () => {
 			const state = makeState( { zoom: 2 } );
@@ -621,14 +751,46 @@ describe( 'InteractionController', () => {
 
 			controller.handleKeyDown( createKeyboardEvent( 'ArrowRight' ) );
 
-			const call = dispatchMock.mock.calls.find(
-				( c ) => c[ 0 ].type === 'SET_PAN'
+			const call = actionMocks.setPan.mock.calls[ 0 ];
+			// ArrowRight scrolls the viewport right — image moves left, so x decreases.
+			// 0 - 0.1 = -0.1, within bounds.
+			expect( call![ 0 ].x ).toBeCloseTo( -0.1 );
+		} );
+
+		it( 'uses fine keyboardStep by default for arrow key panning', () => {
+			const state = makeState( { zoom: 2 } );
+			const { controller } = createController( state );
+
+			controller.handleKeyDown( createKeyboardEvent( 'ArrowRight' ) );
+
+			const call = actionMocks.setPan.mock.calls[ 0 ];
+			expect( call![ 0 ].x ).toBeCloseTo( -0.01 );
+		} );
+
+		it( 'uses a 10x larger keyboardStep when Shift is held while panning', () => {
+			const state = makeState( { zoom: 2 } );
+			const { controller } = createController( state );
+
+			controller.handleKeyDown(
+				createKeyboardEvent( 'ArrowRight', { shiftKey: true } )
 			);
-			// At zoom=2 with full crop rect, maxX = 0.25.
-			// 0 + 0.1 = 0.1, within bounds.
-			expect( ( call![ 0 ].payload as { x: number } ).x ).toBeCloseTo(
-				0.1
+
+			const call = actionMocks.setPan.mock.calls[ 0 ];
+			expect( call![ 0 ].x ).toBeCloseTo( -0.1 );
+		} );
+
+		it( 'applies the Shift multiplier to custom keyboardStep while panning', () => {
+			const state = makeState( { zoom: 2 } );
+			const { controller } = createController( state, {
+				keyboardStep: 0.02,
+			} );
+
+			controller.handleKeyDown(
+				createKeyboardEvent( 'ArrowRight', { shiftKey: true } )
 			);
+
+			const call = actionMocks.setPan.mock.calls[ 0 ];
+			expect( call![ 0 ].x ).toBeCloseTo( -0.2 );
 		} );
 
 		it( 'does not dispatch on unhandled keys', () => {
@@ -637,12 +799,16 @@ describe( 'InteractionController', () => {
 
 			controller.handleKeyDown( createKeyboardEvent( 'a' ) );
 
-			expect( dispatchMock ).not.toHaveBeenCalled();
+			expect( actionMocks.setPan ).not.toHaveBeenCalled();
+			expect( actionMocks.setZoom ).not.toHaveBeenCalled();
+			expect( actionMocks.setZoomAtPoint ).not.toHaveBeenCalled();
+			expect( actionMocks.snapRotate90 ).not.toHaveBeenCalled();
+			expect( actionMocks.toggleFlip ).not.toHaveBeenCalled();
 		} );
 	} );
 
 	describe( 'touch', () => {
-		it( 'single-finger pan dispatches SET_CROP on first move', () => {
+		it( 'single-finger pan calls setPan on first move', () => {
 			const state = makeState( { zoom: 2 } );
 			const { controller } = createController( state );
 			const doc = createMockDocument();
@@ -660,9 +826,27 @@ describe( 'InteractionController', () => {
 				createTouchEvent( [ { clientX: 150, clientY: 120 } ] )
 			);
 
-			expect( dispatchMock ).toHaveBeenCalledWith(
-				expect.objectContaining( { type: 'SET_PAN' } )
+			expect( actionMocks.setPan ).toHaveBeenCalled();
+		} );
+
+		it( 'prevents default on touchmove so the page does not scroll mid-gesture', () => {
+			const state = makeState( { zoom: 2 } );
+			const { controller } = createController( state );
+			const doc = createMockDocument();
+			const rect = createContainerRect();
+
+			controller.handleTouchStart(
+				createTouchEvent( [ { clientX: 100, clientY: 100 } ] ),
+				rect,
+				doc
 			);
+
+			const moveEvent = createTouchEvent( [
+				{ clientX: 150, clientY: 120 },
+			] );
+			doc._fire( 'touchmove', moveEvent );
+
+			expect( moveEvent.preventDefault ).toHaveBeenCalled();
 		} );
 
 		it( 'calls onGestureStart/onGestureEnd for single-finger pan', () => {
@@ -728,7 +912,7 @@ describe( 'InteractionController', () => {
 			);
 		} );
 
-		it( 'pinch zoom dispatches SET_ZOOM_AT_POINT (atomic)', () => {
+		it( 'pinch zoom calls setZoomAtPoint atomically', () => {
 			const state = makeState( { zoom: 1 } );
 			const { controller } = createController( state );
 			const doc = createMockDocument();
@@ -753,9 +937,55 @@ describe( 'InteractionController', () => {
 				] )
 			);
 
-			expect( dispatchMock ).toHaveBeenCalledWith(
-				expect.objectContaining( { type: 'SET_ZOOM_AT_POINT' } )
+			expect( actionMocks.setZoomAtPoint ).toHaveBeenCalled();
+		} );
+
+		it( 'keeps a repeated pinch zoom anchored to the pinch-start midpoint from a zoomed and panned state', () => {
+			let state = makeState( {
+				zoom: 2,
+				pan: { x: 0.1, y: -0.05 },
+			} );
+			actionMocks.setZoomAtPoint.mockImplementation( ( zoom, pan ) => {
+				state = { ...state, zoom, pan };
+			} );
+			const { controller } = createController( state, {
+				getState: () => state,
+			} );
+			const doc = createMockDocument();
+			const rect = createContainerRect();
+
+			controller.handleTouchStart(
+				createTouchEvent( [
+					{ clientX: 300, clientY: 180 },
+					{ clientX: 400, clientY: 180 },
+				] ),
+				rect,
+				doc
 			);
+
+			doc._fire(
+				'touchmove',
+				createTouchEvent( [
+					{ clientX: 275, clientY: 180 },
+					{ clientX: 425, clientY: 180 },
+				] )
+			);
+			doc._fire(
+				'touchmove',
+				createTouchEvent( [
+					{ clientX: 250, clientY: 180 },
+					{ clientX: 450, clientY: 180 },
+				] )
+			);
+
+			expect( actionMocks.setZoomAtPoint ).toHaveBeenCalledTimes( 2 );
+			const [ zoom, pan ] =
+				actionMocks.setZoomAtPoint.mock.calls[
+					actionMocks.setZoomAtPoint.mock.calls.length - 1
+				];
+			expect( zoom ).toBeCloseTo( 4 );
+			expect( pan.x ).toBeCloseTo( 0 );
+			expect( pan.y ).toBeCloseTo( -0.2 );
 		} );
 
 		it( 'calls onGestureStart for pinch, onGestureEnd on touchend', () => {
@@ -803,10 +1033,8 @@ describe( 'InteractionController', () => {
 				'touchmove',
 				createTouchEvent( [ { clientX: 210, clientY: 155 } ] )
 			);
-			expect( dispatchMock ).toHaveBeenCalledWith(
-				expect.objectContaining( { type: 'SET_PAN' } )
-			);
-			dispatchMock.mockClear();
+			expect( actionMocks.setPan ).toHaveBeenCalled();
+			jest.clearAllMocks();
 
 			// Second finger arrives via touchstart.
 			controller.handleTouchStart(
@@ -827,15 +1055,9 @@ describe( 'InteractionController', () => {
 				] )
 			);
 
-			expect( dispatchMock ).toHaveBeenCalledWith(
-				expect.objectContaining( { type: 'SET_ZOOM_AT_POINT' } )
-			);
-			// Should NOT have dispatched any more SET_CROP after switching.
-			expect(
-				dispatchMock.mock.calls.filter(
-					( c ) => c[ 0 ].type === 'SET_PAN'
-				)
-			).toHaveLength( 0 );
+			expect( actionMocks.setZoomAtPoint ).toHaveBeenCalled();
+			// Should NOT have panned after switching.
+			expect( actionMocks.setPan ).not.toHaveBeenCalled();
 		} );
 
 		it( 'mid-move second finger triggers pinch without touchstart', () => {
@@ -861,7 +1083,10 @@ describe( 'InteractionController', () => {
 			);
 
 			// First 2-finger move initializes pinch state, no dispatch yet.
-			expect( dispatchMock ).not.toHaveBeenCalled();
+			expect( actionMocks.setPan ).not.toHaveBeenCalled();
+			expect( actionMocks.setZoom ).not.toHaveBeenCalled();
+			expect( actionMocks.setZoomAtPoint ).not.toHaveBeenCalled();
+			expect( actionMocks.snapRotate90 ).not.toHaveBeenCalled();
 
 			// Second 2-finger move dispatches pinch zoom.
 			doc._fire(
@@ -872,9 +1097,7 @@ describe( 'InteractionController', () => {
 				] )
 			);
 
-			expect( dispatchMock ).toHaveBeenCalledWith(
-				expect.objectContaining( { type: 'SET_ZOOM_AT_POINT' } )
-			);
+			expect( actionMocks.setZoomAtPoint ).toHaveBeenCalled();
 		} );
 
 		it( 'does not switch to pan after pinch finger is lifted', () => {
@@ -902,7 +1125,7 @@ describe( 'InteractionController', () => {
 				] )
 			);
 
-			dispatchMock.mockClear();
+			jest.clearAllMocks();
 
 			// One finger lifts — move with 1 touch should NOT pan
 			// because didPinch is true.
@@ -911,9 +1134,7 @@ describe( 'InteractionController', () => {
 				createTouchEvent( [ { clientX: 250, clientY: 160 } ] )
 			);
 
-			expect( dispatchMock ).not.toHaveBeenCalledWith(
-				expect.objectContaining( { type: 'SET_PAN' } )
-			);
+			expect( actionMocks.setPan ).not.toHaveBeenCalled();
 		} );
 	} );
 
@@ -931,10 +1152,8 @@ describe( 'InteractionController', () => {
 				createWheelEvent( { deltaY: 500, currentTarget: null } )
 			);
 
-			const setZoomCall = dispatchMock.mock.calls.find(
-				( call ) => call[ 0 ].type === 'SET_ZOOM'
-			);
-			expect( setZoomCall![ 0 ].payload ).toBe( 1.5 );
+			const setZoomCall = actionMocks.setZoom.mock.calls[ 0 ];
+			expect( setZoomCall![ 0 ] ).toBe( 1.5 );
 		} );
 	} );
 
@@ -1009,7 +1228,7 @@ describe( 'InteractionController', () => {
 				createPointerEvent( { clientX: 100, clientY: 100 } ),
 				el
 			);
-			dispatchMock.mockClear();
+			jest.clearAllMocks();
 
 			controller.destroy();
 
@@ -1019,7 +1238,10 @@ describe( 'InteractionController', () => {
 				'pointermove',
 				createPointerEvent( { clientX: 150, clientY: 100 } )
 			);
-			expect( dispatchMock ).not.toHaveBeenCalled();
+			expect( actionMocks.setPan ).not.toHaveBeenCalled();
+			expect( actionMocks.setZoom ).not.toHaveBeenCalled();
+			expect( actionMocks.setZoomAtPoint ).not.toHaveBeenCalled();
+			expect( actionMocks.snapRotate90 ).not.toHaveBeenCalled();
 		} );
 	} );
 } );

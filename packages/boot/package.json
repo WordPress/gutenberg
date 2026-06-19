@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/boot",
-	"version": "0.11.0",
+	"version": "0.15.1",
 	"description": "Minimal boot package for WordPress admin pages.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -37,7 +37,6 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScriptModuleExports": "./build-module/index.mjs",
 	"types": "build-types",
 	"dependencies": {
@@ -62,12 +61,19 @@
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/route": "file:../route",
 		"@wordpress/theme": "file:../theme",
+		"@wordpress/ui": "file:../ui",
 		"@wordpress/url": "file:../url",
 		"clsx": "^2.1.1"
 	},
 	"peerDependencies": {
+		"@types/react": "^18.3.27",
 		"react": "^18.0.0",
 		"react-dom": "^18.0.0"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

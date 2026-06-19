@@ -64,7 +64,6 @@ test.describe( 'Background gradient block support', () => {
 			} );
 
 			await editor.openDocumentSettingsSidebar();
-			await page.getByRole( 'tab', { name: 'Styles' } ).click();
 
 			// The gradient indicator in the Background panel should be visible,
 			// meaning the color.gradient value surfaced via the read-through fallback.
@@ -100,7 +99,6 @@ test.describe( 'Background gradient block support', () => {
 			} );
 
 			await editor.openDocumentSettingsSidebar();
-			await page.getByRole( 'tab', { name: 'Styles' } ).click();
 
 			// Open the gradient picker in the Background panel and select a
 			// preset, which triggers the migration.
@@ -141,7 +139,6 @@ test.describe( 'Background gradient block support', () => {
 			} );
 
 			await editor.openDocumentSettingsSidebar();
-			await page.getByRole( 'tab', { name: 'Styles' } ).click();
 
 			// Open the gradient picker and clear it. The inline reset icon
 			// button (aria-label="Reset") is hidden until hover; using the
@@ -186,7 +183,6 @@ test.describe( 'Background gradient block support', () => {
 			} );
 
 			await editor.openDocumentSettingsSidebar();
-			await page.getByRole( 'tab', { name: 'Styles' } ).click();
 
 			// First, trigger migration by selecting a preset gradient.
 			await page
@@ -239,7 +235,6 @@ test.describe( 'Background gradient block support', () => {
 			} );
 
 			await editor.openDocumentSettingsSidebar();
-			await page.getByRole( 'tab', { name: 'Styles' } ).click();
 
 			// Trigger migration by clearing the gradient via the picker.
 			await page

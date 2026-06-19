@@ -66,7 +66,7 @@ npm run wp-env start
 
 This script will create a Docker instance behind the scenes with the latest WordPress Docker image, and then will map the Gutenberg plugin code from your local copy to the environment as a Docker volume. This way, any changes you make to the code locally are reflected immediately in the WordPress instance.
 
-> Note: `npm run` will use the `wp-env` / `WordPress`?? version specified within the Gutenberg project, making sure you are running the latest wp-env version.
+> Note: `npm run` will use the `wp-env` / `WordPress` version specified within the Gutenberg project, making sure you are running the latest wp-env version.
 
 To stop the running environment:
 
@@ -243,7 +243,9 @@ To use Prettier with Visual Studio Code, you should install the [Prettier - Code
 
 This will use the `.prettierrc.js` file included in the root of the Gutenberg repository. The config is included from the [@wordpress/prettier-config](/packages/prettier-config/README.md) package.
 
-If you only want to use this configuration with the Gutenberg project, create a directory called .vscode at the top-level of Gutenberg, and place your settings in a settings.json there. Visual Studio Code refers to this as Workplace Settings, and only apply to the project.
+If you only want to use this configuration with the Gutenberg project, create a directory called `.vscode` at the top-level of Gutenberg (if it doesn't exist yet), and place your settings in a `settings.json` there. Visual Studio Code refers to this as Workspace Settings, and only apply to the project.
+
+After you create a `.vscode/settings.json` file in your repository, you probably want to add it to your [global gitignore file](https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files#configuring-ignored-files-for-all-repositories-on-your-computer) so that it stays private for you and is not committed to the repository.
 
 For other editors, see [Prettier's Editor Integration docs](https://prettier.io/docs/en/editors.html)
 

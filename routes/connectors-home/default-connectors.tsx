@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __experimentalHStack as HStack, Button } from '@wordpress/components';
-import { useEffect, useRef } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 import {
 	__experimentalRegisterConnector as registerConnector,
 	__experimentalConnectorItem as ConnectorItem,
@@ -12,13 +12,13 @@ import {
 	type ConnectorRenderProps,
 } from '@wordpress/connectors';
 import { select } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
-import { Badge } from '@wordpress/ui';
+import { __, sprintf } from '@wordpress/i18n';
+import { Badge, Link } from '@wordpress/ui';
+import { unlock } from '@wordpress/routes-lock-unlock';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../lock-unlock';
 import { useConnectorPlugin } from './use-connector-plugin';
 import {
 	OpenAILogo,
@@ -43,20 +43,32 @@ interface ConnectorData {
 	authentication: NonNullable< ConnectorConfig[ 'authentication' ] >;
 }
 
+interface ConnectorScriptModuleData {
+	connectors?: Record< string, ConnectorData >;
+	isFileModDisabled?: boolean;
+}
+
+function getConnectorScriptModuleData(): ConnectorScriptModuleData {
+	try {
+		return JSON.parse(
+			document.getElementById(
+				'wp-script-module-data-options-connectors-wp-admin'
+			)?.textContent ?? '{}'
+		);
+	} catch {
+		return {};
+	}
+}
+
 /**
  * Reads connector data passed from PHP via the script module data mechanism.
  */
 export function getConnectorData(): Record< string, ConnectorData > {
-	try {
-		const parsed = JSON.parse(
-			document.getElementById(
-				'wp-script-module-data-options-connectors-wp-admin'
-			)?.textContent ?? ''
-		);
-		return parsed?.connectors ?? {};
-	} catch {
-		return {};
-	}
+	return getConnectorScriptModuleData().connectors ?? {};
+}
+
+export function getIsFileModDisabled(): boolean {
+	return !! getConnectorScriptModuleData().isFileModDisabled;
 }
 
 const CONNECTOR_LOGOS: Record< string, React.ComponentType > = {
@@ -94,6 +106,19 @@ const ConnectedBadge = () => (
 	>
 		{ __( 'Connected' ) }
 	</span>
+);
+
+const PluginDirectoryLink = ( { slug }: { slug: string } ) => (
+	<Link
+		href={ sprintf(
+			/* translators: %s: plugin slug. */
+			__( 'https://wordpress.org/plugins/%s/' ),
+			slug
+		) }
+		openInNewTab
+	>
+		{ __( 'Learn more' ) }
+	</Link>
 );
 
 const UnavailableActionBadge = () => <Badge>{ __( 'Not available' ) }</Badge>;
@@ -154,22 +179,6 @@ function ApiKeyConnector( {
 	const showActionButton = ! showUnavailableBadge;
 
 	const actionButtonRef = useRef< HTMLButtonElement >( null );
-	const pendingFocusRef = useRef( false );
-
-	// Restore focus to the action button after async actions complete.
-	useEffect( () => {
-		if ( pendingFocusRef.current && ! isBusy ) {
-			pendingFocusRef.current = false;
-			actionButtonRef.current?.focus();
-		}
-	}, [ isBusy, isExpanded, isConnected ] );
-
-	const handleActionClick = () => {
-		if ( pluginStatus === 'not-installed' || pluginStatus === 'inactive' ) {
-			pendingFocusRef.current = true;
-		}
-		handleButtonClick();
-	};
 
 	return (
 		<ConnectorItem
@@ -182,7 +191,12 @@ function ApiKeyConnector( {
 			actionArea={
 				<HStack spacing={ 3 } expanded={ false }>
 					{ isConnected && <ConnectedBadge /> }
-					{ showUnavailableBadge && <UnavailableActionBadge /> }
+					{ showUnavailableBadge &&
+						( pluginSlug ? (
+							<PluginDirectoryLink slug={ pluginSlug } />
+						) : (
+							<UnavailableActionBadge />
+						) ) }
 					{ showActionButton && (
 						<Button
 							ref={ actionButtonRef }
@@ -192,9 +206,10 @@ function ApiKeyConnector( {
 									: 'secondary'
 							}
 							size="compact"
-							onClick={ handleActionClick }
+							onClick={ handleButtonClick }
 							disabled={ pluginStatus === 'checking' || isBusy }
 							isBusy={ isBusy }
+							accessibleWhenDisabled
 						>
 							{ getButtonLabel() }
 						</Button>
@@ -218,18 +233,14 @@ function ApiKeyConnector( {
 						isExternallyConfigured
 							? undefined
 							: async () => {
-									pendingFocusRef.current = true;
-									try {
-										await removeApiKey();
-									} catch {
-										pendingFocusRef.current = false;
-									}
+									await removeApiKey();
+									actionButtonRef.current?.focus();
 							  }
 					}
 					onSave={ async ( apiKey: string ) => {
 						await saveApiKey( apiKey );
-						pendingFocusRef.current = true;
 						setIsExpanded( false );
+						actionButtonRef.current?.focus();
 					} }
 				/>
 			) }

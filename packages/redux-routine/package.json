@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/redux-routine",
-	"version": "5.44.0",
+	"version": "5.48.1",
 	"description": "Redux middleware for generator coroutines.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -41,7 +41,6 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"wpScriptDefaultExport": true,
 	"types": "build-types",

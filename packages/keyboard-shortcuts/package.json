@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/keyboard-shortcuts",
-	"version": "5.44.0",
+	"version": "5.48.1",
 	"description": "Handling keyboard shortcuts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -39,7 +39,6 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"types": "build-types/index.d.ts",
 	"dependencies": {
@@ -48,7 +47,13 @@
 		"@wordpress/keycodes": "file:../keycodes"
 	},
 	"peerDependencies": {
+		"@types/react": "^18.3.27",
 		"react": "^18.0.0"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

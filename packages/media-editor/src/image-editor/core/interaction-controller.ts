@@ -1,8 +1,14 @@
 /**
  * Internal dependencies
  */
-import type { CropperAction, CropperState, Size } from './types';
-import { MIN_ZOOM, MAX_ZOOM } from './constants';
+import type { CropperState, NormalizedPoint, Size } from './types';
+import {
+	DEFAULT_KEYBOARD_STEP,
+	DEFAULT_WHEEL_ZOOM_SPEED,
+	KEYBOARD_SHIFT_STEP_MULTIPLIER,
+	MIN_ZOOM,
+	MAX_ZOOM,
+} from './constants';
 import { restrictPanZoom } from './containment';
 
 /** Time window for detecting a double-tap gesture (ms). */
@@ -51,6 +57,26 @@ export interface InteractionStatus {
 }
 
 /**
+ * State updates the interaction controller can request from its host UI.
+ */
+export interface CropperInteractionActions {
+	/** Set the image pan offset in normalized coordinates. */
+	setPan: ( pan: NormalizedPoint ) => void;
+	/**
+	 * Set the zoom level. Cursorless surfaces (slider, keyboard `+`/`-`)
+	 * rely on this anchoring at the crop center; pointer-driven zoom
+	 * paths use `setZoomAtPoint` with an explicit focal point instead.
+	 */
+	setZoom: ( zoom: number ) => void;
+	/** Set zoom and pan together for focal-point zoom. */
+	setZoomAtPoint: ( zoom: number, pan: NormalizedPoint ) => void;
+	/** Snap rotate by 90 degrees. */
+	snapRotate90: ( direction: 1 | -1 ) => void;
+	/** Toggle flip on the given axis. */
+	toggleFlip?: ( direction: 'horizontal' | 'vertical' ) => void;
+}
+
+/**
  * Options for creating an InteractionController.
  *
  * Scalar options (minZoom, maxZoom, etc.) are read lazily on each
@@ -60,8 +86,8 @@ export interface InteractionStatus {
 export interface InteractionControllerOptions {
 	/** Returns the current cropper state. Called on every interaction. */
 	getState: () => CropperState;
-	/** Dispatches a cropper action. */
-	dispatch: ( action: CropperAction ) => void;
+	/** State updates the interaction controller can request from its host UI. */
+	actions: CropperInteractionActions;
 	/** Returns the container dimensions in pixels. */
 	getContainerSize: () => Size;
 	/** Returns the rendered image dimensions in pixels, if available. */
@@ -70,9 +96,12 @@ export interface InteractionControllerOptions {
 	minZoom?: number;
 	/** Maximum zoom level. Defaults to MAX_ZOOM. Read lazily. */
 	maxZoom?: number;
-	/** Zoom speed multiplier for wheel events. Defaults to 0.01. Read lazily. */
+	/** Zoom speed multiplier for wheel events. Defaults to 0.0025. Read lazily. */
 	zoomSpeed?: number;
-	/** Pan step size in normalized coords for keyboard events. Defaults to 0.05. Read lazily. */
+	/**
+	 * Pan step size in normalized coords for keyboard events.
+	 * Defaults to 0.01. Read lazily. Shift multiplies it by 10.
+	 */
 	keyboardStep?: number;
 	/** Zoom level for double-tap zoom. Defaults to 2. Read lazily. */
 	doubleTapZoom?: number;
@@ -186,12 +215,24 @@ export class InteractionController {
 
 	/** Read zoomSpeed lazily so option changes take effect immediately. */
 	private get zoomSpeed(): number {
-		return this.options.zoomSpeed ?? 0.01;
+		return this.options.zoomSpeed ?? DEFAULT_WHEEL_ZOOM_SPEED;
 	}
 
 	/** Read keyboardStep lazily so option changes take effect immediately. */
 	private get keyboardStep(): number {
-		return this.options.keyboardStep ?? 0.05;
+		return this.options.keyboardStep ?? DEFAULT_KEYBOARD_STEP;
+	}
+
+	/**
+	 * Get the keyboard pan step, including modifier-based coarse movement.
+	 *
+	 * @param event The native KeyboardEvent.
+	 * @return The normalized pan step.
+	 */
+	private getKeyboardStep( event: KeyboardEvent ): number {
+		return event.shiftKey
+			? this.keyboardStep * KEYBOARD_SHIFT_STEP_MULTIPLIER
+			: this.keyboardStep;
 	}
 
 	/** Read doubleTapZoom lazily so option changes take effect immediately. */
@@ -245,13 +286,24 @@ export class InteractionController {
 		if ( e.button !== 0 ) {
 			return;
 		}
+		// Touch gestures are handled by touchstart/touchmove. Starting the
+		// pointer drag path too can briefly toggle drag UI before pinch begins.
+		if ( e.pointerType === 'touch' ) {
+			return;
+		}
 		e.preventDefault();
 
-		// Blur any focused handle so its focus ring doesn't linger.
+		// Blur any focused handle so its focus ring doesn't linger,
+		// but leave the canvas itself alone so keyboard control works after drag.
 		const ownerDoc = el.ownerDocument;
-		if ( ownerDoc?.activeElement instanceof HTMLElement ) {
+		if (
+			ownerDoc?.activeElement instanceof HTMLElement &&
+			ownerDoc.activeElement !== el
+		) {
 			ownerDoc.activeElement.blur();
 		}
+
+		el.focus();
 
 		// Capture pointer so drag works across iframe boundaries.
 		el.setPointerCapture( e.pointerId );
@@ -301,10 +353,7 @@ export class InteractionController {
 					s.cropRect
 				);
 
-				this.options.dispatch( {
-					type: 'SET_PAN',
-					payload: newCrop,
-				} );
+				this.options.actions.setPan( newCrop );
 			} );
 		};
 
@@ -343,6 +392,10 @@ export class InteractionController {
 	 */
 	handleWheel( e: WheelEvent ): void {
 		e.preventDefault();
+
+		if ( this.drag ) {
+			return;
+		}
 
 		// Debounced gesture boundaries for wheel zoom.
 		// Start on first wheel event, end after 300ms of no events.
@@ -391,12 +444,9 @@ export class InteractionController {
 				getImageSizeFromState( s ),
 				s.cropRect
 			);
-			this.options.dispatch( {
-				type: 'SET_ZOOM_AT_POINT',
-				payload: { zoom: newZoom, pan: clampedCrop },
-			} );
+			this.options.actions.setZoomAtPoint( newZoom, clampedCrop );
 		} else {
-			this.options.dispatch( { type: 'SET_ZOOM', payload: newZoom } );
+			this.options.actions.setZoom( newZoom );
 		}
 	}
 
@@ -523,6 +573,7 @@ export class InteractionController {
 		if ( ! touch ) {
 			return;
 		}
+		moveEvent.preventDefault();
 
 		cancelAnimationFrame( this.rafId );
 		this.rafId = requestAnimationFrame( () => {
@@ -596,20 +647,28 @@ export class InteractionController {
 							? ( my - startMy ) / visSize.height
 							: 0;
 
-					// Focal-point zoom correction.
-					const zoomRatio = s.zoom !== 0 ? 1 - newZoom / s.zoom : 0;
-					const focalNormX = mx / visSize.width;
-					const focalNormY = my / visSize.height;
-					const zoomCropX =
-						s.pan.x + ( focalNormX - s.pan.x ) * zoomRatio;
-					const zoomCropY =
-						s.pan.y + ( focalNormY - s.pan.y ) * zoomRatio;
+					// Focal-point zoom correction. Keep this based on the
+					// pinch-start state; using the current reducer state here
+					// compounds prior touchmove frames and makes a fixed pinch
+					// center drift after the image is already zoomed or panned.
+					const zoomRatio =
+						touch.startZoom !== 0
+							? 1 - newZoom / touch.startZoom
+							: 0;
+					const startFocalNormX = startMx / visSize.width;
+					const startFocalNormY = startMy / visSize.height;
 
-					// Combined: pan drift + zoom correction.
+					// Combined: midpoint drift + zoom around the pinch-start
+					// midpoint, so moving both fingers together pans while
+					// symmetric pinches keep the start center stationary.
 					const newCropX =
-						touch.startPanX + panDx + ( zoomCropX - s.pan.x );
+						touch.startPanX +
+						panDx +
+						( startFocalNormX - touch.startPanX ) * zoomRatio;
 					const newCropY =
-						touch.startPanY + panDy + ( zoomCropY - s.pan.y );
+						touch.startPanY +
+						panDy +
+						( startFocalNormY - touch.startPanY ) * zoomRatio;
 
 					const { pan: clampedCrop } = restrictPanZoom(
 						{
@@ -620,15 +679,9 @@ export class InteractionController {
 						getImageSizeFromState( s ),
 						s.cropRect
 					);
-					this.options.dispatch( {
-						type: 'SET_ZOOM_AT_POINT',
-						payload: { zoom: newZoom, pan: clampedCrop },
-					} );
+					this.options.actions.setZoomAtPoint( newZoom, clampedCrop );
 				} else if ( newZoom !== s.zoom ) {
-					this.options.dispatch( {
-						type: 'SET_ZOOM',
-						payload: newZoom,
-					} );
+					this.options.actions.setZoom( newZoom );
 				}
 			} else if ( moveEvent.touches.length === 1 && ! touch.didPinch ) {
 				// One finger and no pinch ever detected → pan.
@@ -667,10 +720,7 @@ export class InteractionController {
 					s.cropRect
 				);
 
-				this.options.dispatch( {
-					type: 'SET_PAN',
-					payload: newCrop,
-				} );
+				this.options.actions.setPan( newCrop );
 			}
 		} );
 	};
@@ -726,6 +776,11 @@ export class InteractionController {
 			this.setStatus( { isZooming: false } );
 		}, ZOOM_ANIMATION_DURATION );
 
+		// Double-tap bypasses the normal handleTouchStart gesture path so
+		// onGestureStart/End are never called — fire them here so undo
+		// receives a proper boundary around this discrete zoom action.
+		this.options.onGestureStart?.();
+
 		if ( visSize.width > 0 && visSize.height > 0 ) {
 			const fx = tapX - containerRect.left - containerSize.width / 2;
 			const fy = tapY - containerRect.top - containerSize.height / 2;
@@ -749,16 +804,12 @@ export class InteractionController {
 				getImageSizeFromState( currentState ),
 				currentState.cropRect
 			);
-			this.options.dispatch( {
-				type: 'SET_ZOOM_AT_POINT',
-				payload: { zoom: targetZoom, pan: clampedCrop },
-			} );
+			this.options.actions.setZoomAtPoint( targetZoom, clampedCrop );
 		} else {
-			this.options.dispatch( {
-				type: 'SET_ZOOM',
-				payload: targetZoom,
-			} );
+			this.options.actions.setZoom( targetZoom );
 		}
+
+		this.options.onGestureEnd?.();
 		return true;
 	}
 
@@ -775,78 +826,70 @@ export class InteractionController {
 		switch ( e.key ) {
 			case 'ArrowUp': {
 				e.preventDefault();
+				const keyboardStep = this.getKeyboardStep( e );
 				const { pan: newCrop } = restrictPanZoom(
 					{
 						...currentState,
 						pan: {
 							x: currentState.pan.x,
-							y: currentState.pan.y - this.keyboardStep,
+							y: currentState.pan.y + keyboardStep,
 						},
 					},
 					getImageSizeFromState( currentState ),
 					currentState.cropRect
 				);
-				this.options.dispatch( {
-					type: 'SET_PAN',
-					payload: newCrop,
-				} );
+				this.options.actions.setPan( newCrop );
 				break;
 			}
 			case 'ArrowDown': {
 				e.preventDefault();
+				const keyboardStep = this.getKeyboardStep( e );
 				const { pan: newCrop } = restrictPanZoom(
 					{
 						...currentState,
 						pan: {
 							x: currentState.pan.x,
-							y: currentState.pan.y + this.keyboardStep,
+							y: currentState.pan.y - keyboardStep,
 						},
 					},
 					getImageSizeFromState( currentState ),
 					currentState.cropRect
 				);
-				this.options.dispatch( {
-					type: 'SET_PAN',
-					payload: newCrop,
-				} );
+				this.options.actions.setPan( newCrop );
 				break;
 			}
 			case 'ArrowLeft': {
 				e.preventDefault();
+				const keyboardStep = this.getKeyboardStep( e );
 				const { pan: newCrop } = restrictPanZoom(
 					{
 						...currentState,
 						pan: {
-							x: currentState.pan.x - this.keyboardStep,
+							x: currentState.pan.x + keyboardStep,
 							y: currentState.pan.y,
 						},
 					},
 					getImageSizeFromState( currentState ),
 					currentState.cropRect
 				);
-				this.options.dispatch( {
-					type: 'SET_PAN',
-					payload: newCrop,
-				} );
+				this.options.actions.setPan( newCrop );
 				break;
 			}
 			case 'ArrowRight': {
 				e.preventDefault();
+				const keyboardStep = this.getKeyboardStep( e );
 				const { pan: newCrop } = restrictPanZoom(
 					{
 						...currentState,
 						pan: {
-							x: currentState.pan.x + this.keyboardStep,
+							x: currentState.pan.x - keyboardStep,
 							y: currentState.pan.y,
 						},
 					},
 					getImageSizeFromState( currentState ),
 					currentState.cropRect
 				);
-				this.options.dispatch( {
-					type: 'SET_PAN',
-					payload: newCrop,
-				} );
+				this.options.actions.setPan( newCrop );
 				break;
 			}
 			case '+':
@@ -856,10 +899,7 @@ export class InteractionController {
 					this.maxZoom,
 					Math.max( this.minZoom, currentState.zoom + 0.5 )
 				);
-				this.options.dispatch( {
-					type: 'SET_ZOOM',
-					payload: newZoom,
-				} );
+				this.options.actions.setZoom( newZoom );
 				break;
 			}
 			case '-':
@@ -869,19 +909,34 @@ export class InteractionController {
 					this.maxZoom,
 					Math.max( this.minZoom, currentState.zoom - 0.5 )
 				);
-				this.options.dispatch( {
-					type: 'SET_ZOOM',
-					payload: newZoom,
-				} );
+				this.options.actions.setZoom( newZoom );
 				break;
 			}
 			case 'r':
 			case 'R': {
+				if ( e.metaKey || e.ctrlKey || e.altKey ) {
+					break;
+				}
 				e.preventDefault();
-				this.options.dispatch( {
-					type: 'SNAP_ROTATE_90',
-					payload: { direction: 1 },
-				} );
+				this.options.actions.snapRotate90( e.shiftKey ? -1 : 1 );
+				break;
+			}
+			case 'h':
+			case 'H': {
+				if ( e.metaKey || e.ctrlKey || e.altKey || e.shiftKey ) {
+					break;
+				}
+				e.preventDefault();
+				this.options.actions.toggleFlip?.( 'horizontal' );
+				break;
+			}
+			case 'v':
+			case 'V': {
+				if ( e.metaKey || e.ctrlKey || e.altKey || e.shiftKey ) {
+					break;
+				}
+				e.preventDefault();
+				this.options.actions.toggleFlip?.( 'vertical' );
 				break;
 			}
 		}

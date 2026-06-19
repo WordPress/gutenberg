@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import { defineConfig, type Config } from '@terrazzo/parser';
 import pluginCSS from '@terrazzo/plugin-css';
 import { makeCSSVar } from '@terrazzo/token-tools/css';
-
-/**
- * Internal dependencies
- */
 import pluginModeOverrides from './bin/terrazzo-plugin-mode-overrides/index';
 import pluginKnownWpdsCssVariables from './bin/terrazzo-plugin-known-wpds-css-variables/index';
 import pluginDsTokenDocs from './bin/terrazzo-plugin-ds-tokens-docs/index';
@@ -22,6 +15,7 @@ const config: Config = {
 		'./tokens/cursor.json',
 		'./tokens/dimension.json',
 		'./tokens/elevation.json',
+		'./tokens/motion.json',
 		'./tokens/typography.json',
 	],
 	outDir: './src/prebuilt',
@@ -70,30 +64,46 @@ const config: Config = {
 			baseSelector: ':root',
 			modeSelectors: [
 				{
-					tokens: [ 'wpds-dimension.**' ],
-					mode: 'compact',
-					selectors: [
-						"[data-wpds-theme-provider-id][data-wpds-density='compact']",
-					],
-				},
-				{
-					tokens: [ 'wpds-dimension.**' ],
-					mode: 'comfortable',
-					selectors: [
-						"[data-wpds-theme-provider-id][data-wpds-density='comfortable']",
-					],
-				},
-				{
-					tokens: [ 'wpds-dimension.**' ],
-					mode: '.',
-					selectors: [
-						"[data-wpds-theme-provider-id][data-wpds-density='default']",
-					],
-				},
-				{
 					mode: 'high-dpi',
 					selectors: [
 						'@media ( -webkit-min-device-pixel-ratio: 2 ), ( min-resolution: 192dpi )',
+					],
+				},
+				// Each corner-radius preset is applied via the
+				// `data-wpds-corner-radius` attribute that `ThemeProvider`
+				// sets on its scoping element. The additional
+				// `:root:has([data-wpds-root-provider="true"]…)` selector lets
+				// a root `ThemeProvider` forward its preset to the document
+				// element, matching how `color` and `cursor` tokens already
+				// behave so the whole token surface stays consistent on
+				// `<html>` (e.g. for PHP-rendered admin UI outside the React
+				// app).
+				{
+					mode: 'corner-radius-none',
+					selectors: [
+						'[data-wpds-corner-radius="none"]',
+						':root:has([data-wpds-root-provider="true"][data-wpds-corner-radius="none"])',
+					],
+				},
+				{
+					mode: 'corner-radius-subtle',
+					selectors: [
+						'[data-wpds-corner-radius="subtle"]',
+						':root:has([data-wpds-root-provider="true"][data-wpds-corner-radius="subtle"])',
+					],
+				},
+				{
+					mode: 'corner-radius-moderate',
+					selectors: [
+						'[data-wpds-corner-radius="moderate"]',
+						':root:has([data-wpds-root-provider="true"][data-wpds-corner-radius="moderate"])',
+					],
+				},
+				{
+					mode: 'corner-radius-pronounced',
+					selectors: [
+						'[data-wpds-corner-radius="pronounced"]',
+						':root:has([data-wpds-root-provider="true"][data-wpds-corner-radius="pronounced"])',
 					],
 				},
 			],
@@ -122,9 +132,24 @@ const config: Config = {
 					patterns: [ /^wpds-dimension\.gap\.([^.]+)$/ ],
 				},
 				{
+					name: 'ElementSize',
+					description: 'Size scale for element sizing tokens.',
+					patterns: [ /^wpds-dimension\.size\.([^.]+)$/ ],
+				},
+				{
 					name: 'SurfaceWidthSize',
 					description: 'Size scale for surface width tokens.',
 					patterns: [ /^wpds-dimension\.surface-width\.([^.]+)$/ ],
+				},
+				{
+					name: 'DurationSize',
+					description: 'Size scale for duration tokens.',
+					patterns: [ /^wpds-motion\.duration\.([^.]+)$/ ],
+				},
+				{
+					name: 'Easing',
+					description: 'Easing curve variants.',
+					patterns: [ /^wpds-motion\.easing\.([^.]+)$/ ],
 				},
 				{
 					name: 'BorderRadiusSize',
@@ -152,7 +177,7 @@ const config: Config = {
 						'Background color variants for surface elements.',
 					patterns: [
 						{
-							pattern: /^wpds-color\.bg\.surface\.(.+)$/,
+							pattern: /^wpds-color\.background\.surface\.(.+)$/,
 							transform: ( variant ) =>
 								variant.split( '.' ).join( '-' ),
 						},
@@ -164,7 +189,8 @@ const config: Config = {
 						'Background color variants for interactive elements.',
 					patterns: [
 						{
-							pattern: /^wpds-color\.bg\.interactive\.(.+)$/,
+							pattern:
+								/^wpds-color\.background\.interactive\.(.+)$/,
 							transform: ( variant ) =>
 								variant
 									.split( '.' )
@@ -179,7 +205,7 @@ const config: Config = {
 						'Foreground color variants for content text and icons.',
 					patterns: [
 						{
-							pattern: /^wpds-color\.fg\.content\.(.+)$/,
+							pattern: /^wpds-color\.foreground\.content\.(.+)$/,
 							transform: ( variant ) =>
 								variant.split( '.' ).join( '-' ),
 						},
@@ -191,7 +217,8 @@ const config: Config = {
 						'Foreground color variants for interactive element text and icons.',
 					patterns: [
 						{
-							pattern: /^wpds-color\.fg\.interactive\.(.+)$/,
+							pattern:
+								/^wpds-color\.foreground\.interactive\.(.+)$/,
 							transform: ( variant ) =>
 								variant
 									.split( '.' )
@@ -231,7 +258,7 @@ const config: Config = {
 					description: 'Foreground color variants for text elements.',
 					patterns: [
 						{
-							pattern: /^wpds-color\.fg\.[^.]+\.(.+)$/,
+							pattern: /^wpds-color\.foreground\.[^.]+\.(.+)$/,
 							transform: ( variant ) =>
 								variant.split( '.' ).join( '-' ),
 						},
