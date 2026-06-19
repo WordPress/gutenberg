@@ -286,6 +286,11 @@ export class InteractionController {
 		if ( e.button !== 0 ) {
 			return;
 		}
+		// Touch gestures are handled by touchstart/touchmove. Starting the
+		// pointer drag path too can briefly toggle drag UI before pinch begins.
+		if ( e.pointerType === 'touch' ) {
+			return;
+		}
 		e.preventDefault();
 
 		// Blur any focused handle so its focus ring doesn't linger,

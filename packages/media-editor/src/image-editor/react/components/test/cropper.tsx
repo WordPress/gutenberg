@@ -66,9 +66,13 @@ describe( 'Cropper', () => {
 				MouseEvent
 			) {
 				pointerId: number;
+				pointerType: string;
+				isPrimary: boolean;
 				constructor( type: string, init: PointerEventInit = {} ) {
 					super( type, init );
 					this.pointerId = init.pointerId ?? 0;
+					this.pointerType = init.pointerType ?? '';
+					this.isPrimary = init.isPrimary ?? false;
 				}
 			};
 		}
@@ -474,6 +478,44 @@ describe( 'Cropper', () => {
 		expect( controller.setZoomAtPoint ).not.toHaveBeenCalled();
 
 		fireEvent.pointerUp( resizeHandle, { pointerId: 1 } );
+	} );
+
+	it( 'does not start canvas drag from touch pointer events', async () => {
+		const controller = createController();
+		render(
+			<Cropper
+				src="test.jpg"
+				controller={ controller }
+				showDimming
+				showGrid="interactive"
+				freeformCrop
+			/>
+		);
+
+		await screen.findByRole( 'button', {
+			name: 'Resize top-left corner',
+		} );
+		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
+
+		fireEvent.pointerDown( canvas, {
+			button: 0,
+			clientX: 100,
+			clientY: 100,
+			pointerId: 1,
+			pointerType: 'touch',
+			isPrimary: true,
+		} );
+		fireEvent.pointerMove( canvas, {
+			button: 0,
+			clientX: 150,
+			clientY: 120,
+			pointerId: 1,
+			pointerType: 'touch',
+			isPrimary: true,
+		} );
+
+		expect( canvas ).not.toHaveClass( SHOW_GRID_CLASS );
+		expect( controller.setPan ).not.toHaveBeenCalled();
 	} );
 
 	it( 'cancels handle resize when a touch gesture becomes a pinch', async () => {

@@ -291,6 +291,38 @@ describe( 'InteractionController', () => {
 			el._fire( 'pointerup', createPointerEvent() );
 		} );
 
+		it( 'ignores touch pointerdown so touch gestures own touch input', () => {
+			const state = makeState( { zoom: 2 } );
+			const onGestureStart = jest.fn();
+			const onStatusChange = jest.fn();
+			const { controller } = createController( state, {
+				onGestureStart,
+				onStatusChange,
+			} );
+			const el = createMockElement();
+			const event = createPointerEvent( {
+				clientX: 100,
+				clientY: 100,
+				pointerType: 'touch',
+			} );
+
+			controller.handlePointerDown( event, el );
+
+			expect( event.preventDefault ).not.toHaveBeenCalled();
+			expect( el.focus ).not.toHaveBeenCalled();
+			expect( el.setPointerCapture ).not.toHaveBeenCalled();
+			expect( el.addEventListener ).not.toHaveBeenCalled();
+			expect( onGestureStart ).not.toHaveBeenCalled();
+			expect( onStatusChange ).not.toHaveBeenCalled();
+
+			el._fire(
+				'pointermove',
+				createPointerEvent( { clientX: 150, clientY: 120 } )
+			);
+
+			expect( actionMocks.setPan ).not.toHaveBeenCalled();
+		} );
+
 		it( 'stops dispatching after pointerup', () => {
 			const state = makeState( { zoom: 2 } );
 			const { controller } = createController( state );
