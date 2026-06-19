@@ -6,7 +6,7 @@
 	color: inherit;
 	display: flex;
 	width: 100%;
-	min-height: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available
+	min-height: var(--wpds-dimension-size-sm);
 	cursor: var(--wpds-cursor-control);
 	align-items: flex-start;
 	border-radius: var(--wpds-border-radius-sm);
@@ -14,7 +14,7 @@
 
 	&--label-side {
 		flex-direction: row;
-		gap: var(--wpds-dimension-gap-md);
+		gap: var(--wpds-dimension-gap-sm);
 	}
 
 	&--label-top {
@@ -85,7 +85,7 @@
 .dataforms-layouts-panel__field-label {
 	width: 38%;
 	flex-shrink: 0;
-	min-height: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available
+	min-height: var(--wpds-dimension-size-sm);
 	display: flex;
 	align-items: center;
 	line-height: var(--wpds-typography-line-height-sm);
@@ -120,33 +120,20 @@
 .dataforms-layouts-panel__field-control {
 	flex-grow: 1;
 	min-width: 0;
-	min-height: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available
+	min-height: var(--wpds-dimension-size-sm);
 	line-height: var(--wpds-typography-line-height-md);
 	display: flex;
 	align-items: center;
-	overflow: hidden;
+	overflow: clip;
+	// padding-inline + negative margin-inline creates room within the
+	// clip boundary for focus rings of inner controls.
+	padding-inline: var(--wpds-border-width-focus);
+	margin-inline: calc(-1 * var(--wpds-border-width-focus));
 	word-break: break-word;
 	font-weight: var(--wpds-typography-font-weight-medium);
 
 	> * {
 		min-width: 0;
-	}
-
-	.components-button {
-		max-width: 100%;
-		text-align: left;
-		white-space: normal;
-		text-wrap: balance; // Fallback for Safari.
-		text-wrap: pretty;
-		min-height: vars.$button-size-compact;
-	}
-
-	&.components-button.is-link[aria-disabled="true"] {
-		text-decoration: none;
-	}
-
-	.components-dropdown {
-		max-width: 100%;
 	}
 }
 

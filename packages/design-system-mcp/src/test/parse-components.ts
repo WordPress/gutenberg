@@ -34,13 +34,13 @@ describe( 'parseProps', () => {
 		const result = parseProps( {
 			disabled: {
 				required: false,
-				tsType: { name: 'boolean' },
+				type: { name: 'boolean' },
 				description: 'Whether the button is disabled.',
 				defaultValue: { value: 'false' },
 			},
 			variant: {
 				required: false,
-				tsType: {
+				type: {
 					name: 'union',
 					raw: "'solid' | 'outline' | 'minimal' | 'unstyled'",
 				},
@@ -48,7 +48,7 @@ describe( 'parseProps', () => {
 			},
 			style: {
 				required: false,
-				tsType: {
+				type: {
 					name: 'ReactCSSProperties',
 					raw: 'React.CSSProperties',
 				},
@@ -85,12 +85,12 @@ describe( 'parseProps', () => {
 		const result = parseProps( {
 			variant: {
 				required: false,
-				tsType: { name: 'string' },
+				type: { name: 'string' },
 				description: 'The button variant.',
 			},
 			oldProp: {
 				required: false,
-				tsType: { name: 'string' },
+				type: { name: 'string' },
 				description: '@deprecated Use variant instead.',
 			},
 		} );
@@ -103,12 +103,12 @@ describe( 'parseProps', () => {
 		const result = parseProps( {
 			visible: {
 				required: true,
-				tsType: { name: 'boolean' },
+				type: { name: 'boolean' },
 				description: 'Whether visible.',
 			},
 			internal: {
 				required: false,
-				tsType: { name: 'string' },
+				type: { name: 'string' },
 				description: '@ignore Internal use only.',
 			},
 		} );
@@ -307,11 +307,11 @@ describe( 'parseComponentDetail', () => {
 				name: 'Button',
 				description: 'A button component.',
 				path: '../packages/ui/src/button/stories/index.story.tsx',
-				reactDocgen: {
+				reactComponentMeta: {
 					props: {
 						variant: {
 							required: false,
-							tsType: { name: 'string' },
+							type: { name: 'string' },
 							description: 'The button variant.',
 						},
 					},
@@ -394,14 +394,14 @@ describe( 'parseComponentDetail', () => {
 			button: {
 				name: 'Button',
 				path: '../packages/ui/src/button/stories/index.story.tsx',
-				reactDocgen: {
+				reactComponentMeta: {
 					props: {
 						variant: {
-							tsType: { name: 'string' },
+							type: { name: 'string' },
 							description: 'Current prop.',
 						},
 						legacy: {
-							tsType: { name: 'string' },
+							type: { name: 'string' },
 							description: '@deprecated Use variant.',
 						},
 					},
@@ -484,16 +484,16 @@ describe( 'parseComponentDetail', () => {
 		const components = createComponents( {
 			'badge-index': {
 				name: 'Badge',
-				// First entry has no reactDocgen props
+				// First entry has no component meta props
 				path: '../packages/ui/src/badge/stories/index.story.tsx',
 			},
 			'badge-intent': {
 				name: 'Badge',
 				path: '../packages/ui/src/badge/stories/choosing-intent.story.tsx',
-				reactDocgen: {
+				reactComponentMeta: {
 					props: {
 						intent: {
-							tsType: { name: 'string' },
+							type: { name: 'string' },
 							description: 'The badge intent.',
 						},
 					},

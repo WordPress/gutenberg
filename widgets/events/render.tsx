@@ -7,7 +7,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { mapMarker } from '@wordpress/icons';
-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
 import { Icon, Link, Stack, Text, Tooltip } from '@wordpress/ui';
 
 /**

@@ -28,7 +28,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
 }
 
 .emotion-6 {
-  background: var(--wp-components-color-background, #fff);
+  background: var(--wp-components-color-background, var(--wpds-color-background-surface-neutral-strong, #fff));
   border: 1px solid transparent;
   border-radius: 2px;
   display: -webkit-inline-box;
@@ -62,8 +62,8 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   content: '';
   position: absolute;
   pointer-events: none;
-  background: var(--wp-components-color-gray-100, #f0f0f0);
-  border: 1px solid var(--wp-components-color-gray-700, #757575);
+  background: var(--wp-components-color-gray-100, var(--wpds-color-background-surface-neutral, #fcfcfc));
+  border: 1px solid var(--wp-components-color-gray-700, var(--wpds-color-foreground-content-neutral-weak, #707070));
   outline: 2px solid transparent;
   outline-offset: -3px;
   border-radius: 2px;
@@ -106,7 +106,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   background: transparent;
   border: none;
   border-radius: 1px;
-  color: var(--wp-components-color-gray-700, #757575);
+  color: var(--wp-components-color-gray-700, var(--wpds-color-foreground-content-neutral-weak, #707070));
   fill: currentColor;
   cursor: pointer;
   display: -webkit-box;
@@ -134,7 +134,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   aspect-ratio: 1;
   padding-left: 0;
   padding-right: 0;
-  color: var(--wp-components-color-foreground, #1e1e1e);
+  color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
   font-weight: 499;
 }
 
@@ -156,7 +156,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
 }
 
 .emotion-10:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
-  color: var(--wp-components-color-foreground, #1e1e1e);
+  color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
 }
 
 .emotion-11 {
@@ -180,7 +180,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   background: transparent;
   border: none;
   border-radius: 1px;
-  color: var(--wp-components-color-gray-700, #757575);
+  color: var(--wp-components-color-gray-700, var(--wpds-color-foreground-content-neutral-weak, #707070));
   fill: currentColor;
   cursor: pointer;
   display: -webkit-box;
@@ -228,7 +228,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
 }
 
 .emotion-15:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
-  color: var(--wp-components-color-foreground, #1e1e1e);
+  color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
 }
 
 <div>
@@ -361,7 +361,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
 }
 
 .emotion-6 {
-  background: var(--wp-components-color-background, #fff);
+  background: var(--wp-components-color-background, var(--wpds-color-background-surface-neutral-strong, #fff));
   border: 1px solid transparent;
   border-radius: 2px;
   display: -webkit-inline-box;
@@ -395,8 +395,8 @@ exports[`ToggleGroupControl controlled should render correctly with text options
   content: '';
   position: absolute;
   pointer-events: none;
-  background: var(--wp-components-color-gray-100, #f0f0f0);
-  border: 1px solid var(--wp-components-color-gray-700, #757575);
+  background: var(--wp-components-color-gray-100, var(--wpds-color-background-surface-neutral, #fcfcfc));
+  border: 1px solid var(--wp-components-color-gray-700, var(--wpds-color-foreground-content-neutral-weak, #707070));
   outline: 2px solid transparent;
   outline-offset: -3px;
   border-radius: 2px;
@@ -439,7 +439,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
   background: transparent;
   border: none;
   border-radius: 1px;
-  color: var(--wp-components-color-gray-700, #757575);
+  color: var(--wp-components-color-gray-700, var(--wpds-color-foreground-content-neutral-weak, #707070));
   fill: currentColor;
   cursor: pointer;
   display: -webkit-box;
@@ -483,7 +483,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
 }
 
 .emotion-10:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
-  color: var(--wp-components-color-foreground, #1e1e1e);
+  color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
 }
 
 .emotion-11 {
@@ -602,7 +602,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
 }
 
 .emotion-6 {
-  background: var(--wp-components-color-background, #fff);
+  background: var(--wp-components-color-background, var(--wpds-color-background-surface-neutral-strong, #fff));
   border: 1px solid transparent;
   border-radius: 2px;
   display: -webkit-inline-box;
@@ -636,8 +636,8 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   content: '';
   position: absolute;
   pointer-events: none;
-  background: var(--wp-components-color-gray-100, #f0f0f0);
-  border: 1px solid var(--wp-components-color-gray-700, #757575);
+  background: var(--wp-components-color-gray-100, var(--wpds-color-background-surface-neutral, #fcfcfc));
+  border: 1px solid var(--wp-components-color-gray-700, var(--wpds-color-foreground-content-neutral-weak, #707070));
   outline: 2px solid transparent;
   outline-offset: -3px;
   border-radius: 2px;
@@ -680,7 +680,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   background: transparent;
   border: none;
   border-radius: 1px;
-  color: var(--wp-components-color-gray-700, #757575);
+  color: var(--wp-components-color-gray-700, var(--wpds-color-foreground-content-neutral-weak, #707070));
   fill: currentColor;
   cursor: pointer;
   display: -webkit-box;
@@ -708,7 +708,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   aspect-ratio: 1;
   padding-left: 0;
   padding-right: 0;
-  color: var(--wp-components-color-foreground, #1e1e1e);
+  color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
   font-weight: 499;
 }
 
@@ -730,7 +730,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
 }
 
 .emotion-10:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
-  color: var(--wp-components-color-foreground, #1e1e1e);
+  color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
 }
 
 .emotion-11 {
@@ -754,7 +754,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   background: transparent;
   border: none;
   border-radius: 1px;
-  color: var(--wp-components-color-gray-700, #757575);
+  color: var(--wp-components-color-gray-700, var(--wpds-color-foreground-content-neutral-weak, #707070));
   fill: currentColor;
   cursor: pointer;
   display: -webkit-box;
@@ -802,7 +802,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
 }
 
 .emotion-15:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
-  color: var(--wp-components-color-foreground, #1e1e1e);
+  color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
 }
 
 <div>
@@ -929,7 +929,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
 }
 
 .emotion-6 {
-  background: var(--wp-components-color-background, #fff);
+  background: var(--wp-components-color-background, var(--wpds-color-background-surface-neutral-strong, #fff));
   border: 1px solid transparent;
   border-radius: 2px;
   display: -webkit-inline-box;
@@ -963,8 +963,8 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
   content: '';
   position: absolute;
   pointer-events: none;
-  background: var(--wp-components-color-gray-100, #f0f0f0);
-  border: 1px solid var(--wp-components-color-gray-700, #757575);
+  background: var(--wp-components-color-gray-100, var(--wpds-color-background-surface-neutral, #fcfcfc));
+  border: 1px solid var(--wp-components-color-gray-700, var(--wpds-color-foreground-content-neutral-weak, #707070));
   outline: 2px solid transparent;
   outline-offset: -3px;
   border-radius: 2px;
@@ -1007,7 +1007,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
   background: transparent;
   border: none;
   border-radius: 1px;
-  color: var(--wp-components-color-gray-700, #757575);
+  color: var(--wp-components-color-gray-700, var(--wpds-color-foreground-content-neutral-weak, #707070));
   fill: currentColor;
   cursor: pointer;
   display: -webkit-box;
@@ -1051,7 +1051,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
 }
 
 .emotion-10:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
-  color: var(--wp-components-color-foreground, #1e1e1e);
+  color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
 }
 
 .emotion-11 {

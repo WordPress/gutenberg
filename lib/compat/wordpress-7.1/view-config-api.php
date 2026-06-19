@@ -294,6 +294,7 @@ function _gutenberg_get_entity_view_config_post_type_page( $config ) {
 			),
 			'parent',
 			'format',
+			'revisions',
 		),
 	);
 
@@ -373,6 +374,7 @@ function _gutenberg_get_entity_view_config_post_type_post( $config ) {
 			),
 			'parent',
 			'format',
+			'revisions',
 		),
 	);
 
