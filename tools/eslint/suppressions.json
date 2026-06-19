@@ -900,11 +900,6 @@
 			"count": 1
 		}
 	},
-	"packages/edit-site/src/components/sidebar-navigation-item/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/edit-site/src/components/sidebar-navigation-screen-global-styles/content.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
