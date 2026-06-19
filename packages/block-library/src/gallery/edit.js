@@ -754,17 +754,17 @@ export default function GalleryEdit( props ) {
 							/>
 						</ToolsPanelItem>
 					) }
-					<ToolsPanelItem
-						label={ __( 'Navigation button type' ) }
-						isShownByDefault
-						hasValue={ () => navigationButtonType !== 'icon' }
-						onDeselect={ () =>
-							setAttributes( {
-								navigationButtonType: 'icon',
-							} )
-						}
-					>
-						{ hasLightboxImages && (
+					{ lightboxSetting?.allowEditing && hasLightboxImages && (
+						<ToolsPanelItem
+							label={ __( 'Navigation button type' ) }
+							isShownByDefault
+							hasValue={ () => navigationButtonType !== 'icon' }
+							onDeselect={ () =>
+								setAttributes( {
+									navigationButtonType: 'icon',
+								} )
+							}
+						>
 							<ToggleGroupControl
 								label={ __( 'Navigation button type' ) }
 								value={ navigationButtonType }
@@ -789,8 +789,8 @@ export default function GalleryEdit( props ) {
 									)
 								) }
 							</ToggleGroupControl>
-						) }
-					</ToolsPanelItem>
+						</ToolsPanelItem>
+					) }
 				</ToolsPanel>
 			</InspectorControls>
 			<BlockControls group="block">

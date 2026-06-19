@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import { v4 as uuid } from 'uuid';
 
 /**
@@ -14,7 +13,7 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import { getNestedValue, setNestedValue } from './utils';
+import { clearUnchangedEdits, getNestedValue, setNestedValue } from './utils';
 import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
@@ -421,14 +420,7 @@ export const editEntityRecord =
 			recordId,
 			// Clear edits when they are equal to their persisted counterparts
 			// so that the property is not considered dirty.
-			edits: Object.keys( edits ).reduce( ( acc, key ) => {
-				const recordValue = record[ key ];
-				const value = editsWithMerges[ key ];
-				acc[ key ] = fastDeepEqual( recordValue, value )
-					? undefined
-					: value;
-				return acc;
-			}, {} ),
+			edits: clearUnchangedEdits( editsWithMerges, record ),
 		};
 		if ( entityConfig.syncConfig ) {
 			const objectType = `${ kind }/${ name }`;
