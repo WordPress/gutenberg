@@ -2,7 +2,7 @@
  * External dependencies
  */
 import clsx from 'clsx';
-import type { FormEvent, RefObject } from 'react';
+import type { FormEvent, MouseEvent, RefObject } from 'react';
 
 /**
  * WordPress dependencies
@@ -10,6 +10,7 @@ import type { FormEvent, RefObject } from 'react';
 import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import {
+	useCallback,
 	useContext,
 	useEffect,
 	useMemo,
@@ -27,13 +28,22 @@ import { CircularOptionPickerContext } from '../circular-option-picker/circular-
 import { Composite } from '../composite';
 import { Truncate } from '../truncate';
 import { TextControl } from '../text-control';
+import type { AddFormInitialFocus } from './use-color-editing';
 import { colorsAreEqual } from './utils';
 
 type FormMode = 'add' | 'edit';
 
+function onClickWithTarget(
+	onClick: ( trigger: HTMLElement ) => void
+): ( event: MouseEvent< HTMLButtonElement > ) => void {
+	return ( event ) => onClick( event.currentTarget );
+}
+
 function useEscapeToCancel(
 	onCancel: () => void,
-	formRef: RefObject< HTMLFormElement | null >
+	formRef: RefObject< HTMLFormElement | null >,
+	shouldClosePickerInstead?: () => boolean,
+	onClosePicker?: () => void
 ) {
 	useEffect( () => {
 		const handleDocumentKeyDown = ( event: globalThis.KeyboardEvent ) => {
@@ -46,12 +56,16 @@ function useEscapeToCancel(
 			}
 			event.preventDefault();
 			event.stopPropagation();
+			if ( shouldClosePickerInstead?.() && onClosePicker ) {
+				onClosePicker();
+				return;
+			}
 			onCancel();
 		};
 		document.addEventListener( 'keydown', handleDocumentKeyDown );
 		return () =>
 			document.removeEventListener( 'keydown', handleDocumentKeyDown );
-	}, [ onCancel, formRef ] );
+	}, [ onCancel, formRef, shouldClosePickerInstead, onClosePicker ] );
 }
 
 function FormActions( {
@@ -109,7 +123,7 @@ type DefaultInfoRowProps = {
 	canAdd: boolean;
 	onEdit: () => void;
 	onDelete: () => void;
-	onAdd: () => void;
+	onAdd: ( trigger: HTMLElement ) => void;
 };
 
 /**
@@ -168,7 +182,7 @@ export function DefaultInfoRow( {
 							icon={ plus }
 							label={ __( 'Add to custom' ) }
 							showTooltip
-							onClick={ onAdd }
+							onClick={ onClickWithTarget( onAdd ) }
 						/>
 					) }
 					{ canEdit && (
@@ -212,6 +226,7 @@ type ColorEditFormProps = {
 	originalColor?: string;
 	initialName: string;
 	canRename: boolean;
+	initialFocus?: AddFormInitialFocus;
 	onCancel: () => void;
 	onSubmit: ( name: string ) => void;
 };
@@ -229,6 +244,7 @@ export function ColorEditForm( {
 	originalColor,
 	initialName,
 	canRename,
+	initialFocus = 'name',
 	onCancel,
 	onSubmit,
 }: ColorEditFormProps ) {
@@ -236,10 +252,26 @@ export function ColorEditForm( {
 	const inputRef = useRef< HTMLInputElement >( null );
 	const trimmedName = name.trim();
 	const displayName = canRename ? trimmedName : ( originalName ?? '' ).trim();
+	const hasColor = !! hex;
+
+	const focusNameInput = useCallback( () => {
+		const node = inputRef.current;
+		if ( node ) {
+			node.focus();
+			node.select();
+		}
+	}, [] );
 
 	const formAccessibleName = useMemo( () => {
 		if ( mode === 'add' ) {
-			return __( 'Add custom color' );
+			if ( hasColor ) {
+				return sprintf(
+					// translators: %s: hex value of the selected custom color.
+					__( 'Add custom color. Selected color: %s.' ),
+					hex
+				);
+			}
+			return __( 'Add custom color. Choose a color, then name it.' );
 		}
 		if ( canRename ) {
 			return sprintf(
@@ -253,20 +285,16 @@ export function ColorEditForm( {
 			__( 'Edit theme color value: %s' ),
 			displayName
 		);
-	}, [ mode, canRename, originalName, displayName ] );
+	}, [ mode, canRename, originalName, displayName, hasColor, hex ] );
 
-	// Auto-focus + select the name input when the form mounts, so editing
-	// "Color 1" → "Brand Red" is a single typed value.
+	// Only the add-by-name flow auto-focuses the name input. Edits (custom or
+	// theme) and add-from-swatch focus the color control instead. The parent
+	// focuses the swatch toggle for those flows.
 	useEffect( () => {
-		if ( ! canRename ) {
-			return;
+		if ( mode === 'add' && initialFocus !== 'color' ) {
+			focusNameInput();
 		}
-		const node = inputRef.current;
-		if ( node ) {
-			node.focus();
-			node.select();
-		}
-	}, [ canRename ] );
+	}, [ mode, initialFocus, focusNameInput ] );
 
 	const hasChanges = useMemo( () => {
 		if ( mode === 'add' ) {
@@ -429,7 +457,7 @@ export function DeleteConfirmRow( {
 }
 
 type AddCustomColorButtonProps = {
-	onClick: () => void;
+	onClick: ( trigger: HTMLElement ) => void;
 };
 
 /**
@@ -461,7 +489,9 @@ export function AddCustomColorButton( { onClick }: AddCustomColorButtonProps ) {
 					label={ label }
 					aria-label={ label }
 					showTooltip
-					onClick={ onClick }
+					onClick={ ( event: MouseEvent< HTMLButtonElement > ) =>
+						onClick( event.currentTarget )
+					}
 				/>
 			}
 		/>
@@ -470,7 +500,9 @@ export function AddCustomColorButton( { onClick }: AddCustomColorButtonProps ) {
 			__next40pxDefaultSize
 			size="small"
 			className="components-color-palette__add-color-button"
-			onClick={ onClick }
+			onClick={ ( event: MouseEvent< HTMLButtonElement > ) =>
+				onClick( event.currentTarget )
+			}
 			label={ label }
 			aria-label={ label }
 			icon={ plus }

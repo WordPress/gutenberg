@@ -29,9 +29,16 @@ import {
 	toPaletteObjects,
 } from './utils';
 
+export type AddFormInitialFocus = 'name' | 'color';
+
+export type EnterAddOptions = {
+	initialFocus?: AddFormInitialFocus;
+	trigger?: HTMLElement | null;
+};
+
 export type EditingState =
 	| { mode: 'view' }
-	| { mode: 'add' }
+	| { mode: 'add'; initialFocus: AddFormInitialFocus }
 	| {
 			mode: 'edit';
 			entry: ColorObject;
@@ -42,7 +49,7 @@ export type EditingState =
 
 type EditingAction =
 	| { type: 'reset' }
-	| { type: 'enter-add' }
+	| { type: 'enter-add'; initialFocus: AddFormInitialFocus }
 	| { type: 'enter-edit'; entry: ColorObject; paletteSlug: string }
 	| { type: 'enter-delete'; entry: ColorObject; paletteSlug: string }
 	| { type: 'set-preview'; color: string };
@@ -55,7 +62,10 @@ function editingReducer(
 		case 'reset':
 			return { mode: 'view' };
 		case 'enter-add':
-			return { mode: 'add' };
+			return {
+				mode: 'add',
+				initialFocus: action.initialFocus,
+			};
 		case 'enter-edit':
 			return {
 				mode: 'edit',
@@ -107,6 +117,8 @@ export function useColorEditing( {
 		mode: 'view',
 	} );
 	const [ isPickerOpen, setIsPickerOpen ] = useState( false );
+	const focusColorToggleRef = useRef< ( () => void ) | null >( null );
+	const addTriggerRef = useRef< HTMLElement | null >( null );
 
 	const isEditingEnabled = isColorEditingEnabled( colorEditing, {
 		disableCustomColors,
@@ -148,7 +160,15 @@ export function useColorEditing( {
 		dispatch( { type: 'reset' } );
 	}, [] );
 
+	const restoreAddTriggerFocus = useCallback( () => {
+		const trigger = addTriggerRef.current;
+		if ( trigger?.isConnected ) {
+			trigger.focus();
+		}
+	}, [] );
+
 	const handleCancel = useCallback( () => {
+		const shouldRestoreFocus = editingState.mode === 'add';
 		if ( editingState.mode === 'edit' ) {
 			if ( colorEditing?.onPreview ) {
 				colorEditing.onPreview( null );
@@ -162,12 +182,50 @@ export function useColorEditing( {
 		}
 		resetEditing();
 		closeDropdown();
-	}, [ editingState, onChange, colorEditing, resetEditing, closeDropdown ] );
+		if ( shouldRestoreFocus ) {
+			restoreAddTriggerFocus();
+		}
+	}, [
+		editingState,
+		onChange,
+		colorEditing,
+		resetEditing,
+		closeDropdown,
+		restoreAddTriggerFocus,
+	] );
 
 	const handleEnterAdd = useCallback(
-		() => dispatch( { type: 'enter-add' } ),
-		[]
+		( { initialFocus, trigger }: EnterAddOptions = {} ) => {
+			addTriggerRef.current = trigger ?? null;
+			const resolvedInitialFocus =
+				initialFocus ?? ( isDirtyCustomValue ? 'name' : 'color' );
+			if ( resolvedInitialFocus === 'color' ) {
+				// Focus the swatch toggle before opening the picker so the
+				// popover captures it as the focus-return target and restores
+				// to it on close.
+				focusColorToggleRef.current?.();
+				setIsPickerOpen( true );
+			}
+			dispatch( {
+				type: 'enter-add',
+				initialFocus: resolvedInitialFocus,
+			} );
+		},
+		[ isDirtyCustomValue ]
 	);
+
+	// Lets the parent register a way to focus the palette's color toggle
+	// (the existing swatch button) for recolor-first flows.
+	const registerFocusColorToggle = useCallback( ( focus: () => void ) => {
+		focusColorToggleRef.current = focus;
+	}, [] );
+
+	// Every flow that opens the picker focuses the swatch toggle first,
+	// so the popover restores focus to the swatch toggle on close.
+	const handlePickerToggle = useCallback( ( isOpen: boolean ) => {
+		setIsPickerOpen( isOpen );
+	}, [] );
+
 	const handleEnterEdit = useCallback( () => {
 		if ( ! selectedEntry ) {
 			return;
@@ -177,6 +235,9 @@ export function useColorEditing( {
 			entry: selectedEntry.color,
 			paletteSlug: selectedEntry.paletteSlug ?? '',
 		} );
+		// Editing a color is primarily about re-coloring, so move focus to the
+		// swatch toggle (the color control) rather than the name input.
+		focusColorToggleRef.current?.();
 	}, [ selectedEntry ] );
 	const handleEnterDelete = useCallback( () => {
 		if ( ! selectedEntry?.color.slug ) {
@@ -206,6 +267,10 @@ export function useColorEditing( {
 			onChange( value, undefined, nextSlug );
 			resetEditing();
 			closeDropdown();
+			// The add trigger ("+"/"Add to custom") unmounts once the color is
+			// saved, so return focus to the always-present swatch toggle (now
+			// representing the new selection) instead of leaving it on <body>.
+			focusColorToggleRef.current?.();
 		},
 		[
 			colorEditing,
@@ -255,6 +320,9 @@ export function useColorEditing( {
 			onChange( currentColor, undefined, nextSlug );
 			resetEditing();
 			closeDropdown();
+			// Return focus to the swatch toggle (the form's submit button just
+			// unmounted) so focus is never left on <body>.
+			focusColorToggleRef.current?.();
 		},
 		[
 			colorEditing,
@@ -279,6 +347,9 @@ export function useColorEditing( {
 		resetEditing();
 		closeDropdown();
 		onChange( undefined );
+		// The Delete button unmounts with the confirmation; return focus to the
+		// swatch toggle rather than leaving it on <body>.
+		focusColorToggleRef.current?.();
 	}, [ colorEditing, editingState, onChange, resetEditing, closeDropdown ] );
 
 	const handlePickerChange = useCallback(
@@ -363,7 +434,23 @@ export function useColorEditing( {
 		}
 
 		if ( editingState.mode === 'add' ) {
-			speak( __( 'Add custom color' ), 'polite' );
+			if ( editingState.initialFocus === 'color' ) {
+				speak(
+					__( 'Add custom color. Choose a color first.' ),
+					'polite'
+				);
+			} else if ( displayValue ) {
+				speak(
+					sprintf(
+						// translators: %s: hex value of the custom color being added.
+						__( 'Adding custom color %s. Enter a name.' ),
+						displayValue
+					),
+					'polite'
+				);
+			} else {
+				speak( __( 'Add custom color' ), 'polite' );
+			}
 		} else if ( editingState.mode === 'edit' && editingState.entry.name ) {
 			speak(
 				sprintf(
@@ -376,7 +463,7 @@ export function useColorEditing( {
 		}
 
 		prevModeRef.current = editingState.mode;
-	}, [ editingState ] );
+	}, [ editingState, displayValue ] );
 
 	const editPickerColor =
 		editingState.mode === 'edit'
@@ -405,7 +492,8 @@ export function useColorEditing( {
 	return {
 		editingState,
 		isPickerOpen,
-		setIsPickerOpen,
+		setIsPickerOpen: handlePickerToggle,
+		registerFocusColorToggle,
 		closeDropdown,
 		isEditingEnabled,
 		canEditFullCustom,

@@ -85,7 +85,7 @@ export type MultiplePalettesProps = PaletteProps & {
 	colors: PaletteObject[];
 	/** When true, renders an add-custom-color button in the custom palette row. */
 	canAddCustomColor?: boolean;
-	onAddCustom?: () => void;
+	onAddCustom?: ( trigger: HTMLElement ) => void;
 };
 
 export type CustomColorPickerDropdownProps = DropdownProps & {

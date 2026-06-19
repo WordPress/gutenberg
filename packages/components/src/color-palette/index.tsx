@@ -12,7 +12,9 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import {
 	Fragment,
 	useCallback,
+	useEffect,
 	useMemo,
+	useRef,
 	useState,
 	forwardRef,
 } from '@wordpress/element';
@@ -241,8 +243,10 @@ function UnforwardedColorPalette(
 
 	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
 
+	const colorToggleRef = useRef< HTMLElement | null >( null );
 	const customColorPaletteCallbackRef = useCallback(
 		( node: HTMLElement | null ) => {
+			colorToggleRef.current = node;
 			setNormalizedColorValue( normalizeColorValue( value, node ) );
 		},
 		[ value ]
@@ -280,6 +284,13 @@ function UnforwardedColorPalette(
 		buttonLabelName,
 		resolvedColorValue,
 	} );
+
+	// Recolor-first flows (value-only edits) move focus to the existing
+	// swatch toggle rather than introducing a separate in-form color control.
+	const { registerFocusColorToggle } = editing;
+	useEffect( () => {
+		registerFocusColorToggle( () => colorToggleRef.current?.focus() );
+	}, [ registerFocusColorToggle ] );
 
 	const customColorAccessibleLabel = !! displayValue
 		? sprintf(
@@ -452,7 +463,12 @@ function UnforwardedColorPalette(
 								headingLevel={ headingLevel }
 								colors={ displayedColors as PaletteObject[] }
 								canAddCustomColor={ editing.canEditFullCustom }
-								onAddCustom={ editing.handleEnterAdd }
+								onAddCustom={ ( trigger ) =>
+									editing.handleEnterAdd( {
+										initialFocus: 'color',
+										trigger,
+									} )
+								}
 							/>
 						) : (
 							<SinglePalette

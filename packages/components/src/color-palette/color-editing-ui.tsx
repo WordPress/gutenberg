@@ -8,7 +8,7 @@ import {
 	DefaultInfoRow,
 	DeleteConfirmRow,
 } from './color-editing-controls';
-import type { EditingState } from './use-color-editing';
+import type { EditingState, EnterAddOptions } from './use-color-editing';
 import type { PaletteEditingCapability } from './types';
 
 type CustomColorPickerContentProps = {
@@ -43,7 +43,7 @@ type InfoAreaProps = {
 	canEditSelected: boolean;
 	canDeleteSelected: boolean;
 	isDirtyCustomValue: boolean;
-	onEnterAdd: () => void;
+	onEnterAdd: ( options?: EnterAddOptions ) => void;
 	onEnterEdit: () => void;
 	onEnterDelete: () => void;
 	onCancel: () => void;
@@ -87,6 +87,7 @@ export function InfoArea( {
 				hex={ displayValue }
 				initialName=""
 				canRename
+				initialFocus={ editingState.initialFocus }
 				onCancel={ onCancel }
 				onSubmit={ onSubmitAdd }
 			/>
@@ -118,7 +119,9 @@ export function InfoArea( {
 			canAdd={ isDirtyCustomValue }
 			onEdit={ onEnterEdit }
 			onDelete={ onEnterDelete }
-			onAdd={ onEnterAdd }
+			onAdd={ ( trigger ) =>
+				onEnterAdd( { initialFocus: 'name', trigger } )
+			}
 		/>
 	);
 }
