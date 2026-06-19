@@ -90,7 +90,8 @@ function Layout() {
 	useEffect( () => {
 		if ( previousCanvaMode === 'edit' ) {
 			const desktopToggle = sidebarRegionRef.current
-				? focus.tabbable.find( sidebarRegionRef.current )[ 0 ]
+				? // We're typically expecting the `<DashboardBackButton />` component as the first tabbable element.
+				  focus.tabbable.find( sidebarRegionRef.current )[ 0 ]
 				: undefined;
 			( desktopToggle ?? mobileToggleRef.current )?.focus();
 		}
