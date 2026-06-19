@@ -44,9 +44,9 @@ function gutenberg_add_svg_to_safe_style_css( array $attr ): array {
 
 		// Markers.
 		'marker',
-		'marker-start',
-		'marker-mid',
 		'marker-end',
+		'marker-mid',
+		'marker-start',
 
 		// Clipping and masking.
 		'clip-path',
