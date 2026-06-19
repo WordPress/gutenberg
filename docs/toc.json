@@ -354,7 +354,10 @@
 					{
 						"docs/explanations/architecture/full-site-editing-templates.md": []
 					},
-					{ "docs/explanations/architecture/styles.md": [] }
+					{ "docs/explanations/architecture/styles.md": [] },
+					{
+						"docs/explanations/architecture/dashboard-widgets.md": []
+					}
 				]
 			},
 			{
@@ -402,22 +405,6 @@
 							},
 							{
 								"docs/contributors/code/auto-cherry-picking.md": []
-							}
-						]
-					},
-					{
-						"docs/contributors/code/react-native/README.md": [
-							{
-								"docs/contributors/code/react-native/getting-started-react-native.md": []
-							},
-							{
-								"docs/contributors/code/react-native/osx-setup-guide.md": []
-							},
-							{
-								"docs/contributors/code/react-native/integration-test-guide.md": []
-							},
-							{
-								"docs/contributors/code/react-native/internationalization-guide.md": []
 							}
 						]
 					},

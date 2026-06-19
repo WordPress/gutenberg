@@ -2,13 +2,38 @@
 
 ## Unreleased
 
-### Breaking Changes
+### Enhancements
 
--   Revert React back to v18 [#78940](https://github.com/WordPress/gutenberg/pull/78940).
+-   `Field.Description`: Apply `text-wrap: pretty` to description text to avoid typographic widows ([#79143](https://github.com/WordPress/gutenberg/pull/79143)).
+-   `Autocomplete`: Add `Autocomplete.Group` and `Autocomplete.GroupLabel` subcomponents ([#78901](https://github.com/WordPress/gutenberg/pull/78901)).
 
 ### Code Quality
 
--   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+-   `Button`: Reference the medium font-weight design token instead of a literal value. No visual change ([#79278](https://github.com/WordPress/gutenberg/pull/79278)).
+-   Move `@types/react` from `dependencies` to an optional peer dependency so consumers' React type version is used ([#79095](https://github.com/WordPress/gutenberg/pull/79095)).
+-   `Button` and `AlertDialog`: Reference the tone-specific `brand`/`error` disabled color tokens for disabled states instead of the `neutral` ones, to match each element's tone. Disabled `Select`/`Autocomplete`/`Combobox` list items also adopt the `brand` disabled background token. No visual change ([#79124](https://github.com/WordPress/gutenberg/pull/79124)).
+
+### Bug Fixes
+
+-   `Button`: Fix `loading` state in forced colors mode ([#78820](https://github.com/WordPress/gutenberg/pull/78820)).
+-   `Button`: Fix `loading` prop affecting `unstyled` variant ([#78820](https://github.com/WordPress/gutenberg/pull/78820)).
+
+### Internal
+
+-   Adopt `--wpds-dimension-size-*` design tokens [#79093](https://github.com/WordPress/gutenberg/pull/79093).
+
+## 0.15.1 (2026-06-16)
+
+## 0.15.0 (2026-06-10)
+
+### Breaking Changes
+
+-   Update CSS cascade layers from flat list to nested, replacing `wp-ui-utilities`, `wp-ui-components`, `wp-ui-compositions`, and `wp-ui-overrides` with a single layer `wp-ui` ([#78959](https://github.com/WordPress/gutenberg/pull/78959)).
+-   Revert React back to v18 ([#78940](https://github.com/WordPress/gutenberg/pull/78940)).
+
+### Code Quality
+
+-   Add missing `@types/react` dependency ([#78882](https://github.com/WordPress/gutenberg/pull/78882)).
 
 ### Bug Fixes
 
@@ -18,6 +43,8 @@
 
 ### Enhancements
 
+-   `Tooltip`: Use `--wpds-border-radius-md` for portaled popup surfaces, aligning with menus and popovers ([#78983](https://github.com/WordPress/gutenberg/pull/78983)).
+-   `Popover`: Animate the popup open and closed ([#78885](https://github.com/WordPress/gutenberg/pull/78885)).
 -   `Tooltip.Provider`: Widen the types to accept all props of the equivalent `Tooltip.Provider` from `@base-ui/react` (types-only change) ([#78642](https://github.com/WordPress/gutenberg/pull/78642)).
 
 ### Internal

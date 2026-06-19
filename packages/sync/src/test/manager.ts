@@ -747,7 +747,7 @@ describe( 'SyncManager', () => {
 			);
 		} );
 
-		it( 'updates the record metadata when the update is associated with a save', async () => {
+		it( 'updates save metadata when the update is associated with a save', async () => {
 			// Capture the Y.Doc from provider creator.
 			let capturedDoc: Y.Doc | null = null;
 			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
@@ -967,6 +967,44 @@ describe( 'SyncManager', () => {
 			expect( mockHandlers.editRecord ).toHaveBeenCalledWith( {
 				title: 'Title from remote peer',
 			} );
+		} );
+
+		it( 'refetches the entity record when a remote save updates save metadata', async () => {
+			// Capture the Y.Doc from provider creator.
+			let capturedDoc: Y.Doc | null = null;
+			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
+				capturedDoc = ydoc;
+				return mockProviderResult;
+			} );
+
+			const manager = createSyncManager();
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			mockHandlers.refetchRecord.mockClear();
+
+			expect( capturedDoc ).not.toBeNull();
+
+			const remoteDoc = new Y.Doc();
+			const stateMap = remoteDoc.getMap( CRDT_STATE_MAP_KEY );
+			stateMap.set( SAVED_AT_KEY, Date.now() + 1000 );
+			stateMap.set( SAVED_BY_KEY, remoteDoc.clientID );
+			Y.applyUpdateV2(
+				capturedDoc as unknown as Y.Doc,
+				Y.encodeStateAsUpdateV2( remoteDoc )
+			);
+			remoteDoc.destroy();
+
+			// Wait a tick.
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+			expect( mockHandlers.refetchRecord ).toHaveBeenCalledTimes( 1 );
 		} );
 
 		it( 'does not edit the local record for local transactions', async () => {

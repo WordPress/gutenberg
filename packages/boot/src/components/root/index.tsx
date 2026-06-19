@@ -19,7 +19,6 @@ import { menu } from '@wordpress/icons';
 import { useState, useEffect, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Page, getAdminThemeColors } from '@wordpress/admin-ui';
-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
 import { Tooltip } from '@wordpress/ui';
 import { privateApis as themePrivateApis } from '@wordpress/theme';
 
@@ -67,7 +66,7 @@ export default function Root() {
 			<Tooltip.Provider>
 				<ThemeProvider
 					isRoot
-					color={ { ...themeColors, bg: '#f8f8f8' } }
+					color={ { ...themeColors, background: '#f8f8f8' } }
 				>
 					<ThemeProvider color={ themeColors }>
 						<div
@@ -155,7 +154,10 @@ export default function Root() {
 							) }
 							<div className="boot-layout__surfaces">
 								<ThemeProvider
-									color={ { ...themeColors, bg: '#ffffff' } }
+									color={ {
+										...themeColors,
+										background: '#ffffff',
+									} }
 								>
 									<Outlet />
 									{ /* Render Canvas in Root to prevent remounting on route changes */ }

@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { Platform } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
@@ -56,9 +55,7 @@ export function __experimentalUpdateSettings(
 
 	let cleanSettings = incomingSettings;
 
-	// There are no plugins in the mobile apps, so there is no
-	// need to strip the experimental settings:
-	if ( stripExperimentalSettings && Platform.OS === 'web' ) {
+	if ( stripExperimentalSettings ) {
 		cleanSettings = {};
 		for ( const key in incomingSettings ) {
 			if ( ! privateSettings.includes( key ) ) {

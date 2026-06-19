@@ -16,7 +16,7 @@ import {
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 } from '@wordpress/components';
 import { Icon, alignNone, stretchWide } from '@wordpress/icons';
-import { useCallback, useState, Platform } from '@wordpress/element';
+import { useCallback, useState } from '@wordpress/element';
 import { getValueFromVariable } from '@wordpress/global-styles-engine';
 
 /**
@@ -32,7 +32,6 @@ import { setImmutably } from '../../utils/object';
 import {
 	DEFAULT_BLOCK_STYLE_STATE,
 	hasPseudoBlockStyleState,
-	isDefaultBlockStyleState,
 	hasViewportBlockStyleState,
 } from '../../hooks/block-style-state';
 
@@ -43,18 +42,17 @@ export function useHasDimensionsPanel(
 	styleState = DEFAULT_BLOCK_STYLE_STATE
 ) {
 	return (
-		Platform.OS === 'web' &&
-		( hasContentSize( settings ) ||
-			hasWideSize( settings ) ||
-			hasPadding( settings ) ||
-			hasMargin( settings ) ||
-			hasGap( settings ) ||
-			hasHeight( settings ) ||
-			hasMinHeight( settings ) ||
-			hasMinWidth( settings ) ||
-			hasWidth( settings ) ||
-			hasAspectRatio( settings, styleState ) ||
-			hasChildLayout( settings, styleState ) )
+		hasContentSize( settings ) ||
+		hasWideSize( settings ) ||
+		hasPadding( settings ) ||
+		hasMargin( settings ) ||
+		hasGap( settings ) ||
+		hasHeight( settings ) ||
+		hasMinHeight( settings ) ||
+		hasMinWidth( settings ) ||
+		hasWidth( settings ) ||
+		hasAspectRatio( settings, styleState ) ||
+		hasChildLayout( settings, styleState )
 	);
 }
 
@@ -96,7 +94,7 @@ function hasWidth( settings ) {
 
 function hasAspectRatio( settings, styleState = DEFAULT_BLOCK_STYLE_STATE ) {
 	return (
-		isDefaultBlockStyleState( styleState ) &&
+		! hasPseudoBlockStyleState( styleState ) &&
 		settings?.dimensions?.aspectRatio
 	);
 }
