@@ -35,7 +35,7 @@
 	"scripts": {
 		"check-installed-deps": "node ./check-installed-deps.mjs",
 		"check-licenses": "node ./check-licenses.mjs",
-		"dependency-audit": "dependency-audit --collapse-root-cause ../../packages/*",
+		"dependency-audit": "dependency-audit --collapse-root-cause \"../../packages/*\"",
 		"check-local-changes": "node ./check-local-changes.cjs",
 		"test-create-block": "node ./test-create-block.mjs",
 		"validate-package-lock": "node ./validate-package-lock.cjs",
