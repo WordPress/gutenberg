@@ -3,6 +3,10 @@
  */
 const path = require( 'path' );
 const { readFile, writeFile } = require( 'fs' ).promises;
+
+/**
+ * Internal dependencies
+ */
 const { getPublicIcons } = require( './get-public-icons.cjs' );
 
 const MANIFEST_JSON_PATH = path.join( __dirname, '..', 'src', 'manifest.json' );
