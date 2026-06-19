@@ -33,11 +33,15 @@ export function MainSidebarNavigationContent( { isBlockBasedTheme = true } ) {
 				{ _x( 'Identity', 'site identity' ) }
 			</SidebarNavigationItem>
 			<SidebarNavigationItem
-				to="/styles"
-				uid="global-styles-navigation-item"
+				to={ isBlockBasedTheme ? '/styles' : '/stylebook' }
+				uid={
+					isBlockBasedTheme
+						? 'global-styles-navigation-item'
+						: 'stylebook-navigation-item'
+				}
 				icon={ styles }
-				activeOnRouteName="styles"
-				isHidden={ ! isBlockBasedTheme }
+				activeOnRouteName={ isBlockBasedTheme ? 'styles' : undefined }
+				withChevron={ ! isBlockBasedTheme }
 			>
 				{ __( 'Styles' ) }
 			</SidebarNavigationItem>
@@ -58,15 +62,6 @@ export function MainSidebarNavigationContent( { isBlockBasedTheme = true } ) {
 				isHidden={ ! isBlockBasedTheme }
 			>
 				{ __( 'Navigation' ) }
-			</SidebarNavigationItem>
-			<SidebarNavigationItem
-				uid="stylebook-navigation-item"
-				to="/stylebook"
-				withChevron
-				icon={ styles }
-				isHidden={ isBlockBasedTheme }
-			>
-				{ __( 'Styles' ) }
 			</SidebarNavigationItem>
 			<SidebarNavigationItem
 				uid="patterns-navigation-item"
