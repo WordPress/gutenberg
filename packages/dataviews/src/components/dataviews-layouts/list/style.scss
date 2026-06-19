@@ -1,4 +1,3 @@
-@use "@wordpress/base-styles/variables" as vars;
 @use "../../../dataviews/style" as *;
 
 div.dataviews-view-list {
@@ -32,7 +31,7 @@ div.dataviews-view-list {
 			}
 
 			> div {
-				height: vars.$button-size-small;
+				height: var(--wpds-dimension-size-sm);
 			}
 
 			> :not(:last-child) {
@@ -126,7 +125,7 @@ div.dataviews-view-list {
 	}
 	.dataviews-view-list__title-field {
 		flex: 1;
-		min-height: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available
+		min-height: var(--wpds-dimension-size-sm);
 		line-height: var(--wpds-typography-line-height-md);
 		overflow: hidden;
 		// The field should be in front of the main button in case it has a link/button.
@@ -190,7 +189,7 @@ div.dataviews-view-list {
 		}
 
 		.dataviews-view-list__field-value {
-			min-height: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available
+			min-height: var(--wpds-dimension-size-sm);
 			line-height: var(--wpds-typography-line-height-sm);
 			display: flex;
 			align-items: center;
@@ -209,17 +208,17 @@ div.dataviews-view-list {
 			}
 
 			.dataviews-view-list__title-field {
-				min-height: calc(var(--wpds-dimension-base) * 4); // TODO: use size token when available
+				min-height: var(--wpds-dimension-size-2xs);
 				line-height: var(--wpds-typography-line-height-xs);
 			}
 
 			.dataviews-view-list__media-wrapper {
-				width: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
-				height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
+				width: var(--wpds-dimension-size-md);
+				height: var(--wpds-dimension-size-md);
 			}
 
 			.dataviews-view-list__field-wrapper {
-				min-height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
+				min-height: var(--wpds-dimension-size-md);
 			}
 
 			.dataviews-view-list__fields {
@@ -227,7 +226,7 @@ div.dataviews-view-list {
 				row-gap: var(--wpds-dimension-gap-xs);
 
 				.dataviews-view-list__field-value {
-					min-height: calc(var(--wpds-dimension-base) * 4); // TODO: use size token when available
+					min-height: var(--wpds-dimension-size-2xs);
 					line-height: var(--wpds-typography-line-height-xs);
 				}
 			}
@@ -241,7 +240,7 @@ div.dataviews-view-list {
 			}
 
 			.dataviews-view-list__title-field {
-				min-height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
+				min-height: var(--wpds-dimension-size-md);
 				line-height: var(--wpds-typography-line-height-xl);
 			}
 
@@ -259,7 +258,7 @@ div.dataviews-view-list {
 				row-gap: var(--wpds-dimension-gap-sm);
 
 				.dataviews-view-list__field-value {
-					min-height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
+					min-height: var(--wpds-dimension-size-md);
 					line-height: var(--wpds-typography-line-height-md);
 				}
 			}
