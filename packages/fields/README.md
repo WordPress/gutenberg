@@ -47,6 +47,10 @@ Date field for BasePost.
 
 Delete action for Templates, Patterns and Template Parts.
 
+### descriptionField
+
+Description field for templates.
+
 ### discussionField
 
 Discussion field for BasePost with custom render logic.
@@ -78,6 +82,10 @@ Featured Image field for BasePostWithEmbeddedFeaturedMedia.
 ### formatField
 
 Format field for BasePost.
+
+### lastEditedDateField
+
+Last edited date field for BasePost.
 
 ### MediaEdit
 
@@ -160,9 +168,25 @@ Ping status field for BasePost.
 
 Post content information field for BasePost.
 
+### postsPageTitleField
+
+Title field for the posts page (the `page` assigned as `page_for_posts`).
+
+### postsPerPageField
+
+Posts per page field for the `root/site` entity.
+
 ### PostType
 
 Undocumented declaration.
+
+### readOnlyDescriptionField
+
+Read-only description field for theme-provided templates, which can't be edited. Shares the display config with `descriptionField` but renders as read-only and is only visible when a description exists.
+
+_Type_
+
+-   `Field< Template >`
 
 ### renamePost
 
@@ -183,6 +207,10 @@ Restore action for PostWithPermissions.
 ### scheduledDateField
 
 ScheduledDate Field.
+
+### siteDiscussionField
+
+Discussion field for the `root/site` entity.
 
 ### slugField
 
