@@ -62,41 +62,14 @@ const transforms = {
 		},
 		{
 			type: 'block',
-			blocks: [ 'core/audio' ],
+			blocks: [ 'core/audio', 'core/video', 'core/image' ],
 			transform: ( attributes ) => {
+				// Audio/Video use `src`, Image uses `url`.
+				const href = attributes.src ?? attributes.url;
 				return createBlock( 'core/file', {
-					href: attributes.src,
-					fileName: attributes.caption,
-					textLinkHref: attributes.src,
-					id: attributes.id,
-					anchor: attributes.anchor,
-					downloadButtonText,
-				} );
-			},
-		},
-		{
-			type: 'block',
-			blocks: [ 'core/video' ],
-			transform: ( attributes ) => {
-				return createBlock( 'core/file', {
-					href: attributes.src,
-					fileName: attributes.caption,
-					textLinkHref: attributes.src,
-					id: attributes.id,
-					anchor: attributes.anchor,
-					downloadButtonText,
-				} );
-			},
-		},
-		{
-			type: 'block',
-			blocks: [ 'core/image' ],
-			transform: ( attributes ) => {
-				return createBlock( 'core/file', {
-					href: attributes.url,
-					fileName:
-						attributes.caption || getFilename( attributes.url ),
-					textLinkHref: attributes.url,
+					href,
+					fileName: attributes.caption || getFilename( href ),
+					textLinkHref: href,
 					id: attributes.id,
 					anchor: attributes.anchor,
 					downloadButtonText,

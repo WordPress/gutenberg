@@ -32,6 +32,12 @@ The contract types and `<WidgetRender>` work in any React application. The
 `@wordpress/core-data`, so it expects to run against a WordPress site that
 exposes the `/wp/v2/widget-modules` REST endpoint.
 
+That endpoint ships with the Gutenberg plugin and, at this experimental
+stage, is registered only while the `gutenberg-dashboard-widgets` experiment
+is enabled. On a site without it, `useWidgetTypes()` resolves to an empty
+list; the contract types and `<WidgetRender>` do not depend on the endpoint
+and work regardless.
+
 ## Public API
 
 -   `<WidgetRender>`: canonical entry point for any host that mounts a widget.

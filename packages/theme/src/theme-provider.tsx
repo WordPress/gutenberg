@@ -70,7 +70,7 @@ export const ThemeProvider = ( {
 			) : null }
 			<div
 				data-wpds-theme-provider-id={ instanceId }
-				data-wpds-root-provider={ isRoot }
+				data-wpds-root-provider={ isRoot || undefined }
 				data-wpds-corner-radius={ cornerRadiusPreset }
 				className={ styles.root }
 			>

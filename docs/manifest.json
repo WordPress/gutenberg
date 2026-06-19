@@ -2898,6 +2898,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/widget-dashboard",
+		"slug": "packages-widget-dashboard",
+		"markdown_source": "../packages/widget-dashboard/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/widget-primitives",
 		"slug": "packages-widget-primitives",
 		"markdown_source": "../packages/widget-primitives/README.md",
