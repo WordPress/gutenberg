@@ -38,9 +38,8 @@ import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
 import {
-	Icon,
+	Icon as WCIcon,
 	SlotFillProvider,
-	Tooltip,
 	__unstableUseNavigateRegions as useNavigateRegions,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
@@ -50,7 +49,7 @@ import {
 	useRefEffect,
 	useViewportMatch,
 } from '@wordpress/compose';
-import { VisuallyHidden } from '@wordpress/ui';
+import { Tooltip, VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -73,7 +72,8 @@ import { useMetaBoxInitialization } from '../meta-boxes/use-meta-box-initializat
 const { useCommandContext } = unlock( commandsPrivateApis );
 /** @type {{} & {useDrag: import('@use-gesture/react').useDrag}} */
 const { useDrag } = unlock( componentsPrivateApis );
-const { Editor, FullscreenMode } = unlock( editorPrivateApis );
+const { Editor, FullscreenMode, UploadProgressSnackbar } =
+	unlock( editorPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 const DESIGN_POST_TYPES = [
 	'wp_template',
@@ -162,8 +162,8 @@ function MetaBoxesMain( { isLegacy } ) {
 		if ( ! container ) {
 			return;
 		}
-		const noticeLists = container.querySelectorAll(
-			':scope > .components-notice-list'
+		const noticeContainer = container.querySelector(
+			':scope > .notices-inline-notices-wrapper'
 		);
 		const resizeHandle = container.querySelector(
 			'.edit-post-meta-boxes-main__presenter'
@@ -171,16 +171,16 @@ function MetaBoxesMain( { isLegacy } ) {
 		const deriveConstraints = () => {
 			const fullHeight = container.offsetHeight;
 			let nextMax = fullHeight;
-			for ( const element of noticeLists ) {
-				nextMax -= element.offsetHeight;
+			if ( noticeContainer ) {
+				nextMax -= noticeContainer.offsetHeight;
 			}
-			const nextMin = resizeHandle.offsetHeight;
+			const nextMin = resizeHandle?.offsetHeight ?? 0;
 			setHeightConstraints( { min: nextMin, max: nextMax } );
 		};
 		const observer = new window.ResizeObserver( deriveConstraints );
 		observer.observe( container );
-		for ( const element of noticeLists ) {
-			observer.observe( element );
+		if ( noticeContainer ) {
+			observer.observe( noticeContainer );
 		}
 		return () => observer.disconnect();
 	}, [] );
@@ -194,6 +194,11 @@ function MetaBoxesMain( { isLegacy } ) {
 	const separatorHelpId = useId();
 
 	const heightRef = useRef();
+
+	const getAriaValueNow = ( height ) =>
+		Math.round( ( ( height - min ) / ( max - min ) ) * 100 );
+	const persistIsOpen = ( to = ! isOpen ) =>
+		setPreference( 'core/edit-post', 'metaBoxesMainIsOpen', to );
 
 	/**
 	 * @param {number|'auto'} [candidateHeight] Height in pixels or 'auto'.
@@ -294,13 +299,8 @@ function MetaBoxesMain( { isLegacy } ) {
 	const usedOpenHeight = isShort ? 'auto' : openHeight;
 	const usedHeight = isOpen ? usedOpenHeight : min;
 
-	const getAriaValueNow = ( height ) =>
-		Math.round( ( ( height - min ) / ( max - min ) ) * 100 );
 	const usedAriaValueNow =
 		max === undefined || isAutoHeight ? 50 : getAriaValueNow( usedHeight );
-
-	const persistIsOpen = ( to = ! isOpen ) =>
-		setPreference( 'core/edit-post', 'metaBoxesMainIsOpen', to );
 
 	const paneLabel = __( 'Meta Boxes' );
 
@@ -321,23 +321,28 @@ function MetaBoxesMain( { isLegacy } ) {
 			{ ...( ! isShort && bindDragGesture( persistIsOpen ) ) }
 		>
 			{ paneLabel }
-			<Icon icon={ isOpen ? chevronUp : chevronDown } />
+			<WCIcon icon={ isOpen ? chevronUp : chevronDown } />
 		</button>
 	);
 
 	// The separator button that provides a11y for resizing.
 	const separator = ! isShort && (
 		<>
-			<Tooltip text={ __( 'Drag to resize' ) }>
-				<button
-					ref={ separatorRef }
-					role="separator" // eslint-disable-line jsx-a11y/no-interactive-element-to-noninteractive-role
-					aria-valuenow={ usedAriaValueNow }
-					aria-label={ __( 'Drag to resize' ) }
-					aria-describedby={ separatorHelpId }
-					{ ...bindDragGesture() }
+			<Tooltip.Root>
+				<Tooltip.Trigger
+					render={
+						<button
+							ref={ separatorRef }
+							role="separator" // eslint-disable-line jsx-a11y/no-interactive-element-to-noninteractive-role
+							aria-valuenow={ usedAriaValueNow }
+							aria-label={ __( 'Drag to resize' ) }
+							aria-describedby={ separatorHelpId }
+							{ ...bindDragGesture() }
+						/>
+					}
 				/>
-			</Tooltip>
+				<Tooltip.Popup>{ __( 'Drag to resize' ) }</Tooltip.Popup>
+			</Tooltip.Root>
 			<VisuallyHidden id={ separatorHelpId }>
 				{ __(
 					'Use up and down arrow keys to resize the meta box pane.'
@@ -472,7 +477,6 @@ function Layout( {
 			styles,
 			onNavigateToEntityRecord,
 			onNavigateToPreviousEntityRecord,
-			defaultRenderingMode: 'post-only',
 		} ),
 		[
 			settings,
@@ -573,56 +577,57 @@ function Layout( {
 
 	return (
 		<SlotFillProvider>
-			<ErrorBoundary canCopyContent>
-				<WelcomeGuide postType={ currentPostType } />
-				<div
-					className={ navigateRegionsProps.className }
-					{ ...navigateRegionsProps }
-					ref={ navigateRegionsProps.ref }
-				>
-					<Editor
-						settings={ editorSettings }
-						initialEdits={ initialEdits }
-						postType={ currentPostType }
-						postId={ currentPostId }
-						templateId={ templateId }
-						className={ className }
-						forceIsDirty={ hasActiveMetaboxes }
-						disableIframe={ ! shouldIframe }
-						// We should auto-focus the canvas (title) on load.
-						// eslint-disable-next-line jsx-a11y/no-autofocus
-						autoFocus={ ! isWelcomeGuideVisible }
-						onActionPerformed={ onActionPerformed }
-						extraSidebarPanels={
-							showMetaBoxes && <MetaBoxes location="side" />
-						}
-						extraContent={
-							! isDistractionFree &&
-							showMetaBoxes && (
-								<MetaBoxesMain isLegacy={ isDevicePreview } />
-							)
-						}
-					>
-						<PostLockedModal />
-						<EditorInitialization />
-						<FullscreenMode isActive={ isFullscreenActive } />
-						<BrowserURL />
-						<UnsavedChangesWarning />
-						<AutosaveMonitor />
-						<LocalAutosaveMonitor />
-						<EditPostKeyboardShortcuts />
-						<EditorKeyboardShortcutsRegister />
-						<BlockKeyboardShortcuts />
-						{ currentPostType === 'wp_block' && (
-							<InitPatternModal />
-						) }
-						<PluginArea onError={ onPluginAreaError } />
-						<PostEditorMoreMenu />
-						{ backButton }
-						<SnackbarNotices className="edit-post-layout__snackbar" />
-					</Editor>
-				</div>
-			</ErrorBoundary>
+			<Tooltip.Provider>
+				<ErrorBoundary canCopyContent>
+					<WelcomeGuide postType={ currentPostType } />
+					<div { ...navigateRegionsProps }>
+						<Editor
+							settings={ editorSettings }
+							initialEdits={ initialEdits }
+							postType={ currentPostType }
+							postId={ currentPostId }
+							templateId={ templateId }
+							className={ className }
+							forceIsDirty={ hasActiveMetaboxes }
+							disableIframe={ ! shouldIframe }
+							// We should auto-focus the canvas (title) on load.
+							// eslint-disable-next-line jsx-a11y/no-autofocus
+							autoFocus={ ! isWelcomeGuideVisible }
+							onActionPerformed={ onActionPerformed }
+							extraSidebarPanels={
+								showMetaBoxes && <MetaBoxes location="side" />
+							}
+							extraContent={
+								! isDistractionFree &&
+								showMetaBoxes && (
+									<MetaBoxesMain
+										isLegacy={ isDevicePreview }
+									/>
+								)
+							}
+						>
+							<PostLockedModal />
+							<EditorInitialization />
+							<FullscreenMode isActive={ isFullscreenActive } />
+							<BrowserURL />
+							<UnsavedChangesWarning />
+							<AutosaveMonitor />
+							<LocalAutosaveMonitor />
+							<EditPostKeyboardShortcuts />
+							<EditorKeyboardShortcutsRegister />
+							<BlockKeyboardShortcuts />
+							{ currentPostType === 'wp_block' && (
+								<InitPatternModal />
+							) }
+							<PluginArea onError={ onPluginAreaError } />
+							<PostEditorMoreMenu />
+							{ backButton }
+							<SnackbarNotices className="edit-post-layout__snackbar" />
+							<UploadProgressSnackbar />
+						</Editor>
+					</div>
+				</ErrorBoundary>
+			</Tooltip.Provider>
 		</SlotFillProvider>
 	);
 }

@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import { v4 as uuid } from 'uuid';
 
 /**
@@ -14,7 +13,7 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import { getNestedValue, setNestedValue } from './utils';
+import { clearUnchangedEdits, getNestedValue, setNestedValue } from './utils';
 import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
@@ -421,14 +420,7 @@ export const editEntityRecord =
 			recordId,
 			// Clear edits when they are equal to their persisted counterparts
 			// so that the property is not considered dirty.
-			edits: Object.keys( edits ).reduce( ( acc, key ) => {
-				const recordValue = record[ key ];
-				const value = editsWithMerges[ key ];
-				acc[ key ] = fastDeepEqual( recordValue, value )
-					? undefined
-					: value;
-				return acc;
-			}, {} ),
+			edits: clearUnchangedEdits( editsWithMerges, record ),
 		};
 		if ( entityConfig.syncConfig ) {
 			const objectType = `${ kind }/${ name }`;
@@ -597,17 +589,15 @@ export const __unstableCreateUndoLevel =
  *                                                the exceptions. Defaults to false.
  */
 export const saveEntityRecord =
-	(
-		kind,
-		name,
-		record,
-		{
+	( kind, name, record, options = {} ) =>
+	async ( { select, resolveSelect, dispatch } ) => {
+		const {
 			isAutosave = false,
 			__unstableFetch = apiFetch,
+			__unstableSkipSyncUpdate = false,
 			throwOnError = false,
-		} = {}
-	) =>
-	async ( { select, resolveSelect, dispatch } ) => {
+		} = options;
+
 		logEntityDeprecation( kind, name, 'saveEntityRecord' );
 		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
@@ -798,7 +788,7 @@ export const saveEntityRecord =
 						getSyncManager()?.update(
 							`${ kind }/${ name }`,
 							recordId,
-							updatedRecord,
+							__unstableSkipSyncUpdate ? {} : updatedRecord,
 							LOCAL_UNDO_IGNORED_ORIGIN,
 							{ isSave: true }
 						);
@@ -1116,32 +1106,3 @@ export const receiveRevisions =
 			invalidateCache,
 		} );
 	};
-
-/**
- * Returns an action object used to set the sync connection status for an entity or collection.
- *
- * @param {string}             kind   Kind of the entity.
- * @param {string}             name   Name of the entity.
- * @param {number|string|null} key    The entity key, or null for collections.
- * @param {Object|null}        status The connection state object or null on unload.
- *
- * @return {Object} Action object.
- */
-export function setSyncConnectionStatus( kind, name, key, status ) {
-	if ( ! status ) {
-		return {
-			type: 'CLEAR_SYNC_CONNECTION_STATUS',
-			kind,
-			name,
-			key,
-		};
-	}
-
-	return {
-		type: 'SET_SYNC_CONNECTION_STATUS',
-		kind,
-		name,
-		key,
-		status,
-	};
-}

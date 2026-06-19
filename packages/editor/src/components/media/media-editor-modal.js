@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useSettings } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { privateApis as mediaEditorPrivateApis } from '@wordpress/media-editor';
 
@@ -11,7 +12,9 @@ import { privateApis as mediaEditorPrivateApis } from '@wordpress/media-editor';
 import { unlock } from '../../lock-unlock';
 import usePostFields from '../post-fields';
 
-const { MediaEditorModal } = unlock( mediaEditorPrivateApis );
+const { MediaEditorModal, store: mediaEditorStore } = unlock(
+	mediaEditorPrivateApis
+);
 
 function ratioToNumber( ratio ) {
 	if ( ratio === undefined || ratio === null ) {
@@ -48,9 +51,24 @@ function aspectRatioPresetFromSettings( { name, ratio } = {} ) {
  * into the modal, since `@wordpress/media-editor` cannot depend on
  * `@wordpress/editor`.
  *
- * @return {Element} The MediaEditorModal component wired with attachment fields.
+ * Defers the attachment fields and settings reads until the modal
+ * actually opens, so editor startup doesn't pay for them on every
+ * page load.
+ *
+ * @return {Element|null} The MediaEditorModal component wired with attachment fields, or null when closed.
  */
 export default function MediaEditorModalMount() {
+	const isOpen = useSelect(
+		( select ) => select( mediaEditorStore ).isOpen(),
+		[]
+	);
+	if ( ! isOpen ) {
+		return null;
+	}
+	return <MediaEditorModalContent />;
+}
+
+function MediaEditorModalContent() {
 	const fields = usePostFields( { postType: 'attachment' } );
 	const [ defaultRatios, themeRatios, showDefaultRatios ] = useSettings(
 		'dimensions.aspectRatios.default',

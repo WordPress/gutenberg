@@ -76,6 +76,9 @@ function FontCollection( { slug }: { slug: string } ) {
 	const [ selectedFont, setSelectedFont ] = useState< FontFamily | null >(
 		null
 	);
+	const [ lastSelectedFontSlug, setLastSelectedFontSlug ] = useState<
+		string | undefined
+	>( undefined );
 	const [ notice, setNotice ] = useState< {
 		type: 'success' | 'error' | 'info';
 		message: string;
@@ -257,26 +260,8 @@ function FontCollection( { slug }: { slug: string } ) {
 		return <GoogleFontsConfirmDialog />;
 	}
 
-	const ActionsComponent = () => {
-		if ( slug !== 'google-fonts' || renderConfirmDialog || selectedFont ) {
-			return null;
-		}
-		return (
-			<DropdownMenu
-				icon={ moreVertical }
-				label={ __( 'Actions' ) }
-				popoverProps={ {
-					position: 'bottom left',
-				} }
-				controls={ [
-					{
-						title: __( 'Revoke access to Google Fonts' ),
-						onClick: revokeAccess,
-					},
-				] }
-			/>
-		);
-	};
+	const showActions =
+		slug === 'google-fonts' && ! renderConfirmDialog && ! selectedFont;
 
 	return (
 		<div className="font-library__tabpanel-layout">
@@ -301,7 +286,23 @@ function FontCollection( { slug }: { slug: string } ) {
 										{ selectedCollection.description }
 									</WCText>
 								</VStack>
-								<ActionsComponent />
+								{ showActions && (
+									<DropdownMenu
+										icon={ moreVertical }
+										label={ __( 'Actions' ) }
+										popoverProps={ {
+											position: 'bottom left',
+										} }
+										controls={ [
+											{
+												title: __(
+													'Revoke access to Google Fonts'
+												),
+												onClick: revokeAccess,
+											},
+										] }
+									/>
+								) }
 							</HStack>
 							<Spacer margin={ 4 } />
 							<HStack spacing={ 4 } justify="space-between">
@@ -363,6 +364,11 @@ function FontCollection( { slug }: { slug: string } ) {
 													font.font_family_settings
 												}
 												navigatorPath="/fontFamily"
+												shouldFocus={
+													font.font_family_settings
+														.slug ===
+													lastSelectedFontSlug
+												}
 												onClick={ () => {
 													setSelectedFont(
 														font.font_family_settings
@@ -384,6 +390,9 @@ function FontCollection( { slug }: { slug: string } ) {
 									}
 									size="small"
 									onClick={ () => {
+										setLastSelectedFontSlug(
+											selectedFont?.slug
+										);
 										setSelectedFont( null );
 										setNotice( null );
 									} }

@@ -26,7 +26,11 @@ import { Note } from './note';
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
 import { FloatingContainer } from './floating-container';
-import { focusNoteThread, getNoteExcerpt } from './utils';
+import {
+	focusNoteThread,
+	getNoteExcerpt,
+	scrollNoteThreadIntoView,
+} from './utils';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
@@ -67,6 +71,15 @@ export function NoteThread( {
 		}
 		return () => unregisterThread?.( note.id );
 	}, [ relatedBlockElement, note.id, registerThread, unregisterThread ] );
+
+	// Scroll the thread into view when it becomes selected, and re-scroll
+	// when its floating position settles after `useFloatingBoard` recomputes.
+	useEffect( () => {
+		if ( ! isSelected || note.id === 'new' ) {
+			return;
+		}
+		scrollNoteThreadIntoView( note.id, sidebarRef.current );
+	}, [ isSelected, floating?.y, note.id, sidebarRef ] );
 
 	const onMouseEnter = () => {
 		debouncedToggleBlockHighlight( note.blockClientId, true );
@@ -113,11 +126,16 @@ export function NoteThread( {
 		// - An element other than a note is clicked.
 		// - Focus was lost by tabbing.
 		toggleBlockHighlight( note.blockClientId, false );
-		unselectNote();
+		onDeselectNote();
 	};
 
-	const handleNoteSelect = () => {
+	const onSelectNote = () => {
+		if ( isSelected ) {
+			return;
+		}
+
 		selectNote( note.id );
+		focusNoteThread( note.id, sidebarRef.current );
 		toggleBlockSpotlight( note.blockClientId, true );
 		if ( !! note.blockClientId ) {
 			// Pass `null` as the second parameter to prevent focusing the block.
@@ -125,14 +143,14 @@ export function NoteThread( {
 		}
 	};
 
-	const unselectNote = () => {
+	const onDeselectNote = () => {
 		selectNote( undefined );
 		toggleBlockSpotlight( note.blockClientId, false );
 	};
 
 	const handleResolve = () => {
 		onEditNote( { id: note.id, status: 'approved' } );
-		unselectNote();
+		onDeselectNote();
 		if ( isFloating ) {
 			relatedBlockElement?.focus();
 		} else {
@@ -181,7 +199,7 @@ export function NoteThread( {
 			} ) }
 			id={ `note-thread-${ note.id }` }
 			gap="md"
-			onClick={ handleNoteSelect }
+			onClick={ onSelectNote }
 			onMouseEnter={ onMouseEnter }
 			onMouseLeave={ onMouseLeave }
 			onFocus={ onFocus }
@@ -247,9 +265,9 @@ export function NoteThread( {
 						size="compact"
 						variant="tertiary"
 						className="editor-collab-sidebar-panel__more-reply-button"
-						onClick={ () => {
-							selectNote( note.id );
-							focusNoteThread( note.id, sidebarRef.current );
+						onClick={ ( event ) => {
+							event.stopPropagation();
+							onSelectNote();
 						} }
 					>
 						{ sprintf(
@@ -295,7 +313,7 @@ export function NoteThread( {
 						onCancel={ ( event ) => {
 							// Prevent the parent onClick from being triggered.
 							event.stopPropagation();
-							unselectNote();
+							onDeselectNote();
 							focusNoteThread( note.id, sidebarRef.current );
 						} }
 						labels={ {

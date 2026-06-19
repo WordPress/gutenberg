@@ -59,7 +59,7 @@ export const globalTypes = {
 	},
 	dsColorTheme: {},
 	dsCursorControl: {},
-	dsDensity: {},
+	dsCornerRadius: {},
 };
 
 export const decorators = [

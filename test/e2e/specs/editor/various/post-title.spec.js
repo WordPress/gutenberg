@@ -55,7 +55,6 @@ test.describe( 'Post title', () => {
 
 	test.describe( 'HTML handling', () => {
 		test( `should (visually) render any HTML in Post Editor's post title field when in Visual editing mode`, async ( {
-			page,
 			editor,
 			admin,
 			requestUtils,
@@ -66,20 +65,7 @@ test.describe( 'Post title', () => {
 				status: 'publish',
 			} );
 
-			await admin.visitAdminPage(
-				'post.php',
-				`post=${ postId }&action=edit`
-			);
-
-			await page.evaluate( () => {
-				window.wp.data
-					.dispatch( 'core/preferences' )
-					.set( 'core/edit-post', 'welcomeGuide', false );
-
-				window.wp.data
-					.dispatch( 'core/preferences' )
-					.set( 'core/edit-post', 'fullscreenMode', false );
-			}, false );
+			await admin.editPost( postId );
 
 			const pageTitleField = editor.canvas.getByRole( 'textbox', {
 				name: 'Add title',
@@ -116,20 +102,7 @@ test.describe( 'Post title', () => {
 				status: 'publish',
 			} );
 
-			await admin.visitAdminPage(
-				'post.php',
-				`post=${ postId }&action=edit`
-			);
-
-			await page.evaluate( () => {
-				window.wp.data
-					.dispatch( 'core/preferences' )
-					.set( 'core/edit-post', 'welcomeGuide', false );
-
-				window.wp.data
-					.dispatch( 'core/preferences' )
-					.set( 'core/edit-post', 'fullscreenMode', false );
-			}, false );
+			await admin.editPost( postId );
 
 			// switch Editor to code editor mode
 			// Open code editor

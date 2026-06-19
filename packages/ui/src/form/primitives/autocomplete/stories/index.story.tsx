@@ -6,22 +6,40 @@ import { Icon } from '../../../../icon';
 import { Input } from '../../input';
 import { InputLayout } from '../../input-layout';
 import { Textarea } from '../../textarea';
-import { COMMANDS, URLS, USERS, type FixtureItem } from './fixtures';
+import {
+	COMMANDS,
+	GROUPED_COMMANDS,
+	URLS,
+	USERS,
+	type FixtureGroup,
+	type FixtureItem,
+} from './fixtures';
 
 const meta: Meta< typeof Autocomplete.Root > = {
 	title: 'Design System/Components/Form/Primitives/Autocomplete',
 	component: Autocomplete.Root,
 	subcomponents: {
-		Popup: Autocomplete.Popup,
-		Input: Autocomplete.Input,
-		InputGroup: Autocomplete.InputGroup,
-		List: Autocomplete.List,
-		ListBody: Autocomplete.ListBody,
-		Collection: Autocomplete.Collection,
-		Item: Autocomplete.Item,
-		Value: Autocomplete.Value,
-		Empty: Autocomplete.Empty,
-		Clear: Autocomplete.Clear,
+		'Autocomplete.Portal': Autocomplete.Portal,
+		'Autocomplete.Positioner': Autocomplete.Positioner,
+		'Autocomplete.Popup': Autocomplete.Popup,
+		'Autocomplete.Input': Autocomplete.Input,
+		'Autocomplete.InputGroup': Autocomplete.InputGroup,
+		'Autocomplete.List': Autocomplete.List,
+		'Autocomplete.ListBody': Autocomplete.ListBody,
+		'Autocomplete.Collection': Autocomplete.Collection,
+		'Autocomplete.Group': Autocomplete.Group,
+		'Autocomplete.GroupLabel': Autocomplete.GroupLabel,
+		'Autocomplete.Item': Autocomplete.Item,
+		'Autocomplete.Value': Autocomplete.Value,
+		'Autocomplete.Empty': Autocomplete.Empty,
+		'Autocomplete.Clear': Autocomplete.Clear,
+	},
+	parameters: {
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components`, overlays compatibility, and component set completeness. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
+		},
 	},
 };
 export default meta;
@@ -426,6 +444,50 @@ export const WithCustomZIndex: Story = {
 									>
 										{ item.value }
 									</Autocomplete.Item>
+								) }
+							</Autocomplete.Collection>
+						</Autocomplete.ListBody>
+					</Autocomplete.List>
+				</Autocomplete.Popup>
+			</>
+		),
+	},
+};
+
+/**
+ * Suggestions can be organized into labeled groups with `Autocomplete.Group`
+ * and `Autocomplete.GroupLabel`.
+ */
+export const Grouped: Story = {
+	args: {
+		items: GROUPED_COMMANDS,
+		children: (
+			<>
+				<Autocomplete.Input placeholder="Type a command" />
+				<Autocomplete.Popup>
+					<Autocomplete.Empty>No matching items.</Autocomplete.Empty>
+					<Autocomplete.List>
+						<Autocomplete.ListBody>
+							<Autocomplete.Collection>
+								{ ( group: FixtureGroup ) => (
+									<Autocomplete.Group
+										key={ group.label }
+										items={ group.items }
+									>
+										<Autocomplete.GroupLabel>
+											{ group.label }
+										</Autocomplete.GroupLabel>
+										<Autocomplete.Collection>
+											{ ( item: FixtureItem ) => (
+												<Autocomplete.Item
+													key={ item.id }
+													value={ item }
+												>
+													{ item.value }
+												</Autocomplete.Item>
+											) }
+										</Autocomplete.Collection>
+									</Autocomplete.Group>
 								) }
 							</Autocomplete.Collection>
 						</Autocomplete.ListBody>
