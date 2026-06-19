@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.5.2-next.0 (2026-06-19)
+
 ### Bug Fixes
 
 -   Remove implicit dependency on `storybook` in TypeScript types ([#79132](https://github.com/WordPress/gutenberg/pull/79132)).

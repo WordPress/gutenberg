@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.16.0-next.0 (2026-06-19)
+
 ### Enhancements
 
 -   `Field.Description`: Apply `text-wrap: pretty` to description text to avoid typographic widows ([#79143](https://github.com/WordPress/gutenberg/pull/79143)).

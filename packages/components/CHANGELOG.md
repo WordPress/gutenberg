@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 35.1.0-next.0 (2026-06-19)
+
 ### Enhancements
 
 -   `BaseControl`: Apply `text-wrap: pretty` to help text to avoid typographic widows ([#79112](https://github.com/WordPress/gutenberg/pull/79112)).

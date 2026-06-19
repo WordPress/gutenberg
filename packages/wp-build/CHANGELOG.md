@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.16.2-next.0 (2026-06-19)
+
 ### Documentation
 
 -   Fix `genereated` typo to `generated` in README. ([#79331](https://github.com/WordPress/gutenberg/pull/79331))
