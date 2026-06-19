@@ -61,7 +61,10 @@ import { mat2d, vec2 } from 'gl-matrix';
 /**
  * Internal dependencies
  */
-import { buildModifiers } from '../build-modifiers';
+import {
+	buildExifOrientationModifiers,
+	buildModifiers,
+} from '../build-modifiers';
 import type { Modifier } from '../build-modifiers';
 import {
 	createExportCamera,
@@ -353,5 +356,57 @@ describe( 'buildModifiers ↔ Export-camera parity', () => {
 		// expected from floating-point. Anything larger is a real bug.
 		expect( server.x ).toBeCloseTo( exported.x, 0 );
 		expect( server.y ).toBeCloseTo( exported.y, 0 );
+	} );
+} );
+
+describe( 'buildExifOrientationModifiers', () => {
+	it.each( [
+		[ 1, [] ],
+		[
+			2,
+			[
+				{
+					type: 'flip',
+					args: { flip: { horizontal: true, vertical: false } },
+				},
+			],
+		],
+		[ 3, [ { type: 'rotate', args: { angle: 180 } } ] ],
+		[
+			4,
+			[
+				{
+					type: 'flip',
+					args: { flip: { horizontal: false, vertical: true } },
+				},
+			],
+		],
+		[
+			5,
+			[
+				{
+					type: 'flip',
+					args: { flip: { horizontal: true, vertical: false } },
+				},
+				{ type: 'rotate', args: { angle: 270 } },
+			],
+		],
+		[ 6, [ { type: 'rotate', args: { angle: 90 } } ] ],
+		[
+			7,
+			[
+				{
+					type: 'flip',
+					args: { flip: { horizontal: true, vertical: false } },
+				},
+				{ type: 'rotate', args: { angle: 90 } },
+			],
+		],
+		[ 8, [ { type: 'rotate', args: { angle: 270 } } ] ],
+		[ 9, [] ],
+	] )( 'maps EXIF orientation %s', ( orientation, expected ) => {
+		expect( buildExifOrientationModifiers( orientation ) ).toEqual(
+			expected
+		);
 	} );
 } );

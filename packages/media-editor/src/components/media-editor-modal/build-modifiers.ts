@@ -32,6 +32,61 @@ export type Modifier =
 	  };
 
 /**
+ * Build Core-compatible modifiers for normalizing EXIF orientation.
+ *
+ * Core applies modifiers sequentially and its `rotate` angle is
+ * clockwise-positive in the REST payload, so orientations 5 and 7 are
+ * expressed as flip-first, rotate-second.
+ *
+ * @param orientation EXIF orientation value.
+ * @return Ordered modifier array; empty for normal/unknown orientation.
+ */
+export function buildExifOrientationModifiers(
+	orientation: number
+): Modifier[] {
+	switch ( orientation ) {
+		case 2:
+			return [
+				{
+					type: 'flip',
+					args: { flip: { horizontal: true, vertical: false } },
+				},
+			];
+		case 3:
+			return [ { type: 'rotate', args: { angle: 180 } } ];
+		case 4:
+			return [
+				{
+					type: 'flip',
+					args: { flip: { horizontal: false, vertical: true } },
+				},
+			];
+		case 5:
+			return [
+				{
+					type: 'flip',
+					args: { flip: { horizontal: true, vertical: false } },
+				},
+				{ type: 'rotate', args: { angle: 270 } },
+			];
+		case 6:
+			return [ { type: 'rotate', args: { angle: 90 } } ];
+		case 7:
+			return [
+				{
+					type: 'flip',
+					args: { flip: { horizontal: true, vertical: false } },
+				},
+				{ type: 'rotate', args: { angle: 90 } },
+			];
+		case 8:
+			return [ { type: 'rotate', args: { angle: 270 } } ];
+		default:
+			return [];
+	}
+}
+
+/**
  * Tolerance (percent) used to decide whether a crop rect is effectively
  * full-frame. Sub-pixel / float-ulp deltas below this value are treated
  * as no crop. Matches the historical threshold used by the legacy

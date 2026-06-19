@@ -13,6 +13,13 @@ export interface Media {
 	source_url?: string;
 	mime_type?: string;
 	alt_text?: string;
+	exif_orientation?: number;
+	media_details?: {
+		width?: number;
+		height?: number;
+		source_image?: string;
+		[ key: string ]: any;
+	};
 	title?: string | { rendered?: string; raw?: string };
 	caption?: string | { rendered?: string; raw?: string };
 	description?: string | { rendered?: string; raw?: string };

@@ -15,6 +15,7 @@ import type { Media } from '../media-editor-provider';
 import type { MediaEditorController } from '../../state';
 import {
 	buildModifiers,
+	buildExifOrientationModifiers,
 	type Modifier,
 } from '../media-editor-modal/build-modifiers';
 
@@ -30,6 +31,9 @@ const METADATA_EDIT_KEYS = [
 
 // Scope media editor snackbars so they don't leak into the host editor/page.
 export const MEDIA_EDITOR_NOTICES_CONTEXT = 'media-editor';
+
+const HEIC_SOURCE_IMAGE_REGEX = /\.hei[cf]$/i;
+const NON_SAFARI_IOS_BROWSER_REGEX = /\b(CriOS|FxiOS|EdgiOS|OPiOS)\b/;
 
 type PendingMetadataEdits = Record< string, unknown > | undefined;
 
@@ -56,14 +60,64 @@ interface UseSaveMediaEditorReturn {
 	save: () => Promise< void >;
 }
 
-function getCropModifiers( cropper: MediaEditorController ): Modifier[] {
+function isMobileSafari() {
+	if ( typeof navigator === 'undefined' ) {
+		return false;
+	}
+
+	const { userAgent, platform, maxTouchPoints } = navigator;
+	const isIOS =
+		/iP(ad|hone|od)/.test( userAgent ) ||
+		( platform === 'MacIntel' && maxTouchPoints > 1 );
+
+	return (
+		isIOS &&
+		/Safari\//.test( userAgent ) &&
+		! NON_SAFARI_IOS_BROWSER_REGEX.test( userAgent )
+	);
+}
+
+function isHeicSourceImage( media?: Media | null ): boolean {
+	const sourceImage = media?.media_details?.source_image;
+	return (
+		typeof sourceImage === 'string' &&
+		HEIC_SOURCE_IMAGE_REGEX.test( sourceImage )
+	);
+}
+
+export function getHeicExifOrientationModifiers(
+	media?: Media | null,
+	isMobileSafariBrowser = isMobileSafari()
+): Modifier[] {
+	const orientation = Number( media?.exif_orientation );
+	if (
+		! isMobileSafariBrowser ||
+		! isHeicSourceImage( media ) ||
+		! Number.isInteger( orientation )
+	) {
+		return [];
+	}
+
+	return buildExifOrientationModifiers( orientation );
+}
+
+function getCropModifiers(
+	cropper: MediaEditorController,
+	media?: Media | null
+): Modifier[] {
 	if ( ! cropper.isCropperDirty || ! cropper.state.image ) {
 		return [];
 	}
-	return buildModifiers( cropper.state, {
+	const modifiers = buildModifiers( cropper.state, {
 		width: cropper.state.image.naturalWidth,
 		height: cropper.state.image.naturalHeight,
 	} );
+
+	if ( modifiers.length === 0 ) {
+		return modifiers;
+	}
+
+	return [ ...getHeicExifOrientationModifiers( media ), ...modifiers ];
 }
 
 function getMetadataEdits(
@@ -107,7 +161,7 @@ export function useSaveMediaEditor( {
 		setIsSaving( true );
 		try {
 			let saved: Media | null | undefined;
-			const modifiers = getCropModifiers( cropper );
+			const modifiers = getCropModifiers( cropper, media );
 			const previous =
 				modifiers.length > 0 && media
 					? {
