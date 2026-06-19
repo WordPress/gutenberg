@@ -16,6 +16,10 @@
 -   Adopt `--wpds-dimension-size-*` design tokens [#79093](https://github.com/WordPress/gutenberg/pull/79093).
 -   Point the legacy `--wp-components-*` color fallbacks at the design system tokens (`--wpds-*` / `--wp-admin-theme-color*`), so component styles get sensible defaults from the prebuilt token stylesheet without a runtime `<ThemeProvider>` ([#78664](https://github.com/WordPress/gutenberg/pull/78664)).
 
+### Documentation
+
+-   `Menu`: Fix `overriden` typo to `overridden` in `CheckboxItemProps` and `RadioItemProps`. ([#79331](https://github.com/WordPress/gutenberg/pull/79331))
+
 ### Code Quality
 
 -   Move `@types/react` from `dependencies` to an optional peer dependency so consumers' React type version is used [#79095](https://github.com/WordPress/gutenberg/pull/79095).

@@ -97,6 +97,7 @@ export interface Template extends CommonPost {
 	plugin?: string;
 	has_theme_file: boolean;
 	id: string;
+	description?: string;
 }
 
 export interface TemplatePart extends CommonPost {
@@ -113,6 +114,15 @@ export interface Pattern extends CommonPost {
 	slug: string;
 	title: { raw: string };
 	wp_pattern_sync_status: string;
+}
+
+export interface SiteSettings {
+	posts_per_page?: number;
+	default_comment_status?: string | null;
+}
+
+export interface PostsPage {
+	title?: { raw?: string } | string;
 }
 
 export type Post = Template | TemplatePart | Pattern | BasePost;

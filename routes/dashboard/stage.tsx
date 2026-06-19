@@ -8,14 +8,19 @@ import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as viewportStore } from '@wordpress/viewport';
-import { useWidgetTypes } from '@wordpress/widget-primitives';
+import {
+	WidgetDashboard,
+	type DashboardWidget,
+} from '@wordpress/widget-dashboard';
+import {
+	useWidgetTypes,
+	type WidgetModuleRecord,
+} from '@wordpress/widget-primitives';
 
 /**
  * Internal dependencies
  */
 import { useDashboardGridSettings, useDashboardLayout } from './hooks';
-import { WidgetDashboard } from './widget-dashboard';
-import type { DashboardWidget } from './widget-dashboard';
 
 function Dashboard() {
 	const [ layout, setLayout, resetLayout ] = useDashboardLayout(
@@ -24,7 +29,15 @@ function Dashboard() {
 
 	const [ gridSettings, setGridSettings ] = useDashboardGridSettings();
 
-	const [ widgetTypes, isResolving ] = useWidgetTypes();
+	const widgetsModules = useSelect(
+		( select ) =>
+			select( coreStore ).getEntityRecords( 'root', 'widgetModule' ) as
+				| WidgetModuleRecord[]
+				| null,
+		[]
+	);
+
+	const [ widgetTypes, isResolving ] = useWidgetTypes( widgetsModules );
 
 	const [ editMode, setEditMode ] = useState( false );
 
@@ -97,6 +110,8 @@ function Dashboard() {
 				<WidgetDashboard.NoWidgetsState />
 				<WidgetDashboard.Widgets />
 			</Page>
+
+			<WidgetDashboard.Commands />
 		</WidgetDashboard>
 	);
 }
