@@ -47,7 +47,8 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 					),
 				),
 				'schema' => array( $this, 'get_public_item_schema' ),
-			)
+			),
+			true // override existing route defined by core, if it exists
 		);
 	}
 
