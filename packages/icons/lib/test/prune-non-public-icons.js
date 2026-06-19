@@ -63,7 +63,7 @@ describe( 'pruneNonPublicIcons', () => {
 		const remaining = ( await readdir( libraryDir ) ).sort();
 		expect( remaining ).toEqual( [ 'public-a.svg', 'public-b.svg' ] );
 		expect( result ).toEqual( { pruned: 1, retained: 2 } );
-		expect( console ).toHaveLogged(
+		expect( console ).toHaveLoggedWith(
 			'Pruned 1 non-public icon(s); 2 retained.'
 		);
 	} );
