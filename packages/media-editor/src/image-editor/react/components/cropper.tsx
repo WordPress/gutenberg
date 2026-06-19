@@ -861,6 +861,11 @@ function CropperInner(
 		}, SETTLE_TRANSITION_FALLBACK_MS );
 	}, [ finishSettling, settleCrop, onGestureEnd, resetViewport ] );
 
+	/**
+	 * Finish settling when the stage transform transition actually completes.
+	 * Other transitionend events can bubble up from cropper descendants, so only
+	 * the transform transition should clear the settle state.
+	 */
 	const handleSettleTransitionEnd = useCallback(
 		( event: React.TransitionEvent< HTMLDivElement > ) => {
 			if (
