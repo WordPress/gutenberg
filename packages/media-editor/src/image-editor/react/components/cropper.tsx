@@ -877,8 +877,7 @@ function CropperInner(
 		( event: React.TransitionEvent< HTMLDivElement > ) => {
 			if (
 				! isSettlingRef.current ||
-				event.propertyName !== 'transform' ||
-				event.target !== event.currentTarget
+				event.propertyName !== 'transform'
 			) {
 				return;
 			}

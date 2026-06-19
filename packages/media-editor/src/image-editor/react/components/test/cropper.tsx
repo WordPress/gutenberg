@@ -431,13 +431,16 @@ describe( 'Cropper', () => {
 		act( () => jest.advanceTimersByTime( 200 ) );
 		expect( stage ).toHaveStyle( 'transition: transform 200ms ease-out' );
 
+		// The transform transition runs on the image and bubbles up to the
+		// stage handler, so fire from the image to exercise the real path.
+		const image = screen.getByTestId( 'cropper-image' );
 		const transitionEndEvent = new Event( 'transitionend', {
 			bubbles: true,
 		} );
 		Object.defineProperty( transitionEndEvent, 'propertyName', {
 			value: 'transform',
 		} );
-		fireEvent( stage, transitionEndEvent );
+		fireEvent( image, transitionEndEvent );
 
 		expect( stage ).not.toHaveStyle(
 			'transition: transform 200ms ease-out'
