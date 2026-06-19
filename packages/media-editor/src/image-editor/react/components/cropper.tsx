@@ -379,6 +379,12 @@ function CropperInner(
 	const [ isResizing, setIsResizing ] = useState( false );
 	const isResizingRef = useRef( false );
 	const isSettlingRef = useRef( false );
+	const [ isTouchPinching, setIsTouchPinchingState ] = useState( false );
+	const isTouchPinchingRef = useRef( false );
+	const setTouchPinching = useCallback( ( isPinching: boolean ) => {
+		isTouchPinchingRef.current = isPinching;
+		setIsTouchPinchingState( isPinching );
+	}, [] );
 	// Direction of the handle the user is currently resizing — pointer or
 	// keyboard. `null` outside of an active resize. Drives the live
 	// dimensions tooltip overlay.
@@ -593,6 +599,26 @@ function CropperInner(
 		onPointerDownCapture: () => {
 			setIsFocusVisible( false );
 		},
+		onTouchStartCapture: ( event: React.TouchEvent< HTMLDivElement > ) => {
+			if ( event.touches.length > 1 ) {
+				setTouchPinching( true );
+			}
+		},
+		onTouchMoveCapture: ( event: React.TouchEvent< HTMLDivElement > ) => {
+			if ( event.touches.length > 1 ) {
+				setTouchPinching( true );
+			}
+		},
+		onTouchEndCapture: ( event: React.TouchEvent< HTMLDivElement > ) => {
+			if ( event.touches.length === 0 ) {
+				setTouchPinching( false );
+			}
+		},
+		onTouchCancelCapture: ( event: React.TouchEvent< HTMLDivElement > ) => {
+			if ( event.touches.length === 0 ) {
+				setTouchPinching( false );
+			}
+		},
 		onKeyDownCapture: ( event: React.KeyboardEvent< HTMLDivElement > ) => {
 			// Modifier-only keypresses precede another key rather than
 			// indicating deliberate keyboard interaction on their own.
@@ -603,6 +629,14 @@ function CropperInner(
 			}
 		},
 		onPointerDown: ( event: React.PointerEvent< HTMLDivElement > ) => {
+			if (
+				isResizingRef.current ||
+				isTouchPinchingRef.current ||
+				( event.pointerType === 'touch' && event.isPrimary === false )
+			) {
+				event.preventDefault();
+				return;
+			}
 			handlers.onPointerDown?.( event );
 			// Re-assert false after handlers run — el.focus() inside the
 			// handler fires onFocus, which may otherwise set it back to true.
@@ -667,6 +701,9 @@ function CropperInner(
 
 	const handleCropChange = useCallback(
 		( rect: NormalizedRect ) => {
+			if ( isTouchPinchingRef.current ) {
+				return;
+			}
 			setCropRect( rect );
 			// During a resize drag, pan the viewport so the handle stays
 			// visible even when the crop extends beyond the canvas edge.
@@ -752,6 +789,9 @@ function CropperInner(
 
 	const handleResizeStart = useCallback(
 		( handle?: HandlePosition ) => {
+			if ( isTouchPinchingRef.current ) {
+				return;
+			}
 			// Freeze the magnification at its current value so grabbing a
 			// handle doesn't reset the zoom; it holds for the whole drag.
 			setFrozenViewScale( viewScaleRest );
@@ -775,9 +815,19 @@ function CropperInner(
 	 * and reset the viewport pan back to neutral.
 	 */
 	const handleResizeEnd = useCallback( () => {
+		const isCancellingForPinch = isTouchPinchingRef.current;
 		isResizingRef.current = false;
 		setIsResizing( false );
 		setActiveHandle( null );
+		clearTimeout( settleTimerRef.current );
+
+		if ( isCancellingForPinch ) {
+			isSettlingRef.current = false;
+			setSettling( false );
+			resetViewport();
+			return;
+		}
+
 		isSettlingRef.current = true;
 		setSettling( true );
 		// Reset viewport pan first so it transitions back to zero in sync
@@ -785,7 +835,6 @@ function CropperInner(
 		resetViewport();
 		settleCrop();
 		onGestureEnd?.();
-		clearTimeout( settleTimerRef.current );
 		settleTimerRef.current = setTimeout( () => {
 			isSettlingRef.current = false;
 			setSettling( false );
@@ -983,6 +1032,7 @@ function CropperInner(
 						onEscape={ handleEscape }
 						aspectRatio={ aspectRatio }
 						freeformCrop={ freeformCrop }
+						isResizeDisabled={ isTouchPinching }
 						stencilTransition={ settleStencilTransition }
 						cropBounds={ cropBounds }
 						minCropSize={ minCropSize }

@@ -476,6 +476,108 @@ describe( 'Cropper', () => {
 		fireEvent.pointerUp( resizeHandle, { pointerId: 1 } );
 	} );
 
+	it( 'cancels handle resize when a touch gesture becomes a pinch', async () => {
+		const originalRAF = globalThis.requestAnimationFrame;
+		const originalCAF = globalThis.cancelAnimationFrame;
+		globalThis.requestAnimationFrame = ( cb: FrameRequestCallback ) => {
+			cb( 0 );
+			return 0;
+		};
+		globalThis.cancelAnimationFrame = jest.fn();
+
+		try {
+			const controller = createController();
+			const onGestureEnd = jest.fn();
+			render(
+				<Cropper
+					src="test.jpg"
+					controller={ controller }
+					showDimming={ false }
+					freeformCrop
+					onGestureEnd={ onGestureEnd }
+				/>
+			);
+
+			const resizeHandle = await screen.findByRole( 'button', {
+				name: 'Resize top-left corner',
+			} );
+			const canvas = screen.getByRole( 'group', {
+				name: 'Crop area',
+			} );
+
+			fireEvent.pointerDown( resizeHandle, {
+				button: 0,
+				clientX: 100,
+				clientY: 100,
+				pointerId: 1,
+				pointerType: 'touch',
+				isPrimary: true,
+			} );
+
+			( controller.setPan as jest.Mock ).mockClear();
+			fireEvent.pointerDown( canvas, {
+				button: 0,
+				clientX: 250,
+				clientY: 200,
+				pointerId: 2,
+				pointerType: 'touch',
+				isPrimary: false,
+			} );
+			fireEvent.pointerMove( canvas, {
+				button: 0,
+				clientX: 275,
+				clientY: 200,
+				pointerId: 2,
+				pointerType: 'touch',
+				isPrimary: false,
+			} );
+
+			expect( controller.setPan ).not.toHaveBeenCalled();
+
+			fireEvent.touchStart( canvas, {
+				touches: [
+					{ clientX: 250, clientY: 200 },
+					{ clientX: 350, clientY: 200 },
+				],
+			} );
+
+			await act( async () => {
+				await Promise.resolve();
+			} );
+
+			expect( controller.settleCrop ).not.toHaveBeenCalled();
+			expect( onGestureEnd ).not.toHaveBeenCalled();
+
+			( controller.setCropRect as jest.Mock ).mockClear();
+			( controller.setZoomAtPoint as jest.Mock ).mockClear();
+
+			fireEvent.pointerMove( resizeHandle, {
+				button: 0,
+				clientX: 60,
+				clientY: 60,
+				pointerId: 1,
+				pointerType: 'touch',
+				isPrimary: true,
+			} );
+			fireEvent.touchMove( document, {
+				touches: [
+					{ clientX: 225, clientY: 200 },
+					{ clientX: 375, clientY: 200 },
+				],
+			} );
+
+			expect( controller.setCropRect ).not.toHaveBeenCalled();
+			expect( controller.setZoomAtPoint ).toHaveBeenCalled();
+
+			fireEvent.touchEnd( canvas, { touches: [] } );
+
+			expect( onGestureEnd ).toHaveBeenCalledTimes( 1 );
+		} finally {
+			globalThis.requestAnimationFrame = originalRAF;
+			globalThis.cancelAnimationFrame = originalCAF;
+		}
+	} );
+
 	// View-scale: at rest, the scene magnifies so an under-filling crop fills
 	// the canvas. Canvas is mocked at 600x400. A tall 400x1200 image contain-
 	// fits to a 133.33x400 footprint (fills the height, 133px of 600 wide). A
