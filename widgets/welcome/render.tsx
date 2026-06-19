@@ -1,8 +1,15 @@
+/**
+ * WordPress dependencies
+ */
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { layout, pencil, styles as stylesIcon } from '@wordpress/icons';
-import { Stack } from '@wordpress/ui';
+import { Stack, Text } from '@wordpress/ui';
+
+/**
+ * Internal dependencies
+ */
 import { Banner, FeatureHighlight } from './components';
 import styles from './style.module.css';
 
@@ -56,6 +63,17 @@ export default function WelcomeBanner() {
 	return (
 		<Stack className={ styles.root } direction="column" gap="lg">
 			<Banner />
+
+			<Stack
+				direction="column"
+				style={ {
+					paddingInline: 'var(--wpds-dimension-padding-2xl)',
+				} }
+			>
+				<Text variant="heading-lg" render={ <h2 /> }>
+					{ __( 'Get started with WordPress' ) }
+				</Text>
+			</Stack>
 
 			<Stack className={ styles.columns }>
 				<FeatureHighlight

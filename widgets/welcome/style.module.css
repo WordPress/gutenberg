@@ -14,7 +14,7 @@
 	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 	gap: var(--wpds-dimension-gap-2xl);
 	flex: 1;
-	align-items: center;
+	align-items: start;
 	padding: 0 var(--wpds-dimension-padding-2xl) var(--wpds-dimension-padding-2xl);
 	margin: 0 var(--wpds-dimension-padding-2xl) var(--wpds-dimension-padding-2xl);
 }
