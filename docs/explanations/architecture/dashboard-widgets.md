@@ -62,15 +62,15 @@ The registry exists as a class (rather than the manifest being read directly by 
 
 The package is the single source of truth for what a widget _is_ on the client, shared by widget authors and hosts. It exposes three kinds of resources and deliberately nothing else:
 
--   **Contract types**: `WidgetType`, `WidgetName`, `WidgetIcon`, `WidgetRenderProps`, `ResolveWidgetModule`. Authors type `widget.ts` / `render.tsx` against them; hosts consume the same shapes. Nothing re-exports them.
--   **Discovery**: `useWidgetTypes()` reads the `widgetModule` core-data entity (backed by `/wp/v2/widget-modules`), dynamically imports each record's `widget_module` to retrieve the live metadata, and merges both halves into `WidgetType[]`. The record's `presentation` (originating in `widget.json`) wins over the module's value.
+-   **Contract types**: `WidgetType`, `WidgetName`, `WidgetIcon`, `WidgetRenderProps`, `ResolveWidgetModule`, `WidgetModuleRecord`. Authors type `widget.ts` / `render.tsx` against them; hosts consume the same shapes. Nothing re-exports them.
+-   **Discovery**: `useWidgetTypes( records )` takes host-supplied widget-module records, dynamically imports each record's `widget_module` to retrieve the live metadata, and merges both halves into `WidgetType[]`. The record's `presentation` (originating in `widget.json`) wins over the module's value. The hook reaches for no store or endpoint: the host fetches the records however it wants (the dashboard reads its own `widgetModule` core-data entity, backed by `/wp/v2/widget-modules`) and passes them in.
 -   **Rendering**: `<WidgetRender>` resolves a `WidgetType.renderModule` through a host-provided `ResolveWidgetModule` and mounts the component with the `attributes` / `setAttributes` contract. On a WordPress page the resolver can be as simple as `( id ) => import( id )`, provided the hosting page exposed the module in its import map; hosts with other loading strategies supply their own resolver.
 
 Equally important is what the package does not do: no chrome, no layout, no persistence, no data store of its own, and no knowledge of any host. That is what makes it publishable and consumable outside the WordPress admin.
 
 ## Hosts
 
-A host is any context that renders widgets; the contract privileges none of them. The dashboard engine ([`@wordpress/widget-dashboard`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/widget-dashboard), mounted by `routes/dashboard/`) is the host this repository ships today, and it illustrates what a host owns: it calls `useWidgetTypes()`, owns the layout array and its persistence, wraps every instance in its own chrome (header, toolbars, error boundary, Suspense fallback), and passes `resolveWidgetModule` down through its context (overridable for tests and Storybook).
+A host is any context that renders widgets; the contract privileges none of them. The dashboard engine ([`@wordpress/widget-dashboard`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/widget-dashboard), mounted by `routes/dashboard/`) is the host this repository ships today, and it illustrates what a host owns: it registers the `widgetModule` core-data entity when its route module loads (before the dashboard renders), reads the entity's records and passes them to `useWidgetTypes( records )`, owns the layout array and its persistence, wraps every instance in its own chrome (header, toolbars, error boundary, Suspense fallback), and passes `resolveWidgetModule` down through its context (overridable for tests and Storybook).
 
 The same `WidgetType` could equally be rendered by a sidebar, a plugin panel, or an application outside wp-admin; the choice of where and how to render belongs entirely to the host. Every host is a consumer of the package; not every consumer is a host: tests, Storybook, or a picker that only lists widget types consume the same contract without rendering anything.
 
@@ -80,4 +80,4 @@ The pipeline above has a natural seam: everything up to the REST endpoint is Wor
 
 -   Widget authors depend on it to type their metadata and render components.
 -   Hosts depend on it to discover and mount widgets without knowing how they were built or registered.
--   Neither side needs the other's dependencies: the package keeps its own footprint minimal (`core-data`, `data`, `element`, `i18n`, plus type-only `dataviews`).
+-   Neither side needs the other's dependencies: the package keeps its own footprint minimal (`element`, plus type-only `dataviews`); discovery is data-source agnostic, so it no longer depends on `core-data`/`data`.

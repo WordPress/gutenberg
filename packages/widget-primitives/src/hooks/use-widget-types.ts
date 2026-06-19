@@ -1,82 +1,35 @@
 /**
  * WordPress dependencies
  */
-import { dispatch, useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
 import { useEffect, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import type { WidgetName, WidgetType, WidgetTypeMetadata } from '../types';
+import type { WidgetModuleRecord, WidgetName, WidgetType } from '../types';
 
-/**
- * Registers the `widgetModule` core-data entity at module load.
- *
- * Scoped to this experimental feature: the entity lives here instead of
- * the static `rootEntitiesConfig` array, so WP installs that never load
- * this package never see it.
- */
-dispatch( coreStore ).addEntities( [
-	{
-		name: 'widgetModule',
-		kind: 'root',
-		key: 'name',
-		baseURL: '/wp/v2/widget-modules',
-		plural: 'widgetModules',
-		label: __( 'Widget modules' ),
-		supportsPagination: false,
-	},
-] );
-
-/**
- * Shape returned by the `/wp/v2/widget-modules` REST endpoint. PHP keeps
- * snake_case (project convention); the camelCase mapping happens here at
- * the JS boundary.
- */
-interface WidgetModuleRecord {
-	name: string;
-	render_module?: string | null;
-	widget_module?: string | null;
-	presentation?: WidgetTypeMetadata[ 'presentation' ] | null;
-}
-
-/**
- * `isResolvingWidgetTypes` is true while widget-module records or their
- * metadata imports have not finished resolving. Hosts must not treat a
- * widget instance as missing until it is false.
- */
+/* `true` while records or their metadata imports are still resolving; hosts
+   must not treat a widget instance as missing until it is `false`. */
 type UseWidgetTypesResult = readonly [ WidgetType[], boolean ];
 
 /**
- * Returns the registered widget types, with each record's metadata
- * resolved from its `widget_module` script module.
+ * Resolves widget types from host-supplied records.
  *
- * The list of records is read from the `widgetModule` core-data entity,
- * which fetches `/wp/v2/widget-modules` on first selector resolution.
- * For each record this hook dynamically imports `widget_module` and
- * merges the module's default export with the runtime fields (`name`,
- * `renderModule`).
+ * For each record it dynamically imports `widget_module` and merges the
+ * module's default export with the runtime fields (`name`, `renderModule`).
+ * Pass `null`/`undefined` while records are still loading.
  *
- * Consumers do not register or dispatch anything; the data layer owns
- * caching and invalidation.
+ * @param records Host-supplied records, or `null`/`undefined` while loading.
  */
-export function useWidgetTypes(): UseWidgetTypesResult {
-	const records = useSelect(
-		( select ) =>
-			select( coreStore ).getEntityRecords( 'root', 'widgetModule' ) as
-				| WidgetModuleRecord[]
-				| null,
-		[]
-	);
-
+export function useWidgetTypes(
+	records: WidgetModuleRecord[] | null | undefined
+): UseWidgetTypesResult {
 	const [ widgetTypes, setWidgetTypes ] = useState< WidgetType[] >( [] );
 	const [ isResolvingWidgetTypes, setIsResolvingWidgetTypes ] =
 		useState( true );
 
 	useEffect( () => {
-		if ( records === null ) {
+		if ( records === null || records === undefined ) {
 			setIsResolvingWidgetTypes( true );
 			return;
 		}

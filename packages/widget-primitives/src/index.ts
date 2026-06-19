@@ -17,4 +17,5 @@ export type {
 	WidgetType,
 	WidgetRenderProps,
 	ResolveWidgetModule,
+	WidgetModuleRecord,
 } from './types';
