@@ -190,7 +190,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 		// Core attributes applicable to most elements. `data-*` is a wildcard
 		// supported by wp_kses() and matches any data attribute.
 		$core_attributes = array_fill_keys(
-			array( 'id', 'class', 'style', 'data-*' ),
+			array( 'class', 'data-*', 'id', 'style' ),
 			true
 		);
 
@@ -252,8 +252,8 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				'aria-valuemin',
 				'aria-valuenow',
 				'aria-valuetext',
-				'role',
 				'focusable',
+				'role',
 				'tabindex',
 			),
 			true
@@ -262,50 +262,50 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 		// Presentation attributes for graphics elements (shapes, text, use, image).
 		$presentation_attributes = array_fill_keys(
 			array(
-				'fill',
-				'fill-opacity',
-				'fill-rule',
-				'stroke',
-				'stroke-width',
-				'stroke-linecap',
-				'stroke-linejoin',
-				'stroke-miterlimit',
-				'stroke-dasharray',
-				'stroke-dashoffset',
-				'stroke-opacity',
-				'opacity',
-				'transform',
 				'clip-path',
 				'clip-rule',
-				'mask',
-				'filter',
-				'visibility',
-				'display',
 				'color',
 				'color-interpolation',
 				'color-rendering',
-				'vector-effect',
+				'display',
+				'fill',
+				'fill-opacity',
+				'fill-rule',
+				'filter',
+				'mask',
+				'opacity',
 				'paint-order',
+				'stroke',
+				'stroke-dasharray',
+				'stroke-dashoffset',
+				'stroke-linecap',
+				'stroke-linejoin',
+				'stroke-miterlimit',
+				'stroke-opacity',
+				'stroke-width',
+				'transform',
+				'vector-effect',
+				'visibility',
 			),
 			true
 		);
 
 		// Marker attributes (only for shape elements).
 		$marker_attributes = array_fill_keys(
-			array( 'marker-start', 'marker-mid', 'marker-end' ),
+			array( 'marker-end', 'marker-mid', 'marker-start' ),
 			true
 		);
 
 		// Container attributes for grouping elements.
 		$container_attributes = array_fill_keys(
 			array(
-				'transform',
 				'clip-path',
-				'mask',
-				'filter',
-				'visibility',
 				'display',
+				'filter',
+				'mask',
 				'opacity',
+				'transform',
+				'visibility',
 			),
 			true
 		);
@@ -325,13 +325,13 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				$presentation_attributes,
 				array_fill_keys(
 					array(
+						'height',
+						'preserveaspectratio',
+						'viewbox',
+						'width',
+						'x',
 						'xmlns',
 						'xmlns:xlink',
-						'width',
-						'height',
-						'viewbox',
-						'preserveaspectratio',
-						'x',
 						'y',
 					),
 					true
@@ -426,12 +426,12 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				$marker_attributes,
 				array_fill_keys(
 					array(
-						'x',
-						'y',
-						'width',
 						'height',
 						'rx',
 						'ry',
+						'width',
+						'x',
+						'y',
 					),
 					true
 				)
@@ -447,10 +447,10 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				$core_attributes,
 				array_fill_keys(
 					array(
-						'viewbox',
 						'preserveaspectratio',
-						'zoomandpan',
+						'viewbox',
 						'viewtarget',
+						'zoomandpan',
 					),
 					true
 				)
@@ -461,12 +461,12 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				$container_attributes,
 				array_fill_keys(
 					array(
-						'viewbox',
+						'height',
 						'preserveaspectratio',
+						'viewbox',
+						'width',
 						'x',
 						'y',
-						'width',
-						'height',
 					),
 					true
 				)
@@ -477,12 +477,12 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				$presentation_attributes,
 				array_fill_keys(
 					array(
-						'href',
-						'xlink:href',
-						'x',
-						'y',
-						'width',
 						'height',
+						'href',
+						'width',
+						'x',
+						'xlink:href',
+						'y',
 					),
 					true
 				)
@@ -501,10 +501,10 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				array_fill_keys(
 					array(
 						'href',
-						'xlink:href',
-						'target',
 						'rel',
+						'target',
 						'type',
+						'xlink:href',
 					),
 					true
 				)
@@ -523,12 +523,12 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				$core_attributes,
 				array_fill_keys(
 					array(
+						'height',
+						'maskcontentunits',
+						'maskunits',
+						'width',
 						'x',
 						'y',
-						'width',
-						'height',
-						'maskunits',
-						'maskcontentunits',
 					),
 					true
 				)
@@ -538,15 +538,15 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				$core_attributes,
 				array_fill_keys(
 					array(
+						'gradienttransform',
+						'gradientunits',
+						'href',
+						'spreadmethod',
 						'x1',
 						'x2',
+						'xlink:href',
 						'y1',
 						'y2',
-						'gradientunits',
-						'gradienttransform',
-						'spreadmethod',
-						'href',
-						'xlink:href',
 					),
 					true
 				)
@@ -557,14 +557,14 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 					array(
 						'cx',
 						'cy',
-						'r',
+						'fr',
 						'fx',
 						'fy',
-						'fr',
-						'gradientunits',
 						'gradienttransform',
-						'spreadmethod',
+						'gradientunits',
 						'href',
+						'r',
+						'spreadmethod',
 						'xlink:href',
 					),
 					true
@@ -586,17 +586,17 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				$core_attributes,
 				array_fill_keys(
 					array(
-						'x',
-						'y',
-						'width',
 						'height',
-						'patternunits',
+						'href',
 						'patterncontentunits',
 						'patterntransform',
-						'viewbox',
+						'patternunits',
 						'preserveaspectratio',
-						'href',
+						'viewbox',
+						'width',
+						'x',
 						'xlink:href',
+						'y',
 					),
 					true
 				)
@@ -606,12 +606,12 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				$core_attributes,
 				array_fill_keys(
 					array(
+						'filterunits',
+						'height',
+						'primitiveunits',
+						'width',
 						'x',
 						'y',
-						'width',
-						'height',
-						'filterunits',
-						'primitiveunits',
 					),
 					true
 				)
@@ -628,9 +628,9 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			'fecolormatrix'       => array_fill_keys(
 				array(
 					'in',
+					'result',
 					'type',
 					'values',
-					'result',
 				),
 				true
 			),
@@ -645,36 +645,36 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				array(
 					'in',
 					'in2',
-					'operator',
 					'k1',
 					'k2',
 					'k3',
 					'k4',
+					'operator',
 					'result',
 				),
 				true
 			),
 			'feconvolvematrix'    => array_fill_keys(
 				array(
-					'in',
-					'order',
-					'kernelmatrix',
-					'divisor',
 					'bias',
-					'targetx',
-					'targety',
+					'divisor',
 					'edgemode',
+					'in',
+					'kernelmatrix',
+					'order',
 					'preservealpha',
 					'result',
+					'targetx',
+					'targety',
 				),
 				true
 			),
 			'fediffuselighting'   => array_fill_keys(
 				array(
-					'in',
-					'surfacescale',
 					'diffuseconstant',
+					'in',
 					'result',
+					'surfacescale',
 				),
 				true
 			),
@@ -682,10 +682,10 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				array(
 					'in',
 					'in2',
+					'result',
 					'scale',
 					'xchannelselector',
 					'ychannelselector',
-					'result',
 				),
 				true
 			),
@@ -706,19 +706,19 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			),
 			'fegaussianblur'      => array_fill_keys(
 				array(
-					'in',
-					'stddeviation',
 					'edgemode',
+					'in',
 					'result',
+					'stddeviation',
 				),
 				true
 			),
 			'feimage'             => array_fill_keys(
 				array(
 					'href',
-					'xlink:href',
 					'preserveaspectratio',
 					'result',
+					'xlink:href',
 				),
 				true
 			),
@@ -745,9 +745,9 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			),
 			'feoffset'            => array_fill_keys(
 				array(
-					'in',
 					'dx',
 					'dy',
+					'in',
 					'result',
 				),
 				true
@@ -763,23 +763,23 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			'fespecularlighting'  => array_fill_keys(
 				array(
 					'in',
-					'surfacescale',
+					'result',
 					'specularconstant',
 					'specularexponent',
-					'result',
+					'surfacescale',
 				),
 				true
 			),
 			'fespotlight'         => array_fill_keys(
 				array(
-					'x',
-					'y',
-					'z',
+					'limitingconeangle',
 					'pointsatx',
 					'pointsaty',
 					'pointsatz',
 					'specularexponent',
-					'limitingconeangle',
+					'x',
+					'y',
+					'z',
 				),
 				true
 			),
@@ -794,58 +794,58 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				array(
 					'basefrequency',
 					'numoctaves',
+					'result',
 					'seed',
 					'stitchtiles',
 					'type',
-					'result',
 				),
 				true
 			),
 			'fefunca'             => array_fill_keys(
 				array(
-					'type',
-					'tablevalues',
-					'slope',
-					'intercept',
 					'amplitude',
 					'exponent',
+					'intercept',
 					'offset',
+					'slope',
+					'tablevalues',
+					'type',
 				),
 				true
 			),
 			'fefuncb'             => array_fill_keys(
 				array(
-					'type',
-					'tablevalues',
-					'slope',
-					'intercept',
 					'amplitude',
 					'exponent',
+					'intercept',
 					'offset',
+					'slope',
+					'tablevalues',
+					'type',
 				),
 				true
 			),
 			'fefuncg'             => array_fill_keys(
 				array(
-					'type',
-					'tablevalues',
-					'slope',
-					'intercept',
 					'amplitude',
 					'exponent',
+					'intercept',
 					'offset',
+					'slope',
+					'tablevalues',
+					'type',
 				),
 				true
 			),
 			'fefuncr'             => array_fill_keys(
 				array(
-					'type',
-					'tablevalues',
-					'slope',
-					'intercept',
 					'amplitude',
 					'exponent',
+					'intercept',
 					'offset',
+					'slope',
+					'tablevalues',
+					'type',
 				),
 				true
 			),
@@ -856,26 +856,26 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				$presentation_attributes,
 				array_fill_keys(
 					array(
-						'x',
-						'y',
-						'dx',
-						'dy',
-						'rotate',
-						'textlength',
-						'lengthadjust',
-						'text-anchor',
-						'font-family',
-						'font-size',
-						'font-weight',
-						'font-style',
-						'font-variant',
-						'text-decoration',
-						'writing-mode',
-						'letter-spacing',
-						'word-spacing',
-						'dominant-baseline',
 						'alignment-baseline',
 						'baseline-shift',
+						'dominant-baseline',
+						'dx',
+						'dy',
+						'font-family',
+						'font-size',
+						'font-style',
+						'font-variant',
+						'font-weight',
+						'lengthadjust',
+						'letter-spacing',
+						'rotate',
+						'text-anchor',
+						'text-decoration',
+						'textlength',
+						'word-spacing',
+						'writing-mode',
+						'x',
+						'y',
 					),
 					true
 				)
@@ -886,19 +886,19 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				$presentation_attributes,
 				array_fill_keys(
 					array(
-						'x',
-						'y',
 						'dx',
 						'dy',
-						'rotate',
-						'textlength',
-						'lengthadjust',
-						'text-anchor',
 						'font-family',
 						'font-size',
-						'font-weight',
 						'font-style',
+						'font-weight',
+						'lengthadjust',
+						'rotate',
+						'text-anchor',
 						'text-decoration',
+						'textlength',
+						'x',
+						'y',
 					),
 					true
 				)
@@ -910,11 +910,11 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				array_fill_keys(
 					array(
 						'href',
-						'xlink:href',
-						'startoffset',
 						'method',
 						'spacing',
+						'startoffset',
 						'text-anchor',
+						'xlink:href',
 					),
 					true
 				)
@@ -930,13 +930,13 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				$presentation_attributes,
 				array_fill_keys(
 					array(
-						'x',
-						'y',
-						'width',
 						'height',
 						'href',
-						'xlink:href',
 						'preserveaspectratio',
+						'width',
+						'x',
+						'xlink:href',
+						'y',
 					),
 					true
 				)
@@ -946,13 +946,13 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				$core_attributes,
 				array_fill_keys(
 					array(
-						'markerunits',
-						'refx',
-						'refy',
-						'markerwidth',
 						'markerheight',
+						'markerunits',
+						'markerwidth',
 						'orient',
 						'preserveaspectratio',
+						'refx',
+						'refy',
 						'viewbox',
 					),
 					true
@@ -963,19 +963,19 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				$core_attributes,
 				array_fill_keys(
 					array(
-						'attributename',
-						'from',
-						'to',
-						'dur',
-						'repeatcount',
-						'begin',
-						'end',
-						'values',
-						'keytimes',
-						'keysplines',
-						'calcmode',
-						'additive',
 						'accumulate',
+						'additive',
+						'attributename',
+						'begin',
+						'calcmode',
+						'dur',
+						'end',
+						'from',
+						'keysplines',
+						'keytimes',
+						'repeatcount',
+						'to',
+						'values',
 					),
 					true
 				)
@@ -984,21 +984,21 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				$core_attributes,
 				array_fill_keys(
 					array(
-						'path',
-						'keypoints',
-						'rotate',
-						'keytimes',
-						'keysplines',
+						'accumulate',
+						'additive',
+						'begin',
 						'calcmode',
+						'dur',
+						'end',
 						'from',
+						'keypoints',
+						'keysplines',
+						'keytimes',
+						'path',
+						'repeatcount',
+						'rotate',
 						'to',
 						'values',
-						'dur',
-						'repeatcount',
-						'begin',
-						'end',
-						'additive',
-						'accumulate',
 					),
 					true
 				)
@@ -1007,20 +1007,20 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				$core_attributes,
 				array_fill_keys(
 					array(
-						'attributename',
-						'type',
-						'from',
-						'to',
-						'dur',
-						'repeatcount',
-						'begin',
-						'end',
-						'values',
-						'keytimes',
-						'keysplines',
-						'calcmode',
-						'additive',
 						'accumulate',
+						'additive',
+						'attributename',
+						'begin',
+						'calcmode',
+						'dur',
+						'end',
+						'from',
+						'keysplines',
+						'keytimes',
+						'repeatcount',
+						'to',
+						'type',
+						'values',
 					),
 					true
 				)
@@ -1030,11 +1030,11 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				array_fill_keys(
 					array(
 						'attributename',
-						'to',
 						'begin',
 						'dur',
 						'end',
 						'repeatcount',
+						'to',
 					),
 					true
 				)
