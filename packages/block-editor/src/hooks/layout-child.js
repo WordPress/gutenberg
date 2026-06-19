@@ -367,7 +367,6 @@ function GridTools( {
 		blockBlockVisibility,
 		deviceType,
 		isChildBlockAGrid,
-		isAnyAncestorHidden,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -390,10 +389,6 @@ function GridTools( {
 				};
 			}
 
-			const { isBlockParentHiddenAtViewport } = unlock(
-				select( blockEditorStore )
-			);
-
 			const parentAttributes = getBlockAttributes( _rootClientId );
 			const blockAttributes = getBlockAttributes( clientId );
 			const settings = getSettings();
@@ -411,10 +406,6 @@ function GridTools( {
 				deviceType: currentDeviceType,
 				// Check if the selected child block is itself a grid.
 				isChildBlockAGrid: blockAttributes?.layout?.type === 'grid',
-				isAnyAncestorHidden: isBlockParentHiddenAtViewport(
-					_rootClientId,
-					currentDeviceType
-				),
 			};
 		},
 		[ clientId ]
@@ -426,12 +417,33 @@ function GridTools( {
 	const rawCanvasView = blockElement?.ownerDocument?.defaultView;
 	const canvasView = rawCanvasView === null ? undefined : rawCanvasView;
 
-	const { isBlockCurrentlyHidden: isParentBlockCurrentlyHidden } =
-		useBlockVisibility( {
-			blockVisibility: parentBlockVisibility,
-			deviceType,
-			view: canvasView,
-		} );
+	const {
+		isBlockCurrentlyHidden: isParentBlockCurrentlyHidden,
+		currentViewport,
+	} = useBlockVisibility( {
+		blockVisibility: parentBlockVisibility,
+		deviceType,
+		view: canvasView,
+	} );
+
+	// Check whether any ancestor of the parent grid is hidden at the viewport
+	// actually detected from the canvas, so it stays consistent with how
+	// blocks are hidden.
+	const isAnyAncestorHidden = useSelect(
+		( select ) => {
+			if ( ! rootClientId ) {
+				return false;
+			}
+			const { isBlockParentHiddenAtViewport } = unlock(
+				select( blockEditorStore )
+			);
+			return isBlockParentHiddenAtViewport(
+				rootClientId,
+				currentViewport
+			);
+		},
+		[ rootClientId, currentViewport ]
+	);
 
 	const { isBlockCurrentlyHidden: isBlockItselfCurrentlyHidden } =
 		useBlockVisibility( {
