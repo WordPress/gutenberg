@@ -12,6 +12,7 @@ import { useEffect } from '@wordpress/element';
  * Internal dependencies
  */
 import { debounce } from '../../utils/debounce';
+import type { DebounceOptions, DebouncedFunc } from '../../utils/debounce';
 
 /**
  * Debounces a function similar to Lodash's `debounce`. A new debounced function will
@@ -21,14 +22,18 @@ import { debounce } from '../../utils/debounce';
  *
  * @see https://lodash.com/docs/4#debounce
  *
- * @template {(...args: any[]) => void} TFunc
+ * @template TFunc
  *
- * @param {TFunc}                                          fn        The function to debounce.
- * @param {number}                                         [wait]    The number of milliseconds to delay.
- * @param {import('../../utils/debounce').DebounceOptions} [options] The options object.
- * @return {import('../../utils/debounce').DebouncedFunc<TFunc>} Debounced function.
+ * @param    fn      The function to debounce.
+ * @param    wait    The number of milliseconds to delay.
+ * @param    options The options object.
+ * @return          Debounced function.
  */
-export default function useDebounce( fn, wait, options ) {
+export default function useDebounce< TFunc extends ( ...args: any[] ) => void >(
+	fn: TFunc,
+	wait?: number,
+	options?: DebounceOptions
+): DebouncedFunc< TFunc > {
 	const debounced = useMemoOne(
 		() => debounce( fn, wait ?? 0, options ),
 		[ fn, wait, options?.leading, options?.trailing, options?.maxWait ]
