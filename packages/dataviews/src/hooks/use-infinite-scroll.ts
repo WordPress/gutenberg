@@ -28,6 +28,7 @@ function captureAnchorElement(
 	anchorElementRef: React.MutableRefObject< {
 		posinset: number;
 		viewportOffset: number;
+		scrollTop: number;
 		direction: 'up' | 'down' | null;
 	} | null >,
 	direction: 'up' | 'down'
@@ -61,6 +62,7 @@ function captureAnchorElement(
 	anchorElementRef.current = {
 		posinset,
 		viewportOffset: anchorRect.top - containerRect.top,
+		scrollTop: container.scrollTop,
 		direction,
 	};
 	return true;
@@ -95,6 +97,7 @@ export function useInfiniteScroll( {
 	const anchorElementRef = useRef< {
 		posinset: number;
 		viewportOffset: number;
+		scrollTop: number;
 		direction: 'up' | 'down' | null;
 	} | null >( null );
 	const viewRef = useRef( view );
@@ -174,8 +177,20 @@ export function useInfiniteScroll( {
 			const anchorRect = anchorElement.getBoundingClientRect();
 			const currentOffset = anchorRect.top - containerRect.top;
 
-			// Calculate how much the anchor has moved and adjust scroll to compensate
-			const scrollAdjustment = currentOffset - anchor.viewportOffset;
+			// Compensate only for the anchor being displaced by items added or
+			// removed since capture — not for the user's own scrolling in the
+			// meantime. The raw offset delta (`currentOffset - viewportOffset`)
+			// conflates both: between capture and this restore the user can keep
+			// scrolling (the next page often loads asynchronously), and that
+			// scroll shows up as offset change too. Adding back the scroll delta
+			// (`scrollTop - capturedScrollTop`) cancels the user-driven component,
+			// leaving just the content-driven shift. Without it, the restore snaps
+			// the list back to its capture-time position and undoes the scrolling
+			// the user did while the page was loading.
+			const scrollAdjustment =
+				currentOffset -
+				anchor.viewportOffset +
+				( container.scrollTop - anchor.scrollTop );
 
 			if ( Math.abs( scrollAdjustment ) > 1 ) {
 				container.scrollTop += scrollAdjustment;

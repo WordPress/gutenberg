@@ -10,6 +10,10 @@
 
 -   DataViewsPicker: Add a new `pickerActivity` layout that renders selectable items as a vertical activity timeline. [#78941](https://github.com/WordPress/gutenberg/pull/78941)
 
+### Bug Fixes
+
+-   DataViews: Stop infinite-scroll anchor restoration from undoing the user's scrolling while a page loads, which made the list jump when scrolling down to load more.
+
 ### Code Quality
 
 -   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).

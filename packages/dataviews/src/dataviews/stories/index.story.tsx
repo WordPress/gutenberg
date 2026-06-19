@@ -13,6 +13,7 @@ import LayoutGridComponent from './layout-grid';
 import LayoutListComponent from './layout-list';
 import LayoutCustomComponent from './layout-custom';
 import InfiniteScrollComponent from './infinite-scroll';
+import AsyncInfiniteScrollComponent from './async-infinite-scroll';
 import WithCardComponent from './with-card';
 import FreeCompositionComponent from './free-composition';
 import MinimalUIComponent from './minimal-ui';
@@ -266,6 +267,21 @@ export const WithCard = {
 
 export const InfiniteScroll = {
 	render: InfiniteScrollComponent,
+	parameters: {
+		containerHeight: '600px',
+	},
+	argTypes: {
+		containerHeight: {
+			control: false,
+			table: {
+				disable: true,
+			},
+		},
+	},
+};
+
+export const AsyncInfiniteScroll = {
+	render: AsyncInfiniteScrollComponent,
 	parameters: {
 		containerHeight: '600px',
 	},
