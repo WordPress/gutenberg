@@ -251,8 +251,9 @@ async function dev() {
 				];
 
 				// Check if building for WordPress Core to exclude experimental blocks
-				const isWordPressCore = process.env.IS_WORDPRESS_CORE === 'true' ||
-					process.argv.includes( 'IS_WORDPRESS_CORE=true' );
+				const hasWordPressCoreArg = process.argv.includes(
+					'IS_WORDPRESS_CORE=true'
+				);
 
 				for ( const { input, output: outputPath } of blocksDirs ) {
 					const manifestArgs = [
@@ -262,7 +263,9 @@ async function dev() {
 					];
 
 					// Exclude experimental blocks when building for WordPress Core
-					if ( isWordPressCore ) {
+					if ( globalThis.IS_WORDPRESS_CORE ) {
+						manifestArgs.push( '--exclude-experimental' );
+					} else if ( hasWordPressCoreArg ) {
 						manifestArgs.push( '--exclude-experimental' );
 					}
 
