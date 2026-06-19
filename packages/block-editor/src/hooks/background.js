@@ -8,7 +8,6 @@ import clsx from 'clsx';
  */
 import { getBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -129,42 +128,41 @@ export function getBackgroundImageClasses( style ) {
 		: '';
 }
 
-function BackgroundInspectorControl( {
-	children,
-	backgroundGradientSupported = false,
-} ) {
-	const resetAllFilter = useCallback(
-		( attributes ) => {
-			const updatedClassName = attributes.className?.includes(
-				'has-background'
-			)
-				? attributes.className
-						.split( ' ' )
-						.filter( ( c ) => c !== 'has-background' )
-						.join( ' ' ) || undefined
-				: attributes.className;
-			return {
-				...attributes,
-				className: updatedClassName,
-				backgroundColor: undefined,
+// Clears every control the Background panel owns: the background image,
+// background color, and the gradient. The Background panel owns the gradient
+// control for both the newer `background.gradient` support and the legacy
+// `color.gradient` path, so "Reset all" clears the legacy value too,
+// regardless of which path stored it.
+export function backgroundResetAllFilter( attributes ) {
+	const updatedClassName = attributes.className?.includes( 'has-background' )
+		? attributes.className
+				.split( ' ' )
+				.filter( ( c ) => c !== 'has-background' )
+				.join( ' ' ) || undefined
+		: attributes.className;
+	return {
+		...attributes,
+		className: updatedClassName,
+		backgroundColor: undefined,
+		gradient: undefined,
+		style: cleanEmptyObject( {
+			...attributes.style,
+			background: undefined,
+			color: {
+				...attributes.style?.color,
+				background: undefined,
 				gradient: undefined,
-				style: cleanEmptyObject( {
-					...attributes.style,
-					background: undefined,
-					color: {
-						...attributes.style?.color,
-						background: undefined,
-						gradient: backgroundGradientSupported
-							? undefined
-							: attributes.style?.color?.gradient,
-					},
-				} ),
-			};
-		},
-		[ backgroundGradientSupported ]
-	);
+			},
+		} ),
+	};
+}
+
+function BackgroundInspectorControl( { children } ) {
 	return (
-		<InspectorControls group="background" resetAllFilter={ resetAllFilter }>
+		<InspectorControls
+			group="background"
+			resetAllFilter={ backgroundResetAllFilter }
+		>
 			{ children }
 		</InspectorControls>
 	);
@@ -203,20 +201,6 @@ export function BackgroundImagePanel( {
 	const backgroundGradientSupported = hasBackgroundSupport(
 		name,
 		'gradient'
-	);
-
-	// Must be declared before the early return to follow Rules of Hooks.
-	// Passes backgroundGradientSupported so that "Reset All" also clears
-	// the legacy color.gradient value when background.gradient is supported.
-	const defaultWrapper = useCallback(
-		( { children } ) => (
-			<BackgroundInspectorControl
-				backgroundGradientSupported={ backgroundGradientSupported }
-			>
-				{ children }
-			</BackgroundInspectorControl>
-		),
-		[ backgroundGradientSupported ]
 	);
 
 	const colorSupport = getBlockSupport( name, 'color' );
@@ -400,7 +384,7 @@ export function BackgroundImagePanel( {
 			colorDefaultControls?.background,
 	};
 
-	const Wrapper = asWrapper || defaultWrapper;
+	const Wrapper = asWrapper || BackgroundInspectorControl;
 
 	return (
 		<StylesBackgroundPanel
