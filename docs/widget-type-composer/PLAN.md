@@ -31,7 +31,7 @@ Parallelizable once their deps are on the feature branch: {3,4,5}, {11,12},
 | NN | Title | Phase | Depends on | Status |
 |----|-------|-------|------------|--------|
 | 00 | gate-scaffold | Foundation | none | done |
-| 01 | js-contract | Foundation | none | todo |
+| 01 | js-contract | Foundation | none | done |
 | 02 | widget-type-origin | Server framework | 00 | todo |
 | 03 | code-registered | Server framework | 02 | todo |
 | 04 | cpt-defs | Server framework | 02 | todo |

@@ -271,6 +271,24 @@ export interface WidgetType< Item = unknown >
 	 * time, produced from the conventional `render.*` entry point.
 	 */
 	renderModule: string;
+
+	/**
+	 * Where this Widget Type comes from; absent is interpreted as built-in.
+	 */
+	origin?: 'built-in' | 'code-registered' | 'cpt';
+
+	/**
+	 * For CPT-defined Widget Types, the underlying `widget_def` post ID. Null
+	 * or absent for the other origins.
+	 */
+	definitionId?: number | null;
+
+	/**
+	 * Composition (raw block markup) for server-defined Widget Types, both
+	 * code-registered and cpt. Null or absent for built-in Widget Types, which
+	 * render client-side from their module.
+	 */
+	content?: string | null;
 }
 
 /**
@@ -357,4 +375,19 @@ export interface WidgetModuleRecord extends WidgetModuleRecordOverrides {
 	 * `null`/absent means the module's actions stand.
 	 */
 	actions?: WidgetActionRecord[] | null;
+
+	/**
+	 * Where this Widget Type comes from; absent is interpreted as built-in.
+	 */
+	origin?: 'built-in' | 'code-registered' | 'cpt';
+
+	/**
+	 * For CPT-defined Widget Types, the underlying `widget_def` post ID.
+	 */
+	definition_id?: number | null;
+
+	/**
+	 * Composition (raw block markup) for server-defined Widget Types.
+	 */
+	content?: string | null;
 }
