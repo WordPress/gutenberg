@@ -123,6 +123,12 @@ type NavigationTreeAdditionalContentProps = NavigationLinkUIProps & {
 	NavigationLinkUI?: ComponentType< NavigationLinkUIProps >;
 	onInsertedSubmenuComplete: ( block: Block | null | undefined ) => void;
 };
+type PopoverAnchor =
+	| Element
+	| {
+			getBoundingClientRect: () => DOMRect;
+			ownerDocument?: Document;
+	  };
 
 function deferUntilDropdownCloses( callback: () => void ) {
 	window.requestAnimationFrame( callback );
@@ -148,6 +154,67 @@ function getBlockLibraryPrivateApis(): BlockLibraryPrivateApis {
 
 function getBlockListRootClientId( clientId: ClientId ) {
 	return clientId || '';
+}
+
+function getListViewBlockPopoverAnchorElement(
+	listViewElement: HTMLElement,
+	clientId: string
+) {
+	const rowElement = listViewElement.querySelector(
+		`[role="row"][data-block="${ clientId }"]`
+	);
+
+	if ( ! rowElement ) {
+		return null;
+	}
+
+	/*
+	 * List View rows span the whole tree grid. Anchoring the label-only
+	 * submenu popover to the row places it at the far edge of the panel,
+	 * which visually detaches it from the submenu the user just inserted.
+	 * Prefer the visible block content control so the popover stays attached
+	 * to the submenu item itself.
+	 */
+	return (
+		rowElement.querySelector( '.block-editor-list-view-block-contents' ) ||
+		rowElement.querySelector(
+			'.block-editor-list-view-block__contents-container'
+		) ||
+		rowElement
+	);
+}
+
+function getLabelOnlySubmenuPopoverAnchor(
+	listViewElement: HTMLElement,
+	clientId: string
+): PopoverAnchor | null {
+	const anchorElement = getListViewBlockPopoverAnchorElement(
+		listViewElement,
+		clientId
+	);
+
+	if ( ! anchorElement ) {
+		return null;
+	}
+
+	/*
+	 * The List View item can still be wider than the visible submenu label.
+	 * Use a virtual anchor whose left edge matches the item but whose width is
+	 * constrained, so the label-only popover opens below the submenu row
+	 * instead of being pushed toward the preview canvas.
+	 */
+	return {
+		ownerDocument: anchorElement.ownerDocument,
+		getBoundingClientRect() {
+			const rect = anchorElement.getBoundingClientRect();
+			return new DOMRect(
+				rect.left,
+				rect.top,
+				Math.min( rect.width, 240 ),
+				rect.height
+			);
+		},
+	};
 }
 
 function NavigationTreeAppender( {
@@ -397,7 +464,7 @@ export default function NavigationMenuContent( {
 		null
 	);
 	const [ labelOnlyAnchorElement, setLabelOnlyAnchorElement ] =
-		useState< Element | null >( null );
+		useState< PopoverAnchor | null >( null );
 	const listViewRef = useRef< HTMLDivElement >( null );
 
 	const editingBlockAttributes = useSelect(
@@ -467,8 +534,9 @@ export default function NavigationMenuContent( {
 			return;
 		}
 
-		const element = listViewRef.current.querySelector(
-			`[data-block="${ labelOnlySubmenuClientId }"]`
+		const element = getLabelOnlySubmenuPopoverAnchor(
+			listViewRef.current,
+			labelOnlySubmenuClientId
 		);
 		setLabelOnlyAnchorElement( element ?? null );
 	}, [ labelOnlySubmenuClientId, navigationBlocks ] );
@@ -798,7 +866,7 @@ export default function NavigationMenuContent( {
 			{ labelOnlySubmenuClientId && labelOnlyAnchorElement && (
 				<Popover
 					anchor={ labelOnlyAnchorElement }
-					placement="right-start"
+					placement="bottom-start"
 					onClose={ cancelLabelOnlySubmenu }
 					className="navigation-edit-editor__label-only-submenu"
 				>
@@ -810,7 +878,7 @@ export default function NavigationMenuContent( {
 						} }
 					>
 						<TextControl
-							label={ __( 'Drop-down label' ) }
+							label={ __( 'Submenu label' ) }
 							value={ labelOnlySubmenuLabel }
 							onChange={ setLabelOnlySubmenuLabel }
 							autoComplete="off"
