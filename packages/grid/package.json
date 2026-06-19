@@ -1,8 +1,7 @@
 {
 	"name": "@wordpress/grid",
-	"version": "1.0.0-prerelease",
-	"private": true,
-	"description": "Grid component with drag-and-drop reordering and resize for dashboard layouts.",
+	"version": "0.1.0-prerelease",
+	"description": "Grid layout components for arranging tiles in dashboard-style surfaces, with drag-to-reorder and tile resizing.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
@@ -56,11 +55,13 @@
 		"clsx": "^2.1.1"
 	},
 	"devDependencies": {
+		"@storybook/react-vite": "^10.4.3",
 		"@testing-library/dom": "^10.4.1",
 		"@testing-library/react": "^16.3.2",
 		"@types/jest": "^29.5.14",
 		"@wordpress/icons": "file:../icons",
-		"@wordpress/ui": "file:../ui"
+		"@wordpress/ui": "file:../ui",
+		"storybook": "^10.4.3"
 	},
 	"peerDependencies": {
 		"@types/react": "^18.3.27",

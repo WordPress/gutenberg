@@ -40,7 +40,7 @@
 				width: var(--wpds-dimension-padding-md);
 
 				&::before {
-					height: calc(var(--wpds-dimension-base) * 3);
+					height: var(--wpds-dimension-size-3xs);
 				}
 			}
 			.dataviews-view-picker-activity__item-type-icon {
@@ -54,10 +54,10 @@
 
 		&.is-balanced {
 			.dataviews-view-picker-activity__item-type {
-				width: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available
+				width: var(--wpds-dimension-size-sm);
 
 				&::before {
-					height: calc(var(--wpds-dimension-base) * 3);
+					height: var(--wpds-dimension-size-3xs);
 				}
 			}
 			.dataviews-view-picker-activity__item-type-icon {
@@ -72,10 +72,10 @@
 
 		&.is-comfortable {
 			.dataviews-view-picker-activity__item-type {
-				width: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
+				width: var(--wpds-dimension-size-md);
 
 				&::before {
-					height: calc(var(--wpds-dimension-base) * 2);
+					height: var(--wpds-dimension-size-4xs);
 				}
 			}
 			.dataviews-view-picker-activity__item-type-icon {
@@ -106,7 +106,7 @@
 		.dataviews-view-picker-activity__item-title,
 		.dataviews-view-picker-activity__item-description,
 		.dataviews-view-picker-activity__item-fields {
-			min-height: calc(var(--wpds-dimension-base) * 4); // TODO: use size token when available
+			min-height: var(--wpds-dimension-size-2xs);
 		}
 
 		.dataviews-view-picker-activity__item-title {

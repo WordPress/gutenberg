@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/style-runtime",
-	"version": "0.4.0",
+	"version": "0.4.1",
 	"description": "Runtime helpers for injecting WordPress package styles.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
