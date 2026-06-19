@@ -32,7 +32,7 @@ Parallelizable once their deps are on the feature branch: {3,4,5}, {11,12},
 |----|-------|-------|------------|--------|
 | 00 | gate-scaffold | Foundation | none | done |
 | 01 | js-contract | Foundation | none | done |
-| 02 | widget-type-origin | Server framework | 00 | todo |
+| 02 | widget-type-origin | Server framework | 00 | done |
 | 03 | code-registered | Server framework | 02 | todo |
 | 04 | cpt-defs | Server framework | 02 | todo |
 | 05 | controller-fields | Server framework | 02 | todo |

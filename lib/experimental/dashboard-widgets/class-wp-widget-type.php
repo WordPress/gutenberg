@@ -141,6 +141,16 @@ if ( ! class_exists( 'WP_Widget_Type' ) ) {
 		public $keywords = null;
 
 		/**
+		 * Where this widget type comes from. Set by the resolver in
+		 * `widget-types.php`. One of `built-in`, `code-registered`, `cpt`;
+		 * absent is interpreted as `built-in` by consumers. Later origins add
+		 * their own metadata (content, definition id) in subsequent steps.
+		 *
+		 * @var string|null
+		 */
+		public $origin = null;
+
+		/**
 		 * Constructor.
 		 *
 		 * @param string $name Widget type name including namespace.
