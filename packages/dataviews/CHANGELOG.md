@@ -12,7 +12,7 @@
 
 ### Bug Fixes
 
--   DataViews: Stop infinite-scroll anchor restoration from undoing the user's scrolling while a page loads, which made the list jump when scrolling down to load more.
+-   DataViews: Stop infinite-scroll anchor restoration from undoing the user's scrolling while a page loads, which made the list jump when scrolling down to load more. [#79334](https://github.com/WordPress/gutenberg/pull/79334)
 
 ### Code Quality
 
