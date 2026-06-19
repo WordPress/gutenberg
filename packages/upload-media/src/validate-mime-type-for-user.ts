@@ -6,7 +6,7 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { UploadError } from './upload-error';
+import { ErrorCode, UploadError } from './upload-error';
 import { getMimeTypesArray } from './get-mime-types-array';
 
 /**
@@ -32,7 +32,7 @@ export function validateMimeTypeForUser(
 
 	if ( file.type && ! isAllowedMimeTypeForUser ) {
 		throw new UploadError( {
-			code: 'MIME_TYPE_NOT_ALLOWED_FOR_USER',
+			code: ErrorCode.MIME_TYPE_NOT_ALLOWED_FOR_USER,
 			message: sprintf(
 				// translators: %s: file name.
 				__(
