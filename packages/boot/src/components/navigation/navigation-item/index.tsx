@@ -43,6 +43,10 @@ interface NavigationItemProps {
 	 * The path to navigate to.
 	 */
 	to: string;
+	/**
+	 * Optional trailing action shown alongside the navigation link.
+	 */
+	action?: ReactNode;
 }
 
 export default function NavigationItem( {
@@ -51,6 +55,7 @@ export default function NavigationItem( {
 	shouldShowPlaceholder = true,
 	children,
 	to,
+	action,
 }: NavigationItemProps ) {
 	// Check if the 'to' prop is an external URL
 	const isExternal = ! String(
@@ -64,25 +69,32 @@ export default function NavigationItem( {
 		</HStack>
 	);
 
-	if ( isExternal ) {
+	const item = isExternal ? (
 		// Render as a regular anchor tag for external URLs
-		return (
-			<Item
-				as="a"
-				href={ to }
-				className={ clsx( 'boot-navigation-item', className ) }
-			>
-				{ content }
-			</Item>
-		);
-	}
-
-	return (
+		<Item
+			as="a"
+			href={ to }
+			className={ clsx( 'boot-navigation-item', className ) }
+		>
+			{ content }
+		</Item>
+	) : (
 		<RouterLinkItem
 			to={ to }
 			className={ clsx( 'boot-navigation-item', className ) }
 		>
 			{ content }
 		</RouterLinkItem>
+	);
+
+	if ( ! action ) {
+		return item;
+	}
+
+	return (
+		<div className="boot-navigation-item__container">
+			{ item }
+			<div className="boot-navigation-item__action">{ action }</div>
+		</div>
 	);
 }

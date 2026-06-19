@@ -1,8 +1,17 @@
 /**
+ * External dependencies
+ */
+import type { MouseEvent } from 'react';
+
+/**
  * WordPress dependencies
  */
 import { useEffect, useState, useMemo, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
+import { Button } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+import { cog } from '@wordpress/icons';
+import { useNavigate } from '@wordpress/route';
 
 /**
  * Internal dependencies
@@ -22,6 +31,7 @@ function Navigation( {
 }: {
 	onRootChange?: ( isRoot: boolean ) => void;
 } ) {
+	const navigate = useNavigate();
 	const backButtonRef = useRef< HTMLButtonElement >( null );
 	const [ animationDirection, setAnimationDirection ] = useState<
 		'forward' | 'backward' | null
@@ -83,6 +93,27 @@ function Navigation( {
 	);
 
 	const renderItem = ( item: MenuItem ) => {
+		const action =
+			item.id === 'home' ? (
+				<Button
+					className="boot-navigation-item__configure-homepage"
+					icon={ cog }
+					label={ __( 'Configure homepage' ) }
+					size="compact"
+					variant="tertiary"
+					onClick={ ( event: MouseEvent ) => {
+						event.preventDefault();
+						event.stopPropagation();
+						navigate( {
+							to: '/',
+							search: () => ( {
+								configureHomepage: '1',
+							} ),
+						} as never );
+					} }
+				/>
+			) : undefined;
+
 		if ( item.parent_type === 'dropdown' ) {
 			return (
 				<DropdownItem
@@ -119,6 +150,7 @@ function Navigation( {
 				to={ item.to }
 				icon={ item.icon }
 				shouldShowPlaceholder={ hasRealIcons }
+				action={ action }
 			>
 				{ item.label }
 			</NavigationItem>

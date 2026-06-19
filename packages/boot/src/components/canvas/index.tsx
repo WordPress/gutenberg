@@ -2,7 +2,13 @@
  * External dependencies
  */
 import clsx from 'clsx';
-import type { ReactNode, SyntheticEvent } from 'react';
+import type {
+	CSSProperties,
+	KeyboardEvent,
+	PointerEvent as ReactPointerEvent,
+	ReactNode,
+	SyntheticEvent,
+} from 'react';
 
 /**
  * WordPress dependencies
@@ -19,12 +25,13 @@ import {
 	Button,
 	DropdownMenu,
 	MenuItem,
+	Notice,
 	Spinner,
 	Tooltip as WCTooltip,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	archive,
 	category as categoryIcon,
@@ -32,6 +39,7 @@ import {
 	chevronLeft,
 	chevronRight,
 	desktop,
+	external,
 	home,
 	layout,
 	mobile,
@@ -42,7 +50,7 @@ import {
 	tag,
 	tablet,
 } from '@wordpress/icons';
-import { useInvalidate, useNavigate } from '@wordpress/route';
+import { useInvalidate, useNavigate, useSearch } from '@wordpress/route';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -75,8 +83,25 @@ interface PreviewLinkResponse {
 }
 
 type PreviewDevice = 'desktop' | 'tablet' | 'mobile';
+type ResizablePreviewDevice = Exclude< PreviewDevice, 'desktop' >;
+type ResizeSide = 'start' | 'end';
 type PreparedPreviewDocument = Document & {
 	__bootPreviewLinksReady?: boolean;
+};
+
+const PREVIEW_DEVICE_WIDTHS: Record< ResizablePreviewDevice, number > = {
+	tablet: 780,
+	mobile: 390,
+};
+
+const PREVIEW_DEVICE_MIN_WIDTHS: Record< ResizablePreviewDevice, number > = {
+	tablet: 600,
+	mobile: 320,
+};
+
+const PREVIEW_DEVICE_MAX_WIDTHS: Record< ResizablePreviewDevice, number > = {
+	tablet: 1024,
+	mobile: 480,
 };
 
 const PREVIEW_QUERY_ARG = 'site-editor-preview';
@@ -181,6 +206,49 @@ function isLocalPreviewUrl( url?: string ) {
 	}
 }
 
+function getElementFromEventTarget( target: EventTarget | null ) {
+	if ( ! target || ! ( 'nodeType' in target ) ) {
+		return null;
+	}
+
+	const node = target as globalThis.Node;
+	if ( node.nodeType === 1 ) {
+		return node as Element;
+	}
+
+	return node.parentElement;
+}
+
+function getLinkFromPreviewEvent( event: MouseEvent ) {
+	return getElementFromEventTarget( event.target )?.closest(
+		'a[href]'
+	) as HTMLAnchorElement | null;
+}
+
+function isResizablePreviewDevice(
+	device: PreviewDevice
+): device is ResizablePreviewDevice {
+	return device !== 'desktop';
+}
+
+function clampPreviewWidth(
+	width: number,
+	device: ResizablePreviewDevice,
+	viewportWidth?: number
+) {
+	const maxAvailableWidth =
+		viewportWidth && viewportWidth > 0
+			? Math.max( 280, viewportWidth - 32 )
+			: PREVIEW_DEVICE_MAX_WIDTHS[ device ];
+	const maxWidth = Math.min(
+		PREVIEW_DEVICE_MAX_WIDTHS[ device ],
+		maxAvailableWidth
+	);
+	const minWidth = Math.min( PREVIEW_DEVICE_MIN_WIDTHS[ device ], maxWidth );
+
+	return Math.round( Math.min( Math.max( width, minWidth ), maxWidth ) );
+}
+
 function getPreviewStatusClass( status?: string ) {
 	switch ( status ) {
 		case 'homepage':
@@ -263,11 +331,39 @@ function PreviewDocumentInfo( {
 	onPreviewRefresh,
 }: CanvasProps & { onPreviewRefresh?: () => void } ) {
 	const invalidate = useInvalidate();
+	const navigate = useNavigate();
+	const searchParams = useSearch( { strict: false } ) as Record<
+		string,
+		unknown
+	>;
 	const [ isConfiguringHomepage, setIsConfiguringHomepage ] =
 		useState( false );
 	const showPreviewStatus = Boolean(
 		canvas.previewStatus || canvas.previewStatusLabel
 	);
+	const hasConfigureHomepageFlag = Boolean( searchParams.configureHomepage );
+	const clearConfigureHomepageFlag = useCallback( () => {
+		if ( ! hasConfigureHomepageFlag ) {
+			return;
+		}
+
+		navigate( {
+			search: ( currentSearch: Record< string, unknown > ) => ( {
+				...currentSearch,
+				configureHomepage: undefined,
+			} ),
+		} as never );
+	}, [ hasConfigureHomepageFlag, navigate ] );
+	const closeConfigureHomepageModal = useCallback( () => {
+		setIsConfiguringHomepage( false );
+		clearConfigureHomepageFlag();
+	}, [ clearConfigureHomepageFlag ] );
+
+	useEffect( () => {
+		if ( canvas.previewStatus === 'homepage' && hasConfigureHomepageFlag ) {
+			setIsConfiguringHomepage( true );
+		}
+	}, [ canvas.previewStatus, hasConfigureHomepageFlag ] );
 
 	if (
 		! canvas.previewLabel &&
@@ -344,7 +440,7 @@ function PreviewDocumentInfo( {
 			</div>
 			{ isConfiguringHomepage && (
 				<ConfigureHomepageModal
-					onClose={ () => setIsConfiguringHomepage( false ) }
+					onClose={ closeConfigureHomepageModal }
 					onSaved={ () => {
 						invalidate();
 						onPreviewRefresh?.();
@@ -396,12 +492,250 @@ function PreviewDeviceSwitcher( {
 	);
 }
 
+function PreviewLiveSiteButton( { url }: { url?: string } ) {
+	if ( ! url ) {
+		return null;
+	}
+
+	return (
+		<Button
+			className="boot-preview-canvas__live-site-button"
+			icon={ external }
+			label={ __( 'View site in new tab' ) }
+			href={ url }
+			target="_blank"
+			rel="noreferrer"
+			variant="tertiary"
+			__next40pxDefaultSize
+		/>
+	);
+}
+
+function ExternalPreviewNotice( {
+	url,
+	onDismiss,
+}: {
+	url?: string;
+	onDismiss: () => void;
+} ) {
+	if ( ! url ) {
+		return null;
+	}
+
+	return (
+		<Notice
+			className="boot-preview-canvas__external-notice"
+			status="warning"
+			onDismiss={ onDismiss }
+		>
+			{ sprintf(
+				/* translators: %s: The external URL that cannot be previewed. */
+				__(
+					"I can't preview that link (%s) because it's external to your website."
+				),
+				url
+			) + ' ' }
+			<a
+				className="boot-preview-canvas__external-notice-link"
+				href={ url }
+				target="_blank"
+				rel="noopener noreferrer"
+			>
+				{ __( 'Open in new tab' ) }
+			</a>
+		</Notice>
+	);
+}
+
+function PreviewViewport( {
+	device,
+	children,
+}: {
+	device: PreviewDevice;
+	children: ReactNode;
+} ) {
+	const viewportRef = useRef< HTMLDivElement >( null );
+	const frameRef = useRef< HTMLDivElement >( null );
+	const resizeStateRef = useRef< {
+		side: ResizeSide;
+		startWidth: number;
+		startX: number;
+	} | null >( null );
+	const [ customWidth, setCustomWidth ] = useState< number | undefined >();
+	const [ isResizing, setIsResizing ] = useState( false );
+
+	useEffect( () => {
+		setCustomWidth( undefined );
+		setIsResizing( false );
+		resizeStateRef.current = null;
+	}, [ device ] );
+
+	const getNextWidth = useCallback(
+		( width: number ) => {
+			if ( ! isResizablePreviewDevice( device ) ) {
+				return width;
+			}
+
+			return clampPreviewWidth(
+				width,
+				device,
+				viewportRef.current?.clientWidth
+			);
+		},
+		[ device ]
+	);
+
+	const updateResizeWidth = useCallback(
+		( clientX: number ) => {
+			const resizeState = resizeStateRef.current;
+			if ( ! resizeState || ! isResizablePreviewDevice( device ) ) {
+				return;
+			}
+
+			const delta = clientX - resizeState.startX;
+			const nextWidth =
+				resizeState.side === 'end'
+					? resizeState.startWidth + delta * 2
+					: resizeState.startWidth - delta * 2;
+
+			setCustomWidth( getNextWidth( nextWidth ) );
+		},
+		[ device, getNextWidth ]
+	);
+
+	const stopResizing = useCallback( () => {
+		resizeStateRef.current = null;
+		setIsResizing( false );
+	}, [] );
+
+	useEffect( () => {
+		if ( ! isResizing ) {
+			return;
+		}
+
+		const handlePointerMove = ( event: globalThis.PointerEvent ) => {
+			updateResizeWidth( event.clientX );
+		};
+		const handlePointerUp = () => {
+			stopResizing();
+		};
+
+		window.addEventListener( 'pointermove', handlePointerMove );
+		window.addEventListener( 'pointerup', handlePointerUp );
+		window.addEventListener( 'pointercancel', handlePointerUp );
+
+		return () => {
+			window.removeEventListener( 'pointermove', handlePointerMove );
+			window.removeEventListener( 'pointerup', handlePointerUp );
+			window.removeEventListener( 'pointercancel', handlePointerUp );
+		};
+	}, [ isResizing, stopResizing, updateResizeWidth ] );
+
+	const handleResizePointerDown = useCallback(
+		( event: ReactPointerEvent< HTMLButtonElement >, side: ResizeSide ) => {
+			if ( ! isResizablePreviewDevice( device ) ) {
+				return;
+			}
+
+			event.preventDefault();
+			resizeStateRef.current = {
+				side,
+				startWidth:
+					frameRef.current?.getBoundingClientRect().width ||
+					PREVIEW_DEVICE_WIDTHS[ device ],
+				startX: event.clientX,
+			};
+			setIsResizing( true );
+		},
+		[ device ]
+	);
+
+	const handleResizeKeyDown = useCallback(
+		( event: KeyboardEvent< HTMLButtonElement > ) => {
+			if ( ! isResizablePreviewDevice( device ) ) {
+				return;
+			}
+
+			if ( event.key === 'Home' ) {
+				event.preventDefault();
+				setCustomWidth( undefined );
+				return;
+			}
+
+			if ( event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' ) {
+				return;
+			}
+
+			event.preventDefault();
+			const currentWidth = customWidth || PREVIEW_DEVICE_WIDTHS[ device ];
+			const delta = event.key === 'ArrowRight' ? 10 : -10;
+			setCustomWidth( getNextWidth( currentWidth + delta ) );
+		},
+		[ customWidth, device, getNextWidth ]
+	);
+
+	const isResizable = isResizablePreviewDevice( device );
+	const frameStyle: CSSProperties | undefined = isResizable
+		? {
+				maxInlineSize: `${
+					customWidth || PREVIEW_DEVICE_WIDTHS[ device ]
+				}px`,
+		  }
+		: undefined;
+
+	return (
+		<div className="boot-preview-canvas__viewport" ref={ viewportRef }>
+			<div
+				ref={ frameRef }
+				className={ clsx(
+					'boot-preview-canvas__frame',
+					`is-${ device }`,
+					{
+						'is-resizable': isResizable,
+						'is-resizing': isResizing,
+					}
+				) }
+				style={ frameStyle }
+			>
+				{ children }
+				{ isResizable && (
+					<>
+						<button
+							type="button"
+							className="boot-preview-canvas__resize-handle is-start"
+							aria-label={ __( 'Resize preview width' ) }
+							title={ __( 'Resize preview width' ) }
+							onPointerDown={ ( event ) =>
+								handleResizePointerDown( event, 'start' )
+							}
+							onPointerCancel={ stopResizing }
+							onKeyDown={ handleResizeKeyDown }
+						/>
+						<button
+							type="button"
+							className="boot-preview-canvas__resize-handle is-end"
+							aria-label={ __( 'Resize preview width' ) }
+							title={ __( 'Resize preview width' ) }
+							onPointerDown={ ( event ) =>
+								handleResizePointerDown( event, 'end' )
+							}
+							onPointerCancel={ stopResizing }
+							onKeyDown={ handleResizeKeyDown }
+						/>
+					</>
+				) }
+			</div>
+		</div>
+	);
+}
+
 function PreviewToolbar( {
 	canvas,
 	editLink,
 	isResolving,
 	device,
 	onChangeDevice,
+	livePreviewUrl,
 	canGoBack = false,
 	canGoForward = false,
 	onGoBack,
@@ -412,6 +746,7 @@ function PreviewToolbar( {
 	isResolving?: boolean;
 	device: PreviewDevice;
 	onChangeDevice: ( device: PreviewDevice ) => void;
+	livePreviewUrl?: string;
 	canGoBack?: boolean;
 	canGoForward?: boolean;
 	onGoBack?: () => void;
@@ -464,6 +799,7 @@ function PreviewToolbar( {
 					device={ device }
 					onChange={ onChangeDevice }
 				/>
+				<PreviewLiveSiteButton url={ livePreviewUrl } />
 			</div>
 		</div>
 	);
@@ -508,6 +844,7 @@ function FrontendPreviewCanvas( { canvas }: CanvasProps ) {
 	const previewHistoryIndexRef = useRef( previewHistoryIndex );
 	const pendingHistoryIndexRef = useRef< number | null >( null );
 	const previewContextRequestRef = useRef( 0 );
+	const [ externalPreviewUrl, setExternalPreviewUrl ] = useState< string >();
 
 	useEffect( () => {
 		previewHistoryRef.current = previewHistory;
@@ -524,6 +861,7 @@ function FrontendPreviewCanvas( { canvas }: CanvasProps ) {
 		setFrameSrc( nextPreviewUrl );
 		setPreviewHistory( nextPreviewUrl ? [ nextPreviewUrl ] : [] );
 		setPreviewHistoryIndex( 0 );
+		setExternalPreviewUrl( undefined );
 		pendingHistoryIndexRef.current = null;
 	}, [ canvas.editLink, fallbackPreviewMetadata, canvas.previewUrl ] );
 
@@ -661,23 +999,23 @@ function FrontendPreviewCanvas( { canvas }: CanvasProps ) {
 			frameDocument.addEventListener(
 				'click',
 				( event ) => {
-					const link =
-						event.target instanceof Element
-							? ( event.target.closest(
-									'a[href]'
-							  ) as HTMLAnchorElement | null )
-							: null;
+					const link = getLinkFromPreviewEvent( event );
 					const href = link?.getAttribute( 'href' );
-					if (
-						! link ||
-						! href ||
-						href.startsWith( '#' ) ||
-						link.target ||
-						! isLocalPreviewUrl( link.href )
-					) {
+					if ( ! link || ! href || href.startsWith( '#' ) ) {
 						return;
 					}
 
+					if ( ! isLocalPreviewUrl( link.href ) ) {
+						event.preventDefault();
+						setExternalPreviewUrl( link.href );
+						return;
+					}
+
+					if ( link.target ) {
+						return;
+					}
+
+					setExternalPreviewUrl( undefined );
 					const previewUrl = addPreviewQueryArg( link.href );
 					if ( ! previewUrl ) {
 						return;
@@ -767,6 +1105,9 @@ function FrontendPreviewCanvas( { canvas }: CanvasProps ) {
 		...canvas,
 		...previewMetadata,
 	};
+	const currentPreviewUrl =
+		previewHistory[ previewHistoryIndex ] || frameSrc || canvas.previewUrl;
+	const livePreviewUrl = removePreviewQueryArg( currentPreviewUrl );
 
 	return (
 		<div
@@ -785,24 +1126,22 @@ function FrontendPreviewCanvas( { canvas }: CanvasProps ) {
 				onGoBack={ () => handleHistoryNavigation( -1 ) }
 				onGoForward={ () => handleHistoryNavigation( 1 ) }
 				onPreviewRefresh={ refreshCurrentPreview }
+				livePreviewUrl={ livePreviewUrl }
 			/>
-			<div className="boot-preview-canvas__viewport">
-				<div
-					className={ clsx(
-						'boot-preview-canvas__frame',
-						`is-${ selectedDevice }`
-					) }
-				>
-					{ frameSrc && (
-						<iframe
-							key={ frameRefreshKey }
-							title={ __( 'Site preview' ) }
-							src={ frameSrc }
-							onLoad={ handleLoad }
-						/>
-					) }
-				</div>
-			</div>
+			<ExternalPreviewNotice
+				url={ externalPreviewUrl }
+				onDismiss={ () => setExternalPreviewUrl( undefined ) }
+			/>
+			<PreviewViewport device={ selectedDevice }>
+				{ frameSrc && (
+					<iframe
+						key={ frameRefreshKey }
+						title={ __( 'Site preview' ) }
+						src={ frameSrc }
+						onLoad={ handleLoad }
+					/>
+				) }
+			</PreviewViewport>
 		</div>
 	);
 }
@@ -828,16 +1167,9 @@ function EditorPreviewCanvas( {
 				device={ selectedDevice }
 				onChangeDevice={ setSelectedDevice }
 			/>
-			<div className="boot-preview-canvas__viewport">
-				<div
-					className={ clsx(
-						'boot-preview-canvas__frame',
-						`is-${ selectedDevice }`
-					) }
-				>
-					{ children }
-				</div>
-			</div>
+			<PreviewViewport device={ selectedDevice }>
+				{ children }
+			</PreviewViewport>
 		</div>
 	);
 }

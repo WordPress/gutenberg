@@ -1007,11 +1007,12 @@ function PostList() {
 						sprintf(
 							// translators: %s: Template title.
 							__(
-								'Your homepage is currently set to show your latest posts. WordPress generates that page automatically using the <templateLink>%s</templateLink> template.'
+								'Your homepage is currently set to show your latest <postsLink>Posts</postsLink>. WordPress is generating that page automatically using the <templateLink>%s</templateLink> template.'
 							),
 							latestPostsTemplateTitle
 						),
 						{
+							postsLink: <Link to="/types/post/list/all" />,
 							// @ts-ignore Children are injected by createInterpolateElement.
 							templateLink: (
 								<Link to={ latestPostsTemplateEditPath } />
