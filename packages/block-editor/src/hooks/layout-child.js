@@ -9,6 +9,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../store';
+import { unlock } from '../lock-unlock';
 import { useStyleOverride } from './utils';
 import { useLayout } from '../components/block-list/layout';
 import {
@@ -366,6 +367,7 @@ function GridTools( {
 		blockBlockVisibility,
 		deviceType,
 		isChildBlockAGrid,
+		isAnyAncestorHidden,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -388,9 +390,16 @@ function GridTools( {
 				};
 			}
 
+			const { isBlockParentHiddenAtViewport } = unlock(
+				select( blockEditorStore )
+			);
+
 			const parentAttributes = getBlockAttributes( _rootClientId );
 			const blockAttributes = getBlockAttributes( clientId );
 			const settings = getSettings();
+			const currentDeviceType =
+				settings?.[ deviceTypeKey ]?.toLowerCase() ||
+				BLOCK_VISIBILITY_VIEWPORTS.desktop.key;
 
 			return {
 				rootClientId: _rootClientId,
@@ -399,11 +408,13 @@ function GridTools( {
 					parentAttributes?.metadata?.blockVisibility,
 				blockBlockVisibility:
 					blockAttributes?.metadata?.blockVisibility,
-				deviceType:
-					settings?.[ deviceTypeKey ]?.toLowerCase() ||
-					BLOCK_VISIBILITY_VIEWPORTS.desktop.key,
+				deviceType: currentDeviceType,
 				// Check if the selected child block is itself a grid.
 				isChildBlockAGrid: blockAttributes?.layout?.type === 'grid',
+				isAnyAncestorHidden: isBlockParentHiddenAtViewport(
+					_rootClientId,
+					currentDeviceType
+				),
 			};
 		},
 		[ clientId ]
@@ -434,7 +445,7 @@ function GridTools( {
 
 	const childGridClientId = isChildBlockAGrid ? clientId : undefined;
 
-	if ( ! isVisible || isParentBlockCurrentlyHidden ) {
+	if ( ! isVisible || isParentBlockCurrentlyHidden || isAnyAncestorHidden ) {
 		return null;
 	}
 
