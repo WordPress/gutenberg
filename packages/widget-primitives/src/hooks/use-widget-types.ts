@@ -8,29 +8,18 @@ import { useEffect, useState } from '@wordpress/element';
  */
 import type { WidgetModuleRecord, WidgetName, WidgetType } from '../types';
 
-/**
- * `isResolvingWidgetTypes` is true while the records or their metadata
- * imports have not finished resolving. Hosts must not treat a widget
- * instance as missing until it is false.
- */
+/* `true` while records or their metadata imports are still resolving; hosts
+   must not treat a widget instance as missing until it is `false`. */
 type UseWidgetTypesResult = readonly [ WidgetType[], boolean ];
 
 /**
- * Resolves widget types from host-supplied records, importing each
- * record's `widget_module` for its live metadata.
+ * Resolves widget types from host-supplied records.
  *
- * The hook is data-source agnostic: it never reaches for a store or an
- * endpoint. The host obtains the widget-module records however it wants
- * (a core-data entity, a REST call, a static list) and passes them in.
- * For each record the hook dynamically imports `widget_module` and merges
- * the module's default export with the runtime fields (`name`,
- * `renderModule`).
+ * For each record it dynamically imports `widget_module` and merges the
+ * module's default export with the runtime fields (`name`, `renderModule`).
+ * Pass `null`/`undefined` while records are still loading.
  *
- * `records` is `null` or `undefined` while the host is still fetching; the
- * hook reports `isResolvingWidgetTypes` until both the records and their
- * metadata imports have settled.
- *
- * @param records Widget-module records, or `null`/`undefined` while loading.
+ * @param records Host-supplied records, or `null`/`undefined` while loading.
  */
 export function useWidgetTypes(
 	records: WidgetModuleRecord[] | null | undefined
