@@ -19,6 +19,15 @@ function gutenberg_register_block_editor_settings() {
 }
 add_action( 'rest_api_init', 'gutenberg_register_block_editor_settings' );
 
+/**
+ * Registers the Field Collections REST API routes.
+ */
+function gutenberg_register_field_collections_rest_routes() {
+	$controller = new Gutenberg_REST_Field_Collections_Controller();
+	$controller->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_field_collections_rest_routes' );
+
 
 /**
  * Shim for get_sample_permalink() to add support for auto-draft status.
