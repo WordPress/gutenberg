@@ -25,15 +25,8 @@
 	},
 	"supports": {
 		"html": false,
-		"reusable": false,
 		"visibility": false,
 		"lock": false,
-		"dimensions": {
-			"aspectRatio": false,
-			"height": false,
-			"minHeight": false,
-			"width": false
-		},
 		"color": {
 			"background": true,
 			"text": true,
@@ -56,23 +49,18 @@
 		},
 		"layout": {
 			"default": {
-				"type": "flex",
-				"flexWrap": "nowrap",
-				"orientation": "horizontal"
+				"type": "flex"
 			},
-			"allowSwitching": false,
-			"allowVerticalAlignment": true,
-			"allowJustification": true,
-			"allowOrientation": true
+			"allowVerticalAlignment": false,
+			"allowOrientation": false,
+			"allowWrap": false
 		},
 		"spacing": {
 			"padding": true,
-			"margin": true,
 			"blockGap": true,
 			"__experimentalSkipSerialization": [ "padding" ],
 			"__experimentalDefaultControls": {
 				"padding": true,
-				"margin": true,
 				"blockGap": true
 			}
 		}
@@ -87,7 +75,6 @@
 			"padding": ".wp-block-tab-list button"
 		}
 	},
-	"editorScript": "file:./index.js",
-	"editorStyle": "file:./editor.css",
-	"style": "file:./style-index.css"
+	"editorStyle": "wp-block-tab-list-editor",
+	"style": "wp-block-tab-list"
 }

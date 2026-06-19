@@ -23,15 +23,51 @@ import { useGetNumberOfBlocksBeforeCell } from '../grid/use-get-number-of-blocks
 import { store as blockEditorStore } from '../../store';
 import { useSettings } from '../use-settings';
 
-function helpText( selfStretch, parentLayout ) {
-	const { orientation = 'horizontal' } = parentLayout;
+// These are the serialized `selfStretch` values. `max` used to be called
+// "Fixed" in the UI, but was renamed and replaced by `fixedNoShrink`.
+const FLEX_CHILD_LAYOUT_VALUES = {
+	fit: 'fit',
+	grow: 'fill',
+	max: 'fixed',
+	fixed: 'fixedNoShrink',
+};
 
-	if ( selfStretch === 'fill' ) {
+const FLEX_SIZE_VALUES = [
+	FLEX_CHILD_LAYOUT_VALUES.max,
+	FLEX_CHILD_LAYOUT_VALUES.fixed,
+];
+
+function isFlexSizeValue( value ) {
+	return FLEX_SIZE_VALUES.includes( value );
+}
+
+function maxSizeLabel( parentLayout ) {
+	const { orientation = 'horizontal' } = parentLayout ?? {};
+	return orientation === 'horizontal'
+		? _x( 'Max', 'Block with maximum width in flex layout' )
+		: _x( 'Max', 'Block with maximum height in flex layout' );
+}
+
+function helpText( flexControlValue, parentLayout ) {
+	const { orientation = 'horizontal' } = parentLayout ?? {};
+
+	if ( flexControlValue === FLEX_CHILD_LAYOUT_VALUES.grow ) {
 		return __( 'Stretch to fill available space.' );
 	}
-	if ( selfStretch === 'fixed' && orientation === 'horizontal' ) {
+	if (
+		flexControlValue === FLEX_CHILD_LAYOUT_VALUES.max &&
+		orientation === 'horizontal'
+	) {
+		return __( 'Specify a maximum width.' );
+	} else if ( flexControlValue === FLEX_CHILD_LAYOUT_VALUES.max ) {
+		return __( 'Specify a maximum height.' );
+	}
+	if (
+		flexControlValue === FLEX_CHILD_LAYOUT_VALUES.fixed &&
+		orientation === 'horizontal'
+	) {
 		return __( 'Specify a fixed width.' );
-	} else if ( selfStretch === 'fixed' ) {
+	} else if ( flexControlValue === FLEX_CHILD_LAYOUT_VALUES.fixed ) {
 		return __( 'Specify a fixed height.' );
 	}
 	return __( 'Fit contents.' );
@@ -99,6 +135,8 @@ function FlexControls( {
 } ) {
 	const { selfStretch, flexSize } = childLayout;
 	const { orientation = 'horizontal' } = parentLayout ?? {};
+	const flexControlValue = selfStretch || FLEX_CHILD_LAYOUT_VALUES.fit;
+	const hasFlexSizeValue = isFlexSizeValue( flexControlValue );
 	const hasFlexValue = () => !! selfStretch;
 	const flexResetLabel =
 		orientation === 'horizontal' ? __( 'Width' ) : __( 'Height' );
@@ -121,13 +159,13 @@ function FlexControls( {
 	};
 
 	useEffect( () => {
-		if ( selfStretch === 'fixed' && ! flexSize ) {
+		if ( isFlexSizeValue( selfStretch ) && ! flexSize ) {
 			onChange( {
 				...childLayout,
-				selfStretch: 'fit',
+				selfStretch: FLEX_CHILD_LAYOUT_VALUES.fit,
 			} );
 		}
-	}, [] );
+	}, [] ); // eslint-disable-line react-hooks/exhaustive-deps
 
 	return (
 		<VStack
@@ -142,10 +180,12 @@ function FlexControls( {
 			<ToggleGroupControl
 				size="__unstable-large"
 				label={ childLayoutOrientation( parentLayout ) }
-				value={ selfStretch || 'fit' }
-				help={ helpText( selfStretch, parentLayout ) }
+				value={ flexControlValue }
+				help={ helpText( flexControlValue, parentLayout ) }
 				onChange={ ( value ) => {
-					const newFlexSize = value !== 'fixed' ? null : flexSize;
+					const newFlexSize = isFlexSizeValue( value )
+						? flexSize
+						: null;
 					onChange( {
 						selfStretch: value,
 						flexSize: newFlexSize,
@@ -154,37 +194,42 @@ function FlexControls( {
 				isBlock
 			>
 				<ToggleGroupControlOption
-					key="fit"
-					value="fit"
+					key={ FLEX_CHILD_LAYOUT_VALUES.fit }
+					value={ FLEX_CHILD_LAYOUT_VALUES.fit }
 					label={ _x(
 						'Fit',
 						'Intrinsic block width in flex layout'
 					) }
 				/>
 				<ToggleGroupControlOption
-					key="fill"
-					value="fill"
+					key={ FLEX_CHILD_LAYOUT_VALUES.grow }
+					value={ FLEX_CHILD_LAYOUT_VALUES.grow }
 					label={ _x(
 						'Grow',
 						'Block with expanding width in flex layout'
 					) }
 				/>
 				<ToggleGroupControlOption
-					key="fixed"
-					value="fixed"
+					key={ FLEX_CHILD_LAYOUT_VALUES.max }
+					value={ FLEX_CHILD_LAYOUT_VALUES.max }
+					label={ maxSizeLabel( parentLayout ) }
+				/>
+				<ToggleGroupControlOption
+					key={ FLEX_CHILD_LAYOUT_VALUES.fixed }
+					value={ FLEX_CHILD_LAYOUT_VALUES.fixed }
 					label={ _x(
 						'Fixed',
 						'Block with fixed width in flex layout'
 					) }
 				/>
 			</ToggleGroupControl>
-			{ selfStretch === 'fixed' && (
+			{ hasFlexSizeValue && (
 				<UnitControl
 					size="__unstable-large"
 					units={ units }
 					onChange={ ( value ) => {
 						onChange( {
-							selfStretch,
+							selfStretch: flexControlValue,
 							flexSize: value,
 						} );
 					} }
@@ -199,7 +244,7 @@ function FlexControls( {
 }
 
 export function childLayoutOrientation( parentLayout ) {
-	const { orientation = 'horizontal' } = parentLayout;
+	const { orientation = 'horizontal' } = parentLayout ?? {};
 	return orientation === 'horizontal' ? __( 'Width' ) : __( 'Height' );
 }
 

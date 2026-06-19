@@ -26,7 +26,7 @@ Snapshot Diff:
   <div>
     <div
 -     class="components-card__body components-card-body css-1gg1viu-PolymorphicDiv-Body-borderRadius-medium e19lxcc00"
-+     class="components-card__body components-card-body css-p7byxx-PolymorphicDiv-Body-borderRadius-medium-shady e19lxcc00"
++     class="components-card__body components-card-body css-1jxruy0-PolymorphicDiv-Body-borderRadius-medium-shady e19lxcc00"
       data-wp-c16t="true"
       data-wp-component="CardBody"
     >
@@ -43,7 +43,7 @@ Snapshot Diff:
   <div>
     <div
 -     class="components-flex components-card__footer components-card-footer css-1s5uzde-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium e19lxcc00"
-+     class="components-flex components-card__footer components-card-footer css-12kx59h-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium-shady e19lxcc00"
++     class="components-flex components-card__footer components-card-footer css-1nz7z3h-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium-shady e19lxcc00"
       data-wp-c16t="true"
       data-wp-component="CardFooter"
     >
@@ -77,7 +77,7 @@ Snapshot Diff:
   <div>
     <div
 -     class="components-flex components-card__header components-card-header css-1hlwlpa-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-medium e19lxcc00"
-+     class="components-flex components-card__header components-card-header css-lljjlu-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-medium-shady e19lxcc00"
++     class="components-flex components-card__header components-card-header css-zom6gv-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-medium-shady e19lxcc00"
       data-wp-c16t="true"
       data-wp-component="CardHeader"
     >
