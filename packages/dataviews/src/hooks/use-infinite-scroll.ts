@@ -177,16 +177,8 @@ export function useInfiniteScroll( {
 			const anchorRect = anchorElement.getBoundingClientRect();
 			const currentOffset = anchorRect.top - containerRect.top;
 
-			// Compensate only for the anchor being displaced by items added or
-			// removed since capture — not for the user's own scrolling in the
-			// meantime. The raw offset delta (`currentOffset - viewportOffset`)
-			// conflates both: between capture and this restore the user can keep
-			// scrolling (the next page often loads asynchronously), and that
-			// scroll shows up as offset change too. Adding back the scroll delta
-			// (`scrollTop - capturedScrollTop`) cancels the user-driven component,
-			// leaving just the content-driven shift. Without it, the restore snaps
-			// the list back to its capture-time position and undoes the scrolling
-			// the user did while the page was loading.
+			// Add back any scrolling the user did since capture so we only
+			// compensate the content-driven shift, not their own scroll.
 			const scrollAdjustment =
 				currentOffset -
 				anchor.viewportOffset +
