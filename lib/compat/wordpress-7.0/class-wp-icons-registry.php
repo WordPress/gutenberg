@@ -219,11 +219,6 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 					'focusable' => true,
 				),
 			);
-
-			// SVG presentation properties used in `style` attributes (e.g.
-			// `style="fill: none"` on stroke-based icons) are allowlisted globally
-			// via the `safe_style_css` filter in `lib/compat/wordpress-7.1/kses.php`,
-			// so they survive `wp_kses()` sanitization here.
 			return wp_kses( $icon_content, $allowed_tags );
 		}
 
