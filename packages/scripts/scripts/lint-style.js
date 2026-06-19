@@ -16,6 +16,30 @@ const {
 	hasProjectFile,
 } = require( '../utils' );
 
+/**
+ * Checks whether a resolvable Stylelint configuration exists
+ * for the current working directory.
+ *
+ * @return {Promise<boolean>} Whether a config was found.
+ */
+async function hasResolvableConfig() {
+	try {
+		const config = await stylelint.resolveConfig( 'index.css', {
+			cwd: process.cwd(),
+		} );
+		return config !== undefined;
+	} catch ( err ) {
+		// "No configuration provided" means no user config found;
+		// inject the bundled default.
+		// Other errors mean the config exists but is broken;
+		// let stylelint report them during linting.
+		if ( err.message?.includes( 'No configuration provided' ) ) {
+			return false;
+		}
+		return true;
+	}
+}
+
 async function main() {
 	const args = getArgsFromCLI();
 
@@ -33,19 +57,7 @@ async function main() {
 
 	// See: https://stylelint.io/user-guide/configure/
 	const hasLintConfig =
-		hasArgInCLI( '--config' ) ||
-		( await stylelint
-			.resolveConfig( 'index.css', { cwd: process.cwd() } )
-			.then( ( config ) => config !== undefined )
-			.catch( ( err ) => {
-				// "No configuration provided" means no user config found;
-				// inject the bundled default.
-				// Other errors mean the config exists but is broken; let stylelint report them during linting.
-				if ( err.message?.includes( 'No configuration provided' ) ) {
-					return false;
-				}
-				return true;
-			} ) );
+		hasArgInCLI( '--config' ) || ( await hasResolvableConfig() );
 
 	const defaultConfigArgs = ! hasLintConfig
 		? [ '--config', fromConfigRoot( '.stylelintrc.json' ) ]
