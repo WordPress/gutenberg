@@ -62,9 +62,7 @@ export default function SidebarNavigationScreenGlobalStyles() {
 				description={ __(
 					'Customize the appearance of your website using the block editor.'
 				) }
-				content={
-					<MainSidebarNavigationContent activeItem="styles-navigation-item" />
-				}
+				content={ <MainSidebarNavigationContent /> }
 				footer={
 					shouldShowGlobalStylesFooter && (
 						<SidebarNavigationScreenDetailsFooter
