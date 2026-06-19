@@ -72,6 +72,16 @@ npm ci
 status "Generating build... 👷‍♀️"
 npm run build -- --skip-types
 
+# For WordPress Core builds, prune icons that the icon registry does not
+# publish (those not marked `public` in the manifest) so the artifact ships
+# only stable icons and stays smaller. Plugin builds keep the full library.
+# This runs after the build—so icon collection validation still sees the full
+# library—and before the archive is created.
+if [ "$IS_WORDPRESS_CORE" = "true" ]; then
+	status "Pruning non-public icons for WordPress Core... ✂️"
+	node packages/icons/lib/prune-non-public-icons.cjs
+fi
+
 # Generate the plugin zip file.
 status "Creating archive... 🎁"
 zip --recurse-paths --no-dir-entries \
