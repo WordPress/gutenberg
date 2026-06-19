@@ -239,3 +239,8 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-dashboard-widgets' ) ) {
 	require __DIR__ . '/experimental/dashboard-widgets/dashboard-layout.php';
 	require __DIR__ . '/experimental/dashboard-widgets/default-layout-seed.php';
 }
+
+// Widget Type Composer (only load when experiment is enabled).
+if ( gutenberg_is_experiment_enabled( 'gutenberg-widget-type-composer' ) ) {
+	require __DIR__ . '/experimental/widget-type-composer/load.php';
+}

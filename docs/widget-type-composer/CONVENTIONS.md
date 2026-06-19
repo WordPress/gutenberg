@@ -1,4 +1,4 @@
-# Widget Type Composer — working conventions
+# Widget Type Composer, working conventions
 
 This feature is built as many small, atomic, independently reviewable steps that
 accumulate on one integration branch, documented as they land. It is explicitly
@@ -6,14 +6,14 @@ multi-session and multi-agent: the docs in this folder are the shared state.
 
 ## Branches
 
-- `feature/widget-type-composer` — the integration branch. Every step merges
+- `feature/widget-type-composer`, the integration branch. Every step merges
   here. Built up from `trunk`; not proposed to `trunk` until the feature
   graduates.
-- `wtc/NN-<slug>` — one branch per atomic step (e.g. `wtc/03-code-registered`),
+- `wtc/NN-<slug>`, one branch per atomic step (e.g. `wtc/03-code-registered`),
   branched from the **current tip of the feature branch** and merged back when
   done (hub-and-spoke). Independent steps run in parallel; a step waits only for
   the steps listed in its `Depends on` to be on the feature branch first.
-- `recovered/widget-type-composer` — the **oracle**: a complete,
+- `recovered/widget-type-composer`, the **oracle**: a complete,
   working-but-unstructured version of the whole vertical. Consult it for the
   target shape of any piece. Never merge from it; re-derive cleanly.
 

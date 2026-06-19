@@ -1,4 +1,4 @@
-# Widget Type Composer — plan
+# Widget Type Composer, plan
 
 The atomic steps that build the feature. Read `ARCHITECTURE.md` first and
 `CONVENTIONS.md` for the workflow. Each step is one `wtc/NN-<slug>` branch.
@@ -30,8 +30,8 @@ Parallelizable once their deps are on the feature branch: {3,4,5}, {11,12},
 
 | NN | Title | Phase | Depends on | Status |
 |----|-------|-------|------------|--------|
-| 00 | gate-scaffold | Foundation | — | todo |
-| 01 | js-contract | Foundation | — | todo |
+| 00 | gate-scaffold | Foundation | none | done |
+| 01 | js-contract | Foundation | none | todo |
 | 02 | widget-type-origin | Server framework | 00 | todo |
 | 03 | code-registered | Server framework | 02 | todo |
 | 04 | cpt-defs | Server framework | 02 | todo |
@@ -44,7 +44,7 @@ Parallelizable once their deps are on the feature branch: {3,4,5}, {11,12},
 | 11 | block-context | Renderer core | 09 | todo |
 | 12 | ui-primitives | Primitive blocks | 09 | todo |
 | 13 | binding-sources | Binding language | 11 | todo |
-| 14 | expression | Connection language | — | todo |
+| 14 | expression | Connection language | none | todo |
 | 15 | connection-runtime | Connection language | 09, 14 | todo |
 | 16 | actions | Connection language | 15 | todo |
 | 17 | host-provider | Connection language | 16 | todo |
@@ -70,7 +70,7 @@ Register the `gutenberg-widget-type-composer` experiment and gate an (empty)
 
 ### 01 · js-contract
 Extend the widget contract types for server-defined origins.
-- Files: `WP-PRIM/types.ts` — add `origin`/`content`/`definitionId` to
+- Files: `WP-PRIM/types.ts`, add `origin`/`content`/`definitionId` to
   `WidgetType`; add `origin`/`definition_id`/`content`/`title`/`description`/
   `icon` to `WidgetModuleRecord`.
 - Accept: `tsgo` clean; no runtime change.
@@ -104,7 +104,7 @@ inline `content`.
 
 ### 05 · controller-fields
 Emit the server-defined fields over `/wp/v2/widget-modules`.
-- Files: `DASH/class-wp-rest-widget-modules-controller.php` —
+- Files: `DASH/class-wp-rest-widget-modules-controller.php` -
   `prepare_item_for_response` + schema for `origin`/`content`/`definition_id`/
   `title`/`description`/`icon`.
 - Accept: REST response carries the fields per origin (built-in → null content;
@@ -122,7 +122,7 @@ binding source.
 ### 07 · use-widget-types
 Resolve server-defined records in the discovery hook (keep trunk's
 records-param API).
-- Files: `WP-PRIM/hooks/use-widget-types.ts` — `buildRuntimeFields`,
+- Files: `WP-PRIM/hooks/use-widget-types.ts`, `buildRuntimeFields`,
   `DEFAULT_API_VERSION`, the no-`widget_module` branch.
 - Accept: records with `origin` code-registered/cpt yield a `WidgetType` with
   `content`; built-in unchanged.
@@ -191,7 +191,7 @@ contract + `useWidgetHost`.
 
 ### 16 · actions
 The action registry and the shipped actions; the error contract.
-- Files: `ABR/actions.ts` — `registerAction`/`getAction`, `save-entity`
+- Files: `ABR/actions.ts`, `registerAction`/`getAction`, `save-entity`
   (`throwOnError`), `refetch`, `navigate`, `notify`.
 - Accept: a connection that saves then notifies works; a rejecting step runs
   `onError`.
