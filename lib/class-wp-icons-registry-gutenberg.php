@@ -172,6 +172,16 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	}
 
 	/**
+	 * Builds the allowed attribute list for wp_kses() from attribute names.
+	 *
+	 * @param non-empty-string ...$attribute_names Attribute names to allow.
+	 * @return array<non-empty-string, true> Attribute names mapped to true.
+	 */
+	private function get_allowed_attribute_list( ...$attribute_names ): array {
+		return array_fill_keys( $attribute_names, true );
+	}
+
+	/**
 	 * Sanitizes the icon SVG content.
 	 *
 	 * Uses WP_HTML_Processor to extract the SVG element in its entirety before
@@ -189,10 +199,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	protected function sanitize_icon_content( $icon_content ) {
 		// Core attributes applicable to most elements. `data-*` is a wildcard
 		// supported by wp_kses() and matches any data attribute.
-		$core_attributes = array_fill_keys(
-			array( 'class', 'data-*', 'id', 'style' ),
-			true
-		);
+		$core_attributes = $this->get_allowed_attribute_list( 'class', 'data-*', 'id', 'style' );
 
 		/*
 		 * ARIA and accessibility attributes. wp_kses() does not support an
@@ -201,113 +208,101 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 		 *
 		 * @link https://www.w3.org/TR/wai-aria-1.2/#state_prop_def
 		 */
-		$aria_attributes = array_fill_keys(
-			array(
-				'aria-activedescendant',
-				'aria-atomic',
-				'aria-autocomplete',
-				'aria-busy',
-				'aria-checked',
-				'aria-colcount',
-				'aria-colindex',
-				'aria-colspan',
-				'aria-controls',
-				'aria-current',
-				'aria-describedby',
-				'aria-description',
-				'aria-details',
-				'aria-disabled',
-				'aria-dropeffect',
-				'aria-errormessage',
-				'aria-expanded',
-				'aria-flowto',
-				'aria-grabbed',
-				'aria-haspopup',
-				'aria-hidden',
-				'aria-invalid',
-				'aria-keyshortcuts',
-				'aria-label',
-				'aria-labelledby',
-				'aria-level',
-				'aria-live',
-				'aria-modal',
-				'aria-multiline',
-				'aria-multiselectable',
-				'aria-orientation',
-				'aria-owns',
-				'aria-placeholder',
-				'aria-posinset',
-				'aria-pressed',
-				'aria-readonly',
-				'aria-relevant',
-				'aria-required',
-				'aria-roledescription',
-				'aria-rowcount',
-				'aria-rowindex',
-				'aria-rowspan',
-				'aria-selected',
-				'aria-setsize',
-				'aria-sort',
-				'aria-valuemax',
-				'aria-valuemin',
-				'aria-valuenow',
-				'aria-valuetext',
-				'focusable',
-				'role',
-				'tabindex',
-			),
-			true
+		$aria_attributes = $this->get_allowed_attribute_list(
+			'aria-activedescendant',
+			'aria-atomic',
+			'aria-autocomplete',
+			'aria-busy',
+			'aria-checked',
+			'aria-colcount',
+			'aria-colindex',
+			'aria-colspan',
+			'aria-controls',
+			'aria-current',
+			'aria-describedby',
+			'aria-description',
+			'aria-details',
+			'aria-disabled',
+			'aria-dropeffect',
+			'aria-errormessage',
+			'aria-expanded',
+			'aria-flowto',
+			'aria-grabbed',
+			'aria-haspopup',
+			'aria-hidden',
+			'aria-invalid',
+			'aria-keyshortcuts',
+			'aria-label',
+			'aria-labelledby',
+			'aria-level',
+			'aria-live',
+			'aria-modal',
+			'aria-multiline',
+			'aria-multiselectable',
+			'aria-orientation',
+			'aria-owns',
+			'aria-placeholder',
+			'aria-posinset',
+			'aria-pressed',
+			'aria-readonly',
+			'aria-relevant',
+			'aria-required',
+			'aria-roledescription',
+			'aria-rowcount',
+			'aria-rowindex',
+			'aria-rowspan',
+			'aria-selected',
+			'aria-setsize',
+			'aria-sort',
+			'aria-valuemax',
+			'aria-valuemin',
+			'aria-valuenow',
+			'aria-valuetext',
+			'focusable',
+			'role',
+			'tabindex',
 		);
 
 		// Presentation attributes for graphics elements (shapes, text, use, image).
-		$presentation_attributes = array_fill_keys(
-			array(
-				'clip-path',
-				'clip-rule',
-				'color',
-				'color-interpolation',
-				'color-rendering',
-				'display',
-				'fill',
-				'fill-opacity',
-				'fill-rule',
-				'filter',
-				'mask',
-				'opacity',
-				'paint-order',
-				'stroke',
-				'stroke-dasharray',
-				'stroke-dashoffset',
-				'stroke-linecap',
-				'stroke-linejoin',
-				'stroke-miterlimit',
-				'stroke-opacity',
-				'stroke-width',
-				'transform',
-				'vector-effect',
-				'visibility',
-			),
-			true
+		$presentation_attributes = $this->get_allowed_attribute_list(
+			'clip-path',
+			'clip-rule',
+			'color',
+			'color-interpolation',
+			'color-rendering',
+			'display',
+			'fill',
+			'fill-opacity',
+			'fill-rule',
+			'filter',
+			'mask',
+			'opacity',
+			'paint-order',
+			'stroke',
+			'stroke-dasharray',
+			'stroke-dashoffset',
+			'stroke-linecap',
+			'stroke-linejoin',
+			'stroke-miterlimit',
+			'stroke-opacity',
+			'stroke-width',
+			'transform',
+			'vector-effect',
+			'visibility',
 		);
 
 		// Marker attributes (only for shape elements).
-		$marker_attributes = array_fill_keys(
-			array( 'marker-end', 'marker-mid', 'marker-start' ),
-			true
-		);
+		$marker_attributes = $this->get_allowed_attribute_list( 'marker-end', 'marker-mid', 'marker-start' );
 
 		// Container attributes for grouping elements.
-		$container_attributes = array_fill_keys(
-			array(
-				'clip-path',
-				'display',
-				'filter',
-				'mask',
-				'opacity',
-				'transform',
-				'visibility',
-			),
-			true
+		$container_attributes = $this->get_allowed_attribute_list(
+			'clip-path',
+			'display',
+			'filter',
+			'mask',
+			'opacity',
+			'transform',
+			'visibility',
 		);
 
 		/*
@@ -323,18 +318,15 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				$core_attributes,
 				$aria_attributes,
 				$presentation_attributes,
-				array_fill_keys(
-					array(
-						'height',
-						'preserveaspectratio',
-						'viewbox',
-						'width',
-						'x',
-						'xmlns',
-						'xmlns:xlink',
-						'y',
-					),
-					true
+				$this->get_allowed_attribute_list(
+					'height',
+					'preserveaspectratio',
+					'viewbox',
+					'width',
+					'x',
+					'xmlns',
+					'xmlns:xlink',
+					'y',
 				)
 			),
 			// Basic shape elements (with markers).
@@ -343,12 +335,9 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				$aria_attributes,
 				$presentation_attributes,
 				$marker_attributes,
-				array_fill_keys(
-					array(
-						'd',
-						'pathlength',
-					),
-					true
+				$this->get_allowed_attribute_list(
+					'd',
+					'pathlength',
 				)
 			),
 			'circle'              => array_merge(
@@ -356,13 +345,10 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				$aria_attributes,
 				$presentation_attributes,
 				$marker_attributes,
-				array_fill_keys(
-					array(
-						'cx',
-						'cy',
-						'r',
-					),
-					true
+				$this->get_allowed_attribute_list(
+					'cx',
+					'cy',
+					'r',
 				)
 			),
 			'ellipse'             => array_merge(
@@ -370,14 +356,11 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				$aria_attributes,
 				$presentation_attributes,
 				$marker_attributes,
-				array_fill_keys(
-					array(
-						'cx',
-						'cy',
-						'rx',
-						'ry',
-					),
-					true
+				$this->get_allowed_attribute_list(
+					'cx',
+					'cy',
+					'rx',
+					'ry',
 				)
 			),
 			'line'                => array_merge(
@@ -385,14 +368,11 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				$aria_attributes,
 				$presentation_attributes,
 				$marker_attributes,
-				array_fill_keys(
-					array(
-						'x1',
-						'x2',
-						'y1',
-						'y2',
-					),
-					true
+				$this->get_allowed_attribute_list(
+					'x1',
+					'x2',
+					'y1',
+					'y2',
 				)
 			),
 			'polygon'             => array_merge(
@@ -400,11 +380,8 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				$aria_attributes,
 				$presentation_attributes,
 				$marker_attributes,
-				array_fill_keys(
-					array(
-						'points',
-					),
-					true
+				$this->get_allowed_attribute_list(
+					'points',
 				)
 			),
 			'polyline'            => array_merge(
@@ -412,11 +389,8 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				$aria_attributes,
 				$presentation_attributes,
 				$marker_attributes,
-				array_fill_keys(
-					array(
-						'points',
-					),
-					true
+				$this->get_allowed_attribute_list(
+					'points',
 				)
 			),
 			'rect'                => array_merge(
@@ -424,16 +398,13 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				$aria_attributes,
 				$presentation_attributes,
 				$marker_attributes,
-				array_fill_keys(
-					array(
-						'height',
-						'rx',
-						'ry',
-						'width',
-						'x',
-						'y',
-					),
-					true
+				$this->get_allowed_attribute_list(
+					'height',
+					'rx',
+					'ry',
+					'width',
+					'x',
+					'y',
 				)
 			),
 			// Grouping and structural elements.
@@ -445,46 +416,37 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			'defs'                => $core_attributes,
 			'view'                => array_merge(
 				$core_attributes,
-				array_fill_keys(
-					array(
-						'preserveaspectratio',
-						'viewbox',
-						'viewtarget',
-						'zoomandpan',
-					),
-					true
+				$this->get_allowed_attribute_list(
+					'preserveaspectratio',
+					'viewbox',
+					'viewtarget',
+					'zoomandpan',
 				)
 			),
 			'symbol'              => array_merge(
 				$core_attributes,
 				$aria_attributes,
 				$container_attributes,
-				array_fill_keys(
-					array(
-						'height',
-						'preserveaspectratio',
-						'viewbox',
-						'width',
-						'x',
-						'y',
-					),
-					true
+				$this->get_allowed_attribute_list(
+					'height',
+					'preserveaspectratio',
+					'viewbox',
+					'width',
+					'x',
+					'y',
 				)
 			),
 			'use'                 => array_merge(
 				$core_attributes,
 				$aria_attributes,
 				$presentation_attributes,
-				array_fill_keys(
-					array(
-						'height',
-						'href',
-						'width',
-						'x',
-						'xlink:href',
-						'y',
-					),
-					true
+				$this->get_allowed_attribute_list(
+					'height',
+					'href',
+					'width',
+					'x',
+					'xlink:href',
+					'y',
 				)
 			),
 			'switch'              => array_merge(
@@ -498,425 +460,320 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				$aria_attributes,
 				$presentation_attributes,
 				$container_attributes,
-				array_fill_keys(
-					array(
-						'href',
-						'rel',
-						'target',
-						'type',
-						'xlink:href',
-					),
-					true
+				$this->get_allowed_attribute_list(
+					'href',
+					'rel',
+					'target',
+					'type',
+					'xlink:href',
 				)
 			),
 			'clippath'            => array_merge(
 				$core_attributes,
-				array_fill_keys(
-					array(
-						'clippathunits',
-						'transform',
-					),
-					true
+				$this->get_allowed_attribute_list(
+					'clippathunits',
+					'transform',
 				)
 			),
 			'mask'                => array_merge(
 				$core_attributes,
-				array_fill_keys(
-					array(
-						'height',
-						'maskcontentunits',
-						'maskunits',
-						'width',
-						'x',
-						'y',
-					),
-					true
+				$this->get_allowed_attribute_list(
+					'height',
+					'maskcontentunits',
+					'maskunits',
+					'width',
+					'x',
+					'y',
 				)
 			),
 			// Gradient elements.
 			'lineargradient'      => array_merge(
 				$core_attributes,
-				array_fill_keys(
-					array(
-						'gradienttransform',
-						'gradientunits',
-						'href',
-						'spreadmethod',
-						'x1',
-						'x2',
-						'xlink:href',
-						'y1',
-						'y2',
-					),
-					true
+				$this->get_allowed_attribute_list(
+					'gradienttransform',
+					'gradientunits',
+					'href',
+					'spreadmethod',
+					'x1',
+					'x2',
+					'xlink:href',
+					'y1',
+					'y2',
 				)
 			),
 			'radialgradient'      => array_merge(
 				$core_attributes,
-				array_fill_keys(
-					array(
-						'cx',
-						'cy',
-						'fr',
-						'fx',
-						'fy',
-						'gradienttransform',
-						'gradientunits',
-						'href',
-						'r',
-						'spreadmethod',
-						'xlink:href',
-					),
-					true
+				$this->get_allowed_attribute_list(
+					'cx',
+					'cy',
+					'fr',
+					'fx',
+					'fy',
+					'gradienttransform',
+					'gradientunits',
+					'href',
+					'r',
+					'spreadmethod',
+					'xlink:href',
 				)
 			),
 			'stop'                => array_merge(
 				$core_attributes,
-				array_fill_keys(
-					array(
-						'offset',
-						'stop-color',
-						'stop-opacity',
-					),
-					true
+				$this->get_allowed_attribute_list(
+					'offset',
+					'stop-color',
+					'stop-opacity',
 				)
 			),
 			// Pattern element.
 			'pattern'             => array_merge(
 				$core_attributes,
-				array_fill_keys(
-					array(
-						'height',
-						'href',
-						'patterncontentunits',
-						'patterntransform',
-						'patternunits',
-						'preserveaspectratio',
-						'viewbox',
-						'width',
-						'x',
-						'xlink:href',
-						'y',
-					),
-					true
+				$this->get_allowed_attribute_list(
+					'height',
+					'href',
+					'patterncontentunits',
+					'patterntransform',
+					'patternunits',
+					'preserveaspectratio',
+					'viewbox',
+					'width',
+					'x',
+					'xlink:href',
+					'y',
 				)
 			),
 			// Filter elements.
 			'filter'              => array_merge(
 				$core_attributes,
-				array_fill_keys(
-					array(
-						'filterunits',
-						'height',
-						'primitiveunits',
-						'width',
-						'x',
-						'y',
-					),
-					true
+				$this->get_allowed_attribute_list(
+					'filterunits',
+					'height',
+					'primitiveunits',
+					'width',
+					'x',
+					'y',
 				)
 			),
-			'feblend'             => array_fill_keys(
-				array(
-					'in',
-					'in2',
-					'mode',
-					'result',
-				),
-				true
+			'feblend'             => $this->get_allowed_attribute_list(
+				'in',
+				'in2',
+				'mode',
+				'result',
 			),
-			'fecolormatrix'       => array_fill_keys(
-				array(
-					'in',
-					'result',
-					'type',
-					'values',
-				),
-				true
+			'fecolormatrix'       => $this->get_allowed_attribute_list(
+				'in',
+				'result',
+				'type',
+				'values',
 			),
-			'fecomponenttransfer' => array_fill_keys(
-				array(
-					'in',
-					'result',
-				),
-				true
+			'fecomponenttransfer' => $this->get_allowed_attribute_list(
+				'in',
+				'result',
 			),
-			'fecomposite'         => array_fill_keys(
-				array(
-					'in',
-					'in2',
-					'k1',
-					'k2',
-					'k3',
-					'k4',
-					'operator',
-					'result',
-				),
-				true
+			'fecomposite'         => $this->get_allowed_attribute_list(
+				'in',
+				'in2',
+				'k1',
+				'k2',
+				'k3',
+				'k4',
+				'operator',
+				'result',
 			),
-			'feconvolvematrix'    => array_fill_keys(
-				array(
-					'bias',
-					'divisor',
-					'edgemode',
-					'in',
-					'kernelmatrix',
-					'order',
-					'preservealpha',
-					'result',
-					'targetx',
-					'targety',
-				),
-				true
+			'feconvolvematrix'    => $this->get_allowed_attribute_list(
+				'bias',
+				'divisor',
+				'edgemode',
+				'in',
+				'kernelmatrix',
+				'order',
+				'preservealpha',
+				'result',
+				'targetx',
+				'targety',
 			),
-			'fediffuselighting'   => array_fill_keys(
-				array(
-					'diffuseconstant',
-					'in',
-					'result',
-					'surfacescale',
-				),
-				true
+			'fediffuselighting'   => $this->get_allowed_attribute_list(
+				'diffuseconstant',
+				'in',
+				'result',
+				'surfacescale',
 			),
-			'fedisplacementmap'   => array_fill_keys(
-				array(
-					'in',
-					'in2',
-					'result',
-					'scale',
-					'xchannelselector',
-					'ychannelselector',
-				),
-				true
+			'fedisplacementmap'   => $this->get_allowed_attribute_list(
+				'in',
+				'in2',
+				'result',
+				'scale',
+				'xchannelselector',
+				'ychannelselector',
 			),
-			'fedistantlight'      => array_fill_keys(
-				array(
-					'azimuth',
-					'elevation',
-				),
-				true
+			'fedistantlight'      => $this->get_allowed_attribute_list(
+				'azimuth',
+				'elevation',
 			),
-			'feflood'             => array_fill_keys(
-				array(
-					'flood-color',
-					'flood-opacity',
-					'result',
-				),
-				true
+			'feflood'             => $this->get_allowed_attribute_list(
+				'flood-color',
+				'flood-opacity',
+				'result',
 			),
-			'fegaussianblur'      => array_fill_keys(
-				array(
-					'edgemode',
-					'in',
-					'result',
-					'stddeviation',
-				),
-				true
+			'fegaussianblur'      => $this->get_allowed_attribute_list(
+				'edgemode',
+				'in',
+				'result',
+				'stddeviation',
 			),
-			'feimage'             => array_fill_keys(
-				array(
-					'href',
-					'preserveaspectratio',
-					'result',
-					'xlink:href',
-				),
-				true
+			'feimage'             => $this->get_allowed_attribute_list(
+				'href',
+				'preserveaspectratio',
+				'result',
+				'xlink:href',
 			),
-			'femerge'             => array_fill_keys(
-				array(
-					'result',
-				),
-				true
+			'femerge'             => $this->get_allowed_attribute_list(
+				'result',
 			),
-			'femergenode'         => array_fill_keys(
-				array(
-					'in',
-				),
-				true
+			'femergenode'         => $this->get_allowed_attribute_list(
+				'in',
 			),
-			'femorphology'        => array_fill_keys(
-				array(
-					'in',
-					'operator',
-					'radius',
-					'result',
-				),
-				true
+			'femorphology'        => $this->get_allowed_attribute_list(
+				'in',
+				'operator',
+				'radius',
+				'result',
 			),
-			'feoffset'            => array_fill_keys(
-				array(
-					'dx',
-					'dy',
-					'in',
-					'result',
-				),
-				true
+			'feoffset'            => $this->get_allowed_attribute_list(
+				'dx',
+				'dy',
+				'in',
+				'result',
 			),
-			'fepointlight'        => array_fill_keys(
-				array(
-					'x',
-					'y',
-					'z',
-				),
-				true
+			'fepointlight'        => $this->get_allowed_attribute_list(
+				'x',
+				'y',
+				'z',
 			),
-			'fespecularlighting'  => array_fill_keys(
-				array(
-					'in',
-					'result',
-					'specularconstant',
-					'specularexponent',
-					'surfacescale',
-				),
-				true
+			'fespecularlighting'  => $this->get_allowed_attribute_list(
+				'in',
+				'result',
+				'specularconstant',
+				'specularexponent',
+				'surfacescale',
 			),
-			'fespotlight'         => array_fill_keys(
-				array(
-					'limitingconeangle',
-					'pointsatx',
-					'pointsaty',
-					'pointsatz',
-					'specularexponent',
-					'x',
-					'y',
-					'z',
-				),
-				true
+			'fespotlight'         => $this->get_allowed_attribute_list(
+				'limitingconeangle',
+				'pointsatx',
+				'pointsaty',
+				'pointsatz',
+				'specularexponent',
+				'x',
+				'y',
+				'z',
 			),
-			'fetile'              => array_fill_keys(
-				array(
-					'in',
-					'result',
-				),
-				true
+			'fetile'              => $this->get_allowed_attribute_list(
+				'in',
+				'result',
 			),
-			'feturbulence'        => array_fill_keys(
-				array(
-					'basefrequency',
-					'numoctaves',
-					'result',
-					'seed',
-					'stitchtiles',
-					'type',
-				),
-				true
+			'feturbulence'        => $this->get_allowed_attribute_list(
+				'basefrequency',
+				'numoctaves',
+				'result',
+				'seed',
+				'stitchtiles',
+				'type',
 			),
-			'fefunca'             => array_fill_keys(
-				array(
-					'amplitude',
-					'exponent',
-					'intercept',
-					'offset',
-					'slope',
-					'tablevalues',
-					'type',
-				),
-				true
+			'fefunca'             => $this->get_allowed_attribute_list(
+				'amplitude',
+				'exponent',
+				'intercept',
+				'offset',
+				'slope',
+				'tablevalues',
+				'type',
 			),
-			'fefuncb'             => array_fill_keys(
-				array(
-					'amplitude',
-					'exponent',
-					'intercept',
-					'offset',
-					'slope',
-					'tablevalues',
-					'type',
-				),
-				true
+			'fefuncb'             => $this->get_allowed_attribute_list(
+				'amplitude',
+				'exponent',
+				'intercept',
+				'offset',
+				'slope',
+				'tablevalues',
+				'type',
 			),
-			'fefuncg'             => array_fill_keys(
-				array(
-					'amplitude',
-					'exponent',
-					'intercept',
-					'offset',
-					'slope',
-					'tablevalues',
-					'type',
-				),
-				true
+			'fefuncg'             => $this->get_allowed_attribute_list(
+				'amplitude',
+				'exponent',
+				'intercept',
+				'offset',
+				'slope',
+				'tablevalues',
+				'type',
 			),
-			'fefuncr'             => array_fill_keys(
-				array(
-					'amplitude',
-					'exponent',
-					'intercept',
-					'offset',
-					'slope',
-					'tablevalues',
-					'type',
-				),
-				true
+			'fefuncr'             => $this->get_allowed_attribute_list(
+				'amplitude',
+				'exponent',
+				'intercept',
+				'offset',
+				'slope',
+				'tablevalues',
+				'type',
 			),
 			// Text elements.
 			'text'                => array_merge(
 				$core_attributes,
 				$aria_attributes,
 				$presentation_attributes,
-				array_fill_keys(
-					array(
-						'alignment-baseline',
-						'baseline-shift',
-						'dominant-baseline',
-						'dx',
-						'dy',
-						'font-family',
-						'font-size',
-						'font-style',
-						'font-variant',
-						'font-weight',
-						'lengthadjust',
-						'letter-spacing',
-						'rotate',
-						'text-anchor',
-						'text-decoration',
-						'textlength',
-						'word-spacing',
-						'writing-mode',
-						'x',
-						'y',
-					),
-					true
+				$this->get_allowed_attribute_list(
+					'alignment-baseline',
+					'baseline-shift',
+					'dominant-baseline',
+					'dx',
+					'dy',
+					'font-family',
+					'font-size',
+					'font-style',
+					'font-variant',
+					'font-weight',
+					'lengthadjust',
+					'letter-spacing',
+					'rotate',
+					'text-anchor',
+					'text-decoration',
+					'textlength',
+					'word-spacing',
+					'writing-mode',
+					'x',
+					'y',
 				)
 			),
 			'tspan'               => array_merge(
 				$core_attributes,
 				$aria_attributes,
 				$presentation_attributes,
-				array_fill_keys(
-					array(
-						'dx',
-						'dy',
-						'font-family',
-						'font-size',
-						'font-style',
-						'font-weight',
-						'lengthadjust',
-						'rotate',
-						'text-anchor',
-						'text-decoration',
-						'textlength',
-						'x',
-						'y',
-					),
-					true
+				$this->get_allowed_attribute_list(
+					'dx',
+					'dy',
+					'font-family',
+					'font-size',
+					'font-style',
+					'font-weight',
+					'lengthadjust',
+					'rotate',
+					'text-anchor',
+					'text-decoration',
+					'textlength',
+					'x',
+					'y',
 				)
 			),
 			'textpath'            => array_merge(
 				$core_attributes,
 				$aria_attributes,
 				$presentation_attributes,
-				array_fill_keys(
-					array(
-						'href',
-						'method',
-						'spacing',
-						'startoffset',
-						'text-anchor',
-						'xlink:href',
-					),
-					true
+				$this->get_allowed_attribute_list(
+					'href',
+					'method',
+					'spacing',
+					'startoffset',
+					'text-anchor',
+					'xlink:href',
 				)
 			),
 			// Descriptive elements.
@@ -928,115 +785,97 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				$core_attributes,
 				$aria_attributes,
 				$presentation_attributes,
-				array_fill_keys(
-					array(
-						'height',
-						'href',
-						'preserveaspectratio',
-						'width',
-						'x',
-						'xlink:href',
-						'y',
-					),
-					true
+				$this->get_allowed_attribute_list(
+					'height',
+					'href',
+					'preserveaspectratio',
+					'width',
+					'x',
+					'xlink:href',
+					'y',
 				)
 			),
 			// Marker element.
 			'marker'              => array_merge(
 				$core_attributes,
-				array_fill_keys(
-					array(
-						'markerheight',
-						'markerunits',
-						'markerwidth',
-						'orient',
-						'preserveaspectratio',
-						'refx',
-						'refy',
-						'viewbox',
-					),
-					true
+				$this->get_allowed_attribute_list(
+					'markerheight',
+					'markerunits',
+					'markerwidth',
+					'orient',
+					'preserveaspectratio',
+					'refx',
+					'refy',
+					'viewbox',
 				)
 			),
 			// Animation elements.
 			'animate'             => array_merge(
 				$core_attributes,
-				array_fill_keys(
-					array(
-						'accumulate',
-						'additive',
-						'attributename',
-						'begin',
-						'calcmode',
-						'dur',
-						'end',
-						'from',
-						'keysplines',
-						'keytimes',
-						'repeatcount',
-						'to',
-						'values',
-					),
-					true
+				$this->get_allowed_attribute_list(
+					'accumulate',
+					'additive',
+					'attributename',
+					'begin',
+					'calcmode',
+					'dur',
+					'end',
+					'from',
+					'keysplines',
+					'keytimes',
+					'repeatcount',
+					'to',
+					'values',
 				)
 			),
 			'animatemotion'       => array_merge(
 				$core_attributes,
-				array_fill_keys(
-					array(
-						'accumulate',
-						'additive',
-						'begin',
-						'calcmode',
-						'dur',
-						'end',
-						'from',
-						'keypoints',
-						'keysplines',
-						'keytimes',
-						'path',
-						'repeatcount',
-						'rotate',
-						'to',
-						'values',
-					),
-					true
+				$this->get_allowed_attribute_list(
+					'accumulate',
+					'additive',
+					'begin',
+					'calcmode',
+					'dur',
+					'end',
+					'from',
+					'keypoints',
+					'keysplines',
+					'keytimes',
+					'path',
+					'repeatcount',
+					'rotate',
+					'to',
+					'values',
 				)
 			),
 			'animatetransform'    => array_merge(
 				$core_attributes,
-				array_fill_keys(
-					array(
-						'accumulate',
-						'additive',
-						'attributename',
-						'begin',
-						'calcmode',
-						'dur',
-						'end',
-						'from',
-						'keysplines',
-						'keytimes',
-						'repeatcount',
-						'to',
-						'type',
-						'values',
-					),
-					true
+				$this->get_allowed_attribute_list(
+					'accumulate',
+					'additive',
+					'attributename',
+					'begin',
+					'calcmode',
+					'dur',
+					'end',
+					'from',
+					'keysplines',
+					'keytimes',
+					'repeatcount',
+					'to',
+					'type',
+					'values',
 				)
 			),
 			'set'                 => array_merge(
 				$core_attributes,
-				array_fill_keys(
-					array(
-						'attributename',
-						'begin',
-						'dur',
-						'end',
-						'repeatcount',
-						'to',
-					),
-					true
+				$this->get_allowed_attribute_list(
+					'attributename',
+					'begin',
+					'dur',
+					'end',
+					'repeatcount',
+					'to',
 				)
 			),
 		);
