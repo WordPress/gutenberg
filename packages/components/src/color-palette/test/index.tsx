@@ -481,6 +481,9 @@ describe( 'ColorPalette', () => {
 			},
 		];
 
+		const getSwatchToggle = () =>
+			screen.getByRole( 'button', { name: /^Custom color picker/ } );
+
 		it( 'is opt-in: no `+` swatch or edit/delete buttons when `colorEditing` is absent', () => {
 			render(
 				<ColorPalette
@@ -562,6 +565,11 @@ describe( 'ColorPalette', () => {
 				screen.getByRole( 'option', { name: 'Add custom color' } )
 			);
 
+			expect(
+				screen.getByRole( 'form', {
+					name: 'Add custom color. Choose a color, then name it.',
+				} )
+			).toBeInTheDocument();
 			expect( screen.getByLabelText( 'Color name' ) ).toHaveValue( '' );
 		} );
 
@@ -634,7 +642,11 @@ describe( 'ColorPalette', () => {
 			);
 
 			expect( screen.getByLabelText( 'Color name' ) ).toBeInTheDocument();
+			expect( getSwatchToggle() ).toHaveFocus();
 
+			// Escape only cancels when focus is inside the form; edit opens on
+			// the swatch toggle, so move into the form first.
+			await user.tab();
 			await user.keyboard( '{Escape}' );
 
 			expect(
