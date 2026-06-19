@@ -21,12 +21,15 @@ import styles from './style.module.scss';
 export default function Cell( {
 	id,
 	value,
+	autoFocus,
 	...props
 }: WordPressComponentProps< AlignmentMatrixControlCellProps, 'span', false > ) {
 	return (
 		<Tooltip text={ ALIGNMENT_LABEL[ value ] }>
 			<Composite.Item
 				id={ id }
+				// eslint-disable-next-line jsx-a11y/no-autofocus -- This is a pass-through, and the appropriateness of autoFocus should be determined by the consumer.
+				autoFocus={ autoFocus }
 				render={
 					<span
 						{ ...props }

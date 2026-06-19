@@ -29,6 +29,7 @@ function UnforwardedAlignmentMatrixControl( {
 	value,
 	onChange,
 	width = 92,
+	autoFocus = false,
 	...props
 }: WordPressComponentProps< AlignmentMatrixControlProps, 'div', false > ) {
 	const baseId = useInstanceId(
@@ -36,6 +37,10 @@ function UnforwardedAlignmentMatrixControl( {
 		'alignment-matrix-control',
 		id
 	);
+
+	const defaultActiveId = getItemId( baseId, defaultValue );
+	const activeId = getItemId( baseId, value );
+	const resolvedActiveId = activeId ?? defaultActiveId;
 
 	const setActiveId = useCallback<
 		NonNullable< React.ComponentProps< typeof Composite >[ 'setActiveId' ] >
@@ -57,8 +62,8 @@ function UnforwardedAlignmentMatrixControl( {
 
 	return (
 		<Composite
-			defaultActiveId={ getItemId( baseId, defaultValue ) }
-			activeId={ getItemId( baseId, value ) }
+			defaultActiveId={ defaultActiveId }
+			activeId={ activeId }
 			setActiveId={ setActiveId }
 			rtl={ isRTL() }
 			render={
@@ -79,13 +84,20 @@ function UnforwardedAlignmentMatrixControl( {
 					}
 					key={ index }
 				>
-					{ cells.map( ( cell ) => (
-						<Cell
-							id={ getItemId( baseId, cell ) }
-							key={ cell }
-							value={ cell }
-						/>
-					) ) }
+					{ cells.map( ( cell ) => {
+						const cellId = getItemId( baseId, cell );
+						return (
+							<Cell
+								id={ cellId }
+								key={ cell }
+								value={ cell }
+								// eslint-disable-next-line jsx-a11y/no-autofocus -- This is a pass-through, and the appropriateness of autoFocus should be determined by the consumer.
+								autoFocus={
+									autoFocus && cellId === resolvedActiveId
+								}
+							/>
+						);
+					} ) }
 				</Composite.Row>
 			) ) }
 		</Composite>

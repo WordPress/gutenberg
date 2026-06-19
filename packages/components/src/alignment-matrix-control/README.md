@@ -24,6 +24,17 @@ const Example = () => {
 
 ## Props
 
+### `autoFocus`
+
+ - Type: `boolean`
+ - Required: No
+ - Default: `false`
+
+If `true`, the currently active cell receives focus when the control
+mounts. Intended for cases where the control is revealed in a popover or
+dialog and focus should move to it; leave it `false` for inline usage so
+the control does not steal focus on mount.
+
 ### `defaultValue`
 
  - Type: `"center" | "top left" | "top center" | "top right" | "center left" | "center center" | "center right" | "bottom left" | "bottom center" | "bottom right"`
