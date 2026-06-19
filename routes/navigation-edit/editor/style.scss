@@ -115,7 +115,8 @@
 	overflow-y: auto;
 }
 
-.navigation-add-items-modal__tab {
+.navigation-add-items-modal__tab,
+.navigation-add-items-modal__more-tab.components-button {
 	box-sizing: border-box;
 	display: flex;
 	flex: 0 0 auto;
@@ -134,7 +135,8 @@
 	gap: 12px;
 }
 
-.navigation-add-items-modal__tab:is(:hover, :focus-visible) {
+.navigation-add-items-modal__tab:is(:hover, :focus-visible),
+.navigation-add-items-modal__more-tab.components-button:is(:hover, :focus-visible) {
 	background: #f6f7f7;
 }
 
@@ -160,6 +162,26 @@
 
 .navigation-add-items-modal__tab-label {
 	font-weight: 500;
+}
+
+.navigation-add-items-modal__more-tab.components-button {
+	gap: 12px;
+
+	.navigation-add-items-modal__tab-label {
+		flex: 1;
+		text-align: start;
+	}
+}
+
+.navigation-add-items-modal__more-tab-icon {
+	display: inline-flex;
+	flex-shrink: 0;
+	color: #757575;
+}
+
+.navigation-add-items-modal__more-tab-icon .components-icon {
+	width: 20px;
+	height: 20px;
 }
 
 .navigation-add-items-modal__tab svg {
@@ -399,7 +421,8 @@
 		overflow-x: auto;
 	}
 
-	.navigation-add-items-modal__tab {
+	.navigation-add-items-modal__tab,
+	.navigation-add-items-modal__more-tab.components-button {
 		width: auto;
 		flex-shrink: 0;
 	}

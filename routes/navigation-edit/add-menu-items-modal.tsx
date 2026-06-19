@@ -26,8 +26,10 @@ import {
 	// @ts-expect-error - No type declarations available for @wordpress/blocks
 } from '@wordpress/blocks';
 import {
+	archive,
 	blockDefault,
 	category,
+	chevronDown,
 	customLink,
 	file,
 	image,
@@ -88,22 +90,30 @@ const GROUPS = [
 		icon: postList,
 	},
 	{
+		id: 'blocks',
+		title: __( 'Blocks' ),
+		description: __( 'Blocks that can be inserted into navigation menus.' ),
+		icon: blockDefault,
+	},
+	{
 		id: 'taxonomy',
 		title: __( 'Categories & tags' ),
 		description: __( 'Categories, tags, and other term archives.' ),
 		icon: category,
 	},
 	{
+		id: 'archives',
+		title: __( 'Archives' ),
+		description: __(
+			'Post type archive index pages, such as all Posts, Products, or Events.'
+		),
+		icon: archive,
+	},
+	{
 		id: 'media',
 		title: __( 'Media' ),
 		description: __( 'Media files and downloads.' ),
 		icon: image,
-	},
-	{
-		id: 'blocks',
-		title: __( 'Blocks' ),
-		description: __( 'Blocks that can be inserted into navigation menus.' ),
-		icon: blockDefault,
 	},
 	{
 		id: 'custom',
@@ -114,7 +124,13 @@ const GROUPS = [
 ] as const;
 
 type PickerGroup = ( typeof GROUPS )[ number ][ 'id' ];
-type SourceKind = 'post-type' | 'taxonomy' | 'custom';
+type SourceKind = 'post-type' | 'post-type-archive' | 'taxonomy' | 'custom';
+
+const PRIMARY_GROUPS = new Set< PickerGroup >( [
+	'pages',
+	'content',
+	'blocks',
+] );
 
 interface PostRecord {
 	id: number;
@@ -137,8 +153,11 @@ interface PostTypeRecord {
 	viewable?: boolean;
 	visibility?: {
 		public?: boolean;
+		show_in_nav_menus?: boolean;
 	};
+	site_editor_archive_url?: string | null;
 	labels?: {
+		archives?: string;
 		name?: string;
 		singular_name?: string;
 	};
@@ -187,6 +206,7 @@ interface TermRecordEntry {
 }
 
 interface MenuItemSourceRecords {
+	archivePostTypes: PostTypeRecord[];
 	contentPostTypes: PostTypeRecord[];
 	contentRecords: ContentRecordEntry[];
 	termRecords: TermRecordEntry[];
@@ -230,6 +250,7 @@ interface AddMenuItemsModalProps {
 }
 
 const EMPTY_SOURCE_RECORDS: MenuItemSourceRecords = {
+	archivePostTypes: [],
 	contentPostTypes: [],
 	contentRecords: [],
 	termRecords: [],
@@ -396,7 +417,10 @@ function getNavigationLinkBlock( item: PickerItem ): NavigationBlock {
 		url: item.url || '',
 	};
 
-	if ( item.objectId && item.sourceKind !== 'custom' ) {
+	if (
+		item.objectId &&
+		( item.sourceKind === 'post-type' || item.sourceKind === 'taxonomy' )
+	) {
 		attributes.id = item.objectId;
 		attributes.metadata = {
 			bindings: {
@@ -496,6 +520,17 @@ function isContentPostType( postType: PostTypeRecord ) {
 	);
 }
 
+function isArchivePostType( postType: PostTypeRecord ) {
+	return (
+		!! postType?.slug &&
+		postType.visibility?.show_in_nav_menus !== false &&
+		postType.visibility?.public !== false &&
+		postType.viewable !== false &&
+		typeof postType.site_editor_archive_url === 'string' &&
+		postType.site_editor_archive_url.length > 0
+	);
+}
+
 function isLinkableTaxonomy( taxonomy: TaxonomyRecord ) {
 	const excluded = new Set( [ 'nav_menu', 'link_category', 'post_format' ] );
 	return (
@@ -536,6 +571,8 @@ function SourceIcon( { item }: { item: PickerItem } ) {
 		icon = category;
 	} else if ( item.group === 'custom' ) {
 		icon = customLink;
+	} else if ( item.group === 'archives' ) {
+		icon = archive;
 	} else if ( item.group === 'content' ) {
 		icon = postList;
 	}
@@ -669,6 +706,7 @@ export default function AddMenuItemsModal( {
 	const [ error, setError ] = useState< string >();
 	const [ customUrl, setCustomUrl ] = useState( '' );
 	const [ customLabel, setCustomLabel ] = useState( '' );
+	const [ areMoreGroupsVisible, setAreMoreGroupsVisible ] = useState( false );
 
 	const { records: pageRecords, isResolving: isResolvingPages } =
 		useEntityRecords( 'postType', 'page', PAGE_QUERY );
@@ -701,14 +739,17 @@ export default function AddMenuItemsModal( {
 
 	const sourceRecordsPayload = useSelect( ( select ) => {
 		const core = select( coreStore );
-		const resolvedPostTypes = (
-			core.getPostTypes( POST_TYPES_QUERY ) || []
-		).filter( isContentPostType ) as PostTypeRecord[];
+		const resolvedPostTypes = ( core.getPostTypes( POST_TYPES_QUERY ) ||
+			[] ) as PostTypeRecord[];
+		const resolvedContentPostTypes =
+			resolvedPostTypes.filter( isContentPostType );
+		const resolvedArchivePostTypes =
+			resolvedPostTypes.filter( isArchivePostType );
 		const resolvedTaxonomies = (
 			core.getTaxonomies( TAXONOMIES_QUERY ) || []
 		).filter( isLinkableTaxonomy ) as TaxonomyRecord[];
 
-		const contentRecords = resolvedPostTypes.flatMap( ( postType ) =>
+		const contentRecords = resolvedContentPostTypes.flatMap( ( postType ) =>
 			(
 				core.getEntityRecords(
 					'postType',
@@ -765,7 +806,12 @@ export default function AddMenuItemsModal( {
 		 * subscribing to the dynamic entity selectors above.
 		 */
 		return JSON.stringify( {
-			contentPostTypes: resolvedPostTypes.map( ( postType ) => ( {
+			archivePostTypes: resolvedArchivePostTypes.map( ( postType ) => ( {
+				slug: postType.slug,
+				labels: postType.labels,
+				site_editor_archive_url: postType.site_editor_archive_url,
+			} ) ),
+			contentPostTypes: resolvedContentPostTypes.map( ( postType ) => ( {
 				slug: postType.slug,
 				labels: postType.labels,
 			} ) ),
@@ -774,11 +820,16 @@ export default function AddMenuItemsModal( {
 			mediaRecords,
 		} );
 	}, [] );
-	const { contentPostTypes, contentRecords, termRecords, mediaRecords } =
-		useMemo(
-			() => parseMenuItemSourceRecords( sourceRecordsPayload ),
-			[ sourceRecordsPayload ]
-		);
+	const {
+		archivePostTypes,
+		contentPostTypes,
+		contentRecords,
+		termRecords,
+		mediaRecords,
+	} = useMemo(
+		() => parseMenuItemSourceRecords( sourceRecordsPayload ),
+		[ sourceRecordsPayload ]
+	);
 
 	const menuContent = navigationMenu.content?.raw || '';
 	const linkedState = useMemo(
@@ -847,6 +898,31 @@ export default function AddMenuItemsModal( {
 		[ contentPostTypes ]
 	);
 
+	const archiveItems: PickerItem[] = useMemo(
+		() =>
+			archivePostTypes.map( ( postType ) => {
+				const item = {
+					id: `archive:${ postType.slug }`,
+					title:
+						postType.labels?.archives ||
+						postType.labels?.name ||
+						postType.slug,
+					linkLabel: postType.site_editor_archive_url || '',
+					status: 'publish',
+					typeLabel: __( 'Archive' ),
+					group: 'archives' as const,
+					sourceKind: 'post-type-archive' as const,
+					sourceType: postType.slug,
+					url: postType.site_editor_archive_url || '',
+				};
+				return {
+					...item,
+					inThisMenu: isItemInNavigation( item, linkedState ),
+				};
+			} ),
+		[ archivePostTypes, linkedState ]
+	);
+
 	const taxonomyItems: PickerItem[] = useMemo(
 		() =>
 			termRecords.map( ( { record, taxonomy } ) => {
@@ -908,12 +984,20 @@ export default function AddMenuItemsModal( {
 		() => ( {
 			pages: pageItems,
 			content: contentItems,
+			archives: archiveItems,
 			taxonomy: taxonomyItems,
 			media: mediaItems,
 			blocks: blockItems,
 			custom: [],
 		} ),
-		[ blockItems, contentItems, mediaItems, pageItems, taxonomyItems ]
+		[
+			archiveItems,
+			blockItems,
+			contentItems,
+			mediaItems,
+			pageItems,
+			taxonomyItems,
+		]
 	);
 
 	const activeGroupConfig =
@@ -988,6 +1072,9 @@ export default function AddMenuItemsModal( {
 
 	const selectGroup = useCallback( ( nextGroup: PickerGroup ) => {
 		setActiveGroup( nextGroup );
+		if ( ! PRIMARY_GROUPS.has( nextGroup ) ) {
+			setAreMoreGroupsVisible( true );
+		}
 		setSelection( [] );
 		setError( undefined );
 		setView( createDefaultView( nextGroup ) );
@@ -1024,6 +1111,29 @@ export default function AddMenuItemsModal( {
 	}, [ addItems, customLabel, customUrl, linkedState.urls ] );
 
 	const isLoading = activeGroup === 'pages' ? isResolvingPages : false;
+	const primaryGroups = GROUPS.filter( ( group ) =>
+		PRIMARY_GROUPS.has( group.id )
+	);
+	const secondaryGroups = GROUPS.filter(
+		( group ) => ! PRIMARY_GROUPS.has( group.id )
+	);
+	const renderGroupTab = ( group: ( typeof GROUPS )[ number ] ) => (
+		<Tabs.Tab
+			key={ group.id }
+			value={ group.id }
+			className="navigation-add-items-modal__tab"
+		>
+			<span
+				className="navigation-add-items-modal__tab-icon"
+				aria-hidden="true"
+			>
+				<WCIcon icon={ group.icon } />
+			</span>
+			<span className="navigation-add-items-modal__tab-label">
+				{ group.title }
+			</span>
+		</Tabs.Tab>
+	);
 
 	return (
 		<Modal
@@ -1045,23 +1155,29 @@ export default function AddMenuItemsModal( {
 						className="navigation-add-items-modal__tablist"
 						aria-label={ __( 'Menu item types' ) }
 					>
-						{ GROUPS.map( ( group ) => (
-							<Tabs.Tab
-								key={ group.id }
-								value={ group.id }
-								className="navigation-add-items-modal__tab"
+						{ primaryGroups.map( renderGroupTab ) }
+						{ areMoreGroupsVisible ? (
+							secondaryGroups.map( renderGroupTab )
+						) : (
+							<Button
+								className="navigation-add-items-modal__more-tab"
+								variant="tertiary"
+								onClick={ () =>
+									setAreMoreGroupsVisible( true )
+								}
+								__next40pxDefaultSize
 							>
+								<span className="navigation-add-items-modal__tab-label">
+									{ __( 'More…' ) }
+								</span>
 								<span
-									className="navigation-add-items-modal__tab-icon"
+									className="navigation-add-items-modal__more-tab-icon"
 									aria-hidden="true"
 								>
-									<WCIcon icon={ group.icon } />
+									<WCIcon icon={ chevronDown } />
 								</span>
-								<span className="navigation-add-items-modal__tab-label">
-									{ group.title }
-								</span>
-							</Tabs.Tab>
-						) ) }
+							</Button>
+						) }
 					</Tabs.List>
 
 					<div className="navigation-add-items-modal__panel">
