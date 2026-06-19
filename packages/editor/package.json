@@ -60,7 +60,6 @@
 	],
 	"dependencies": {
 		"@wordpress/a11y": "file:../a11y",
-		"@wordpress/annotations": "file:../annotations",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/blob": "file:../blob",

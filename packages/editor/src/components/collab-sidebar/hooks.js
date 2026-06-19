@@ -19,12 +19,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { getScrollContainer } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as interfaceStore } from '@wordpress/interface';
-import { store as annotationsStore } from '@wordpress/annotations';
-import {
-	RichTextData,
-	create,
-	store as richTextStore,
-} from '@wordpress/rich-text';
+import { RichTextData, create } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -531,123 +526,6 @@ export function useFloatingBoard( {
 		registerThread: store.registerThread,
 		unregisterThread: store.unregisterThread,
 	};
-}
-
-const NOTE_ANNOTATION_SOURCE = 'core-note';
-
-/**
- * Decorate inline-note ranges using the annotations API. The in-content
- * `core/note` marker is the sole anchor: its `data-id` identifies the note and
- * its position follows edits, so the range is read straight from the block
- * content.
- *
- * @param {Array} threads Note threads, including resolved status.
- */
-export function useAnnotateBlocks( threads ) {
-	const { getBlockAttributes } = useSelect( blockEditorStore );
-	const {
-		__experimentalAddAnnotation,
-		__experimentalRemoveAnnotation,
-		__experimentalRemoveAnnotationsBySource,
-	} = useDispatch( annotationsStore );
-
-	// `findNoteInBlock` locates a note's marker by parsing block content, which
-	// only resolves the `core/note` format once that format type is registered.
-	// The notes sidebar registers it on mount and unregisters it on unmount, so
-	// the code-editor round-trip (which unmounts the sidebar) leaves a window
-	// where it's missing. Tracking registration reactively means the derivation
-	// below re-runs once the format is registered again, instead of caching an
-	// empty result from the brief unregistered window after a remount.
-	const isNoteFormatRegistered = useSelect(
-		( select ) =>
-			!! select( richTextStore ).getFormatType( NOTE_FORMAT_NAME ),
-		[]
-	);
-
-	const annotations = useMemo( () => {
-		if ( ! threads?.length || ! isNoteFormatRegistered ) {
-			return [];
-		}
-		const out = [];
-		for ( const thread of threads ) {
-			// Resolved threads shouldn't decorate; reopened threads still apply.
-			if ( thread.status !== 'hold' || ! thread.blockClientId ) {
-				continue;
-			}
-			const attributes = getBlockAttributes( thread.blockClientId );
-			const found = findNoteInBlock( attributes, thread.id );
-			if ( ! found ) {
-				continue;
-			}
-			out.push( {
-				id: String( thread.id ),
-				clientId: thread.blockClientId,
-				attributeKey: found.attributeKey,
-				start: found.start,
-				end: found.end,
-			} );
-		}
-		return out;
-	}, [ threads, getBlockAttributes, isNoteFormatRegistered ] );
-
-	// Track which note annotations the store currently holds, as a stable
-	// string key so this only changes when the *set* of annotations changes -
-	// not on the per-keystroke range updates the annotations API performs while
-	// editing. Reconciling against this (rather than adding once) lets us
-	// re-assert annotations the store drops behind our back: switching to the
-	// code editor unmounts the canvas RichText, whose change handler removes the
-	// note annotations, and switching back does not re-parse the blocks, so
-	// `annotations` keeps the same reference and a plain add-once effect would
-	// never re-run. See https://github.com/WordPress/gutenberg/pull/78218.
-	const presentKey = useSelect(
-		( select ) =>
-			select( annotationsStore )
-				.__experimentalGetAnnotations()
-				.filter( ( a ) => a.source === NOTE_ANNOTATION_SOURCE )
-				.map( ( a ) => a.id )
-				.sort()
-				.join( ',' ),
-		[]
-	);
-
-	useEffect( () => {
-		const present = new Set( presentKey ? presentKey.split( ',' ) : [] );
-		const desired = new Set( annotations.map( ( a ) => a.id ) );
-
-		// Add any desired annotation the store is missing (the initial decorate
-		// and any re-add after the store drops them).
-		for ( const a of annotations ) {
-			if ( ! present.has( a.id ) ) {
-				__experimentalAddAnnotation( {
-					id: a.id,
-					source: NOTE_ANNOTATION_SOURCE,
-					blockClientId: a.clientId,
-					richTextIdentifier: a.attributeKey,
-					range: { start: a.start, end: a.end },
-				} );
-			}
-		}
-		// Remove our annotations that are no longer wanted (thread resolved,
-		// marker deleted, block removed).
-		for ( const id of present ) {
-			if ( ! desired.has( id ) ) {
-				__experimentalRemoveAnnotation( id );
-			}
-		}
-	}, [
-		annotations,
-		presentKey,
-		__experimentalAddAnnotation,
-		__experimentalRemoveAnnotation,
-	] );
-
-	// Drop all note annotations when the consumer unmounts so they don't leak
-	// into contexts where notes aren't shown.
-	useEffect( () => {
-		return () => {
-			__experimentalRemoveAnnotationsBySource( NOTE_ANNOTATION_SOURCE );
-		};
-	}, [ __experimentalRemoveAnnotationsBySource ] );
 }
 
 /**

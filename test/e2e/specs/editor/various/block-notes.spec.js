@@ -1142,12 +1142,9 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'button', { name: 'Add note', exact: true } )
 				.click();
 
-			// Wait for the annotation `<mark>` to appear in the canvas; the
-			// `annotation-text-core-note` class is added by the annotations
-			// API for any annotation whose `source` is `core-note`.
-			const mark = editor.canvas
-				.locator( 'mark.annotation-text-core-note' )
-				.first();
+			// Wait for the inline-note `<mark>` to appear in the canvas; the
+			// `core/note` format serializes the marker as `mark.wp-note`.
+			const mark = editor.canvas.locator( 'mark.wp-note' ).first();
 			await expect( mark ).toBeVisible();
 
 			// Browsers report the per-author tint as an rgba() value with
@@ -1197,25 +1194,21 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'button', { name: 'Add note', exact: true } )
 				.click();
 
-			// The annotations API renders the highlight as a `<mark>`; confirm it
-			// is present before the round-trip.
+			// The `core/note` marker serializes as a `<mark>`; confirm it is
+			// present before the round-trip.
 			await expect(
-				editor.canvas
-					.locator( 'mark.annotation-text-core-note' )
-					.first()
+				editor.canvas.locator( 'mark.wp-note' ).first()
 			).toBeVisible();
 
 			// Switch to the code editor and back. The visual editor unmounts and
-			// remounts, dropping then restoring the inline-note annotations: the
-			// highlight must reappear rather than silently vanish until the next
-			// block edit or reload. https://github.com/WordPress/gutenberg/pull/78218
+			// remounts; because the marker lives in the block content (not a
+			// runtime decoration), the highlight must survive the round-trip
+			// rather than silently vanish. https://github.com/WordPress/gutenberg/pull/78218
 			await pageUtils.pressKeys( 'secondary+M' );
 			await pageUtils.pressKeys( 'secondary+M' );
 
 			await expect(
-				editor.canvas
-					.locator( 'mark.annotation-text-core-note' )
-					.first()
+				editor.canvas.locator( 'mark.wp-note' ).first()
 			).toBeVisible();
 		} );
 	} );

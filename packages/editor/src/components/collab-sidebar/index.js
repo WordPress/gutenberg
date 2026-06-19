@@ -28,7 +28,6 @@ import { NoteAvatarIndicator } from './note-indicator-toolbar';
 import { NoteHighlightStyles } from './note-highlight-styles';
 import { useGlobalStyles } from '../global-styles';
 import {
-	useAnnotateBlocks,
 	useEnableFloatingSidebar,
 	useNoteThreads,
 	useReconcileRemovedInlineNotes,
@@ -86,7 +85,6 @@ function NotesSidebar( { postId } ) {
 	);
 
 	const { notes, unresolvedNotes } = useNoteThreads( postId );
-	useAnnotateBlocks( unresolvedNotes );
 	// Removing the marked text deletes the note rather than letting it become a
 	// block-level note.
 	useReconcileRemovedInlineNotes( unresolvedNotes );

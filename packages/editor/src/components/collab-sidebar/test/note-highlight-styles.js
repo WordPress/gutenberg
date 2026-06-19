@@ -7,7 +7,7 @@ import { getAvatarBorderColor } from '../utils';
 describe( 'buildHighlightCss', () => {
 	it( 'always emits the mark reset so the browser default yellow does not bleed through', () => {
 		expect( buildHighlightCss( [] ) ).toContain(
-			'mark.annotation-text-core-note,mark.wp-note{background-color:transparent;color:inherit;}'
+			'mark.wp-note{background-color:transparent;color:inherit;}'
 		);
 	} );
 
@@ -17,12 +17,12 @@ describe( 'buildHighlightCss', () => {
 			{ id: 12, author: 3 },
 		] );
 		expect( css ).toContain(
-			`#annotation-text-7{background-color:${ getAvatarBorderColor(
+			`mark.wp-note[data-id="7"]{background-color:${ getAvatarBorderColor(
 				1
 			) }40;}`
 		);
 		expect( css ).toContain(
-			`#annotation-text-12{background-color:${ getAvatarBorderColor(
+			`mark.wp-note[data-id="12"]{background-color:${ getAvatarBorderColor(
 				3
 			) }40;}`
 		);
@@ -32,7 +32,7 @@ describe( 'buildHighlightCss', () => {
 		const css = buildHighlightCss( [ { id: 7, author: 1 } ] );
 		const color = getAvatarBorderColor( 1 );
 		expect( css ).toContain(
-			`#annotation-text-7:hover,#annotation-text-7:focus-within{background-color:${ color }80;}`
+			`mark.wp-note[data-id="7"]:hover,mark.wp-note[data-id="7"]:focus-within{background-color:${ color }80;}`
 		);
 	} );
 
@@ -44,14 +44,14 @@ describe( 'buildHighlightCss', () => {
 		const color = getAvatarBorderColor( 1 );
 		// Rest rule still present.
 		expect( css ).toContain(
-			`#annotation-text-7{background-color:${ color }40;}`
+			`mark.wp-note[data-id="7"]{background-color:${ color }40;}`
 		);
 		// Active rule appended later, so the cascade picks it.
 		const restIndex = css.indexOf(
-			`#annotation-text-7{background-color:${ color }40;}`
+			`mark.wp-note[data-id="7"]{background-color:${ color }40;}`
 		);
 		const activeIndex = css.lastIndexOf(
-			`#annotation-text-7{background-color:${ color }80;}`
+			`mark.wp-note[data-id="7"]{background-color:${ color }80;}`
 		);
 		expect( activeIndex ).toBeGreaterThan( restIndex );
 	} );
@@ -67,7 +67,7 @@ describe( 'buildHighlightCss', () => {
 			{ id: null, author: 1 },
 			{ author: 1 },
 		] );
-		expect( css ).not.toMatch( /annotation-text-(null|undefined)/ );
+		expect( css ).not.toMatch( /data-id="(null|undefined)"/ );
 	} );
 
 	it( 'cycles through AVATAR_BORDER_COLORS by author id modulo length', () => {
@@ -80,10 +80,10 @@ describe( 'buildHighlightCss', () => {
 		] );
 		const color = getAvatarBorderColor( 1 );
 		expect( css ).toContain(
-			`#annotation-text-a{background-color:${ color }40;}`
+			`mark.wp-note[data-id="a"]{background-color:${ color }40;}`
 		);
 		expect( css ).toContain(
-			`#annotation-text-b{background-color:${ color }40;}`
+			`mark.wp-note[data-id="b"]{background-color:${ color }40;}`
 		);
 	} );
 
@@ -91,16 +91,16 @@ describe( 'buildHighlightCss', () => {
 		const css = buildHighlightCss( [ { id: 'x' } ] );
 		const color = getAvatarBorderColor( 0 );
 		expect( css ).toContain(
-			`#annotation-text-x{background-color:${ color }40;}`
+			`mark.wp-note[data-id="x"]{background-color:${ color }40;}`
 		);
 	} );
 
 	it( 'returns just the reset when no threads are provided', () => {
 		expect( buildHighlightCss() ).toBe(
-			'mark.annotation-text-core-note,mark.wp-note{background-color:transparent;color:inherit;}'
+			'mark.wp-note{background-color:transparent;color:inherit;}'
 		);
 		expect( buildHighlightCss( null ) ).toBe(
-			'mark.annotation-text-core-note,mark.wp-note{background-color:transparent;color:inherit;}'
+			'mark.wp-note{background-color:transparent;color:inherit;}'
 		);
 	} );
 } );
