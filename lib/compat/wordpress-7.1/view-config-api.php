@@ -757,10 +757,10 @@ function _gutenberg_get_entity_view_config_post_type_wp_template( $config ) {
 			),
 			'revisions',
 			// The following fields are only meaningful in the `home`/`index`
-			// template summary; they hide themselves on every other template.
-			// They edit other entities (`root/site` and the posts page), which
-			// the editor merges into the form data under a namespace.
-			'posttype_page_title',
+			// template summary. They edit other entities (`root/site` and the
+			// posts page); the editor merges those records into the form data
+			// under a namespace and controls when the fields are shown.
+			'posts_page_title',
 			'posts_per_page',
 			'default_comment_status',
 		),

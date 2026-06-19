@@ -25,6 +25,6 @@ export {
 export { default as formatField } from './format';
 export { default as postContentInfoField } from './post-content-info';
 export { default as stickyField } from './sticky';
-export { default as templatePostsPerPageField } from './template-posts-per-page';
-export { default as templateSiteDiscussionField } from './template-site-discussion';
-export { default as templatePostsPageTitleField } from './template-posts-page-title';
+export { default as postsPerPageField } from './posts-per-page';
+export { default as siteDiscussionField } from './site-discussion';
+export { default as postsPageTitleField } from './posts-page-title';

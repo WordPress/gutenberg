@@ -118,25 +118,11 @@ export interface Pattern extends CommonPost {
 
 export interface SiteSettings {
 	posts_per_page?: number;
-	default_comment_status?: string;
+	default_comment_status?: string | null;
 }
 
-/**
- * Shape of the data backing the `home`/`index` template summary fields.
- *
- * These fields edit several entities at once. The record for the template
- * being edited is augmented with the related entity records stored under a
- * `${ kind }_${ name }` namespace key (e.g. `root_site`, `posttype_page`), so
- * that a single DataForm can read and write all of them. The editor is
- * responsible for merging those records in and routing the namespaced edits
- * back to their entity.
- */
-export interface HomeTemplateData {
-	slug?: string;
-	root_site?: SiteSettings;
-	posttype_page?: {
-		title?: { raw?: string } | string;
-	};
+export interface PostsPage {
+	title?: { raw?: string } | string;
 }
 
 export type Post = Template | TemplatePart | Pattern | BasePost;

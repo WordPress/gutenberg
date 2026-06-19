@@ -28,16 +28,21 @@ const EMPTY_FORM = { layout: { type: 'panel' }, fields: [] };
 // a single DataForm can read and write all of them, and edits to those keys are
 // routed back to their entity.
 //
-// Currently only `wp_template` uses this, for the `home`/`index` template
-// summary: `posts_per_page` and `default_comment_status` target `root/site`,
-// and `posttype_page_title` targets the posts page (the `page` assigned as
-// `page_for_posts`). The fields themselves hide on every other template via
-// their `isVisible` callback.
+// The fields themselves are namespace-agnostic: they read and write a plain
+// record. The `fields` list ties each one to the entity it edits, and this
+// component overrides their `getValue`/`setValue`/`render` to operate on the
+// namespaced record, plus their `isVisible` to only show where that record is
+// present (e.g. the `home`/`index` template summary).
+//
+// Currently only `wp_template` uses this: `posts_per_page` and
+// `default_comment_status` target `root/site`, and `posts_page_title` targets
+// the posts page (the `page` assigned as `page_for_posts`).
 const ENTITIES = {
 	wp_template: {
 		root_site: {
 			kind: 'root',
 			name: 'site',
+			fields: [ 'posts_per_page', 'default_comment_status' ],
 		},
 		posttype_page: {
 			kind: 'postType',
@@ -45,9 +50,39 @@ const ENTITIES = {
 			getId: ( select ) =>
 				select( coreDataStore ).getEditedEntityRecord( 'root', 'site' )
 					?.page_for_posts,
+			fields: [ 'posts_page_title' ],
 		},
 	},
 };
+
+// Rebinds a namespace-agnostic field to the namespaced record it edits. Every
+// field callback that receives the form `item` is redirected to the
+// `item[ namespace ]` sub-record so the field operates on its own entity:
+// `getValue`/`setValue`/`render` here, and the rest indirectly because they all
+// funnel through the (remapped) `getValue` (default `render`, `getValueFormatted`
+// and `isValid` range/`custom` validation). Edits are wrapped back under the
+// namespace key, and `isVisible` only shows the field where its record is
+// present (the `home`/`index` template summary).
+function bindFieldToNamespace( field, namespace ) {
+	const subItem = ( item ) => item?.[ namespace ] ?? {};
+	return {
+		...field,
+		getValue: ( { item } ) =>
+			field.getValue
+				? field.getValue( { item: subItem( item ) } )
+				: subItem( item )[ field.id ],
+		setValue: ( { item, value } ) => ( {
+			[ namespace ]: field.setValue( { item: subItem( item ), value } ),
+		} ),
+		render: field.render
+			? ( props ) =>
+					field.render( { ...props, item: subItem( props.item ) } )
+			: undefined,
+		isVisible: ( item ) =>
+			[ 'home', 'index' ].includes( item.slug ?? '' ) &&
+			!! item[ namespace ],
+	};
+}
 
 export default function DataFormPostSummary( { onActionPerformed } ) {
 	const { postType, postId } = useSelect( ( select ) => {
@@ -141,11 +176,28 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 
 	const { editEntityRecord } = useDispatch( coreDataStore );
 
+	// Map of namespaced field id to the namespace key its entity is merged under.
+	const fieldNamespaces = useMemo( () => {
+		const map = {};
+		for ( const [ namespace, entity ] of Object.entries(
+			ENTITIES[ postType ] ?? {}
+		) ) {
+			for ( const id of entity.fields ?? [] ) {
+				map[ id ] = namespace;
+			}
+		}
+		return map;
+	}, [ postType ] );
+
 	const _fields = usePostFields( { postType } );
 	const fields = useMemo(
 		() =>
 			_fields
 				?.map( ( field ) => {
+					const namespace = fieldNamespaces[ field.id ];
+					if ( namespace ) {
+						return bindFieldToNamespace( field, namespace );
+					}
 					if ( field.id === 'status' ) {
 						return {
 							...field,
@@ -180,7 +232,7 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 				// Editor-only field, injected here rather than registered
 				// so it never leaks into the site editor list / quick-edit fields.
 				.concat( revisionsField ),
-		[ _fields, templatePanelMode, availableTemplates ]
+		[ _fields, templatePanelMode, availableTemplates, fieldNamespaces ]
 	);
 
 	const onChange = ( edits ) => {

@@ -168,6 +168,14 @@ Ping status field for BasePost.
 
 Post content information field for BasePost.
 
+### postsPageTitleField
+
+Title field for the posts page (the `page` assigned as `page_for_posts`).
+
+### postsPerPageField
+
+Posts per page field for the `root/site` entity.
+
 ### PostType
 
 Undocumented declaration.
@@ -200,6 +208,10 @@ Restore action for PostWithPermissions.
 
 ScheduledDate Field.
 
+### siteDiscussionField
+
+Discussion field for the `root/site` entity.
+
 ### slugField
 
 Slug field for BasePost.
@@ -215,18 +227,6 @@ Sticky field for BasePost.
 ### templateField
 
 Template field for BasePost.
-
-### templatePostsPageTitleField
-
-Posts page title field for the `home`/`index` template summary.
-
-### templatePostsPerPageField
-
-Posts per page field for the `home`/`index` template summary.
-
-### templateSiteDiscussionField
-
-Discussion field for the `home`/`index` template summary.
 
 ### templateTitleField
 

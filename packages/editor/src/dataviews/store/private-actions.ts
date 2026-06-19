@@ -43,9 +43,9 @@ import {
 	stickyField,
 	descriptionField,
 	readOnlyDescriptionField,
-	templatePostsPerPageField,
-	templateSiteDiscussionField,
-	templatePostsPageTitleField,
+	postsPerPageField,
+	siteDiscussionField,
+	postsPageTitleField,
 } from '@wordpress/fields';
 import {
 	altTextField,
@@ -301,15 +301,12 @@ export const registerPostTypeSchema =
 				postTypeConfig.slug === 'wp_template' &&
 					readOnlyDescriptionField,
 				// The `home`/`index` template summary exposes a few fields that
-				// target other entities (`root/site` and the posts page). They
-				// are merged into the form data under a namespace and routed
-				// back to their entity by `DataFormPostSummary`.
-				postTypeConfig.slug === 'wp_template' &&
-					templatePostsPageTitleField,
-				postTypeConfig.slug === 'wp_template' &&
-					templatePostsPerPageField,
-				postTypeConfig.slug === 'wp_template' &&
-					templateSiteDiscussionField,
+				// target other entities (`root/site` and the posts page).
+				// `DataFormPostSummary` overrides them to read/write the right
+				// entity and to control their visibility.
+				postTypeConfig.slug === 'wp_template' && postsPageTitleField,
+				postTypeConfig.slug === 'wp_template' && postsPerPageField,
+				postTypeConfig.slug === 'wp_template' && siteDiscussionField,
 				postTypeConfig.supports?.editor &&
 					postTypeConfig.viewable &&
 					postPreviewField,
