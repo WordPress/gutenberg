@@ -272,30 +272,74 @@ function gutenberg_sanitize_widget_icon( $icon ) {
 	return $icon;
 }
 
+/*
+ * Pattern enforced by `gutenberg_register_widget_type_if_new()` for Widget
+ * Type names: lowercase namespace and slug joined by a slash.
+ */
+const GUTENBERG_WIDGET_TYPE_NAME_PATTERN = '/^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/';
+
 /**
- * Hydrates the widget type registry from the build manifest.
+ * Registers a Widget Type if the name is well-formed and not already
+ * registered.
  *
- * Iterates the widgets discovered by the build pipeline (via
- * `gutenberg_get_registered_widget_modules()`) and registers each one in
- * `WP_Widget_Type_Registry`. The manifest is the single source of widget
- * authorship in this codebase; this loop is a deterministic copy of it
- * into the in-memory registry, with no filters in between.
+ * Shared helper for the registry resolver. Validates the `name` shape and skips
+ * silently when the registry already holds an entry, so earlier sources take
+ * precedence on a name collision. Emits `_doing_it_wrong` for a malformed name
+ * so authoring problems surface during development.
+ *
+ * @access private
+ *
+ * @param string $name Widget Type name (`<namespace>/<slug>`).
+ * @param array  $args Args forwarded to `WP_Widget_Type_Registry::register()`.
+ * @return bool True when the entry was registered, false when skipped.
+ */
+function gutenberg_register_widget_type_if_new( $name, $args ) {
+	if ( ! is_string( $name ) || '' === $name || ! preg_match( GUTENBERG_WIDGET_TYPE_NAME_PATTERN, $name ) ) {
+		_doing_it_wrong(
+			__FUNCTION__,
+			sprintf(
+				/* translators: %s: Widget Type name. */
+				esc_html__( 'Widget Type name "%s" is malformed. Expected the shape "<namespace>/<slug>" with lowercase, kebab-case segments.', 'gutenberg' ),
+				esc_html( (string) $name )
+			),
+			'Gutenberg 23.2'
+		);
+		return false;
+	}
+
+	$registry = WP_Widget_Type_Registry::get_instance();
+	if ( $registry->is_registered( $name ) ) {
+		return false;
+	}
+
+	$registry->register( $name, $args );
+	return true;
+}
+
+/**
+ * Hydrates the widget type registry.
+ *
+ * Built-in origin: iterates the widgets discovered by the build pipeline (via
+ * `gutenberg_get_registered_widget_modules()`) and registers each one with
+ * `origin = 'built-in'`. The manifest is the single source of built-in widget
+ * authorship in this codebase; this loop is a deterministic copy of it into the
+ * in-memory registry, with no filters in between. Later origins register
+ * through the same `gutenberg_register_widget_type_if_new()` helper; earlier
+ * sources win on a name collision.
  */
 function gutenberg_register_widget_types() {
 	if ( ! function_exists( 'gutenberg_get_registered_widget_modules' ) ) {
 		return;
 	}
 
-	$registry = WP_Widget_Type_Registry::get_instance();
-
 	foreach ( gutenberg_get_registered_widget_modules() as $widget ) {
-		if ( empty( $widget['name'] ) || $registry->is_registered( $widget['name'] ) ) {
+		if ( empty( $widget['name'] ) ) {
 			continue;
 		}
 
 		$widget = gutenberg_translate_widget_metadata( $widget );
 
-		$registry->register(
+		gutenberg_register_widget_type_if_new(
 			$widget['name'],
 			array(
 				'render_module' => $widget['render_module'] ?? null,
@@ -311,6 +355,7 @@ function gutenberg_register_widget_types() {
 					$widget['dir_name'] ?? ''
 				),
 				'keywords'      => $widget['keywords'] ?? null,
+				'origin'        => 'built-in',
 			)
 		);
 	}
@@ -319,7 +364,11 @@ function gutenberg_register_widget_types() {
 if ( did_action( 'init' ) ) {
 	gutenberg_register_widget_types();
 } else {
-	add_action( 'init', 'gutenberg_register_widget_types' );
+	/*
+	 * Runs at priority 30 so origin sources that populate the registry at
+	 * earlier priorities (added in later steps) are in place first.
+	 */
+	add_action( 'init', 'gutenberg_register_widget_types', 30 );
 }
 
 /**
