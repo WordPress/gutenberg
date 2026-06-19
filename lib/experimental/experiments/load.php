@@ -137,6 +137,11 @@ function gutenberg_initialize_experiments_settings() {
 					'description' => __( 'Enables a new dashboard experience with resizable, reorderable widgets that plugins can register and users can personalize.', 'gutenberg' ),
 				),
 				array(
+					'id'          => 'gutenberg-widget-type-composer',
+					'label'       => __( 'Widget Type Composer', 'gutenberg' ),
+					'description' => __( 'Enables a visual composer for widget types: users author widget types by composing blocks, alongside built-in and code-registered widget types sharing a single render path. Builds on top of the New Dashboard experience.', 'gutenberg' ),
+				),
+				array(
 					'id'          => 'gutenberg-react-19',
 					'label'       => __( 'React 19', 'gutenberg' ),
 					'description' => __( 'Registers React 19 as the bundled React version, replacing the default React 18 scripts.', 'gutenberg' ),

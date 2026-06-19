@@ -1,4 +1,4 @@
-# Widget Type Composer — architecture
+# Widget Type Composer, architecture
 
 ## What it is
 
@@ -12,37 +12,37 @@ It builds on the existing widget framework (`@wordpress/widget-primitives` +
 `WP_Widget_Type_Registry` + `/wp/v2/widget-modules`). A widget type gains an
 `origin`:
 
-- `built-in` — a build-discovered render module. The existing path, unchanged.
-- `code-registered` — declared in PHP via `gutenberg_register_widget_def()`,
+- `built-in`, a build-discovered render module. The existing path, unchanged.
+- `code-registered`, declared in PHP via `gutenberg_register_widget_def()`,
   held in an in-memory registry, carrying its composition `content` inline.
-- `cpt` — a `widget_def` post; editable, persistent, queryable.
+- `cpt`, a `widget_def` post; editable, persistent, queryable.
 
 `built-in` renders client-side from its module; `code-registered` and `cpt`
 render through the **admin block renderer**.
 
 ## Layers (bottom to top)
 
-1. **Server framework** — the three origins, the resolver that merges them into
+1. **Server framework**, the three origins, the resolver that merges them into
    `WP_Widget_Type_Registry`, the REST exposure (`/wp/v2/widget-modules`
    carrying `origin`/`content`/`definition_id`/`title`/`description`/`icon`), and
    the SSR render endpoint (`/wp/v2/widget-defs/render`, `do_blocks()` with
    per-instance attributes seeded into block context).
-2. **Discovery** — `useWidgetTypes(records)` builds a `WidgetType` per record:
+2. **Discovery**, `useWidgetTypes(records)` builds a `WidgetType` per record:
    for server-defined origins from the inline metadata, for built-in by
    importing the module.
-3. **Render** — `WidgetRender` branches on `origin`; server-defined flows to
+3. **Render**, `WidgetRender` branches on `origin`; server-defined flows to
    `AdminBlockRenderer`, which parses the composition with the grammar parser
    (`@wordpress/block-serialization-default-parser`, not `blocks.parse`) and
    mounts, per block and in order, either a registered admin component or a
    per-block SSR fallback, as one React tree.
-4. **Admin blocks** — declarative specs mapping block attributes to a
+4. **Admin blocks**, declarative specs mapping block attributes to a
    component's props (`createAdminBlock`). UI primitives (stack, text, button,
    icon, badge, card, link, icon-button) plus data-bound blocks:
    `core-admin/form` over `DataForm`, `core-admin/collection` over `DataViews`.
-5. **Bindings** — `metadata.bindings` resolves an attribute from a named source
+5. **Bindings**, `metadata.bindings` resolves an attribute from a named source
    (e.g. `core/instance-attribute`) against ambient block context
    (`providesContext`/`usesContext`, mirroring `block.json`).
-6. **Connections** — `metadata.connections` wires a logical event to an ordered,
+6. **Connections**, `metadata.connections` wires a logical event to an ordered,
    async-aware list of action steps with `when` guards and connection-level
    `onError`. Argument values and guards use a serializable subset of CEL
    (`{ "$expr": "..." }`). Handlers receive an action context of two tiers:
