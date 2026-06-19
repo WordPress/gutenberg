@@ -1,13 +1,13 @@
 <?php
 /**
- * Block bindings additions for WordPress 7.1.
+ * Block bindings additions for WordPress 7.0.
  *
- * @since 7.1.0
+ * @since 7.0.0
  * @package gutenberg
  * @subpackage Block Bindings
  */
 
-// The following filter can be removed once the minimum required WordPress version is 7.1 or newer.
+// The following filter can be removed once the minimum required WordPress version is 7.0 or newer.
 add_filter(
 	'block_bindings_supported_attributes',
 	function ( $attributes, $block_type ) {
@@ -33,7 +33,7 @@ add_filter(
 /**
  * Returns whether the list item metadata declares a content binding.
  *
- * @since 7.1.0
+ * @since 7.0.0
  *
  * @param mixed $metadata Block metadata attribute.
  * @return bool Whether a content binding (direct or via pattern overrides) is present.
@@ -58,7 +58,7 @@ function gutenberg_list_item_metadata_has_content_binding( $metadata ) {
  * the nested List. The inner blocks are still available on the instance, so they
  * are rendered again and re-appended before the closing `</li>`.
  *
- * @since 7.1.0
+ * @since 7.0.0
  *
  * @param string   $block_content The rendered block content.
  * @param array    $parsed_block  The parsed block.

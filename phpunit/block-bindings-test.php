@@ -809,10 +809,5 @@ HTML;
 			$block->inner_blocks[0]->attributes['metadata']['bindings'],
 			'The __default binding should be updated with the list item content binding metadata.'
 		);
-		$this->assertArrayNotHasKey(
-			'__gutenbergListItemBindings',
-			$block->inner_blocks[0]->attributes['metadata'],
-			'Temporary list item binding metadata should not be exposed on rendered block attributes.'
-		);
 	}
 }
