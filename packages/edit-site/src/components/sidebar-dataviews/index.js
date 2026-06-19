@@ -23,6 +23,8 @@ import SidebarNavigationItem from '../sidebar-navigation-item';
 
 const { useLocation } = unlock( routerPrivateApis );
 
+const VIEW_CONFIG_FIELDS = [ 'view_list' ];
+
 const SLUG_TO_ICON = {
 	all: pages,
 	published,
@@ -44,10 +46,13 @@ export default function DataViewsSidebarContent( {
 		path,
 		query: { activeView = 'all' },
 	} = useLocation();
-	const { view_list: viewList } = useViewConfig( {
-		kind: 'postType',
-		name: postType,
-	} );
+	const { view_list: viewList } = useViewConfig(
+		{
+			kind: 'postType',
+			name: postType,
+		},
+		{ fields: VIEW_CONFIG_FIELDS }
+	);
 	if ( ! postType ) {
 		return null;
 	}
