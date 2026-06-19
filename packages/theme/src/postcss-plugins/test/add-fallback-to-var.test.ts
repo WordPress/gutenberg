@@ -4,9 +4,9 @@ const mockFallbacks: Record< string, string > = {
 	'--wpds-border-radius-sm': '2px',
 	'--wpds-dimension-gap-sm': '8px',
 	'--wpds-dimension-gap-lg': '16px',
-	'--wpds-color-bg-interactive-brand-strong':
+	'--wpds-color-background-interactive-brand-strong':
 		'var(--wp-admin-theme-color, #3858e9)',
-	'--wpds-color-bg-interactive-brand-strong-active':
+	'--wpds-color-background-interactive-brand-strong-active':
 		'color-mix(in oklch, var(--wp-admin-theme-color, #3858e9) 92%, black)',
 	'--wpds-typography-font-family-body':
 		'-apple-system, system-ui, "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", sans-serif',
@@ -53,21 +53,21 @@ describe( 'addFallbackToVar', () => {
 
 	it( 'injects a brand token fallback with var(--wp-admin-theme-color)', () => {
 		const result = addFallbackToVar(
-			'var(--wpds-color-bg-interactive-brand-strong)',
+			'var(--wpds-color-background-interactive-brand-strong)',
 			mockFallbacks
 		);
 		expect( result ).toBe(
-			'var(--wpds-color-bg-interactive-brand-strong, var(--wp-admin-theme-color, #3858e9))'
+			'var(--wpds-color-background-interactive-brand-strong, var(--wp-admin-theme-color, #3858e9))'
 		);
 	} );
 
 	it( 'injects a color-mix fallback for a derived brand token', () => {
 		const result = addFallbackToVar(
-			'var(--wpds-color-bg-interactive-brand-strong-active)',
+			'var(--wpds-color-background-interactive-brand-strong-active)',
 			mockFallbacks
 		);
 		expect( result ).toBe(
-			'var(--wpds-color-bg-interactive-brand-strong-active, color-mix(in oklch, var(--wp-admin-theme-color, #3858e9) 92%, black))'
+			'var(--wpds-color-background-interactive-brand-strong-active, color-mix(in oklch, var(--wp-admin-theme-color, #3858e9) 92%, black))'
 		);
 	} );
 

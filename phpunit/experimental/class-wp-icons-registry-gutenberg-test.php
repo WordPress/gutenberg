@@ -324,4 +324,62 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 
 		$this->assertNull( $icon['content'] );
 	}
+
+	/**
+	 * Should register an icon that provides its content through `file_path`.
+	 */
+	public function test_register_icon_with_file_path() {
+		$file_path = tempnam( get_temp_dir(), 'gutenberg-icon-' );
+		file_put_contents( $file_path, '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"></svg>' );
+
+		$name     = 'test-plugin/file-path-icon';
+		$settings = array(
+			'label'     => 'Icon',
+			'file_path' => $file_path,
+		);
+
+		$result = $this->register( $name, $settings );
+		$this->assertTrue( $result );
+		$this->assertTrue( $this->registry->is_registered( $name ) );
+
+		$registered_icons = $this->registry->get_registered_icons( $name );
+		$this->assertCount( 1, $registered_icons );
+		$this->assertStringContainsString( '<svg', $registered_icons[0]['content'] );
+
+		unlink( $file_path );
+	}
+
+	/**
+	 * Should fail to register an icon that provides both `content` and `file_path`.
+	 *
+	 * @expectedIncorrectUsage WP_Icons_Registry_Gutenberg::register
+	 */
+	public function test_register_icon_with_content_and_file_path() {
+		$name     = 'test-plugin/content-and-file-path';
+		$settings = array(
+			'label'     => 'Icon',
+			'content'   => '<svg></svg>',
+			'file_path' => '/path/to/icon.svg',
+		);
+
+		$result = $this->register( $name, $settings );
+		$this->assertFalse( $result );
+		$this->assertFalse( $this->registry->is_registered( $name ) );
+	}
+
+	/**
+	 * Should fail to register an icon that provides neither `content` nor `file_path`.
+	 *
+	 * @expectedIncorrectUsage WP_Icons_Registry_Gutenberg::register
+	 */
+	public function test_register_icon_without_content_or_file_path() {
+		$name     = 'test-plugin/no-content';
+		$settings = array(
+			'label' => 'Icon',
+		);
+
+		$result = $this->register( $name, $settings );
+		$this->assertFalse( $result );
+		$this->assertFalse( $this->registry->is_registered( $name ) );
+	}
 }
