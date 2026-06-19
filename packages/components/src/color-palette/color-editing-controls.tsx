@@ -160,12 +160,7 @@ export function DefaultInfoRow( {
 				</Truncate>
 			</Stack>
 			{ ( canEdit || canDelete || canAdd ) && (
-				<Stack
-					className="components-color-palette__info-row-actions"
-					direction="row"
-					gap="xs"
-					justify="flex-end"
-				>
+				<Stack direction="row" gap="xs" justify="flex-end">
 					{ canAdd && (
 						<Button
 							__next40pxDefaultSize
@@ -174,7 +169,6 @@ export function DefaultInfoRow( {
 							label={ __( 'Add to custom' ) }
 							showTooltip
 							onClick={ onAdd }
-							className="components-color-palette__add-to-custom-button"
 						/>
 					) }
 					{ canEdit && (
