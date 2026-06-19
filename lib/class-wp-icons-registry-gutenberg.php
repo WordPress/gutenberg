@@ -199,7 +199,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 		 * `aria-*` wildcard, so every ARIA state and property is listed
 		 * explicitly. The list mirrors the WAI-ARIA states and properties.
 		 *
-		 * @see https://www.w3.org/TR/wai-aria-1.2/#state_prop_def
+		 * @link https://www.w3.org/TR/wai-aria-1.2/#state_prop_def
 		 */
 		$aria_attributes = array_fill_keys(
 			array(
