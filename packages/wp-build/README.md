@@ -181,7 +181,7 @@ Configure your root `package.json` with a `wpPlugin` object to control global na
 
 ### `wpPlugin.name`
 
-Name used to prefix genereated PHP functions. Must follow function name rules in PHP, i.e. valid name starts with a letter or underscore, followed by any number of letters, numbers, or underscores.
+Name used to prefix generated PHP functions. Must follow function name rules in PHP, i.e. valid name starts with a letter or underscore, followed by any number of letters, numbers, or underscores.
 
 ```json
 {
