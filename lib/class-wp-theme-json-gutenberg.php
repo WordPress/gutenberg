@@ -4716,14 +4716,13 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @since 6.8.0
 	 *
-	 * @param array $elements               The elements to process.
-	 * @param array $responsive_media_queries Responsive media queries.
+	 * @param array      $elements                 The elements to process.
+	 * @param array|null $responsive_media_queries Optional. Responsive media queries. Default null.
 	 * @return array The sanitized elements styles.
 	 */
 	protected static function remove_insecure_element_styles( $elements, $responsive_media_queries = null ) {
-		$sanitized                = array();
-		$valid_element_names      = array_keys( static::ELEMENTS );
-		$responsive_media_queries = $responsive_media_queries ?? static::get_responsive_media_queries();
+		$sanitized           = array();
+		$valid_element_names = array_keys( static::ELEMENTS );
 
 		foreach ( $valid_element_names as $element_name ) {
 			$element_input = $elements[ $element_name ] ?? null;
@@ -4738,15 +4737,17 @@ class WP_Theme_JSON_Gutenberg {
 					}
 				}
 
-				// Re-add and process responsive breakpoint styles for elements.
-				foreach ( array_keys( $responsive_media_queries ) as $breakpoint ) {
-					if ( isset( $element_input[ $breakpoint ] ) ) {
-						$element_output[ $breakpoint ] = static::remove_insecure_styles( $element_input[ $breakpoint ] );
+				if ( null !== $responsive_media_queries ) {
+					// Re-add and process responsive breakpoint styles for elements.
+					foreach ( array_keys( $responsive_media_queries ) as $breakpoint ) {
+						if ( isset( $element_input[ $breakpoint ] ) ) {
+							$element_output[ $breakpoint ] = static::remove_insecure_styles( $element_input[ $breakpoint ] );
 
-						if ( isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element_name ] ) ) {
-							foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element_name ] as $pseudo_selector ) {
-								if ( isset( $element_input[ $breakpoint ][ $pseudo_selector ] ) ) {
-									$element_output[ $breakpoint ][ $pseudo_selector ] = static::remove_insecure_styles( $element_input[ $breakpoint ][ $pseudo_selector ] );
+							if ( isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element_name ] ) ) {
+								foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element_name ] as $pseudo_selector ) {
+									if ( isset( $element_input[ $breakpoint ][ $pseudo_selector ] ) ) {
+										$element_output[ $breakpoint ][ $pseudo_selector ] = static::remove_insecure_styles( $element_input[ $breakpoint ][ $pseudo_selector ] );
+									}
 								}
 							}
 						}
@@ -4764,13 +4765,12 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @since 6.8.0
 	 *
-	 * @param array $blocks                 The block styles to process.
-	 * @param array $responsive_media_queries Responsive media queries.
+	 * @param array      $blocks                   The block styles to process.
+	 * @param array|null $responsive_media_queries Optional. Responsive media queries. Default null.
 	 * @return array Sanitized block type styles.
 	 */
 	protected static function remove_insecure_inner_block_styles( $blocks, $responsive_media_queries = null ) {
-		$sanitized                = array();
-		$responsive_media_queries = $responsive_media_queries ?? static::get_responsive_media_queries();
+		$sanitized = array();
 		foreach ( $blocks as $block_type => $block_input ) {
 			$block_output = static::remove_insecure_styles( $block_input );
 
@@ -4778,15 +4778,17 @@ class WP_Theme_JSON_Gutenberg {
 				$block_output['elements'] = static::remove_insecure_element_styles( $block_input['elements'], $responsive_media_queries );
 			}
 
-			// Re-add and process responsive breakpoint styles for inner blocks.
-			foreach ( array_keys( $responsive_media_queries ) as $breakpoint ) {
-				if ( isset( $block_input[ $breakpoint ] ) ) {
-					$block_output[ $breakpoint ] = static::remove_insecure_styles( $block_input[ $breakpoint ] );
+			if ( null !== $responsive_media_queries ) {
+				// Re-add and process responsive breakpoint styles for inner blocks.
+				foreach ( array_keys( $responsive_media_queries ) as $breakpoint ) {
+					if ( isset( $block_input[ $breakpoint ] ) ) {
+						$block_output[ $breakpoint ] = static::remove_insecure_styles( $block_input[ $breakpoint ] );
 
-					if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block_type ] ) ) {
-						foreach ( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block_type ] as $pseudo_selector ) {
-							if ( isset( $block_input[ $breakpoint ][ $pseudo_selector ] ) ) {
-								$block_output[ $breakpoint ][ $pseudo_selector ] = static::remove_insecure_styles( $block_input[ $breakpoint ][ $pseudo_selector ] );
+						if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block_type ] ) ) {
+							foreach ( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block_type ] as $pseudo_selector ) {
+								if ( isset( $block_input[ $breakpoint ][ $pseudo_selector ] ) ) {
+									$block_output[ $breakpoint ][ $pseudo_selector ] = static::remove_insecure_styles( $block_input[ $breakpoint ][ $pseudo_selector ] );
+								}
 							}
 						}
 					}
