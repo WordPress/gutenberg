@@ -446,6 +446,87 @@ describe( 'Cropper', () => {
 		jest.useRealTimers();
 	} );
 
+	it( 'clears settling via the fallback timer when no transitionend fires', async () => {
+		jest.useFakeTimers();
+
+		render(
+			<Cropper
+				src="test.jpg"
+				controller={ createController() }
+				showDimming={ false }
+				freeformCrop
+			/>
+		);
+
+		const handle = await screen.findByRole( 'button', {
+			name: 'Resize top-left corner',
+		} );
+		const stage = screen.getByTestId( 'cropper-stage' );
+
+		fireEvent.pointerDown( handle, {
+			button: 0,
+			clientX: 100,
+			clientY: 100,
+			pointerId: 1,
+		} );
+		fireEvent.pointerUp( handle, { pointerId: 1 } );
+
+		expect( stage ).toHaveStyle( 'transition: transform 200ms ease-out' );
+
+		// Without a transitionend, settling persists past the CSS duration...
+		act( () => jest.advanceTimersByTime( 200 ) );
+		expect( stage ).toHaveStyle( 'transition: transform 200ms ease-out' );
+
+		// ...and is cleared by the fallback timer (CSS duration + 100ms).
+		act( () => jest.advanceTimersByTime( 100 ) );
+		expect( stage ).not.toHaveStyle(
+			'transition: transform 200ms ease-out'
+		);
+
+		jest.useRealTimers();
+	} );
+
+	it( 'ignores non-transform transitionend events while settling', async () => {
+		jest.useFakeTimers();
+
+		render(
+			<Cropper
+				src="test.jpg"
+				controller={ createController() }
+				showDimming={ false }
+				freeformCrop
+			/>
+		);
+
+		const handle = await screen.findByRole( 'button', {
+			name: 'Resize top-left corner',
+		} );
+		const stage = screen.getByTestId( 'cropper-stage' );
+
+		fireEvent.pointerDown( handle, {
+			button: 0,
+			clientX: 100,
+			clientY: 100,
+			pointerId: 1,
+		} );
+		fireEvent.pointerUp( handle, { pointerId: 1 } );
+
+		expect( stage ).toHaveStyle( 'transition: transform 200ms ease-out' );
+
+		// A stencil left/top/width/height transitionend must not clear settling.
+		const stencilTransitionEnd = new Event( 'transitionend', {
+			bubbles: true,
+		} );
+		Object.defineProperty( stencilTransitionEnd, 'propertyName', {
+			value: 'left',
+		} );
+		fireEvent( stage, stencilTransitionEnd );
+
+		expect( stage ).toHaveStyle( 'transition: transform 200ms ease-out' );
+
+		jest.useRealTimers();
+	} );
+
 	it( 'pans the canvas when a keyboard resize extends the crop past the canvas edge', async () => {
 		jest.useFakeTimers();
 

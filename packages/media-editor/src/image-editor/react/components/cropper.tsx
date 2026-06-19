@@ -60,6 +60,9 @@ const CROP_RECT_EPSILON = 1e-6;
 const CARDINAL_ROTATION_EPSILON = 1e-6;
 /** Duration of the settle transform transition after resize end. */
 const SETTLE_TRANSITION_DURATION_MS = 200;
+// Fallback timer for when the computed transform is unchanged and no
+// `transitionend` fires. Sits past the CSS duration so it only wins the race
+// when the transition genuinely never runs.
 const SETTLE_TRANSITION_FALLBACK_MS = SETTLE_TRANSITION_DURATION_MS + 100;
 const SETTLE_TRANSFORM_TRANSITION = `transform ${ SETTLE_TRANSITION_DURATION_MS }ms ease-out`;
 const SETTLE_STENCIL_TRANSITION = [
@@ -856,15 +859,19 @@ function CropperInner(
 		// Normal completion is driven by transitionend so settling cannot clear
 		// before the browser has actually finished animating. Keep a fallback for
 		// cases where the computed transform is unchanged and no event fires.
-		settleTimerRef.current = setTimeout( () => {
-			finishSettling();
-		}, SETTLE_TRANSITION_FALLBACK_MS );
+		settleTimerRef.current = setTimeout(
+			finishSettling,
+			SETTLE_TRANSITION_FALLBACK_MS
+		);
 	}, [ finishSettling, settleCrop, onGestureEnd, resetViewport ] );
 
 	/**
-	 * Finish settling when the stage transform transition actually completes.
-	 * Other transitionend events can bubble up from cropper descendants, so only
-	 * the transform transition should clear the settle state.
+	 * Finish settling when the settle transform transition actually completes.
+	 * The handler lives on the stage, but in the common (un-panned) case the
+	 * transform transition runs on the image layer and its `transitionend`
+	 * bubbles up to here. Other transitionend events (stencil left/top/width/
+	 * height) also bubble up, so only the transform transition should clear the
+	 * settle state.
 	 */
 	const handleSettleTransitionEnd = useCallback(
 		( event: React.TransitionEvent< HTMLDivElement > ) => {
