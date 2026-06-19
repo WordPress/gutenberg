@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/i18n",
-	"version": "6.18.1-next.v.202605131032.0+f6d6e7149",
+	"version": "6.21.1",
 	"description": "WordPress internationalization (i18n) library.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -39,7 +39,6 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"types": "build-types",
 	"bin": {
@@ -53,7 +52,7 @@
 		"tannin": "^1.2.0"
 	},
 	"devDependencies": {
-		"benchmark": "2.1.4"
+		"benchmark": "^2.1.4"
 	},
 	"publishConfig": {
 		"access": "public"

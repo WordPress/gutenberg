@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { useRef } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	store as blockEditorStore,
@@ -34,6 +35,7 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 	const blockElement = useBlockElement( clientId );
 	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
+	const isSubmittingRef = useRef( false );
 
 	const unselectNote = () => {
 		selectNote( undefined );
@@ -61,6 +63,12 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 				if ( ! document.hasFocus() ) {
 					return;
 				}
+				// Prevent blur from closing the form while the async submit
+				// is in progress. Clicking "Add note" moves focus away,
+				// triggering blur before onSubmit completes.
+				if ( isSubmittingRef.current ) {
+					return;
+				}
 				if ( event.currentTarget.contains( event.relatedTarget ) ) {
 					return;
 				}
@@ -71,6 +79,7 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 			<NoteCard>
 				<NoteForm
 					onSubmit={ async ( inputComment ) => {
+						isSubmittingRef.current = true;
 						const { id } = await onSubmit( {
 							content: inputComment,
 						} );

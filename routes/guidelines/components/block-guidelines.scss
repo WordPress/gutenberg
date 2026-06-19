@@ -15,13 +15,11 @@
 	}
 
 	.dataviews-wrapper {
-		margin-right: -$grid-unit-30;
-		margin-left: -$grid-unit-30;
+		margin-inline: -$grid-unit-30;
 	}
 
 	.dataviews-search {
-		margin-right: $grid-unit-30;
-		margin-left: $grid-unit-30;
+		margin-inline: $grid-unit-30;
 	}
 }
 

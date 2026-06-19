@@ -44,7 +44,7 @@ export default function MigrationNotice( { content, onReplace } ) {
 	return (
 		<Warning actions={ actions }>
 			{ __(
-				'The Classic block is being phased out. Convert this content to blocks for the best editing experience, or move it to a Custom HTML block to preserve the markup as-is.'
+				'The Classic block is being phased out. Convert this content to blocks for the best editing experience, or move it to a Custom HTML block to preserve the original markup.'
 			) }
 		</Warning>
 	);

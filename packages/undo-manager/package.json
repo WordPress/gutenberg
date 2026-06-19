@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/undo-manager",
-	"version": "1.45.1-next.v.202605131032.0+f6d6e7149",
+	"version": "1.48.1",
 	"description": "A small package to manage undo/redo.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -40,7 +40,6 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"types": "build-types",
 	"sideEffects": false,

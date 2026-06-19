@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/viewport",
-	"version": "6.45.1-next.v.202605131032.0+f6d6e7149",
+	"version": "6.48.1",
 	"description": "Viewport module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -39,7 +39,6 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"types": "build-types",
 	"dependencies": {
@@ -48,10 +47,18 @@
 		"@wordpress/element": "file:../element"
 	},
 	"devDependencies": {
-		"deep-freeze": "0.0.1"
+		"@testing-library/dom": "^10.4.1",
+		"@testing-library/react": "^16.3.2",
+		"deep-freeze": "^0.0.1"
 	},
 	"peerDependencies": {
+		"@types/react": "^18.3.27",
 		"react": "^18.0.0"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

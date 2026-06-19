@@ -311,4 +311,212 @@ test.describe( 'User taxonomies', () => {
 			).toBeVisible();
 		} );
 	} );
+
+	test.describe( 'Default term', () => {
+		// Nonsense slug to minimize the chance of collision with terms left
+		// behind by other specs that touch built-in taxonomies.
+		const SLUG = 'xyzzy';
+		const PLURAL = 'Xyzzies';
+		const SINGULAR = 'Xyzzy';
+
+		// Outer `afterEach` deletes the wp_user_taxonomy record; this
+		// additionally cleans up the posts the tests publish. The terms
+		// auto-created by WP's default-term mechanism are intentionally
+		// left in place — the current default term is protected from REST
+		// deletion (`rest_cannot_delete`), and tests are resilient to the
+		// leftover terms since `register_taxonomy()` reuses terms by name.
+		// TODO: once wp_user_taxonomy deletion cascades to the
+		// `default_term_{slug}` option and orphan terms, drop this comment
+		// and explicitly clean the terms here.
+		test.afterEach( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllPosts( 'posts' );
+		} );
+
+		async function createHierarchicalTaxonomyWithDefaultTerm( {
+			admin,
+			page,
+			defaultTermName,
+		} ) {
+			await admin.visitAdminPage(
+				SETTINGS_PAGE_PATH,
+				CONTENT_TYPES_PAGE_QUERY
+			);
+			await page.getByRole( 'button', { name: 'Add taxonomy' } ).click();
+			await page
+				.getByRole( 'textbox', { name: 'Plural label' } )
+				.fill( PLURAL );
+			await page
+				.getByRole( 'textbox', { name: 'Singular label' } )
+				.fill( SINGULAR );
+			const slugField = page.getByRole( 'textbox', {
+				name: 'Taxonomy key',
+			} );
+			await Promise.all( [
+				page.waitForResponse(
+					( resp ) =>
+						resp.url().includes( `/${ TAXONOMIES_REST_BASE }` ) &&
+						resp.url().includes( `slug=${ SLUG }` )
+				),
+				slugField.focus(),
+			] );
+			await page
+				.getByRole( 'checkbox', { name: 'Hierarchical' } )
+				.click();
+			await page.getByRole( 'combobox', { name: 'Post types' } ).click();
+			await page.getByRole( 'option', { name: 'Posts' } ).click();
+
+			await page.getByRole( 'button', { name: 'Advanced' } ).click();
+			await page
+				.getByRole( 'checkbox', { name: 'Set a default term' } )
+				.click();
+			await page
+				.getByRole( 'textbox', { name: 'Default term name' } )
+				.fill( defaultTermName );
+			await page.getByRole( 'button', { name: 'Create' } ).click();
+			await expect( page.getByTestId( 'snackbar' ) ).toContainText(
+				`"${ PLURAL }" taxonomy created.`
+			);
+		}
+
+		async function expandTaxonomyPanel( page ) {
+			const button = page.getByRole( 'button', { name: PLURAL } );
+			const expanded = await button.getAttribute( 'aria-expanded' );
+			if ( expanded === 'false' ) {
+				await button.click();
+			}
+		}
+
+		// Resolves the wp_user_taxonomy record id so a test can navigate
+		// back to its edit page. Slug-based lookup avoids depending on the
+		// post-create redirect URL.
+		async function getTaxonomyId( requestUtils ) {
+			const records = await requestUtils.rest( {
+				path: `/wp/v2/${ TAXONOMIES_REST_BASE }?slug=${ SLUG }&status=publish`,
+				method: 'GET',
+			} );
+			return records[ 0 ].id;
+		}
+
+		test( 'auto-applies the default term, and stops after the toggle is disabled', async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			await createHierarchicalTaxonomyWithDefaultTerm( {
+				admin,
+				page,
+				defaultTermName: 'Default Xyzzy A',
+			} );
+
+			// Publish a post without touching the taxonomy panel.
+			await admin.createNewPost();
+			await editor.openDocumentSettingsSidebar();
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.fill( 'Post one' );
+			await editor.publishPost();
+			await page.reload();
+			await editor.openDocumentSettingsSidebar();
+			await expandTaxonomyPanel( page );
+			const genresGroup = page.getByRole( 'group', { name: PLURAL } );
+			await expect(
+				genresGroup.getByRole( 'checkbox', { name: 'Default Xyzzy A' } )
+			).toBeChecked();
+
+			// Disable the default-term toggle via the edit page.
+			const taxonomyId = await getTaxonomyId( requestUtils );
+			await admin.visitAdminPage(
+				SETTINGS_PAGE_PATH,
+				`page=content-types-wp-admin&p=/taxonomies/${ taxonomyId }`
+			);
+			await page.getByRole( 'button', { name: 'Advanced' } ).click();
+			await page
+				.getByRole( 'checkbox', { name: 'Set a default term' } )
+				.click();
+			await page.getByRole( 'button', { name: 'Save' } ).click();
+			await expect( page.getByTestId( 'snackbar' ).last() ).toContainText(
+				`"${ PLURAL }" taxonomy updated.`
+			);
+
+			// Publish another post — the default term must no longer
+			// auto-attach, so no checkbox in the term group is checked.
+			await admin.createNewPost();
+			await editor.openDocumentSettingsSidebar();
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.fill( 'Post two' );
+			await editor.publishPost();
+			await page.reload();
+			await editor.openDocumentSettingsSidebar();
+			await expandTaxonomyPanel( page );
+			const genresGroupTwo = page.getByRole( 'group', { name: PLURAL } );
+			await expect(
+				genresGroupTwo.getByRole( 'checkbox', { checked: true } )
+			).toHaveCount( 0 );
+		} );
+
+		test( 'renaming the default term creates a new term and preserves the old', async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			await createHierarchicalTaxonomyWithDefaultTerm( {
+				admin,
+				page,
+				defaultTermName: 'Original Xyzzy',
+			} );
+
+			// Publish post A — the original default term should be checked.
+			await admin.createNewPost();
+			await editor.openDocumentSettingsSidebar();
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.fill( 'Post A' );
+			await editor.publishPost();
+			await page.reload();
+			await editor.openDocumentSettingsSidebar();
+			await expandTaxonomyPanel( page );
+			const postAGroup = page.getByRole( 'group', { name: PLURAL } );
+			await expect(
+				postAGroup.getByRole( 'checkbox', { name: 'Original Xyzzy' } )
+			).toBeChecked();
+
+			// Rename the default term via the edit page.
+			const taxonomyId = await getTaxonomyId( requestUtils );
+			await admin.visitAdminPage(
+				SETTINGS_PAGE_PATH,
+				`page=content-types-wp-admin&p=/taxonomies/${ taxonomyId }`
+			);
+			await page.getByRole( 'button', { name: 'Advanced' } ).click();
+			await page
+				.getByRole( 'textbox', { name: 'Default term name' } )
+				.fill( 'Renamed Xyzzy' );
+			await page.getByRole( 'button', { name: 'Save' } ).click();
+			await expect( page.getByTestId( 'snackbar' ).last() ).toContainText(
+				`"${ PLURAL }" taxonomy updated.`
+			);
+
+			// Publish post B — the newly created term should be checked,
+			// and the original term should still appear in the panel
+			// (preserved, not deleted), just unchecked.
+			await admin.createNewPost();
+			await editor.openDocumentSettingsSidebar();
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.fill( 'Post B' );
+			await editor.publishPost();
+			await page.reload();
+			await editor.openDocumentSettingsSidebar();
+			await expandTaxonomyPanel( page );
+			const postBGroup = page.getByRole( 'group', { name: PLURAL } );
+			await expect(
+				postBGroup.getByRole( 'checkbox', { name: 'Renamed Xyzzy' } )
+			).toBeChecked();
+			await expect(
+				postBGroup.getByRole( 'checkbox', { name: 'Original Xyzzy' } )
+			).not.toBeChecked();
+		} );
+	} );
 } );

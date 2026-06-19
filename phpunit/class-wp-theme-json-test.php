@@ -4213,7 +4213,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$reflection_class = new ReflectionClass( WP_Theme_JSON_Gutenberg::class );
 
 		$get_property_value_method = $reflection_class->getMethod( 'get_property_value' );
-		$get_property_value_method->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$get_property_value_method->setAccessible( true );
+		}
 		$result = $get_property_value_method->invoke( null, $styles, $path );
 
 		$this->assertSame( '', $result );
@@ -4929,13 +4931,15 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	public function test_get_styles_for_block_with_style_variations_and_custom_selectors() {
+		$color_selector = '.wp-block-test-milk .liquid, .wp-block-test-milk:is(.frothed, .steamed) .foam, .wp-block-test-milk:not(.spoiled), .wp-block-test-milk.in-bottle';
+
 		register_block_type(
 			'test/milk',
 			array(
 				'api_version' => 3,
 				'selectors'   => array(
 					'root'  => '.milk',
-					'color' => '.wp-block-test-milk .liquid, .wp-block-test-milk:not(.spoiled), .wp-block-test-milk.in-bottle',
+					'color' => $color_selector,
 				),
 			)
 		);
@@ -4975,7 +4979,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'path'       => array( 'styles', 'blocks', 'test/milk' ),
 			'selector'   => '.wp-block-test-milk',
 			'selectors'  => array(
-				'color' => '.wp-block-test-milk .liquid, .wp-block-test-milk:not(.spoiled), .wp-block-test-milk.in-bottle',
+				'color' => $color_selector,
 			),
 			'variations' => array(
 				'chocolate' => array(
@@ -4986,12 +4990,139 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$actual_styles    = $theme_json->get_styles_for_block( $metadata );
-		$default_styles   = ':root :where(.wp-block-test-milk .liquid, .wp-block-test-milk:not(.spoiled), .wp-block-test-milk.in-bottle){background-color: white;}';
-		$variation_styles = ':root :where(.is-style-chocolate.wp-block-test-milk .liquid,.is-style-chocolate.wp-block-test-milk:not(.spoiled),.is-style-chocolate.wp-block-test-milk.in-bottle){background-color: #35281E;}';
+		$default_styles   = ':root :where(.wp-block-test-milk .liquid, .wp-block-test-milk:is(.frothed, .steamed) .foam, .wp-block-test-milk:not(.spoiled), .wp-block-test-milk.in-bottle){background-color: white;}';
+		$variation_styles = ':root :where(.wp-block-test-milk.is-style-chocolate .liquid,.wp-block-test-milk.is-style-chocolate:is(.frothed, .steamed) .foam,.wp-block-test-milk.is-style-chocolate:not(.spoiled),.wp-block-test-milk.in-bottle.is-style-chocolate){background-color: #35281E;}';
 		$expected         = $default_styles . $variation_styles;
 
 		unregister_block_style( 'test/milk', 'chocolate' );
 		unregister_block_type( 'test/milk' );
+
+		$this->assertSame( $expected, $actual_styles );
+	}
+
+	public function test_get_styles_for_block_with_style_variation_width_and_custom_selector() {
+		register_block_style(
+			'core/button',
+			array(
+				'name'  => 'outline',
+				'label' => 'Outline',
+			)
+		);
+
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/button' => array(
+							'variations' => array(
+								'outline' => array(
+									'dimensions' => array(
+										'width' => '10rem',
+									),
+									':hover'     => array(
+										'dimensions' => array(
+											'width' => '20rem',
+										),
+										'color'      => array(
+											'background' => 'red',
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$metadata = array(
+			'name'       => 'core/button',
+			'path'       => array( 'styles', 'blocks', 'core/button' ),
+			'selector'   => '.wp-block-button .wp-block-button__link',
+			'selectors'  => array(
+				'dimensions' => array(
+					'root'  => '.wp-block-button',
+					'width' => '.wp-block-button',
+				),
+			),
+			'variations' => array(
+				'outline' => array(
+					'path'     => array( 'styles', 'blocks', 'core/button', 'variations', 'outline' ),
+					'selector' => '.wp-block-button.is-style-outline .wp-block-button__link',
+				),
+			),
+		);
+
+		$actual_styles = $theme_json->get_styles_for_block( $metadata );
+		$expected      = ':root :where(.wp-block-button.is-style-outline){width: 10rem;}:root :where(.wp-block-button.is-style-outline:hover){width: 20rem;}:root :where(.wp-block-button.is-style-outline .wp-block-button__link:hover){background-color: red;}';
+
+		unregister_block_style( 'core/button', 'outline' );
+
+		$this->assertSame( $expected, $actual_styles );
+	}
+
+	public function test_get_stylesheet_with_scoped_style_variation_width_and_custom_selector() {
+		register_block_style(
+			'core/button',
+			array(
+				'name'  => 'outline--3',
+				'label' => 'Outline',
+			)
+		);
+
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/button' => array(
+							'variations' => array(
+								'outline--3' => array(
+									'dimensions' => array(
+										'width' => '10rem',
+									),
+									':hover'     => array(
+										'dimensions' => array(
+											'width' => '20rem',
+										),
+										'color'      => array(
+											'background' => 'red',
+										),
+									),
+									'tablet'     => array(
+										'dimensions' => array(
+											'width' => '30rem',
+										),
+										':hover'     => array(
+											'dimensions' => array(
+												'width' => '40rem',
+											),
+											'color'      => array(
+												'background' => 'blue',
+											),
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$actual_styles = $theme_json->get_stylesheet(
+			array( 'styles' ),
+			array( 'custom' ),
+			array(
+				'include_block_style_variations' => true,
+				'skip_root_layout_styles'        => true,
+				'scope'                          => '.is-style-outline--3',
+			)
+		);
+		$expected      = ':root :where(.wp-block-button.is-style-outline--3){width: 10rem;}@media (480px < width <= 782px){:root :where(.wp-block-button.is-style-outline--3){width: 30rem;}}:root :where(.wp-block-button.is-style-outline--3:hover){width: 20rem;}:root :where(.wp-block-button.is-style-outline--3 .wp-block-button__link:hover){background-color: red;}@media (480px < width <= 782px){:root :where(.wp-block-button.is-style-outline--3:hover){width: 40rem;}}@media (480px < width <= 782px){:root :where(.wp-block-button.is-style-outline--3 .wp-block-button__link:hover){background-color: blue;}}';
+
+		unregister_block_style( 'core/button', 'outline--3' );
 
 		$this->assertSame( $expected, $actual_styles );
 	}
@@ -6485,7 +6616,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 		$reflection = new ReflectionMethod( $theme_json, 'process_blocks_custom_css' );
-		$reflection->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$reflection->setAccessible( true );
+		}
 
 		$this->assertSame( $expected, $reflection->invoke( $theme_json, $input['css'], $input['selector'] ) );
 	}
@@ -6810,7 +6943,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$theme_json = new ReflectionClass( 'WP_Theme_JSON_Gutenberg' );
 
 		$func = $theme_json->getMethod( 'get_block_style_variation_selector' );
-		$func->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$func->setAccessible( true );
+		}
 
 		$actual = $func->invoke( null, 'custom', $selector );
 
@@ -6890,7 +7025,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$theme_json = new ReflectionClass( 'WP_Theme_JSON_Gutenberg' );
 
 		$func = $theme_json->getMethod( 'scope_style_node_selectors' );
-		$func->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$func->setAccessible( true );
+		}
 
 		$node = array(
 			'name'      => 'core/image',
@@ -6937,7 +7074,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$theme_json = new ReflectionClass( 'WP_Theme_JSON_Gutenberg' );
 
 		$func = $theme_json->getMethod( 'get_block_nodes' );
-		$func->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$func->setAccessible( true );
+		}
 
 		$theme_json = array(
 			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -6971,7 +7110,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$theme_json = new ReflectionClass( 'WP_Theme_JSON_Gutenberg' );
 
 		$func = $theme_json->getMethod( 'get_block_nodes' );
-		$func->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$func->setAccessible( true );
+		}
 
 		$theme_json = array(
 			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -6997,6 +7138,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$expected = array(
 			array(
+				'name'     => 'outline',
 				'path'     => array( 'styles', 'blocks', 'core/button', 'variations', 'outline' ),
 				'selector' => '.wp-block-button.is-style-outline .wp-block-button__link',
 			),
@@ -7013,7 +7155,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$theme_json = new ReflectionClass( 'WP_Theme_JSON_Gutenberg' );
 
 		$func = $theme_json->getMethod( 'get_block_nodes' );
-		$func->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$func->setAccessible( true );
+		}
 
 		$theme_json = array(
 			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -7065,7 +7209,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$theme_json = new ReflectionClass( 'WP_Theme_JSON_Gutenberg' );
 
 		$func = $theme_json->getMethod( 'get_block_nodes' );
-		$func->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$func->setAccessible( true );
+		}
 
 		$theme_json = array(
 			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -7861,7 +8007,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 */
 	public function test_to_ruleset_skips_non_scalar_values_and_casts_numerics() {
 		$reflection = new ReflectionMethod( WP_Theme_JSON_Gutenberg::class, 'to_ruleset' );
-		$reflection->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$reflection->setAccessible( true );
+		}
 		$declarations = array(
 			array(
 				'name'  => 'color',

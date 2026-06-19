@@ -9,6 +9,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
  */
 import BlockStyles from '../block-styles';
 import InspectorControls from '../inspector-controls';
+import PositionControls from './position-controls-panel';
 import { useBorderPanelLabel } from '../../hooks/border';
 import { useBlockSettings } from '../../hooks/utils';
 import { store as blockEditorStore } from '../../store';
@@ -78,7 +79,11 @@ const StylesTab = ( {
 					contentClientIds={ contentClientIds }
 				/>
 			) }
-			{ ! isSectionBlock && (
+			{
+				// Extenders have in the past always been allowed to add controls to group
+				// the restrictions are lessened for that block.
+			 }
+			{ ( ! isSectionBlock || blockName === 'core/template-part' ) && (
 				<>
 					<InspectorControls.Slot
 						group="color"
@@ -96,6 +101,10 @@ const StylesTab = ( {
 						label={ __( 'Typography' ) }
 					/>
 					<InspectorControls.Slot
+						group="layout"
+						label={ __( 'Layout' ) }
+					/>
+					<InspectorControls.Slot
 						group="dimensions"
 						label={ __( 'Dimensions' ) }
 					/>
@@ -103,6 +112,7 @@ const StylesTab = ( {
 						group="border"
 						label={ borderPanelLabel }
 					/>
+					<PositionControls />
 					<InspectorControls.Slot group="styles" />
 				</>
 			) }

@@ -446,6 +446,34 @@ test.describe( 'Block Notes', () => {
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
 		} );
 
+		test( 'should keep a note collapsed while editing the same block', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Sticky collapse' },
+				comment: 'Sticky collapse note',
+			} );
+
+			const thread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', {
+					name: 'Note: Sticky collapse note',
+				} );
+
+			await thread.click();
+			await page.keyboard.press( 'Escape' );
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.click();
+			await page.keyboard.type( ' edited' );
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+		} );
+
 		test( 'should collapse a note after canceling note form', async ( {
 			page,
 			blockNoteUtils,
@@ -848,6 +876,208 @@ test.describe( 'Block Notes', () => {
 			await expect( thread ).toBeFocused();
 		} );
 	} );
+
+	test.describe( 'Multiple notes per block', () => {
+		test( 'can add multiple notes to the same block', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Block with multiple notes' },
+				comment: 'First note on block',
+			} );
+
+			// Second "Add note" should open the new-note form, not the reply
+			// form — confirms the menu item routes through the multi-note path.
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			const newNoteForm = page.getByRole( 'textbox', {
+				name: 'New note',
+				exact: true,
+			} );
+			await expect( newNoteForm ).toBeFocused();
+			await newNoteForm.fill( 'Second note on block' );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
+
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			await expect(
+				settings.getByRole( 'treeitem', {
+					name: 'Note: First note on block',
+				} )
+			).toBeVisible();
+			await expect(
+				settings.getByRole( 'treeitem', {
+					name: 'Note: Second note on block',
+				} )
+			).toBeVisible();
+
+			// noteId is stored as an array; the array shape (vs. a child
+			// comment) proves the second add went through the new-note path.
+			const noteIds = ( await editor.getBlocks() ).find(
+				( b ) => b.name === 'core/paragraph'
+			)?.attributes?.metadata?.noteId;
+			expect( noteIds ).toHaveLength( 2 );
+		} );
+
+		test( 'deleting one note preserves the other notes on the same block', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Block with notes to delete' },
+				comment: 'Note to keep',
+			} );
+			await blockNoteUtils.addNote( 'Note to delete' );
+
+			// Both notes should be visible.
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			await expect(
+				settings.getByRole( 'treeitem', { name: 'Note: Note to keep' } )
+			).toBeVisible();
+			await expect(
+				settings.getByRole( 'treeitem', {
+					name: 'Note: Note to delete',
+				} )
+			).toBeVisible();
+
+			// Delete the second note.
+			const secondThread = settings.getByRole( 'treeitem', {
+				name: 'Note: Note to delete',
+			} );
+			await secondThread.click();
+			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Delete' );
+			await page
+				.getByRole( 'dialog' )
+				.getByRole( 'button', { name: 'Delete' } )
+				.click();
+
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Note deleted.' } )
+			).toBeVisible();
+
+			// First note should still be visible; second should be gone.
+			await expect(
+				settings.getByRole( 'treeitem', { name: 'Note: Note to keep' } )
+			).toBeVisible();
+			await expect(
+				settings.getByRole( 'treeitem', {
+					name: 'Note: Note to delete',
+				} )
+			).toBeHidden();
+
+			// Metadata should still have one noteId remaining.
+			const blocks = await editor.getBlocks();
+			const paragraphBlock = blocks.find(
+				( b ) => b.name === 'core/paragraph'
+			);
+			const noteIds = paragraphBlock?.attributes?.metadata?.noteId;
+			expect( noteIds ).toHaveLength( 1 );
+		} );
+
+		test( 'resolving one note does not affect sibling notes on the same block', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Block with notes to resolve' },
+				comment: 'Note A',
+			} );
+			await blockNoteUtils.addNote( 'Note B' );
+
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+
+			// Resolve Note A.
+			const threadA = settings.getByRole( 'treeitem', {
+				name: 'Note: Note A',
+			} );
+			await threadA.click();
+			await page.getByRole( 'button', { name: 'Resolve' } ).click();
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Note marked as resolved.' } )
+			).toBeVisible();
+
+			// Note B should still be visible and unresolved (expanded).
+			const threadB = settings.getByRole( 'treeitem', {
+				name: 'Note: Note B',
+			} );
+			await expect( threadB ).toBeVisible();
+
+			// Both notes should still exist in metadata.
+			const blocks = await editor.getBlocks();
+			const paragraphBlock = blocks.find(
+				( b ) => b.name === 'core/paragraph'
+			);
+			const noteIds = paragraphBlock?.attributes?.metadata?.noteId;
+			expect( noteIds ).toHaveLength( 2 );
+		} );
+
+		test( 'auto-selects first unresolved note when clicking a block with multiple notes', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Block for auto-select' },
+				comment: 'First note',
+			} );
+			await blockNoteUtils.addNote( 'Second note' );
+
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+
+			// Resolve the first note.
+			const firstThread = settings.getByRole( 'treeitem', {
+				name: 'Note: First note',
+			} );
+			await firstThread.click();
+			await page.getByRole( 'button', { name: 'Resolve' } ).click();
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Note marked as resolved.' } )
+			).toBeVisible();
+
+			// Click the title to deselect the block and its comment.
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.focus();
+
+			// Click back on the original block.
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.filter( { hasText: 'Block for auto-select' } )
+				.click();
+
+			// The second (unresolved) note should be the active one.
+			const secondThread = settings.getByRole( 'treeitem', {
+				name: 'Note: Second note',
+			} );
+			await expect( secondThread ).toHaveAttribute(
+				'aria-expanded',
+				'true'
+			);
+		} );
+	} );
 } );
 
 class BlockNoteUtils {
@@ -888,29 +1118,27 @@ class BlockNoteUtils {
 					name: type,
 					attributes,
 				} );
-				await this.#editor.clickBlockOptionsMenuItem( 'Add note' );
-				await this.#page
-					.getByRole( 'textbox', {
-						name: 'New note',
-						exact: true,
-					} )
-					.fill( comment );
-				await this.#page
-					.getByRole( 'region', { name: 'Editor settings' } )
-					.getByRole( 'button', { name: 'Add note', exact: true } )
-					.click();
-				await expect(
-					this.#page
-						.getByRole( 'region', {
-							name: 'Editor settings',
-						} )
-						.getByRole( 'treeitem', {
-							name: `Note: ${ comment }`,
-						} )
-				).toBeVisible();
+				await this.addNote( comment );
 			},
 			{ box: true }
 		);
+	}
+
+	async addNote( content ) {
+		await this.#editor.clickBlockOptionsMenuItem( 'Add note' );
+		await this.#page
+			.getByRole( 'textbox', { name: 'New note', exact: true } )
+			.fill( content );
+		await this.#page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Add note', exact: true } )
+			.click();
+		// Wait for the new thread to appear before returning.
+		await expect(
+			this.#page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', { name: `Note: ${ content }` } )
+		).toBeVisible();
 	}
 
 	async clickBlockNoteActionMenuItem( actionName, index = 0 ) {

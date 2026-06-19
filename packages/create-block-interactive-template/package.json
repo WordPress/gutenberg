@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/create-block-interactive-template",
-	"version": "2.45.1-next.v.202605131032.0+f6d6e7149",
+	"version": "2.48.1",
 	"description": "Template for @wordpress/create-block to create interactive blocks with the Interactivity API.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
