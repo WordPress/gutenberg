@@ -86,6 +86,12 @@ class FakeDOMRectList extends Array {
 /**
  * Checks if an element has an associated layout box.
  *
+ * The checks intentionally avoid `window.getComputedStyle`, which is very slow
+ * in JSDOM. Instead, we check visibility based on accessible attributes and
+ * inline styles. The trade-off is that this doesn't fully resolve visibility
+ * applied through CSS styles, though generally we do not rely on stylesheet
+ * styles in tests.
+ *
  * @param {HTMLElement} element The element to check.
  * @return {boolean} Whether the element has an associated layout box.
  */
@@ -97,13 +103,18 @@ function hasAssociatedLayoutBox( element ) {
 	/** @type {HTMLElement | null} */
 	let current = element;
 	while ( current ) {
-		const style = window.getComputedStyle( current );
-		if ( style.display === 'none' ) {
+		if ( current.hidden ) {
 			return false;
 		}
-		if ( current === element && style.display === 'contents' ) {
+
+		if ( current.style?.display === 'none' ) {
 			return false;
 		}
+
+		if ( current === element && current.style?.display === 'contents' ) {
+			return false;
+		}
+
 		current = current.parentElement;
 	}
 
