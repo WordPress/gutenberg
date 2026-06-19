@@ -220,30 +220,11 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 				),
 			);
 
-			// `wp_kses()` filters the `style` attribute value through
-			// `safecss_filter_attr()`, which only keeps allowlisted CSS properties.
-			// SVG presentation properties such as `fill` (e.g. `style="fill: none"`
-			// on stroke-based icons) are not in the default allowlist, so temporarily
-			// allow them while sanitizing.
-			$allow_svg_css = static function ( $properties ) {
-				return array_merge(
-					$properties,
-					array(
-						'fill',
-						'stroke',
-						'stroke-width',
-						'stroke-linecap',
-						'stroke-linejoin',
-						'stroke-miterlimit',
-					)
-				);
-			};
-
-			add_filter( 'safe_style_css', $allow_svg_css );
-			$sanitized_content = wp_kses( $icon_content, $allowed_tags );
-			remove_filter( 'safe_style_css', $allow_svg_css );
-
-			return $sanitized_content;
+			// SVG presentation properties used in `style` attributes (e.g.
+			// `style="fill: none"` on stroke-based icons) are allowlisted globally
+			// via the `safe_style_css` filter in `lib/compat/wordpress-7.1/kses.php`,
+			// so they survive `wp_kses()` sanitization here.
+			return wp_kses( $icon_content, $allowed_tags );
 		}
 
 		/**
