@@ -22,7 +22,7 @@ import { privateApis as mediaEditorPrivateApis } from '@wordpress/media-editor';
 /**
  * Internal dependencies
  */
-import inserterMediaCategories from '../media-categories';
+import getInserterMediaCategories from '../media-categories';
 import { mediaUpload } from '../../utils';
 import mediaUploadOnSuccess from '../../utils/media-upload/on-success';
 import { default as mediaSideload } from '../../utils/media-sideload';
@@ -321,6 +321,13 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 
 	const forceDisableFocusMode = settings.focusMode === false;
 
+	// The "Attached images" media category depends on the current post, so the
+	// categories are derived from `postId` rather than being a static list.
+	const inserterMediaCategories = useMemo(
+		() => getInserterMediaCategories( postId ),
+		[ postId ]
+	);
+
 	return useMemo( () => {
 		const blockEditorSettings = {
 			...Object.fromEntries(
@@ -435,6 +442,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		hasUploadPermissions,
 		blockPatterns,
 		blockPatternCategories,
+		inserterMediaCategories,
 		canUseUnfilteredHTML,
 		undo,
 		createPageEntity,

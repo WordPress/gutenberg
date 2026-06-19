@@ -17,11 +17,13 @@ import { unlock } from '../../../lock-unlock';
  * Fetches media items based on the provided category.
  * Each media category is responsible for providing a `fetch` function.
  *
- * @param {Object}               category The media category to fetch results for.
- * @param {InserterMediaRequest} query    The query args to use for the request.
+ * @param {Object}               category   The media category to fetch results for.
+ * @param {InserterMediaRequest} query      The query args to use for the request.
+ * @param {any}                  refreshKey Optional value that, when changed, forces
+ *                                          a refetch (e.g. after attaching/detaching).
  * @return {InserterMediaItem[]} The media results.
  */
-export function useMediaResults( category, query = {} ) {
+export function useMediaResults( category, query = {}, refreshKey ) {
 	const [ mediaList, setMediaList ] = useState();
 	const [ isLoading, setIsLoading ] = useState( false );
 	// We need to keep track of the last request made because
@@ -47,7 +49,7 @@ export function useMediaResults( category, query = {} ) {
 				setIsLoading( false );
 			}
 		} )();
-	}, [ category.name, ...Object.values( query ) ] );
+	}, [ category.name, ...Object.values( query ), refreshKey ] );
 	return { mediaList, isLoading };
 }
 
@@ -119,7 +121,8 @@ export function useMediaCategories( rootClientId ) {
 			inserterMediaCategories.forEach( ( category ) => {
 				if (
 					canInsertMediaType[ category.mediaType ] &&
-					categoriesHaveMedia.get( category.name )
+					( categoriesHaveMedia.get( category.name ) ||
+						category.showIfEmpty )
 				) {
 					_categories.push( category );
 				}

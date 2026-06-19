@@ -10,7 +10,7 @@
  * WordPress dependencies
  */
 import { __, sprintf, _x } from '@wordpress/i18n';
-import { resolveSelect } from '@wordpress/data';
+import { dispatch, resolveSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 
 /**
@@ -124,14 +124,16 @@ const getOpenverseCaption = ( item ) => {
 	return _caption.replace( /\s{2}/g, ' ' );
 };
 
+const getCoreMediaQuery = ( query = {} ) => ( {
+	...query,
+	orderBy: !! query?.search ? 'relevance' : 'date',
+} );
+
 const coreMediaFetch = async ( query = {} ) => {
 	const mediaItems = await resolveSelect( coreStore ).getEntityRecords(
 		'postType',
 		'attachment',
-		{
-			...query,
-			orderBy: !! query?.search ? 'relevance' : 'date',
-		}
+		getCoreMediaQuery( query )
 	);
 	return mediaItems.map( ( mediaItem ) => ( {
 		...mediaItem,
@@ -141,6 +143,99 @@ const coreMediaFetch = async ( query = {} ) => {
 		caption: mediaItem.caption?.raw,
 	} ) );
 };
+
+const getAttachedImagesQuery = ( postId, query = {} ) => ( {
+	...query,
+	media_type: 'image',
+	parent: postId,
+} );
+
+const normalizePostId = ( postId ) => {
+	const parsedPostId = typeof postId === 'number' ? postId : Number( postId );
+
+	return Number.isInteger( parsedPostId ) && parsedPostId > 0
+		? parsedPostId
+		: undefined;
+};
+
+const saveAttachmentParent = ( attachmentId, postId ) =>
+	dispatch( coreStore ).saveEntityRecord( 'postType', 'attachment', {
+		id: attachmentId,
+		post: postId,
+	} );
+
+const getAttachmentIds = ( mediaItems ) => [
+	...new Set(
+		( Array.isArray( mediaItems ) ? mediaItems : [ mediaItems ] )
+			.map( ( mediaItem ) => mediaItem?.id )
+			.filter( Boolean )
+	),
+];
+
+const invalidateAttachedImagesQueries = ( postId, query = {} ) => {
+	const { invalidateResolution } = dispatch( coreStore );
+	// Invalidate the query backing the visible grid as well as the
+	// `per_page: 1` probe `useMediaCategories` uses to decide whether the
+	// source appears in the tab list (e.g. attaching the first image, or
+	// detaching the last one).
+	const queries = [ query, { per_page: 1 } ];
+
+	for ( const attachedImagesQuery of queries ) {
+		invalidateResolution( 'getEntityRecords', [
+			'postType',
+			'attachment',
+			getCoreMediaQuery(
+				getAttachedImagesQuery( postId, attachedImagesQuery )
+			),
+		] );
+	}
+};
+
+/**
+ * Builds the "Attachments" media category for a given post. It behaves like
+ * any other inserter media source (e.g. Openverse): it appears in the tab list
+ * and renders through the shared media panel. In addition to `fetch`, it exposes
+ * optional `attach`/`detach`/`invalidate` capabilities that the shared panel
+ * picks up to offer an "Attach images" button and a per-item "Detach from post"
+ * action in the same dropdown Openverse uses for "Report image".
+ *
+ * @param {number} postId The current post id.
+ * @return {InserterMediaCategory} The attached images media category.
+ */
+const getAttachedImagesCategory = ( postId ) => ( {
+	name: 'attached-images',
+	labels: {
+		name: __( 'Attachments' ),
+		search_items: __( 'Search attachments' ),
+	},
+	mediaType: 'image',
+	// Helper text shown beneath the search field to clarify what this source is,
+	// since "Attachments" alone can read as ambiguous next to "Images".
+	description: __( 'Images attached to the current post.' ),
+	// Always show the source in the tab list, like Openverse, so it remains
+	// discoverable and the first image can be attached even with none yet.
+	showIfEmpty: true,
+	async fetch( query = {} ) {
+		return coreMediaFetch( getAttachedImagesQuery( postId, query ) );
+	},
+	async attach( mediaItems ) {
+		const attachmentIds = getAttachmentIds( mediaItems );
+
+		await Promise.all(
+			attachmentIds.map( ( attachmentId ) =>
+				saveAttachmentParent( attachmentId, postId )
+			)
+		);
+
+		return attachmentIds.length;
+	},
+	async detach( mediaItem ) {
+		await saveAttachmentParent( mediaItem.id, 0 );
+	},
+	invalidate( query = {} ) {
+		invalidateAttachedImagesQueries( postId, query );
+	},
+} );
 
 /** @type {InserterMediaCategory[]} */
 const inserterMediaCategories = [
@@ -226,4 +321,24 @@ const inserterMediaCategories = [
 	},
 ];
 
-export default inserterMediaCategories;
+/**
+ * Returns the inserter media categories for a given post. The "Attached images"
+ * category is prepended only when editing a real post (a numeric id), so it is
+ * omitted in contexts such as template editing where there is no post to attach
+ * media to.
+ *
+ * @param {number|string} postId The current post id.
+ * @return {InserterMediaCategory[]} The inserter media categories.
+ */
+export default function getInserterMediaCategories( postId ) {
+	const currentPostId = normalizePostId( postId );
+
+	if ( ! currentPostId ) {
+		return inserterMediaCategories;
+	}
+
+	return [
+		getAttachedImagesCategory( currentPostId ),
+		...inserterMediaCategories,
+	];
+}

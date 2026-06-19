@@ -494,6 +494,23 @@ $block-inserter-tabs-height: 44px;
 			padding: $grid-unit-20 $grid-unit-30 $grid-unit-20;
 		}
 	}
+
+	.block-editor-inserter__media-panel-description {
+		margin: 0 0 $grid-unit-15;
+		color: $gray-700;
+		font-size: $helptext-font-size;
+		@include break-medium() {
+			margin: 0 $grid-unit-30 $grid-unit-15;
+		}
+	}
+
+	.block-editor-inserter__media-panel-attach {
+		justify-content: center;
+		margin-bottom: $grid-unit-20;
+		@include break-medium() {
+			margin: 0 $grid-unit-30 $grid-unit-20;
+		}
+	}
 }
 
 .block-editor-inserter__media-list__list-item {
