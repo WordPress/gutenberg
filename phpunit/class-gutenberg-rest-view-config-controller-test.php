@@ -157,13 +157,38 @@ class Tests_REST_View_Config_Controller extends WP_Test_REST_TestCase {
 		wp_set_current_user( self::$editor_id );
 
 		$response = $this->dispatch_request( 'postType', 'page' );
-		$data     = $response->get_data();
-		$config   = gutenberg_get_entity_view_config( 'postType', 'page' );
+		// Normalize through JSON to compare what a client actually receives:
+		// the response's object casts collapse back to the source arrays.
+		$data   = json_decode( wp_json_encode( $response->get_data() ), true );
+		$config = gutenberg_get_entity_view_config( 'postType', 'page' );
 
 		$this->assertSame( $config['default_view'], $data['default_view'] );
 		$this->assertSame( $config['default_layouts'], $data['default_layouts'] );
 		$this->assertSame( $config['view_list'], $data['view_list'] );
 		$this->assertSame( $config['form'], $data['form'] );
+	}
+
+	/**
+	 * Empty object-typed config values serialize as JSON objects ({}), not arrays ([]).
+	 *
+	 * @covers ::get_items
+	 */
+	public function test_empty_object_fields_serialize_as_json_objects() {
+		wp_set_current_user( self::$editor_id );
+
+		// An entity with no provider yields empty default_layouts entries and form.
+		$decoded = json_decode( wp_json_encode( $this->dispatch_request( 'custom_kind', 'custom_name' )->get_data() ) );
+
+		$this->assertIsObject( $decoded->form );
+		$this->assertIsObject( $decoded->default_layouts->table );
+		$this->assertIsObject( $decoded->default_layouts->grid );
+		$this->assertIsObject( $decoded->default_layouts->list );
+
+		// wp_template_part yields an empty default_view.layout and grid layout.
+		$decoded = json_decode( wp_json_encode( $this->dispatch_request( 'postType', 'wp_template_part' )->get_data() ) );
+
+		$this->assertIsObject( $decoded->default_view->layout );
+		$this->assertIsObject( $decoded->default_layouts->grid->layout );
 	}
 
 	/**

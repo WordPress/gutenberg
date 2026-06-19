@@ -84,13 +84,31 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 
 		$config = gutenberg_get_entity_view_config( $kind, $name );
 
+		/*
+		 * The schema types these as objects, but PHP encodes empty arrays as
+		 * JSON arrays ([]). Cast the object-typed values that may be empty so
+		 * they serialize as JSON objects ({}) and match the schema.
+		 */
+		$default_view = $config['default_view'];
+		if ( isset( $default_view['layout'] ) ) {
+			$default_view['layout'] = (object) $default_view['layout'];
+		}
+
+		$default_layouts = $config['default_layouts'];
+		foreach ( $default_layouts as $view_type => $layout ) {
+			if ( isset( $layout['layout'] ) ) {
+				$layout['layout'] = (object) $layout['layout'];
+			}
+			$default_layouts[ $view_type ] = (object) $layout;
+		}
+
 		$response = array(
 			'kind'            => $kind,
 			'name'            => $name,
-			'default_view'    => $config['default_view'],
-			'default_layouts' => $config['default_layouts'],
+			'default_view'    => $default_view,
+			'default_layouts' => $default_layouts,
 			'view_list'       => $config['view_list'],
-			'form'            => $config['form'],
+			'form'            => (object) $config['form'],
 		);
 
 		return rest_ensure_response( $response );
