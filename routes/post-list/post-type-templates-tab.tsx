@@ -14,7 +14,7 @@ import {
 	useCallback,
 	useState,
 } from '@wordpress/element';
-import { Modal, Spinner } from '@wordpress/components';
+import { Modal, Spinner, Tooltip as WCTooltip } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { page, postList } from '@wordpress/icons';
@@ -26,10 +26,12 @@ import { Badge, Button, Icon, Stack, Text } from '@wordpress/ui'; // eslint-disa
  * Internal dependencies
  */
 import { getTemplatePlaceholderItemId } from './view-utils';
+import { isPageApplicableTemplate } from './template-utils';
 
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 
 type PageTemplateRecord = WpTemplate & {
+	author?: number | string;
 	author_text?: string;
 	is_custom?: boolean;
 	post_types?: string[];
@@ -41,6 +43,7 @@ type PageTemplateRecord = WpTemplate & {
 	_isActive?: boolean;
 	_isCustom?: boolean;
 	_isPlaceholder?: boolean;
+	wp_id?: number;
 	_templateSlot?: TemplateSlot;
 	_fallbackTemplateId?: string | number;
 	_fallbackTemplateTitle?: string;
@@ -72,6 +75,19 @@ type PostTypeObject = {
 	};
 	name?: string;
 	slug?: string;
+};
+
+type TemplateAuthor = {
+	name?: string;
+};
+
+type ThemeRecord = {
+	name?:
+		| {
+				rendered?: string;
+		  }
+		| string;
+	stylesheet?: string;
 };
 
 interface PostTypeTemplatesTabProps {
@@ -108,6 +124,18 @@ function getPostTypePluralLabel( postTypeObject: PostTypeObject | undefined ) {
 		postTypeObject?.slug ||
 		''
 	);
+}
+
+function getPostTypeSentenceLabel(
+	postTypeObject: PostTypeObject | undefined
+) {
+	const label = getPostTypePluralLabel( postTypeObject );
+
+	if ( ! label ) {
+		return '';
+	}
+
+	return label.toLowerCase();
 }
 
 function getTemplateSlots(
@@ -194,15 +222,6 @@ function supportsPostType( record: PageTemplateRecord, postType: string ) {
 		: false;
 }
 
-function isPageSpecificTemplate( record: PageTemplateRecord ) {
-	const slug = record.slug;
-	return (
-		supportsPostType( record, 'page' ) ||
-		slug === 'page' ||
-		!! slug?.startsWith( 'page-' )
-	);
-}
-
 function decodeTemplateText( value: string | undefined ) {
 	return decodeEntities( ( value || '' ).replace( /<[^>]*>/g, ' ' ) ).trim();
 }
@@ -239,11 +258,88 @@ function getTemplateRecordTitle( record: PageTemplateRecord ) {
 	);
 }
 
-function getTemplateRecordDescription( record: PageTemplateRecord ) {
+function getTemplateRecordDescription(
+	record: PageTemplateRecord,
+	postType: string
+) {
 	return (
 		decodeTemplateText( record.description ) ||
 		record._templateSlot?.description ||
+		( postType === 'page' && record._isCustom
+			? __( 'Custom page template.' )
+			: '' ) ||
 		''
+	);
+}
+
+function getThemeName( activeTheme: ThemeRecord | undefined ) {
+	if ( typeof activeTheme?.name === 'string' ) {
+		return decodeTemplateText( activeTheme.name );
+	}
+
+	return decodeTemplateText( activeTheme?.name?.rendered );
+}
+
+function getTemplateAuthorText(
+	record: PageTemplateRecord,
+	activeTheme: ThemeRecord | undefined,
+	authorsById: Record< string, TemplateAuthor | undefined >
+) {
+	const authorText = decodeTemplateText( record.author_text );
+	if ( authorText ) {
+		return authorText;
+	}
+
+	if ( record.author ) {
+		const author = authorsById[ String( record.author ) ];
+		if ( author?.name ) {
+			return author.name;
+		}
+	}
+
+	if ( record._isCustom ) {
+		return __( 'User-created' );
+	}
+
+	if ( record.theme === activeTheme?.stylesheet ) {
+		return getThemeName( activeTheme ) || record.theme || __( 'Theme' );
+	}
+
+	return record.theme || __( 'Unknown' );
+}
+
+function getTemplateActivationId( record: PageTemplateRecord ) {
+	if ( typeof record.id === 'number' ) {
+		return record.id;
+	}
+
+	if ( typeof record.wp_id === 'number' ) {
+		return record.wp_id;
+	}
+
+	return undefined;
+}
+
+function isDefaultPageTemplate(
+	record: PageTemplateRecord,
+	activeTemplatesOption: Record< string, string | number > | undefined,
+	activeThemeStylesheet: string | undefined
+) {
+	const activePageTemplateId = activeTemplatesOption?.page;
+
+	if ( activePageTemplateId ) {
+		const activationId = getTemplateActivationId( record );
+
+		return (
+			( activationId !== undefined &&
+				String( activationId ) === String( activePageTemplateId ) ) ||
+			String( record.id ) === String( activePageTemplateId )
+		);
+	}
+
+	return (
+		record.slug === 'page' &&
+		( ! record.theme || record.theme === activeThemeStylesheet )
 	);
 }
 
@@ -393,7 +489,7 @@ export function PostTypeTemplatesTab( {
 	const { records, isResolving, hasResolved } =
 		useEntityRecordsWithPermissions( 'postType', 'wp_template', {
 			per_page: -1,
-			post_type: postType,
+			...( postType === 'page' ? {} : { post_type: postType } ),
 		} );
 	const isTemplateActivateEnabled =
 		typeof window !== 'undefined' &&
@@ -501,7 +597,7 @@ export function PostTypeTemplatesTab( {
 			.filter( ( record ) => !! record.slug );
 
 		if ( postType === 'page' ) {
-			return normalizedRecords.filter( isPageSpecificTemplate );
+			return normalizedRecords.filter( isPageApplicableTemplate );
 		}
 
 		const slotTemplates = templateSlots
@@ -591,6 +687,29 @@ export function PostTypeTemplatesTab( {
 		slotLookups,
 		templateSlots,
 	] );
+	const authorIds = useMemo(
+		() => [
+			...new Set(
+				templates
+					.map( ( template ) => Number( template.author ) )
+					.filter( ( authorId ) => Number.isFinite( authorId ) )
+			),
+		],
+		[ templates ]
+	);
+	const authorsById = useSelect(
+		( select ) => {
+			const store = select( coreStore ) as any;
+			return authorIds.reduce(
+				( result, authorId ) => ( {
+					...result,
+					[ authorId ]: store.getUser( authorId ),
+				} ),
+				{} as Record< string, TemplateAuthor | undefined >
+			);
+		},
+		[ authorIds ]
+	);
 	const selectedSearchPostIds = getSearchPostIds(
 		( searchParams as { postIds?: string[] | string } ).postIds
 	);
@@ -735,12 +854,57 @@ export function PostTypeTemplatesTab( {
 						{ __( 'No templates found.' ) }
 					</Text>
 				) }
+				{ templates.length > 0 && (
+					<Text
+						variant="body-sm"
+						render={ <p /> }
+						style={ {
+							color: 'var(--wpds-color-foreground-content-neutral-weak)',
+							margin: 0,
+						} }
+					>
+						{ postType === 'page'
+							? __(
+									'Templates control the layout used by pages on your site. The default template is used unless a page has a different template selected.'
+							  )
+							: sprintf(
+									// translators: %s: Plural post type label, e.g. "posts", "products", or "books".
+									__(
+										'These templates control how all %s appear on your site, including listings and individual items.'
+									),
+									getPostTypeSentenceLabel(
+										postTypeObject as
+											| PostTypeObject
+											| undefined
+									) || postType
+							  ) }
+					</Text>
+				) }
 				{ templates.map( ( template ) => {
 					const itemId = getItemId( template );
 					const isSelected = itemId === selectedItemId;
-					const isActive = !! template._isActive;
-					const description =
-						getTemplateRecordDescription( template );
+					const isDefaultPage =
+						postType === 'page' &&
+						isDefaultPageTemplate(
+							template,
+							activeTemplatesOption as
+								| Record< string, string | number >
+								| undefined,
+							activeTheme?.stylesheet
+						);
+					const isActive =
+						postType === 'page'
+							? isDefaultPage
+							: !! template._isActive;
+					const description = getTemplateRecordDescription(
+						template,
+						postType
+					);
+					const authorText = getTemplateAuthorText(
+						template,
+						activeTheme as ThemeRecord | undefined,
+						authorsById
+					);
 
 					return (
 						<Button
@@ -749,7 +913,7 @@ export function PostTypeTemplatesTab( {
 							variant="outline"
 							tone={ isSelected ? 'brand' : 'neutral' }
 							className={
-								isActive
+								isActive || postType === 'page'
 									? 'routes-post-list__template-card'
 									: 'routes-post-list__template-card is-inactive'
 							}
@@ -810,18 +974,46 @@ export function PostTypeTemplatesTab( {
 									>
 										{ getTemplateRecordTitle( template ) }
 									</Text>
-									<Badge
-										intent={ isActive ? 'stable' : 'none' }
-										style={ {
-											alignSelf: 'flex-start',
-											overflowWrap: 'normal',
-											whiteSpace: 'nowrap',
-										} }
-									>
-										{ isActive
-											? __( 'Active' )
-											: __( 'Inactive' ) }
-									</Badge>
+									{ postType === 'page' ? (
+										isDefaultPage && (
+											<WCTooltip
+												text={ __(
+													'Pages without a custom template use this default template.'
+												) }
+											>
+												<span>
+													<Badge
+														intent="stable"
+														style={ {
+															alignSelf:
+																'flex-start',
+															overflowWrap:
+																'normal',
+															whiteSpace:
+																'nowrap',
+														} }
+													>
+														{ __( 'Default' ) }
+													</Badge>
+												</span>
+											</WCTooltip>
+										)
+									) : (
+										<Badge
+											intent={
+												isActive ? 'stable' : 'none'
+											}
+											style={ {
+												alignSelf: 'flex-start',
+												overflowWrap: 'normal',
+												whiteSpace: 'nowrap',
+											} }
+										>
+											{ isActive
+												? __( 'Active' )
+												: __( 'Inactive' ) }
+										</Badge>
+									) }
 									{ !! description && (
 										<Text
 											variant="body-sm"
@@ -833,6 +1025,19 @@ export function PostTypeTemplatesTab( {
 											{ description }
 										</Text>
 									) }
+									<Text
+										variant="body-sm"
+										style={ {
+											color: 'var(--wpds-color-foreground-content-neutral-weak)',
+											whiteSpace: 'normal',
+										} }
+									>
+										{ sprintf(
+											// translators: %s: Template author name.
+											__( 'Author: %s' ),
+											authorText
+										) }
+									</Text>
 								</Stack>
 							</Stack>
 						</Button>
@@ -848,8 +1053,14 @@ export function PostTypeTemplatesTab( {
 						} }
 					>
 						{ createInterpolateElement(
-							__(
-								'For more advanced control over templates, <link>view all templates</link>.'
+							sprintf(
+								// translators: %s: Post type singular label, e.g. "Page", "Post", or "Event".
+								__(
+									'For more advanced control over %s templates, <link>view all templates</link>.'
+								),
+								getPostTypeLabel(
+									postTypeObject as PostTypeObject | undefined
+								) || postType
 							),
 							{
 								// @ts-ignore Children are injected by createInterpolateElement.

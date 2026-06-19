@@ -17,6 +17,7 @@ import {
 	getTemplateSlugFromPlaceholderItemId,
 	viewToQuery,
 } from './view-utils';
+import { isPageApplicableTemplate } from './template-utils';
 
 function getFirstPostId( postIds?: string[] | string ) {
 	if ( Array.isArray( postIds ) ) {
@@ -211,15 +212,6 @@ function isTemplateForSlot(
 	);
 }
 
-function isPageTemplate( record: TemplateRecord ) {
-	return (
-		record.post_types?.includes( 'page' ) ||
-		record.postTypes?.includes( 'page' ) ||
-		record.slug === 'page' ||
-		!! record.slug?.startsWith( 'page-' )
-	);
-}
-
 function getTemplateCanvas(
 	templateId: string | number,
 	editLink?: string,
@@ -333,11 +325,13 @@ export const route = {
 				coreStore
 			).getEntityRecords( 'postType', 'wp_template', {
 				per_page: -1,
-				post_type: params.type,
+				...( params.type === 'page' ? {} : { post_type: params.type } ),
 			} ) ) as TemplateRecord[] | undefined;
 
 			if ( params.type === 'page' ) {
-				const pageTemplate = templates?.find( isPageTemplate );
+				const pageTemplate = templates?.find(
+					isPageApplicableTemplate
+				);
 				if ( pageTemplate ) {
 					return getTemplateCanvas(
 						pageTemplate.id,
