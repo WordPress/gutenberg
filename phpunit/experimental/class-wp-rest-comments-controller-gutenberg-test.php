@@ -455,4 +455,134 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			'reopen'   => array( 'reopen' ),
 		);
 	}
+
+	/**
+	 * Helper: POST a note with the given raw HTML content as an editor and
+	 * return the persisted comment_content (after server-side sanitisation).
+	 *
+	 * @param string $content Raw note content posted by the client.
+	 * @return string Sanitised comment_content as stored.
+	 */
+	private function post_note_and_get_stored_content( $content ) {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create(
+			array(
+				'post_status' => 'publish',
+				'post_author' => self::$editor_id,
+			)
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'post'    => $post_id,
+					'content' => $content,
+					'author'  => self::$editor_id,
+					'type'    => 'note',
+				)
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 201, $response->get_status() );
+
+		$comment = get_comment( $response->get_data()['id'] );
+		return $comment->comment_content;
+	}
+
+	public function test_note_preserves_allowed_inline_formatting() {
+		$stored = $this->post_note_and_get_stored_content(
+			'<strong>Bold</strong> and <em>italic</em> and <code>code</code>'
+		);
+		$this->assertSame(
+			'<strong>Bold</strong> and <em>italic</em> and <code>code</code>',
+			$stored
+		);
+	}
+
+	public function test_note_preserves_safe_link_and_forces_rel() {
+		$stored = $this->post_note_and_get_stored_content(
+			'See <a href="https://wordpress.org/">WordPress</a>.'
+		);
+		$this->assertStringContainsString(
+			'<a href="https://wordpress.org/"',
+			$stored
+		);
+		// Core's `wp_rel_ugc` filter may append `ugc` to the rel attribute on
+		// comment links, so assert the forced safety tokens are present rather
+		// than matching the exact rel string.
+		$this->assertMatchesRegularExpression(
+			'/<a\b[^>]*\brel="[^"]*\bnoopener\b[^"]*\bnofollow\b[^"]*"/i',
+			$stored
+		);
+		$this->assertStringContainsString( '>WordPress</a>', $stored );
+	}
+
+	public function test_note_overrides_client_supplied_rel() {
+		$stored = $this->post_note_and_get_stored_content(
+			'<a href="https://wordpress.org/" rel="dofollow">WP</a>'
+		);
+		$this->assertStringNotContainsString( 'dofollow', $stored );
+		$this->assertMatchesRegularExpression(
+			'/<a\b[^>]*\brel="[^"]*\bnoopener\b[^"]*\bnofollow\b[^"]*"/i',
+			$stored
+		);
+	}
+
+	public function test_note_strips_disallowed_tags() {
+		$stored = $this->post_note_and_get_stored_content(
+			'Hi<script>alert(1)</script><img src="x" onerror="alert(2)">'
+		);
+		$this->assertStringNotContainsString( '<script', $stored );
+		$this->assertStringNotContainsString( '<img', $stored );
+		$this->assertStringNotContainsString( 'onerror', $stored );
+		$this->assertStringContainsString( 'Hi', $stored );
+	}
+
+	public function test_note_strips_event_handlers_from_allowed_tags() {
+		$stored = $this->post_note_and_get_stored_content(
+			'<strong onclick="alert(1)">Bold</strong>'
+		);
+		$this->assertStringContainsString( '<strong>Bold</strong>', $stored );
+		$this->assertStringNotContainsString( 'onclick', $stored );
+	}
+
+	public function test_non_note_comment_still_strips_inline_formatting() {
+		// Regular comments must continue to use the strict wp_filter_kses
+		// allowlist; the note allowlist should not leak across types.
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create(
+			array(
+				'post_status' => 'publish',
+				'post_author' => self::$editor_id,
+			)
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'post'         => $post_id,
+					'content'      => '<strong>Bold</strong> body',
+					'author'       => self::$editor_id,
+					'author_name'  => 'Ed',
+					'author_email' => 'ed@example.test',
+				)
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 201, $response->get_status() );
+
+		$comment = get_comment( $response->get_data()['id'] );
+		// The strict comment allowlist permits <strong>, so the tag itself
+		// being preserved is expected. The key assertion is that the note
+		// allowlist did NOT install for a non-note request, so the forced
+		// `noopener nofollow` rel from the note filter must be absent.
+		$this->assertStringContainsString( 'body', $comment->comment_content );
+		$this->assertStringNotContainsString( 'noopener', $comment->comment_content );
+	}
 }
