@@ -94,6 +94,10 @@ jobs:
             - name: Type checking
               run: npm run build
 
+            - name: Audit published dependencies
+              if: ${{ matrix.annotations }}
+              run: npm run lint:published-deps -- --fail-unused-ignores
+
             - name: Check local changes
               run: npm run other:check-local-changes
 

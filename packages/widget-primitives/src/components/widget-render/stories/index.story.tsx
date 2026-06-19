@@ -25,11 +25,8 @@ import { WidgetRender } from '..';
 import type { WidgetRenderProps, WidgetType } from '../../../types';
 
 /*
- * In WordPress, a widget's metadata and render component live in a
- * `widgets/<name>/` folder and reach the client through the build manifest,
- * the server registry, and `useWidgetTypes()`. Stories run without
- * WordPress, so both halves are declared inline and injected: the type
- * through the `widgetType` prop, the component through
+ * Stories run without WordPress, so both halves are declared inline: the
+ * type through the `widgetType` prop, the component through
  * `resolveWidgetModule`.
  */
 
@@ -114,10 +111,6 @@ function DemoWidget( {
 	);
 }
 
-/*
- * The authoring shape: `attributes` is a dataviews `Field[]`, so a host can
- * mount a settings form straight from the type with no per-widget wiring.
- */
 const demoWidgetType: WidgetType< DemoAttributes > = {
 	apiVersion: 1,
 	name: 'demo/hello-world',
@@ -165,15 +158,13 @@ const meta: Meta< typeof WidgetRender > = {
 		docs: {
 			description: {
 				component: `
-\`WidgetRender\` is the host-agnostic entry point that renders a widget type: it resolves the widget's render component and mounts it with the current attributes. Everything else stays in the hands of the host.
+\`WidgetRender\` is the host-agnostic entry point that renders a widget type: it resolves the widget's render component and mounts it with the current attributes.
 
 A host provides three things:
 
 - \`widgetType\`: the widget's metadata, as declared by its author. On a WordPress page it arrives through \`useWidgetTypes()\`.
 - \`resolveWidgetModule\`: how the render component is loaded. Dynamic \`import()\` against an import map, eagerly enqueued script modules, or a custom resolver are all valid strategies.
 - \`setAttributes\` (optional): grants the widget write access to its own attributes. Omit it and the widget renders read-only.
-
-These stories run outside WordPress, so both halves (the type and the module resolution) are declared inline and injected.
 `,
 			},
 		},
@@ -347,10 +338,6 @@ function WidgetInHostChrome() {
 	);
 }
 
-/*
- * Chrome belongs to the host: it reads the type's metadata and frames the
- * render however it wants. In this story, a Card header.
- */
 export const WithHostChrome: StoryObj = {
 	render: () => <WidgetInHostChrome />,
 	parameters: {
@@ -361,7 +348,7 @@ Chrome belongs to the host: the widget describes itself through metadata, and ea
 
 In this story the chrome is a \`Card\`: its header reads the type's metadata (\`icon\`, \`title\`) and the card body frames the widget render.
 
-The diagonal stripes mark the chrome's area. Everything striped is drawn by the host; the solid panel inside is the widget render. The widget doesn't render a header of its own; another host could place the same metadata elsewhere, or skip it entirely.
+The diagonal stripes mark the chrome's area; the solid panel inside is the widget render. The widget renders no header of its own; another host could place the same metadata elsewhere, or skip it.
 `,
 			},
 		},
