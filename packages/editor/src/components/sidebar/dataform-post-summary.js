@@ -172,11 +172,18 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 
 	// Merge the supplementary data onto the record only when there is any.
 	const data = useMemo( () => {
-		if ( ! record || ! Object.keys( entityData ).length ) {
+		if ( ! record ) {
 			return record;
 		}
-		return { ...record, ...entityData };
-	}, [ record, entityData ] );
+		const extra = { ...entityData };
+		if ( availableTemplates && Object.keys( availableTemplates ).length ) {
+			extra.available_templates = availableTemplates;
+		}
+		if ( ! Object.keys( extra ).length ) {
+			return record;
+		}
+		return { ...record, ...extra };
+	}, [ record, entityData, availableTemplates ] );
 
 	const { editEntityRecord } = useDispatch( coreDataStore );
 
