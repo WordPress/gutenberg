@@ -21,13 +21,13 @@ add_filter(
 );
 
 /*
- * On WordPress versions whose `WP_Block::replace_html()` lacks the inner-blocks
- * fix (wordpress-develop#12113), binding a List Item's content replaces the whole
- * `<li>` and drops the nested List rendered inside it. Core still has the inner
- * blocks on the instance, so re-append them after the binding has been applied.
+ * On WordPress versions before 7.1, `WP_Block::replace_html()` lacks the
+ * inner-blocks fix (wordpress-develop#12113), so binding a List Item's content
+ * replaces the whole `<li>` and drops the nested List rendered inside it. Core
+ * still has the inner blocks on the instance, so re-append them after the
+ * binding has been applied.
  *
- * This can be removed once the minimum required WordPress version includes that
- * Core fix.
+ * This can be removed once the minimum required WordPress version is 7.1.
  */
 
 /**
