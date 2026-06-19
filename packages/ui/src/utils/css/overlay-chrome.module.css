@@ -41,8 +41,7 @@
 			gap: var(--wpds-dimension-gap-sm);
 			padding-block: var(--wpds-dimension-padding-2xl) var(--wpds-dimension-gap-lg);
 			padding-inline: var(--wpds-dimension-padding-2xl);
-			/* TODO: refactor to a DS element size token when available. */
-			min-height: 32px;
+			min-height: var(--wpds-dimension-size-md);
 		}
 
 		.footer {

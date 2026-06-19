@@ -1,6 +1,6 @@
 == Changelog ==
 
-= 23.4.0-rc.1 =
+= 23.4.0 =
 
 ## Changelog
 
@@ -73,6 +73,7 @@
 #### Block Editor
 - Changed labels to consistently use Patterns in favor of Block patterns. ([56880](https://github.com/WordPress/gutenberg/pull/56880))
 - List View: Remove redundant visibilityLabel compoutation. ([78640](https://github.com/WordPress/gutenberg/pull/78640))
+- Add React 19 as an experimental flag. ([79077](https://github.com/WordPress/gutenberg/pull/79077))
 
 #### Icons
 - Maintain absolute stroke-width regardless of icon-size. ([78774](https://github.com/WordPress/gutenberg/pull/78774))
@@ -106,12 +107,14 @@
 - Prevent font-size propagation in Navigation items causing `em` compounding. ([77419](https://github.com/WordPress/gutenberg/pull/77419))
 - Shortcode block: Fix editor crash when selecting transform menu. ([78770](https://github.com/WordPress/gutenberg/pull/78770))
 - Writing flow: Delete at end of nested list item should merge into next block. ([78742](https://github.com/WordPress/gutenberg/pull/78742))
+- Image block: Don't show crop icon while image is uploading. ([79103](https://github.com/WordPress/gutenberg/pull/79103))
 
 #### Media
 - Media Editor: Fix media editor sidebar close button label. ([78895](https://github.com/WordPress/gutenberg/pull/78895))
 - Media Editor: Fix sidebar overflowing the modal between the small and medium breakpoints. ([78931](https://github.com/WordPress/gutenberg/pull/78931))
 - Media Editor: Keep crop handles operable on large images. ([79011](https://github.com/WordPress/gutenberg/pull/79011))
 - Media Editor: Remove lag when toggling the sidebar. ([79024](https://github.com/WordPress/gutenberg/pull/79024))
+- Media Editor: Small tweak to gutters. ([79168](https://github.com/WordPress/gutenberg/pull/79168))
 
 #### Components
 - Button.Icon: Fix clipped icons. ([78614](https://github.com/WordPress/gutenberg/pull/78614))
@@ -267,6 +270,7 @@
 - Remove platform-docs Docusaurus site. ([79034](https://github.com/WordPress/gutenberg/pull/79034))
 - Skip including inactive or experimental routes when building for WordPress Core. ([76715](https://github.com/WordPress/gutenberg/pull/76715))
 - feat: Migrate performance results to tools release. ([78761](https://github.com/WordPress/gutenberg/pull/78761))
+- Add more React internals polyfills. ([79142](https://github.com/WordPress/gutenberg/pull/79142))
 
 #### Testing
 - Abilities: Add validation tests pinning behavior for WP-specific schema keywords. ([78783](https://github.com/WordPress/gutenberg/pull/78783))
@@ -297,6 +301,8 @@ The following PRs were merged by first-time contributors:
 The following contributors merged PRs in this release:
 
 @aaronrobertshaw @adamsilverstein @aduth @alecgeatches @amitraj2203 @andrewserong @apermo @ciampo @colinduwe @desrosj @ekamran @elazzabi @ellatrix @fushar @gziolo @hbhalodia @hi0001234d @himanshupathak95 @i-am-chitti @im3dabasia @Infinite-Null @itzmekhokan @jameskoster @jasmussen @jsnajdr @juanfra @juanmaguitar @Kgupta62 @kushagra-goyal-14 @macayu17 @Mamaduka @manzoorwanijk @mikachan @mirka @Mustafabharmal @n8finch @ntsekouras @oandregal @paulopmt1 @ramonjd @retrofox @sarthaknagoshe2002 @scruffian @shail-mehta @shekharnwagh @simison @simondud @sirreal @t-hamano @talldan @tellthemachines @torounit @tyxla @USERSATOSHI @westonruter @xavier-lc @yogeshbhutkar
+
+
 
 
 = 23.3.2 =

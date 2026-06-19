@@ -40,7 +40,8 @@ import type {
 	revokeBlobUrls,
 } from './private-actions';
 import { maybeRecycleVipsWorker, vipsCancelOperations } from './utils';
-import { UploadError } from '../upload-error';
+import { debug } from './utils/debug-logger';
+import { ErrorCode, UploadError } from '../upload-error';
 import { validateMimeType } from '../validate-mime-type';
 import { validateMimeTypeForUser } from '../validate-mime-type-for-user';
 import { validateFileSize } from '../validate-file-size';
@@ -212,6 +213,12 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 				// eslint-disable-next-line no-console -- Deliberately log errors here.
 				console.error( 'Upload cancelled', error );
 			}
+		} else {
+			debug(
+				`Item cancelled: ${ item.file.name } (item ${ id }): ${
+					error instanceof Error ? error.message : error
+				}`
+			);
 		}
 
 		const { currentOperation, parentId, batchId } = item;
@@ -306,7 +313,7 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 							code:
 								( error instanceof UploadError &&
 									error.code ) ||
-								'UPLOAD_ERROR',
+								ErrorCode.GENERAL,
 							message:
 								error?.message ||
 								__( 'The image could not be uploaded.' ),
@@ -320,6 +327,7 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 
 		// All items of this batch were cancelled or finished.
 		if ( batchId && select.isBatchUploaded( batchId ) ) {
+			debug( `Batch completed: ${ batchId }` );
 			item.onBatchSuccess?.();
 		}
 	};
