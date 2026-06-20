@@ -43,6 +43,7 @@ import { Caption } from '../utils/caption';
 import PosterImage from '../utils/poster-image';
 import { isGifVariation } from './variations';
 import GifRestoreControl from './gif-restore-control';
+import VideoOriginalControl from './video-original-control';
 
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
 
@@ -119,11 +120,23 @@ function VideoEdit( {
 			return;
 		}
 
+		// Prefer the web-safe transcoded companion when available: the
+		// original video stays the attachment (media.id) but the block plays
+		// the optimized version. `media_details.optimized_video` is only set
+		// on transcoded video attachments, so its presence is a sufficient
+		// signal to swap the playback source. The author can switch back to
+		// the original from the toolbar (see VideoOriginalControl).
+		let nextSrc = media.url;
+		if ( media.media_details?.optimized_video ) {
+			const dir = media.url.slice( 0, media.url.lastIndexOf( '/' ) + 1 );
+			nextSrc = dir + media.media_details.optimized_video;
+		}
+
 		// Sets the block's attribute and updates the edit component from the
 		// selected media.
 		setAttributes( {
 			blob: undefined,
-			src: media.url,
+			src: nextSrc,
 			id: media.id,
 			poster:
 				media.image?.src !== media.icon ? media.image?.src : undefined,
@@ -229,6 +242,12 @@ function VideoEdit( {
 						<GifRestoreControl
 							attributes={ attributes }
 							clientId={ clientId }
+						/>
+					) }
+					{ ! isGif && (
+						<VideoOriginalControl
+							attributes={ attributes }
+							setAttributes={ setAttributes }
 						/>
 					) }
 				</>
