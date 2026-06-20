@@ -141,14 +141,17 @@ class MediaProcessingUtils {
 			);
 		} );
 
-		// Chromium 148 shipped a regression in the cross-origin isolated
-		// `Document-Isolation-Policy: isolate-and-credentialless` runtime
-		// (the header Gutenberg sends to enable CSM). Feature detection still
-		// reports CSM as available, but the wasm-vips transcode silently falls
-		// back to the server, so the editor uploads the original file unchanged
-		// and these CSM-specific assertions (format/rotation/sub-sizes) no
-		// longer hold. Treat CSM as inactive until the browser regression is
-		// resolved. See https://github.com/WordPress/gutenberg/pull/78632.
+		// Client-side media processing fails in CI after the Playwright
+		// upgrade to Chrome for Testing 148/149 (the only change in #78632):
+		// feature detection still reports CSM as available, but image
+		// processing breaks so these CSM-specific assertions
+		// (format/rotation/sub-sizes) fail. Shipping Google Chrome processes
+		// CSM uploads correctly (AVIF verified manually on stable 149 and
+		// Canary 151), so this is specific to the CI browser, not a
+		// user-facing regression. The underlying cause (a
+		// Document-Isolation-Policy interaction) is tracked in
+		// https://github.com/WordPress/gutenberg/pull/78632. Skip until the
+		// bundled browser is past the affected versions.
 		const chromiumVersion = await getChromiumMajorVersion( this.page );
 
 		testInstance.skip(

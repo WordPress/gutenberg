@@ -291,11 +291,11 @@ test.describe( 'Site Editor Performance', () => {
 		} );
 
 		test.beforeEach( async ( { page } ) => {
-			// Chromium 148 shipped a regression in the cross-origin isolated
-			// `Document-Isolation-Policy: isolate-and-credentialless` runtime
-			// (the header Gutenberg sends on editor screens). Under it the
-			// site editor never settles, so this measurement times out. Skip
-			// until the browser regression is resolved. See
+			// This site-editor measurement fails in CI after the Playwright
+			// upgrade to Chrome for Testing 148/149 (the only change in
+			// #78632): on the Document-Isolation-Policy editor screen the
+			// site editor never settles, so the measurement times out. Skip
+			// until the bundled browser is past the affected versions. See
 			// https://github.com/WordPress/gutenberg/pull/78632.
 			test.skip(
 				( await getChromiumMajorVersion( page ) ) >= 148,

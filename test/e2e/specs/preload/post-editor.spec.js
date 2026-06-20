@@ -35,13 +35,12 @@ test.describe( 'Preload', () => {
 	} );
 
 	test.beforeEach( async ( { page } ) => {
-		// Chromium 148 shipped a regression in the cross-origin isolated
-		// `Document-Isolation-Policy: isolate-and-credentialless` runtime (the
-		// header Gutenberg sends on editor screens). Under it, editor startup
-		// never reaches `networkidle` and the page is torn down, so these
-		// startup-request assertions time out. Skip until the browser
-		// regression is resolved. See
-		// https://github.com/WordPress/gutenberg/pull/78632.
+		// These editor-startup request assertions fail in CI after the
+		// Playwright upgrade to Chrome for Testing 148/149 (the only change in
+		// #78632): on the Document-Isolation-Policy editor screen, startup
+		// never reaches `networkidle` and the page is torn down, so the test
+		// times out. Skip until the bundled browser is past the affected
+		// versions. See https://github.com/WordPress/gutenberg/pull/78632.
 		test.skip(
 			( await getChromiumMajorVersion( page ) ) >= 148,
 			'Document-Isolation-Policy is broken in Chromium 148+'
