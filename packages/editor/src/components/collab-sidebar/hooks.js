@@ -6,7 +6,6 @@ import {
 	useState,
 	useEffect,
 	useMemo,
-	useRef,
 	useSyncExternalStore,
 } from '@wordpress/element';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
@@ -36,7 +35,7 @@ import {
 	getInlineMarkerStart,
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
-	reconcileInlineNoteMarker,
+	removeNoteFormat,
 	removeNoteIdFromMetadata,
 } from './utils';
 
@@ -235,12 +234,48 @@ function wrapInlineNote( value, id, start, end ) {
 	);
 }
 
+/**
+ * Strip a note's inline `core/note` marker from whichever block holds it, if
+ * any, so a deleted or resolved note's highlight does not linger in the content.
+ * No-op for block-level notes (those carry no marker). Used by the resolve path,
+ * which only knows the note id; the delete path strips the marker inline since
+ * it already has the block.
+ *
+ * @param {number}   noteId                      Note id whose marker to remove.
+ * @param {Function} getClientIdsWithDescendants Block-editor selector.
+ * @param {Function} getBlockAttributes          Block-editor selector.
+ * @param {Function} updateBlockAttributes       Block-editor action.
+ */
+function clearInlineNoteMarker(
+	noteId,
+	getClientIdsWithDescendants,
+	getBlockAttributes,
+	updateBlockAttributes
+) {
+	for ( const clientId of getClientIdsWithDescendants() ) {
+		const attributes = getBlockAttributes( clientId );
+		const found = findNoteInBlock( attributes, noteId );
+		if ( ! found ) {
+			continue;
+		}
+		const next = removeNoteFormat(
+			attributes[ found.attributeKey ],
+			noteId
+		);
+		if ( next ) {
+			updateBlockAttributes( clientId, { [ found.attributeKey ]: next } );
+		}
+		return;
+	}
+}
+
 export function useNoteActions() {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
 	const { getCurrentPostId } = useSelect( editorStore );
 	const {
 		getBlockAttributes,
+		getClientIdsWithDescendants,
 		getSelectedBlockClientId,
 		getSelectionStart,
 		getSelectionEnd,
@@ -373,6 +408,17 @@ export function useNoteActions() {
 				await saveEntityRecord( 'root', 'comment', newNoteData, {
 					throwOnError: true,
 				} );
+
+				// Resolving a note drops its inline highlight: strip the marker
+				// so the note falls back to a block-level note in the content.
+				if ( status === 'approved' ) {
+					clearInlineNoteMarker(
+						id,
+						getClientIdsWithDescendants,
+						getBlockAttributes,
+						updateBlockAttributes
+					);
+				}
 			} else {
 				const updateData = {
 					id,
@@ -411,14 +457,29 @@ export function useNoteActions() {
 				if ( ! clientId ) {
 					return;
 				}
-				const metadata = getBlockAttributes( clientId )?.metadata;
-				const updatedMetadata = removeNoteIdFromMetadata(
-					metadata,
-					note.id
-				);
-				updateBlockAttributes( clientId, {
-					metadata: cleanEmptyObject( updatedMetadata ),
-				} );
+				const attributes = getBlockAttributes( clientId );
+				const newAttributes = {
+					metadata: cleanEmptyObject(
+						removeNoteIdFromMetadata(
+							attributes?.metadata,
+							note.id
+						)
+					),
+				};
+				// Strip the inline marker too (if any) so the deleted note's
+				// highlight doesn't linger in the content. Folded into the same
+				// attribute update so it's a single undo step.
+				const found = findNoteInBlock( attributes, note.id );
+				if ( found ) {
+					const next = removeNoteFormat(
+						attributes[ found.attributeKey ],
+						note.id
+					);
+					if ( next ) {
+						newAttributes[ found.attributeKey ] = next;
+					}
+				}
+				updateBlockAttributes( clientId, newAttributes );
 			}
 
 			createNotice( 'snackbar', __( 'Note deleted.' ), {
@@ -526,103 +587,4 @@ export function useFloatingBoard( {
 		registerThread: store.registerThread,
 		unregisterThread: store.unregisterThread,
 	};
-}
-
-/**
- * Delete inline notes whose in-content marker the user has removed (e.g. by
- * backspacing the marked text) instead of letting them silently fall back to
- * block-level notes.
- *
- * A note is only deleted once its marker has been observed present earlier in
- * the same session, guarding against false deletes while content is still
- * loading or in the brief window after creation before the marker is written.
- *
- * @param {Array} threads Inline note threads (unresolved roots) to reconcile.
- */
-export function useReconcileRemovedInlineNotes( threads ) {
-	const { onDelete } = useNoteActions();
-	const anchoredRef = useRef();
-
-	// Resolve each thread's marker presence via `useSelect` so it re-runs when
-	// block content changes - removing the marked text is a block edit, not a
-	// `threads` change, so a plain `useMemo` over the (stable) selectors would
-	// never observe the marker disappear. Returning a compact string signature
-	// (rather than an array) keeps the subscription cheap: it only triggers a
-	// re-render when a marker's presence actually flips, not on every keystroke
-	// elsewhere in the document. Presence is a tristate encoded per thread as
-	// `id:1` (present), `id:0` (absent), or `id:?` (block not loaded, unknown).
-	const presenceKey = useSelect(
-		( select ) => {
-			if ( ! threads?.length ) {
-				return '';
-			}
-			const { getBlockAttributes } = select( blockEditorStore );
-			return threads
-				.map( ( thread ) => {
-					const attributes = thread.blockClientId
-						? getBlockAttributes( thread.blockClientId )
-						: null;
-					let state = '?';
-					if ( attributes ) {
-						state = findNoteInBlock( attributes, thread.id )
-							? '1'
-							: '0';
-					}
-					return `${ thread.id }:${ state }`;
-				} )
-				.join( ',' );
-		},
-		[ threads ]
-	);
-
-	// Pair each thread back up with its presence for the reconciling effect.
-	// `null` means unknown (block not loaded); otherwise a boolean.
-	const reconciliation = useMemo( () => {
-		if ( ! threads?.length ) {
-			return [];
-		}
-		const presence = new Map(
-			presenceKey
-				.split( ',' )
-				.filter( Boolean )
-				.map( ( entry ) => {
-					const [ id, state ] = entry.split( ':' );
-					return [ id, state ];
-				} )
-		);
-		return threads.map( ( thread ) => {
-			const state = presence.get( String( thread.id ) );
-			const present =
-				state === undefined || state === '?' ? null : state === '1';
-			return { thread, present };
-		} );
-	}, [ threads, presenceKey ] );
-
-	useEffect( () => {
-		if ( ! reconciliation.length ) {
-			return;
-		}
-		// Lazily seed the session set inside the effect; refs must not be
-		// read or written during render.
-		if ( ! anchoredRef.current ) {
-			anchoredRef.current = new Set();
-		}
-		const anchored = anchoredRef.current;
-		for ( const { thread, present } of reconciliation ) {
-			const action = reconcileInlineNoteMarker(
-				thread,
-				present,
-				anchored
-			);
-			if ( action === 'anchor' ) {
-				anchored.add( thread.id );
-			} else if ( action === 'delete' ) {
-				// Drop from the set first so a re-render before the delete
-				// settles (the thread lingers until the entity refetches) does
-				// not enqueue a second delete.
-				anchored.delete( thread.id );
-				onDelete( thread );
-			}
-		}
-	}, [ reconciliation, onDelete ] );
 }

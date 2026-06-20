@@ -27,20 +27,13 @@ import { AddNoteMenuItem } from './add-note-menu-item';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
 import { NoteHighlightStyles } from './note-highlight-styles';
 import { useGlobalStyles } from '../global-styles';
-import {
-	useEnableFloatingSidebar,
-	useNoteThreads,
-	useReconcileRemovedInlineNotes,
-} from './hooks';
+import { useEnableFloatingSidebar, useNoteThreads } from './hooks';
 import { getNoteIdsFromMetadata, pickPrimaryNote } from './utils';
 import { NOTE_FORMAT_NAME, noteFormat } from './format';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
 
 function NotesSidebar( { postId } ) {
-	// Register the inline-note format for as long as the notes feature is
-	// mounted, mirroring how revision diff formats are registered. The cleanup
-	// unregisters it, so there's no need to guard against double registration.
 	useEffect( () => {
 		registerFormatType( NOTE_FORMAT_NAME, noteFormat );
 		return () => {
@@ -79,17 +72,12 @@ function NotesSidebar( { postId } ) {
 			isDistractionFree: get( 'core', 'distractionFree' ),
 		};
 	}, [] );
-	// `getSelectedNote` returns the selected note *id* (a number), `'new'`, or
-	// undefined - not a note object.
 	const selectedNoteId = useSelect(
 		( select ) => unlock( select( editorStore ) ).getSelectedNote(),
 		[]
 	);
 
 	const { notes, unresolvedNotes } = useNoteThreads( postId );
-	// Removing the marked text deletes the note rather than letting it become a
-	// block-level note.
-	useReconcileRemovedInlineNotes( unresolvedNotes );
 
 	// Only enable the floating sidebar for large viewports.
 	const showFloatingSidebar = isLargeViewport;

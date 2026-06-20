@@ -18,6 +18,7 @@ import {
 	findNoteRange,
 	findNoteInBlock,
 	applyNoteFormat,
+	removeNoteFormat,
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
 	removeNoteIdFromMetadata,
@@ -25,7 +26,6 @@ import {
 	pickPrimaryNote,
 	BLOCK_LEVEL_NOTE_START,
 	getInlineMarkerStart,
-	reconcileInlineNoteMarker,
 } from '../utils';
 
 function makeRect( top ) {
@@ -925,46 +925,76 @@ describe( 'getInlineMarkerStart', () => {
 	} );
 } );
 
-describe( 'reconcileInlineNoteMarker', () => {
-	// Marker presence is resolved by the caller, so these cases drive the
-	// decision directly via the `present` tristate (`true`/`false`/`null`).
-	const inlineThread = { id: 7, blockClientId: 'abc' };
+describe( 'removeNoteFormat', () => {
+	// `create`/`findNoteRange` parse marker elements through the registered
+	// `core/note` format, so register it for the fixtures below.
+	const FORMAT_NAME = 'core/note';
 
-	it( 'returns "anchor" when the marker is present', () => {
-		expect(
-			reconcileInlineNoteMarker( inlineThread, true, new Set() )
-		).toBe( 'anchor' );
+	const isRegistered = () =>
+		!! select( richTextStore ).getFormatType( FORMAT_NAME );
+
+	beforeAll( () => {
+		if ( ! isRegistered() ) {
+			registerFormatType( FORMAT_NAME, {
+				title: 'Note',
+				tagName: 'mark',
+				className: 'wp-note',
+				attributes: { 'data-id': 'data-id' },
+				edit: () => null,
+			} );
+		}
 	} );
 
-	it( 'returns "delete" when a previously anchored marker is now gone', () => {
-		expect(
-			reconcileInlineNoteMarker( inlineThread, false, new Set( [ 7 ] ) )
-		).toBe( 'delete' );
+	afterAll( () => {
+		if ( isRegistered() ) {
+			unregisterFormatType( FORMAT_NAME );
+		}
 	} );
 
-	it( 'returns "skip" when the marker is gone but was never observed (never-anchored note)', () => {
-		expect(
-			reconcileInlineNoteMarker( inlineThread, false, new Set() )
-		).toBe( 'skip' );
+	it( 'returns null when the value is not rich text', () => {
+		expect( removeNoteFormat( 'plain string', 1 ) ).toBeNull();
+		expect( removeNoteFormat( undefined, 1 ) ).toBeNull();
 	} );
 
-	it( 'returns "skip" for a block-level note (no marker, never anchored)', () => {
-		const blockLevel = { id: 5, blockClientId: 'abc' };
-		expect(
-			reconcileInlineNoteMarker( blockLevel, false, new Set() )
-		).toBe( 'skip' );
+	it( 'returns null when no marker matches the note id', () => {
+		const value = RichTextData.fromHTMLString(
+			'the <mark class="wp-note" data-id="2">quick</mark> brown fox'
+		);
+		expect( removeNoteFormat( value, 1 ) ).toBeNull();
 	} );
 
-	it( 'returns "skip" for an orphan thread with no blockClientId', () => {
-		const orphan = { id: 7, blockClientId: null };
-		expect(
-			reconcileInlineNoteMarker( orphan, true, new Set( [ 7 ] ) )
-		).toBe( 'skip' );
+	it( 'removes the marker while leaving the text intact', () => {
+		const value = RichTextData.fromHTMLString(
+			'the <mark class="wp-note" data-id="7">quick</mark> brown fox'
+		);
+		expect( removeNoteFormat( value, 7 ).toHTMLString() ).toBe(
+			'the quick brown fox'
+		);
 	} );
 
-	it( 'returns "skip" when block attributes are not loaded yet', () => {
+	it( 'removes only the targeted note, leaving a co-located note intact', () => {
+		// Note 2 wraps the whole string; note 1 nests inside it.
+		const value = RichTextData.fromHTMLString(
+			'<mark data-id="2" class="wp-note">the quick brown <mark data-id="1" class="wp-note">fox ju</mark>mps ove</mark>r'
+		);
+		const result = removeNoteFormat( value, 1 );
+		expect( findNoteRange( result, 1 ) ).toBeNull();
+		expect( findNoteRange( result, 2 ) ).toEqual( { start: 0, end: 29 } );
+	} );
+
+	it( 'matches numeric and string note ids', () => {
+		const html = 'a <mark class="wp-note" data-id="5">b</mark> c';
 		expect(
-			reconcileInlineNoteMarker( inlineThread, null, new Set( [ 7 ] ) )
-		).toBe( 'skip' );
+			removeNoteFormat(
+				RichTextData.fromHTMLString( html ),
+				5
+			).toHTMLString()
+		).toBe( 'a b c' );
+		expect(
+			removeNoteFormat(
+				RichTextData.fromHTMLString( html ),
+				'5'
+			).toHTMLString()
+		).toBe( 'a b c' );
 	} );
 } );

@@ -1229,7 +1229,7 @@ test.describe( 'Block Notes', () => {
 			).toBeVisible();
 		} );
 
-		test( 'deletes the note when its inline marker is removed', async ( {
+		test( 'falls back to a block-level note when its inline marker is removed', async ( {
 			editor,
 			page,
 		} ) => {
@@ -1256,11 +1256,6 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'button', { name: 'Add note', exact: true } )
 				.click();
 
-			// The marker is written into the content once the note is saved;
-			// `useReconcileRemovedInlineNotes` observes it present here, which
-			// arms the later delete (the hook guards against false deletes by
-			// only acting on markers it has seen anchored earlier in the
-			// session).
 			await expect(
 				editor.canvas.locator( 'mark.wp-note' ).first()
 			).toBeVisible();
@@ -1270,8 +1265,11 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'treeitem', { name: 'Note: Anchored to text' } );
 			await expect( thread ).toBeVisible();
 
-			// Remove the marked text. With the marker gone, the note is deleted
-			// rather than silently downgraded to a block-level note.
+			// Remove the marked text. The marker disappears, but the note must
+			// not be auto-deleted: deleting a note is destructive and not easily
+			// undone, unlike a content edit. Instead it falls back to a
+			// block-level note, mirroring how a removed block orphans (rather
+			// than deletes) its note.
 			await paragraph.click();
 			await page.keyboard.press( 'ControlOrMeta+a' );
 			await page.keyboard.press( 'Delete' );
@@ -1279,13 +1277,99 @@ test.describe( 'Block Notes', () => {
 			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
 				0
 			);
+			await expect( thread ).toBeVisible();
+		} );
 
-			await expect( thread ).toBeHidden();
+		test( 'removes the inline marker when the note is deleted', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Delete the whole note.' },
+			} );
+
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await paragraph.click();
+			await page.keyboard.press( 'ControlOrMeta+a' );
+
+			await page
+				.getByRole( 'button', { name: 'More', exact: true } )
+				.click();
+			await page.getByRole( 'menuitem', { name: 'Add note' } ).click();
+			await page
+				.getByRole( 'textbox', { name: 'New note', exact: true } )
+				.fill( 'Remove my marker on delete' );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
+
+			await expect(
+				editor.canvas.locator( 'mark.wp-note' ).first()
+			).toBeVisible();
+
+			// Deleting the note strips its inline marker from the content (rather
+			// than leaving a stray highlight behind) while keeping the text.
+			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Delete' );
+			await page
+				.getByRole( 'dialog' )
+				.getByRole( 'button', { name: 'Delete' } )
+				.click();
+
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
+				0
+			);
+			await expect( paragraph ).toHaveText( 'Delete the whole note.' );
+		} );
+
+		test( 'removes the inline marker when the note is resolved', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Resolve this note.' },
+			} );
+
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await paragraph.click();
+			await page.keyboard.press( 'ControlOrMeta+a' );
+
+			await page
+				.getByRole( 'button', { name: 'More', exact: true } )
+				.click();
+			await page.getByRole( 'menuitem', { name: 'Add note' } ).click();
+			await page
+				.getByRole( 'textbox', { name: 'New note', exact: true } )
+				.fill( 'Resolve removes my marker' );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
+
+			await expect(
+				editor.canvas.locator( 'mark.wp-note' ).first()
+			).toBeVisible();
+
+			// Resolving drops the highlight, so the marker is removed from the
+			// content and the note settles back to a block-level note.
+			await page.getByRole( 'button', { name: 'Resolve' } ).click();
 			await expect(
 				page
 					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Note deleted.' } )
+					.filter( { hasText: 'Note marked as resolved.' } )
 			).toBeVisible();
+
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
+				0
+			);
+			await expect( paragraph ).toHaveText( 'Resolve this note.' );
 		} );
 
 		test( 'anchors the marker to only the selected text', async ( {

@@ -229,40 +229,6 @@ export function getInlineMarkerStart( thread, attributes ) {
 }
 
 /**
- * Decide what to do with an inline note based on whether its in-content marker
- * is still present. Pure so it can be unit-tested without React/stores.
- *
- * The marker presence is resolved by the caller and passed in as a tristate so
- * the expensive content scan (`findNoteInBlock`) can be memoized upstream rather
- * than re-run on every render:
- *
- * - `true`: the block is loaded and its marker is present.
- * - `false`: the block is loaded but the marker is gone.
- * - `null`: the block (or its attributes) isn't loaded yet, so presence is
- *   unknown and the note must not be touched.
- *
- * - `'anchor'`: the marker is present; record that we've seen it this session.
- * - `'delete'`: the marker was seen earlier this session but is now gone (the
- *   user removed the marked text), so the note should be deleted.
- * - `'skip'`: the block isn't loaded yet, the note is block-level (no marker),
- *   or the marker is absent for a note we never saw anchored this session.
- *
- * @param {Object}       thread   Materialized thread record (with `.id`, `.blockClientId`).
- * @param {boolean|null} present  Marker presence: `true`/`false` when loaded, `null` when unloaded.
- * @param {Set}          anchored Ids whose marker has been observed present this session.
- * @return {'anchor'|'delete'|'skip'} The action to take.
- */
-export function reconcileInlineNoteMarker( thread, present, anchored ) {
-	if ( ! thread?.blockClientId || present === null ) {
-		return 'skip';
-	}
-	if ( present ) {
-		return 'anchor';
-	}
-	return anchored.has( thread.id ) ? 'delete' : 'skip';
-}
-
-/**
  * Apply a `core/note` marker across `[start, end)` without removing notes
  * already present in that range.
  *
@@ -338,6 +304,52 @@ export function applyNoteFormat( record, format, start, end ) {
 	}
 
 	return { ...record, formats };
+}
+
+/**
+ * Remove a single note's `core/note` marker from a rich-text value, leaving any
+ * other notes nested or overlapping with it intact. Used when a note is deleted
+ * or resolved so its highlight does not linger in the content.
+ *
+ * Rich-text's `removeFormat` strips every `core/note` marker in a range, so it
+ * would wipe co-located notes; this filters by `data-id` to drop only the target
+ * marker.
+ *
+ * @param {*}             value  Block attribute value (RichTextData or other).
+ * @param {number|string} noteId Note id whose marker should be removed.
+ * @return {?RichTextData} A new value with the marker removed, or null when the
+ *                         attribute isn't rich text or carries no such marker.
+ */
+export function removeNoteFormat( value, noteId ) {
+	if ( ! ( value instanceof RichTextData ) ) {
+		return null;
+	}
+	const target = String( noteId );
+	const record = create( { html: value.toHTMLString() } );
+	let changed = false;
+	const formats = record.formats.map( ( stack ) => {
+		if ( ! stack ) {
+			return stack;
+		}
+		const filtered = stack.filter(
+			( format ) =>
+				! (
+					format.type === NOTE_FORMAT_TYPE &&
+					format.attributes?.[ 'data-id' ] === target
+				)
+		);
+		if ( filtered.length === stack.length ) {
+			return stack;
+		}
+		changed = true;
+		return filtered.length ? filtered : undefined;
+	} );
+	// Round-trip through HTML so the stored value matches a fresh reload.
+	return changed
+		? RichTextData.fromHTMLString(
+				new RichTextData( { ...record, formats } ).toHTMLString()
+		  )
+		: null;
 }
 
 /**
