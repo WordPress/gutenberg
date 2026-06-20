@@ -18,15 +18,23 @@ export function isInSameBlock( a, b ) {
  * Returns true if an element is considered part of the block and not its inner
  * blocks or appender.
  *
- * @param {Element} blockElement Block container element.
- * @param {Element} element      Element.
+ * @param {Element} blockElement   Block container element.
+ * @param {Element} element        Element.
+ * @param {boolean} ignoreAppender Whether to ignore the appender.
  *
  * @return {boolean} Whether an element is considered part of the block and not
  *                   its inner blocks or appender.
  */
-export function isInsideRootBlock( blockElement, element ) {
+export function isInsideRootBlock(
+	blockElement,
+	element,
+	ignoreAppender = false
+) {
 	const parentBlock = element.closest(
-		[ BLOCK_SELECTOR, APPENDER_SELECTOR, BLOCK_APPENDER_CLASS ].join( ',' )
+		( ignoreAppender
+			? [ BLOCK_SELECTOR ]
+			: [ BLOCK_SELECTOR, APPENDER_SELECTOR, BLOCK_APPENDER_CLASS ]
+		).join( ',' )
 	);
 	return parentBlock === blockElement;
 }
