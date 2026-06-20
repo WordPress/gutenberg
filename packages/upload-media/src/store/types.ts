@@ -37,6 +37,11 @@ export interface QueueItem {
 	// (recorded in attachment metadata as `animated_video`). Not set for
 	// non-animated-GIF items.
 	animatedGifFile?: File;
+	// Original video, kept separately so it can be transcoded to a web-safe
+	// format and sideloaded as a companion file of the video attachment
+	// (recorded in attachment metadata as `optimized_video`). Not set for
+	// videos that do not need transcoding.
+	videoCompanionFile?: File;
 	poster?: File;
 	attachment?: Partial< Attachment >;
 	status: ItemStatus;
@@ -230,9 +235,23 @@ export interface Settings {
 	// When enabled, animated GIFs are transcoded to video for smaller file sizes.
 	// Default is true.
 	gifConvert?: boolean;
-	// Output format for GIF-to-video conversion.
+	// Output format for GIF-to-video conversion and video transcoding.
 	// Accepts 'video/mp4' or 'video/webm'. Default is 'video/mp4'.
 	videoOutputFormat?: 'video/mp4' | 'video/webm';
+	// Whether to transcode uploaded videos to a web-safe format (MP4/WebM)
+	// during upload. Default is true.
+	videoConvert?: boolean;
+	// Whether to keep the original video upload and serve the transcoded
+	// version as a companion file (default true). When false, the video is
+	// transcoded before upload so only the optimized file is stored.
+	videoKeepOriginal?: boolean;
+	// Maximum dimension (longest edge) in pixels for transcoded videos.
+	// Videos larger than this are downscaled. Default is 1920.
+	bigVideoSizeThreshold?: number;
+	// Optional maximum average bitrate (bits per second) for a video to be
+	// considered already-optimized. Web-safe videos above this are transcoded
+	// to reduce file size. Unset by default (no bitrate-based transcoding).
+	videoTranscodeMaxBitrate?: number;
 	// Retry settings for automatic retry on failure.
 	retry?: RetrySettings;
 	// Function for deleting an attachment from the server. Used to clean up
@@ -303,6 +322,8 @@ export enum OperationType {
 	Rotate = 'ROTATE',
 	TranscodeImage = 'TRANSCODE_IMAGE',
 	TranscodeGif = 'TRANSCODE_GIF',
+	TranscodeVideo = 'TRANSCODE_VIDEO',
+	GenerateVideoCompanion = 'GENERATE_VIDEO_COMPANION',
 	ThumbnailGeneration = 'THUMBNAIL_GENERATION',
 	Finalize = 'FINALIZE',
 	// UltraHDR operations
@@ -355,6 +376,10 @@ export interface OperationArgs {
 		interlaced: boolean;
 	};
 	[ OperationType.TranscodeGif ]: {
+		/** Video output format: 'mp4' or 'webm'. */
+		outputFormat: 'mp4' | 'webm';
+	};
+	[ OperationType.TranscodeVideo ]: {
 		/** Video output format: 'mp4' or 'webm'. */
 		outputFormat: 'mp4' | 'webm';
 	};

@@ -55,3 +55,52 @@ export const HEIC_MIME_TYPES: readonly string[] = [
 	'image/heic',
 	'image/heif',
 ] as const;
+
+/**
+ * Video MIME types eligible for client-side transcoding.
+ *
+ * These are container/codec combinations mediabunny can decode in the browser.
+ * Includes both already-web-safe formats (which may still need downscaling or
+ * bitrate reduction) and non-web-safe formats (e.g. QuickTime/MOV, Matroska,
+ * AVI) that need converting for broad browser playback.
+ */
+export const TRANSCODABLE_VIDEO_MIME_TYPES: readonly string[] = [
+	'video/mp4',
+	'video/webm',
+	'video/quicktime',
+	'video/x-matroska',
+	'video/x-msvideo',
+	'video/mpeg',
+	'video/3gpp',
+	'video/x-m4v',
+	'video/ogg',
+] as const;
+
+/**
+ * Web-safe video MIME types.
+ *
+ * A video already in one of these containers, with a web-safe codec and within
+ * the dimension/bitrate budget, can skip transcoding.
+ */
+export const WEB_SAFE_VIDEO_MIME_TYPES: readonly string[] = [
+	'video/mp4',
+	'video/webm',
+] as const;
+
+/**
+ * Web-safe video codecs (mediabunny codec identifiers) that do not require
+ * re-encoding for browser compatibility.
+ */
+export const WEB_SAFE_VIDEO_CODECS: readonly string[] = [
+	'avc',
+	'vp9',
+	'vp8',
+] as const;
+
+/**
+ * Default maximum dimension (longest edge) in pixels for transcoded videos.
+ *
+ * Videos whose longest edge exceeds this are downscaled. Mirrors the
+ * `media-experiments` default and is filterable on the server.
+ */
+export const DEFAULT_VIDEO_SIZE_THRESHOLD = 1920;

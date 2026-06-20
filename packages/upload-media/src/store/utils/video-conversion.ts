@@ -110,7 +110,58 @@ export async function convertGifToVideo(
 }
 
 /**
- * Cancels all ongoing GIF-to-video conversions for the given item.
+ * Reads metadata from a video file's primary video track via the worker.
+ *
+ * Used to decide whether an uploaded video is already web-safe (and can skip
+ * transcoding) or needs to be converted.
+ *
+ * @param file Video file object.
+ * @return The primary video track's metadata.
+ */
+export async function getVideoMetadata( file: File ) {
+	const { getVideoMetadata: read } = await loadVideoConversionModule();
+	return read( file );
+}
+
+/**
+ * Transcodes a video to a web-safe format using the video conversion worker.
+ *
+ * @param id                    Queue item ID.
+ * @param file                  Video file object.
+ * @param outputMimeType        Output MIME type ('video/mp4' or 'video/webm').
+ * @param options               Transcoding options.
+ * @param options.maxDimensions Maximum dimension (longest edge) in pixels.
+ * @param options.frameRate     Target output frame rate cap in hertz.
+ * @param options.bitrate       Target output bitrate in bits per second.
+ * @return Transcoded video file.
+ */
+export async function transcodeVideo(
+	id: QueueItemId,
+	file: File,
+	outputMimeType: string,
+	options?: {
+		maxDimensions?: number;
+		frameRate?: number;
+		bitrate?: number;
+	}
+) {
+	const { transcodeVideo: transcode } = await loadVideoConversionModule();
+	// Pass the File straight through: the worker reads its bytes once, off
+	// the main thread, instead of materializing an ArrayBuffer here.
+	const buffer = await transcode( id, file, outputMimeType, options );
+
+	const ext = outputMimeType === 'video/webm' ? 'webm' : 'mp4';
+	const fileName = `${ getFileBasename( file.name ) }.${ ext }`;
+	return new File(
+		[ new Blob( [ buffer as ArrayBuffer ], { type: outputMimeType } ) ],
+		fileName,
+		{ type: outputMimeType }
+	);
+}
+
+/**
+ * Cancels all ongoing video conversions (GIF-to-video or transcode) for the
+ * given item.
  *
  * @param id Queue item ID to cancel operations for.
  * @return Whether any operation was cancelled.

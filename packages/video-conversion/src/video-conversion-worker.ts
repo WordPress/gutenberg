@@ -6,7 +6,7 @@ import { wrap, terminate, type Remote } from '@wordpress/worker-threads';
 /**
  * Internal dependencies
  */
-import type { ItemId } from './types';
+import type { ItemId, VideoMetadata, TranscodeVideoOptions } from './types';
 import type { WorkerAPI } from './worker';
 import { workerCode } from './worker-code';
 
@@ -74,7 +74,40 @@ export async function convertGifToVideo(
 }
 
 /**
- * Cancels all ongoing GIF-to-video conversions for a given item ID.
+ * Reads metadata from a video file's primary video track using the worker.
+ *
+ * @param source Video file as a Blob/File or ArrayBuffer.
+ * @return The primary video track's metadata.
+ */
+export async function getVideoMetadata(
+	source: ArrayBuffer | Blob
+): Promise< VideoMetadata > {
+	const api = getWorkerAPI();
+	return api.getVideoMetadata( source );
+}
+
+/**
+ * Transcodes a video to a web-safe format using the worker pipeline.
+ *
+ * @param id             Item ID.
+ * @param source         Video file as a Blob/File or ArrayBuffer.
+ * @param outputMimeType Output MIME type ('video/mp4' or 'video/webm').
+ * @param options        Transcoding options (max dimension, frame rate, bitrate).
+ * @return Video file buffer.
+ */
+export async function transcodeVideo(
+	id: ItemId,
+	source: ArrayBuffer | Blob,
+	outputMimeType: string,
+	options?: TranscodeVideoOptions
+): Promise< ArrayBuffer > {
+	const api = getWorkerAPI();
+	return api.transcodeVideo( id, source, outputMimeType, options );
+}
+
+/**
+ * Cancels all ongoing video conversions (GIF-to-video or transcode) for a
+ * given item ID.
  *
  * @param id Item ID.
  * @return Whether any operation was cancelled.

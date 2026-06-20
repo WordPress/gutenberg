@@ -26,7 +26,14 @@ import {
 	exceedsClientProcessingMemory,
 } from '../feature-detection';
 import { getImageDimensions } from '../get-image-dimensions';
-import { CLIENT_SIDE_SUPPORTED_MIME_TYPES, HEIC_MIME_TYPES } from './constants';
+import {
+	CLIENT_SIDE_SUPPORTED_MIME_TYPES,
+	HEIC_MIME_TYPES,
+	TRANSCODABLE_VIDEO_MIME_TYPES,
+	WEB_SAFE_VIDEO_MIME_TYPES,
+	WEB_SAFE_VIDEO_CODECS,
+	DEFAULT_VIDEO_SIZE_THRESHOLD,
+} from './constants';
 import { StubFile } from '../stub-file';
 import { ErrorCode, UploadError } from '../upload-error';
 import { measure } from './utils/debug-logger';
@@ -41,6 +48,8 @@ import {
 } from './utils';
 import {
 	convertGifToVideo,
+	transcodeVideo,
+	getVideoMetadata,
 	isUnsupportedConversionError,
 	terminateVideoConversionWorker,
 } from './utils/video-conversion';
@@ -105,6 +114,8 @@ type ActionCreators = {
 	rotateItem: typeof rotateItem;
 	transcodeImageItem: typeof transcodeImageItem;
 	transcodeGifItem: typeof transcodeGifItem;
+	transcodeVideoItem: typeof transcodeVideoItem;
+	generateVideoCompanion: typeof generateVideoCompanion;
 	generateThumbnails: typeof generateThumbnails;
 	finalizeItem: typeof finalizeItem;
 	updateItemProgress: typeof updateItemProgress;
@@ -344,10 +355,14 @@ export function processItem( id: QueueItemId ) {
 		}
 
 		/*
-		 * GIF-to-video conversion is memory-intensive (WebCodecs encode).
-		 * Limit to 1 concurrent transcoding operation.
+		 * Video encoding (GIF-to-video and video transcoding) is
+		 * memory-intensive (WebCodecs encode). Both share a single limit of
+		 * 1 concurrent transcoding operation.
 		 */
-		if ( operation === OperationType.TranscodeGif ) {
+		if (
+			operation === OperationType.TranscodeGif ||
+			operation === OperationType.TranscodeVideo
+		) {
 			const activeCount = select.getActiveVideoProcessingCount();
 			if ( activeCount >= 1 ) {
 				return;
@@ -472,6 +487,17 @@ export function processItem( id: QueueItemId ) {
 					item.id,
 					operationArgs as OperationArgs[ OperationType.TranscodeGif ]
 				);
+				break;
+
+			case OperationType.TranscodeVideo:
+				dispatch.transcodeVideoItem(
+					item.id,
+					operationArgs as OperationArgs[ OperationType.TranscodeVideo ]
+				);
+				break;
+
+			case OperationType.GenerateVideoCompanion:
+				dispatch.generateVideoCompanion( item.id );
 				break;
 
 			case OperationType.Upload:
@@ -638,7 +664,10 @@ export function finishOperation(
 		 * If a video processing operation just finished, there may be items
 		 * waiting due to the video processing concurrency limit.
 		 */
-		if ( previousOperation === OperationType.TranscodeGif ) {
+		if (
+			previousOperation === OperationType.TranscodeGif ||
+			previousOperation === OperationType.TranscodeVideo
+		) {
 			const pendingItems = select.getPendingVideoProcessing();
 			for ( const pendingItem of pendingItems ) {
 				dispatch.processItem( pendingItem.id );
@@ -727,6 +756,72 @@ export async function getTranscodeImageOperation(
 }
 
 /**
+ * Decides whether a video should be transcoded to a web-safe format.
+ *
+ * A video is left untouched ("already optimized") only when it is in the
+ * desired web-safe container, uses a web-safe codec, fits within the
+ * dimension threshold, and is within the optional bitrate budget. Anything
+ * else (non-web-safe container/codec, oversized, or over budget) is
+ * transcoded. This satisfies the "skip small/already-optimized files"
+ * requirement.
+ *
+ * @param file             The uploaded video file.
+ * @param metadata         Metadata read from the video's primary track.
+ * @param metadata.codec   The video codec, or null if unknown.
+ * @param metadata.width   Display width in pixels.
+ * @param metadata.height  Display height in pixels.
+ * @param metadata.bitrate Average bitrate in bits per second.
+ * @param settings         Upload-media settings.
+ * @return Whether the video needs transcoding.
+ */
+function needsVideoTranscode(
+	file: File,
+	metadata: {
+		codec: string | null;
+		width: number;
+		height: number;
+		bitrate: number;
+	},
+	settings: Settings
+): boolean {
+	const targetMime = settings.videoOutputFormat ?? 'video/mp4';
+	const threshold =
+		settings.bigVideoSizeThreshold ?? DEFAULT_VIDEO_SIZE_THRESHOLD;
+
+	// Non-web-safe container, or not the desired output container.
+	if (
+		! WEB_SAFE_VIDEO_MIME_TYPES.includes( file.type ) ||
+		file.type !== targetMime
+	) {
+		return true;
+	}
+
+	// Non-web-safe codec.
+	if (
+		! metadata.codec ||
+		! WEB_SAFE_VIDEO_CODECS.includes( metadata.codec )
+	) {
+		return true;
+	}
+
+	// Larger than the dimension threshold (longest edge).
+	if ( Math.max( metadata.width, metadata.height ) > threshold ) {
+		return true;
+	}
+
+	// Over the optional bitrate budget.
+	if (
+		settings.videoTranscodeMaxBitrate &&
+		metadata.bitrate &&
+		metadata.bitrate > settings.videoTranscodeMaxBitrate
+	) {
+		return true;
+	}
+
+	return false;
+}
+
+/**
  * Prepares an item for initial processing.
  *
  * Determines the list of operations to perform for a given image,
@@ -735,8 +830,10 @@ export async function getTranscodeImageOperation(
  * For example, HEIF images first need to be converted, resized,
  * compressed, and then uploaded.
  *
- * Or videos need to be compressed, and then need poster generation
- * before upload.
+ * Eligible videos are transcoded to a web-safe format: the original uploads
+ * normally and the transcoded version is sideloaded as a companion file
+ * (see generateVideoCompanion), unless the original is opted out of being
+ * kept, in which case the video is transcoded before upload.
  *
  * UltraHDR JPEG images are detected and uploaded unmodified — they are
  * already backwards compatible (SDR displays use the embedded base image).
@@ -819,6 +916,93 @@ export function prepareItem( id: QueueItemId ) {
 					} );
 					return;
 				}
+			}
+		}
+
+		// Video → web-safe transcode. WebCodecs is required; client-side media
+		// already runs only under cross-origin isolation, so this is a
+		// capability check, not a browser-support fallback path.
+		//
+		// By default the original video uploads as a normal core/video
+		// attachment and the transcoded, web-safe version is sideloaded as a
+		// companion file of that attachment (recorded in attachment metadata
+		// as `optimized_video`) once the upload completes (see
+		// generateVideoCompanion). The editor then points the block's playback
+		// src at that companion. When `videoKeepOriginal` is false, the video
+		// is transcoded before upload instead, so only the optimized file is
+		// stored.
+		if (
+			TRANSCODABLE_VIDEO_MIME_TYPES.includes( file.type ) &&
+			settings.videoConvert !== false &&
+			typeof VideoEncoder !== 'undefined'
+		) {
+			let shouldTranscode = false;
+			try {
+				const metadata = await getVideoMetadata( file );
+				shouldTranscode = needsVideoTranscode(
+					file,
+					metadata,
+					settings
+				);
+			} catch {
+				// If the video metadata can't be read, fall through to the
+				// normal (server) upload path rather than failing the upload.
+				shouldTranscode = false;
+			}
+
+			if ( shouldTranscode ) {
+				const outputFormat =
+					settings.videoOutputFormat === 'video/webm'
+						? 'webm'
+						: 'mp4';
+
+				if ( settings.videoKeepOriginal !== false ) {
+					// Companion model: upload the original, then transcode and
+					// sideload the companion once the attachment exists.
+					operations.push(
+						OperationType.Upload,
+						OperationType.GenerateVideoCompanion,
+						OperationType.Finalize
+					);
+
+					dispatch< AddOperationsAction >( {
+						type: Type.AddOperations,
+						id,
+						operations,
+					} );
+
+					dispatch.finishOperation( id, {
+						videoCompanionFile: item.file,
+						additionalData: {
+							...item.additionalData,
+							generate_sub_sizes: true,
+							convert_format: true,
+						},
+					} );
+					return;
+				}
+
+				// Replace-primary (opt-out): transcode before upload so only
+				// the optimized file is stored.
+				operations.push(
+					[ OperationType.TranscodeVideo, { outputFormat } ],
+					OperationType.Upload
+				);
+
+				dispatch< AddOperationsAction >( {
+					type: Type.AddOperations,
+					id,
+					operations,
+				} );
+
+				dispatch.finishOperation( id, {
+					additionalData: {
+						...item.additionalData,
+						generate_sub_sizes: true,
+						convert_format: true,
+					},
+				} );
+				return;
 			}
 		}
 
@@ -1458,6 +1642,153 @@ export function transcodeGifItem(
 				true
 			);
 		}
+	};
+}
+
+type TranscodeVideoItemArgs = OperationArgs[ OperationType.TranscodeVideo ];
+
+/**
+ * Transcodes a video to a web-safe format (MP4/H.264 or WebM/VP9).
+ *
+ * Runs in one of two contexts:
+ *
+ * - As a sideload child of the video attachment (companion model): the
+ *   original is already uploaded, so on any failure the sideload is silently
+ *   cancelled and the original stays as-is.
+ * - As the primary item (replace-primary opt-out): on any failure the
+ *   original file is uploaded unchanged, so the user never loses their video.
+ *
+ * @param id     Item ID.
+ * @param [args] Transcode arguments including output format.
+ */
+export function transcodeVideoItem(
+	id: QueueItemId,
+	args?: TranscodeVideoItemArgs
+) {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItem( id );
+		if ( ! item ) {
+			return;
+		}
+
+		const settings = select.getSettings();
+		const outputFormat = args?.outputFormat ?? 'mp4';
+		const outputMimeType = `video/${ outputFormat }`;
+		const maxDimensions =
+			settings.bigVideoSizeThreshold ?? DEFAULT_VIDEO_SIZE_THRESHOLD;
+
+		// A sideload child means the original is already uploaded (companion
+		// model); the primary item means replace-primary, where the original
+		// must still be uploaded on failure.
+		const isSideload = Boolean( item.parentId );
+
+		try {
+			const file = await transcodeVideo(
+				item.id,
+				item.file,
+				outputMimeType,
+				{ maxDimensions }
+			);
+
+			// Hand the transcoded video to the next Upload op as the payload.
+			dispatch.finishOperation( id, { file } );
+		} catch ( error ) {
+			// "Unsupported" is a graceful outcome, not a failure.
+			if ( isUnsupportedConversionError( error ) ) {
+				if ( isSideload ) {
+					// Companion: the parent video attachment already exists
+					// and stays as-is; silently drop the companion.
+					dispatch.cancelItem(
+						id,
+						new Error( 'Video transcoding unsupported' ),
+						true
+					);
+				} else {
+					// Replace-primary: upload the original unchanged so the
+					// user's video is not lost.
+					dispatch.finishOperation( id, { file: item.file } );
+				}
+				return;
+			}
+
+			// Real engine failure. Log the cause for debuggability.
+			// eslint-disable-next-line no-console
+			console.error(
+				'[video-conversion] Video transcoding failed:',
+				error
+			);
+
+			if ( isSideload ) {
+				// Companion: silently drop it; the original is fine.
+				dispatch.cancelItem(
+					id,
+					new UploadError( {
+						code: ErrorCode.VIDEO_TRANSCODING_ERROR,
+						message: 'Video could not be transcoded',
+						file: item.file,
+						cause: error instanceof Error ? error : undefined,
+					} ),
+					true
+				);
+			} else {
+				// Replace-primary: fall back to uploading the original.
+				dispatch.finishOperation( id, { file: item.file } );
+			}
+		}
+	};
+}
+
+/**
+ * Transcodes the original video to a web-safe format and sideloads it as a
+ * companion file of the video attachment.
+ *
+ * Runs after the original video has uploaded (operations
+ * `Upload → GenerateVideoCompanion → Finalize`). The transcoded video is
+ * sideloaded under the `optimized-video` image size and recorded in
+ * attachment metadata as `optimized_video`; the original stays the primary
+ * attachment and the editor points the block's playback src at the companion.
+ * Mirrors the animated-GIF companion flow.
+ *
+ * @param id Item ID.
+ */
+export function generateVideoCompanion( id: QueueItemId ) {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItem( id );
+		if ( ! item ) {
+			return;
+		}
+
+		const attachment = item.attachment;
+
+		// Only sideload a companion when we have both the original video and
+		// an uploaded attachment to attach it to.
+		if ( item.videoCompanionFile && attachment?.id ) {
+			const settings = select.getSettings();
+			const outputFormat =
+				settings.videoOutputFormat === 'video/webm' ? 'webm' : 'mp4';
+
+			dispatch.addSideloadItem( {
+				file: item.videoCompanionFile,
+				batchId: uuidv4(),
+				parentId: item.id,
+				additionalData: {
+					post: attachment.id,
+					image_size: 'optimized-video',
+					convert_format: false,
+				},
+				operations: [
+					[
+						OperationType.TranscodeVideo,
+						{
+							outputFormat,
+						} as OperationArgs[ OperationType.TranscodeVideo ],
+					],
+					OperationType.Upload,
+				],
+			} );
+		}
+
+		dispatch.finishOperation( id, {} );
 	};
 }
 

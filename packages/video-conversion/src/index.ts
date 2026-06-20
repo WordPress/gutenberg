@@ -2,7 +2,10 @@
  * External dependencies
  */
 import {
+	Input,
 	Output,
+	Conversion,
+	BlobSource,
 	BufferTarget,
 	Mp4OutputFormat,
 	WebMOutputFormat,
@@ -10,12 +13,15 @@ import {
 	VideoSample,
 	QUALITY_HIGH,
 	canEncodeVideo,
+	ALL_FORMATS,
+	type VideoCodec,
+	type ConversionVideoOptions,
 } from 'mediabunny';
 
 /**
  * Internal dependencies
  */
-import type { ItemId } from './types';
+import type { ItemId, VideoMetadata, TranscodeVideoOptions } from './types';
 
 /**
  * Tracks in-progress operations so they can be cancelled at async boundaries.
@@ -251,6 +257,174 @@ export async function convertGifToVideo(
 		} finally {
 			decoder.close();
 		}
+	} finally {
+		inProgressOperations.delete( id );
+		releaseLock();
+	}
+}
+
+/**
+ * Reads metadata from a video file's primary video track.
+ *
+ * Only the container headers are read (not the full media), so this is cheap
+ * enough to run on every upload to decide whether the video is already
+ * web-safe. Bitrate and duration are best-effort: if they cannot be computed
+ * they are returned as 0, and the format/dimension checks still suffice.
+ *
+ * Accepts the video as a Blob/File so the bytes are read here in the worker.
+ * An ArrayBuffer is still accepted for direct callers and tests.
+ *
+ * @param source Video file as a Blob/File or ArrayBuffer.
+ * @return The primary video track's metadata.
+ */
+export async function getVideoMetadata(
+	source: ArrayBuffer | Blob
+): Promise< VideoMetadata > {
+	const blob = source instanceof Blob ? source : new Blob( [ source ] );
+	const input = new Input( {
+		formats: ALL_FORMATS,
+		source: new BlobSource( blob ),
+	} );
+
+	const track = await input.getPrimaryVideoTrack();
+	if ( ! track ) {
+		throw new Error( 'No video track found' );
+	}
+
+	const [ codec, width, height ] = await Promise.all( [
+		track.getCodec(),
+		track.getDisplayWidth(),
+		track.getDisplayHeight(),
+	] );
+
+	let bitrate = 0;
+	let duration = 0;
+	try {
+		// Sample a subset of packets for the bitrate estimate to keep this
+		// fast; an exact figure is not needed for the eligibility decision.
+		const stats = await track.computePacketStats( 100 );
+		bitrate = stats.averageBitrate;
+		duration = await track.computeDuration();
+	} catch {
+		// Bitrate/duration are best-effort; leave them at 0.
+	}
+
+	return { codec, width, height, bitrate, duration };
+}
+
+/**
+ * Transcodes a video to a web-safe format (MP4/H.264 or WebM/VP9).
+ *
+ * Re-encodes the input with mediabunny / WebCodecs, optionally downscaling to
+ * a maximum dimension and capping the frame rate. The MP4 output uses Fast
+ * Start (moov atom at the front) for progressive playback.
+ *
+ * Accepts the video as a Blob/File so the bytes are read once, here in the
+ * worker, instead of being materialized on the main thread and transferred.
+ * An ArrayBuffer is still accepted for direct callers and tests.
+ *
+ * @param id             Item ID.
+ * @param source         Video file as a Blob/File or ArrayBuffer.
+ * @param outputMimeType Output MIME type ('video/mp4' or 'video/webm').
+ * @param options        Transcoding options (max dimension, frame rate, bitrate).
+ * @return Encoded video buffer.
+ */
+export async function transcodeVideo(
+	id: ItemId,
+	source: ArrayBuffer | Blob,
+	outputMimeType: string,
+	options: TranscodeVideoOptions = {}
+): Promise< ArrayBuffer > {
+	inProgressOperations.add( id );
+
+	const previousLock = operationLock;
+	let releaseLock: () => void = () => {};
+	operationLock = new Promise< void >( ( resolve ) => {
+		releaseLock = resolve;
+	} );
+
+	try {
+		await previousLock;
+
+		if ( ! inProgressOperations.has( id ) ) {
+			throw new Error( 'Operation cancelled' );
+		}
+
+		if ( typeof VideoEncoder === 'undefined' ) {
+			throw new Error(
+				`${ UNSUPPORTED_ERROR_PREFIX }: WebCodecs unavailable`
+			);
+		}
+
+		const isWebm = outputMimeType === 'video/webm';
+		const codec: VideoCodec = isWebm ? 'vp9' : 'avc';
+
+		if ( ! ( await canEncodeVideo( codec ) ) ) {
+			throw new Error(
+				`${ UNSUPPORTED_ERROR_PREFIX }: encoder codec not supported`
+			);
+		}
+
+		if ( ! inProgressOperations.has( id ) ) {
+			throw new Error( 'Operation cancelled' );
+		}
+
+		const blob = source instanceof Blob ? source : new Blob( [ source ] );
+		const input = new Input( {
+			formats: ALL_FORMATS,
+			source: new BlobSource( blob ),
+		} );
+		const output = new Output( {
+			format: isWebm
+				? new WebMOutputFormat()
+				: new Mp4OutputFormat( { fastStart: 'in-memory' } ),
+			target: new BufferTarget(),
+		} );
+
+		const videoOptions: ConversionVideoOptions = {
+			codec,
+			bitrate: options.bitrate ?? QUALITY_HIGH,
+			hardwareAcceleration: 'prefer-hardware',
+		};
+		if ( options.frameRate ) {
+			videoOptions.frameRate = options.frameRate;
+		}
+
+		// Cap the longest edge while preserving aspect ratio: set only the
+		// dominant dimension and let mediabunny deduce the other.
+		if ( options.maxDimensions ) {
+			const track = await input.getPrimaryVideoTrack();
+			if ( track ) {
+				const [ srcW, srcH ] = await Promise.all( [
+					track.getDisplayWidth(),
+					track.getDisplayHeight(),
+				] );
+				if ( srcW >= srcH && srcW > options.maxDimensions ) {
+					videoOptions.width = options.maxDimensions;
+				} else if ( srcH > srcW && srcH > options.maxDimensions ) {
+					videoOptions.height = options.maxDimensions;
+				}
+			}
+		}
+
+		const conversion = await Conversion.init( {
+			input,
+			output,
+			video: videoOptions,
+		} );
+
+		if ( ! inProgressOperations.has( id ) ) {
+			await conversion.cancel();
+			throw new Error( 'Operation cancelled' );
+		}
+
+		await conversion.execute();
+
+		const out = output.target.buffer;
+		if ( ! out || out.byteLength === 0 ) {
+			throw new Error( 'Encoder produced empty output' );
+		}
+		return out;
 	} finally {
 		inProgressOperations.delete( id );
 		releaseLock();

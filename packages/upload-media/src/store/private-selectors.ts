@@ -126,8 +126,9 @@ export function getActiveImageProcessingCount( state: State ): number {
 /**
  * Returns the number of items currently performing video processing operations.
  *
- * This counts items whose current operation is TranscodeGif,
- * used to enforce the video processing concurrency limit (1 at a time).
+ * This counts items whose current operation is TranscodeGif or
+ * TranscodeVideo, used to enforce the shared video processing concurrency
+ * limit (1 at a time).
  *
  * @param state Upload state.
  *
@@ -135,7 +136,9 @@ export function getActiveImageProcessingCount( state: State ): number {
  */
 export function getActiveVideoProcessingCount( state: State ): number {
 	return state.queue.filter(
-		( item ) => item.currentOperation === OperationType.TranscodeGif
+		( item ) =>
+			item.currentOperation === OperationType.TranscodeGif ||
+			item.currentOperation === OperationType.TranscodeVideo
 	).length;
 }
 
@@ -163,7 +166,7 @@ export function getPendingImageProcessing( state: State ): QueueItem[] {
 
 /**
  * Returns items waiting for video processing (next operation is TranscodeGif
- * but not yet started).
+ * or TranscodeVideo but not yet started).
  *
  * @param state Upload state.
  *
@@ -174,10 +177,13 @@ export function getPendingVideoProcessing( state: State ): QueueItem[] {
 		const nextOperation = Array.isArray( item.operations?.[ 0 ] )
 			? item.operations[ 0 ][ 0 ]
 			: item.operations?.[ 0 ];
-		return (
-			nextOperation === OperationType.TranscodeGif &&
-			item.currentOperation !== OperationType.TranscodeGif
-		);
+		const isVideoOp =
+			nextOperation === OperationType.TranscodeGif ||
+			nextOperation === OperationType.TranscodeVideo;
+		const isProcessingVideo =
+			item.currentOperation === OperationType.TranscodeGif ||
+			item.currentOperation === OperationType.TranscodeVideo;
+		return isVideoOp && ! isProcessingVideo;
 	} );
 }
 
