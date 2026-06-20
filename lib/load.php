@@ -73,6 +73,8 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-rest-view-config-controller-7-1.php';
 	require __DIR__ . '/compat/wordpress-7.1/rest-api.php';
 	require __DIR__ . '/compat/wordpress-7.1/collaboration.php';
+	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-rest-comment-suggestions-controller.php';
+	require __DIR__ . '/compat/wordpress-7.1/block-comment-suggestions.php';
 	require __DIR__ . '/compat/wordpress-7.1/block-bindings.php';
 	require __DIR__ . '/compat/wordpress-7.1/block-comments.php';
 
@@ -117,6 +119,7 @@ if ( class_exists( '\WordPress\AiClient\AiClient' ) ) {
 }
 
 // WordPress 7.1 compat.
+require __DIR__ . '/compat/wordpress-7.1/kses.php';
 require __DIR__ . '/compat/wordpress-7.1/media.php';
 require __DIR__ . '/compat/wordpress-7.1/preload.php';
 require __DIR__ . '/compat/wordpress-7.1/classic-block.php';
