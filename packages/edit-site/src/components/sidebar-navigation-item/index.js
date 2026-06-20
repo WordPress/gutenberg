@@ -6,11 +6,8 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalItem as Item,
-	__experimentalHStack as HStack,
-	FlexBlock,
-} from '@wordpress/components';
+import { __experimentalItem as Item, FlexBlock } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { isRTL } from '@wordpress/i18n';
 import { chevronRightSmall, chevronLeftSmall, Icon } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
@@ -22,7 +19,7 @@ import { useContext } from '@wordpress/element';
 import { unlock } from '../../lock-unlock';
 import { SidebarNavigationContext } from '../sidebar';
 
-const { useHistory, useLink } = unlock( routerPrivateApis );
+const { useHistory, useLink, useLocation } = unlock( routerPrivateApis );
 
 export default function SidebarNavigationItem( {
 	className,
@@ -32,11 +29,16 @@ export default function SidebarNavigationItem( {
 	uid,
 	to,
 	onClick,
+	activeOnRouteName,
 	children,
 	...props
 } ) {
 	const history = useHistory();
+	const linkProps = useLink( to );
+	const { name } = useLocation();
 	const { navigate } = useContext( SidebarNavigationContext );
+
+	const isActive = activeOnRouteName && name === activeOnRouteName;
 	// If there is no custom click handler, create one that navigates to `params`.
 	function handleClick( e ) {
 		if ( onClick ) {
@@ -48,7 +50,6 @@ export default function SidebarNavigationItem( {
 			navigate( 'forward', `[id="${ uid }"]` );
 		}
 	}
-	const linkProps = useLink( to );
 
 	return (
 		<Item
@@ -60,9 +61,10 @@ export default function SidebarNavigationItem( {
 			id={ uid }
 			onClick={ handleClick }
 			href={ to ? linkProps.href : undefined }
+			aria-current={ isActive ? true : undefined }
 			{ ...props }
 		>
-			<HStack justify="flex-start">
+			<Stack direction="row" align="center" justify="start" gap="sm">
 				{ icon && (
 					<Icon
 						style={ { fill: 'currentcolor' } }
@@ -79,7 +81,7 @@ export default function SidebarNavigationItem( {
 					/>
 				) }
 				{ ! withChevron && suffix }
-			</HStack>
+			</Stack>
 		</Item>
 	);
 }

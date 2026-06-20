@@ -3,18 +3,17 @@
  */
 import { useRef, useEffect, useCallback } from '@wordpress/element';
 
-/** @type {Element|null} */
-let origin = null;
+let origin: Element | null = null;
 
 /**
  * Adds the unmount behavior of returning focus to the element which had it
  * previously as is expected for roles like menus or dialogs.
  *
- * @param {() => void} [onFocusReturn] Overrides the default return behavior.
- * @return {React.RefCallback<HTMLElement>} Element Ref.
+ * @param onFocusReturn Overrides the default return behavior.
+ * @return Element Ref.
  *
  * @example
- * ```js
+ * ```ts
  * import { useFocusReturn } from '@wordpress/compose';
  *
  * const WithFocusReturn = () => {
@@ -28,23 +27,26 @@ let origin = null;
  * }
  * ```
  */
-function useFocusReturn( onFocusReturn ) {
-	/** @type {React.MutableRefObject<null | HTMLElement>} */
-	const ref = useRef( null );
-	/** @type {React.MutableRefObject<null | Element>} */
-	const focusedBeforeMount = useRef( null );
-	const onFocusReturnRef = useRef( onFocusReturn );
+function useFocusReturn(
+	onFocusReturn?: () => void
+): React.RefCallback< HTMLElement > {
+	const ref = useRef< HTMLElement | null >( null );
+	const focusedBeforeMountRef = useRef< Element | null >( null );
+	const onFocusReturnRef = useRef< ( () => void ) | undefined >(
+		onFocusReturn
+	);
+
 	useEffect( () => {
 		onFocusReturnRef.current = onFocusReturn;
 	}, [ onFocusReturn ] );
 
-	return useCallback( ( node ) => {
+	return useCallback( ( node: HTMLElement | null ) => {
 		if ( node ) {
 			// Set ref to be used when unmounting.
 			ref.current = node;
 
 			// Only set when the node mounts.
-			if ( focusedBeforeMount.current ) {
+			if ( focusedBeforeMountRef.current ) {
 				return;
 			}
 
@@ -54,14 +56,15 @@ function useFocusReturn( onFocusReturn ) {
 					? node.ownerDocument.activeElement.contentDocument
 					: node.ownerDocument;
 
-			focusedBeforeMount.current = activeDocument?.activeElement ?? null;
-		} else if ( focusedBeforeMount.current ) {
+			focusedBeforeMountRef.current =
+				activeDocument?.activeElement ?? null;
+		} else if ( focusedBeforeMountRef.current ) {
 			const isFocused = ref.current?.contains(
-				ref.current?.ownerDocument.activeElement
+				ref.current?.ownerDocument.activeElement ?? null
 			);
 
 			if ( ref.current?.isConnected && ! isFocused ) {
-				origin ??= focusedBeforeMount.current;
+				origin ??= focusedBeforeMountRef.current;
 				return;
 			}
 
@@ -72,11 +75,13 @@ function useFocusReturn( onFocusReturn ) {
 			if ( onFocusReturnRef.current ) {
 				onFocusReturnRef.current();
 			} else {
-				/** @type {null|HTMLElement} */ (
-					! focusedBeforeMount.current.isConnected
+				const elementToFocus = (
+					! focusedBeforeMountRef.current.isConnected
 						? origin
-						: focusedBeforeMount.current
-				)?.focus();
+						: focusedBeforeMountRef.current
+				) as HTMLElement | SVGElement | null;
+
+				elementToFocus?.focus();
 			}
 			origin = null;
 		}
