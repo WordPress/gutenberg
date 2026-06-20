@@ -118,7 +118,13 @@ export async function convertGifToVideo(
  * @param file Video file object.
  * @return The primary video track's metadata.
  */
-export async function getVideoMetadata( file: File ) {
+export async function getVideoMetadata( file: File ): Promise< {
+	codec: string | null;
+	width: number;
+	height: number;
+	bitrate: number;
+	duration: number;
+} > {
 	const { getVideoMetadata: read } = await loadVideoConversionModule();
 	return read( file );
 }
