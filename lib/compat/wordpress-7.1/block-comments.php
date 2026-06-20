@@ -113,7 +113,6 @@ function gutenberg_filter_comment_count_query_exclude_block_comments_7_1( $query
 	}
 	return $query;
 }
-remove_filter( 'query', 'gutenberg_filter_comment_count_query_exclude_block_comments' );
 add_filter( 'query', 'gutenberg_filter_comment_count_query_exclude_block_comments_7_1' );
 
 /**
@@ -130,7 +129,6 @@ function gutenberg_hide_note_from_comment_list_table_7_1( $args ) {
 	}
 	return $args;
 }
-remove_filter( 'comments_list_table_query_args', 'gutenberg_hide_note_from_comment_list_table' );
 add_filter( 'comments_list_table_query_args', 'gutenberg_hide_note_from_comment_list_table_7_1' );
 
 /**
@@ -159,7 +157,6 @@ function gutenberg_exclude_notes_from_comment_count_7_1( $new_count, $old_count,
 	);
 	return $new_count;
 }
-remove_filter( 'pre_wp_update_comment_count_now', 'gutenberg_exclude_notes_from_comment_count', 10 );
 add_filter( 'pre_wp_update_comment_count_now', 'gutenberg_exclude_notes_from_comment_count_7_1', 10, 3 );
 
 /**

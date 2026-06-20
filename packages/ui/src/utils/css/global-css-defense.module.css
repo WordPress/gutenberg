@@ -49,7 +49,7 @@
 		border-radius: var(--_gcd-input-border-radius, 0);
 		border: var(--_gcd-input-border, none);
 		background-color: var(--_gcd-input-background-color, transparent);
-		color: var(--_gcd-input-color, var(--wpds-color-fg-interactive-neutral));
+		color: var(--_gcd-input-color, var(--wpds-color-foreground-interactive-neutral));
 
 		&:focus {
 			border-color: var(--_gcd-input-border-color-focus, var(--wp-admin-theme-color));
@@ -61,11 +61,11 @@
 			background: var(--_gcd-input-background-disabled, transparent);
 			border-color: var(--_gcd-input-border-color-disabled, transparent);
 			box-shadow: var(--_gcd-input-box-shadow-disabled, none);
-			color: var(--_gcd-input-color-disabled, var(--wpds-color-fg-interactive-neutral-disabled));
+			color: var(--_gcd-input-color-disabled, var(--wpds-color-foreground-interactive-neutral-disabled));
 		}
 
 		&::placeholder {
-			color: var(--_gcd-input-placeholder-color, var(--wpds-color-fg-interactive-neutral-disabled));
+			color: var(--_gcd-input-placeholder-color, var(--wpds-color-foreground-interactive-neutral-disabled));
 		}
 	}
 
@@ -101,7 +101,7 @@ p.p {
 
 /* Narrowed down to h[1-6] elements only, to support element multiplicity of Text component. */
 :is(h1, h2, h3, h4, h5, h6).heading {
-	color: var(--_gcd-heading-color, var(--wpds-color-fg-content-neutral));
+	color: var(--_gcd-heading-color, var(--wpds-color-foreground-content-neutral));
 	font-size: var(--_gcd-heading-font-size, inherit);
 	font-weight: var(--_gcd-heading-font-weight, var(--wpds-typography-font-weight-medium));
 	margin: var(--_gcd-heading-margin, 0);

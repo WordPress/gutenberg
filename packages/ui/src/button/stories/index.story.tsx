@@ -96,7 +96,7 @@ export const AllTonesAndVariants: Story = {
 			style={ {
 				display: 'grid',
 				gridTemplateColumns: 'max-content repeat(2, max-content)',
-				color: 'var(--wpds-color-fg-content-neutral)',
+				color: 'var(--wpds-color-foreground-content-neutral)',
 			} }
 		>
 			<div></div>
