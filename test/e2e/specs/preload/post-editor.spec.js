@@ -8,6 +8,20 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
  */
 const { recordRequests } = require( './record-requests' );
 
+/**
+ * Returns the major Chromium version from the browser's user agent, or 0 if
+ * not Chromium.
+ *
+ * @param {import('@playwright/test').Page} page Playwright page object.
+ * @return {Promise<number>} Major Chromium version.
+ */
+async function getChromiumMajorVersion( page ) {
+	return page.evaluate( () => {
+		const match = window.navigator.userAgent.match( /Chrome\/(\d+)/ );
+		return match ? parseInt( match[ 1 ], 10 ) : 0;
+	} );
+}
+
 test.describe( 'Preload', () => {
 	let postId;
 
@@ -18,6 +32,20 @@ test.describe( 'Preload', () => {
 			status: 'draft',
 		} );
 		postId = post.id;
+	} );
+
+	test.beforeEach( async ( { page } ) => {
+		// Chromium 148 shipped a regression in the cross-origin isolated
+		// `Document-Isolation-Policy: isolate-and-credentialless` runtime (the
+		// header Gutenberg sends on editor screens). Under it, editor startup
+		// never reaches `networkidle` and the page is torn down, so these
+		// startup-request assertions time out. Skip until the browser
+		// regression is resolved. See
+		// https://github.com/WordPress/gutenberg/pull/78632.
+		test.skip(
+			( await getChromiumMajorVersion( page ) ) >= 148,
+			'Document-Isolation-Policy is broken in Chromium 148+'
+		);
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {

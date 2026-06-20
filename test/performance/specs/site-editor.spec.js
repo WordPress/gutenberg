@@ -13,6 +13,20 @@ import { PerfUtils } from '../fixtures';
 // See https://github.com/WordPress/gutenberg/issues/51383#issuecomment-1613460429
 const BROWSER_IDLE_WAIT = 1000;
 
+/**
+ * Returns the major Chromium version from the browser's user agent, or 0 if
+ * not Chromium.
+ *
+ * @param {import('@playwright/test').Page} page Playwright page object.
+ * @return {Promise<number>} Major Chromium version.
+ */
+async function getChromiumMajorVersion( page ) {
+	return page.evaluate( () => {
+		const match = window.navigator.userAgent.match( /Chrome\/(\d+)/ );
+		return match ? parseInt( match[ 1 ], 10 ) : 0;
+	} );
+}
+
 const results = {
 	serverResponse: [],
 	firstPaint: [],
@@ -274,6 +288,19 @@ test.describe( 'Site Editor Performance', () => {
 	test.describe( 'Loading Patterns', () => {
 		test.beforeAll( async ( { requestUtils } ) => {
 			await requestUtils.activateTheme( 'twentytwentyfour' );
+		} );
+
+		test.beforeEach( async ( { page } ) => {
+			// Chromium 148 shipped a regression in the cross-origin isolated
+			// `Document-Isolation-Policy: isolate-and-credentialless` runtime
+			// (the header Gutenberg sends on editor screens). Under it the
+			// site editor never settles, so this measurement times out. Skip
+			// until the browser regression is resolved. See
+			// https://github.com/WordPress/gutenberg/pull/78632.
+			test.skip(
+				( await getChromiumMajorVersion( page ) ) >= 148,
+				'Document-Isolation-Policy is broken in Chromium 148+'
+			);
 		} );
 
 		test.afterAll( async ( { requestUtils } ) => {
