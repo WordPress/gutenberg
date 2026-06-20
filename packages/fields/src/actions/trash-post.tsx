@@ -92,7 +92,9 @@ const trashPost: Action< PostWithPermissions > = {
 										'postType',
 										item.type,
 										item.id.toString(),
-										{},
+										item.type === 'attachment'
+											? { force: true }
+											: {},
 										{ throwOnError: true }
 									)
 								)

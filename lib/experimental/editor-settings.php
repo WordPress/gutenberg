@@ -18,6 +18,9 @@ function gutenberg_enable_experiments() {
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-dataviews-media-modal' ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalDataViewsMediaModal = true', 'before' );
 	}
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-dataviews-media-library' ) ) {
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalDataViewsMediaLibrary = true', 'before' );
+	}
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-content-only-inspector-fields' ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalContentOnlyInspectorFields = true', 'before' );
 	}

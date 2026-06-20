@@ -1,0 +1,35 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.edit-site-sidebar-media-library__section {
+	margin-top: $grid-unit-20;
+	padding: 0 $grid-unit-10;
+}
+
+.edit-site-sidebar-media-library__section-title {
+	color: $gray-200;
+	font-size: $helptext-font-size;
+	font-weight: $font-weight-medium;
+	padding: 0 $grid-unit-10;
+	margin-bottom: $grid-unit-05;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.edit-site-sidebar-media-library__count {
+	margin-left: auto;
+	color: $gray-600;
+	font-size: $helptext-font-size;
+}
+
+.edit-site-media-list__title-cell {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.edit-site-media-list__inline-thumb {
+	border-radius: 2px;
+	object-fit: cover;
+	flex-shrink: 0;
+}

@@ -10,6 +10,7 @@ import {
 	styles,
 	page,
 	siteLogo,
+	media,
 } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -49,6 +50,16 @@ export function MainSidebarNavigationContent( { isBlockBasedTheme = true } ) {
 					>
 						{ __( 'Pages' ) }
 					</SidebarNavigationItem>
+					{ window.__experimentalDataViewsMediaLibrary && (
+						<SidebarNavigationItem
+							uid="media-navigation-item"
+							to="/media"
+							withChevron
+							icon={ media }
+						>
+							{ __( 'Media' ) }
+						</SidebarNavigationItem>
+					) }
 					<SidebarNavigationItem
 						uid="navigation-navigation-item"
 						to="/navigation"
