@@ -40,6 +40,20 @@ async function probeUltraHdrUrl( url ) {
  * @typedef {import('@playwright/test').Page} Page
  */
 
+/**
+ * Returns the major Chromium version from the browser's user agent, or 0 if
+ * not Chromium.
+ *
+ * @param {Page} page Playwright page object.
+ * @return {Promise<number>} Major Chromium version.
+ */
+async function getChromiumMajorVersion( page ) {
+	return page.evaluate( () => {
+		const match = window.navigator.userAgent.match( /Chrome\/(\d+)/ );
+		return match ? parseInt( match[ 1 ], 10 ) : 0;
+	} );
+}
+
 const ASSETS_DIR = path.join( __dirname, '..', '..', '..', 'assets' );
 
 test.use( {
@@ -126,8 +140,19 @@ class MediaProcessingUtils {
 				typeof Worker !== 'undefined'
 			);
 		} );
+
+		// Chromium 148 shipped a regression in the cross-origin isolated
+		// `Document-Isolation-Policy: isolate-and-credentialless` runtime
+		// (the header Gutenberg sends to enable CSM). Feature detection still
+		// reports CSM as available, but the wasm-vips transcode silently falls
+		// back to the server, so the editor uploads the original file unchanged
+		// and these CSM-specific assertions (format/rotation/sub-sizes) no
+		// longer hold. Treat CSM as inactive until the browser regression is
+		// resolved. See https://github.com/WordPress/gutenberg/pull/78632.
+		const chromiumVersion = await getChromiumMajorVersion( this.page );
+
 		testInstance.skip(
-			! isActive,
+			! isActive || chromiumVersion >= 148,
 			'Client-side media processing is not active in this environment'
 		);
 	}
