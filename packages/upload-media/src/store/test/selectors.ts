@@ -400,11 +400,44 @@ describe( 'selectors', () => {
 			expect( getActiveVideoProcessingCount( state ) ).toBe( 2 );
 		} );
 
+		it( 'getActiveVideoProcessingCount counts items transcoding a video', () => {
+			const state = {
+				queue: [
+					{ currentOperation: OperationType.TranscodeVideo },
+					{ currentOperation: OperationType.TranscodeGif },
+					{ currentOperation: OperationType.Upload },
+				],
+			} as never;
+			// Both GIF and video transcoding share the single concurrency gate.
+			expect( getActiveVideoProcessingCount( state ) ).toBe( 2 );
+		} );
+
 		it( 'getPendingVideoProcessing returns items whose next op is TranscodeGif', () => {
 			const state = {
 				queue: [
 					{
 						operations: [ OperationType.TranscodeGif ],
+						currentOperation: undefined,
+					},
+					{
+						operations: [ OperationType.Upload ],
+						currentOperation: undefined,
+					},
+				],
+			} as never;
+			expect( getPendingVideoProcessing( state ) ).toHaveLength( 1 );
+		} );
+
+		it( 'getPendingVideoProcessing returns items whose next op is TranscodeVideo', () => {
+			const state = {
+				queue: [
+					{
+						operations: [
+							[
+								OperationType.TranscodeVideo,
+								{ outputFormat: 'mp4' },
+							],
+						],
 						currentOperation: undefined,
 					},
 					{

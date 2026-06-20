@@ -12,6 +12,8 @@ import {
 	finalizeItem,
 	prepareItem,
 	transcodeGifItem,
+	transcodeVideoItem,
+	generateVideoCompanion,
 	detectUltraHdr,
 	removeItem,
 } from '../private-actions';
@@ -23,6 +25,8 @@ import {
 } from '../utils';
 import {
 	convertGifToVideo,
+	transcodeVideo,
+	getVideoMetadata,
 	terminateVideoConversionWorker,
 } from '../utils/video-conversion';
 
@@ -55,6 +59,8 @@ jest.mock( '../utils/video-conversion', () => {
 	const actual = jest.requireActual( '../utils/video-conversion' );
 	return {
 		convertGifToVideo: jest.fn(),
+		transcodeVideo: jest.fn(),
+		getVideoMetadata: jest.fn(),
 		cancelGifToVideoOperations: jest.fn(),
 		terminateVideoConversionWorker: jest.fn(),
 		isUnsupportedConversionError: actual.isUnsupportedConversionError,
@@ -840,6 +846,372 @@ describe( 'private actions', () => {
 			expect( convertGifToVideo ).not.toHaveBeenCalled();
 			expect( dispatch.finishOperation ).not.toHaveBeenCalled();
 			expect( dispatch.cancelItem ).not.toHaveBeenCalled();
+		} );
+	} );
+
+	describe( 'prepareItem video transcoding', () => {
+		function flattenOperations( operations ) {
+			return ( operations || [] ).map( ( op ) =>
+				Array.isArray( op ) ? op[ 0 ] : op
+			);
+		}
+
+		async function runPrepareItem( { file, settings = {} } ) {
+			const item = { id: 'video-id', file, additionalData: {} };
+
+			let dispatchedOperations;
+			const dispatch = ( action ) => {
+				if ( action?.type === 'ADD_OPERATIONS' ) {
+					dispatchedOperations = action.operations;
+				}
+			};
+			dispatch.cancelItem = jest.fn();
+			dispatch.finishOperation = jest.fn();
+
+			const select = {
+				getItem: () => item,
+				getSettings: () => settings,
+			};
+
+			await prepareItem( 'video-id' )( { select, dispatch } );
+			return { operations: dispatchedOperations, dispatch, item };
+		}
+
+		beforeEach( () => {
+			global.VideoEncoder = function () {};
+			getVideoMetadata.mockReset();
+		} );
+
+		afterEach( () => {
+			delete global.VideoEncoder;
+		} );
+
+		it( 'enqueues the companion pipeline for a non-web-safe video', async () => {
+			const file = new File( [ 'mov' ], 'clip.mov', {
+				type: 'video/quicktime',
+			} );
+			getVideoMetadata.mockResolvedValue( {
+				codec: 'hevc',
+				width: 1280,
+				height: 720,
+				bitrate: 0,
+			} );
+
+			const { operations, dispatch, item } = await runPrepareItem( {
+				file,
+			} );
+
+			expect( flattenOperations( operations ) ).toEqual( [
+				OperationType.Upload,
+				OperationType.GenerateVideoCompanion,
+				OperationType.Finalize,
+			] );
+			expect( dispatch.finishOperation ).toHaveBeenCalledWith(
+				'video-id',
+				expect.objectContaining( {
+					videoCompanionFile: item.file,
+				} )
+			);
+		} );
+
+		it( 'leaves an already web-safe, small video untouched', async () => {
+			const file = new File( [ 'mp4' ], 'clip.mp4', {
+				type: 'video/mp4',
+			} );
+			getVideoMetadata.mockResolvedValue( {
+				codec: 'avc',
+				width: 1280,
+				height: 720,
+				bitrate: 0,
+			} );
+
+			const { operations, dispatch } = await runPrepareItem( { file } );
+
+			expect( flattenOperations( operations ) ).toEqual( [
+				OperationType.Upload,
+			] );
+			expect( dispatch.finishOperation ).not.toHaveBeenCalledWith(
+				'video-id',
+				expect.objectContaining( {
+					videoCompanionFile: expect.anything(),
+				} )
+			);
+		} );
+
+		it( 'transcodes an oversized web-safe video', async () => {
+			const file = new File( [ 'mp4' ], 'clip.mp4', {
+				type: 'video/mp4',
+			} );
+			getVideoMetadata.mockResolvedValue( {
+				codec: 'avc',
+				width: 3840,
+				height: 2160,
+				bitrate: 0,
+			} );
+
+			const { operations } = await runPrepareItem( { file } );
+
+			expect( flattenOperations( operations ) ).toContain(
+				OperationType.GenerateVideoCompanion
+			);
+		} );
+
+		it( 'transcodes before upload when videoKeepOriginal is false', async () => {
+			const file = new File( [ 'mov' ], 'clip.mov', {
+				type: 'video/quicktime',
+			} );
+			getVideoMetadata.mockResolvedValue( {
+				codec: 'hevc',
+				width: 1280,
+				height: 720,
+				bitrate: 0,
+			} );
+
+			const { operations, dispatch } = await runPrepareItem( {
+				file,
+				settings: { videoKeepOriginal: false },
+			} );
+
+			expect( operations[ 0 ] ).toEqual( [
+				OperationType.TranscodeVideo,
+				{ outputFormat: 'mp4' },
+			] );
+			expect( flattenOperations( operations ) ).toEqual( [
+				OperationType.TranscodeVideo,
+				OperationType.Upload,
+			] );
+			expect( dispatch.finishOperation ).not.toHaveBeenCalledWith(
+				'video-id',
+				expect.objectContaining( {
+					videoCompanionFile: expect.anything(),
+				} )
+			);
+		} );
+
+		it( 'falls through to a plain upload when WebCodecs is unavailable', async () => {
+			const file = new File( [ 'mov' ], 'clip.mov', {
+				type: 'video/quicktime',
+			} );
+			delete global.VideoEncoder;
+
+			const { operations } = await runPrepareItem( { file } );
+
+			expect( getVideoMetadata ).not.toHaveBeenCalled();
+			expect( flattenOperations( operations ) ).toEqual( [
+				OperationType.Upload,
+			] );
+		} );
+
+		it( 'falls through to a plain upload when metadata cannot be read', async () => {
+			const file = new File( [ 'mov' ], 'clip.mov', {
+				type: 'video/quicktime',
+			} );
+			getVideoMetadata.mockRejectedValue( new Error( 'no track' ) );
+
+			const { operations, dispatch } = await runPrepareItem( { file } );
+
+			expect( flattenOperations( operations ) ).toEqual( [
+				OperationType.Upload,
+			] );
+			expect( dispatch.finishOperation ).not.toHaveBeenCalledWith(
+				'video-id',
+				expect.objectContaining( {
+					videoCompanionFile: expect.anything(),
+				} )
+			);
+		} );
+	} );
+
+	describe( 'transcodeVideoItem', () => {
+		const sourceVideo = new File( [ 'mov' ], 'clip.mov', {
+			type: 'video/quicktime',
+		} );
+
+		// parentId set => companion sideload; absent => replace-primary.
+		function buildArgs( { parentId } = {} ) {
+			const dispatch = Object.assign( jest.fn(), {
+				finishOperation: jest.fn(),
+				cancelItem: jest.fn(),
+			} );
+			const select = {
+				getItem: jest.fn( () => ( {
+					id: 'video-1',
+					file: sourceVideo,
+					parentId,
+				} ) ),
+				getSettings: jest.fn( () => ( {
+					bigVideoSizeThreshold: 1920,
+				} ) ),
+			};
+			return { select, dispatch };
+		}
+
+		let consoleError;
+
+		beforeEach( () => {
+			transcodeVideo.mockReset();
+			consoleError = jest
+				.spyOn( console, 'error' )
+				.mockImplementation( () => {} );
+		} );
+
+		afterEach( () => {
+			consoleError.mockRestore();
+		} );
+
+		it( 'hands the transcoded video to the next Upload via finishOperation', async () => {
+			const videoFile = new File( [ 'mp4' ], 'clip.mp4', {
+				type: 'video/mp4',
+			} );
+			transcodeVideo.mockResolvedValue( videoFile );
+			const { select, dispatch } = buildArgs( { parentId: 'parent-1' } );
+
+			await transcodeVideoItem( 'video-1', { outputFormat: 'mp4' } )( {
+				select,
+				dispatch,
+			} );
+
+			expect( transcodeVideo ).toHaveBeenCalledWith(
+				'video-1',
+				sourceVideo,
+				'video/mp4',
+				{ maxDimensions: 1920 }
+			);
+			expect( dispatch.finishOperation ).toHaveBeenCalledWith(
+				'video-1',
+				{ file: videoFile }
+			);
+			expect( dispatch.cancelItem ).not.toHaveBeenCalled();
+		} );
+
+		it( 'silently cancels the companion sideload on an Unsupported error', async () => {
+			transcodeVideo.mockRejectedValue(
+				new Error( 'Unsupported: encoder codec not supported' )
+			);
+			const { select, dispatch } = buildArgs( { parentId: 'parent-1' } );
+
+			await transcodeVideoItem( 'video-1' )( { select, dispatch } );
+
+			expect( dispatch.finishOperation ).not.toHaveBeenCalled();
+			expect( dispatch.cancelItem ).toHaveBeenCalledTimes( 1 );
+			const [ cancelledId, , silent ] =
+				dispatch.cancelItem.mock.calls[ 0 ];
+			expect( cancelledId ).toBe( 'video-1' );
+			expect( silent ).toBe( true );
+			expect( consoleError ).not.toHaveBeenCalled();
+		} );
+
+		it( 'uploads the original on an Unsupported error in replace-primary mode', async () => {
+			// No parentId => the video is the primary item; falling back to
+			// uploading the original must not lose the user's file.
+			transcodeVideo.mockRejectedValue(
+				new Error( 'Unsupported: WebCodecs unavailable' )
+			);
+			const { select, dispatch } = buildArgs();
+
+			await transcodeVideoItem( 'video-1' )( { select, dispatch } );
+
+			expect( dispatch.cancelItem ).not.toHaveBeenCalled();
+			expect( dispatch.finishOperation ).toHaveBeenCalledWith(
+				'video-1',
+				{ file: sourceVideo }
+			);
+		} );
+
+		it( 'uploads the original on a hard failure in replace-primary mode', async () => {
+			const cause = new Error( 'Encoder produced empty output' );
+			transcodeVideo.mockRejectedValue( cause );
+			const { select, dispatch } = buildArgs();
+
+			await transcodeVideoItem( 'video-1' )( { select, dispatch } );
+
+			expect( consoleError ).toHaveBeenCalled();
+			expect( dispatch.cancelItem ).not.toHaveBeenCalled();
+			expect( dispatch.finishOperation ).toHaveBeenCalledWith(
+				'video-1',
+				{ file: sourceVideo }
+			);
+		} );
+
+		it( 'silently cancels the companion sideload on a hard failure', async () => {
+			const cause = new Error( 'Encoder produced empty output' );
+			transcodeVideo.mockRejectedValue( cause );
+			const { select, dispatch } = buildArgs( { parentId: 'parent-1' } );
+
+			await transcodeVideoItem( 'video-1' )( { select, dispatch } );
+
+			expect( dispatch.finishOperation ).not.toHaveBeenCalled();
+			expect( dispatch.cancelItem ).toHaveBeenCalledTimes( 1 );
+			const [ cancelledId, error, silent ] =
+				dispatch.cancelItem.mock.calls[ 0 ];
+			expect( cancelledId ).toBe( 'video-1' );
+			expect( error.code ).toBe( 'VIDEO_TRANSCODING_ERROR' );
+			expect( error.cause ).toBe( cause );
+			expect( silent ).toBe( true );
+			expect( consoleError ).toHaveBeenCalled();
+		} );
+	} );
+
+	describe( 'generateVideoCompanion', () => {
+		const sourceVideo = new File( [ 'mov' ], 'clip.mov', {
+			type: 'video/quicktime',
+		} );
+
+		function buildArgs( item ) {
+			const dispatch = Object.assign( jest.fn(), {
+				finishOperation: jest.fn(),
+				addSideloadItem: jest.fn(),
+			} );
+			const select = {
+				getItem: jest.fn( () => item ),
+				getSettings: jest.fn( () => ( {
+					videoOutputFormat: 'video/mp4',
+				} ) ),
+			};
+			return { select, dispatch };
+		}
+
+		it( 'sideloads the transcoded companion when an attachment exists', async () => {
+			const { select, dispatch } = buildArgs( {
+				id: 'video-1',
+				videoCompanionFile: sourceVideo,
+				attachment: { id: 42 },
+			} );
+
+			await generateVideoCompanion( 'video-1' )( { select, dispatch } );
+
+			expect( dispatch.addSideloadItem ).toHaveBeenCalledTimes( 1 );
+			const sideload = dispatch.addSideloadItem.mock.calls[ 0 ][ 0 ];
+			expect( sideload.file ).toBe( sourceVideo );
+			expect( sideload.parentId ).toBe( 'video-1' );
+			expect( sideload.additionalData ).toMatchObject( {
+				post: 42,
+				image_size: 'optimized-video',
+				convert_format: false,
+			} );
+			expect( sideload.operations ).toEqual( [
+				[ OperationType.TranscodeVideo, { outputFormat: 'mp4' } ],
+				OperationType.Upload,
+			] );
+			expect( dispatch.finishOperation ).toHaveBeenCalledWith(
+				'video-1',
+				{}
+			);
+		} );
+
+		it( 'does not sideload when there is no companion file', async () => {
+			const { select, dispatch } = buildArgs( {
+				id: 'video-1',
+				attachment: { id: 42 },
+			} );
+
+			await generateVideoCompanion( 'video-1' )( { select, dispatch } );
+
+			expect( dispatch.addSideloadItem ).not.toHaveBeenCalled();
+			expect( dispatch.finishOperation ).toHaveBeenCalledWith(
+				'video-1',
+				{}
+			);
 		} );
 	} );
 
