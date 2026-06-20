@@ -836,7 +836,6 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 				'Gutenberg_REST_Comment_Suggestions_Controller',
 				'is_suggestion_lifecycle_update'
 			);
-			$reflection->setAccessible( true );
 
 			$this->assertSame(
 				$case['expected'],
@@ -868,7 +867,6 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			'Gutenberg_REST_Comment_Suggestions_Controller',
 			'is_suggestion_lifecycle_update'
 		);
-		$reflection->setAccessible( true );
 		$this->assertTrue( $reflection->invoke( null, $request ) );
 	}
 }
