@@ -2,15 +2,17 @@
  * WordPress dependencies
  */
 import { __experimentalHStack as HStack, Button } from '@wordpress/components';
-import { useRef } from '@wordpress/element';
+import { useId, useRef, useState } from '@wordpress/element';
 import {
 	__experimentalRegisterConnector as registerConnector,
 	__experimentalConnectorItem as ConnectorItem,
 	__experimentalDefaultConnectorSettings as DefaultConnectorSettings,
 	privateApis as connectorsPrivateApis,
 	type ConnectorConfig,
+	type ConnectorField,
 	type ConnectorRenderProps,
 } from '@wordpress/connectors';
+import apiFetch from '@wordpress/api-fetch';
 import { select } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { Badge, Link } from '@wordpress/ui';
@@ -41,6 +43,7 @@ interface ConnectorData {
 		isActivated: boolean;
 	};
 	authentication: NonNullable< ConnectorConfig[ 'authentication' ] >;
+	configSchema?: ConnectorField[];
 }
 
 interface ConnectorScriptModuleData {
@@ -248,6 +251,140 @@ function ApiKeyConnector( {
 	);
 }
 
+/**
+ * Render used for connectors that declare one or more configuration fields
+ * via `register_connector_field()` on top of (or instead of) the legacy
+ * api_key authentication.
+ *
+ * Mirrors the behaviour of the legacy api_key render: shows a Configure /
+ * Edit button in the action area that toggles visibility of the field form.
+ * The form itself is rendered by `DefaultConnectorSettings`, which renders one
+ * typed control per schema entry with a single Save button for the connector.
+ *
+ * @param props              Connector render props.
+ * @param props.name         Display name of the connector.
+ * @param props.description  Description shown under the name.
+ * @param props.logo         Logo element rendered alongside the connector.
+ * @param props.configSchema Typed configuration fields for the connector.
+ */
+function SchemaConnector( {
+	name,
+	description,
+	logo,
+	configSchema,
+}: ConnectorRenderProps ) {
+	const [ isExpanded, setIsExpanded ] = useState( false );
+	// Stable id used to link the disclosure button's `aria-controls` to the
+	// panel it reveals — implements the WAI-ARIA disclosure pattern.
+	const panelId = useId();
+	// `configSchema` is a snapshot taken at page load; `field.isStored` reflects
+	// only the state the server reported then. We track the names of fields the
+	// user saves during this session so the Connected badge and "Edit" /
+	// "Configure" label flip immediately without waiting for a reload.
+	const [ locallySavedFields, setLocallySavedFields ] = useState<
+		Set< string >
+	>( () => new Set() );
+
+	if ( ! configSchema || configSchema.length === 0 ) {
+		return null;
+	}
+
+	const hasStoredFieldFromServer = configSchema.some(
+		( field ) => field.isStored
+	);
+	const isConnected = hasStoredFieldFromServer || locallySavedFields.size > 0;
+
+	let buttonLabel: string;
+	if ( isExpanded ) {
+		buttonLabel = __( 'Cancel' );
+	} else if ( isConnected ) {
+		buttonLabel = __( 'Edit' );
+	} else {
+		buttonLabel = __( 'Configure' );
+	}
+
+	return (
+		<ConnectorItem
+			logo={ logo }
+			name={ name }
+			description={ description }
+			actionArea={
+				<HStack spacing={ 3 } expanded={ false }>
+					{ isConnected && <ConnectedBadge /> }
+					<Button
+						variant={
+							isExpanded || isConnected ? 'tertiary' : 'secondary'
+						}
+						size="compact"
+						aria-expanded={ isExpanded }
+						aria-controls={ panelId }
+						onClick={ () => setIsExpanded( ( prev ) => ! prev ) }
+					>
+						{ buttonLabel }
+					</Button>
+				</HStack>
+			}
+		>
+			{ isExpanded && (
+				<div id={ panelId }>
+					<DefaultConnectorSettings
+						configSchema={ configSchema }
+						onSaveFields={ async ( changed ) => {
+							// Map field names to their option (settingName) and
+							// persist the whole connector in one Settings request.
+							const data: Record< string, unknown > = {};
+							const savedNames: string[] = [];
+							for ( const [ fieldName, value ] of Object.entries(
+								changed
+							) ) {
+								const field = configSchema.find(
+									( f ) => f.name === fieldName
+								);
+								if ( ! field ) {
+									continue;
+								}
+								data[ field.settingName ] = value;
+								savedNames.push( fieldName );
+							}
+							if ( savedNames.length === 0 ) {
+								return;
+							}
+							await apiFetch( {
+								path: '/wp/v2/settings',
+								method: 'POST',
+								data,
+							} );
+							setLocallySavedFields( ( prev ) => {
+								const next = new Set( prev );
+								savedNames.forEach( ( fieldName ) =>
+									next.add( fieldName )
+								);
+								return next;
+							} );
+						} }
+					/>
+				</div>
+			) }
+		</ConnectorItem>
+	);
+}
+
+/**
+ * Returns true when the connector declares fields beyond the legacy api_key
+ * (the synthetic api_key alone is considered a legacy-shaped connector).
+ *
+ * @param configSchema Typed configuration fields for the connector.
+ * @return Whether the schema declares any field other than `api_key`.
+ */
+function hasExtraSchemaFields(
+	configSchema: ConnectorField[] | undefined
+): boolean {
+	if ( ! configSchema || configSchema.length === 0 ) {
+		return false;
+	}
+	return configSchema.some( ( field ) => field.name !== 'api_key' );
+}
+
 // Register connectors from server-provided connector data.
 export function registerDefaultConnectors() {
 	const connectors = getConnectorData();
@@ -261,7 +398,7 @@ export function registerDefaultConnectors() {
 			continue;
 		}
 
-		const { authentication } = data;
+		const { authentication, configSchema } = data;
 
 		const connectorName = sanitize( connectorId );
 		const args: Partial< Omit< ConnectorConfig, 'slug' > > = {
@@ -271,6 +408,7 @@ export function registerDefaultConnectors() {
 			logo: getConnectorLogo( connectorId, data.logoUrl ),
 			authentication,
 			plugin: data.plugin,
+			configSchema,
 		};
 
 		// Preserve a render that was already registered for this slug by
@@ -279,8 +417,12 @@ export function registerDefaultConnectors() {
 		const existing = unlock( select( connectorsStore ) ).getConnector(
 			connectorName
 		);
-		if ( authentication.method === 'api_key' && ! existing?.render ) {
-			args.render = ApiKeyConnector;
+		if ( ! existing?.render ) {
+			if ( hasExtraSchemaFields( configSchema ) ) {
+				args.render = SchemaConnector;
+			} else if ( authentication.method === 'api_key' ) {
+				args.render = ApiKeyConnector;
+			}
 		}
 
 		registerConnector( connectorName, args );

@@ -168,6 +168,9 @@ function ConnectorsPage() {
 													connector.authentication
 												}
 												plugin={ connector.plugin }
+												configSchema={
+													connector.configSchema
+												}
 											/>
 										);
 									}
