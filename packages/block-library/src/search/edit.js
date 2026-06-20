@@ -508,7 +508,12 @@ export default function SearchEdit( {
 						// The help text is updated via aria-describedby, which
 						// is not re-announced while focus remains on the select.
 						// Announce the new description so it is not missed.
-						speak( TAG_NAME_MESSAGES[ value ] );
+						// speak() strips HTML-like tags, which would drop the
+						// element names (e.g. <search>) entirely. Remove only the
+						// angle brackets so the words are retained when spoken.
+						speak(
+							TAG_NAME_MESSAGES[ value ].replace( /[<>]/g, '' )
+						);
 					} }
 					help={ TAG_NAME_MESSAGES[ tagName ?? '' ] }
 				/>
