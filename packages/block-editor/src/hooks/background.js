@@ -211,10 +211,8 @@ export function BackgroundImagePanel( {
 	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
 
 	// Fold the backgroundColor / gradient attribute slugs back into the style
-	// object the panel consumes, so preset selections round-trip correctly.
-	// When background.gradient is supported but not yet explicitly set, fall
-	// back to color.gradient for display. Any write from this panel migrates
-	// the value to background.gradient and clears color.gradient atomically.
+	// object the panel consumes. When background.gradient is supported but not
+	// yet explicitly set, fall back to color.gradient for display.
 	const styleValue = {
 		...style,
 		color: {
@@ -237,10 +235,7 @@ export function BackgroundImagePanel( {
 		} ),
 	};
 
-	// Contrast checking is enabled by default. It is disabled when editing a
-	// block style state, while a gradient is set (gradients can't be reliably
-	// evaluated), when no background color is set in this panel, or when a block
-	// opts out via `color.enableContrastChecker: false`.
+	// Skipped for gradients, which can't be reliably evaluated for contrast.
 	const enableContrastChecking =
 		! isStateSelected &&
 		! styleValue?.color?.gradient &&
@@ -295,8 +290,8 @@ export function BackgroundImagePanel( {
 			? undefined
 			: newStyle?.color?.gradient;
 
-		// Strip slug-resolved values out of the style object so they don't
-		// get persisted as inline values alongside the attribute slugs.
+		// Drop slug-resolved values so they aren't persisted inline alongside
+		// the attribute slugs.
 		const cleanedStyle = {
 			...newStyle,
 			color: {
@@ -304,18 +299,14 @@ export function BackgroundImagePanel( {
 				background: newBackgroundColorSlug
 					? undefined
 					: newBackgroundColorValue,
-				// When background.gradient is supported, always clear the
-				// legacy color.gradient path on write.
 				gradient: backgroundGradientSupported
 					? undefined
 					: cleanedColorGradient,
 			},
 		};
 		if ( backgroundGradientSupported ) {
-			// Background gradients live in `style.background.gradient` (as a
-			// preset reference or a raw value), not in the legacy color-support
-			// `gradient` attribute. Keep the value here rather than extracting
-			// its slug to the attribute.
+			// Background gradients are kept whole in `style.background.gradient`
+			// rather than extracted to the legacy `gradient` attribute.
 			cleanedStyle.background = {
 				...cleanedStyle.background,
 				gradient: newStyle?.background?.gradient,

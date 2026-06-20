@@ -90,11 +90,8 @@ export function ElementsEdit( {
 				setAttributes( { style: cleanEmptyObject( newStyle ) } );
 		  };
 
-	// Contrast checking is enabled by default. It is disabled when editing a
-	// block style state, when no link color is set in this panel, or when a
-	// block opts out via `color.enableContrastChecker: false`. Text and
-	// background color failures are reported by the Typography and Background
-	// panels, which own those selections.
+	// Text and background color failures are reported by the Typography and
+	// Background panels, which own those selections.
 	const enableContrastChecking =
 		! isStateSelected &&
 		!! value?.elements?.link?.color?.text &&
@@ -109,8 +106,6 @@ export function ElementsEdit( {
 		clientId,
 		name,
 		enabled: !! enableContrastChecking,
-		// Text color failures are reported by the Typography panel, which
-		// owns the text color selection.
 		checkTextColor: false,
 		messageOverride: __(
 			'This link color has poor contrast against the background. Consider increasing contrast.'

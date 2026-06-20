@@ -10,7 +10,9 @@ import { __ } from '@wordpress/i18n';
 import {
 	BaseControl,
 	__experimentalVStack as VStack,
+	ColorPalette,
 	GradientPicker,
+	Notice,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 
@@ -20,7 +22,7 @@ import {
 import { useSettings } from '../use-settings';
 import { unlock } from '../../lock-unlock';
 
-const { ColorPalette, Tabs } = unlock( componentsPrivateApis );
+const { Tabs } = unlock( componentsPrivateApis );
 const colorsAndGradientKeys = [
 	'colors',
 	'disableCustomColors',
@@ -67,21 +69,35 @@ function ColorGradientControlInner( {
 		  }
 		: ( newColor, _index, newSlug ) => onColorChange( newColor, newSlug );
 
+	const colorPalette = (
+		<ColorPalette
+			value={ colorValue }
+			selectedSlug={ colorSlug }
+			onChange={ colorPaletteOnChange }
+			{ ...{ colors, disableCustomColors } }
+			__experimentalIsRenderedInSidebar={
+				__experimentalIsRenderedInSidebar
+			}
+			clearable={ clearable }
+			enableAlpha={ enableAlpha }
+			headingLevel={ headingLevel }
+		/>
+	);
+
 	const tabPanels = {
+		// The `ColorPalette` must stay at a stable position in the tree whether
+		// or not a notice is present. Wrapping it in a `VStack` only when a
+		// notice appears remounts it, which resets the custom color picker back
+		// to the swatch view mid-edit. Keep `ColorPalette` last and toggle only
+		// the notice ahead of it; the notice's own bottom margin provides the
+		// spacing the wrapper used to.
 		[ TAB_IDS.color ]: (
-			<ColorPalette
-				value={ colorValue }
-				selectedSlug={ colorSlug }
-				onChange={ colorPaletteOnChange }
-				{ ...{ colors, disableCustomColors } }
-				__experimentalIsRenderedInSidebar={
-					__experimentalIsRenderedInSidebar
-				}
-				clearable={ clearable }
-				enableAlpha={ enableAlpha }
-				headingLevel={ headingLevel }
-				noticeProps={ noticeProps }
-			/>
+			<>
+				{ noticeProps && (
+					<Notice isDismissible={ false } { ...noticeProps } />
+				) }
+				{ colorPalette }
+			</>
 		),
 		[ TAB_IDS.gradient ]: (
 			<GradientPicker

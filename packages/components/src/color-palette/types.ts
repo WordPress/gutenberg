@@ -8,7 +8,6 @@ import type { CSSProperties, ReactNode } from 'react';
  */
 import type { DropdownProps } from '../dropdown/types';
 import type { HeadingSize } from '../heading/types';
-import type { NoticeProps } from '../notice/types';
 
 export type ColorObject = {
 	name: string;
@@ -140,29 +139,3 @@ export type ColorPaletteProps = Pick<
 				'aria-label'?: never;
 		  }
 	);
-
-/**
- * Props for the private `ColorPalette` variant exposed to Core via the
- * components package's private APIs. It extends the public component with the
- * ability to render a contextual `Notice`.
- *
- * The `noticeProps` API is intentionally kept off the public `ColorPalette`:
- * the placement of the notice (between the custom color picker and the palette
- * of color options) is an internal implementation detail, and limiting the prop
- * to the private surface keeps the public API free of injected markup.
- */
-export type PrivateColorPaletteProps = ColorPaletteProps & {
-	/**
-	 * Props for an optional `Notice` rendered between the custom color picker
-	 * and the palette of color options. Intended for short, contextual status
-	 * messages about the current selection, such as a contrast warning.
-	 *
-	 * The notice is rendered as non-dismissible: provide the message via
-	 * `children`, and optionally set the `status`, `spokenMessage`, and
-	 * `className`.
-	 */
-	noticeProps?: Pick<
-		NoticeProps,
-		'children' | 'status' | 'spokenMessage' | 'className'
-	>;
-};

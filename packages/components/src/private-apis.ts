@@ -15,7 +15,6 @@ import { kebabCase, normalizeTextString } from './utils/strings';
 import { withIgnoreIMEEvents } from './utils/with-ignore-ime-events';
 import { lock } from './lock-unlock';
 import Badge from './badge';
-import { PrivateColorPalette } from './color-palette';
 
 import { DateCalendar, DateRangeCalendar, TZDate } from './calendar';
 import {
@@ -35,7 +34,6 @@ import { ValidatedFormTokenField } from './validated-form-controls/components/fo
 export const privateApis = {};
 lock( privateApis, {
 	__experimentalPopoverLegacyPositionToPlacement,
-	ColorPalette: PrivateColorPalette,
 	ComponentsContext,
 	Tabs,
 	Theme,

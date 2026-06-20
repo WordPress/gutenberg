@@ -18,7 +18,6 @@ import { useCallback, useMemo, useState, forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import Dropdown from '../dropdown';
-import Notice from '../notice';
 import { ColorPicker } from '../color-picker';
 import CircularOptionPicker, {
 	getComputeCircularOptionPickerCommonProps,
@@ -33,7 +32,6 @@ import type {
 	CustomColorPickerDropdownProps,
 	MultiplePalettesProps,
 	PaletteObject,
-	PrivateColorPaletteProps,
 	SinglePaletteProps,
 } from './types';
 import type { WordPressComponentProps } from '../context';
@@ -188,7 +186,7 @@ export function CustomColorPickerDropdown( {
 }
 
 function UnforwardedColorPalette(
-	props: WordPressComponentProps< PrivateColorPaletteProps, 'div' >,
+	props: WordPressComponentProps< ColorPaletteProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {
@@ -205,7 +203,6 @@ function UnforwardedColorPalette(
 		headingLevel = 2,
 		'aria-label': ariaLabel,
 		'aria-labelledby': ariaLabelledby,
-		noticeProps,
 		...additionalProps
 	} = props;
 	const [ normalizedColorValue, setNormalizedColorValue ] = useState( value );
@@ -337,9 +334,6 @@ function UnforwardedColorPalette(
 					) }
 				/>
 			) }
-			{ noticeProps && (
-				<Notice isDismissible={ false } { ...noticeProps } />
-			) }
 			{ ( colors.length > 0 || actions ) && (
 				<CircularOptionPicker
 					{ ...metaProps }
@@ -368,30 +362,6 @@ function UnforwardedColorPalette(
 }
 
 /**
- * Private `ColorPalette` variant that additionally supports rendering a
- * contextual `Notice` via `noticeProps`. Exposed to Core through the components
- * package's private APIs; not part of the public component surface.
- */
-export const PrivateColorPalette = forwardRef( UnforwardedColorPalette );
-PrivateColorPalette.displayName = 'ColorPalette';
-
-function UnforwardedPublicColorPalette(
-	props: WordPressComponentProps< ColorPaletteProps, 'div' >,
-	forwardedRef: ForwardedRef< any >
-) {
-	// The `noticeProps` API is intentionally limited to the private variant.
-	// Force it off here so it can never be injected through the public
-	// component, even by untyped (JS) callers spreading arbitrary props.
-	return (
-		<PrivateColorPalette
-			ref={ forwardedRef }
-			{ ...props }
-			noticeProps={ undefined }
-		/>
-	);
-}
-
-/**
  * Allows the user to pick a color from a list of pre-defined color entries.
  *
  * ```jsx
@@ -415,7 +385,7 @@ function UnforwardedPublicColorPalette(
  * } );
  * ```
  */
-export const ColorPalette = forwardRef( UnforwardedPublicColorPalette );
+export const ColorPalette = forwardRef( UnforwardedColorPalette );
 ColorPalette.displayName = 'ColorPalette';
 
 export default ColorPalette;

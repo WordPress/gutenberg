@@ -95,16 +95,20 @@ test.describe( 'Navigation colors', () => {
 		const editorSettings = page.getByRole( 'region', {
 			name: 'Editor settings',
 		} );
-		await editorSettings
+		const textColorToggle = editorSettings
 			.locator( '.components-tools-panel' )
 			.filter( {
 				has: page.getByRole( 'heading', { name: 'Typography' } ),
 			} )
-			.getByRole( 'button', { name: 'Color', exact: true } )
-			.click();
+			.getByRole( 'button', { name: 'Color', exact: true } );
+		await textColorToggle.click();
 		await page
 			.getByRole( 'option', { name: 'White' } )
 			.click( { force: true } );
+		// Close the text color popover before opening the background one so the
+		// two option pickers don't overlap (each palette contains a "Black"
+		// swatch, which would otherwise be ambiguous).
+		await textColorToggle.click();
 
 		await editorSettings
 			.locator( '.components-tools-panel' )

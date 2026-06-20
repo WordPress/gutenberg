@@ -108,7 +108,6 @@ export function getContrastWarning( {
 			if ( messageOverride ) {
 				message = messageOverride;
 				speakMessage = messageOverride;
-				// These messages take priority over the transparency warning.
 				break;
 			}
 			message =

@@ -211,16 +211,13 @@ export function TypographyPanel( {
 				setAttributes( newAttributes );
 		  };
 
-	// Contrast checking is enabled by default. It is disabled when editing a
-	// block style state, for gradients (which can't be reliably evaluated), when
-	// no text color is set in this panel, or when a block opts out via
-	// `color.enableContrastChecker: false`. Link color failures are reported by
-	// the Elements panel, which owns the link color selection.
+	// Link color failures are reported by the Elements panel, which owns the
+	// link color selection.
 	const enableContrastChecking =
 		! isStateSelected &&
 		! value?.color?.gradient &&
 		!! value?.color?.text &&
-		( settings?.color?.text || settings?.color?.link ) &&
+		settings?.color?.text &&
 		false !== getBlockSupport( name, [ 'color', 'enableContrastChecker' ] );
 
 	const contrastWarning = useBlockColorContrastWarning( {

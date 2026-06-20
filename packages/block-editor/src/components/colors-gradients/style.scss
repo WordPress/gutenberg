@@ -68,6 +68,11 @@ $swatch-gap: 12px;
 	background: linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
 }
 
+// Space the in-popover contrast notice away from the color palette below it.
+.block-editor-panel-color-gradient-settings__contrast-notice {
+	margin-bottom: $grid-unit-20;
+}
+
 /**
 * The following styles replicate the separated border of the
 * `ItemGroup` component but allows for hidden items. This is because
