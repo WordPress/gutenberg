@@ -42,15 +42,20 @@ import {
 	DEFAULT_VIEW,
 	getActiveViewOverridesForTab,
 } from './view-utils';
+import { useTemplatePartTitle } from './hooks';
 
-const { usePostActions, usePostFields, templateTitleField } =
-	unlock( editorPrivateApis );
+const {
+	usePostActions,
+	usePostFields,
+	templateTitleField,
+	useTemplatesFilteredByTemplatePart,
+} = unlock( editorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );
 
 export default function PageTemplates() {
 	const { path, query } = useLocation();
-	const { activeView = 'active', postId } = query;
+	const { activeView = 'active', postId, usingTemplatePart } = query;
 	const [ selection, setSelection ] = useState( [ postId ] );
 	const [ selectedRegisteredTemplate, setSelectedRegisteredTemplate ] =
 		useState( false );
@@ -143,7 +148,7 @@ export default function PageTemplates() {
 		isLoadingData = isLoadingStaticData;
 	}
 
-	const records = useMemo( () => {
+	const unfilteredRecords = useMemo( () => {
 		function isCustom( record ) {
 			// For registered templates, the is_custom field is defined.
 			return (
@@ -183,6 +188,13 @@ export default function PageTemplates() {
 		staticRecords,
 		activeView,
 	] );
+
+	const records = useTemplatesFilteredByTemplatePart(
+		usingTemplatePart,
+		unfilteredRecords
+	);
+
+	const templatePartTitle = useTemplatePartTitle( usingTemplatePart );
 
 	const users = useSelect(
 		( select ) => {
@@ -321,12 +333,21 @@ export default function PageTemplates() {
 		( action ) => action.id === 'duplicate-post'
 	);
 
+	let title = __( 'Templates' );
+	if ( usingTemplatePart && templatePartTitle ) {
+		title = sprintf(
+			/* translators: %s: template part title */
+			__( 'Templates using %s template part.' ),
+			templatePartTitle
+		);
+	}
+
 	return (
 		<Page
 			className="edit-site-page-templates"
-			title={ __( 'Templates' ) }
+			title={ title }
 			headingLevel={ 2 }
-			actions={ <AddNewTemplate /> }
+			actions={ usingTemplatePart ? undefined : <AddNewTemplate /> }
 		>
 			<DataViews
 				key={ activeView }
