@@ -32,7 +32,7 @@ const EMPTY_ARRAY = [];
  */
 const TABS_TEMPLATE = [ [ 'core/tab-list' ], [ 'core/tab-panels' ] ];
 
-function Edit( { clientId, attributes, setAttributes } ) {
+function Edit( { clientId, attributes } ) {
 	const { anchor, activeTabIndex, editorActiveTabIndex } = attributes;
 
 	const { tabPanels, tabListClientId } = useSelect(
@@ -93,11 +93,7 @@ function Edit( { clientId, attributes, setAttributes } ) {
 	return (
 		<BlockContextProvider value={ contextValue }>
 			<div { ...innerBlockProps }>
-				<Controls
-					clientId={ clientId }
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-				/>
+				<Controls clientId={ clientId } />
 				{ innerBlockProps.children }
 			</div>
 		</BlockContextProvider>

@@ -815,11 +815,6 @@
 			"count": 2
 		}
 	},
-	"packages/edit-post/src/components/init-pattern-modal/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
 	"packages/edit-post/src/components/welcome-guide/default.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -900,17 +895,7 @@
 			"count": 4
 		}
 	},
-	"packages/edit-site/src/components/save-hub/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/edit-site/src/components/sidebar-global-styles/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/edit-site/src/components/sidebar-navigation-item/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		}
@@ -1089,11 +1074,6 @@
 		}
 	},
 	"packages/editor/src/components/post-visibility/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/editor/src/components/revision-created-panel/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		}
@@ -1547,26 +1527,6 @@
 			"count": 1
 		}
 	},
-	"packages/patterns/src/components/allow-overrides-modal.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		}
-	},
-	"packages/patterns/src/components/create-pattern-modal.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
-	"packages/patterns/src/components/rename-pattern-category-modal.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
-	"packages/patterns/src/components/rename-pattern-modal.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
 	"packages/preferences/src/components/preferences-modal-tabs/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 6
@@ -1580,16 +1540,6 @@
 	"packages/rich-text/src/hook/index.js": {
 		"react-hooks/refs": {
 			"count": 12
-		}
-	},
-	"packages/server-side-render/src/server-side-render.js": {
-		"react-hooks/refs": {
-			"count": 3
-		}
-	},
-	"packages/theme/src/stories/index.story.tsx": {
-		"react-hooks/refs": {
-			"count": 5
 		}
 	},
 	"packages/ui/src/alert-dialog/root.tsx": {
@@ -1631,11 +1581,6 @@
 		},
 		"@wordpress/use-recommended-components": {
 			"count": 3
-		}
-	},
-	"routes/dashboard/widget-dashboard/components/dashboard-widget-chrome/dashboard-widget-chrome.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
 		}
 	},
 	"routes/experiments-home/stage.tsx": {
