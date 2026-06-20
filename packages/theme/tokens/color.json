@@ -1372,7 +1372,7 @@
 					"$description": "Foreground color for interactive elements with brand tone and normal emphasis."
 				},
 				"brand-active": {
-					"$value": "{wpds-color.primitive.primary.fgSurface3}",
+					"$value": "{wpds-color.primitive.primary.fgSurface4}",
 					"$description": "Foreground color for interactive elements with brand tone and normal emphasis that are hovered, focused, or active."
 				},
 				"brand-disabled": {
@@ -1396,7 +1396,7 @@
 					"$description": "Foreground color for interactive elements with error tone and normal emphasis."
 				},
 				"error-active": {
-					"$value": "{wpds-color.primitive.error.fgSurface3}",
+					"$value": "{wpds-color.primitive.error.fgSurface4}",
 					"$description": "Foreground color for interactive elements with error tone and normal emphasis that are hovered, focused, or active."
 				},
 				"error-disabled": {
@@ -1465,6 +1465,14 @@
 				"warning-strong": {
 					"$value": "{wpds-color.primitive.warning.stroke3}",
 					"$description": "Decorative stroke color used to define warning-toned surface boundaries with strong emphasis."
+				},
+				"caution": {
+					"$value": "{wpds-color.primitive.caution.stroke1}",
+					"$description": "Decorative stroke color used to define caution-toned surface boundaries with normal emphasis."
+				},
+				"caution-strong": {
+					"$value": "{wpds-color.primitive.caution.stroke3}",
+					"$description": "Decorative stroke color used to define caution-toned surface boundaries with strong emphasis."
 				},
 				"error": {
 					"$value": "{wpds-color.primitive.error.stroke1}",

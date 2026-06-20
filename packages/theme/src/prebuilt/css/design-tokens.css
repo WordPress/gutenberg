@@ -150,7 +150,7 @@
 	/* Foreground color for interactive elements with brand tone and normal emphasis. */
 	--wpds-color-foreground-interactive-brand: #3858e9;
 	/* Foreground color for interactive elements with brand tone and normal emphasis that are hovered, focused, or active. */
-	--wpds-color-foreground-interactive-brand-active: #3858e9;
+	--wpds-color-foreground-interactive-brand-active: #0b0070;
 	/* Foreground color for interactive elements with brand tone and normal emphasis, in their disabled state. */
 	--wpds-color-foreground-interactive-brand-disabled: #8d8d8d;
 	/* Foreground color for interactive elements with brand tone and strong emphasis. */
@@ -162,7 +162,7 @@
 	/* Foreground color for interactive elements with error tone and normal emphasis. */
 	--wpds-color-foreground-interactive-error: #cc1818;
 	/* Foreground color for interactive elements with error tone and normal emphasis that are hovered, focused, or active. */
-	--wpds-color-foreground-interactive-error-active: #cc1818;
+	--wpds-color-foreground-interactive-error-active: #470000;
 	/* Foreground color for interactive elements with error tone and normal emphasis, in their disabled state. */
 	--wpds-color-foreground-interactive-error-disabled: #8d8d8d;
 	/* Foreground color for interactive elements with error tone and strong emphasis. */
@@ -193,6 +193,10 @@
 	--wpds-color-stroke-surface-warning: #e1bc7c;
 	/* Decorative stroke color used to define warning-toned surface boundaries with strong emphasis. */
 	--wpds-color-stroke-surface-warning-strong: #926300;
+	/* Decorative stroke color used to define caution-toned surface boundaries with normal emphasis. */
+	--wpds-color-stroke-surface-caution: #cfc28d;
+	/* Decorative stroke color used to define caution-toned surface boundaries with strong emphasis. */
+	--wpds-color-stroke-surface-caution-strong: #826a00;
 	/* Decorative stroke color used to define error-toned surface boundaries with normal emphasis. */
 	--wpds-color-stroke-surface-error: #dab1aa;
 	/* Decorative stroke color used to define error-toned surface boundaries with strong emphasis. */
@@ -356,7 +360,8 @@
 	}
 }
 
-[data-wpds-corner-radius='none'] {
+[data-wpds-corner-radius='none'],
+:root:has( [data-wpds-root-provider='true'][data-wpds-corner-radius='none'] ) {
 	/* Buttons and other elements nested inside controls. */
 	--wpds-border-radius-xs: 0;
 	/* Standalone buttons, inputs, and compact controls. */
@@ -369,7 +374,10 @@
 	--wpds-border-radius-xl: 0;
 }
 
-[data-wpds-corner-radius='subtle'] {
+[data-wpds-corner-radius='subtle'],
+:root:has(
+		[data-wpds-root-provider='true'][data-wpds-corner-radius='subtle']
+	) {
 	/* Buttons and other elements nested inside controls. */
 	--wpds-border-radius-xs: 1px;
 	/* Standalone buttons, inputs, and compact controls. */
@@ -382,7 +390,10 @@
 	--wpds-border-radius-xl: 12px;
 }
 
-[data-wpds-corner-radius='moderate'] {
+[data-wpds-corner-radius='moderate'],
+:root:has(
+		[data-wpds-root-provider='true'][data-wpds-corner-radius='moderate']
+	) {
 	/* Buttons and other elements nested inside controls. */
 	--wpds-border-radius-xs: 6px;
 	/* Standalone buttons, inputs, and compact controls. */
@@ -395,7 +406,10 @@
 	--wpds-border-radius-xl: 20px;
 }
 
-[data-wpds-corner-radius='pronounced'] {
+[data-wpds-corner-radius='pronounced'],
+:root:has(
+		[data-wpds-root-provider='true'][data-wpds-corner-radius='pronounced']
+	) {
 	/* Buttons and other elements nested inside controls. */
 	--wpds-border-radius-xs: 18px;
 	/* Standalone buttons, inputs, and compact controls. */

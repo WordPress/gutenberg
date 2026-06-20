@@ -12,7 +12,7 @@
 			overflow: hidden;
 			display: flex;
 			align-items: center;
-			min-height: 24px;
+			min-height: var(--wpds-dimension-size-sm);
 			border: 1px solid var(--wpds-color-stroke-interactive-neutral);
 			border-radius: 12px;
 			background-color: var(--wpds-color-background-interactive-neutral-weak);
@@ -53,8 +53,8 @@
 			justify-content: center;
 			align-items: center;
 			margin-inline-start: 1px;
-			width: 20px;
-			height: 20px;
+			width: var(--wpds-dimension-size-xs);
+			height: var(--wpds-dimension-size-xs);
 			border-radius: 50%;
 			overflow: hidden;
 			flex-shrink: 0;

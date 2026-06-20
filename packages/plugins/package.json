@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/plugins",
-	"version": "7.48.0",
+	"version": "7.48.1",
 	"description": "Plugins module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -49,11 +49,13 @@
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
-		"memize": "^2.1.0"
+		"memize": "^2.1.0",
+		"react-is": "^18.3.0"
 	},
 	"devDependencies": {
 		"@testing-library/dom": "^10.4.1",
-		"@testing-library/react": "^16.3.2"
+		"@testing-library/react": "^16.3.2",
+		"@types/react-is": "^18.3.1"
 	},
 	"peerDependencies": {
 		"@types/react": "^18.3.27",

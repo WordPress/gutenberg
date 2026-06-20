@@ -196,7 +196,7 @@
 
 			[data-orientation="vertical"] & {
 				padding: var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-md);
-				min-height: 40px;  /* TODO: use semantic size/height tokens when available */
+				min-height: var(--wpds-dimension-size-lg);
 			}
 
 			[data-orientation="vertical"][data-select-on-move="false"] &::after {

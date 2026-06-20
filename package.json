@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "23.4.0-rc.1",
+	"version": "23.4.0",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -62,12 +62,15 @@
 		"IS_GUTENBERG_PLUGIN": true
 	},
 	"devDependencies": {
+		"@playwright/test": "^1.58.2",
 		"@types/react": "^18.3.27",
 		"@types/react-dom": "^18.3.1",
 		"@typescript/native-preview": "^7.0.0-dev.20260423.1",
+		"@wordpress/env": "file:./packages/env",
 		"@wordpress/eslint-tools": "file:./tools/eslint",
 		"@wordpress/release-tools": "file:./tools/release",
-		"@wordpress/vips": "file:./packages/vips",
+		"@wordpress/scripts": "file:./packages/scripts",
+		"@wordpress/stylelint-tools": "file:./tools/stylelint",
 		"concurrently": "^3.5.0",
 		"cross-env": "^7.0.3",
 		"husky": "^7.0.0",
@@ -75,9 +78,7 @@
 		"lint-staged": "^16.4.0",
 		"npm-run-all": "^4.1.5",
 		"patch-package": "^8.0.0",
-		"prettier": "npm:wp-prettier@^3.0.3",
 		"rimraf": "^5.0.10",
-		"stylelint-plugin-logical-css": "^1.2.3",
 		"syncpack": "^15.3.1",
 		"typescript": "^6.0.2",
 		"wait-on": "^8.0.1"
@@ -122,6 +123,7 @@
 		"prelint:php": "npm run other:update-packages:php",
 		"lint:php": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script lint",
 		"lint:pkg-json": "wp-scripts lint-pkg-json . 'packages/*/package.json'",
+		"lint:published-deps": "npm run --workspace @wordpress/validation-tools dependency-audit --",
 		"other:changelog": "npm exec --no release-cli -- changelog",
 		"other:check-licenses": "concurrently \"npm run --workspace @wordpress/validation-tools check-licenses --\" \"wp-scripts check-licenses --dev\"",
 		"preother:check-local-changes": "npm run docs:build && npm run --workspace @wordpress/theme build",

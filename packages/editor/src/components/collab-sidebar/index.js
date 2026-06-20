@@ -2,14 +2,15 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { useRef } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { useEffect, useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { registerFormatType, unregisterFormatType } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -24,13 +25,30 @@ import { Notes } from './notes';
 import { store as editorStore } from '../../store';
 import { AddNoteMenuItem } from './add-note-menu-item';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
+import { NoteHighlightStyles } from './note-highlight-styles';
 import { useGlobalStyles } from '../global-styles';
-import { useNoteThreads, useEnableFloatingSidebar } from './hooks';
+import {
+	useAnnotateBlocks,
+	useEnableFloatingSidebar,
+	useNoteThreads,
+	useReconcileRemovedInlineNotes,
+} from './hooks';
 import { getNoteIdsFromMetadata, pickPrimaryNote } from './utils';
+import { NOTE_FORMAT_NAME, noteFormat } from './format';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
 
 function NotesSidebar( { postId } ) {
+	// Register the inline-note format for as long as the notes feature is
+	// mounted, mirroring how revision diff formats are registered. The cleanup
+	// unregisters it, so there's no need to guard against double registration.
+	useEffect( () => {
+		registerFormatType( NOTE_FORMAT_NAME, noteFormat );
+		return () => {
+			unregisterFormatType( NOTE_FORMAT_NAME );
+		};
+	}, [] );
+
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const { toggleBlockSpotlight, selectBlock } = unlock(
@@ -68,6 +86,10 @@ function NotesSidebar( { postId } ) {
 	);
 
 	const { notes, unresolvedNotes } = useNoteThreads( postId );
+	useAnnotateBlocks( unresolvedNotes );
+	// Removing the marked text deletes the note rather than letting it become a
+	// block-level note.
+	useReconcileRemovedInlineNotes( unresolvedNotes );
 
 	// Only enable the floating sidebar for large viewports.
 	const showFloatingSidebar = isLargeViewport;
@@ -159,6 +181,10 @@ function NotesSidebar( { postId } ) {
 
 	return (
 		<>
+			<NoteHighlightStyles
+				threads={ unresolvedNotes }
+				selectedId={ selectedNote?.id }
+			/>
 			{ !! currentThread && (
 				<NoteAvatarIndicator
 					note={ currentThread }

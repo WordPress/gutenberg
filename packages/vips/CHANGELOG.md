@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Enhancements
+
+- Bump `wasm-vips` to `^0.0.18`, adding native decoding of 10- and 12-bit (high bit depth) AVIF images ([#79179](https://github.com/WordPress/gutenberg/pull/79179)).
+
+## 2.1.1 (2026-06-16)
+
 ## 2.1.0 (2026-06-10)
 
 ### New Features
