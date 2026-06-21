@@ -266,7 +266,7 @@ function CSSClassUsageWarning( { usages }: { usages: CSSClassUsage[] } ) {
 				) ) }
 			</ul>
 			{ remainingUsageCount > 0 && (
-				<Text variant="muted">
+				<Text variant="body-sm">
 					{ sprintf(
 						/* translators: %d: Number of additional class usages. */
 						_n(
@@ -599,7 +599,7 @@ export default function ScreenCSSClasses( {
 					) }
 					{ cssClassIssues.length > 0 && (
 						<Stack direction="column" gap="xs">
-							<Text weight={ 600 }>
+							<Text variant="heading-sm">
 								{ __( 'Class conflicts and provenance' ) }
 							</Text>
 							{ cssClassIssues.map( ( issue, index ) => (
@@ -636,7 +636,7 @@ export default function ScreenCSSClasses( {
 										justify="space-between"
 									>
 										<FlexItem>
-											<Stack direction="column" gap="2xs">
+											<Stack direction="column" gap="xs">
 												<Button
 													__next40pxDefaultSize
 													icon={ code }
@@ -655,7 +655,7 @@ export default function ScreenCSSClasses( {
 												>
 													{ `.${ className }` }
 												</Button>
-												<Text variant="muted">
+												<Text variant="body-sm">
 													{ sprintf(
 														/* translators: %s: Comma-separated provenance labels. */
 														__( 'Defined by %s.' ),
@@ -1053,7 +1053,7 @@ export function ScreenCSSClassUsages( {
 						</Text>
 						{ visibleUsages.length > 0 && (
 							<>
-								<Text weight={ 600 }>
+								<Text variant="heading-sm">
 									{ __( 'Visible in this canvas' ) }
 								</Text>
 								<ItemGroup className="global-styles-ui-css-classes__list">
@@ -1078,7 +1078,7 @@ export function ScreenCSSClassUsages( {
 						) }
 						{ elsewhereUsages.length > 0 && (
 							<>
-								<Text weight={ 600 }>
+								<Text variant="heading-sm">
 									{ __( 'Elsewhere on this site' ) }
 								</Text>
 								<ItemGroup className="global-styles-ui-css-classes__list">
@@ -1102,17 +1102,18 @@ export function ScreenCSSClassUsages( {
 												} )
 											}
 										>
-											<Stack direction="column" gap="2xs">
+											<Stack direction="column" gap="xs">
 												<Text>
 													{ usage.entityTitle }
 												</Text>
-												<Text variant="muted">
+												<Text variant="body-sm">
 													{ sprintf(
 														/* translators: 1: Entity type label. 2: Block title. */
 														__(
 															'%1$s, %2$s block'
 														),
-														usage.entityLabel,
+														usage.entityLabel ||
+															__( 'Content' ),
 														usage.blockTitle
 													) }
 												</Text>
