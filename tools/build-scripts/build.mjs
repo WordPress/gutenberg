@@ -7,6 +7,11 @@ import spawn from 'cross-spawn';
 import { fileURLToPath } from 'url';
 import path from 'path';
 
+/**
+ * Internal dependencies
+ */
+import { isBuildCacheValid, writeBuildCache } from './cache.mjs';
+
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 const ROOT_DIR = path.resolve( __dirname, '../..' );
 
@@ -78,11 +83,22 @@ function exec( command, args = [], options = {} ) {
  * Main build orchestration function.
  */
 async function build() {
-	const skipTypes = process.argv.includes( '--skip-types' );
+	const buildTypes =
+		process.argv.includes( '--with-types' ) ||
+		process.argv.includes( '--types' );
+	const buildArgs = process.argv
+		.slice( 2 )
+		.filter(
+			( arg ) =>
+				! [ '--skip-types', '--with-types', '--types' ].includes( arg )
+		);
+	const cacheKey = buildTypes ? 'build:types' : 'build:runtime';
+	const cacheMetadata = {
+		args: buildArgs,
+		nodeEnv: 'production',
+	};
 
 	console.log( '🔨 Starting build process...\n' );
-
-	const startTime = Date.now();
 
 	try {
 		/*
@@ -109,6 +125,21 @@ async function build() {
 			} );
 		}
 
+		if (
+			await isBuildCacheValid( ROOT_DIR, {
+				cacheKey,
+				buildTypes,
+				metadata: cacheMetadata,
+			} )
+		) {
+			console.log(
+				'\n⚡ Build outputs are up to date. Skipping rebuild.'
+			);
+			return;
+		}
+
+		const startTime = Date.now();
+
 		console.log( '\n🧹 Cleaning packages...' );
 		await exec( 'npm', [ 'run', 'clean:packages' ], { silent: true } );
 
@@ -125,7 +156,7 @@ async function build() {
 			path.join( __dirname, 'packages/generate-worker-placeholders.mjs' ),
 		] );
 
-		if ( ! skipTypes ) {
+		if ( buildTypes ) {
 			console.log( '\n📘 Building TypeScript types...\n' );
 			const tsStartTime = Date.now();
 			await exec( 'tsgo', [ '--build' ] ).catch( () => {
@@ -144,6 +175,10 @@ async function build() {
 					'packages/check-build-type-declaration-files.cjs'
 				),
 			] );
+		} else {
+			console.log(
+				'\n📘 Skipping TypeScript types (use --with-types to include them).'
+			);
 		}
 
 		console.log( '\n📦 Building vendor files...' );
@@ -152,9 +187,6 @@ async function build() {
 		] );
 
 		console.log( '\n📦 Building packages (production mode)...' );
-		const buildArgs = process.argv
-			.slice( 2 )
-			.filter( ( arg ) => arg !== '--skip-types' );
 		await exec( 'wp-build', buildArgs, {
 			env: { ...process.env, NODE_ENV: 'production' },
 		} );
@@ -192,6 +224,19 @@ async function build() {
 			[ 'run', '--if-present', '--workspaces', '--silent', 'build:wp' ],
 			{ silent: true }
 		);
+
+		await writeBuildCache( ROOT_DIR, {
+			cacheKey,
+			buildTypes,
+			metadata: cacheMetadata,
+		} );
+		if ( buildTypes ) {
+			await writeBuildCache( ROOT_DIR, {
+				cacheKey: 'build:runtime',
+				buildTypes: false,
+				metadata: cacheMetadata,
+			} );
+		}
 
 		const totalTime = Date.now() - startTime;
 		console.log(

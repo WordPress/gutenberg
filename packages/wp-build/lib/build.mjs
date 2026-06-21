@@ -2638,13 +2638,22 @@ async function main() {
 						? "includes_url( 'build/' )"
 						: 'plugin_dir_url( __FILE__ )',
 			},
+			'watch-only': {
+				type: 'boolean',
+				default: false,
+			},
 		},
 		strict: false,
 	} );
 
 	const baseUrlExpression = values[ 'base-url' ];
 
-	await buildAll( baseUrlExpression );
+	if ( values[ 'watch-only' ] ) {
+		console.log( '\n👀 Watching for changes...\n' );
+		await watchMode();
+	} else {
+		await buildAll( baseUrlExpression );
+	}
 
 	if ( values.watch ) {
 		console.log( '\n👀 Watching for changes...\n' );

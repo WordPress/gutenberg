@@ -133,7 +133,7 @@
 		"other:update-packages:php": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer update --no-interaction",
 		"postinstall": "patch-package",
 		"prepare": "husky install",
-		"prepublishOnly": "npm run build",
+		"prepublishOnly": "npm run build -- --with-types",
 		"rtc:http": "node ./test/e2e/bin/rtc-dev.mjs --mode=http",
 		"rtc:ws": "node ./test/e2e/bin/rtc-dev.mjs --mode=websockets",
 		"rtc:ws:slow": "cross-env RTC_WS_DELAY=100 npm run rtc:ws",

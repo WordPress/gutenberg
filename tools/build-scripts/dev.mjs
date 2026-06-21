@@ -8,6 +8,11 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 import fs from 'fs';
 
+/**
+ * Internal dependencies
+ */
+import { isBuildCacheValid, writeBuildCache } from './cache.mjs';
+
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 const ROOT_DIR = path.resolve( __dirname, '../..' );
 
@@ -117,6 +122,21 @@ async function dev() {
 	console.log( '🔨 Starting development build...\n' );
 
 	const startTime = Date.now();
+	const watchTypes =
+		process.argv.includes( '--with-types' ) ||
+		process.argv.includes( '--types' );
+	const cacheKey = 'dev:runtime';
+	const cacheMetadata = {
+		args: process.argv
+			.slice( 2 )
+			.filter(
+				( arg ) =>
+					! [ '--skip-types', '--with-types', '--types' ].includes(
+						arg
+					)
+			),
+		nodeEnv: 'development',
+	};
 
 	// Clean up marker file from previous runs
 	readyMarkerFile.cleanup();
@@ -146,78 +166,87 @@ async function dev() {
 			} );
 		}
 
-		console.log( '\n🧹 Cleaning packages...' );
-		await exec( 'npm', [ 'run', 'clean:packages' ], { silent: true } );
-
-		console.log( '\n📦 Building workspaces...' );
-		await exec(
-			'npm',
-			[ 'run', '--if-present', '--workspaces', '--silent', 'build' ],
-			{ silent: true }
-		);
-
-		// This must happen before TypeScript compilation because some packages
-		// (like vips) have source files that import from generated worker-code.ts
-		await exec( 'node', [
-			path.join( __dirname, 'packages/generate-worker-placeholders.mjs' ),
-		] );
-
-		console.log( '\n📘 Building TypeScript types...\n' );
-		const tsStartTime = Date.now();
-		await exec( 'tsgo', [ '--build' ] ).catch( () => {
-			console.error(
-				'\n❌ TypeScript compilation failed. Try cleaning up first: `npm run clean:package-types`'
-			);
-			throw new Error( 'TypeScript compilation failed' );
+		const hasValidRuntimeCache = await isBuildCacheValid( ROOT_DIR, {
+			cacheKey,
+			metadata: cacheMetadata,
 		} );
-		const buildTime = Date.now() - tsStartTime;
-		console.log( `   ✔ Built TypeScript types (${ buildTime }ms)` );
 
-		console.log( '\n✅ Checking type declaration files...' );
-		await exec( 'node', [
-			path.join(
-				__dirname,
-				'packages/check-build-type-declaration-files.cjs'
-			),
-		] );
+		if ( hasValidRuntimeCache ) {
+			console.log(
+				'\n⚡ Development build outputs are up to date. Starting watchers.'
+			);
+		} else {
+			console.log( '\n🧹 Cleaning packages...' );
+			await exec( 'npm', [ 'run', 'clean:packages' ], { silent: true } );
 
-		console.log( '\n📦 Building vendor files...' );
-		await exec( 'node', [
-			path.join( __dirname, 'packages/build-vendors.mjs' ),
-		] );
+			console.log( '\n📦 Building workspaces...' );
+			await exec(
+				'npm',
+				[ 'run', '--if-present', '--workspaces', '--silent', 'build' ],
+				{ silent: true }
+			);
+
+			// This must happen before TypeScript compilation because some packages
+			// (like vips) have source files that import from generated worker-code.ts
+			await exec( 'node', [
+				path.join(
+					__dirname,
+					'packages/generate-worker-placeholders.mjs'
+				),
+			] );
+
+			console.log( '\n📦 Building vendor files...' );
+			await exec( 'node', [
+				path.join( __dirname, 'packages/build-vendors.mjs' ),
+			] );
+		}
 
 		const setupTime = Date.now() - startTime;
 		console.log(
-			`\n✅ Initial build completed! (${ Math.round(
+			`\n✅ Initial setup completed! (${ Math.round(
 				setupTime / 1000
 			) }s)\n`
 		);
 
 		console.log( '👀 Starting watch mode...\n' );
-		console.log( '   - TypeScript compiler watching for type changes' );
+		if ( watchTypes ) {
+			console.log( '   - TypeScript compiler watching for type changes' );
+		} else {
+			console.log(
+				'   - TypeScript compiler skipped (use --with-types to include it)'
+			);
+		}
 		console.log( '   - Package builder watching for source changes\n' );
 
-		// Start TypeScript watch
-		const tscWatch = execAsync( 'tsgo', [
-			'--build',
-			'--watch',
-			'--preserveWatchOutput',
-		] );
+		const tscWatch = watchTypes
+			? execAsync( 'tsgo', [
+					'--build',
+					'--watch',
+					'--preserveWatchOutput',
+			  ] )
+			: null;
 
 		// Start package build watch and wait for initial build to complete
 		// before signaling ready. wp-build outputs "Watching for changes..."
 		// when its initial build is done.
-		const buildWatch = spawn( 'wp-build', [ '--watch' ], {
-			cwd: ROOT_DIR,
-			stdio: [ 'inherit', 'pipe', 'inherit' ],
-			shell: true,
-			env: { ...process.env, NODE_ENV: 'development' },
-		} );
+		const buildWatch = spawn(
+			'wp-build',
+			[ hasValidRuntimeCache ? '--watch-only' : '--watch' ],
+			{
+				cwd: ROOT_DIR,
+				stdio: [ 'inherit', 'pipe', 'inherit' ],
+				shell: true,
+				env: { ...process.env, NODE_ENV: 'development' },
+			}
+		);
+
+		let isStopping = false;
 
 		// Handle process termination
 		const cleanup = () => {
+			isStopping = true;
 			console.log( '\n\n👋 Stopping watch mode...' );
-			tscWatch.kill();
+			tscWatch?.kill();
 			buildWatch.kill();
 			readyMarkerFile.cleanup();
 			process.exit( 0 );
@@ -236,35 +265,51 @@ async function dev() {
 			if ( ! isReady && output.includes( 'Watching for changes' ) ) {
 				isReady = true;
 
-				// Build blocks manifests after initial build completes
-				const blocksDirs = [
-					{
-						input: 'build/scripts/block-library',
-						output: 'build/scripts/block-library/blocks-manifest.php',
-					},
-					{
-						input: 'build/scripts/edit-widgets/blocks',
-						output: 'build/scripts/edit-widgets/blocks/blocks-manifest.php',
-					},
-					{
-						input: 'build/scripts/widgets/blocks',
-						output: 'build/scripts/widgets/blocks/blocks-manifest.php',
-					},
-				];
-				for ( const { input, output: outputPath } of blocksDirs ) {
-					await exec(
-						'wp-scripts',
-						[
-							'build-blocks-manifest',
-							`--input=${ input }`,
-							`--output=${ outputPath }`,
-						],
-						{ silent: true }
-					);
+				if ( ! hasValidRuntimeCache ) {
+					// Build blocks manifests after initial build completes
+					const blocksDirs = [
+						{
+							input: 'build/scripts/block-library',
+							output: 'build/scripts/block-library/blocks-manifest.php',
+						},
+						{
+							input: 'build/scripts/edit-widgets/blocks',
+							output: 'build/scripts/edit-widgets/blocks/blocks-manifest.php',
+						},
+						{
+							input: 'build/scripts/widgets/blocks',
+							output: 'build/scripts/widgets/blocks/blocks-manifest.php',
+						},
+					];
+					for ( const { input, output: outputPath } of blocksDirs ) {
+						await exec(
+							'wp-scripts',
+							[
+								'build-blocks-manifest',
+								`--input=${ input }`,
+								`--output=${ outputPath }`,
+							],
+							{ silent: true }
+						);
+					}
+					await writeBuildCache( ROOT_DIR, {
+						cacheKey,
+						metadata: cacheMetadata,
+					} );
 				}
-
 				readyMarkerFile.create();
 			}
+		} );
+
+		buildWatch.on( 'exit', ( code ) => {
+			if ( isStopping ) {
+				return;
+			}
+			const exitCode = code === 0 ? 1 : code ?? 1;
+			setTimeout( () => {
+				readyMarkerFile.cleanup();
+				process.exit( exitCode );
+			}, 10000 );
 		} );
 
 		// Keep the process running
