@@ -40,15 +40,17 @@ const { getCSSDeclarationBlockValidationError } = unlock(
 	blockEditorPrivateApis
 );
 
-function decodeClassName( value?: string ) {
+function decodeClassName( value?: string | string[] ) {
 	if ( ! value ) {
 		return '';
 	}
 
+	const rawValue = Array.isArray( value ) ? value[ 0 ] : value;
+
 	try {
-		return decodeURIComponent( value );
+		return decodeURIComponent( rawValue );
 	} catch {
-		return value;
+		return rawValue;
 	}
 }
 
