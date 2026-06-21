@@ -16,6 +16,7 @@ type WPDataRegistry = ReturnType< typeof createRegistry >;
  */
 import { cloneFile, convertBlobToFile, renameFile } from '../utils';
 import { canvasConvertToJpeg } from '../canvas-utils';
+import { getUnappliedExifOrientation } from '../heic-parser';
 import {
 	isClientSideMediaSupported,
 	exceedsClientProcessingMemory,
@@ -1276,47 +1277,75 @@ export function generateThumbnails( id: QueueItemId ) {
 			} );
 		}
 
-		// Check if image needs rotation.
-		// If exif_orientation is not 1, the image needs rotation.
-		// Images that were scaled (bigImageSizeThreshold) are already rotated by vips.
+		// Determine the EXIF orientation. The server reads it for JPEG/TIFF,
+		// but for AVIF/HEIF it reports 1 even when the file carries an EXIF
+		// orientation tag, and libvips only auto-rotates from a native `irot`
+		// transform, not from EXIF. Detect it on the client for those formats
+		// so the sub-sizes (which vips will not auto-rotate) and the rotated
+		// original are corrected.
+		// See https://github.com/WordPress/gutenberg/issues/79383.
+		let exifOrientation = attachment.exif_orientation || 1;
+		const serverReadOrientation = exifOrientation !== 1;
+		const sourceType = item.sourceFile.type;
+		if (
+			exifOrientation === 1 &&
+			( sourceType === 'image/avif' || sourceType === 'image/heif' )
+		) {
+			exifOrientation = getUnappliedExifOrientation(
+				await item.sourceFile.arrayBuffer()
+			);
+		}
+
+		// When orientation was detected on the client, libvips will not
+		// auto-rotate the sub-sizes, so they must be generated from an
+		// explicitly rotated source rather than the original file.
+		const needsClientRotation =
+			exifOrientation !== 1 && ! serverReadOrientation;
+
+		// Rotate the source once and reuse it for the sideloaded "original"
+		// (original_image metadata) and, for the client-rotation case, as the
+		// thumbnail/scaled source. Images that were scaled
+		// (bigImageSizeThreshold) are already rotated by vips, so the original
+		// is skipped for them, matching WordPress core.
+		let rotatedSource: File | undefined;
 		{
 			const needsRotation =
-				attachment.exif_orientation &&
-				attachment.exif_orientation !== 1 &&
-				! item.file.name.includes( '-scaled' );
+				exifOrientation !== 1 && ! item.file.name.includes( '-scaled' );
 
-			// If rotation is needed for a non-scaled image, sideload the rotated version.
-			// This matches WordPress core's behavior of creating a -rotated version.
-			if ( needsRotation && attachment.id ) {
+			if ( ( needsRotation || needsClientRotation ) && attachment.id ) {
 				try {
-					const rotatedFile = await vipsRotateImage(
+					rotatedSource = await vipsRotateImage(
 						item.id,
 						item.sourceFile,
-						attachment.exif_orientation as number,
+						exifOrientation,
 						item.abortController?.signal
 					);
-
-					// Sideload the rotated file as the "original" to set original_image metadata.
-					// The server will store this in $metadata['original_image'].
-					dispatch.addSideloadItem( {
-						file: rotatedFile,
-						batchId: uuidv4(),
-						parentId: item.id,
-						additionalData: {
-							post: attachment.id,
-							image_size: 'original',
-							convert_format: false,
-						},
-						operations: [ OperationType.Upload ],
-					} );
 				} catch {
 					// If rotation fails, continue with thumbnail generation.
-					// Thumbnails will still be rotated correctly by vips.
+					// Thumbnails will still be rotated correctly by vips for
+					// server-readable formats.
 					// eslint-disable-next-line no-console
 					console.warn(
 						'Failed to rotate image, continuing with thumbnails'
 					);
 				}
+			}
+
+			// Sideload the rotated file as the "original" to set
+			// original_image metadata; the server stores it in
+			// $metadata['original_image'].
+			if ( needsRotation && rotatedSource && attachment.id ) {
+				dispatch.addSideloadItem( {
+					file: rotatedSource,
+					batchId: uuidv4(),
+					parentId: item.id,
+					additionalData: {
+						post: attachment.id,
+						image_size: 'original',
+						convert_format: false,
+					},
+					operations: [ OperationType.Upload ],
+				} );
 			}
 		}
 
@@ -1330,7 +1359,10 @@ export function generateThumbnails( id: QueueItemId ) {
 			const sizesToGenerate: string[] =
 				attachment.missing_image_sizes as string[];
 
-			const thumbnailSource = item.sourceFile;
+			const thumbnailSource =
+				needsClientRotation && rotatedSource
+					? rotatedSource
+					: item.sourceFile;
 			const file = attachment.filename
 				? renameFile( thumbnailSource, attachment.filename )
 				: thumbnailSource;
