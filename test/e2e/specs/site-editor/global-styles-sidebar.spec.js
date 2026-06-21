@@ -200,6 +200,7 @@ test.describe( 'Global styles sidebar', () => {
 
 	test( 'should count CSS class usages across site content', async ( {
 		admin,
+		editor,
 		page,
 		requestUtils,
 	} ) => {
@@ -250,6 +251,14 @@ test.describe( 'Global styles sidebar', () => {
 		).toBeVisible();
 		await expect( page.getByText( 'Usage page one' ) ).toHaveCount( 2 );
 		await expect( page.getByText( 'Usage page two' ) ).toHaveCount( 2 );
+
+		await page
+			.getByRole( 'button', { name: /Usage page one/ } )
+			.first()
+			.click();
+		await expect(
+			editor.canvas.getByText( 'First page first usage' )
+		).toBeVisible();
 	} );
 
 	test( 'should show CSS class conflict and provenance hints', async ( {

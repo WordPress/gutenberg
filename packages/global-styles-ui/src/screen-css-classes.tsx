@@ -173,6 +173,18 @@ function getUsageKey( usage: CSSClassUsage ) {
 	].join( ':' );
 }
 
+function canNavigateToUsage(
+	usage: CSSClassUsage,
+	onNavigateToEntity?: ( entity: CSSClassUsageEntity ) => void
+) {
+	return (
+		!! onNavigateToEntity &&
+		usage.source === 'post' &&
+		!! usage.entityId &&
+		!! usage.entityType
+	);
+}
+
 function useCSSClassSiteUsageData() {
 	const [ usageData, setUsageData ] = useState< CSSClassUsageData >( {
 		usages: [],
@@ -862,6 +874,13 @@ export function ScreenCSSClassUsages( {
 											__next40pxDefaultSize
 											className="global-styles-ui-css-classes__usage"
 											variant="tertiary"
+											disabled={
+												! canNavigateToUsage(
+													usage,
+													onNavigateToEntity
+												)
+											}
+											accessibleWhenDisabled
 											onClick={ () =>
 												onNavigateToEntity?.( {
 													id: usage.entityId,
