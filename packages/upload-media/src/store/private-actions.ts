@@ -43,6 +43,7 @@ import type {
 	BatchId,
 	CacheBlobUrlAction,
 	ImageFormat,
+	LoadPersistedAction,
 	OnBatchSuccessHandler,
 	OnChangeHandler,
 	OnErrorHandler,
@@ -53,8 +54,10 @@ import type {
 	OperationStartAction,
 	PauseItemAction,
 	PauseQueueAction,
+	PersistedQueueItem,
 	QueueItem,
 	QueueItemId,
+	RegisterCallbacksAction,
 	ResumeQueueAction,
 	RevokeBlobUrlsAction,
 	SideloadAdditionalData,
@@ -71,6 +74,9 @@ import {
 	persistItem,
 	deleteItem,
 	toPersistedRecord,
+	pruneStale,
+	clearAll,
+	isPersistenceAvailable,
 } from './utils/persistence';
 
 const DEFAULT_OUTPUT_QUALITY = 0.82;
@@ -133,6 +139,10 @@ type ActionCreators = {
 	updateItemProgress: typeof updateItemProgress;
 	revokeBlobUrls: typeof revokeBlobUrls;
 	detectUltraHdr: typeof detectUltraHdr;
+	loadPersistedQueue: typeof loadPersistedQueue;
+	registerItemCallbacks: typeof registerItemCallbacks;
+	resumePersistedQueue: typeof resumePersistedQueue;
+	discardPersistedQueue: typeof discardPersistedQueue;
 	< T = Record< string, unknown > >( args: T ): void;
 };
 
@@ -1630,5 +1640,141 @@ export function updateSettings(
 	return {
 		type: Type.UpdateSettings,
 		settings,
+	};
+}
+
+/**
+ * Loads any persisted upload-queue records into the store as inert
+ * PendingResume items. Stale and over-budget records are pruned first. Each
+ * loaded item gets a fresh AbortController and a recreated preview blob URL so
+ * the originating block can show the image again once reconnected.
+ */
+export function loadPersistedQueue() {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		if (
+			! isPersistenceAvailable() ||
+			select.getSettings().durableQueue === false
+		) {
+			return;
+		}
+
+		const survivors = await pruneStale();
+		if ( survivors.length === 0 ) {
+			return;
+		}
+
+		const items: QueueItem[] = survivors.map(
+			( record: PersistedQueueItem ): QueueItem => {
+				const blobUrl = createBlobURL( record.file );
+				return {
+					id: record.id,
+					uploadId: record.uploadId,
+					postId: record.postId,
+					batchId: record.batchId,
+					parentId: record.parentId,
+					file: record.file,
+					sourceFile: record.sourceFile,
+					originalHeicFile: record.originalHeicFile,
+					poster: record.poster,
+					operations: record.operations,
+					currentOperation: undefined,
+					status: ItemStatus.PendingResume,
+					attachment: { ...record.attachment, url: blobUrl },
+					subSizes: record.subSizes,
+					additionalData: record.additionalData,
+					retryCount: record.retryCount,
+					nextRetryTimestamp: record.nextRetryTimestamp,
+					progress: record.progress,
+					sourceUrl: record.sourceUrl,
+					sourceAttachmentId: record.sourceAttachmentId,
+					abortController: new AbortController(),
+				};
+			}
+		);
+
+		// Track the recreated preview blob URLs so they can be revoked on discard.
+		for ( const item of items ) {
+			if ( item.attachment?.url ) {
+				dispatch< CacheBlobUrlAction >( {
+					type: Type.CacheBlobUrl,
+					id: item.id,
+					blobUrl: item.attachment.url,
+				} );
+			}
+		}
+
+		dispatch< LoadPersistedAction >( {
+			type: Type.LoadPersisted,
+			items,
+		} );
+	};
+}
+
+/**
+ * Attaches a block's callbacks to a loaded item identified by its durable
+ * marker, so a resumed upload routes its results back to the block.
+ *
+ * @param uploadId            Durable marker.
+ * @param callbacks           Block callbacks.
+ * @param callbacks.onChange  Called as previews/attachments become available.
+ * @param callbacks.onSuccess Called when the upload completes.
+ * @param callbacks.onError   Called when the upload fails.
+ */
+export function registerItemCallbacks(
+	uploadId: string,
+	{
+		onChange,
+		onSuccess,
+		onError,
+	}: {
+		onChange?: OnChangeHandler;
+		onSuccess?: OnSuccessHandler;
+		onError?: OnErrorHandler;
+	}
+) {
+	return ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItemByUploadId( uploadId );
+		if ( ! item ) {
+			return;
+		}
+		dispatch< RegisterCallbacksAction >( {
+			type: Type.RegisterCallbacks,
+			id: item.id,
+			onChange,
+			onSuccess,
+			onError,
+		} );
+	};
+}
+
+/**
+ * Resumes all loaded (PendingResume) items: flips them to Processing and runs
+ * the next operation. Items whose block never re-registered callbacks still
+ * finish to the Media Library.
+ */
+export function resumePersistedQueue() {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const resumable = select.getResumableItems();
+		for ( const item of resumable ) {
+			dispatch( { type: Type.ResumeItem, id: item.id } );
+		}
+		for ( const item of resumable ) {
+			dispatch.processItem( item.id );
+		}
+	};
+}
+
+/**
+ * Discards all loaded items and clears durable storage. Called when the user
+ * declines to resume.
+ */
+export function discardPersistedQueue() {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const resumable = select.getResumableItems();
+		for ( const item of resumable ) {
+			dispatch.revokeBlobUrls( item.id );
+			dispatch.removeItem( item.id );
+		}
+		await clearAll();
 	};
 }
