@@ -252,6 +252,55 @@ test.describe( 'Global styles sidebar', () => {
 		await expect( page.getByText( 'Usage page two' ) ).toHaveCount( 2 );
 	} );
 
+	test( 'should show CSS class conflict and provenance hints', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		await updateGlobalStyles( requestUtils, {
+			cssClasses: [
+				{
+					name: 'wp-block-button',
+					css: 'color: rgb(255, 0, 0);',
+				},
+			],
+		} );
+		await requestUtils.createPage( {
+			title: 'Unmanaged class usage',
+			content: `<!-- wp:paragraph {"className":"raw-card"} -->
+<p class="raw-card">Unmanaged class paragraph</p>
+<!-- /wp:paragraph -->`,
+			status: 'publish',
+		} );
+
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//index',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
+		await openCSSClassesPanel( page );
+
+		const settingsPanel = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await expect(
+			settingsPanel.getByText( 'Class conflicts and provenance' )
+		).toBeVisible();
+		await expect(
+			settingsPanel.getByText(
+				'".wp-block-button" looks like a core block class and may collide with WordPress generated markup.'
+			)
+		).toBeVisible();
+		await expect(
+			settingsPanel.getByText(
+				'".raw-card" is used in content but is not managed by global styles.'
+			)
+		).toBeVisible();
+		await expect(
+			settingsPanel.getByText( 'Defined by user global styles.' )
+		).toBeVisible();
+	} );
+
 	test( 'should suggest managed CSS classes in block Advanced settings without limiting custom classes', async ( {
 		admin,
 		editor,

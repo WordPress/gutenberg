@@ -68,6 +68,17 @@ function useCSSClasses() {
 	return [ Array.isArray( value ) ? value : [], setValue ] as const;
 }
 
+function useBaseCSSClasses() {
+	const [ value ] = useStyle< CSSClassDefinition[] >(
+		'cssClasses',
+		undefined,
+		'base',
+		false
+	);
+
+	return Array.isArray( value ) ? value : [];
+}
+
 interface ScreenCSSClassesProps {
 	contentBlocks?: BlockLike[];
 	currentEntity?: CSSClassUsageEntity;
@@ -84,6 +95,12 @@ interface ScreenCSSClassUsagesProps {
 interface CSSClassUsageEntity {
 	id?: string | number;
 	type?: string;
+}
+
+interface CSSClassIssue {
+	className: string;
+	message: string;
+	status: 'warning' | 'error' | 'info';
 }
 
 function useCSSClassUsageCounts(
@@ -250,18 +267,183 @@ function getCSSClassesWithout(
 	);
 }
 
+function getNormalizedClassNameSet( cssClasses: CSSClassDefinition[] ) {
+	return new Set(
+		cssClasses
+			.map( ( cssClass ) => normalizeCSSClassName( cssClass.name ) )
+			.filter( Boolean )
+	);
+}
+
+function getDuplicateClassNames( cssClasses: CSSClassDefinition[] ) {
+	const counts = cssClasses.reduce< Record< string, number > >(
+		( result, cssClass ) => {
+			const className = normalizeCSSClassName( cssClass.name );
+			if ( className ) {
+				result[ className ] = ( result[ className ] ?? 0 ) + 1;
+			}
+			return result;
+		},
+		{}
+	);
+
+	return Object.keys( counts ).filter(
+		( className ) => counts[ className ] > 1
+	);
+}
+
+function getClassProvenance(
+	className: string,
+	userClassNames: Set< string >,
+	baseClassNames: Set< string >,
+	usedClassNames: Set< string >
+) {
+	return [
+		userClassNames.has( className ) && __( 'user global styles' ),
+		baseClassNames.has( className ) && __( 'theme global styles' ),
+		usedClassNames.has( className ) && __( 'content usage' ),
+	].filter( Boolean );
+}
+
+function getCSSClassIssues(
+	userCSSClasses: CSSClassDefinition[],
+	baseCSSClasses: CSSClassDefinition[],
+	usedClassNames: string[]
+): CSSClassIssue[] {
+	const userClassNames = getNormalizedClassNameSet( userCSSClasses );
+	const baseClassNames = getNormalizedClassNameSet( baseCSSClasses );
+	const usedClassNameSet = new Set( usedClassNames );
+	const allKnownClassNames = new Set( [
+		...userClassNames,
+		...baseClassNames,
+		...usedClassNameSet,
+	] );
+	const issues: CSSClassIssue[] = [];
+
+	[ ...allKnownClassNames ].forEach( ( className ) => {
+		if ( ! isValidCSSClassName( className ) ) {
+			issues.push( {
+				className,
+				status: 'error',
+				message: sprintf(
+					/* translators: %s: CSS class name. */
+					__( '".%s" is not a valid managed CSS class name.' ),
+					className
+				),
+			} );
+		}
+
+		if ( className.startsWith( 'wp-block-' ) ) {
+			issues.push( {
+				className,
+				status: 'warning',
+				message: sprintf(
+					/* translators: %s: CSS class name. */
+					__(
+						'".%s" looks like a core block class and may collide with WordPress generated markup.'
+					),
+					className
+				),
+			} );
+		}
+
+		if (
+			userClassNames.has( className ) &&
+			baseClassNames.has( className )
+		) {
+			issues.push( {
+				className,
+				status: 'warning',
+				message: sprintf(
+					/* translators: %s: CSS class name. */
+					__(
+						'".%s" is defined by both user global styles and theme global styles.'
+					),
+					className
+				),
+			} );
+		}
+
+		if (
+			usedClassNameSet.has( className ) &&
+			! userClassNames.has( className ) &&
+			! baseClassNames.has( className )
+		) {
+			issues.push( {
+				className,
+				status: 'info',
+				message: sprintf(
+					/* translators: %s: CSS class name. */
+					__(
+						'".%s" is used in content but is not managed by global styles.'
+					),
+					className
+				),
+			} );
+		}
+	} );
+
+	getDuplicateClassNames( userCSSClasses ).forEach( ( className ) => {
+		issues.push( {
+			className,
+			status: 'warning',
+			message: sprintf(
+				/* translators: %s: CSS class name. */
+				__( '".%s" has multiple user global style definitions.' ),
+				className
+			),
+		} );
+	} );
+
+	getDuplicateClassNames( baseCSSClasses ).forEach( ( className ) => {
+		issues.push( {
+			className,
+			status: 'warning',
+			message: sprintf(
+				/* translators: %s: CSS class name. */
+				__( '".%s" has multiple theme global style definitions.' ),
+				className
+			),
+		} );
+	} );
+
+	return issues;
+}
+
 export default function ScreenCSSClasses( {
 	contentBlocks,
 	currentEntity,
 }: ScreenCSSClassesProps ) {
 	const { goTo } = useNavigator();
 	const [ cssClasses ] = useCSSClasses();
+	const baseCSSClasses = useBaseCSSClasses();
 	const { usageData, isLoading, error } = useCSSClassSiteUsageData();
 	const usageCounts = useCSSClassUsageCounts(
 		cssClasses,
 		contentBlocks,
 		usageData.usages,
 		currentEntity
+	);
+	const userClassNames = useMemo(
+		() => getNormalizedClassNameSet( cssClasses ),
+		[ cssClasses ]
+	);
+	const baseClassNames = useMemo(
+		() => getNormalizedClassNameSet( baseCSSClasses ),
+		[ baseCSSClasses ]
+	);
+	const usedClassNames = useMemo(
+		() => new Set( usageData.classNames ),
+		[ usageData.classNames ]
+	);
+	const cssClassIssues = useMemo(
+		() =>
+			getCSSClassIssues(
+				cssClasses,
+				baseCSSClasses,
+				usageData.classNames
+			),
+		[ baseCSSClasses, cssClasses, usageData.classNames ]
 	);
 
 	return (
@@ -294,6 +476,22 @@ export default function ScreenCSSClasses( {
 							) }
 						</Notice>
 					) }
+					{ cssClassIssues.length > 0 && (
+						<Stack direction="column" gap="xs">
+							<Text weight={ 600 }>
+								{ __( 'Class conflicts and provenance' ) }
+							</Text>
+							{ cssClassIssues.map( ( issue, index ) => (
+								<Notice
+									key={ `${ issue.className }-${ index }` }
+									status={ issue.status }
+									isDismissible={ false }
+								>
+									{ issue.message }
+								</Notice>
+							) ) }
+						</Stack>
+					) }
 					{ cssClasses.length === 0 && (
 						<Notice status="info" isDismissible={ false }>
 							{ __( 'No CSS classes yet.' ) }
@@ -317,20 +515,34 @@ export default function ScreenCSSClasses( {
 										justify="space-between"
 									>
 										<FlexItem>
-											<Button
-												__next40pxDefaultSize
-												icon={ code }
-												variant="tertiary"
-												onClick={ () =>
-													goTo(
-														`/css-classes/edit/${ encodeURIComponent(
-															className
-														) }`
-													)
-												}
-											>
-												{ `.${ className }` }
-											</Button>
+											<Stack direction="column" gap="2xs">
+												<Button
+													__next40pxDefaultSize
+													icon={ code }
+													variant="tertiary"
+													onClick={ () =>
+														goTo(
+															`/css-classes/edit/${ encodeURIComponent(
+																className
+															) }`
+														)
+													}
+												>
+													{ `.${ className }` }
+												</Button>
+												<Text variant="muted">
+													{ sprintf(
+														/* translators: %s: Comma-separated provenance labels. */
+														__( 'Defined by %s.' ),
+														getClassProvenance(
+															className,
+															userClassNames,
+															baseClassNames,
+															usedClassNames
+														).join( ', ' )
+													) }
+												</Text>
+											</Stack>
 										</FlexItem>
 										<Button
 											__next40pxDefaultSize
