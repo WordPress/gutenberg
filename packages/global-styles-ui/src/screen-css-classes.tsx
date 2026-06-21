@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { MouseEvent } from 'react';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -12,12 +17,18 @@ import {
 	useNavigator,
 } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
+import {
+	DataViews,
+	filterSortAndPaginate,
+	type Action,
+	type Field,
+	type View,
+} from '@wordpress/dataviews';
 import { Stack, Text } from '@wordpress/ui';
-// @ts-expect-error: Not typed yet.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { code, plus, trash } from '@wordpress/icons';
+import { pencil, plus, trash } from '@wordpress/icons';
 import {
 	isValidCSSClassName,
 	normalizeCSSClassName,
@@ -121,6 +132,22 @@ interface CSSClassIssue {
 	className: string;
 	message: string;
 	status: 'warning' | 'error' | 'info';
+}
+
+interface CSSClassListItem {
+	id: string;
+	className: string;
+	cssClass: CSSClassDefinition;
+	usageCount: number;
+	provenance: string[];
+}
+
+function getUsageCountText( usageCount: number ) {
+	return sprintf(
+		/* translators: %d: Number of class usages. */
+		_n( '%d use', '%d uses', usageCount ),
+		usageCount
+	);
 }
 
 function useCSSClassUsageCounts(
@@ -446,11 +473,19 @@ function getClassProvenance(
 	baseClassNames: Set< string >,
 	usedClassNames: Set< string >
 ) {
-	return [
-		userClassNames.has( className ) && __( 'user global styles' ),
-		baseClassNames.has( className ) && __( 'theme global styles' ),
-		usedClassNames.has( className ) && __( 'content usage' ),
-	].filter( Boolean );
+	const provenance: string[] = [];
+
+	if ( userClassNames.has( className ) ) {
+		provenance.push( __( 'user global styles' ) );
+	}
+	if ( baseClassNames.has( className ) ) {
+		provenance.push( __( 'theme global styles' ) );
+	}
+	if ( usedClassNames.has( className ) ) {
+		provenance.push( __( 'content usage' ) );
+	}
+
+	return provenance;
 }
 
 function getCSSClassIssues(
@@ -542,8 +577,27 @@ export default function ScreenCSSClasses( {
 	currentEntity,
 }: ScreenCSSClassesProps ) {
 	const { goTo } = useNavigator();
-	const [ cssClasses ] = useCSSClasses();
+	const [ cssClasses, setCSSClasses ] = useCSSClasses();
 	const baseCSSClasses = useBaseCSSClasses();
+	const [ classToDelete, setClassToDelete ] =
+		useState< CSSClassListItem | null >( null );
+	const [ selection, setSelection ] = useState< string[] >( [] );
+	const [ view, setView ] = useState< View >( {
+		type: 'list',
+		search: '',
+		page: 1,
+		perPage: 10,
+		titleField: 'className',
+		descriptionField: 'provenance',
+		fields: [],
+		sort: {
+			field: 'className',
+			direction: 'asc',
+		},
+		layout: {
+			density: 'comfortable',
+		},
+	} );
 	const { usageData, isLoading, error } = useCSSClassSiteUsageData();
 	const { canManageCssClasses } = usageData;
 	const usageCounts = useCSSClassUsageCounts(
@@ -568,9 +622,211 @@ export default function ScreenCSSClasses( {
 		() => getCSSClassIssues( cssClasses, baseCSSClasses ),
 		[ baseCSSClasses, cssClasses ]
 	);
+	const classItems = useMemo(
+		() =>
+			cssClasses.map( ( cssClass, index ) => {
+				const className = normalizeCSSClassName( cssClass.name );
+				return {
+					id: `${ className }-${ index }`,
+					className,
+					cssClass,
+					usageCount: usageCounts[ className ] ?? 0,
+					provenance: getClassProvenance(
+						className,
+						userClassNames,
+						baseClassNames,
+						usedClassNames
+					),
+				};
+			} ),
+		[
+			baseClassNames,
+			cssClasses,
+			usageCounts,
+			usedClassNames,
+			userClassNames,
+		]
+	);
+	const openEditScreen = useCallback(
+		( item: CSSClassListItem ) => {
+			goTo(
+				`/css-classes/edit/${ encodeURIComponent( item.className ) }`
+			);
+		},
+		[ goTo ]
+	);
+	const fields = useMemo< Field< CSSClassListItem >[] >(
+		() => [
+			{
+				id: 'className',
+				label: __( 'Class' ),
+				enableGlobalSearch: true,
+				getValue: ( { item } ) => `.${ item.className }`,
+				render: ( { item } ) => (
+					<Stack
+						className="global-styles-ui-css-classes__dataviews-title"
+						direction="row"
+						align="center"
+						justify="space-between"
+					>
+						<Text className="global-styles-ui-css-classes__dataviews-class-name">
+							{ `.${ item.className }` }
+						</Text>
+						<Button
+							size="small"
+							variant="tertiary"
+							onClick={ (
+								event: MouseEvent< HTMLButtonElement >
+							) => {
+								event.stopPropagation();
+								goTo(
+									`/css-classes/usages/${ encodeURIComponent(
+										item.className
+									) }`
+								);
+							} }
+						>
+							{ getUsageCountText( item.usageCount ) }
+						</Button>
+					</Stack>
+				),
+				sort: ( a, b, direction ) => {
+					const order = a.className.localeCompare( b.className );
+					return direction === 'asc' ? order : -order;
+				},
+			},
+			{
+				id: 'provenance',
+				label: __( 'Source' ),
+				enableGlobalSearch: true,
+				getValue: ( { item } ) => item.provenance.join( ', ' ),
+				render: ( { item } ) => (
+					<Text
+						className="global-styles-ui-css-classes__item-provenance"
+						variant="body-sm"
+					>
+						{ sprintf(
+							/* translators: %s: Comma-separated provenance labels. */
+							__( 'Defined by %s.' ),
+							item.provenance.join( ', ' )
+						) }
+					</Text>
+				),
+				sort: ( a, b, direction ) => {
+					const order = a.provenance
+						.join( ', ' )
+						.localeCompare( b.provenance.join( ', ' ) );
+					return direction === 'asc' ? order : -order;
+				},
+			},
+			{
+				id: 'usageCount',
+				label: __( 'Usages' ),
+				type: 'integer',
+				enableSorting: true,
+				getValue: ( { item } ) => item.usageCount,
+				sort: ( a, b, direction ) => {
+					const order = a.usageCount - b.usageCount;
+					return direction === 'asc' ? order : -order;
+				},
+			},
+		],
+		[ goTo ]
+	);
+	const { data: shownClassItems, paginationInfo } = useMemo(
+		() => filterSortAndPaginate( classItems, view, fields ),
+		[ classItems, fields, view ]
+	);
+	const actions = useMemo< Action< CSSClassListItem >[] >(
+		() => [
+			{
+				id: 'edit',
+				label: __( 'Edit' ),
+				icon: pencil,
+				isPrimary: true,
+				disabled: ! canManageCssClasses,
+				callback: ( items ) => {
+					openEditScreen( items[ 0 ] );
+				},
+			},
+			{
+				id: 'delete',
+				label: __( 'Delete' ),
+				icon: trash,
+				disabled: ! canManageCssClasses,
+				callback: ( items ) => {
+					setClassToDelete( items[ 0 ] );
+				},
+			},
+		],
+		[ canManageCssClasses, openEditScreen ]
+	);
+	const onChangeView = useCallback( ( nextView: View ) => {
+		setView( ( previousView ) => ( {
+			...nextView,
+			page: nextView.search !== previousView.search ? 1 : nextView.page,
+		} ) );
+	}, [] );
+	useEffect( () => {
+		if ( ! canManageCssClasses || ! selection.length ) {
+			return;
+		}
+
+		const selectedItem = classItems.find(
+			( item ) => item.id === selection[ 0 ]
+		);
+
+		if ( selectedItem ) {
+			openEditScreen( selectedItem );
+			setSelection( [] );
+		}
+	}, [ canManageCssClasses, classItems, openEditScreen, selection ] );
+	const deleteClassUsages = useMemo(
+		() =>
+			classToDelete
+				? usageData.usages.filter(
+						( usage ) => usage.className === classToDelete.className
+				  )
+				: [],
+		[ classToDelete, usageData.usages ]
+	);
+
+	function deleteCSSClassFromList() {
+		if ( ! classToDelete ) {
+			return;
+		}
+
+		setCSSClasses(
+			getCSSClassesWithout( cssClasses, classToDelete.className )
+		);
+		setClassToDelete( null );
+	}
 
 	return (
 		<>
+			{ classToDelete && (
+				<ConfirmDialog
+					isOpen={ !! classToDelete }
+					cancelButtonText={ __( 'Cancel' ) }
+					confirmButtonText={ __( 'Delete' ) }
+					onCancel={ () => setClassToDelete( null ) }
+					onConfirm={ deleteCSSClassFromList }
+					size="medium"
+				>
+					<Stack direction="column" gap="sm">
+						<Text>
+							{ sprintf(
+								/* translators: %s: CSS class name. */
+								__(
+									'Are you sure you want to delete ".%s"? Blocks using this class will keep the class name, but it will no longer be managed by global styles.'
+								),
+								classToDelete.className
+							) }
+						</Text>
+						<CSSClassUsageWarning usages={ deleteClassUsages } />
+					</Stack>
+				</ConfirmDialog>
+			) }
 			<ScreenHeader
 				title={ __( 'CSS classes' ) }
 				description={ __(
@@ -579,16 +835,6 @@ export default function ScreenCSSClasses( {
 			/>
 			<ScreenBody className="global-styles-ui-css-classes">
 				<Stack direction="column" gap="md">
-					{ canManageCssClasses && (
-						<Button
-							__next40pxDefaultSize
-							icon={ plus }
-							variant="primary"
-							onClick={ () => goTo( '/css-classes/new' ) }
-						>
-							{ __( 'Add class' ) }
-						</Button>
-					) }
 					{ ! canManageCssClasses && ! isLoading && (
 						<Notice status="info" isDismissible={ false }>
 							{ __(
@@ -624,94 +870,38 @@ export default function ScreenCSSClasses( {
 							) ) }
 						</Stack>
 					) }
-					{ cssClasses.length === 0 && (
-						<Notice status="info" isDismissible={ false }>
-							{ __( 'No CSS classes yet.' ) }
-						</Notice>
-					) }
-					{ cssClasses.length > 0 && (
-						<ItemGroup className="global-styles-ui-css-classes__list">
-							{ cssClasses.map( ( cssClass ) => {
-								const className = normalizeCSSClassName(
-									cssClass.name
-								);
-								const usageCount =
-									usageCounts[ className ] ?? 0;
-
-								return (
-									<Stack
-										className="global-styles-ui-css-classes__item"
-										key={ className }
-										direction="column"
-									>
-										<Stack
-											className="global-styles-ui-css-classes__item-header"
-											align="center"
-											direction="row"
-											justify="space-between"
-										>
-											<FlexItem>
-												<Button
-													__next40pxDefaultSize
-													icon={ code }
-													variant="tertiary"
-													disabled={
-														! canManageCssClasses
-													}
-													accessibleWhenDisabled
-													onClick={ () =>
-														goTo(
-															`/css-classes/edit/${ encodeURIComponent(
-																className
-															) }`
-														)
-													}
-												>
-													{ `.${ className }` }
-												</Button>
-											</FlexItem>
-											<Button
-												__next40pxDefaultSize
-												variant="tertiary"
-												onClick={ () =>
-													goTo(
-														`/css-classes/usages/${ encodeURIComponent(
-															className
-														) }`
-													)
-												}
-											>
-												{ sprintf(
-													/* translators: %d: Number of class usages. */
-													_n(
-														'%d use',
-														'%d uses',
-														usageCount
-													),
-													usageCount
-												) }
-											</Button>
-										</Stack>
-										<Text
-											className="global-styles-ui-css-classes__item-provenance"
-											variant="body-sm"
-										>
-											{ sprintf(
-												/* translators: %s: Comma-separated provenance labels. */
-												__( 'Defined by %s.' ),
-												getClassProvenance(
-													className,
-													userClassNames,
-													baseClassNames,
-													usedClassNames
-												).join( ', ' )
-											) }
-										</Text>
-									</Stack>
-								);
-							} ) }
-						</ItemGroup>
-					) }
+					<DataViews
+						actions={ actions }
+						data={ shownClassItems }
+						defaultLayouts={ { list: true } }
+						empty={
+							<Notice status="info" isDismissible={ false }>
+								{ __( 'No CSS classes found.' ) }
+							</Notice>
+						}
+						fields={ fields }
+						getItemId={ ( item ) => item.id }
+						header={
+							canManageCssClasses && (
+								<Button
+									__next40pxDefaultSize
+									icon={ plus }
+									variant="primary"
+									onClick={ () => goTo( '/css-classes/new' ) }
+								>
+									{ __( 'Add class' ) }
+								</Button>
+							)
+						}
+						isLoading={ isLoading }
+						onChangeSelection={ setSelection }
+						onChangeView={ onChangeView }
+						paginationInfo={ paginationInfo }
+						search
+						searchLabel={ __( 'Search classes' ) }
+						selection={ selection }
+						view={ view }
+					/>
 				</Stack>
 			</ScreenBody>
 		</>

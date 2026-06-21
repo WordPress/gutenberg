@@ -15,6 +15,7 @@
 		{ "path": "../core-data" },
 		{ "path": "../date" },
 		{ "path": "../data" },
+		{ "path": "../dataviews" },
 		{ "path": "../element" },
 		{ "path": "../global-styles-engine" },
 		{ "path": "../i18n" },

@@ -234,19 +234,20 @@
 	width: 100%;
 }
 
-.global-styles-ui-css-classes__item {
-	box-sizing: border-box;
-	min-height: variables.$grid-unit-60;
-	padding: variables.$grid-unit-05 variables.$grid-unit-10;
-	width: 100%;
-}
-
-.global-styles-ui-css-classes__item-header {
-	width: 100%;
-}
-
 .global-styles-ui-css-classes__item-provenance {
 	color: colors.$gray-700;
+}
+
+.global-styles-ui-css-classes__dataviews-title {
+	gap: variables.$grid-unit-10;
+	width: 100%;
+}
+
+.global-styles-ui-css-classes__dataviews-class-name {
+	font-family: variables.$font-family-mono;
+	font-weight: 600;
+	line-break: anywhere;
+	min-width: 0;
 }
 
 .global-styles-ui-css-classes__usage {
