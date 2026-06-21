@@ -2,10 +2,11 @@
  * WordPress dependencies
  */
 import { store as coreStore } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { GlobalStylesUI } from '@wordpress/global-styles-ui';
 import { uploadMedia } from '@wordpress/media-utils';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -88,6 +89,11 @@ export default function GlobalStylesUIWrapper( {
 	} = useGlobalStyles();
 	const { serverCSS, serverSettings, fontLibraryEnabled } =
 		useServerData( settings );
+	const contentBlocks = useSelect(
+		( select ) => select( blockEditorStore ).getBlocks(),
+		[]
+	);
+	const { selectBlock } = useDispatch( blockEditorStore );
 
 	// Show loading state while data is being fetched
 	if ( ! isReady ) {
@@ -105,6 +111,8 @@ export default function GlobalStylesUIWrapper( {
 				fontLibraryEnabled={ fontLibraryEnabled }
 				serverCSS={ serverCSS }
 				serverSettings={ serverSettings }
+				contentBlocks={ contentBlocks }
+				onSelectContentBlock={ selectBlock }
 			/>
 			<GlobalStylesBlockLink
 				path={ path }

@@ -30,9 +30,14 @@ import { ScreenShadows, ScreenShadowsEdit } from './screen-shadows';
 import ScreenLayout from './screen-layout';
 import ScreenStyleVariations from './screen-style-variations';
 import ScreenCSS from './screen-css';
+import ScreenCSSClasses, {
+	ScreenCSSClassEdit,
+	ScreenCSSClassUsages,
+} from './screen-css-classes';
 import ScreenRevisions from './screen-revisions';
 import FontSizes from './font-sizes/font-sizes';
 import FontSize from './font-sizes/font-size';
+import type { BlockLike } from './css-classes';
 interface BlockStylesNavigationScreensProps {
 	parentMenu: string;
 	blockStyles: any[];
@@ -110,6 +115,10 @@ interface GlobalStylesUIProps {
 	serverCSS?: { isGlobalStyles?: boolean }[];
 	/** Server settings for BlockEditorProvider (optional) */
 	serverSettings?: { __unstableResolvedAssets: Record< string, unknown > };
+	/** Blocks from the editor content canvas, used for CSS class usage counts. */
+	contentBlocks?: BlockLike[];
+	/** Callback to select a block usage in the editor content canvas. */
+	onSelectContentBlock?: ( clientId: string ) => void;
 }
 
 export function GlobalStylesUI( {
@@ -121,6 +130,8 @@ export function GlobalStylesUI( {
 	fontLibraryEnabled = false,
 	serverCSS,
 	serverSettings,
+	contentBlocks,
+	onSelectContentBlock,
 }: GlobalStylesUIProps ) {
 	const blocks = getBlockTypes();
 
@@ -193,6 +204,21 @@ export function GlobalStylesUI( {
 					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/css">
 						<ScreenCSS />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/css-classes">
+						<ScreenCSSClasses contentBlocks={ contentBlocks } />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/css-classes/new">
+						<ScreenCSSClassEdit isNew />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/css-classes/edit/:className">
+						<ScreenCSSClassEdit />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/css-classes/usages/:className">
+						<ScreenCSSClassUsages
+							contentBlocks={ contentBlocks }
+							onSelectContentBlock={ onSelectContentBlock }
+						/>
 					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/revisions/:revisionId?">
 						<ScreenRevisions />

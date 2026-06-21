@@ -214,6 +214,38 @@
 	margin-top: 8px;
 }
 
+.global-styles-ui-css-classes {
+	.components-notice {
+		margin: 0;
+	}
+
+	.components-base-control,
+	.components-textarea-control__input {
+		width: 100%;
+	}
+
+	.components-textarea-control__input {
+		min-height: 180px;
+		font-family: variables.$font-family-mono;
+	}
+}
+
+.global-styles-ui-css-classes__list {
+	width: 100%;
+}
+
+.global-styles-ui-css-classes__item {
+	box-sizing: border-box;
+	min-height: variables.$grid-unit-60;
+	padding: variables.$grid-unit-05 variables.$grid-unit-10;
+	width: 100%;
+}
+
+.global-styles-ui-css-classes__usage {
+	justify-content: flex-start;
+	width: 100%;
+}
+
 .global-styles-ui-screen-variations {
 	margin-top: 16px;
 	border-top: 1px solid #ddd;

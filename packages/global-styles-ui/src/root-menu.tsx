@@ -7,6 +7,7 @@ import {
 	typography,
 	color,
 	layout,
+	code,
 	shadow as shadowIcon,
 } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
@@ -79,6 +80,9 @@ function RootMenu() {
 						{ __( 'Layout' ) }
 					</NavigationButtonAsItem>
 				) }
+				<NavigationButtonAsItem icon={ code } path="/css-classes">
+					{ __( 'CSS classes' ) }
+				</NavigationButtonAsItem>
 			</ItemGroup>
 		</>
 	);
