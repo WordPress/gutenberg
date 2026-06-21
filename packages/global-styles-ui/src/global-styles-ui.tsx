@@ -129,6 +129,8 @@ interface GlobalStylesUIProps {
 		id?: string | number;
 		type?: string;
 	} ) => void;
+	/** Callback to rename a CSS class in the current editor canvas. */
+	onRenameContentClassName?: ( oldName: string, newName: string ) => void;
 }
 
 export function GlobalStylesUI( {
@@ -144,6 +146,7 @@ export function GlobalStylesUI( {
 	currentEntity,
 	onSelectContentBlock,
 	onNavigateToEntity,
+	onRenameContentClassName,
 }: GlobalStylesUIProps ) {
 	const blocks = getBlockTypes();
 
@@ -227,7 +230,11 @@ export function GlobalStylesUI( {
 						<ScreenCSSClassEdit isNew />
 					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/css-classes/edit/:className">
-						<ScreenCSSClassEdit />
+						<ScreenCSSClassEdit
+							onRenameContentClassName={
+								onRenameContentClassName
+							}
+						/>
 					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/css-classes/usages/:className">
 						<ScreenCSSClassUsages

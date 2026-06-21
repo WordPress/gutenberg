@@ -445,4 +445,77 @@ test.describe( 'Global styles sidebar', () => {
 			)
 			.toBe( 'managed-card current-card elsewhere-card' );
 	} );
+
+	test( 'should rename CSS classes and update persisted usages', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		await updateGlobalStyles( requestUtils, {
+			cssClasses: [
+				{
+					name: 'rename-card',
+					css: 'color: rgb(255, 0, 0);',
+				},
+			],
+		} );
+		const { id } = await requestUtils.createPage( {
+			title: 'Rename class usage',
+			content: `<!-- wp:paragraph {"className":"rename-card"} -->
+<p class="rename-card">First rename usage</p>
+<!-- /wp:paragraph -->
+<!-- wp:paragraph {"className":"rename-card"} -->
+<p class="rename-card">Second rename usage</p>
+<!-- /wp:paragraph -->`,
+			status: 'publish',
+		} );
+
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//index',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
+		await openCSSClassesPanel( page );
+
+		await page.getByRole( 'button', { name: '.rename-card' } ).click();
+		await page
+			.getByRole( 'textbox', { name: 'Class name' } )
+			.fill( 'renamed-card' );
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Save' } )
+			.click();
+
+		await expect(
+			page.getByText(
+				'Rename ".rename-card" to ".renamed-card" and update all existing usages?'
+			)
+		).toBeVisible();
+		await expect(
+			page.getByText( '2 existing usages will be affected.' )
+		).toBeVisible();
+		await page
+			.getByRole( 'button', { name: 'Rename and update usages' } )
+			.click();
+
+		await expect(
+			page.getByRole( 'button', { name: '.renamed-card' } )
+		).toBeVisible();
+		await expect(
+			page.getByRole( 'button', { name: '2 uses' } )
+		).toBeVisible();
+
+		await expect
+			.poll( async () => {
+				const updatedPage = await requestUtils.rest( {
+					path: `/wp/v2/pages/${ id }?context=edit`,
+				} );
+				return updatedPage.content.raw;
+			} )
+			.toContain( 'renamed-card' );
+		const updatedPage = await requestUtils.rest( {
+			path: `/wp/v2/pages/${ id }?context=edit`,
+		} );
+		expect( updatedPage.content.raw ).not.toContain( 'rename-card' );
+	} );
 } );

@@ -3,8 +3,9 @@
  */
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useCallback } from '@wordpress/element';
 import { GlobalStylesUI } from '@wordpress/global-styles-ui';
+import { normalizeCSSClassName } from '@wordpress/global-styles-engine';
 import { uploadMedia } from '@wordpress/media-utils';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
@@ -77,6 +78,57 @@ function useServerData( settings ) {
 	return { serverCSS, serverSettings, fontLibraryEnabled };
 }
 
+function replaceClassNameToken( classNames, oldName, newName ) {
+	const tokens = classNames?.split( /\s+/ ).filter( Boolean ) ?? [];
+
+	if ( ! tokens.length ) {
+		return classNames;
+	}
+
+	const oldClassName = normalizeCSSClassName( oldName );
+	const newClassName = normalizeCSSClassName( newName );
+	const nextTokens = [];
+	for ( const token of tokens ) {
+		const nextToken =
+			normalizeCSSClassName( token ) === oldClassName
+				? newClassName
+				: token;
+
+		if ( nextToken && ! nextTokens.includes( nextToken ) ) {
+			nextTokens.push( nextToken );
+		}
+	}
+
+	return nextTokens.length ? nextTokens.join( ' ' ) : undefined;
+}
+
+function getClassNameAttributeUpdates( blocks, oldName, newName ) {
+	const updates = [];
+
+	function visit( block ) {
+		const className = block.attributes?.className;
+		if ( block.clientId && typeof className === 'string' ) {
+			const nextClassName = replaceClassNameToken(
+				className,
+				oldName,
+				newName
+			);
+
+			if ( nextClassName !== className ) {
+				updates.push( {
+					clientId: block.clientId,
+					className: nextClassName,
+				} );
+			}
+		}
+
+		block.innerBlocks?.forEach( visit );
+	}
+
+	blocks.forEach( visit );
+	return updates;
+}
+
 export default function GlobalStylesUIWrapper( {
 	path,
 	onPathChange,
@@ -104,7 +156,22 @@ export default function GlobalStylesUIWrapper( {
 		} ),
 		[]
 	);
-	const { selectBlock } = useDispatch( blockEditorStore );
+	const { selectBlock, updateBlockAttributes } =
+		useDispatch( blockEditorStore );
+	const onRenameContentClassName = useCallback(
+		( oldName, newName ) => {
+			const updates = getClassNameAttributeUpdates(
+				contentBlocks,
+				oldName,
+				newName
+			);
+
+			updates.forEach( ( { clientId, className } ) => {
+				updateBlockAttributes( clientId, { className } );
+			} );
+		},
+		[ contentBlocks, updateBlockAttributes ]
+	);
 	const onNavigateToEntity = ( entity ) => {
 		if (
 			! settings?.onNavigateToEntityRecord ||
@@ -140,6 +207,7 @@ export default function GlobalStylesUIWrapper( {
 				currentEntity={ currentEntity }
 				onSelectContentBlock={ selectBlock }
 				onNavigateToEntity={ onNavigateToEntity }
+				onRenameContentClassName={ onRenameContentClassName }
 			/>
 			<GlobalStylesBlockLink
 				path={ path }

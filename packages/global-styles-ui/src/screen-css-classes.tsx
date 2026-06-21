@@ -92,6 +92,11 @@ interface ScreenCSSClassUsagesProps {
 	onNavigateToEntity?: ( entity: CSSClassUsageEntity ) => void;
 }
 
+interface ScreenCSSClassEditProps {
+	isNew?: boolean;
+	onRenameContentClassName?: ( oldName: string, newName: string ) => void;
+}
+
 interface CSSClassUsageEntity {
 	id?: string | number;
 	type?: string;
@@ -182,6 +187,84 @@ function canNavigateToUsage(
 		usage.source === 'post' &&
 		!! usage.entityId &&
 		!! usage.entityType
+	);
+}
+
+function getUsageSummary( usages: CSSClassUsage[], limit = 5 ) {
+	const summary = usages.reduce< Map< string, CSSClassUsage > >(
+		( results, usage ) => {
+			const key = [
+				usage.source,
+				usage.entityType,
+				usage.entityId,
+				usage.blockName,
+				usage.blockPath?.join( '.' ),
+			].join( ':' );
+
+			if ( ! results.has( key ) ) {
+				results.set( key, usage );
+			}
+
+			return results;
+		},
+		new Map()
+	);
+
+	return Array.from( summary.values() ).slice( 0, limit );
+}
+
+function CSSClassUsageWarning( { usages }: { usages: CSSClassUsage[] } ) {
+	if ( ! usages.length ) {
+		return null;
+	}
+
+	const visibleUsages = getUsageSummary( usages );
+	const remainingUsageCount = Math.max(
+		usages.length - visibleUsages.length,
+		0
+	);
+
+	return (
+		<Stack direction="column" gap="xs">
+			<Text>
+				{ sprintf(
+					/* translators: %d: Number of class usages. */
+					_n(
+						'%d existing usage will be affected.',
+						'%d existing usages will be affected.',
+						usages.length
+					),
+					usages.length
+				) }
+			</Text>
+			<ul>
+				{ visibleUsages.map( ( usage ) => (
+					<li key={ getUsageKey( usage ) }>
+						{ sprintf(
+							/* translators: 1: Entity title. 2: Block title. */
+							__( '%1$s, %2$s block' ),
+							usage.entityTitle ||
+								usage.entityLabel ||
+								__( 'Current canvas' ),
+							usage.blockTitle
+						) }
+					</li>
+				) ) }
+			</ul>
+			{ remainingUsageCount > 0 && (
+				<Text variant="muted">
+					{ sprintf(
+						/* translators: %d: Number of additional class usages. */
+						_n(
+							'And %d more usage.',
+							'And %d more usages.',
+							remainingUsageCount
+						),
+						remainingUsageCount
+					) }
+				</Text>
+			) }
+		</Stack>
 	);
 }
 
@@ -588,10 +671,14 @@ export default function ScreenCSSClasses( {
 	);
 }
 
-export function ScreenCSSClassEdit( { isNew = false }: { isNew?: boolean } ) {
+export function ScreenCSSClassEdit( {
+	isNew = false,
+	onRenameContentClassName,
+}: ScreenCSSClassEditProps ) {
 	const { goBack, goTo, params } = useNavigator();
 	const originalName = isNew ? '' : decodeClassName( params.className );
 	const [ cssClasses, setCSSClasses ] = useCSSClasses();
+	const { usageData } = useCSSClassSiteUsageData();
 	const existingClass = useMemo(
 		() =>
 			cssClasses.find(
@@ -605,6 +692,9 @@ export function ScreenCSSClassEdit( { isNew = false }: { isNew?: boolean } ) {
 	);
 	const [ css, setCSS ] = useState( isNew ? '' : existingClass?.css ?? '' );
 	const [ isDeleteConfirmOpen, setIsDeleteConfirmOpen ] = useState( false );
+	const [ isRenameConfirmOpen, setIsRenameConfirmOpen ] = useState( false );
+	const [ isSaving, setIsSaving ] = useState( false );
+	const [ saveError, setSaveError ] = useState< Error | null >( null );
 
 	useEffect( () => {
 		if ( ! isNew && ! existingClass ) {
@@ -622,18 +712,27 @@ export function ScreenCSSClassEdit( { isNew = false }: { isNew?: boolean } ) {
 	const hasChanges =
 		normalizedName !== normalizeCSSClassName( existingClass?.name ) ||
 		css !== ( existingClass?.css ?? '' );
+	const isRename =
+		! isNew &&
+		!! normalizedName &&
+		normalizedName !== normalizeCSSClassName( originalName );
 	const canSave =
 		!! normalizedName &&
 		!! css.trim() &&
 		! nameError &&
 		! cssError &&
-		( isNew || hasChanges );
+		( isNew || hasChanges ) &&
+		! isSaving;
+	const originalClassUsages = useMemo(
+		() =>
+			usageData.usages.filter(
+				( usage ) =>
+					usage.className === normalizeCSSClassName( originalName )
+			),
+		[ originalName, usageData.usages ]
+	);
 
-	function saveCSSClass() {
-		if ( ! canSave ) {
-			return;
-		}
-
+	function updateCSSClassDefinition() {
 		const nextCSSClass = {
 			name: normalizedName,
 			css: css.trim(),
@@ -646,6 +745,43 @@ export function ScreenCSSClassEdit( { isNew = false }: { isNew?: boolean } ) {
 
 		setCSSClasses( nextCSSClasses );
 		goTo( '/css-classes' );
+	}
+
+	async function confirmRenameCSSClass() {
+		setIsSaving( true );
+		setSaveError( null );
+
+		try {
+			await apiFetch( {
+				path: `/wp/v2/css-class-usages/${ encodeURIComponent(
+					normalizeCSSClassName( originalName )
+				) }/rename`,
+				method: 'POST',
+				data: { newName: normalizedName },
+			} );
+			onRenameContentClassName?.(
+				normalizeCSSClassName( originalName ),
+				normalizedName
+			);
+			updateCSSClassDefinition();
+		} catch ( error ) {
+			setSaveError( error as Error );
+			setIsSaving( false );
+			setIsRenameConfirmOpen( false );
+		}
+	}
+
+	function saveCSSClass() {
+		if ( ! canSave ) {
+			return;
+		}
+
+		if ( isRename ) {
+			setIsRenameConfirmOpen( true );
+			return;
+		}
+
+		updateCSSClassDefinition();
 	}
 
 	function deleteCSSClass() {
@@ -671,6 +807,30 @@ export function ScreenCSSClassEdit( { isNew = false }: { isNew?: boolean } ) {
 					) }
 				</ConfirmDialog>
 			) }
+			{ isRenameConfirmOpen && (
+				<ConfirmDialog
+					isOpen={ isRenameConfirmOpen }
+					cancelButtonText={ __( 'Cancel' ) }
+					confirmButtonText={ __( 'Rename and update usages' ) }
+					onCancel={ () => setIsRenameConfirmOpen( false ) }
+					onConfirm={ confirmRenameCSSClass }
+					size="medium"
+				>
+					<Stack direction="column" gap="sm">
+						<Text>
+							{ sprintf(
+								/* translators: 1: Old CSS class name. 2: New CSS class name. */
+								__(
+									'Rename ".%1$s" to ".%2$s" and update all existing usages?'
+								),
+								originalName,
+								normalizedName
+							) }
+						</Text>
+						<CSSClassUsageWarning usages={ originalClassUsages } />
+					</Stack>
+				</ConfirmDialog>
+			) }
 			<ScreenHeader
 				title={
 					isNew
@@ -692,6 +852,12 @@ export function ScreenCSSClassEdit( { isNew = false }: { isNew?: boolean } ) {
 					{ cssError && (
 						<Notice status="error" isDismissible={ false }>
 							{ cssError }
+						</Notice>
+					) }
+					{ saveError && (
+						<Notice status="error" isDismissible={ false }>
+							{ saveError.message ||
+								__( 'Could not update CSS class usages.' ) }
 						</Notice>
 					) }
 					<TextControl
