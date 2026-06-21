@@ -17,6 +17,7 @@ import {
 	useNavigator,
 } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
+import { useCopyToClipboard } from '@wordpress/compose';
 import {
 	DataViews,
 	filterSortAndPaginate,
@@ -28,7 +29,7 @@ import { Stack, Tabs, Text } from '@wordpress/ui';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { pencil, plus, trash } from '@wordpress/icons';
+import { copy, pencil, plus, trash } from '@wordpress/icons';
 import {
 	isValidCSSClassName,
 	normalizeCSSClassName,
@@ -89,6 +90,16 @@ const CSS_CLASS_PSEUDO_STATES: Exclude< CSSClassStateKey, 'default' >[] = [
 	'active',
 	'disabled',
 ];
+
+const CSS_CLASS_PSEUDO_SELECTORS: Record<
+	Exclude< CSSClassStateKey, 'default' >,
+	string
+> = {
+	hover: ':hover',
+	focus: ':focus',
+	active: ':active',
+	disabled: ':disabled',
+};
 
 /*
  * TODO: North star: managed classes should behave like first-class design tokens
@@ -218,6 +229,34 @@ function getCSSClassPseudoStates( cssByState: CSSClassStateValues ) {
 	} );
 
 	return states;
+}
+
+function getCSSClassRuleCSS( selector: string, css: string ) {
+	const declarations = css.trim();
+
+	if ( ! declarations ) {
+		return '';
+	}
+
+	return `${ selector } {\n\t${ declarations }\n}`;
+}
+
+function getCSSClassDefinitionCSS(
+	className: string,
+	cssByState: CSSClassStateValues
+) {
+	const selector = `.${ className }`;
+	const rules = [
+		getCSSClassRuleCSS( selector, cssByState.default ),
+		...CSS_CLASS_PSEUDO_STATES.map( ( state ) =>
+			getCSSClassRuleCSS(
+				`${ selector }${ CSS_CLASS_PSEUDO_SELECTORS[ state ] }`,
+				cssByState[ state ]
+			)
+		),
+	].filter( Boolean );
+
+	return rules.join( '\n\n' );
 }
 
 function useCSSClassUsageCounts(
@@ -1007,6 +1046,7 @@ export function ScreenCSSClassEdit( {
 	const [ isRenameConfirmOpen, setIsRenameConfirmOpen ] = useState( false );
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ saveError, setSaveError ] = useState< Error | null >( null );
+	const [ hasCopiedCSS, setHasCopiedCSS ] = useState( false );
 
 	useEffect( () => {
 		if ( ! isNew && ! existingClass ) {
@@ -1019,6 +1059,17 @@ export function ScreenCSSClassEdit( {
 		name,
 		cssClasses,
 		isNew ? undefined : originalName
+	);
+	const copyCSS = useMemo(
+		() =>
+			normalizedName
+				? getCSSClassDefinitionCSS( normalizedName, cssByState )
+				: '',
+		[ cssByState, normalizedName ]
+	);
+	const copyCSSButtonRef = useCopyToClipboard< HTMLButtonElement >(
+		copyCSS,
+		() => setHasCopiedCSS( true )
 	);
 	const cssErrors = useMemo( () => {
 		const errors: Partial< Record< CSSClassStateKey, string > > = {};
@@ -1067,6 +1118,18 @@ export function ScreenCSSClassEdit( {
 			),
 		[ originalName, usageData.usages ]
 	);
+
+	useEffect( () => {
+		if ( ! hasCopiedCSS ) {
+			return;
+		}
+
+		const timeoutId = setTimeout( () => {
+			setHasCopiedCSS( false );
+		}, 4000 );
+
+		return () => clearTimeout( timeoutId );
+	}, [ hasCopiedCSS ] );
 
 	function updateCSSClassDefinition() {
 		const states = getCSSClassPseudoStates( cssByState );
@@ -1232,6 +1295,16 @@ export function ScreenCSSClassEdit( {
 						autoComplete="off"
 						placeholder={ __( 'my-class' ) }
 					/>
+					<Button
+						__next40pxDefaultSize
+						ref={ copyCSSButtonRef }
+						icon={ copy }
+						variant="secondary"
+						disabled={ ! copyCSS }
+						accessibleWhenDisabled
+					>
+						{ hasCopiedCSS ? __( 'Copied' ) : __( 'Copy CSS' ) }
+					</Button>
 					<Tabs.Root
 						value={ activeState }
 						onValueChange={ ( state ) =>

@@ -184,6 +184,42 @@ test.describe( 'Global styles sidebar', () => {
 		await expect( paragraph ).toHaveCSS( 'color', 'rgb(0, 0, 255)' );
 	} );
 
+	test( 'should copy CSS class rules', async ( { page } ) => {
+		await page.evaluate( () => {
+			Object.defineProperty( window.navigator, 'clipboard', {
+				configurable: true,
+				value: {
+					writeText: async ( text ) => {
+						window.__copiedCSSClassRules = text;
+					},
+				},
+			} );
+		} );
+
+		await openCSSClassesPanel( page );
+		await page.getByRole( 'button', { name: 'Add class' } ).click();
+		await page
+			.getByRole( 'textbox', { name: 'Class name' } )
+			.fill( 'copy-card' );
+		await page
+			.getByRole( 'textbox', { name: 'CSS' } )
+			.fill( 'color: rgb(255, 0, 0);' );
+		await page.getByRole( 'tab', { name: 'Hover' } ).click();
+		await page
+			.getByRole( 'textbox', { name: 'Hover CSS' } )
+			.fill( 'color: rgb(0, 0, 255);' );
+		await page.getByRole( 'button', { name: 'Copy CSS' } ).click();
+
+		await expect(
+			page.getByRole( 'button', { name: 'Copied' } )
+		).toBeVisible();
+		await expect
+			.poll( () => page.evaluate( () => window.__copiedCSSClassRules ) )
+			.toBe(
+				'.copy-card {\n\tcolor: rgb(255, 0, 0);\n}\n\n.copy-card:hover {\n\tcolor: rgb(0, 0, 255);\n}'
+			);
+	} );
+
 	test( 'should count CSS classes used in edited page content', async ( {
 		admin,
 		editor,
