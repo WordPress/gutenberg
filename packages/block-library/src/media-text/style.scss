@@ -54,6 +54,9 @@
 	/*rtl:end:ignore*/
 	padding: 0 8% 0 8%;
 	word-break: break-word;
+	// Add min-width to prevent overflow issues in CSS Grid layouts in Firefox.
+	// See: https://github.com/WordPress/gutenberg/issues/76647
+	min-width: 0;
 }
 
 .wp-block-media-text.has-media-on-the-right > .wp-block-media-text__media {
