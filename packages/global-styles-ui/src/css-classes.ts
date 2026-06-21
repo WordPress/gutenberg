@@ -8,10 +8,23 @@ import {
 } from '@wordpress/global-styles-engine';
 
 export interface CSSClassUsage {
-	clientId: string;
+	clientId?: string;
 	className: string;
 	blockName: string;
 	blockTitle: string;
+	blockPath?: number[];
+	entityId?: string;
+	entityType?: string;
+	entityLabel?: string;
+	entityTitle?: string;
+	status?: string;
+	source?: string;
+}
+
+export interface CSSClassUsageData {
+	usages: CSSClassUsage[];
+	counts: Record< string, number >;
+	classNames: string[];
 }
 
 export interface BlockLike {
@@ -63,6 +76,7 @@ export function getCSSClassUsages(
 				className: normalizedClassName,
 				blockName: block.name,
 				blockTitle: getBlockTitle( block.name ),
+				source: 'canvas',
 			} );
 		}
 

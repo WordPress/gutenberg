@@ -43,12 +43,14 @@ describe( 'getCSSClassUsages', () => {
 				className: 'featured-card',
 				blockName: 'core/group',
 				blockTitle: 'core/group',
+				source: 'canvas',
 			},
 			{
 				clientId: 'paragraph-client-id',
 				className: 'featured-card',
 				blockName: 'core/paragraph',
 				blockTitle: 'Paragraph',
+				source: 'canvas',
 			},
 		] );
 	} );

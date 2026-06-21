@@ -97,7 +97,28 @@ export default function GlobalStylesUIWrapper( {
 		],
 		[]
 	);
+	const currentEntity = useSelect(
+		( select ) => ( {
+			id: select( editorStore ).getCurrentPostId(),
+			type: select( editorStore ).getCurrentPostType(),
+		} ),
+		[]
+	);
 	const { selectBlock } = useDispatch( blockEditorStore );
+	const onNavigateToEntity = ( entity ) => {
+		if (
+			! settings?.onNavigateToEntityRecord ||
+			! entity.id ||
+			! entity.type
+		) {
+			return;
+		}
+
+		settings.onNavigateToEntityRecord( {
+			postId: entity.id,
+			postType: entity.type,
+		} );
+	};
 
 	// Show loading state while data is being fetched
 	if ( ! isReady ) {
@@ -116,7 +137,9 @@ export default function GlobalStylesUIWrapper( {
 				serverCSS={ serverCSS }
 				serverSettings={ serverSettings }
 				contentBlocks={ contentBlocks }
+				currentEntity={ currentEntity }
 				onSelectContentBlock={ selectBlock }
+				onNavigateToEntity={ onNavigateToEntity }
 			/>
 			<GlobalStylesBlockLink
 				path={ path }

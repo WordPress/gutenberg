@@ -117,8 +117,18 @@ interface GlobalStylesUIProps {
 	serverSettings?: { __unstableResolvedAssets: Record< string, unknown > };
 	/** Blocks from the editor content canvas, used for CSS class usage counts. */
 	contentBlocks?: BlockLike[];
+	/** Current editor entity, used to separate visible usages from usages elsewhere. */
+	currentEntity?: {
+		id?: string | number;
+		type?: string;
+	};
 	/** Callback to select a block usage in the editor content canvas. */
 	onSelectContentBlock?: ( clientId: string ) => void;
+	/** Callback to navigate to an entity with a CSS class usage. */
+	onNavigateToEntity?: ( entity: {
+		id?: string | number;
+		type?: string;
+	} ) => void;
 }
 
 export function GlobalStylesUI( {
@@ -131,7 +141,9 @@ export function GlobalStylesUI( {
 	serverCSS,
 	serverSettings,
 	contentBlocks,
+	currentEntity,
 	onSelectContentBlock,
+	onNavigateToEntity,
 }: GlobalStylesUIProps ) {
 	const blocks = getBlockTypes();
 
@@ -206,7 +218,10 @@ export function GlobalStylesUI( {
 						<ScreenCSS />
 					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/css-classes">
-						<ScreenCSSClasses contentBlocks={ contentBlocks } />
+						<ScreenCSSClasses
+							contentBlocks={ contentBlocks }
+							currentEntity={ currentEntity }
+						/>
 					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/css-classes/new">
 						<ScreenCSSClassEdit isNew />
@@ -217,7 +232,9 @@ export function GlobalStylesUI( {
 					<GlobalStylesNavigationScreen path="/css-classes/usages/:className">
 						<ScreenCSSClassUsages
 							contentBlocks={ contentBlocks }
+							currentEntity={ currentEntity }
 							onSelectContentBlock={ onSelectContentBlock }
+							onNavigateToEntity={ onNavigateToEntity }
 						/>
 					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/revisions/:revisionId?">

@@ -11,10 +11,11 @@ import {
 	TextControl,
 	useNavigator,
 } from '@wordpress/components';
+import apiFetch from '@wordpress/api-fetch';
 import { Stack, Text } from '@wordpress/ui';
 // @ts-expect-error: Not typed yet.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { code, plus, trash } from '@wordpress/icons';
 import {
@@ -34,6 +35,8 @@ import {
 	getCSSClassUsageCounts,
 	getCSSClassUsages,
 	type BlockLike,
+	type CSSClassUsage,
+	type CSSClassUsageData,
 } from './css-classes';
 
 const { getCSSDeclarationBlockValidationError } = unlock(
@@ -67,21 +70,141 @@ function useCSSClasses() {
 
 interface ScreenCSSClassesProps {
 	contentBlocks?: BlockLike[];
+	currentEntity?: CSSClassUsageEntity;
 }
 
 interface ScreenCSSClassUsagesProps {
 	contentBlocks?: BlockLike[];
+	currentEntity?: CSSClassUsageEntity;
+	siteUsages?: CSSClassUsage[];
 	onSelectContentBlock?: ( clientId: string ) => void;
+	onNavigateToEntity?: ( entity: CSSClassUsageEntity ) => void;
+}
+
+interface CSSClassUsageEntity {
+	id?: string | number;
+	type?: string;
 }
 
 function useCSSClassUsageCounts(
 	cssClasses: CSSClassDefinition[],
-	contentBlocks: BlockLike[] = []
+	contentBlocks: BlockLike[] = [],
+	siteUsages: CSSClassUsage[] = [],
+	currentEntity?: CSSClassUsageEntity
 ) {
-	return useMemo(
-		() => getCSSClassUsageCounts( contentBlocks, cssClasses ),
-		[ contentBlocks, cssClasses ]
+	return useMemo( () => {
+		const currentUsageCounts = getCSSClassUsageCounts(
+			contentBlocks,
+			cssClasses
+		);
+		const siteUsageCounts = siteUsages.reduce< Record< string, number > >(
+			( counts, usage ) => {
+				counts[ usage.className ] =
+					( counts[ usage.className ] ?? 0 ) + 1;
+				return counts;
+			},
+			{}
+		);
+		const currentEntityUsageCounts = siteUsages
+			.filter( ( usage ) => isUsageForEntity( usage, currentEntity ) )
+			.reduce< Record< string, number > >( ( counts, usage ) => {
+				counts[ usage.className ] =
+					( counts[ usage.className ] ?? 0 ) + 1;
+				return counts;
+			}, {} );
+
+		return cssClasses.reduce< Record< string, number > >(
+			( counts, item ) => {
+				const className = normalizeCSSClassName( item.name );
+				const currentCount = currentUsageCounts[ className ] ?? 0;
+				const siteCount = siteUsageCounts[ className ] ?? 0;
+				const currentEntityCount =
+					currentEntityUsageCounts[ className ] ?? 0;
+				counts[ className ] =
+					siteCount -
+					currentEntityCount +
+					Math.max( currentCount, currentEntityCount );
+				return counts;
+			},
+			{}
+		);
+	}, [ contentBlocks, cssClasses, currentEntity, siteUsages ] );
+}
+
+function isUsageForEntity(
+	usage: CSSClassUsage,
+	entity?: CSSClassUsageEntity
+) {
+	if ( ! entity?.id || ! entity?.type ) {
+		return false;
+	}
+
+	return (
+		String( usage.entityId ) === String( entity.id ) &&
+		usage.entityType === entity.type
 	);
+}
+
+function getUsageKey( usage: CSSClassUsage ) {
+	return [
+		usage.source,
+		usage.entityType,
+		usage.entityId,
+		usage.blockName,
+		usage.blockPath?.join( '.' ),
+		usage.clientId,
+	].join( ':' );
+}
+
+function useCSSClassSiteUsageData() {
+	const [ usageData, setUsageData ] = useState< CSSClassUsageData >( {
+		usages: [],
+		counts: {},
+		classNames: [],
+	} );
+	const [ isLoading, setIsLoading ] = useState( false );
+	const [ error, setError ] = useState< Error | null >( null );
+
+	const refresh = useCallback( () => {
+		let isMounted = true;
+		setIsLoading( true );
+		setError( null );
+
+		apiFetch< CSSClassUsageData >( {
+			path: '/wp/v2/css-class-usages',
+		} )
+			.then( ( response ) => {
+				if ( isMounted ) {
+					setUsageData( {
+						usages: Array.isArray( response.usages )
+							? response.usages
+							: [],
+						counts: response.counts ?? {},
+						classNames: Array.isArray( response.classNames )
+							? response.classNames
+							: [],
+					} );
+				}
+			} )
+			.catch( ( nextError ) => {
+				if ( isMounted ) {
+					setError( nextError );
+				}
+			} )
+			.finally( () => {
+				if ( isMounted ) {
+					setIsLoading( false );
+				}
+			} );
+
+		return () => {
+			isMounted = false;
+		};
+	}, [] );
+
+	useEffect( () => refresh(), [ refresh ] );
+
+	return { usageData, isLoading, error, refresh };
 }
 
 function getClassNameError(
@@ -129,10 +252,17 @@ function getCSSClassesWithout(
 
 export default function ScreenCSSClasses( {
 	contentBlocks,
+	currentEntity,
 }: ScreenCSSClassesProps ) {
 	const { goTo } = useNavigator();
 	const [ cssClasses ] = useCSSClasses();
-	const usageCounts = useCSSClassUsageCounts( cssClasses, contentBlocks );
+	const { usageData, isLoading, error } = useCSSClassSiteUsageData();
+	const usageCounts = useCSSClassUsageCounts(
+		cssClasses,
+		contentBlocks,
+		usageData.usages,
+		currentEntity
+	);
 
 	return (
 		<>
@@ -152,6 +282,18 @@ export default function ScreenCSSClasses( {
 					>
 						{ __( 'Add class' ) }
 					</Button>
+					{ isLoading && (
+						<Notice status="info" isDismissible={ false }>
+							{ __( 'Loading CSS class usages.' ) }
+						</Notice>
+					) }
+					{ error && (
+						<Notice status="warning" isDismissible={ false }>
+							{ __(
+								'Could not load site-wide CSS class usages.'
+							) }
+						</Notice>
+					) }
 					{ cssClasses.length === 0 && (
 						<Notice status="info" isDismissible={ false }>
 							{ __( 'No CSS classes yet.' ) }
@@ -392,14 +534,46 @@ export function ScreenCSSClassEdit( { isNew = false }: { isNew?: boolean } ) {
 
 export function ScreenCSSClassUsages( {
 	contentBlocks = [],
+	currentEntity,
+	siteUsages = [],
 	onSelectContentBlock,
+	onNavigateToEntity,
 }: ScreenCSSClassUsagesProps ) {
 	const { params } = useNavigator();
 	const className = decodeClassName( params.className );
-	const usages = useMemo(
+	const { usageData, isLoading, error } = useCSSClassSiteUsageData();
+	const allSiteUsages = siteUsages.length ? siteUsages : usageData.usages;
+	const visibleUsages = useMemo(
 		() => getCSSClassUsages( contentBlocks, className ),
 		[ contentBlocks, className ]
 	);
+	const normalizedClassName = normalizeCSSClassName( className );
+	const siteClassUsages = useMemo(
+		() =>
+			allSiteUsages.filter(
+				( usage ) => usage.className === normalizedClassName
+			),
+		[ allSiteUsages, normalizedClassName ]
+	);
+	const currentEntityUsages = useMemo(
+		() =>
+			siteClassUsages.filter( ( usage ) =>
+				isUsageForEntity( usage, currentEntity )
+			),
+		[ currentEntity, siteClassUsages ]
+	);
+	const elsewhereUsages = useMemo(
+		() =>
+			siteClassUsages.filter(
+				( usage ) => ! isUsageForEntity( usage, currentEntity )
+			),
+		[ currentEntity, siteClassUsages ]
+	);
+	const currentUsageCount = Math.max(
+		visibleUsages.length,
+		currentEntityUsages.length
+	);
+	const totalUsageCount = currentUsageCount + elsewhereUsages.length;
 
 	return (
 		<>
@@ -411,27 +585,99 @@ export function ScreenCSSClassUsages( {
 				) }
 			/>
 			<ScreenBody className="global-styles-ui-css-classes">
-				{ usages.length === 0 && (
+				{ isLoading && (
+					<Notice status="info" isDismissible={ false }>
+						{ __( 'Loading CSS class usages.' ) }
+					</Notice>
+				) }
+				{ error && (
+					<Notice status="warning" isDismissible={ false }>
+						{ __( 'Could not load site-wide CSS class usages.' ) }
+					</Notice>
+				) }
+				{ totalUsageCount === 0 && (
 					<Notice status="info" isDismissible={ false }>
 						{ __( 'No usages found.' ) }
 					</Notice>
 				) }
-				{ usages.length > 0 && (
-					<ItemGroup className="global-styles-ui-css-classes__list">
-						{ usages.map( ( usage ) => (
-							<Button
-								key={ usage.clientId }
-								__next40pxDefaultSize
-								className="global-styles-ui-css-classes__usage"
-								variant="tertiary"
-								onClick={ () =>
-									onSelectContentBlock?.( usage.clientId )
-								}
-							>
-								<Text>{ usage.blockTitle }</Text>
-							</Button>
-						) ) }
-					</ItemGroup>
+				{ totalUsageCount > 0 && (
+					<Stack direction="column" gap="md">
+						<Text>
+							{ sprintf(
+								/* translators: %d: Number of class usages. */
+								_n(
+									'%d total usage found.',
+									'%d total usages found.',
+									totalUsageCount
+								),
+								totalUsageCount
+							) }
+						</Text>
+						{ visibleUsages.length > 0 && (
+							<>
+								<Text weight={ 600 }>
+									{ __( 'Visible in this canvas' ) }
+								</Text>
+								<ItemGroup className="global-styles-ui-css-classes__list">
+									{ visibleUsages.map( ( usage ) => (
+										<Button
+											key={ usage.clientId }
+											__next40pxDefaultSize
+											className="global-styles-ui-css-classes__usage"
+											variant="tertiary"
+											onClick={ () =>
+												usage.clientId &&
+												onSelectContentBlock?.(
+													usage.clientId
+												)
+											}
+										>
+											<Text>{ usage.blockTitle }</Text>
+										</Button>
+									) ) }
+								</ItemGroup>
+							</>
+						) }
+						{ elsewhereUsages.length > 0 && (
+							<>
+								<Text weight={ 600 }>
+									{ __( 'Elsewhere on this site' ) }
+								</Text>
+								<ItemGroup className="global-styles-ui-css-classes__list">
+									{ elsewhereUsages.map( ( usage ) => (
+										<Button
+											key={ getUsageKey( usage ) }
+											__next40pxDefaultSize
+											className="global-styles-ui-css-classes__usage"
+											variant="tertiary"
+											onClick={ () =>
+												onNavigateToEntity?.( {
+													id: usage.entityId,
+													type: usage.entityType,
+												} )
+											}
+										>
+											<Stack direction="column" gap="2xs">
+												<Text>
+													{ usage.entityTitle }
+												</Text>
+												<Text variant="muted">
+													{ sprintf(
+														/* translators: 1: Entity type label. 2: Block title. */
+														__(
+															'%1$s, %2$s block'
+														),
+														usage.entityLabel,
+														usage.blockTitle
+													) }
+												</Text>
+											</Stack>
+										</Button>
+									) ) }
+								</ItemGroup>
+							</>
+						) }
+					</Stack>
 				) }
 			</ScreenBody>
 		</>

@@ -198,6 +198,60 @@ test.describe( 'Global styles sidebar', () => {
 		).toBeVisible();
 	} );
 
+	test( 'should count CSS class usages across site content', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		await updateGlobalStyles( requestUtils, {
+			cssClasses: [
+				{
+					name: 'featured-card',
+					css: 'color: rgb(255, 0, 0);',
+				},
+			],
+		} );
+		await requestUtils.createPage( {
+			title: 'Usage page one',
+			content: `<!-- wp:paragraph {"className":"featured-card"} -->
+<p class="featured-card">First page first usage</p>
+<!-- /wp:paragraph -->
+<!-- wp:paragraph {"className":"featured-card"} -->
+<p class="featured-card">First page second usage</p>
+<!-- /wp:paragraph -->`,
+			status: 'publish',
+		} );
+		await requestUtils.createPage( {
+			title: 'Usage page two',
+			content: `<!-- wp:paragraph {"className":"featured-card"} -->
+<p class="featured-card">Second page first usage</p>
+<!-- /wp:paragraph -->
+<!-- wp:paragraph {"className":"featured-card"} -->
+<p class="featured-card">Second page second usage</p>
+<!-- /wp:paragraph -->`,
+			status: 'publish',
+		} );
+
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//index',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
+		await openCSSClassesPanel( page );
+
+		await expect(
+			page.getByRole( 'button', { name: '4 uses' } )
+		).toBeVisible();
+
+		await page.getByRole( 'button', { name: '4 uses' } ).click();
+		await expect( page.getByText( '4 total usages found.' ) ).toBeVisible();
+		await expect(
+			page.getByText( 'Elsewhere on this site' )
+		).toBeVisible();
+		await expect( page.getByText( 'Usage page one' ) ).toHaveCount( 2 );
+		await expect( page.getByText( 'Usage page two' ) ).toHaveCount( 2 );
+	} );
+
 	test( 'should suggest managed CSS classes in block Advanced settings without limiting custom classes', async ( {
 		admin,
 		editor,
