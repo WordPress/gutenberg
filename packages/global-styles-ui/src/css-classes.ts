@@ -25,6 +25,7 @@ export interface CSSClassUsageData {
 	usages: CSSClassUsage[];
 	counts: Record< string, number >;
 	classNames: string[];
+	canManageCssClasses: boolean;
 }
 
 export interface BlockLike {

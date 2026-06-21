@@ -278,6 +278,13 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 		if ( isset( $request['styles'] ) || isset( $request['settings'] ) ) {
 			$config = array();
 			if ( isset( $request['styles'] ) ) {
+				if ( $this->request_updates_css_classes( $request['styles'], $existing_config ) && ! current_user_can( 'manage_options' ) ) {
+					return new WP_Error(
+						'rest_cannot_manage_css_classes',
+						__( 'Sorry, you are not allowed to manage CSS classes.', 'gutenberg' ),
+						array( 'status' => rest_authorization_required_code() )
+					);
+				}
 				if ( isset( $request['styles']['css'] ) ) {
 					$css_validation_result = $this->validate_custom_css( $request['styles']['css'] );
 					if ( is_wp_error( $css_validation_result ) ) {
@@ -778,6 +785,32 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 		}
 
 		return true;
+	}
+
+	/**
+	 * Checks whether a global styles request changes managed CSS class definitions.
+	 *
+	 * @param array $styles          Requested styles object.
+	 * @param array $existing_config Existing user theme JSON config.
+	 * @return bool Whether managed CSS class definitions are changed.
+	 */
+	protected function request_updates_css_classes( $styles, $existing_config ) {
+		if ( ! is_array( $styles ) ) {
+			return false;
+		}
+
+		$existing_styles = isset( $existing_config['styles'] ) && is_array( $existing_config['styles'] ) ? $existing_config['styles'] : array();
+		$has_existing    = array_key_exists( 'cssClasses', $existing_styles );
+		$has_requested   = array_key_exists( 'cssClasses', $styles );
+
+		if ( ! $has_existing && ! $has_requested ) {
+			return false;
+		}
+
+		$existing_css_classes  = $has_existing ? $existing_styles['cssClasses'] : null;
+		$requested_css_classes = $has_requested ? $styles['cssClasses'] : null;
+
+		return $existing_css_classes !== $requested_css_classes;
 	}
 
 	/**

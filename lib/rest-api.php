@@ -457,9 +457,10 @@ function gutenberg_get_site_css_class_usage_data(): array {
 	ksort( $counts );
 
 	return array(
-		'usages'     => $usages,
-		'counts'     => $counts,
-		'classNames' => array_keys( $counts ),
+		'usages'              => $usages,
+		'counts'              => $counts,
+		'classNames'          => array_keys( $counts ),
+		'canManageCssClasses' => current_user_can( 'manage_options' ),
 	);
 }
 
@@ -531,17 +532,20 @@ function gutenberg_register_css_class_usage_routes(): void {
 				'title'      => 'css-class-usages',
 				'type'       => 'object',
 				'properties' => array(
-					'usages'     => array(
+					'usages'              => array(
 						'type'  => 'array',
 						'items' => array( 'type' => 'object' ),
 					),
-					'counts'     => array(
+					'counts'              => array(
 						'type'                 => 'object',
 						'additionalProperties' => array( 'type' => 'integer' ),
 					),
-					'classNames' => array(
+					'classNames'          => array(
 						'type'  => 'array',
 						'items' => array( 'type' => 'string' ),
+					),
+					'canManageCssClasses' => array(
+						'type' => 'boolean',
 					),
 				),
 			),

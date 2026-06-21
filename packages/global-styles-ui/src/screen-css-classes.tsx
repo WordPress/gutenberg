@@ -273,6 +273,7 @@ function useCSSClassSiteUsageData() {
 		usages: [],
 		counts: {},
 		classNames: [],
+		canManageCssClasses: false,
 	} );
 	const [ isLoading, setIsLoading ] = useState( false );
 	const [ error, setError ] = useState< Error | null >( null );
@@ -295,6 +296,7 @@ function useCSSClassSiteUsageData() {
 						classNames: Array.isArray( response.classNames )
 							? response.classNames
 							: [],
+						canManageCssClasses: !! response.canManageCssClasses,
 					} );
 				}
 			} )
@@ -513,6 +515,7 @@ export default function ScreenCSSClasses( {
 	const [ cssClasses ] = useCSSClasses();
 	const baseCSSClasses = useBaseCSSClasses();
 	const { usageData, isLoading, error } = useCSSClassSiteUsageData();
+	const { canManageCssClasses } = usageData;
 	const usageCounts = useCSSClassUsageCounts(
 		cssClasses,
 		contentBlocks,
@@ -551,14 +554,23 @@ export default function ScreenCSSClasses( {
 			/>
 			<ScreenBody className="global-styles-ui-css-classes">
 				<Stack direction="column" gap="md">
-					<Button
-						__next40pxDefaultSize
-						icon={ plus }
-						variant="primary"
-						onClick={ () => goTo( '/css-classes/new' ) }
-					>
-						{ __( 'Add class' ) }
-					</Button>
+					{ canManageCssClasses && (
+						<Button
+							__next40pxDefaultSize
+							icon={ plus }
+							variant="primary"
+							onClick={ () => goTo( '/css-classes/new' ) }
+						>
+							{ __( 'Add class' ) }
+						</Button>
+					) }
+					{ ! canManageCssClasses && ! isLoading && (
+						<Notice status="info" isDismissible={ false }>
+							{ __(
+								'Only administrators can create, edit, or delete managed CSS classes.'
+							) }
+						</Notice>
+					) }
 					{ isLoading && (
 						<Notice status="info" isDismissible={ false }>
 							{ __( 'Loading CSS class usages.' ) }
@@ -615,6 +627,10 @@ export default function ScreenCSSClasses( {
 													__next40pxDefaultSize
 													icon={ code }
 													variant="tertiary"
+													disabled={
+														! canManageCssClasses
+													}
+													accessibleWhenDisabled
 													onClick={ () =>
 														goTo(
 															`/css-classes/edit/${ encodeURIComponent(
@@ -679,6 +695,7 @@ export function ScreenCSSClassEdit( {
 	const originalName = isNew ? '' : decodeClassName( params.className );
 	const [ cssClasses, setCSSClasses ] = useCSSClasses();
 	const { usageData } = useCSSClassSiteUsageData();
+	const { canManageCssClasses } = usageData;
 	const existingClass = useMemo(
 		() =>
 			cssClasses.find(
@@ -722,7 +739,8 @@ export function ScreenCSSClassEdit( {
 		! nameError &&
 		! cssError &&
 		( isNew || hasChanges ) &&
-		! isSaving;
+		! isSaving &&
+		canManageCssClasses;
 	const originalClassUsages = useMemo(
 		() =>
 			usageData.usages.filter(
@@ -867,11 +885,19 @@ export function ScreenCSSClassEdit( {
 								__( 'Could not update CSS class usages.' ) }
 						</Notice>
 					) }
+					{ ! canManageCssClasses && (
+						<Notice status="info" isDismissible={ false }>
+							{ __(
+								'Only administrators can create, edit, or delete managed CSS classes.'
+							) }
+						</Notice>
+					) }
 					<TextControl
 						__next40pxDefaultSize
 						label={ __( 'Class name' ) }
 						value={ name }
 						onChange={ setName }
+						disabled={ ! canManageCssClasses }
 						autoComplete="off"
 						placeholder={ __( 'my-class' ) }
 					/>
@@ -880,6 +906,7 @@ export function ScreenCSSClassEdit( {
 						value={ css }
 						onChange={ setCSS }
 						spellCheck={ false }
+						disabled={ ! canManageCssClasses }
 						help={ __(
 							'Enter declarations without curly braces.'
 						) }
@@ -890,7 +917,7 @@ export function ScreenCSSClassEdit( {
 						align="center"
 					>
 						<FlexItem>
-							{ ! isNew && (
+							{ ! isNew && canManageCssClasses && (
 								<Button
 									__next40pxDefaultSize
 									icon={ trash }
