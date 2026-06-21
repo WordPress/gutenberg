@@ -14,8 +14,12 @@ export { default as getGlobalStylesChanges } from './utils/get-global-styles-cha
 export { generateGlobalStyles } from './core/render';
 export {
 	transformToStyles as toStyles,
+	compileCSSClasses,
 	getBlockSelectors,
 	getLayoutStyles,
+	isValidCSSClassName,
+	isValidCSSDeclarationBlock,
+	normalizeCSSClassName,
 	processCSSNesting,
 } from './core/render';
 export { getBlockSelector } from './core/selectors';

@@ -284,6 +284,12 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 						return $css_validation_result;
 					}
 				}
+				if ( isset( $request['styles']['cssClasses'] ) ) {
+					$css_classes_validation_result = $this->validate_css_classes( $request['styles']['cssClasses'] );
+					if ( is_wp_error( $css_classes_validation_result ) ) {
+						return $css_classes_validation_result;
+					}
+				}
 				$config['styles'] = $request['styles'];
 			} elseif ( isset( $existing_config['styles'] ) ) {
 				$config['styles'] = $existing_config['styles'];
@@ -768,6 +774,50 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 						array( 'status' => 400 )
 					);
 				}
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Validates managed CSS class definitions.
+	 *
+	 * @param array $css_classes Managed CSS class definitions.
+	 * @return true|WP_Error True if the input was validated, otherwise WP_Error.
+	 */
+	protected function validate_css_classes( $css_classes ) {
+		if ( ! is_array( $css_classes ) ) {
+			return new WP_Error(
+				'rest_css_classes_invalid_type',
+				__( 'CSS classes must be an array.', 'gutenberg' ),
+				array( 'status' => 400 )
+			);
+		}
+
+		foreach ( $css_classes as $css_class ) {
+			$name = is_array( $css_class ) ? ( $css_class['name'] ?? '' ) : '';
+			$css  = is_array( $css_class ) ? ( $css_class['css'] ?? '' ) : '';
+
+			if ( ! WP_Theme_JSON_Gutenberg::is_valid_css_class_name( $name ) ) {
+				return new WP_Error(
+					'rest_css_class_invalid_name',
+					__( 'CSS class names must start with a letter, hyphen, or underscore and contain only letters, numbers, hyphens, or underscores.', 'gutenberg' ),
+					array( 'status' => 400 )
+				);
+			}
+
+			if ( ! WP_Theme_JSON_Gutenberg::is_valid_css_declaration_block( $css ) ) {
+				return new WP_Error(
+					'rest_css_class_invalid_css',
+					__( 'CSS class rules must contain declarations without curly braces or markup.', 'gutenberg' ),
+					array( 'status' => 400 )
+				);
+			}
+
+			$css_validation_result = $this->validate_custom_css( '.test{' . $css . '}' );
+			if ( is_wp_error( $css_validation_result ) ) {
+				return $css_validation_result;
 			}
 		}
 

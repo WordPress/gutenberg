@@ -1225,6 +1225,12 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		$schema['styles']                                 = static::VALID_STYLES;
+		$schema['styles']['cssClasses']                   = array(
+			array(
+				'name' => null,
+				'css'  => null,
+			),
+		);
 		$schema['styles']['blocks']                       = $schema_styles_blocks;
 		$schema['styles']['elements']                     = $schema_styles_elements;
 		$schema['settings']                               = static::VALID_SETTINGS;
@@ -1636,6 +1642,10 @@ class WP_Theme_JSON_Gutenberg {
 
 		// Load the custom CSS last so it has the highest specificity.
 		if ( in_array( 'custom-css', $types, true ) ) {
+			// Add managed global CSS classes before the free-form global styles root CSS.
+			$stylesheet .= static::get_css_classes_stylesheet(
+				_wp_array_get( $this->theme_json, array( 'styles', 'cssClasses' ), array() )
+			);
 			// Add the global styles root CSS.
 			$stylesheet .= _wp_array_get( $this->theme_json, array( 'styles', 'css' ) );
 		}
@@ -1698,6 +1708,99 @@ class WP_Theme_JSON_Gutenberg {
 			}
 		}
 		return $processed_css;
+	}
+
+	/**
+	 * Returns a normalized managed CSS class name without a leading dot.
+	 *
+	 * @param string $name Candidate class name.
+	 * @return string Normalized class name.
+	 */
+	public static function normalize_css_class_name( $name ) {
+		return preg_replace( '/^\./', '', trim( (string) $name ) );
+	}
+
+	/**
+	 * Checks whether a managed CSS class name can be emitted as an unescaped selector.
+	 *
+	 * @param string $name Candidate class name.
+	 * @return bool Whether the class name is valid.
+	 */
+	public static function is_valid_css_class_name( $name ) {
+		return 1 === preg_match( '/^-?[_a-zA-Z]+[_a-zA-Z0-9-]*$/', static::normalize_css_class_name( $name ) );
+	}
+
+	/**
+	 * Checks whether CSS contains only the declaration-list portion of a CSS rule.
+	 *
+	 * @param string $css Candidate CSS declarations.
+	 * @return bool Whether the CSS can be safely wrapped in `.class { ... }`.
+	 */
+	public static function is_valid_css_declaration_block( $css ) {
+		return is_string( $css ) && ! preg_match( '/[{}]/', $css ) && ! preg_match( '/<\/?\w/', $css );
+	}
+
+	/**
+	 * Compiles managed CSS class definitions into CSS rules.
+	 *
+	 * @param array $css_classes Managed CSS class definitions.
+	 * @return string Compiled CSS rules.
+	 */
+	public static function get_css_classes_stylesheet( $css_classes ) {
+		if ( ! is_array( $css_classes ) ) {
+			return '';
+		}
+
+		$stylesheet = '';
+		foreach ( $css_classes as $css_class ) {
+			if ( ! is_array( $css_class ) ) {
+				continue;
+			}
+
+			$name = static::normalize_css_class_name( $css_class['name'] ?? '' );
+			$css  = isset( $css_class['css'] ) && is_string( $css_class['css'] ) ? trim( $css_class['css'] ) : '';
+
+			if ( ! $name || ! $css || ! static::is_valid_css_class_name( $name ) || ! static::is_valid_css_declaration_block( $css ) ) {
+				continue;
+			}
+
+			$stylesheet .= '.' . $name . '{' . $css . '}';
+		}
+
+		return $stylesheet;
+	}
+
+	/**
+	 * Sanitizes managed CSS class definitions.
+	 *
+	 * @param array $css_classes Managed CSS class definitions.
+	 * @return array Sanitized class definitions.
+	 */
+	protected static function sanitize_css_class_definitions( $css_classes ) {
+		if ( ! is_array( $css_classes ) ) {
+			return array();
+		}
+
+		$sanitized = array();
+		foreach ( $css_classes as $css_class ) {
+			if ( ! is_array( $css_class ) ) {
+				continue;
+			}
+
+			$name = static::normalize_css_class_name( $css_class['name'] ?? '' );
+			$css  = isset( $css_class['css'] ) && is_string( $css_class['css'] ) ? trim( $css_class['css'] ) : '';
+
+			if ( ! $name || ! $css || ! static::is_valid_css_class_name( $name ) || ! static::is_valid_css_declaration_block( $css ) ) {
+				continue;
+			}
+
+			$sanitized[] = array(
+				'name' => $name,
+				'css'  => $css,
+			);
+		}
+
+		return $sanitized;
 	}
 
 	/**
@@ -4412,6 +4515,13 @@ class WP_Theme_JSON_Gutenberg {
 						_wp_array_set( $sanitized, $variation['path'], $variation_output );
 					}
 				}
+			}
+		}
+
+		if ( isset( $theme_json['styles']['cssClasses'] ) && current_user_can( 'edit_css' ) ) {
+			$css_classes = static::sanitize_css_class_definitions( $theme_json['styles']['cssClasses'] );
+			if ( ! empty( $css_classes ) ) {
+				$sanitized['styles']['cssClasses'] = $css_classes;
 			}
 		}
 

@@ -565,6 +565,33 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 	/**
 	 * @covers WP_REST_Global_Styles_Controller_Gutenberg::update_item
 	 */
+	public function test_update_item_valid_css_classes() {
+		wp_set_current_user( self::$admin_id );
+		if ( is_multisite() ) {
+			grant_super_admin( self::$admin_id );
+		}
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/global-styles/' . self::$global_styles_id );
+		$request->set_body_params(
+			array(
+				'styles' => array(
+					'cssClasses' => array(
+						array(
+							'name' => 'featured-card',
+							'css'  => 'color: red;',
+						),
+					),
+				),
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertSame( 'featured-card', $data['styles']['cssClasses'][0]['name'] );
+		$this->assertSame( 'color: red;', $data['styles']['cssClasses'][0]['css'] );
+	}
+
+	/**
+	 * @covers WP_REST_Global_Styles_Controller_Gutenberg::update_item
+	 */
 	public function test_update_item_invalid_styles_css() {
 		wp_set_current_user( self::$admin_id );
 		if ( is_multisite() ) {
@@ -578,6 +605,56 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 		);
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertErrorResponse( 'rest_custom_css_illegal_markup', $response, 400 );
+	}
+
+	/**
+	 * @covers WP_REST_Global_Styles_Controller_Gutenberg::update_item
+	 */
+	public function test_update_item_invalid_css_class_name() {
+		wp_set_current_user( self::$admin_id );
+		if ( is_multisite() ) {
+			grant_super_admin( self::$admin_id );
+		}
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/global-styles/' . self::$global_styles_id );
+		$request->set_body_params(
+			array(
+				'styles' => array(
+					'cssClasses' => array(
+						array(
+							'name' => 'featured card',
+							'css'  => 'color: red;',
+						),
+					),
+				),
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_css_class_invalid_name', $response, 400 );
+	}
+
+	/**
+	 * @covers WP_REST_Global_Styles_Controller_Gutenberg::update_item
+	 */
+	public function test_update_item_invalid_css_class_declarations() {
+		wp_set_current_user( self::$admin_id );
+		if ( is_multisite() ) {
+			grant_super_admin( self::$admin_id );
+		}
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/global-styles/' . self::$global_styles_id );
+		$request->set_body_params(
+			array(
+				'styles' => array(
+					'cssClasses' => array(
+						array(
+							'name' => 'featured-card',
+							'css'  => '.featured-card { color: red; }',
+						),
+					),
+				),
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_css_class_invalid_css', $response, 400 );
 	}
 
 	/**

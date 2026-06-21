@@ -2699,6 +2699,25 @@
 				{
 					"type": "object",
 					"properties": {
+						"cssClasses": {
+							"description": "Managed CSS class definitions that can be applied to blocks.",
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"name": {
+										"description": "CSS class name without a leading dot.",
+										"type": "string"
+									},
+									"css": {
+										"description": "CSS declarations for the class, without wrapping curly braces.",
+										"type": "string"
+									}
+								},
+								"required": [ "name", "css" ],
+								"additionalProperties": false
+							}
+						},
 						"elements": {
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
 						},
@@ -3300,7 +3319,12 @@
 								"$ref": "#/definitions/stylesPropertyNames"
 							},
 							{
-								"enum": [ "elements", "blocks", "variations" ]
+								"enum": [
+									"cssClasses",
+									"elements",
+									"blocks",
+									"variations"
+								]
 							}
 						]
 					}

@@ -35,7 +35,11 @@ import { setBackgroundStyleDefaults } from '../utils/background';
 import { LAYOUT_DEFINITIONS } from '../utils/layout';
 import { getValueFromObjectPath, setImmutably } from '../utils/object';
 import { getSetting } from '../settings/get-setting';
-import type { GlobalStylesConfig, GlobalStylesStyles } from '../types';
+import type {
+	CSSClassDefinition,
+	GlobalStylesConfig,
+	GlobalStylesStyles,
+} from '../types';
 
 // =============================================================================
 // LOCAL TYPE DEFINITIONS
@@ -2020,6 +2024,75 @@ export function processCSSNesting( css: string, blockSelector: string ) {
 	return processedCSS;
 }
 
+const CSS_CLASS_NAME_REGEXP = /^-?[_a-zA-Z]+[_a-zA-Z0-9-]*$/;
+
+/**
+ * Returns a normalized managed CSS class name without a leading dot.
+ *
+ * @param name Candidate class name.
+ * @return Normalized class name.
+ */
+export function normalizeCSSClassName( name: string = '' ): string {
+	return name.trim().replace( /^\./, '' );
+}
+
+/**
+ * Checks whether a class name can be emitted as an unescaped CSS class selector
+ * and used in a block's className attribute.
+ *
+ * @param name Candidate class name.
+ * @return Whether the class name is valid.
+ */
+export function isValidCSSClassName( name: string ): boolean {
+	return CSS_CLASS_NAME_REGEXP.test( normalizeCSSClassName( name ) );
+}
+
+/**
+ * Checks whether CSS contains only the declaration-list portion of a CSS rule.
+ *
+ * @param css Candidate CSS declarations.
+ * @return Whether the CSS can be safely wrapped in `.class { ... }`.
+ */
+export function isValidCSSDeclarationBlock( css: string ): boolean {
+	return (
+		typeof css === 'string' &&
+		! /[{}]/.test( css ) &&
+		! /<\/?\w/.test( css )
+	);
+}
+
+/**
+ * Compiles managed CSS class definitions into CSS rules.
+ *
+ * @param cssClasses Managed CSS classes.
+ * @return Compiled CSS rules.
+ */
+export function compileCSSClasses(
+	cssClasses: CSSClassDefinition[] = []
+): string {
+	if ( ! Array.isArray( cssClasses ) ) {
+		return '';
+	}
+
+	return cssClasses
+		.map( ( cssClass ) => {
+			const name = normalizeCSSClassName( cssClass?.name );
+			const css = cssClass?.css?.trim();
+
+			if (
+				! name ||
+				! css ||
+				! isValidCSSClassName( name ) ||
+				! isValidCSSDeclarationBlock( css )
+			) {
+				return '';
+			}
+
+			return `.${ name }{${ css }}`;
+		} )
+		.join( '' );
+}
+
 export interface GlobalStylesRenderOptions {
 	hasBlockGapSupport?: boolean;
 	hasFallbackGapSupport?: boolean;
@@ -2084,6 +2157,10 @@ export function generateGlobalStyles(
 		},
 		{
 			css: globalStyles,
+			isGlobalStyles: true,
+		},
+		{
+			css: compileCSSClasses( updatedConfig?.styles?.cssClasses ),
 			isGlobalStyles: true,
 		},
 		// Load custom CSS in own stylesheet so that any invalid CSS entered in the input won't break all the global styles in the editor.

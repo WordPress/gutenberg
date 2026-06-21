@@ -44,7 +44,7 @@ function getMarkupValidationError( css ) {
  * @param {string} css The CSS string to validate.
  * @return {string|null} An error message, or null if the CSS is valid.
  */
-function getCSSValidationError( css ) {
+export function getCSSValidationError( css ) {
 	if ( ! css ) {
 		return null;
 	}
@@ -59,6 +59,27 @@ function getCSSValidationError( css ) {
 	return transformed === null
 		? __( 'There is an error with your CSS structure.' )
 		: null;
+}
+
+/**
+ * Full CSS validation for declaration-list fields. These fields accept only the
+ * content inside a CSS rule's curly braces.
+ *
+ * @param {string} css The CSS declarations to validate.
+ * @return {string|null} An error message, or null if the CSS is valid.
+ */
+export function getCSSDeclarationBlockValidationError( css ) {
+	if ( ! css ) {
+		return null;
+	}
+	const markupError = getMarkupValidationError( css );
+	if ( markupError ) {
+		return markupError;
+	}
+	if ( /[{}]/.test( css ) ) {
+		return __( 'Enter CSS declarations without curly braces.' );
+	}
+	return getCSSValidationError( `.for-validation-only { ${ css } }` );
 }
 
 export default function AdvancedPanel( {

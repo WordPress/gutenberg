@@ -8,6 +8,10 @@ import {
 	transformToStyles,
 	getBlockSelectors,
 	generateGlobalStyles,
+	compileCSSClasses,
+	isValidCSSClassName,
+	isValidCSSDeclarationBlock,
+	normalizeCSSClassName,
 } from '../core/render';
 import type { GlobalStylesConfig } from '../types';
 import {
@@ -1272,6 +1276,40 @@ describe( 'global styles renderer', () => {
 			} );
 		} );
 
+		it( 'should compile managed CSS classes before Additional CSS', () => {
+			const config = {
+				version: 3,
+				settings: {},
+				styles: {
+					cssClasses: [
+						{
+							name: 'featured-card',
+							css: 'color: red;',
+						},
+						{
+							name: '.lead-copy',
+							css: 'font-weight: 700;',
+						},
+					],
+					css: '.featured-card{color: blue;}',
+				},
+			};
+
+			const [ styles ] = generateGlobalStyles( config, [
+				{
+					name: 'core/paragraph',
+					selectors: {
+						root: 'p',
+					},
+				},
+			] );
+
+			expect( styles[ 2 ].css ).toBe(
+				'.featured-card{color: red;}.lead-copy{font-weight: 700;}'
+			);
+			expect( styles[ 3 ].css ).toBe( '.featured-card{color: blue;}' );
+		} );
+
 		it( 'should use css feature selector for block custom CSS when defined', () => {
 			const config = {
 				version: 3,
@@ -1421,6 +1459,60 @@ describe( 'global styles renderer', () => {
 			expect( svgStyle.assets.join( '' ) ).toContain(
 				'wp-duotone-midnight'
 			);
+		} );
+	} );
+
+	describe( 'managed CSS classes', () => {
+		it( 'should normalize class names', () => {
+			expect( normalizeCSSClassName( ' .featured-card ' ) ).toBe(
+				'featured-card'
+			);
+		} );
+
+		it( 'should validate class names', () => {
+			expect( isValidCSSClassName( 'featured-card' ) ).toBe( true );
+			expect( isValidCSSClassName( '_featured-card' ) ).toBe( true );
+			expect( isValidCSSClassName( '1-featured-card' ) ).toBe( false );
+			expect( isValidCSSClassName( 'featured card' ) ).toBe( false );
+		} );
+
+		it( 'should validate declaration-only CSS', () => {
+			expect(
+				isValidCSSDeclarationBlock( 'color: red; padding: 1rem;' )
+			).toBe( true );
+			expect( isValidCSSDeclarationBlock( '{ color: red; }' ) ).toBe(
+				false
+			);
+			expect( isValidCSSDeclarationBlock( 'body { color: red; }' ) ).toBe(
+				false
+			);
+			expect(
+				isValidCSSDeclarationBlock( '</style><script></script>' )
+			).toBe( false );
+		} );
+
+		it( 'should skip invalid or empty definitions when compiling', () => {
+			expect( compileCSSClasses( {} as any ) ).toBe( '' );
+			expect(
+				compileCSSClasses( [
+					{
+						name: 'featured-card',
+						css: 'color: red;',
+					},
+					{
+						name: 'featured card',
+						css: 'color: blue;',
+					},
+					{
+						name: 'empty-card',
+						css: '',
+					},
+					{
+						name: 'wrapped-card',
+						css: '{ color: green; }',
+					},
+				] )
+			).toBe( '.featured-card{color: red;}' );
 		} );
 	} );
 

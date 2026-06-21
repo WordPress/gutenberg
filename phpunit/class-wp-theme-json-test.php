@@ -6399,6 +6399,33 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that managed CSS classes are generated before base custom CSS.
+	 */
+	public function test_get_stylesheet_handles_css_classes() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'cssClasses' => array(
+						array(
+							'name' => 'featured-card',
+							'css'  => 'color:red;',
+						),
+						array(
+							'name' => '.lead-copy',
+							'css'  => 'font-weight:700;',
+						),
+					),
+					'css'        => '.featured-card{color:purple;}',
+				),
+			)
+		);
+
+		$custom_css = '.featured-card{color:red;}.lead-copy{font-weight:700;}.featured-card{color:purple;}';
+		$this->assertSame( $custom_css, $theme_json->get_stylesheet( array( 'custom-css' ) ) );
+	}
+
+	/**
 	 * Tests that block custom CSS is generated correctly.
 	 */
 	public function test_get_styles_for_block_handles_block_custom_css() {
@@ -6546,8 +6573,14 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'styles'  => array(
-					'css'    => 'body { color:purple; }',
-					'blocks' => array(
+					'css'        => 'body { color:purple; }',
+					'cssClasses' => array(
+						array(
+							'name' => 'featured-card',
+							'css'  => 'color:red;',
+						),
+					),
+					'blocks'     => array(
 						'core/separator' => array(
 							'color' => array(
 								'background' => 'blue',
@@ -6573,8 +6606,14 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'expected'      => array(
 					'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 					'styles'  => array(
-						'css'    => 'body { color:purple; }',
-						'blocks' => array(
+						'css'        => 'body { color:purple; }',
+						'cssClasses' => array(
+							array(
+								'name' => 'featured-card',
+								'css'  => 'color:red;',
+							),
+						),
+						'blocks'     => array(
 							'core/separator' => array(
 								'color' => array(
 									'background' => 'blue',

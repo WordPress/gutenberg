@@ -18,7 +18,11 @@ export {
 	default as ImageSettingsPanel,
 	useHasImageSettingsPanel,
 } from './image-settings-panel';
-export { default as AdvancedPanel } from './advanced-panel';
+export {
+	default as AdvancedPanel,
+	getCSSDeclarationBlockValidationError,
+	getCSSValidationError,
+} from './advanced-panel';
 export {
 	default as BackgroundPanel,
 	useHasBackgroundPanel,

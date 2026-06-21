@@ -308,7 +308,16 @@ export interface GlobalStylesStyles {
 	>;
 	blocks?: Record< string, Omit< GlobalStylesStyles, 'blocks' > >;
 	variations?: Record< string, Omit< GlobalStylesStyles, 'blocks' > >;
+	cssClasses?: CSSClassDefinition[];
 	css?: string;
+}
+
+/**
+ * Managed CSS class definition.
+ */
+export interface CSSClassDefinition {
+	name: string;
+	css: string;
 }
 
 /**
