@@ -605,12 +605,15 @@ export default function ScreenCSSClasses( {
 									<Stack
 										className="global-styles-ui-css-classes__item"
 										key={ className }
-										align="center"
-										direction="row"
-										justify="space-between"
+										direction="column"
 									>
-										<FlexItem>
-											<Stack direction="column" gap="xs">
+										<Stack
+											className="global-styles-ui-css-classes__item-header"
+											align="center"
+											direction="row"
+											justify="space-between"
+										>
+											<FlexItem>
 												<Button
 													__next40pxDefaultSize
 													icon={ code }
@@ -629,41 +632,44 @@ export default function ScreenCSSClasses( {
 												>
 													{ `.${ className }` }
 												</Button>
-												<Text variant="body-sm">
-													{ sprintf(
-														/* translators: %s: Comma-separated provenance labels. */
-														__( 'Defined by %s.' ),
-														getClassProvenance(
-															className,
-															userClassNames,
-															baseClassNames,
-															usedClassNames
-														).join( ', ' )
-													) }
-												</Text>
-											</Stack>
-										</FlexItem>
-										<Button
-											__next40pxDefaultSize
-											variant="tertiary"
-											onClick={ () =>
-												goTo(
-													`/css-classes/usages/${ encodeURIComponent(
-														className
-													) }`
-												)
-											}
+											</FlexItem>
+											<Button
+												__next40pxDefaultSize
+												variant="tertiary"
+												onClick={ () =>
+													goTo(
+														`/css-classes/usages/${ encodeURIComponent(
+															className
+														) }`
+													)
+												}
+											>
+												{ sprintf(
+													/* translators: %d: Number of class usages. */
+													_n(
+														'%d use',
+														'%d uses',
+														usageCount
+													),
+													usageCount
+												) }
+											</Button>
+										</Stack>
+										<Text
+											className="global-styles-ui-css-classes__item-provenance"
+											variant="body-sm"
 										>
 											{ sprintf(
-												/* translators: %d: Number of class usages. */
-												_n(
-													'%d use',
-													'%d uses',
-													usageCount
-												),
-												usageCount
+												/* translators: %s: Comma-separated provenance labels. */
+												__( 'Defined by %s.' ),
+												getClassProvenance(
+													className,
+													userClassNames,
+													baseClassNames,
+													usedClassNames
+												).join( ', ' )
 											) }
-										</Button>
+										</Text>
 									</Stack>
 								);
 							} ) }
