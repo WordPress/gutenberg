@@ -43,6 +43,20 @@ const { getCSSDeclarationBlockValidationError } = unlock(
 	blockEditorPrivateApis
 );
 
+/*
+ * TODO: North star: managed classes should behave like first-class design tokens
+ * for block markup. They should be discoverable where authors add classes,
+ * inspectable where designers/site builders manage styles, safely
+ * rename/delete-able, and reliably counted across every entity that can contain
+ * blocks.
+ * TODO: Add a theme provider for starter managed classes.
+ * TODO: Add duplicate class support.
+ * TODO: Mark unused classes.
+ * TODO: Add bulk apply/remove for selected blocks.
+ * TODO: Offer to convert ad hoc classes found in content into managed classes.
+ * TODO: Add import/export of classes.
+ */
+
 function decodeClassName( value?: string | string[] ) {
 	if ( ! value ) {
 		return '';
