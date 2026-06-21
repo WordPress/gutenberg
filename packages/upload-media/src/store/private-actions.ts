@@ -67,6 +67,11 @@ import type {
 import { ItemStatus, OperationType, Type } from './types';
 import type { cancelItem, executeRetry } from './actions';
 import { clearRetryTimer } from './utils/retry';
+import {
+	persistItem,
+	deleteItem,
+	toPersistedRecord,
+} from './utils/persistence';
 
 const DEFAULT_OUTPUT_QUALITY = 0.82;
 
@@ -78,6 +83,35 @@ const DEFAULT_OUTPUT_QUALITY = 0.82;
  * cancellation.
  */
 const ultraHdrItems = new Set< QueueItemId >();
+
+/**
+ * Persists a queue item by id if durable storage is enabled. Fire-and-forget;
+ * never throws into the pipeline.
+ *
+ * @param select             Store selectors.
+ * @param select.getItem     Returns the item for a given id.
+ * @param select.getSettings Returns the current store settings.
+ * @param id                 Item id.
+ */
+function maybePersist(
+	select: {
+		getItem: ( id: QueueItemId ) => QueueItem | undefined;
+		getSettings: () => Settings;
+	},
+	id: QueueItemId
+): void {
+	if ( select.getSettings().durableQueue === false ) {
+		return;
+	}
+	const item = select.getItem( id );
+	if ( ! item ) {
+		return;
+	}
+	const record = toPersistedRecord( item, Date.now() );
+	if ( record ) {
+		void persistItem( record );
+	}
+}
 
 type ActionCreators = {
 	cancelItem: typeof cancelItem;
@@ -130,6 +164,8 @@ interface AddItemArgs {
 	sourceAttachmentId?: number;
 	abortController?: AbortController;
 	operations?: Operation[];
+	uploadId?: string;
+	postId?: number;
 }
 
 /**
@@ -147,6 +183,8 @@ interface AddItemArgs {
  * @param [$0.sourceAttachmentId] Source attachment ID. Used when optimizing an existing file for example.
  * @param [$0.abortController]    Abort controller for upload cancellation.
  * @param [$0.operations]         List of operations to perform. Defaults to automatically determined list, based on the file.
+ * @param [$0.uploadId]           Durable upload ID written into block attributes for resume after reload.
+ * @param [$0.postId]             Post the upload belongs to; persisted for the resume summary notice.
  */
 export function addItem( {
 	file: fileOrBlob,
@@ -160,8 +198,10 @@ export function addItem( {
 	sourceAttachmentId,
 	abortController,
 	operations,
+	uploadId,
+	postId,
 }: AddItemArgs ) {
-	return async ( { dispatch }: ThunkArgs ) => {
+	return async ( { select, dispatch }: ThunkArgs ) => {
 		const itemId = uuidv4();
 
 		// Hardening in case a Blob is passed instead of a File.
@@ -185,6 +225,8 @@ export function addItem( {
 			item: {
 				id: itemId,
 				batchId,
+				uploadId,
+				postId,
 				status: ItemStatus.Processing,
 				sourceFile: cloneFile( file ),
 				file,
@@ -207,6 +249,8 @@ export function addItem( {
 					: [ OperationType.Prepare ],
 			},
 		} );
+
+		maybePersist( select, itemId );
 
 		dispatch.processItem( itemId );
 	};
@@ -539,6 +583,7 @@ export function removeItem( id: QueueItemId ) {
 
 		// Clear any pending retry timer for this item.
 		clearRetryTimer( id );
+		void deleteItem( id );
 
 		dispatch( {
 			type: Type.Remove,
@@ -576,6 +621,7 @@ export function finishOperation(
 		} );
 
 		dispatch.processItem( id );
+		maybePersist( select, id );
 
 		/*
 		 * If an upload just finished, there may be items waiting in the queue

@@ -10,7 +10,19 @@
 /**
  * Internal dependencies
  */
-import type { PersistedQueueItem, QueueItemId } from '../types';
+import type { PersistedQueueItem, QueueItem, QueueItemId } from '../types';
+import { ItemStatus } from '../types';
+
+/**
+ * Statuses worth persisting - anything still in flight. Completed/errored
+ * items are removed from the queue (and from storage) by removeItem.
+ */
+const PERSISTABLE_STATUSES = [
+	ItemStatus.Queued,
+	ItemStatus.Processing,
+	ItemStatus.Paused,
+	ItemStatus.PendingRetry,
+];
 
 const DB_NAME = 'wp-upload-media';
 const DB_VERSION = 1;
@@ -206,4 +218,49 @@ export async function pruneStale(
 	);
 
 	return survivors;
+}
+
+/**
+ * Maps an in-memory queue item to its serializable persisted form.
+ *
+ * Returns null when the item should not be persisted (wrong status, or durable
+ * storage is unavailable), so callers can simply bail on null.
+ *
+ * @param item In-memory queue item.
+ * @param now  Timestamp to stamp the record with.
+ * @return The persisted record, or null.
+ */
+export function toPersistedRecord(
+	item: QueueItem,
+	now: number
+): PersistedQueueItem | null {
+	if ( ! isPersistenceAvailable() ) {
+		return null;
+	}
+	if ( ! PERSISTABLE_STATUSES.includes( item.status ) ) {
+		return null;
+	}
+	return {
+		id: item.id,
+		uploadId: item.uploadId,
+		postId: item.postId,
+		batchId: item.batchId,
+		parentId: item.parentId,
+		file: item.file,
+		sourceFile: item.sourceFile,
+		originalHeicFile: item.originalHeicFile,
+		poster: item.poster,
+		operations: item.operations,
+		currentOperation: item.currentOperation,
+		status: item.status,
+		attachment: item.attachment,
+		subSizes: item.subSizes,
+		additionalData: item.additionalData,
+		retryCount: item.retryCount,
+		nextRetryTimestamp: item.nextRetryTimestamp,
+		progress: item.progress,
+		sourceUrl: item.sourceUrl,
+		sourceAttachmentId: item.sourceAttachmentId,
+		persistedAt: now,
+	};
 }

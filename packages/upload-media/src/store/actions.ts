@@ -33,6 +33,11 @@ import {
 	retryTimers,
 	shouldRetryError,
 } from './utils/retry';
+import {
+	isPersistenceAvailable,
+	persistItem,
+	toPersistedRecord,
+} from './utils/persistence';
 import type {
 	addItem,
 	processItem,
@@ -408,6 +413,19 @@ export function scheduleRetry( id: QueueItemId, error: Error ) {
 			retryCount: currentRetryCount,
 			nextRetryTimestamp: Date.now() + delay,
 		} );
+
+		if (
+			isPersistenceAvailable() &&
+			select.getSettings().durableQueue !== false
+		) {
+			const updated = select.getItem( id );
+			if ( updated ) {
+				const record = toPersistedRecord( updated, Date.now() );
+				if ( record ) {
+					void persistItem( record );
+				}
+			}
+		}
 	};
 }
 
