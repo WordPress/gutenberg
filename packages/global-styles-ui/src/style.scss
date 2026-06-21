@@ -251,8 +251,14 @@
 }
 
 .global-styles-ui-css-classes__usage {
+	align-items: flex-start;
+	height: auto;
 	justify-content: flex-start;
+	min-height: variables.$grid-unit-50;
+	padding-bottom: variables.$grid-unit-10;
+	padding-top: variables.$grid-unit-10;
 	text-align: left;
+	white-space: normal;
 	width: 100%;
 }
 
@@ -260,16 +266,27 @@
 	width: 100%;
 }
 
+.global-styles-ui-css-classes__usage-summary {
+	gap: variables.$grid-unit-10;
+	width: 100%;
+}
+
 .global-styles-ui-css-classes__usage-block {
+	color: colors.$gray-700;
 	font-weight: 600;
+	line-break: anywhere;
 }
 
 .global-styles-ui-css-classes__usage-entity {
 	color: colors.$gray-900;
+	font-weight: 600;
+	line-break: anywhere;
+	min-width: 0;
 }
 
 .global-styles-ui-css-classes__usage-meta {
 	color: colors.$gray-700;
+	flex-shrink: 0;
 }
 
 .global-styles-ui-screen-variations {

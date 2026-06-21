@@ -426,6 +426,39 @@ function CSSClassUsageDetails( {
 	usage: CSSClassUsage;
 	showEntity?: boolean;
 } ) {
+	if ( showEntity ) {
+		return (
+			<Stack
+				className="global-styles-ui-css-classes__usage-details"
+				direction="column"
+				gap="xs"
+			>
+				<Stack
+					className="global-styles-ui-css-classes__usage-summary"
+					direction="row"
+					align="flex-start"
+					justify="space-between"
+				>
+					<Text className="global-styles-ui-css-classes__usage-entity">
+						{ usage.entityTitle || __( 'Untitled' ) }
+					</Text>
+					<Text
+						className="global-styles-ui-css-classes__usage-meta"
+						variant="body-sm"
+					>
+						{ usage.entityLabel || __( 'Content' ) }
+					</Text>
+				</Stack>
+				<Text
+					className="global-styles-ui-css-classes__usage-block"
+					variant="body-sm"
+				>
+					{ usage.blockTitle }
+				</Text>
+			</Stack>
+		);
+	}
+
 	return (
 		<Stack
 			className="global-styles-ui-css-classes__usage-details"
@@ -435,22 +468,6 @@ function CSSClassUsageDetails( {
 			<Text className="global-styles-ui-css-classes__usage-block">
 				{ usage.blockTitle }
 			</Text>
-			{ showEntity && (
-				<>
-					<Text
-						className="global-styles-ui-css-classes__usage-entity"
-						variant="body-sm"
-					>
-						{ usage.entityTitle || __( 'Untitled' ) }
-					</Text>
-					<Text
-						className="global-styles-ui-css-classes__usage-meta"
-						variant="body-sm"
-					>
-						{ usage.entityLabel || __( 'Content' ) }
-					</Text>
-				</>
-			) }
 		</Stack>
 	);
 }
