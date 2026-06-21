@@ -14,6 +14,9 @@ test.describe( 'Global styles variations', () => {
 		await requestUtils.activateTheme(
 			'gutenberg-test-themes/style-variations'
 		);
+		// Ensure a clean slate so the "Default" variation is detected as active,
+		// independent of any global styles a prior spec saved for this theme.
+		await requestUtils.resetThemeGlobalStyles();
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
 	} );
