@@ -3307,14 +3307,22 @@ class WP_Theme_JSON_Gutenberg {
 					}
 				}
 
-				// Handle custom states (e.g. '@current' for navigation).
+				/*
+				 * Handle custom states (e.g. '@current' for navigation).
+				 * The block.json `selectors.states[<state>]` value is a CSS suffix
+				 * appended to the block's root selector (e.g. ".current-menu-item"
+				 * appended to ".wp-block-navigation-link" yields
+				 * ".wp-block-navigation-link.current-menu-item"). Compound states
+				 * append a pseudo-selector after the suffix.
+				 */
 				if ( isset( static::VALID_BLOCK_CUSTOM_STATES[ $name ] ) ) {
 					foreach ( static::VALID_BLOCK_CUSTOM_STATES[ $name ] as $custom_state ) {
 						if (
 							isset( $theme_json['styles']['blocks'][ $name ][ $custom_state ] ) &&
 							isset( $selectors[ $name ]['states'][ $custom_state ] )
 						) {
-							$custom_css_selector = $selectors[ $name ]['states'][ $custom_state ];
+							$custom_state_suffix = $selectors[ $name ]['states'][ $custom_state ];
+							$custom_css_selector = static::append_to_selector( $selector, $custom_state_suffix );
 							$nodes[]             = array(
 								'name'       => $name,
 								'path'       => array( 'styles', 'blocks', $name, $custom_state ),

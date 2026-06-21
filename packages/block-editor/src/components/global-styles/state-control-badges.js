@@ -13,32 +13,40 @@ const { Badge: WCBadge } = unlock( componentsPrivateApis );
 
 export default function StateControlBadges( {
 	viewportStates = [],
+	customStates = [],
 	pseudoStates = [],
 	viewportValue = 'default',
+	customStateValue = 'default',
 	pseudoStateValue = 'default',
 	className = 'block-editor-global-styles-state-control__badges',
 } ) {
-	const activeStates = [];
-	const selectedViewport = viewportStates.find(
-		( state ) => state.value === viewportValue
-	);
-	const selectedPseudoState = pseudoStates.find(
-		( state ) => state.value === pseudoStateValue
-	);
-
-	if ( selectedViewport ) {
-		activeStates.push( {
-			key: `viewport-${ selectedViewport.value }`,
-			label: selectedViewport.label,
-		} );
-	}
-
-	if ( selectedPseudoState ) {
-		activeStates.push( {
-			key: `pseudo-${ selectedPseudoState.value }`,
-			label: selectedPseudoState.label,
-		} );
-	}
+	const activeStates = [
+		{
+			states: viewportStates,
+			value: viewportValue,
+			keyPrefix: 'viewport',
+		},
+		{
+			states: customStates,
+			value: customStateValue,
+			keyPrefix: 'custom',
+		},
+		{
+			states: pseudoStates,
+			value: pseudoStateValue,
+			keyPrefix: 'pseudo',
+		},
+	].flatMap( ( { states, value, keyPrefix } ) => {
+		const selected = states.find( ( state ) => state.value === value );
+		return selected
+			? [
+					{
+						key: `${ keyPrefix }-${ selected.value }`,
+						label: selected.label,
+					},
+			  ]
+			: [];
+	} );
 
 	return (
 		<Stack

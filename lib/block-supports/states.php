@@ -395,6 +395,57 @@ function gutenberg_get_block_state_style_rules( $state_styles, $block_type, $rul
 }
 
 /**
+ * Generates rule descriptors for a custom state's styles, including any nested
+ * pseudo-state compound (e.g. `@current` + `:hover`).
+ *
+ * @param string        $custom_suffix           CSS suffix for the custom state, e.g. `.current-menu-item`.
+ * @param array         $custom_state_data       The style object stored at `style[ $custom_state ]`.
+ * @param array         $supported_pseudo_states Pseudo-states the block supports.
+ * @param WP_Block_Type $block_type              The registered block type.
+ * @param string|null   $rules_group             Optional CSS grouping rule, e.g. a media query.
+ * @return array[] Rule descriptors.
+ */
+function gutenberg_get_custom_state_css_rules( $custom_suffix, $custom_state_data, $supported_pseudo_states, $block_type, $rules_group = null ) {
+	$rules = array();
+	if ( ! is_array( $custom_state_data ) ) {
+		return $rules;
+	}
+
+	$root_style = gutenberg_get_root_state_style(
+		$custom_state_data,
+		array_merge( array( 'elements' ), $supported_pseudo_states )
+	);
+
+	if ( ! empty( $root_style ) ) {
+		$rules = array_merge(
+			$rules,
+			gutenberg_get_block_state_style_rules(
+				array( $custom_suffix => $root_style ),
+				$block_type,
+				$rules_group
+			)
+		);
+	}
+
+	foreach ( $supported_pseudo_states as $pseudo_state ) {
+		if ( empty( $custom_state_data[ $pseudo_state ] ) || ! is_array( $custom_state_data[ $pseudo_state ] ) ) {
+			continue;
+		}
+
+		$rules = array_merge(
+			$rules,
+			gutenberg_get_block_state_style_rules(
+				array( $custom_suffix . $pseudo_state => $custom_state_data[ $pseudo_state ] ),
+				$block_type,
+				$rules_group
+			)
+		);
+	}
+
+	return $rules;
+}
+
+/**
  * Returns a unique class for a set of state style rules.
  *
  * @param string $block_name Block name.
@@ -513,8 +564,24 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 	}
 
 	$supported_pseudo_states = WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ] ?? array();
-	$style                   = $block['attrs']['style'] ?? array();
-	$css_rules               = array();
+	$supported_custom_states = WP_Theme_JSON_Gutenberg::VALID_BLOCK_CUSTOM_STATES[ $block_name ] ?? array();
+	/*
+	 * `selectors.states[<state>]` declares a CSS suffix that is appended to the
+	 * per-instance scope class to produce the state selector. For example,
+	 * '@current' on the navigation-link block declares '.current-menu-item',
+	 * so the final selector is `.wp-states-XXXX.current-menu-item`. The block
+	 * must declare a non-empty string for the state to be honored.
+	 */
+	$custom_state_suffixes = array();
+	foreach ( $supported_custom_states as $custom_state ) {
+		$suffix = $block_type->selectors['states'][ $custom_state ] ?? null;
+		if ( is_string( $suffix ) && '' !== trim( $suffix ) ) {
+			$custom_state_suffixes[ $custom_state ] = $suffix;
+		}
+	}
+
+	$style     = $block['attrs']['style'] ?? array();
+	$css_rules = array();
 
 	foreach ( $supported_pseudo_states as $pseudo_state ) {
 		if ( empty( $style[ $pseudo_state ] ) || ! is_array( $style[ $pseudo_state ] ) ) {
@@ -530,6 +597,22 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 		);
 	}
 
+	foreach ( $custom_state_suffixes as $custom_state => $custom_suffix ) {
+		if ( empty( $style[ $custom_state ] ) || ! is_array( $style[ $custom_state ] ) ) {
+			continue;
+		}
+
+		$css_rules = array_merge(
+			$css_rules,
+			gutenberg_get_custom_state_css_rules(
+				$custom_suffix,
+				$style[ $custom_state ],
+				$supported_pseudo_states,
+				$block_type
+			)
+		);
+	}
+
 	foreach ( WP_Theme_JSON_Gutenberg::RESPONSIVE_BREAKPOINTS as $breakpoint => $media_query ) {
 		if ( empty( $style[ $breakpoint ] ) || ! is_array( $style[ $breakpoint ] ) ) {
 			continue;
@@ -537,7 +620,11 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 
 		$root_state_style = gutenberg_get_root_state_style(
 			$style[ $breakpoint ],
-			array_merge( array( 'elements' ), $supported_pseudo_states )
+			array_merge(
+				array( 'elements' ),
+				$supported_pseudo_states,
+				array_keys( $custom_state_suffixes )
+			)
 		);
 
 		if ( ! empty( $root_state_style ) ) {
@@ -613,6 +700,23 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 				$css_rules,
 				gutenberg_get_block_state_style_rules(
 					array( $pseudo_state => $style[ $breakpoint ][ $pseudo_state ] ),
+					$block_type,
+					$media_query
+				)
+			);
+		}
+
+		foreach ( $custom_state_suffixes as $custom_state => $custom_suffix ) {
+			if ( empty( $style[ $breakpoint ][ $custom_state ] ) || ! is_array( $style[ $breakpoint ][ $custom_state ] ) ) {
+				continue;
+			}
+
+			$css_rules = array_merge(
+				$css_rules,
+				gutenberg_get_custom_state_css_rules(
+					$custom_suffix,
+					$style[ $breakpoint ][ $custom_state ],
+					$supported_pseudo_states,
 					$block_type,
 					$media_query
 				)

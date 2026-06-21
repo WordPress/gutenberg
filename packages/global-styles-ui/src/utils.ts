@@ -3,7 +3,7 @@
  */
 import { areGlobalStylesEqual } from '@wordpress/global-styles-engine';
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * State definition with value and label.
@@ -61,6 +61,26 @@ export const RESPONSIVE_STATES: StateDefinition[] = [
 ];
 
 /**
+ * Valid custom (class-based) states for blocks. Each value is a `@`-prefixed
+ * key (e.g. `@current`) that resolves to a CSS class suffix declared on the
+ * block type via `selectors.states`.
+ *
+ * Mirrors `WP_Theme_JSON_Gutenberg::VALID_BLOCK_CUSTOM_STATES` and
+ * `VALID_BLOCK_CUSTOM_STATES` in `packages/block-editor/src/hooks/states.js`.
+ */
+export const VALID_BLOCK_CUSTOM_STATES: Record< string, StateDefinition[] > = {
+	'core/navigation-link': [
+		{
+			value: '@current',
+			label: _x(
+				'Current',
+				'block style state for the active menu item'
+			),
+		},
+	],
+};
+
+/**
  * Get the valid pseudo states for a given block or element.
  *
  * @param name The block name (e.g., 'core/button') or element name (e.g., 'button')
@@ -87,6 +107,16 @@ export function getValidPseudoStates( name: string ): StateDefinition[] {
  */
 export function getValidViewportStates(): StateDefinition[] {
 	return RESPONSIVE_STATES;
+}
+
+/**
+ * Get the valid custom (class-based) state definitions for a given block.
+ *
+ * @param name The block name (e.g., 'core/navigation-link').
+ * @return Array of valid custom state definitions, or empty array if none.
+ */
+export function getValidCustomStates( name: string ): StateDefinition[] {
+	return VALID_BLOCK_CUSTOM_STATES[ name ] ?? [];
 }
 
 /**

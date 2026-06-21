@@ -137,6 +137,24 @@ export function buildStateSelector( baseSelector, name, state ) {
 }
 
 /**
+ * Returns the CSS suffix declared for a custom (class-based) state on the
+ * block type via `selectors.states[ state ]`, e.g. `'.current-menu-item'` for
+ * `@current` on `core/navigation-link`. The value is appended verbatim to the
+ * block-instance scope selector to produce the per-instance state selector.
+ *
+ * Keep in sync with the equivalent lookup in
+ * `gutenberg_render_block_states_support()` (lib/block-supports/states.php).
+ *
+ * @param {string} name  Block name.
+ * @param {string} state Custom state key, e.g. `'@current'`.
+ * @return {string|null} CSS suffix, or null if not declared on the block type.
+ */
+export function getCustomStateSuffix( name, state ) {
+	const suffix = getBlockType( name )?.selectors?.states?.[ state ];
+	return typeof suffix === 'string' && suffix.trim() ? suffix : null;
+}
+
+/**
  * Builds the CSS selector used to preview a state on the editor canvas,
  * scoped to a specific block instance via its `data-block` attribute.
  *

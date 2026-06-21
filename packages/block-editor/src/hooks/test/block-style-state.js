@@ -67,6 +67,61 @@ describe( 'getStyleForState', () => {
 			color: { text: '#ff0000' },
 		} );
 	} );
+
+	it( 'returns the selected custom state style', () => {
+		const style = {
+			color: { text: '#000000' },
+			'@current': { color: { text: '#ff0000' } },
+		};
+
+		expect(
+			getStyleForState( style, {
+				viewport: 'default',
+				custom: '@current',
+				pseudo: 'default',
+			} )
+		).toEqual( {
+			color: { text: '#ff0000' },
+		} );
+	} );
+
+	it( 'returns the selected custom pseudo state style', () => {
+		const style = {
+			'@current': {
+				':hover': { color: { text: '#ff0000' } },
+			},
+		};
+
+		expect(
+			getStyleForState( style, {
+				viewport: 'default',
+				custom: '@current',
+				pseudo: ':hover',
+			} )
+		).toEqual( {
+			color: { text: '#ff0000' },
+		} );
+	} );
+
+	it( 'returns the selected viewport custom pseudo state style', () => {
+		const style = {
+			mobile: {
+				'@current': {
+					':hover': { color: { text: '#ff0000' } },
+				},
+			},
+		};
+
+		expect(
+			getStyleForState( style, {
+				viewport: 'mobile',
+				custom: '@current',
+				pseudo: ':hover',
+			} )
+		).toEqual( {
+			color: { text: '#ff0000' },
+		} );
+	} );
 } );
 
 describe( 'setStyleForState', () => {
@@ -150,6 +205,42 @@ describe( 'setStyleForState', () => {
 			)
 		).toEqual( {
 			color: { text: '#000000' },
+		} );
+	} );
+
+	it( 'updates only the selected custom state style', () => {
+		expect(
+			setStyleForState(
+				{
+					color: { text: '#000000' },
+					'@current': { color: { text: '#ff0000' } },
+				},
+				{ viewport: 'default', custom: '@current', pseudo: 'default' },
+				{ typography: { fontSize: '32px' } }
+			)
+		).toEqual( {
+			color: { text: '#000000' },
+			'@current': { typography: { fontSize: '32px' } },
+		} );
+	} );
+
+	it( 'updates only the selected custom pseudo state style', () => {
+		expect(
+			setStyleForState(
+				{
+					'@current': {
+						color: { text: '#ff0000' },
+						':hover': { color: { text: '#00ff00' } },
+					},
+				},
+				{ viewport: 'default', custom: '@current', pseudo: ':hover' },
+				{ typography: { fontSize: '32px' } }
+			)
+		).toEqual( {
+			'@current': {
+				color: { text: '#ff0000' },
+				':hover': { typography: { fontSize: '32px' } },
+			},
 		} );
 	} );
 } );
@@ -266,5 +357,27 @@ describe( 'scopeResetAllFilterToState', () => {
 				innerReset
 			)
 		).toBe( innerReset );
+	} );
+
+	it( 'passes only the selected custom state style to the reset filter', () => {
+		const innerReset = jest.fn( () => ( { style: undefined } ) );
+		const attributes = {
+			style: {
+				color: { text: '#000000' },
+				'@current': { color: { text: '#ff0000' } },
+			},
+		};
+
+		const result = scopeResetAllFilterToState(
+			{ viewport: 'default', custom: '@current', pseudo: 'default' },
+			innerReset
+		)( attributes );
+
+		expect( innerReset ).toHaveBeenCalledWith( {
+			style: attributes.style[ '@current' ],
+		} );
+		expect( result ).toEqual( {
+			style: { color: { text: '#000000' } },
+		} );
 	} );
 } );

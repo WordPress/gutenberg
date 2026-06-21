@@ -28,10 +28,13 @@ interface ScreenHeaderProps {
 	description?: string | React.ReactElement;
 	onBack?: () => void;
 	viewportStates?: StateDefinition[];
+	customStates?: StateDefinition[];
 	pseudoStates?: StateDefinition[];
 	selectedViewport?: string;
+	selectedCustomState?: string;
 	selectedPseudoState?: string;
 	onChangeViewport?: ( value: string ) => void;
+	onChangeCustomState?: ( value: string ) => void;
 	onChangePseudoState?: ( value: string ) => void;
 }
 
@@ -40,10 +43,13 @@ export function ScreenHeader( {
 	description,
 	onBack,
 	viewportStates,
+	customStates,
 	pseudoStates,
 	selectedViewport = 'default',
+	selectedCustomState = 'default',
 	selectedPseudoState = 'default',
 	onChangeViewport,
+	onChangeCustomState,
 	onChangePseudoState,
 }: ScreenHeaderProps ) {
 	return (
@@ -70,13 +76,20 @@ export function ScreenHeader( {
 									<VStack spacing={ 2 } alignment="right">
 										<StateControl
 											viewportStates={ viewportStates }
+											customStates={ customStates }
 											pseudoStates={ pseudoStates }
 											viewportValue={ selectedViewport }
+											customStateValue={
+												selectedCustomState
+											}
 											pseudoStateValue={
 												selectedPseudoState
 											}
 											onChangeViewport={
 												onChangeViewport
+											}
+											onChangeCustomState={
+												onChangeCustomState
 											}
 											onChangePseudoState={
 												onChangePseudoState
@@ -84,8 +97,12 @@ export function ScreenHeader( {
 										/>
 										<StateControlBadges
 											viewportStates={ viewportStates }
+											customStates={ customStates }
 											pseudoStates={ pseudoStates }
 											viewportValue={ selectedViewport }
+											customStateValue={
+												selectedCustomState
+											}
 											pseudoStateValue={
 												selectedPseudoState
 											}

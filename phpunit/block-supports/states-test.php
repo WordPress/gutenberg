@@ -27,7 +27,13 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Registers a block for tests when the block is not already registered.
+	 * Registers a block for tests.
+	 *
+	 * If `$selectors` or `$supports` are provided, the block is force-registered
+	 * with those overrides (unregistering any existing registration first) so
+	 * tests get a deterministic block-type shape regardless of what the
+	 * production block.json declares. Without overrides, an existing
+	 * registration is left in place.
 	 *
 	 * @param string $block_name Block name.
 	 * @param array  $selectors  Optional block selectors (e.g. `['root' => '.foo .bar']`).
@@ -35,9 +41,13 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	 * @return WP_Block_Type
 	 */
 	private function ensure_block_registered( $block_name, $selectors = array(), $supports = array() ) {
+		$has_overrides    = ! empty( $selectors ) || ! empty( $supports );
 		$registered_block = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
-		if ( $registered_block ) {
+		if ( $registered_block && ! $has_overrides ) {
 			return $registered_block;
+		}
+		if ( $registered_block ) {
+			unregister_block_type( $block_name );
 		}
 
 		$this->test_block_name = $block_name;
@@ -1742,5 +1752,157 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 			'.' . $parts['unique_class'] . ' .wp-block-button__link:hover{background-color:#ff00d0 !important;background-image:unset !important;}',
 			$actual_stylesheet
 		);
+	}
+
+	/**
+	 * Tests that a custom (`@`-prefixed) state generates CSS scoped via the
+	 * class declared on the block type's `selectors.states`.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_custom_state_generates_class_scoped_css() {
+		$this->ensure_block_registered(
+			'core/navigation-link',
+			array(
+				'states' => array(
+					'@current' => '.current-menu-item',
+				),
+			)
+		);
+
+		$block_content = '<li class="wp-block-navigation-item">Item</li>';
+		$style         = array(
+			'@current' => array(
+				'color' => array( 'text' => '#ff0000' ),
+			),
+		);
+		$block         = array(
+			'blockName' => 'core/navigation-link',
+			'attrs'     => array( 'style' => $style ),
+		);
+
+		$actual = gutenberg_render_block_states_support( $block_content, $block );
+
+		$this->assertMatchesRegularExpression(
+			'/^<li class="wp-block-navigation-item wp-states-[a-f0-9]{8}">Item<\/li>$/',
+			$actual
+		);
+		preg_match( '/wp-states-[a-f0-9]{8}/', $actual, $matches );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringContainsString(
+			'.' . $matches[0] . '.current-menu-item{color:#ff0000 !important;}',
+			$actual_stylesheet
+		);
+		$this->assertStringNotContainsString( '@current', $actual_stylesheet );
+	}
+
+	/**
+	 * Tests that a custom-state + pseudo-state compound (e.g. `@current` + `:hover`)
+	 * generates a single rule with both selectors combined.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 * @covers ::gutenberg_get_custom_state_css_rules
+	 */
+	public function test_custom_state_compound_with_pseudo_generates_combined_selector() {
+		$this->ensure_block_registered(
+			'core/navigation-link',
+			array(
+				'states' => array(
+					'@current' => '.current-menu-item',
+				),
+			)
+		);
+
+		$block_content = '<li class="wp-block-navigation-item">Item</li>';
+		$style         = array(
+			'@current' => array(
+				'color'  => array( 'text' => '#ff0000' ),
+				':hover' => array( 'color' => array( 'text' => '#0000ff' ) ),
+			),
+		);
+		$block         = array(
+			'blockName' => 'core/navigation-link',
+			'attrs'     => array( 'style' => $style ),
+		);
+
+		$actual = gutenberg_render_block_states_support( $block_content, $block );
+
+		preg_match( '/wp-states-[a-f0-9]{8}/', $actual, $matches );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringContainsString(
+			'.' . $matches[0] . '.current-menu-item{color:#ff0000 !important;}',
+			$actual_stylesheet
+		);
+		$this->assertStringContainsString(
+			'.' . $matches[0] . '.current-menu-item:hover{color:#0000ff !important;}',
+			$actual_stylesheet
+		);
+	}
+
+	/**
+	 * Tests that a custom-state inside a responsive breakpoint is wrapped in
+	 * the matching media query.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_custom_state_inside_breakpoint_wrapped_in_media_query() {
+		$this->ensure_block_registered(
+			'core/navigation-link',
+			array(
+				'states' => array(
+					'@current' => '.current-menu-item',
+				),
+			)
+		);
+
+		$block_content = '<li class="wp-block-navigation-item">Item</li>';
+		$style         = array(
+			'mobile' => array(
+				'@current' => array(
+					'color' => array( 'text' => '#ff0000' ),
+				),
+			),
+		);
+		$block         = array(
+			'blockName' => 'core/navigation-link',
+			'attrs'     => array( 'style' => $style ),
+		);
+
+		$actual = gutenberg_render_block_states_support( $block_content, $block );
+
+		preg_match( '/wp-states-[a-f0-9]{8}/', $actual, $matches );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringContainsString(
+			'@media (width <= 480px){.' . $matches[0] . '.current-menu-item{color:#ff0000 !important;}}',
+			$actual_stylesheet
+		);
+	}
+
+	/**
+	 * Tests that a custom-state on a block that does not declare it is silently
+	 * skipped (no CSS emitted).
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_unrecognized_custom_state_is_skipped() {
+		$this->ensure_block_registered( 'core/navigation-link' );
+
+		$block_content = '<li class="wp-block-navigation-item">Item</li>';
+		$style         = array(
+			'@unknown' => array(
+				'color' => array( 'text' => '#ff0000' ),
+			),
+		);
+		$block         = array(
+			'blockName' => 'core/navigation-link',
+			'attrs'     => array( 'style' => $style ),
+		);
+
+		$actual = gutenberg_render_block_states_support( $block_content, $block );
+
+		$this->assertSame( $block_content, $actual );
 	}
 }

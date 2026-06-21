@@ -32,7 +32,11 @@ import {
 import { useStyle, useSetting } from './hooks';
 import { GlobalStylesContext } from './context';
 import { unlock } from './lock-unlock';
-import { getValidPseudoStates, getValidViewportStates } from './utils';
+import {
+	getValidCustomStates,
+	getValidPseudoStates,
+	getValidViewportStates,
+} from './utils';
 
 // Initial control values.
 const BACKGROUND_BLOCK_DEFAULT_VALUES = {
@@ -112,15 +116,28 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 	// State selector state
 	const [ selectedViewport, setSelectedViewport ] =
 		useState< string >( 'default' );
+	const [ selectedCustomState, setSelectedCustomState ] =
+		useState< string >( 'default' );
 	const [ selectedPseudoState, setSelectedPseudoState ] =
 		useState< string >( 'default' );
 	const validViewportStates = useMemo( () => getValidViewportStates(), [] );
+	const validCustomStates = useMemo(
+		() => getValidCustomStates( name ),
+		[ name ]
+	);
 	const validPseudoStates = useMemo(
 		() => getValidPseudoStates( name ),
 		[ name ]
 	);
 
-	const stateParam = [ selectedViewport, selectedPseudoState ]
+	// Path order is viewport.custom.pseudo, matching getStyleStatePath in
+	// packages/block-editor/src/hooks/block-style-state.js: viewport wraps the
+	// rule in a media query, custom and pseudo both modify the block selector.
+	const stateParam = [
+		selectedViewport,
+		selectedCustomState,
+		selectedPseudoState,
+	]
 		.filter( ( value ) => value !== 'default' )
 		.join( '.' );
 	const hasSelectedState = stateParam.length > 0;
@@ -343,10 +360,13 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 					variation ? currentBlockStyle?.label! : blockType?.title!
 				}
 				viewportStates={ validViewportStates }
+				customStates={ validCustomStates }
 				pseudoStates={ validPseudoStates }
 				selectedViewport={ selectedViewport }
+				selectedCustomState={ selectedCustomState }
 				selectedPseudoState={ selectedPseudoState }
 				onChangeViewport={ setSelectedViewport }
+				onChangeCustomState={ setSelectedCustomState }
 				onChangePseudoState={ setSelectedPseudoState }
 			/>
 			<BlockPreviewPanel

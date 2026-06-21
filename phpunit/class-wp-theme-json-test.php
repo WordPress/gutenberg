@@ -7589,7 +7589,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
-		$expected   = ':root :where(.wp-block-navigation .current-menu-item){background-color: blue;color: red;}';
+		// The selectors.states[@current] value (".current-menu-item") is composed
+		// onto the block's root selector, producing a same-element class compound.
+		$expected   = ':root :where(.wp-block-navigation-link.current-menu-item){background-color: blue;color: red;}';
 		$this->assertSameCSS( $expected, $stylesheet );
 	}
 
@@ -7627,7 +7629,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$expected = ':root :where(.wp-block-navigation .current-menu-item){background-color: blue;color: red;}:root :where(.wp-block-navigation .current-menu-item:hover){background-color: white;color: blue;}:root :where(.wp-block-navigation .current-menu-item:focus){background-color: yellow;color: green;}';
+		$expected = ':root :where(.wp-block-navigation-link.current-menu-item){background-color: blue;color: red;}:root :where(.wp-block-navigation-link.current-menu-item:hover){background-color: white;color: blue;}:root :where(.wp-block-navigation-link.current-menu-item:focus){background-color: yellow;color: green;}';
 		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
 	}
 

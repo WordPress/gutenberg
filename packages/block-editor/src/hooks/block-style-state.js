@@ -13,6 +13,7 @@ const DEFAULT_STATE_VALUE = 'default';
 
 export const DEFAULT_BLOCK_STYLE_STATE = {
 	viewport: DEFAULT_STATE_VALUE,
+	custom: DEFAULT_STATE_VALUE,
 	pseudo: DEFAULT_STATE_VALUE,
 };
 
@@ -50,6 +51,19 @@ export function hasPseudoBlockStyleState( selectedState ) {
 }
 
 /**
+ * Returns true when a custom (class-based) style state is selected, e.g.
+ * `@current` for the navigation-link block.
+ *
+ * @param {Object} selectedState Selected block style state.
+ * @return {boolean} Whether a custom state is selected.
+ */
+export function hasCustomBlockStyleState( selectedState ) {
+	return (
+		!! selectedState?.custom && selectedState.custom !== DEFAULT_STATE_VALUE
+	);
+}
+
+/**
  * Returns true when the default style state is selected.
  *
  * @param {Object} selectedState Selected block style state.
@@ -58,12 +72,20 @@ export function hasPseudoBlockStyleState( selectedState ) {
 export function isDefaultBlockStyleState( selectedState ) {
 	return (
 		! hasViewportBlockStyleState( selectedState ) &&
+		! hasCustomBlockStyleState( selectedState ) &&
 		! hasPseudoBlockStyleState( selectedState )
 	);
 }
 
 /**
  * Returns the style object path for the selected block style state.
+ *
+ * Path order is `[ viewport, custom, pseudo ]` — viewport is outermost
+ * because it represents a media-query wrapper, while custom (class-based)
+ * and pseudo states both modify the block-instance selector. With this
+ * ordering, e.g. selecting mobile + @current + :hover stores at
+ * `style.mobile['@current'][':hover']` and renders as
+ * `@media(...) { .wp-states-X.current-menu-item:hover { ... } }`.
  *
  * @param {Object} selectedState Selected block style state.
  * @return {string[]} Object path for the selected state styles.
@@ -73,9 +95,11 @@ function getStyleStatePath( selectedState ) {
 		return [];
 	}
 
-	return [ selectedState.viewport, selectedState.pseudo ].filter(
-		( state ) => state && state !== DEFAULT_STATE_VALUE
-	);
+	return [
+		selectedState.viewport,
+		selectedState.custom,
+		selectedState.pseudo,
+	].filter( ( state ) => state && state !== DEFAULT_STATE_VALUE );
 }
 
 export function getStyleForState( style, selectedState ) {
