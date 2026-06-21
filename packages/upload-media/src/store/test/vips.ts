@@ -347,4 +347,72 @@ describe( 'vips utilities', () => {
 			expect( result ).toBe( false );
 		} );
 	} );
+
+	describe( 'transient worker failure retry', () => {
+		it( 'retries a transient decode failure and resolves', async () => {
+			mockResizeImage
+				.mockRejectedValueOnce(
+					new Error(
+						'unable to call thumbnail_buffer\nsource: bad seek to 1109'
+					)
+				)
+				.mockResolvedValueOnce( {
+					buffer: new ArrayBuffer( 10 ),
+					width: 150,
+					height: 150,
+					originalWidth: 300,
+					originalHeight: 300,
+				} );
+
+			const resize: ImageSizeCrop = { width: 150, height: 150 };
+			const result = await vipsResizeImage(
+				'item-1',
+				jpegFile,
+				resize,
+				false,
+				true
+			);
+
+			expect( result ).toBeInstanceOf( ImageFile );
+			expect( result.width ).toBe( 150 );
+			expect( mockResizeImage ).toHaveBeenCalledTimes( 2 );
+		} );
+
+		it( 'gives up and rejects after the maximum number of attempts', async () => {
+			mockConvertImageFormat.mockRejectedValue(
+				new Error( 'Bitstream not supported by this decoder' )
+			);
+
+			await expect(
+				vipsConvertImageFormat( 'item-1', jpegFile, 'image/avif', 0.8 )
+			).rejects.toThrow( 'Bitstream not supported' );
+
+			// Initial attempt plus retries (VIPS_MAX_ATTEMPTS = 3).
+			expect( mockConvertImageFormat ).toHaveBeenCalledTimes( 3 );
+		} );
+
+		it( 'stops retrying once the abort signal is aborted', async () => {
+			const controller = new AbortController();
+			mockResizeImage.mockImplementation( () => {
+				// Abort mid-flight, then fail: the next loop iteration should
+				// bail with "Operation aborted" rather than retry.
+				controller.abort();
+				return Promise.reject( new Error( 'bad seek' ) );
+			} );
+
+			const resize: ImageSizeCrop = { width: 150, height: 150 };
+			await expect(
+				vipsResizeImage(
+					'item-1',
+					jpegFile,
+					resize,
+					false,
+					true,
+					controller.signal
+				)
+			).rejects.toThrow( 'Operation aborted' );
+
+			expect( mockResizeImage ).toHaveBeenCalledTimes( 1 );
+		} );
+	} );
 } );
