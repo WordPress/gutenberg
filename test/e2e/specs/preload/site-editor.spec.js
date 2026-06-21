@@ -37,15 +37,19 @@ test.describe( 'Preload', () => {
 	} );
 
 	test.beforeEach( async ( { page } ) => {
-		// These editor-startup request assertions fail in CI after the
-		// Playwright upgrade to Chrome for Testing 148/149 (the only change in
-		// #78632): on the Document-Isolation-Policy editor screen, startup
-		// never reaches `networkidle` and the page is torn down, so the test
-		// times out. Skip until the bundled browser is past the affected
-		// versions. See https://github.com/WordPress/gutenberg/pull/78632.
+		// These editor-startup request assertions time out in CI starting
+		// with the Playwright upgrade to Chrome for Testing 148/149 (#78632).
+		// Chrome >= 148 is the first CI browser to support
+		// Document-Isolation-Policy, so the editor screen now loads
+		// cross-origin isolated; in that mode startup never reaches the
+		// (deprecated) `networkidle` state these specs wait on, the page is
+		// torn down and the test times out. The exact reason isolation keeps
+		// the network busy is not yet root-caused. Skip on the affected
+		// browsers until the wait is reworked off `networkidle` or the cause
+		// is found. See https://github.com/WordPress/gutenberg/pull/78632.
 		test.skip(
 			( await getChromiumMajorVersion( page ) ) >= 148,
-			'Document-Isolation-Policy is broken in Chromium 148+'
+			'Editor startup never reaches networkidle under cross-origin isolation on Chromium 148+'
 		);
 	} );
 
