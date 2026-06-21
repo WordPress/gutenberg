@@ -73,7 +73,6 @@
 		"@wordpress/stylelint-tools": "file:./tools/stylelint",
 		"concurrently": "^3.5.0",
 		"cross-env": "^7.0.3",
-		"fake-indexeddb": "6.0.0",
 		"husky": "^7.0.0",
 		"lerna": "^9.0.7",
 		"lint-staged": "^16.4.0",

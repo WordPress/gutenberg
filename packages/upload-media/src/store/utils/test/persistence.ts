@@ -1,12 +1,7 @@
 /**
- * External dependencies
- */
-import 'fake-indexeddb/auto';
-import { IDBFactory } from 'fake-indexeddb';
-
-/**
  * Internal dependencies
  */
+import { buildIndexedDBMock } from './build-idb-mock';
 import {
 	isPersistenceAvailable,
 	persistItem,
@@ -40,7 +35,7 @@ function makeRecord(
 describe( 'persistence helper', () => {
 	beforeEach( () => {
 		// Reset the in-memory IndexedDB between tests.
-		( globalThis as any ).indexedDB = new IDBFactory();
+		( globalThis as any ).indexedDB = buildIndexedDBMock();
 	} );
 
 	it( 'reports availability when indexedDB exists', () => {

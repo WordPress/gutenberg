@@ -20,30 +20,6 @@ const DEFAULT_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days.
 const DEFAULT_MAX_BYTES = 500 * 1024 * 1024; // 500 MB.
 
 /**
- * Serialized File representation for IndexedDB storage.
- * File objects cannot be structuredClone'd reliably across environments,
- * so we store the binary data as a plain number array alongside metadata.
- * Using a plain Array (rather than ArrayBuffer/Uint8Array) ensures the data
- * survives structuredClone in all test environments (e.g. jsdom with polyfills).
- */
-type SerializedFile = {
-	_isSerializedFile: true;
-	bytes: number[];
-	name: string;
-	type: string;
-	lastModified: number;
-};
-
-/**
- * Serialized form of a PersistedQueueItem stored in IndexedDB.
- * File fields are replaced with SerializedFile objects.
- */
-type StoredRecord = Omit< PersistedQueueItem, 'file' | 'sourceFile' > & {
-	file: SerializedFile;
-	sourceFile: SerializedFile;
-};
-
-/**
  * Whether durable storage is usable in this environment.
  *
  * @return True when IndexedDB can be accessed.
@@ -54,70 +30,6 @@ export function isPersistenceAvailable(): boolean {
 	} catch {
 		return false;
 	}
-}
-
-/**
- * Converts a File to a plain-object representation safe for structuredClone.
- *
- * @param file The File to serialize.
- * @return A serializable record containing the file's binary data and metadata.
- */
-async function serializeFile( file: File ): Promise< SerializedFile > {
-	const buffer = await file.arrayBuffer();
-	// Store as a plain Array so the data survives structuredClone in all
-	// environments (ArrayBuffer and TypedArray cloning is unreliable in some
-	// jsdom / polyfill combinations).
-	const bytes = Array.from( new Uint8Array( buffer ) );
-	return {
-		_isSerializedFile: true,
-		bytes,
-		name: file.name,
-		type: file.type,
-		lastModified: file.lastModified,
-	};
-}
-
-/**
- * Reconstructs a File from its serialized form.
- *
- * @param serialized The serialized file record.
- * @return The reconstructed File.
- */
-function deserializeFile( serialized: SerializedFile ): File {
-	return new File( [ new Uint8Array( serialized.bytes ) ], serialized.name, {
-		type: serialized.type,
-		lastModified: serialized.lastModified,
-	} );
-}
-
-/**
- * Converts a PersistedQueueItem to a StoredRecord safe for IndexedDB.
- *
- * @param record The queue item to serialize.
- * @return A StoredRecord with File fields replaced by SerializedFile objects.
- */
-async function serializeRecord(
-	record: PersistedQueueItem
-): Promise< StoredRecord > {
-	const [ file, sourceFile ] = await Promise.all( [
-		serializeFile( record.file ),
-		serializeFile( record.sourceFile ),
-	] );
-	return { ...record, file, sourceFile };
-}
-
-/**
- * Converts a StoredRecord back to a PersistedQueueItem.
- *
- * @param stored The stored record from IndexedDB.
- * @return The reconstructed PersistedQueueItem.
- */
-function deserializeRecord( stored: StoredRecord ): PersistedQueueItem {
-	return {
-		...stored,
-		file: deserializeFile( stored.file ),
-		sourceFile: deserializeFile( stored.sourceFile ),
-	};
 }
 
 function openDb(): Promise< IDBDatabase > {
@@ -159,6 +71,9 @@ function withStore< T >(
 /**
  * Writes (or replaces) a persisted queue item.
  *
+ * Real browsers structured-clone File/Blob into IndexedDB natively and
+ * efficiently, so the record is stored as-is without any serialization step.
+ *
  * @param record Serializable queue item.
  */
 export async function persistItem(
@@ -168,10 +83,9 @@ export async function persistItem(
 		return;
 	}
 	try {
-		const stored = await serializeRecord( record );
 		await withStore(
 			'readwrite',
-			( store ) => store.put( stored ),
+			( store ) => store.put( record ),
 			() => undefined
 		);
 	} catch {
@@ -209,18 +123,18 @@ export async function getAllItems(): Promise< PersistedQueueItem[] > {
 		return [];
 	}
 	try {
-		let stored: StoredRecord[] = [];
+		let stored: PersistedQueueItem[] = [];
 		await withStore(
 			'readonly',
 			( store ) => {
 				const request = store.getAll();
 				request.onsuccess = () => {
-					stored = request.result as StoredRecord[];
+					stored = request.result as PersistedQueueItem[];
 				};
 			},
 			() => stored
 		);
-		return stored.map( deserializeRecord );
+		return stored;
 	} catch {
 		return [];
 	}
