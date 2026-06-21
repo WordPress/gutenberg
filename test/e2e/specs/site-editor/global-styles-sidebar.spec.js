@@ -4,11 +4,30 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 async function openCSSClassesPanel( page ) {
-	await page
-		.getByRole( 'region', { name: 'Editor top bar' } )
-		.getByRole( 'button', { name: 'Styles' } )
-		.click();
+	const cssClassesButton = page.getByRole( 'button', {
+		name: 'CSS classes',
+	} );
+	if ( await cssClassesButton.first().isVisible() ) {
+		await cssClassesButton.first().click();
+		return;
+	}
+
+	const editorTopBar = page.getByRole( 'region', {
+		name: 'Editor top bar',
+	} );
+	if ( await editorTopBar.isVisible() ) {
+		await editorTopBar.getByRole( 'button', { name: 'Styles' } ).click();
+		await page.getByRole( 'button', { name: 'CSS classes' } ).click();
+		return;
+	}
+
+	await page.getByRole( 'button', { name: 'Styles' } ).first().click();
 	await page.getByRole( 'button', { name: 'CSS classes' } ).click();
+}
+
+async function openCSSClassUsages( page ) {
+	await page.getByRole( 'button', { name: 'Actions' } ).first().click();
+	await page.getByRole( 'menuitem', { name: 'View usages' } ).click();
 }
 
 async function updateGlobalStyles( requestUtils, styles ) {
@@ -136,11 +155,11 @@ test.describe( 'Global styles sidebar', () => {
 			page.getByRole( 'button', { name: '.featured-card' } )
 		).toBeVisible();
 		await expect(
-			page.getByRole( 'button', { name: '1 use' } )
+			page.getByText( '1 use', { exact: true } )
 		).toBeVisible();
 		await expect( paragraph ).toHaveCSS( 'color', 'rgb(255, 0, 0)' );
 
-		await page.getByRole( 'button', { name: '1 use' } ).click();
+		await openCSSClassUsages( page );
 		await expect(
 			page.getByRole( 'heading', { name: 'Usages of .featured-card' } )
 		).toBeVisible();
@@ -263,7 +282,7 @@ test.describe( 'Global styles sidebar', () => {
 			.click();
 
 		await expect(
-			page.getByRole( 'button', { name: '1 use' } )
+			page.getByText( '1 use', { exact: true } )
 		).toBeVisible();
 	} );
 
@@ -310,10 +329,10 @@ test.describe( 'Global styles sidebar', () => {
 		await openCSSClassesPanel( page );
 
 		await expect(
-			page.getByRole( 'button', { name: '4 uses' } )
+			page.getByText( '4 uses', { exact: true } )
 		).toBeVisible();
 
-		await page.getByRole( 'button', { name: '4 uses' } ).click();
+		await openCSSClassUsages( page );
 		await expect( page.getByText( '4 total usages found.' ) ).toBeVisible();
 		await expect(
 			page.getByText( 'Elsewhere on this site' )
@@ -338,6 +357,50 @@ test.describe( 'Global styles sidebar', () => {
 				)
 			)
 			.toBe( 'First page second usage' );
+	} );
+
+	test( 'should navigate CSS class usages from the global styles screen', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		await updateGlobalStyles( requestUtils, {
+			cssClasses: [
+				{
+					name: 'styles-route-card',
+					css: 'color: rgb(255, 0, 0);',
+				},
+			],
+		} );
+		await requestUtils.createPage( {
+			title: 'Styles route usage page',
+			content: `<!-- wp:paragraph {"className":"styles-route-card"} -->
+<p class="styles-route-card">Styles route usage paragraph</p>
+<!-- /wp:paragraph -->`,
+			status: 'publish',
+		} );
+
+		await admin.visitSiteEditor( { path: '/styles' } );
+		await openCSSClassesPanel( page );
+		await openCSSClassUsages( page );
+		await page
+			.getByRole( 'button', { name: /Styles route usage page/ } )
+			.click();
+
+		await expect(
+			editor.canvas.getByText( 'Styles route usage paragraph' )
+		).toBeVisible();
+		await expect
+			.poll( async () =>
+				page.evaluate(
+					() =>
+						window.wp.data
+							.select( 'core/block-editor' )
+							.getSelectedBlock()?.attributes?.content
+				)
+			)
+			.toBe( 'Styles route usage paragraph' );
 	} );
 
 	test( 'should show CSS class conflicts only for managed classes', async ( {
@@ -581,7 +644,7 @@ test.describe( 'Global styles sidebar', () => {
 			page.getByRole( 'button', { name: '.renamed-card' } )
 		).toBeVisible();
 		await expect(
-			page.getByRole( 'button', { name: '2 uses' } )
+			page.getByText( '2 uses', { exact: true } )
 		).toBeVisible();
 
 		await expect
@@ -645,6 +708,6 @@ test.describe( 'Global styles sidebar', () => {
 			.getByRole( 'dialog' )
 			.getByRole( 'button', { name: 'Delete' } )
 			.click();
-		await expect( page.getByText( 'No CSS classes yet.' ) ).toBeVisible();
+		await expect( page.getByText( 'No CSS classes found.' ) ).toBeVisible();
 	} );
 } );

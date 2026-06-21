@@ -5,7 +5,10 @@ import { Page } from '@wordpress/admin-ui';
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import {
+	privateApis as editorPrivateApis,
+	store as editorStore,
+} from '@wordpress/editor';
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { Button, __experimentalHStack as HStack } from '@wordpress/components';
@@ -85,7 +88,10 @@ export default function SidebarGlobalStyles() {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const [ section, onChangeSection ] = useSection();
 	const settings = useSelect(
-		( select ) => select( editSiteStore ).getSettings(),
+		( select ) => ( {
+			...select( editSiteStore ).getSettings(),
+			...select( editorStore ).getEditorSettings(),
+		} ),
 		[]
 	);
 

@@ -6,6 +6,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { parse } from '@wordpress/blocks';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -103,6 +104,11 @@ function getPostType( name ) {
 
 export function useResolveEditedEntity() {
 	const { editEntityRecord } = useDispatch( coreDataStore );
+	const { selectBlock } = useDispatch( blockEditorStore );
+	const editorBlocks = useSelect(
+		( select ) => select( blockEditorStore ).getBlocks(),
+		[]
+	);
 	const { getEditedEntityRecord, hasEntityRecord } =
 		useSelect( coreDataStore );
 	const { name, params = {}, query } = useLocation();
@@ -263,6 +269,29 @@ export function useResolveEditedEntity() {
 			}
 		}
 	}
+
+	useEffect( () => {
+		if ( selectedBlock ) {
+			selectBlock( selectedBlock );
+			return;
+		}
+
+		const blockPath = getSelectedBlockPath( selectedBlockPath );
+		if ( ! blockPath || ! entity.isReady ) {
+			return;
+		}
+
+		const block = getBlockAtPath( editorBlocks, blockPath );
+		if ( block?.clientId ) {
+			selectBlock( block.clientId );
+		}
+	}, [
+		editorBlocks,
+		entity.isReady,
+		selectBlock,
+		selectedBlock,
+		selectedBlockPath,
+	] );
 
 	return entity;
 }

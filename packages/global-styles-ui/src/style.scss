@@ -250,6 +250,11 @@
 	min-width: 0;
 }
 
+.global-styles-ui-css-classes__dataviews-usage-count {
+	color: colors.$gray-700;
+	flex-shrink: 0;
+}
+
 .global-styles-ui-css-classes__usage {
 	align-items: flex-start;
 	height: auto;

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import type { MouseEvent } from 'react';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -26,10 +21,11 @@ import {
 	type View,
 } from '@wordpress/dataviews';
 import { Stack, Tabs, Text } from '@wordpress/ui';
+// @ts-expect-error: Package does not currently publish TypeScript declarations.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { copy, pencil, plus, trash } from '@wordpress/icons';
+import { copy, pencil, plus, seen, trash } from '@wordpress/icons';
 import {
 	isValidCSSClassName,
 	normalizeCSSClassName,
@@ -798,22 +794,12 @@ export default function ScreenCSSClasses( {
 						<Text className="global-styles-ui-css-classes__dataviews-class-name">
 							{ `.${ item.className }` }
 						</Text>
-						<Button
-							size="small"
-							variant="tertiary"
-							onClick={ (
-								event: MouseEvent< HTMLButtonElement >
-							) => {
-								event.stopPropagation();
-								goTo(
-									`/css-classes/usages/${ encodeURIComponent(
-										item.className
-									) }`
-								);
-							} }
+						<Text
+							className="global-styles-ui-css-classes__dataviews-usage-count"
+							variant="body-sm"
 						>
 							{ getUsageCountText( item.usageCount ) }
-						</Button>
+						</Text>
 					</Stack>
 				),
 				sort: ( a, b, direction ) => {
@@ -857,7 +843,7 @@ export default function ScreenCSSClasses( {
 				},
 			},
 		],
-		[ goTo ]
+		[]
 	);
 	const { data: shownClassItems, paginationInfo } = useMemo(
 		() => filterSortAndPaginate( classItems, view, fields ),
@@ -876,6 +862,19 @@ export default function ScreenCSSClasses( {
 				},
 			},
 			{
+				id: 'view-usages',
+				label: __( 'View usages' ),
+				icon: seen,
+				isEligible: ( item ) => item.usageCount > 0,
+				callback: ( items ) => {
+					goTo(
+						`/css-classes/usages/${ encodeURIComponent(
+							items[ 0 ].className
+						) }`
+					);
+				},
+			},
+			{
 				id: 'delete',
 				label: __( 'Delete' ),
 				icon: trash,
@@ -885,7 +884,7 @@ export default function ScreenCSSClasses( {
 				},
 			},
 		],
-		[ canManageCssClasses, openEditScreen ]
+		[ canManageCssClasses, goTo, openEditScreen ]
 	);
 	const onChangeView = useCallback( ( nextView: View ) => {
 		setView( ( previousView ) => ( {
