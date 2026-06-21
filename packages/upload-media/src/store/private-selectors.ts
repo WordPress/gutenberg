@@ -3,6 +3,7 @@
  */
 import {
 	type BatchId,
+	ItemStatus,
 	OperationType,
 	type QueueItem,
 	type QueueItemId,
@@ -185,4 +186,30 @@ export function getItemProgress(
 ): number | undefined {
 	const item = state.queue.find( ( i ) => i.id === id );
 	return item?.progress;
+}
+
+/**
+ * Returns the queue item carrying the given durable upload marker.
+ *
+ * @param state    Upload state.
+ * @param uploadId Durable marker written into block attributes.
+ * @return The matching item, or undefined.
+ */
+export function getItemByUploadId(
+	state: State,
+	uploadId: string
+): QueueItem | undefined {
+	return state.queue.find( ( item ) => item.uploadId === uploadId );
+}
+
+/**
+ * Returns items loaded from durable storage that are awaiting a resume decision.
+ *
+ * @param state Upload state.
+ * @return Items in PendingResume status.
+ */
+export function getResumableItems( state: State ): QueueItem[] {
+	return state.queue.filter(
+		( item ) => item.status === ItemStatus.PendingResume
+	);
 }

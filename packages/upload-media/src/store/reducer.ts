@@ -8,11 +8,13 @@ import {
 	type CacheBlobUrlAction,
 	type CancelAction,
 	ItemStatus,
+	type LoadPersistedAction,
 	type OperationFinishAction,
 	type OperationStartAction,
 	type PauseItemAction,
 	type PauseQueueAction,
 	type QueueItem,
+	type RegisterCallbacksAction,
 	type RemoveAction,
 	type ResumeItemAction,
 	type ResumeQueueAction,
@@ -63,6 +65,8 @@ type Action =
 	| RevokeBlobUrlsAction
 	| UpdateProgressAction
 	| UpdateSettingsAction
+	| LoadPersistedAction
+	| RegisterCallbacksAction
 	| UnknownAction;
 
 function reducer(
@@ -302,6 +306,29 @@ function reducer(
 				},
 			};
 		}
+
+		case Type.LoadPersisted:
+			return {
+				...state,
+				queue: [ ...state.queue, ...action.items ],
+			};
+
+		case Type.RegisterCallbacks:
+			return {
+				...state,
+				queue: state.queue.map(
+					( item ): QueueItem =>
+						item.id === action.id
+							? {
+									...item,
+									onChange: action.onChange ?? item.onChange,
+									onSuccess:
+										action.onSuccess ?? item.onSuccess,
+									onError: action.onError ?? item.onError,
+							  }
+							: item
+				),
+			};
 	}
 
 	return state;
