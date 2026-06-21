@@ -141,17 +141,22 @@ class MediaProcessingUtils {
 			);
 		} );
 
-		// Client-side media processing fails in CI after the Playwright
-		// upgrade to Chrome for Testing 148/149 (the only change in #78632):
-		// feature detection still reports CSM as available, but image
-		// processing breaks so these CSM-specific assertions
-		// (format/rotation/sub-sizes) fail. Shipping Google Chrome processes
-		// CSM uploads correctly (AVIF verified manually on stable 149 and
-		// Canary 151), so this is specific to the CI browser, not a
-		// user-facing regression. The underlying cause (a
-		// Document-Isolation-Policy interaction) is tracked in
-		// https://github.com/WordPress/gutenberg/pull/78632. Skip until the
-		// bundled browser is past the affected versions.
+		// These CSM assertions started failing in CI with the Playwright
+		// upgrade to Chrome for Testing 148/149 (#78632), but the cause is
+		// not a Document-Isolation-Policy regression. DIP is what finally
+		// enables cross-origin isolation in the CI browser: Chrome < 148
+		// never became `crossOriginIsolated` (no SharedArrayBuffer), so CSM
+		// was inactive and these tests simply skipped. With CSM now active
+		// under automation, uploads hit a timing-sensitive race in the
+		// multi-threaded wasm-vips worker - the decoder intermittently gets
+		// a short/garbled source buffer and libheif aborts ("bad seek" /
+		// "Bitstream not supported"), surfacing as a generic
+		// IMAGE_TRANSCODING_ERROR. The same wasm-vips decodes the same
+		// fixtures correctly in Node and in manual Chrome (AVIF verified on
+		// stable 149 and Canary 151), so this is an automation-timing issue,
+		// not a user-facing regression. Tracked in
+		// https://github.com/WordPress/gutenberg/issues/79377; remove this
+		// version gate once the worker decode path is hardened.
 		const chromiumVersion = await getChromiumMajorVersion( this.page );
 
 		testInstance.skip(
