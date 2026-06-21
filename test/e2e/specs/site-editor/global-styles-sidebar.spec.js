@@ -518,4 +518,54 @@ test.describe( 'Global styles sidebar', () => {
 		} );
 		expect( updatedPage.content.raw ).not.toContain( 'rename-card' );
 	} );
+
+	test( 'should warn about affected usages before deleting CSS classes', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		await updateGlobalStyles( requestUtils, {
+			cssClasses: [
+				{
+					name: 'delete-card',
+					css: 'color: rgb(255, 0, 0);',
+				},
+			],
+		} );
+		await requestUtils.createPage( {
+			title: 'Delete class usage',
+			content: `<!-- wp:paragraph {"className":"delete-card"} -->
+<p class="delete-card">Delete usage paragraph</p>
+<!-- /wp:paragraph -->`,
+			status: 'publish',
+		} );
+
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//index',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
+		await openCSSClassesPanel( page );
+
+		await page.getByRole( 'button', { name: '.delete-card' } ).click();
+		await page
+			.getByRole( 'button', { name: 'Delete', exact: true } )
+			.click();
+
+		await expect(
+			page.getByText(
+				'Are you sure you want to delete ".delete-card"? Blocks using this class will keep the class name, but it will no longer be managed by global styles.'
+			)
+		).toBeVisible();
+		await expect(
+			page.getByText( '1 existing usage will be affected.' )
+		).toBeVisible();
+		await expect( page.getByText( 'Delete class usage' ) ).toBeVisible();
+
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Delete' } )
+			.click();
+		await expect( page.getByText( 'No CSS classes yet.' ) ).toBeVisible();
+	} );
 } );

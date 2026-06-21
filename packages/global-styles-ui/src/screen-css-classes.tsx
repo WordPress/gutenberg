@@ -800,11 +800,18 @@ export function ScreenCSSClassEdit( {
 					onConfirm={ deleteCSSClass }
 					size="medium"
 				>
-					{ sprintf(
-						/* translators: %s: CSS class name. */
-						__( 'Are you sure you want to delete ".%s"?' ),
-						originalName
-					) }
+					<Stack direction="column" gap="sm">
+						<Text>
+							{ sprintf(
+								/* translators: %s: CSS class name. */
+								__(
+									'Are you sure you want to delete ".%s"? Blocks using this class will keep the class name, but it will no longer be managed by global styles.'
+								),
+								originalName
+							) }
+						</Text>
+						<CSSClassUsageWarning usages={ originalClassUsages } />
+					</Stack>
 				</ConfirmDialog>
 			) }
 			{ isRenameConfirmOpen && (
