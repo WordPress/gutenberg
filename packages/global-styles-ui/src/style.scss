@@ -251,7 +251,24 @@
 
 .global-styles-ui-css-classes__usage {
 	justify-content: flex-start;
+	text-align: left;
 	width: 100%;
+}
+
+.global-styles-ui-css-classes__usage-details {
+	width: 100%;
+}
+
+.global-styles-ui-css-classes__usage-block {
+	font-weight: 600;
+}
+
+.global-styles-ui-css-classes__usage-entity {
+	color: colors.$gray-900;
+}
+
+.global-styles-ui-css-classes__usage-meta {
+	color: colors.$gray-700;
 }
 
 .global-styles-ui-screen-variations {

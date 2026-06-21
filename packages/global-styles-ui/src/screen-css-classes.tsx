@@ -282,6 +282,42 @@ function CSSClassUsageWarning( { usages }: { usages: CSSClassUsage[] } ) {
 	);
 }
 
+function CSSClassUsageDetails( {
+	usage,
+	showEntity = false,
+}: {
+	usage: CSSClassUsage;
+	showEntity?: boolean;
+} ) {
+	return (
+		<Stack
+			className="global-styles-ui-css-classes__usage-details"
+			direction="column"
+			gap="xs"
+		>
+			<Text className="global-styles-ui-css-classes__usage-block">
+				{ usage.blockTitle }
+			</Text>
+			{ showEntity && (
+				<>
+					<Text
+						className="global-styles-ui-css-classes__usage-entity"
+						variant="body-sm"
+					>
+						{ usage.entityTitle || __( 'Untitled' ) }
+					</Text>
+					<Text
+						className="global-styles-ui-css-classes__usage-meta"
+						variant="body-sm"
+					>
+						{ usage.entityLabel || __( 'Content' ) }
+					</Text>
+				</>
+			) }
+		</Stack>
+	);
+}
+
 function useCSSClassSiteUsageData() {
 	const [ usageData, setUsageData ] = useState< CSSClassUsageData >( {
 		usages: [],
@@ -1050,7 +1086,9 @@ export function ScreenCSSClassUsages( {
 												)
 											}
 										>
-											<Text>{ usage.blockTitle }</Text>
+											<CSSClassUsageDetails
+												usage={ usage }
+											/>
 										</Button>
 									) ) }
 								</ItemGroup>
@@ -1082,22 +1120,10 @@ export function ScreenCSSClassUsages( {
 												} )
 											}
 										>
-											<Stack direction="column" gap="xs">
-												<Text>
-													{ usage.entityTitle }
-												</Text>
-												<Text variant="body-sm">
-													{ sprintf(
-														/* translators: 1: Entity type label. 2: Block title. */
-														__(
-															'%1$s, %2$s block'
-														),
-														usage.entityLabel ||
-															__( 'Content' ),
-														usage.blockTitle
-													) }
-												</Text>
-											</Stack>
+											<CSSClassUsageDetails
+												usage={ usage }
+												showEntity
+											/>
 										</Button>
 									) ) }
 								</ItemGroup>
