@@ -7,15 +7,19 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import { TextControl } from '@wordpress/components';
+import { FormTokenField } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { hasBlockSupport } from '@wordpress/blocks';
+import { useMemo } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { normalizeCSSClassName } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
  */
 import { InspectorControls } from '../components';
 import { useBlockEditingMode } from '../components/block-editing-mode';
+import { store as blockEditorStore } from '../store';
 
 /**
  * Filters registered block settings, extending attributes to include `className`.
@@ -38,22 +42,58 @@ export function addAttribute( settings ) {
 	return settings;
 }
 
+function getClassNameTokens( className = '' ) {
+	return className.split( /\s+/ ).filter( Boolean );
+}
+
+function getClassNameTokenValue( token ) {
+	return typeof token === 'string' ? token : token.value;
+}
+
+function normalizeClassNameTokens( classNames ) {
+	return classNames
+		.flatMap( ( className ) =>
+			String( getClassNameTokenValue( className ) )
+				.split( /\s+/ )
+				.map( normalizeCSSClassName )
+		)
+		.filter( Boolean )
+		.filter(
+			( className, index, classNameList ) =>
+				classNameList.indexOf( className ) === index
+		);
+}
+
 function CustomClassNameControlsPure( { className, setAttributes } ) {
 	const blockEditingMode = useBlockEditingMode();
+	const managedCssClasses = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings()
+				.__experimentalManagedCssClasses ?? [],
+		[]
+	);
+	const suggestions = useMemo(
+		() => normalizeClassNameTokens( managedCssClasses ),
+		[ managedCssClasses ]
+	);
 	if ( blockEditingMode !== 'default' ) {
 		return null;
 	}
 
 	return (
 		<InspectorControls group="advanced">
-			<TextControl
+			<FormTokenField
 				__next40pxDefaultSize
-				autoComplete="off"
 				label={ __( 'Additional CSS class(es)' ) }
-				value={ className || '' }
+				value={ getClassNameTokens( className ) }
+				suggestions={ suggestions }
+				tokenizeOnSpace
 				onChange={ ( nextValue ) => {
+					const classNames = normalizeClassNameTokens( nextValue );
 					setAttributes( {
-						className: nextValue !== '' ? nextValue : undefined,
+						className: classNames.length
+							? classNames.join( ' ' )
+							: undefined,
 					} );
 				} }
 				help={ __( 'Separate multiple classes with spaces.' ) }

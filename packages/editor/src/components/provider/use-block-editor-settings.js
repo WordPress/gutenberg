@@ -13,6 +13,7 @@ import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { useViewportMatch } from '@wordpress/compose';
 import { store as blocksStore } from '@wordpress/blocks';
+import { normalizeCSSClassName } from '@wordpress/global-styles-engine';
 import {
 	privateApis,
 	store as blockEditorStore,
@@ -240,6 +241,15 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	const { merged: mergedGlobalStyles } = useGlobalStyles();
 	const globalStylesData = mergedGlobalStyles.styles ?? EMPTY_OBJECT;
 	const globalStylesLinksData = mergedGlobalStyles._links ?? EMPTY_OBJECT;
+	const managedCssClasses = useMemo( () => {
+		const cssClasses = mergedGlobalStyles.styles?.cssClasses;
+		if ( ! Array.isArray( cssClasses ) ) {
+			return [];
+		}
+		return cssClasses
+			.map( ( cssClass ) => normalizeCSSClassName( cssClass.name ) )
+			.filter( Boolean );
+	}, [ mergedGlobalStyles.styles?.cssClasses ] );
 
 	const settingsBlockPatterns =
 		settings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
@@ -333,6 +343,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			),
 			[ globalStylesDataKey ]: globalStylesData,
 			[ globalStylesLinksDataKey ]: globalStylesLinksData,
+			__experimentalManagedCssClasses: managedCssClasses,
 			allImageSizes,
 			bigImageSizeThreshold,
 			allowedBlockTypes,
@@ -449,6 +460,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		sectionRootClientId,
 		globalStylesData,
 		globalStylesLinksData,
+		managedCssClasses,
 		renderingMode,
 		editMediaEntity,
 		openMediaEditorModal,

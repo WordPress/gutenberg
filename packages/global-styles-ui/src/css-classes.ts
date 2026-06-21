@@ -48,13 +48,16 @@ export function getCSSClassUsages(
 ): CSSClassUsage[] {
 	const normalizedClassName = normalizeCSSClassName( className );
 	const usages: CSSClassUsage[] = [];
+	const seenClientIds = new Set< string >();
 
 	function visit( block: BlockLike ) {
 		if (
 			block.clientId &&
 			block.name &&
-			getBlockClassNames( block ).includes( normalizedClassName )
+			getBlockClassNames( block ).includes( normalizedClassName ) &&
+			! seenClientIds.has( block.clientId )
 		) {
+			seenClientIds.add( block.clientId );
 			usages.push( {
 				clientId: block.clientId,
 				className: normalizedClassName,

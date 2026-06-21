@@ -58,6 +58,12 @@ describe( 'getCSSClassUsages', () => {
 			2
 		);
 	} );
+
+	it( 'should not count the same client ID twice', () => {
+		expect(
+			getCSSClassUsages( [ ...blocks, ...blocks ], 'featured-card' )
+		).toHaveLength( 2 );
+	} );
 } );
 
 describe( 'getCSSClassUsageCounts', () => {

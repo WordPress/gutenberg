@@ -11,6 +11,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
+import { store as editorStore } from '../../store';
 import { GlobalStylesBlockLink } from './block-link';
 import { useGlobalStyles } from './hooks';
 
@@ -90,7 +91,10 @@ export default function GlobalStylesUIWrapper( {
 	const { serverCSS, serverSettings, fontLibraryEnabled } =
 		useServerData( settings );
 	const contentBlocks = useSelect(
-		( select ) => select( blockEditorStore ).getBlocks(),
+		( select ) => [
+			...select( blockEditorStore ).getBlocks(),
+			...select( editorStore ).getEditorBlocks(),
+		],
 		[]
 	);
 	const { selectBlock } = useDispatch( blockEditorStore );
