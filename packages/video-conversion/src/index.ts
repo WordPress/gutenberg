@@ -300,8 +300,10 @@ export async function getVideoMetadata(
 	let bitrate = 0;
 	let duration = 0;
 	try {
-		// Sample a subset of packets for the bitrate estimate to keep this
-		// fast; an exact figure is not needed for the eligibility decision.
+		/*
+		 * Sample a subset of packets for the bitrate estimate to keep this
+		 * fast; an exact figure is not needed for the eligibility decision.
+		 */
 		const stats = await track.computePacketStats( 100 );
 		bitrate = stats.averageBitrate;
 		duration = await track.computeDuration();
@@ -390,8 +392,10 @@ export async function transcodeVideo(
 			videoOptions.frameRate = options.frameRate;
 		}
 
-		// Cap the longest edge while preserving aspect ratio: set only the
-		// dominant dimension and let mediabunny deduce the other.
+		/*
+		 * Cap the longest edge while preserving aspect ratio: set only the
+		 * dominant dimension and let mediabunny deduce the other.
+		 */
 		if ( options.maxDimensions ) {
 			const track = await input.getPrimaryVideoTrack();
 			if ( track ) {

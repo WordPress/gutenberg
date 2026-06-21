@@ -29,79 +29,45 @@
  */
 
 /**
- * Returns the absolute path to an attachment's transcoded video companion
- * file, if recorded.
- *
- * The path is rebuilt from the attachment's own (trusted) directory plus the
- * recorded basename, so the stored metadata cannot point anywhere else.
- *
- * @param int $attachment_id Attachment ID.
- * @return string|null Absolute file path, or null when there is no companion.
- */
-function gutenberg_get_optimized_video_companion_path( int $attachment_id ): ?string {
-	$metadata = wp_get_attachment_metadata( $attachment_id, true );
-
-	if ( empty( $metadata['optimized_video'] ) || ! is_string( $metadata['optimized_video'] ) ) {
-		return null;
-	}
-
-	// Only ever trust the basename of the recorded value; strip any path
-	// components so the metadata can't reference another directory.
-	$name = wp_basename( $metadata['optimized_video'] );
-
-	if ( '' === $name ) {
-		return null;
-	}
-
-	$attached_file = get_attached_file( $attachment_id, true );
-
-	if ( ! $attached_file ) {
-		return null;
-	}
-
-	return path_join( dirname( $attached_file ), $name );
-}
-
-/**
  * Deletes the transcoded video companion when its attachment is deleted.
  *
- * The companion is sideloaded next to the original video and recorded in
- * $metadata['optimized_video']. WordPress core's wp_delete_attachment_files()
- * does not know about it, so without this hook it would linger on disk after
- * the attachment is deleted.
- *
- * The path is confirmed to resolve to a regular file strictly inside the
- * uploads directory before deletion, so this can only ever remove a
- * sideloaded companion.
+ * When the client-side media flow transcodes an uploaded video to a web-safe
+ * format, the original stays the attachment and the transcoded version is
+ * sideloaded as a companion file whose filename is recorded in the
+ * 'optimized_video' metadata key. WordPress only tracks 'original_image' in
+ * wp_delete_attachment_files(), so without this hook the companion file would
+ * linger on disk after the attachment is deleted.
  *
  * @param int $post_id Attachment ID being deleted.
+ * @return bool Whether a companion file was deleted.
  */
-function gutenberg_delete_optimized_video( int $post_id ): void {
-	$path = gutenberg_get_optimized_video_companion_path( $post_id );
+function gutenberg_delete_optimized_video( int $post_id ): bool {
+	$metadata = wp_get_attachment_metadata( $post_id, true );
 
-	if ( ! $path || ! file_exists( $path ) ) {
-		return;
+	$optimized_video = $metadata['optimized_video'] ?? null;
+	if ( ! is_string( $optimized_video ) || '' === $optimized_video ) {
+		return false;
 	}
 
-	$real_path = realpath( $path );
+	$attached_file = get_attached_file( $post_id, true );
 
-	if ( ! $real_path || ! is_file( $real_path ) ) {
-		return;
+	if ( ! $attached_file ) {
+		return false;
 	}
 
-	$uploads  = wp_get_upload_dir();
-	$base_dir = empty( $uploads['error'] ) ? realpath( $uploads['basedir'] ) : false;
+	$uploads = wp_get_upload_dir();
 
-	if ( ! $base_dir ) {
-		return;
+	if ( empty( $uploads['basedir'] ) ) {
+		return false;
 	}
 
-	// Must resolve to a regular file strictly inside the uploads directory.
-	if ( ! str_starts_with( $real_path, $base_dir . DIRECTORY_SEPARATOR ) ) {
-		return;
+	$companion_path = path_join( dirname( $attached_file ), wp_basename( $optimized_video ) );
+
+	if ( ! file_exists( $companion_path ) ) {
+		return false;
 	}
 
-	wp_delete_file( $real_path );
+	return wp_delete_file_from_directory( $companion_path, $uploads['basedir'] );
 }
 
 add_action( 'delete_attachment', 'gutenberg_delete_optimized_video' );

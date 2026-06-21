@@ -152,8 +152,10 @@ export async function transcodeVideo(
 	}
 ) {
 	const { transcodeVideo: transcode } = await loadVideoConversionModule();
-	// Pass the File straight through: the worker reads its bytes once, off
-	// the main thread, instead of materializing an ArrayBuffer here.
+	/*
+	 * Pass the File straight through: the worker reads its bytes once, off
+	 * the main thread, instead of materializing an ArrayBuffer here.
+	 */
 	const buffer = await transcode( id, file, outputMimeType, options );
 
 	const ext = outputMimeType === 'video/webm' ? 'webm' : 'mp4';

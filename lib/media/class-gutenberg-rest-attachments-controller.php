@@ -560,10 +560,12 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 				// See lib/media/animated-gif-to-video.php.
 				$metadata[ self::META_KEY_ANIMATED_VIDEO_POSTER ] = $sub_size['file'];
 			} elseif ( 'optimized-video' === $image_size ) {
-				// Web-safe transcoded companion of an uploaded video. Stored
-				// under its own key; the original video stays the attachment.
-				// The editor reads this key to play the optimized version;
-				// companion cleanup lives in lib/media/video-transcoding.php.
+				/*
+				 * Web-safe transcoded companion of an uploaded video. Stored
+				 * under its own key; the original video stays the attachment.
+				 * The editor reads this key to play the optimized version;
+				 * companion cleanup lives in lib/media/video-transcoding.php.
+				 */
 				$metadata['optimized_video'] = $sub_size['file'];
 			} elseif ( 'scaled' === $image_size ) {
 				if ( ! empty( $sub_size['original_image'] ) ) {
@@ -685,10 +687,12 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 * @return true|WP_Error True if valid, WP_Error if invalid.
 	 */
 	private function validate_image_dimensions( int $width, int $height, $image_size, int $attachment_id ) {
-		// 'animated-video' and 'optimized-video' companion files are videos,
-		// not images. Skip *all* dimension checks (the caller passes (0, 0)
-		// for these so the positive-dimension assertion below would otherwise
-		// fire).
+		/*
+		 * 'animated-video' and 'optimized-video' companion files are videos,
+		 * not images. Skip *all* dimension checks (the caller passes (0, 0)
+		 * for these so the positive-dimension assertion below would otherwise
+		 * fire).
+		 */
 		if ( self::IMAGE_SIZE_ANIMATED_VIDEO === $image_size || 'optimized-video' === $image_size ) {
 			return true;
 		}
@@ -894,15 +898,17 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 		$image_size = $request['image_size'];
 
-		// Read dimensions once up-front. Needed both for early-error handling
-		// (corrupted/unsupported files) and for populating the sub-size payload
-		// below. Scalar 'original' is a byte-only passthrough and does not need
-		// dimensions, but reading them here is harmless.
-		//
-		// 'animated-video' and 'optimized-video' companions are video files
-		// (MP4/WebM); the image helpers can't read their dimensions and would
-		// falsely report the upload as "corrupted or unsupported". Skip the
-		// read for these; validate_image_dimensions() also short-circuits them.
+		/*
+		 * Read dimensions once up-front. Needed both for early-error handling
+		 * (corrupted/unsupported files) and for populating the sub-size payload
+		 * below. Scalar 'original' is a byte-only passthrough and does not need
+		 * dimensions, but reading them here is harmless.
+		 *
+		 * 'animated-video' and 'optimized-video' companions are video files
+		 * (MP4/WebM); the image helpers can't read their dimensions and would
+		 * falsely report the upload as "corrupted or unsupported". Skip the
+		 * read for these; validate_image_dimensions() also short-circuits them.
+		 */
 		$is_video_companion = self::IMAGE_SIZE_ANIMATED_VIDEO === $image_size || 'optimized-video' === $image_size;
 		$size               = $is_video_companion ? array( 0, 0 ) : wp_getimagesize( $path );
 
@@ -960,10 +966,12 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			// video block's poster and deleted with the video.
 			$sub_size_data['file'] = wp_basename( $path );
 		} elseif ( 'optimized-video' === $image_size ) {
-			// Web-safe transcoded video companion. finalize_item() writes the
-			// filename to $metadata['optimized_video']; the editor reads it to
-			// play the optimized version, and a delete_attachment hook removes
-			// it. See lib/media/video-transcoding.php.
+			/*
+			 * Web-safe transcoded video companion. finalize_item() writes the
+			 * filename to $metadata['optimized_video']; the editor reads it to
+			 * play the optimized version, and a delete_attachment hook removes
+			 * it. See lib/media/video-transcoding.php.
+			 */
 			$sub_size_data['file'] = wp_basename( $path );
 		} elseif ( 'scaled' === $image_size ) {
 			// Record the current attached file as the original.

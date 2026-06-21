@@ -54,6 +54,41 @@ _Returns_
 
 -   `Promise< ArrayBuffer >`: Encoded video buffer.
 
+### getVideoMetadata
+
+Reads metadata from a video file's primary video track.
+
+Only the container headers are read (not the full media), so this is cheap enough to run on every upload to decide whether the video is already web-safe. Bitrate and duration are best-effort: if they cannot be computed they are returned as 0, and the format/dimension checks still suffice.
+
+Accepts the video as a Blob/File so the bytes are read here in the worker. An ArrayBuffer is still accepted for direct callers and tests.
+
+_Parameters_
+
+-   _source_ `ArrayBuffer | Blob`: Video file as a Blob/File or ArrayBuffer.
+
+_Returns_
+
+-   `Promise< VideoMetadata >`: The primary video track's metadata.
+
+### transcodeVideo
+
+Transcodes a video to a web-safe format (MP4/H.264 or WebM/VP9).
+
+Re-encodes the input with mediabunny / WebCodecs, optionally downscaling to a maximum dimension and capping the frame rate. The MP4 output uses Fast Start (moov atom at the front) for progressive playback.
+
+Accepts the video as a Blob/File so the bytes are read once, here in the worker, instead of being materialized on the main thread and transferred. An ArrayBuffer is still accepted for direct callers and tests.
+
+_Parameters_
+
+-   _id_ `ItemId`: Item ID.
+-   _source_ `ArrayBuffer | Blob`: Video file as a Blob/File or ArrayBuffer.
+-   _outputMimeType_ `string`: Output MIME type ('video/mp4' or 'video/webm').
+-   _options_ `TranscodeVideoOptions`: Transcoding options (max dimension, frame rate, bitrate).
+
+_Returns_
+
+-   `Promise< ArrayBuffer >`: Encoded video buffer.
+
 ### UNSUPPORTED_ERROR_PREFIX
 
 Message prefix for "unsupported but graceful" outcomes (no WebCodecs, unsupported codec). Consumers detect this prefix and fall back to uploading the original GIF instead of surfacing a hard error.

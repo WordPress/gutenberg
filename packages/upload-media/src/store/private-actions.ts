@@ -919,18 +919,20 @@ export function prepareItem( id: QueueItemId ) {
 			}
 		}
 
-		// Video → web-safe transcode. WebCodecs is required; client-side media
-		// already runs only under cross-origin isolation, so this is a
-		// capability check, not a browser-support fallback path.
-		//
-		// By default the original video uploads as a normal core/video
-		// attachment and the transcoded, web-safe version is sideloaded as a
-		// companion file of that attachment (recorded in attachment metadata
-		// as `optimized_video`) once the upload completes (see
-		// generateVideoCompanion). The editor then points the block's playback
-		// src at that companion. When `videoKeepOriginal` is false, the video
-		// is transcoded before upload instead, so only the optimized file is
-		// stored.
+		/*
+		 * Video → web-safe transcode. WebCodecs is required; client-side media
+		 * already runs only under cross-origin isolation, so this is a
+		 * capability check, not a browser-support fallback path.
+		 *
+		 * By default the original video uploads as a normal core/video
+		 * attachment and the transcoded, web-safe version is sideloaded as a
+		 * companion file of that attachment (recorded in attachment metadata
+		 * as `optimized_video`) once the upload completes (see
+		 * generateVideoCompanion). The editor then points the block's playback
+		 * src at that companion. When `videoKeepOriginal` is false, the video
+		 * is transcoded before upload instead, so only the optimized file is
+		 * stored.
+		 */
 		if (
 			TRANSCODABLE_VIDEO_MIME_TYPES.includes( file.type ) &&
 			settings.videoConvert !== false &&
@@ -945,8 +947,10 @@ export function prepareItem( id: QueueItemId ) {
 					settings
 				);
 			} catch {
-				// If the video metadata can't be read, fall through to the
-				// normal (server) upload path rather than failing the upload.
+				/*
+				 * If the video metadata can't be read, fall through to the
+				 * normal (server) upload path rather than failing the upload.
+				 */
 				shouldTranscode = false;
 			}
 
@@ -957,8 +961,10 @@ export function prepareItem( id: QueueItemId ) {
 						: 'mp4';
 
 				if ( settings.videoKeepOriginal !== false ) {
-					// Companion model: upload the original, then transcode and
-					// sideload the companion once the attachment exists.
+					/*
+					 * Companion model: upload the original, then transcode and
+					 * sideload the companion once the attachment exists.
+					 */
 					operations.push(
 						OperationType.Upload,
 						OperationType.GenerateVideoCompanion,
@@ -982,8 +988,10 @@ export function prepareItem( id: QueueItemId ) {
 					return;
 				}
 
-				// Replace-primary (opt-out): transcode before upload so only
-				// the optimized file is stored.
+				/*
+				 * Replace-primary (opt-out): transcode before upload so only
+				 * the optimized file is stored.
+				 */
 				operations.push(
 					[ OperationType.TranscodeVideo, { outputFormat } ],
 					OperationType.Upload
@@ -1677,9 +1685,11 @@ export function transcodeVideoItem(
 		const maxDimensions =
 			settings.bigVideoSizeThreshold ?? DEFAULT_VIDEO_SIZE_THRESHOLD;
 
-		// A sideload child means the original is already uploaded (companion
-		// model); the primary item means replace-primary, where the original
-		// must still be uploaded on failure.
+		/*
+		 * A sideload child means the original is already uploaded (companion
+		 * model); the primary item means replace-primary, where the original
+		 * must still be uploaded on failure.
+		 */
 		const isSideload = Boolean( item.parentId );
 
 		try {
@@ -1696,16 +1706,20 @@ export function transcodeVideoItem(
 			// "Unsupported" is a graceful outcome, not a failure.
 			if ( isUnsupportedConversionError( error ) ) {
 				if ( isSideload ) {
-					// Companion: the parent video attachment already exists
-					// and stays as-is; silently drop the companion.
+					/*
+					 * Companion: the parent video attachment already exists
+					 * and stays as-is; silently drop the companion.
+					 */
 					dispatch.cancelItem(
 						id,
 						new Error( 'Video transcoding unsupported' ),
 						true
 					);
 				} else {
-					// Replace-primary: upload the original unchanged so the
-					// user's video is not lost.
+					/*
+					 * Replace-primary: upload the original unchanged so the
+					 * user's video is not lost.
+					 */
 					dispatch.finishOperation( id, { file: item.file } );
 				}
 				return;
@@ -1760,8 +1774,10 @@ export function generateVideoCompanion( id: QueueItemId ) {
 
 		const attachment = item.attachment;
 
-		// Only sideload a companion when we have both the original video and
-		// an uploaded attachment to attach it to.
+		/*
+		 * Only sideload a companion when we have both the original video and
+		 * an uploaded attachment to attach it to.
+		 */
 		if ( item.videoCompanionFile && attachment?.id ) {
 			const settings = select.getSettings();
 			const outputFormat =

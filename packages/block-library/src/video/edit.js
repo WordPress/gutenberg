@@ -120,12 +120,14 @@ function VideoEdit( {
 			return;
 		}
 
-		// Prefer the web-safe transcoded companion when available: the
-		// original video stays the attachment (media.id) but the block plays
-		// the optimized version. `media_details.optimized_video` is only set
-		// on transcoded video attachments, so its presence is a sufficient
-		// signal to swap the playback source. The author can switch back to
-		// the original from the toolbar (see VideoOriginalControl).
+		/*
+		 * Prefer the web-safe transcoded companion when available: the
+		 * original video stays the attachment (media.id) but the block plays
+		 * the optimized version. `media_details.optimized_video` is only set
+		 * on transcoded video attachments, so its presence is a sufficient
+		 * signal to swap the playback source. The author can switch back to
+		 * the original from the toolbar (see VideoOriginalControl).
+		 */
 		let nextSrc = media.url;
 		if ( media.media_details?.optimized_video ) {
 			const dir = media.url.slice( 0, media.url.lastIndexOf( '/' ) + 1 );
