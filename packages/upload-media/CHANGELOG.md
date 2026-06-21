@@ -11,6 +11,7 @@
 ### Bug Fix
 
 -   `uploadItem` no longer dispatches `finishOperation` twice when both `onFileChange` and `onSuccess` fire for the same attachment ([#74917](https://github.com/WordPress/gutenberg/pull/74917)).
+-   Retry wasm-vips worker decode operations (resize, transcode, rotate) a small, bounded number of times before failing. The cross-origin-isolated, multi-threaded worker can intermittently receive a short/garbled source buffer and abort with a `bad seek` / `Bitstream not supported` error; re-reading the source and re-issuing the call recovers from this transient condition ([#79378](https://github.com/WordPress/gutenberg/pull/79378)).
 
 ## 0.33.1 (2026-06-16)
 

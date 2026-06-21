@@ -42,6 +42,62 @@ function loadVipsModule(): Promise< typeof import('@wordpress/vips/worker') > {
 }
 
 /**
+ * Maximum number of attempts (initial call plus retries) for a wasm-vips
+ * worker call.
+ *
+ * Decoding in the cross-origin-isolated, multi-threaded wasm-vips worker can
+ * intermittently fail when the worker receives a short or garbled source
+ * buffer under heavy main-thread contention: libheif aborts with a "bad seek"
+ * / "Bitstream not supported" error that surfaces as a generic processing
+ * failure. The condition is transient - re-reading the source and re-issuing
+ * the call on a later task recovers - so a small, bounded number of retries
+ * makes the pipeline resilient without masking genuinely undecodable images,
+ * which still fail after the final attempt.
+ *
+ * See https://github.com/WordPress/gutenberg/issues/79377.
+ */
+const VIPS_MAX_ATTEMPTS = 3;
+
+/**
+ * Runs a wasm-vips worker call with a freshly read source buffer, retrying a
+ * bounded number of times if the worker throws.
+ *
+ * The source bytes are re-read from `file` on every attempt so a transient
+ * short read or transfer is never reused. An aborted signal short-circuits the
+ * loop so cancellation stays responsive.
+ *
+ * @param file   Source file; its bytes are re-read on each attempt.
+ * @param run    Callback performing the worker call with a fresh buffer.
+ * @param signal Optional abort signal; when aborted, stops retrying.
+ * @return The worker call result.
+ */
+async function withVipsRetry< T >(
+	file: File,
+	run: ( buffer: ArrayBuffer ) => Promise< T >,
+	signal?: AbortSignal
+): Promise< T > {
+	let lastError: unknown;
+	for ( let attempt = 1; attempt <= VIPS_MAX_ATTEMPTS; attempt++ ) {
+		if ( signal?.aborted ) {
+			throw new Error( 'Operation aborted' );
+		}
+		try {
+			return await run( await file.arrayBuffer() );
+		} catch ( error ) {
+			lastError = error;
+			if ( attempt < VIPS_MAX_ATTEMPTS && ! signal?.aborted ) {
+				// Yield to a later task so the next read and worker transfer
+				// land outside the contended window.
+				await new Promise( ( resolve ) => {
+					setTimeout( resolve, 50 * attempt );
+				} );
+			}
+		}
+	}
+	throw lastError;
+}
+
+/**
  * Converts an image to a different format using vips in a web worker.
  *
  * @param id         Queue item ID.
@@ -65,13 +121,8 @@ export async function vipsConvertImageFormat(
 ) {
 	const { vipsConvertImageFormat: convertImageFormat } =
 		await loadVipsModule();
-	const buffer = await convertImageFormat(
-		id,
-		await file.arrayBuffer(),
-		file.type,
-		type,
-		quality,
-		interlaced
+	const buffer = await withVipsRetry( file, ( bytes ) =>
+		convertImageFormat( id, bytes, file.type, type, quality, interlaced )
 	);
 	const ext = type.split( '/' )[ 1 ];
 	const fileName = `${ getFileBasename( file.name ) }.${ ext }`;
@@ -96,12 +147,8 @@ export async function vipsCompressImage(
 	interlaced?: boolean
 ) {
 	const { vipsCompressImage: compressImage } = await loadVipsModule();
-	const buffer = await compressImage(
-		id,
-		await file.arrayBuffer(),
-		file.type,
-		quality,
-		interlaced
+	const buffer = await withVipsRetry( file, ( bytes ) =>
+		compressImage( id, bytes, file.type, quality, interlaced )
 	);
 	return new File(
 		[ new Blob( [ buffer as ArrayBuffer ], { type: file.type } ) ],
@@ -169,13 +216,11 @@ export async function vipsResizeImage(
 
 	const { vipsResizeImage: resizeImage } = await loadVipsModule();
 	const { buffer, width, height, originalWidth, originalHeight } =
-		await resizeImage(
-			id,
-			await file.arrayBuffer(),
-			file.type,
-			resize,
-			smartCrop,
-			quality
+		await withVipsRetry(
+			file,
+			( bytes ) =>
+				resizeImage( id, bytes, file.type, resize, smartCrop, quality ),
+			signal
 		);
 
 	let fileName = file.name;
@@ -242,11 +287,10 @@ export async function vipsRotateImage(
 	}
 
 	const { vipsRotateImage: rotateImage } = await loadVipsModule();
-	const { buffer, width, height } = await rotateImage(
-		id,
-		await file.arrayBuffer(),
-		file.type,
-		orientation
+	const { buffer, width, height } = await withVipsRetry(
+		file,
+		( bytes ) => rotateImage( id, bytes, file.type, orientation ),
+		signal
 	);
 
 	// Add '-rotated' suffix to filename, matching WordPress core behavior.
