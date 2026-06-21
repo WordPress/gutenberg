@@ -660,30 +660,75 @@ test.describe( 'Client-side media processing', () => {
 		expect( media.media_details.sizes.large ).toBeDefined();
 	} );
 
-	// Known gap: the client-side pipeline does not bake EXIF orientation into
-	// the full-size attachment. create_item disables `wp_image_maybe_exif_rotate`
-	// "so the client can handle it", but the client only sideloads a rotated
-	// copy as `original_image` — it never rotates the stored full-size file, so
-	// `media_details.width/height` keep the pre-rotation pixel dimensions
-	// (1024x768) instead of the expected 768x1024. (Server-reported
-	// `exif_orientation` is also 1 here, so the client never even attempts the
-	// rotation.) Whether CSM should bake-in rotation like core, or intentionally
-	// preserve the EXIF tag, is a product decision for the feature owners.
-	// Marked fixme so it runs again once that behavior is settled.
+	// EXIF orientation handling. CSM does not bake rotation into the stored
+	// full-size file: `create_item` disables `wp_image_maybe_exif_rotate` so
+	// the full-size file keeps its original pixels plus the EXIF orientation
+	// tag (browsers honor it). Rotation is instead applied to the generated
+	// sub-sizes, which is where the visible difference shows up. A landscape
+	// 1024x768 source tagged "rotate 90° CW" therefore keeps a 1024x768
+	// full-size but yields portrait sub-sizes (height > width).
+	test( 'rotates JPEG sub-sizes from server-detected EXIF orientation', async ( {
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+			editor,
+			requestUtils,
+			'1024x768_e2e_test_image_rotated.jpeg'
+		);
+
+		// The server reads JPEG EXIF and reports the rotation factor. This is
+		// an `edit`-context field, so fetch it explicitly.
+		const edit = await requestUtils.rest( {
+			method: 'GET',
+			path: `/wp/v2/media/${ media.id }?context=edit`,
+		} );
+		expect( edit.exif_orientation ).toBe( 6 );
+
+		// Sub-sizes are rotated to portrait; the full-size keeps its pixels.
+		const medium = media.media_details.sizes.medium;
+		expect( medium.height ).toBeGreaterThan( medium.width );
+	} );
+
+	// AVIF carrying a native HEIF transform (`irot`) rotates correctly even
+	// though the server can't read its EXIF: wasm-vips/libheif honors the
+	// transform box when generating sub-sizes. `exif_orientation` stays 1
+	// because the server (exif_read_data) cannot parse the AVIF container.
+	test( 'rotates AVIF sub-sizes from the embedded HEIF transform', async ( {
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+			editor,
+			requestUtils,
+			'1024x768_e2e_test_image_rotated.avif'
+		);
+
+		expect( media.mime_type ).toBe( 'image/avif' );
+		const medium = media.media_details.sizes.medium;
+		expect( medium.height ).toBeGreaterThan( medium.width );
+	} );
+
+	// Known gap (https://github.com/WordPress/gutenberg/issues/79383): when a
+	// server-unsupported format (AVIF/HEIF) carries its orientation only in an
+	// EXIF tag rather than a native `irot` box, nothing rotates it. The server
+	// can't read the EXIF (`exif_orientation` is 1) and libheif does not apply
+	// EXIF orientation for HEIF-family inputs, so the sub-sizes stay landscape.
+	// Client-side EXIF detection for these formats is needed; once added this
+	// should pass.
 	test.fixme(
-		'auto-rotates images based on EXIF orientation',
+		'rotates AVIF sub-sizes from EXIF-only orientation',
 		async ( { editor, mediaProcessingUtils, requestUtils } ) => {
-			// EXIF orientation=6 means a 90° clockwise rotation. The asset is
-			// stored 1024x768 in pixels but should land 768x1024 after CSM
-			// applies the EXIF-driven rotation.
 			const media = await mediaProcessingUtils.uploadImageAndGetMedia(
 				editor,
 				requestUtils,
-				'1024x768_e2e_test_image_rotated.jpeg'
+				'1024x768_e2e_test_image_rotated_exif.avif'
 			);
 
-			expect( media.media_details.width ).toBe( 768 );
-			expect( media.media_details.height ).toBe( 1024 );
+			const medium = media.media_details.sizes.medium;
+			expect( medium.height ).toBeGreaterThan( medium.width );
 		}
 	);
 
