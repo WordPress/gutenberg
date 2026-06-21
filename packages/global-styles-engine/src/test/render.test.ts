@@ -1514,6 +1514,25 @@ describe( 'global styles renderer', () => {
 				] )
 			).toBe( '.featured-card{color: red;}' );
 		} );
+
+		it( 'should compile pseudo-state definitions', () => {
+			expect(
+				compileCSSClasses( [
+					{
+						name: 'featured-card',
+						css: 'color: red;',
+						states: {
+							hover: 'color: blue;',
+							focus: 'outline: 2px solid currentColor;',
+							active: 'transform: scale(0.98);',
+							disabled: 'opacity: 0.5;',
+						},
+					},
+				] )
+			).toBe(
+				'.featured-card{color: red;}.featured-card:hover{color: blue;}.featured-card:focus{outline: 2px solid currentColor;}.featured-card:active{transform: scale(0.98);}.featured-card:disabled{opacity: 0.5;}'
+			);
+		} );
 	} );
 
 	describe( 'getBlockSelectors', () => {

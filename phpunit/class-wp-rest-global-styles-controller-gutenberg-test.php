@@ -576,8 +576,12 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 				'styles' => array(
 					'cssClasses' => array(
 						array(
-							'name' => 'featured-card',
-							'css'  => 'color: red;',
+							'name'   => 'featured-card',
+							'css'    => 'color: red;',
+							'states' => array(
+								'hover' => 'color: blue;',
+								'focus' => 'outline: 2px solid currentColor;',
+							),
 						),
 					),
 				),
@@ -587,6 +591,8 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 		$data     = $response->get_data();
 		$this->assertSame( 'featured-card', $data['styles']['cssClasses'][0]['name'] );
 		$this->assertSame( 'color: red;', $data['styles']['cssClasses'][0]['css'] );
+		$this->assertSame( 'color: blue;', $data['styles']['cssClasses'][0]['states']['hover'] );
+		$this->assertSame( 'outline: 2px solid currentColor;', $data['styles']['cssClasses'][0]['states']['focus'] );
 	}
 
 	/**
@@ -648,6 +654,34 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 						array(
 							'name' => 'featured-card',
 							'css'  => '.featured-card { color: red; }',
+						),
+					),
+				),
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_css_class_invalid_css', $response, 400 );
+	}
+
+	/**
+	 * @covers WP_REST_Global_Styles_Controller_Gutenberg::update_item
+	 */
+	public function test_update_item_invalid_css_class_state_declarations() {
+		wp_set_current_user( self::$admin_id );
+		if ( is_multisite() ) {
+			grant_super_admin( self::$admin_id );
+		}
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/global-styles/' . self::$global_styles_id );
+		$request->set_body_params(
+			array(
+				'styles' => array(
+					'cssClasses' => array(
+						array(
+							'name'   => 'featured-card',
+							'css'    => 'color: red;',
+							'states' => array(
+								'hover' => '.featured-card:hover { color: blue; }',
+							),
 						),
 					),
 				),

@@ -151,6 +151,39 @@ test.describe( 'Global styles sidebar', () => {
 		).toBeVisible();
 	} );
 
+	test( 'should edit CSS class pseudo-states', async ( { editor, page } ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'Interactive paragraph',
+				className: 'interactive-card',
+			},
+		} );
+
+		const paragraph = editor.canvas.getByText( 'Interactive paragraph' );
+
+		await openCSSClassesPanel( page );
+		await page.getByRole( 'button', { name: 'Add class' } ).click();
+		await page
+			.getByRole( 'textbox', { name: 'Class name' } )
+			.fill( 'interactive-card' );
+		await page
+			.getByRole( 'textbox', { name: 'CSS' } )
+			.fill( 'color: rgb(255, 0, 0);' );
+		await page.getByRole( 'tab', { name: 'Hover' } ).click();
+		await page
+			.getByRole( 'textbox', { name: 'Hover CSS' } )
+			.fill( 'color: rgb(0, 0, 255);' );
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Save' } )
+			.click();
+
+		await expect( paragraph ).toHaveCSS( 'color', 'rgb(255, 0, 0)' );
+		await paragraph.hover();
+		await expect( paragraph ).toHaveCSS( 'color', 'rgb(0, 0, 255)' );
+	} );
+
 	test( 'should count CSS classes used in edited page content', async ( {
 		admin,
 		editor,

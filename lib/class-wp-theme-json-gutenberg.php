@@ -68,6 +68,18 @@ class WP_Theme_JSON_Gutenberg {
 	);
 
 	/**
+	 * Pseudo-selectors supported by managed CSS class definitions.
+	 *
+	 * @var string[]
+	 */
+	const CSS_CLASS_PSEUDO_SELECTORS = array(
+		'hover'    => ':hover',
+		'focus'    => ':focus',
+		'active'   => ':active',
+		'disabled' => ':disabled',
+	);
+
+	/**
 	 * Presets are a set of values that serve
 	 * to bootstrap some styles: colors, font sizes, etc.
 	 *
@@ -1227,8 +1239,14 @@ class WP_Theme_JSON_Gutenberg {
 		$schema['styles']                                 = static::VALID_STYLES;
 		$schema['styles']['cssClasses']                   = array(
 			array(
-				'name' => null,
-				'css'  => null,
+				'name'   => null,
+				'css'    => null,
+				'states' => array(
+					'hover'    => null,
+					'focus'    => null,
+					'active'   => null,
+					'disabled' => null,
+				),
 			),
 		);
 		$schema['styles']['blocks']                       = $schema_styles_blocks;
@@ -1760,11 +1778,22 @@ class WP_Theme_JSON_Gutenberg {
 			$name = static::normalize_css_class_name( $css_class['name'] ?? '' );
 			$css  = isset( $css_class['css'] ) && is_string( $css_class['css'] ) ? trim( $css_class['css'] ) : '';
 
-			if ( ! $name || ! $css || ! static::is_valid_css_class_name( $name ) || ! static::is_valid_css_declaration_block( $css ) ) {
+			if ( ! $name || ! static::is_valid_css_class_name( $name ) ) {
 				continue;
 			}
 
-			$stylesheet .= '.' . $name . '{' . $css . '}';
+			if ( '' !== $css && static::is_valid_css_declaration_block( $css ) ) {
+				$stylesheet .= '.' . $name . '{' . $css . '}';
+			}
+
+			$states = isset( $css_class['states'] ) && is_array( $css_class['states'] ) ? $css_class['states'] : array();
+			foreach ( static::CSS_CLASS_PSEUDO_SELECTORS as $state => $pseudo_selector ) {
+				$state_css = isset( $states[ $state ] ) && is_string( $states[ $state ] ) ? trim( $states[ $state ] ) : '';
+				if ( '' === $state_css || ! static::is_valid_css_declaration_block( $state_css ) ) {
+					continue;
+				}
+				$stylesheet .= '.' . $name . $pseudo_selector . '{' . $state_css . '}';
+			}
 		}
 
 		return $stylesheet;
@@ -1790,14 +1819,43 @@ class WP_Theme_JSON_Gutenberg {
 			$name = static::normalize_css_class_name( $css_class['name'] ?? '' );
 			$css  = isset( $css_class['css'] ) && is_string( $css_class['css'] ) ? trim( $css_class['css'] ) : '';
 
-			if ( ! $name || ! $css || ! static::is_valid_css_class_name( $name ) || ! static::is_valid_css_declaration_block( $css ) ) {
+			if ( ! $name || ! static::is_valid_css_class_name( $name ) ) {
 				continue;
 			}
 
-			$sanitized[] = array(
+			if ( '' !== $css && ! static::is_valid_css_declaration_block( $css ) ) {
+				continue;
+			}
+
+			$states            = isset( $css_class['states'] ) && is_array( $css_class['states'] ) ? $css_class['states'] : array();
+			$sanitized_states  = array();
+			$has_invalid_state = false;
+			foreach ( array_keys( static::CSS_CLASS_PSEUDO_SELECTORS ) as $state ) {
+				$state_css = isset( $states[ $state ] ) && is_string( $states[ $state ] ) ? trim( $states[ $state ] ) : '';
+				if ( '' === $state_css ) {
+					continue;
+				}
+				if ( ! static::is_valid_css_declaration_block( $state_css ) ) {
+					$has_invalid_state = true;
+					break;
+				}
+				$sanitized_states[ $state ] = $state_css;
+			}
+
+			if ( $has_invalid_state || ( '' === $css && empty( $sanitized_states ) ) ) {
+				continue;
+			}
+
+			$sanitized_css_class = array(
 				'name' => $name,
 				'css'  => $css,
 			);
+
+			if ( ! empty( $sanitized_states ) ) {
+				$sanitized_css_class['states'] = $sanitized_states;
+			}
+
+			$sanitized[] = $sanitized_css_class;
 		}
 
 		return $sanitized;

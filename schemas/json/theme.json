@@ -2712,6 +2712,29 @@
 									"css": {
 										"description": "CSS declarations for the class, without wrapping curly braces.",
 										"type": "string"
+									},
+									"states": {
+										"description": "CSS declarations for class pseudo-states, without wrapping curly braces.",
+										"type": "object",
+										"properties": {
+											"hover": {
+												"description": "CSS declarations for the hover state, without wrapping curly braces.",
+												"type": "string"
+											},
+											"focus": {
+												"description": "CSS declarations for the focus state, without wrapping curly braces.",
+												"type": "string"
+											},
+											"active": {
+												"description": "CSS declarations for the active state, without wrapping curly braces.",
+												"type": "string"
+											},
+											"disabled": {
+												"description": "CSS declarations for the disabled state, without wrapping curly braces.",
+												"type": "string"
+											}
+										},
+										"additionalProperties": false
 									}
 								},
 								"required": [ "name", "css" ],

@@ -24,7 +24,7 @@ import {
 	type Field,
 	type View,
 } from '@wordpress/dataviews';
-import { Stack, Text } from '@wordpress/ui';
+import { Stack, Tabs, Text } from '@wordpress/ui';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -53,6 +53,42 @@ import {
 const { getCSSDeclarationBlockValidationError } = unlock(
 	blockEditorPrivateApis
 );
+
+type CSSClassStateKey = 'default' | 'hover' | 'focus' | 'active' | 'disabled';
+type CSSClassStateValues = Record< CSSClassStateKey, string >;
+
+const CSS_CLASS_STATES: {
+	name: CSSClassStateKey;
+	label: string;
+}[] = [
+	{
+		name: 'default',
+		label: __( 'Default' ),
+	},
+	{
+		name: 'hover',
+		label: __( 'Hover' ),
+	},
+	{
+		name: 'focus',
+		label: __( 'Focus' ),
+	},
+	{
+		name: 'active',
+		label: __( 'Active' ),
+	},
+	{
+		name: 'disabled',
+		label: __( 'Disabled' ),
+	},
+];
+
+const CSS_CLASS_PSEUDO_STATES: Exclude< CSSClassStateKey, 'default' >[] = [
+	'hover',
+	'focus',
+	'active',
+	'disabled',
+];
 
 /*
  * TODO: North star: managed classes should behave like first-class design tokens
@@ -148,6 +184,40 @@ function getUsageCountText( usageCount: number ) {
 		_n( '%d use', '%d uses', usageCount ),
 		usageCount
 	);
+}
+
+function getCSSClassStateValues(
+	cssClass?: CSSClassDefinition
+): CSSClassStateValues {
+	return {
+		default: cssClass?.css ?? '',
+		hover: cssClass?.states?.hover ?? '',
+		focus: cssClass?.states?.focus ?? '',
+		active: cssClass?.states?.active ?? '',
+		disabled: cssClass?.states?.disabled ?? '',
+	};
+}
+
+function areCSSClassStateValuesEqual(
+	a: CSSClassStateValues,
+	b: CSSClassStateValues
+) {
+	return CSS_CLASS_STATES.every(
+		( state ) => a[ state.name ] === b[ state.name ]
+	);
+}
+
+function getCSSClassPseudoStates( cssByState: CSSClassStateValues ) {
+	const states: NonNullable< CSSClassDefinition[ 'states' ] > = {};
+
+	CSS_CLASS_PSEUDO_STATES.forEach( ( state ) => {
+		const css = cssByState[ state ].trim();
+		if ( css ) {
+			states[ state ] = css;
+		}
+	} );
+
+	return states;
 }
 
 function useCSSClassUsageCounts(
@@ -928,7 +998,11 @@ export function ScreenCSSClassEdit( {
 	const [ name, setName ] = useState(
 		isNew ? '' : existingClass?.name ?? originalName
 	);
-	const [ css, setCSS ] = useState( isNew ? '' : existingClass?.css ?? '' );
+	const [ activeState, setActiveState ] =
+		useState< CSSClassStateKey >( 'default' );
+	const [ cssByState, setCSSByState ] = useState< CSSClassStateValues >( () =>
+		getCSSClassStateValues( isNew ? undefined : existingClass )
+	);
 	const [ isDeleteConfirmOpen, setIsDeleteConfirmOpen ] = useState( false );
 	const [ isRenameConfirmOpen, setIsRenameConfirmOpen ] = useState( false );
 	const [ isSaving, setIsSaving ] = useState( false );
@@ -946,19 +1020,42 @@ export function ScreenCSSClassEdit( {
 		cssClasses,
 		isNew ? undefined : originalName
 	);
-	const cssError = getCSSDeclarationBlockValidationError( css );
+	const cssErrors = useMemo( () => {
+		const errors: Partial< Record< CSSClassStateKey, string > > = {};
+
+		CSS_CLASS_STATES.forEach( ( state ) => {
+			const css = cssByState[ state.name ];
+			const error = css.trim()
+				? getCSSDeclarationBlockValidationError( css )
+				: null;
+			if ( error ) {
+				errors[ state.name ] = error;
+			}
+		} );
+
+		return errors;
+	}, [ cssByState ] );
+	const cssErrorEntries = CSS_CLASS_STATES.filter(
+		( state ) => !! cssErrors[ state.name ]
+	);
+	const hasAnyCSS = CSS_CLASS_STATES.some( ( state ) =>
+		cssByState[ state.name ].trim()
+	);
 	const hasChanges =
 		normalizedName !== normalizeCSSClassName( existingClass?.name ) ||
-		css !== ( existingClass?.css ?? '' );
+		! areCSSClassStateValuesEqual(
+			cssByState,
+			getCSSClassStateValues( existingClass )
+		);
 	const isRename =
 		! isNew &&
 		!! normalizedName &&
 		normalizedName !== normalizeCSSClassName( originalName );
 	const canSave =
 		!! normalizedName &&
-		!! css.trim() &&
+		hasAnyCSS &&
 		! nameError &&
-		! cssError &&
+		cssErrorEntries.length === 0 &&
 		( isNew || hasChanges ) &&
 		! isSaving &&
 		canManageCssClasses;
@@ -972,10 +1069,14 @@ export function ScreenCSSClassEdit( {
 	);
 
 	function updateCSSClassDefinition() {
-		const nextCSSClass = {
+		const states = getCSSClassPseudoStates( cssByState );
+		const nextCSSClass: CSSClassDefinition = {
 			name: normalizedName,
-			css: css.trim(),
+			css: cssByState.default.trim(),
 		};
+		if ( Object.keys( states ?? {} ).length ) {
+			nextCSSClass.states = states;
+		}
 		const nextCSSClasses = isNew
 			? [ ...cssClasses, nextCSSClass ]
 			: getCSSClassesWithout( cssClasses, originalName ).concat(
@@ -1095,11 +1196,20 @@ export function ScreenCSSClassEdit( {
 							{ nameError }
 						</Notice>
 					) }
-					{ cssError && (
-						<Notice status="error" isDismissible={ false }>
-							{ cssError }
+					{ cssErrorEntries.map( ( state ) => (
+						<Notice
+							key={ state.name }
+							status="error"
+							isDismissible={ false }
+						>
+							{ sprintf(
+								/* translators: 1: CSS class state label. 2: Validation error message. */
+								__( '%1$s: %2$s' ),
+								state.label,
+								cssErrors[ state.name ] ?? ''
+							) }
 						</Notice>
-					) }
+					) ) }
 					{ saveError && (
 						<Notice status="error" isDismissible={ false }>
 							{ saveError.message ||
@@ -1122,16 +1232,50 @@ export function ScreenCSSClassEdit( {
 						autoComplete="off"
 						placeholder={ __( 'my-class' ) }
 					/>
-					<TextareaControl
-						label={ __( 'CSS' ) }
-						value={ css }
-						onChange={ setCSS }
-						spellCheck={ false }
-						disabled={ ! canManageCssClasses }
-						help={ __(
-							'Enter declarations without curly braces.'
-						) }
-					/>
+					<Tabs.Root
+						value={ activeState }
+						onValueChange={ ( state ) =>
+							setActiveState( state as CSSClassStateKey )
+						}
+					>
+						<Tabs.List>
+							{ CSS_CLASS_STATES.map( ( state ) => (
+								<Tabs.Tab
+									key={ state.name }
+									value={ state.name }
+								>
+									{ state.label }
+								</Tabs.Tab>
+							) ) }
+						</Tabs.List>
+						{ CSS_CLASS_STATES.map( ( state ) => (
+							<Tabs.Panel key={ state.name } value={ state.name }>
+								<TextareaControl
+									label={
+										state.name === 'default'
+											? __( 'CSS' )
+											: sprintf(
+													/* translators: %s: CSS class state label. */
+													__( '%s CSS' ),
+													state.label
+											  )
+									}
+									value={ cssByState[ state.name ] }
+									onChange={ ( css ) =>
+										setCSSByState( ( currentValue ) => ( {
+											...currentValue,
+											[ state.name ]: css,
+										} ) )
+									}
+									spellCheck={ false }
+									disabled={ ! canManageCssClasses }
+									help={ __(
+										'Enter declarations without curly braces.'
+									) }
+								/>
+							</Tabs.Panel>
+						) ) }
+					</Tabs.Root>
 					<Stack
 						direction="row"
 						justify="space-between"

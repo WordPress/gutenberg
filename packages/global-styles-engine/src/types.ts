@@ -318,6 +318,9 @@ export interface GlobalStylesStyles {
 export interface CSSClassDefinition {
 	name: string;
 	css: string;
+	states?: Partial<
+		Record< 'hover' | 'focus' | 'active' | 'disabled', string >
+	>;
 }
 
 /**

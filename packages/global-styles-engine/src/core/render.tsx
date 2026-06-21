@@ -2061,6 +2061,27 @@ export function isValidCSSDeclarationBlock( css: string ): boolean {
 	);
 }
 
+const CSS_CLASS_PSEUDO_SELECTORS = {
+	hover: ':hover',
+	focus: ':focus',
+	active: ':active',
+	disabled: ':disabled',
+} as const;
+
+function compileCSSClassRule(
+	name: string,
+	css: string | undefined,
+	pseudoSelector = ''
+) {
+	const trimmedCSS = css?.trim();
+
+	if ( ! trimmedCSS || ! isValidCSSDeclarationBlock( trimmedCSS ) ) {
+		return '';
+	}
+
+	return `.${ name }${ pseudoSelector }{${ trimmedCSS }}`;
+}
+
 /**
  * Compiles managed CSS class definitions into CSS rules.
  *
@@ -2077,18 +2098,26 @@ export function compileCSSClasses(
 	return cssClasses
 		.map( ( cssClass ) => {
 			const name = normalizeCSSClassName( cssClass?.name );
-			const css = cssClass?.css?.trim();
 
-			if (
-				! name ||
-				! css ||
-				! isValidCSSClassName( name ) ||
-				! isValidCSSDeclarationBlock( css )
-			) {
+			if ( ! name || ! isValidCSSClassName( name ) ) {
 				return '';
 			}
 
-			return `.${ name }{${ css }}`;
+			const stateRules = Object.entries( CSS_CLASS_PSEUDO_SELECTORS ).map(
+				( [ state, pseudoSelector ] ) =>
+					compileCSSClassRule(
+						name,
+						cssClass?.states?.[
+							state as keyof typeof CSS_CLASS_PSEUDO_SELECTORS
+						],
+						pseudoSelector
+					)
+			);
+
+			return [
+				compileCSSClassRule( name, cssClass?.css ),
+				...stateRules,
+			].join( '' );
 		} )
 		.join( '' );
 }

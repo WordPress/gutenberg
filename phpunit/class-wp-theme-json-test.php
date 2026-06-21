@@ -6408,8 +6408,12 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'styles'  => array(
 					'cssClasses' => array(
 						array(
-							'name' => 'featured-card',
-							'css'  => 'color:red;',
+							'name'   => 'featured-card',
+							'css'    => 'color:red;',
+							'states' => array(
+								'hover' => 'color:blue;',
+								'focus' => 'outline:2px solid currentColor;',
+							),
 						),
 						array(
 							'name' => '.lead-copy',
@@ -6421,7 +6425,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$custom_css = '.featured-card{color:red;}.lead-copy{font-weight:700;}.featured-card{color:purple;}';
+		$custom_css = '.featured-card{color:red;}.featured-card:hover{color:blue;}.featured-card:focus{outline:2px solid currentColor;}.lead-copy{font-weight:700;}.featured-card{color:purple;}';
 		$this->assertSame( $custom_css, $theme_json->get_stylesheet( array( 'custom-css' ) ) );
 	}
 
@@ -6576,8 +6580,11 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'css'        => 'body { color:purple; }',
 					'cssClasses' => array(
 						array(
-							'name' => 'featured-card',
-							'css'  => 'color:red;',
+							'name'   => 'featured-card',
+							'css'    => 'color:red;',
+							'states' => array(
+								'hover' => 'color:blue;',
+							),
 						),
 					),
 					'blocks'     => array(
@@ -6609,8 +6616,11 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						'css'        => 'body { color:purple; }',
 						'cssClasses' => array(
 							array(
-								'name' => 'featured-card',
-								'css'  => 'color:red;',
+								'name'   => 'featured-card',
+								'css'    => 'color:red;',
+								'states' => array(
+									'hover' => 'color:blue;',
+								),
 							),
 						),
 						'blocks'     => array(

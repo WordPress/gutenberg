@@ -829,8 +829,9 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 		}
 
 		foreach ( $css_classes as $css_class ) {
-			$name = is_array( $css_class ) ? ( $css_class['name'] ?? '' ) : '';
-			$css  = is_array( $css_class ) ? ( $css_class['css'] ?? '' ) : '';
+			$name   = is_array( $css_class ) ? ( $css_class['name'] ?? '' ) : '';
+			$css    = is_array( $css_class ) ? ( $css_class['css'] ?? '' ) : '';
+			$states = is_array( $css_class ) && isset( $css_class['states'] ) && is_array( $css_class['states'] ) ? $css_class['states'] : array();
 
 			if ( ! WP_Theme_JSON_Gutenberg::is_valid_css_class_name( $name ) ) {
 				return new WP_Error(
@@ -840,7 +841,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 				);
 			}
 
-			if ( ! WP_Theme_JSON_Gutenberg::is_valid_css_declaration_block( $css ) ) {
+			if ( '' !== $css && ! WP_Theme_JSON_Gutenberg::is_valid_css_declaration_block( $css ) ) {
 				return new WP_Error(
 					'rest_css_class_invalid_css',
 					__( 'CSS class rules must contain declarations without curly braces or markup.', 'gutenberg' ),
@@ -848,9 +849,50 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 				);
 			}
 
-			$css_validation_result = $this->validate_custom_css( '.test{' . $css . '}' );
-			if ( is_wp_error( $css_validation_result ) ) {
-				return $css_validation_result;
+			if ( '' !== $css ) {
+				$css_validation_result = $this->validate_custom_css( '.test{' . $css . '}' );
+				if ( is_wp_error( $css_validation_result ) ) {
+					return $css_validation_result;
+				}
+			}
+
+			$has_css = '' !== $css;
+			foreach ( $states as $state => $state_css ) {
+				if ( ! array_key_exists( $state, WP_Theme_JSON_Gutenberg::CSS_CLASS_PSEUDO_SELECTORS ) ) {
+					return new WP_Error(
+						'rest_css_class_invalid_state',
+						__( 'CSS class states must be one of hover, focus, active, or disabled.', 'gutenberg' ),
+						array( 'status' => 400 )
+					);
+				}
+
+				if ( ! is_string( $state_css ) || '' === trim( $state_css ) ) {
+					continue;
+				}
+
+				$has_css = true;
+				if ( ! WP_Theme_JSON_Gutenberg::is_valid_css_declaration_block( $state_css ) ) {
+					return new WP_Error(
+						'rest_css_class_invalid_css',
+						__( 'CSS class rules must contain declarations without curly braces or markup.', 'gutenberg' ),
+						array( 'status' => 400 )
+					);
+				}
+
+				$css_validation_result = $this->validate_custom_css(
+					'.test' . WP_Theme_JSON_Gutenberg::CSS_CLASS_PSEUDO_SELECTORS[ $state ] . '{' . $state_css . '}'
+				);
+				if ( is_wp_error( $css_validation_result ) ) {
+					return $css_validation_result;
+				}
+			}
+
+			if ( ! $has_css ) {
+				return new WP_Error(
+					'rest_css_class_empty_css',
+					__( 'CSS class rules must include declarations for at least one state.', 'gutenberg' ),
+					array( 'status' => 400 )
+				);
 			}
 		}
 
