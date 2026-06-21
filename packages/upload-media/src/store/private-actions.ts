@@ -1277,30 +1277,30 @@ export function generateThumbnails( id: QueueItemId ) {
 			} );
 		}
 
-		// Determine the EXIF orientation. The server reads it for JPEG/TIFF,
-		// but for AVIF/HEIF it reports 1 even when the file carries an EXIF
-		// orientation tag, and libvips only auto-rotates from a native `irot`
-		// transform, not from EXIF. Detect it on the client for those formats
-		// so the sub-sizes (which vips will not auto-rotate) and the rotated
-		// original are corrected.
+		// Determine the EXIF orientation. For JPEG/TIFF the server reads it and
+		// libvips auto-rotates the sub-sizes from EXIF. For AVIF/HEIF libheif/
+		// libvips only auto-rotate from a native `irot` transform, never from
+		// EXIF, so those sub-sizes must be rotated explicitly. Read the EXIF
+		// orientation on the client for those formats and treat it as the
+		// source of truth: `getUnappliedExifOrientation` returns 1 when an
+		// `irot` transform is present (already handled on decode), otherwise
+		// the EXIF orientation that nothing else applies.
 		// See https://github.com/WordPress/gutenberg/issues/79383.
 		let exifOrientation = attachment.exif_orientation || 1;
-		const serverReadOrientation = exifOrientation !== 1;
 		const sourceType = item.sourceFile.type;
-		if (
-			exifOrientation === 1 &&
-			( sourceType === 'image/avif' || sourceType === 'image/heif' )
-		) {
+		const isHeifFamily =
+			sourceType === 'image/avif' || sourceType === 'image/heif';
+
+		let needsClientRotation = false;
+		if ( isHeifFamily ) {
 			exifOrientation = getUnappliedExifOrientation(
 				await item.sourceFile.arrayBuffer()
 			);
+			// libvips will not auto-rotate these sub-sizes, so they must be
+			// generated from an explicitly rotated source rather than the
+			// original file.
+			needsClientRotation = exifOrientation !== 1;
 		}
-
-		// When orientation was detected on the client, libvips will not
-		// auto-rotate the sub-sizes, so they must be generated from an
-		// explicitly rotated source rather than the original file.
-		const needsClientRotation =
-			exifOrientation !== 1 && ! serverReadOrientation;
 
 		// Rotate the source once and reuse it for the sideloaded "original"
 		// (original_image metadata) and, for the client-rotation case, as the
