@@ -782,6 +782,7 @@ export default function ScreenCSSClasses( {
 			{
 				id: 'className',
 				label: __( 'Class' ),
+				type: 'text',
 				enableGlobalSearch: true,
 				getValue: ( { item } ) => `.${ item.className }`,
 				render: ( { item } ) => (
@@ -802,14 +803,11 @@ export default function ScreenCSSClasses( {
 						</Text>
 					</Stack>
 				),
-				sort: ( a, b, direction ) => {
-					const order = a.className.localeCompare( b.className );
-					return direction === 'asc' ? order : -order;
-				},
 			},
 			{
 				id: 'provenance',
 				label: __( 'Source' ),
+				type: 'text',
 				enableGlobalSearch: true,
 				getValue: ( { item } ) => item.provenance.join( ', ' ),
 				render: ( { item } ) => (
@@ -824,12 +822,6 @@ export default function ScreenCSSClasses( {
 						) }
 					</Text>
 				),
-				sort: ( a, b, direction ) => {
-					const order = a.provenance
-						.join( ', ' )
-						.localeCompare( b.provenance.join( ', ' ) );
-					return direction === 'asc' ? order : -order;
-				},
 			},
 			{
 				id: 'usageCount',
@@ -837,10 +829,6 @@ export default function ScreenCSSClasses( {
 				type: 'integer',
 				enableSorting: true,
 				getValue: ( { item } ) => item.usageCount,
-				sort: ( a, b, direction ) => {
-					const order = a.usageCount - b.usageCount;
-					return direction === 'asc' ? order : -order;
-				},
 			},
 		],
 		[]

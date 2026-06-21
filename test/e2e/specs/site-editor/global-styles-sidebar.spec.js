@@ -170,6 +170,39 @@ test.describe( 'Global styles sidebar', () => {
 		).toBeVisible();
 	} );
 
+	test( 'should open the CSS classes screen with multiple managed classes', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		await updateGlobalStyles( requestUtils, {
+			cssClasses: [
+				{
+					name: 'feature-card',
+					css: 'color: rgb(255, 0, 0);',
+				},
+				{
+					name: 'layout-card',
+					css: 'color: rgb(0, 0, 255);',
+				},
+			],
+		} );
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//index',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
+
+		await openCSSClassesPanel( page );
+
+		await expect(
+			page.getByRole( 'button', { name: '.feature-card' } )
+		).toBeVisible();
+		await expect(
+			page.getByRole( 'button', { name: '.layout-card' } )
+		).toBeVisible();
+	} );
+
 	test( 'should edit CSS class pseudo-states', async ( { editor, page } ) => {
 		await editor.insertBlock( {
 			name: 'core/paragraph',
