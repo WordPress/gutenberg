@@ -418,20 +418,17 @@ function getClassProvenance(
 
 function getCSSClassIssues(
 	userCSSClasses: CSSClassDefinition[],
-	baseCSSClasses: CSSClassDefinition[],
-	usedClassNames: string[]
+	baseCSSClasses: CSSClassDefinition[]
 ): CSSClassIssue[] {
 	const userClassNames = getNormalizedClassNameSet( userCSSClasses );
 	const baseClassNames = getNormalizedClassNameSet( baseCSSClasses );
-	const usedClassNameSet = new Set( usedClassNames );
-	const allKnownClassNames = new Set( [
+	const managedClassNames = new Set( [
 		...userClassNames,
 		...baseClassNames,
-		...usedClassNameSet,
 	] );
 	const issues: CSSClassIssue[] = [];
 
-	[ ...allKnownClassNames ].forEach( ( className ) => {
+	[ ...managedClassNames ].forEach( ( className ) => {
 		if ( ! isValidCSSClassName( className ) ) {
 			issues.push( {
 				className,
@@ -469,24 +466,6 @@ function getCSSClassIssues(
 					/* translators: %s: CSS class name. */
 					__(
 						'".%s" is defined by both user global styles and theme global styles.'
-					),
-					className
-				),
-			} );
-		}
-
-		if (
-			usedClassNameSet.has( className ) &&
-			! userClassNames.has( className ) &&
-			! baseClassNames.has( className )
-		) {
-			issues.push( {
-				className,
-				status: 'info',
-				message: sprintf(
-					/* translators: %s: CSS class name. */
-					__(
-						'".%s" is used in content but is not managed by global styles.'
 					),
 					className
 				),
@@ -549,13 +528,8 @@ export default function ScreenCSSClasses( {
 		[ usageData.classNames ]
 	);
 	const cssClassIssues = useMemo(
-		() =>
-			getCSSClassIssues(
-				cssClasses,
-				baseCSSClasses,
-				usageData.classNames
-			),
-		[ baseCSSClasses, cssClasses, usageData.classNames ]
+		() => getCSSClassIssues( cssClasses, baseCSSClasses ),
+		[ baseCSSClasses, cssClasses ]
 	);
 
 	return (

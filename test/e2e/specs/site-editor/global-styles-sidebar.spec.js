@@ -261,7 +261,7 @@ test.describe( 'Global styles sidebar', () => {
 		).toBeVisible();
 	} );
 
-	test( 'should show CSS class conflict and provenance hints', async ( {
+	test( 'should show CSS class conflicts only for managed classes', async ( {
 		admin,
 		page,
 		requestUtils,
@@ -304,7 +304,7 @@ test.describe( 'Global styles sidebar', () => {
 			settingsPanel.getByText(
 				'".raw-card" is used in content but is not managed by global styles.'
 			)
-		).toBeVisible();
+		).toHaveCount( 0 );
 		await expect(
 			settingsPanel.getByText( 'Defined by user global styles.' )
 		).toBeVisible();
