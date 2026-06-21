@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { parse } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -31,6 +32,54 @@ const postTypesWithoutParentTemplate = [
 
 const authorizedPostTypes = [ 'page', 'post' ];
 
+function getBlockAtPath( blocks, blockPath ) {
+	if ( ! Array.isArray( blockPath ) || ! blockPath.length ) {
+		return;
+	}
+
+	let blockList = blocks;
+	let block;
+
+	for ( const index of blockPath ) {
+		block = blockList?.[ index ];
+		if ( ! block ) {
+			return;
+		}
+		blockList = block.innerBlocks;
+	}
+
+	return block;
+}
+
+function getContentString( record ) {
+	if ( typeof record?.content === 'string' ) {
+		return record.content;
+	}
+
+	if ( typeof record?.content?.raw === 'string' ) {
+		return record.content.raw;
+	}
+
+	return '';
+}
+
+function getSelectedBlockPath( selectedBlockPath ) {
+	const value = Array.isArray( selectedBlockPath )
+		? selectedBlockPath[ 0 ]
+		: selectedBlockPath;
+
+	if ( typeof value !== 'string' ) {
+		return;
+	}
+
+	const blockPath = value.split( '.' ).map( ( index ) => Number( index ) );
+	return blockPath.every(
+		( index ) => Number.isInteger( index ) && index >= 0
+	)
+		? blockPath
+		: undefined;
+}
+
 function getPostType( name ) {
 	let postType;
 	if ( name === 'navigation-item' ) {
@@ -54,12 +103,13 @@ function getPostType( name ) {
 
 export function useResolveEditedEntity() {
 	const { editEntityRecord } = useDispatch( coreDataStore );
-	const { hasEntityRecord } = useSelect( coreDataStore );
+	const { getEditedEntityRecord, hasEntityRecord } =
+		useSelect( coreDataStore );
 	const { name, params = {}, query } = useLocation();
 	const { postId = query?.postId } = params; // Fallback to query param for postId for list view routes.
 	const postType = getPostType( name, postId ) ?? query?.postType;
-	// Extract selectedBlock from URL for selection restoration on navigation back.
-	const { selectedBlock } = query;
+	// Extract selectedBlock from URL for selection restoration on navigation.
+	const { selectedBlock, selectedBlockPath } = query;
 
 	// Track which selection we've applied to avoid re-applying the same one,
 	// but allow applying a new one if the URL changes.
@@ -152,36 +202,65 @@ export function useResolveEditedEntity() {
 	// This ensures the selection is available when blocks are reset.
 	// When editing a page with a template, EditorProvider reads selection from
 	// the page entity (context), not the template entity.
-	if (
-		selectedBlock &&
-		entity.isReady &&
-		appliedSelectionRef.current !== selectedBlock
-	) {
+	if ( ( selectedBlock || selectedBlockPath ) && entity.isReady ) {
 		const selectionPostType = entity.context?.postId
 			? entity.context.postType
 			: entity.postType;
 		const selectionPostId = entity.context?.postId
 			? entity.context.postId
 			: entity.postId;
+		const selectionKey = [
+			selectionPostType,
+			selectionPostId,
+			selectedBlock || '',
+			selectedBlockPath || '',
+		].join( ':' );
 
 		// Only apply selection if the entity record is loaded,
 		// otherwise editEntityRecord will throw.
 		if (
+			appliedSelectionRef.current !== selectionKey &&
 			hasEntityRecord( 'postType', selectionPostType, selectionPostId )
 		) {
-			editEntityRecord(
-				'postType',
-				selectionPostType,
-				selectionPostId,
-				{
-					selection: {
-						selectionStart: { clientId: selectedBlock },
-						selectionEnd: { clientId: selectedBlock },
-					},
+			const edits = {
+				selection: {
+					selectionStart: { clientId: selectedBlock },
+					selectionEnd: { clientId: selectedBlock },
 				},
-				{ undoIgnore: true }
-			);
-			appliedSelectionRef.current = selectedBlock;
+			};
+
+			if ( ! selectedBlock ) {
+				const record = getEditedEntityRecord(
+					'postType',
+					selectionPostType,
+					selectionPostId
+				);
+				const blockPath = getSelectedBlockPath( selectedBlockPath );
+				const blocks =
+					record?.blocks ?? parse( getContentString( record ) );
+				const block = getBlockAtPath( blocks, blockPath );
+
+				if ( block?.clientId ) {
+					if ( ! record?.blocks ) {
+						edits.blocks = blocks;
+					}
+					edits.selection = {
+						selectionStart: { clientId: block.clientId },
+						selectionEnd: { clientId: block.clientId },
+					};
+				}
+			}
+
+			if ( edits.selection.selectionStart.clientId ) {
+				editEntityRecord(
+					'postType',
+					selectionPostType,
+					selectionPostId,
+					edits,
+					{ undoIgnore: true }
+				);
+				appliedSelectionRef.current = selectionKey;
+			}
 		}
 	}
 

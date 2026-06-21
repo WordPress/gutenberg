@@ -172,20 +172,24 @@ export default function GlobalStylesUIWrapper( {
 		},
 		[ contentBlocks, updateBlockAttributes ]
 	);
-	const onNavigateToEntity = ( entity ) => {
-		if (
-			! settings?.onNavigateToEntityRecord ||
-			! entity.id ||
-			! entity.type
-		) {
-			return;
-		}
+	const onNavigateToEntity = useCallback(
+		( entity ) => {
+			if (
+				! settings?.onNavigateToEntityRecord ||
+				! entity.id ||
+				! entity.type
+			) {
+				return;
+			}
 
-		settings.onNavigateToEntityRecord( {
-			postId: entity.id,
-			postType: entity.type,
-		} );
-	};
+			settings.onNavigateToEntityRecord( {
+				postId: entity.id,
+				postType: entity.type,
+				selectedBlockPath: entity.blockPath,
+			} );
+		},
+		[ settings?.onNavigateToEntityRecord ]
+	);
 
 	// Show loading state while data is being fetched
 	if ( ! isReady ) {

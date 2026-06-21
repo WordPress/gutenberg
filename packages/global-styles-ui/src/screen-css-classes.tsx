@@ -114,6 +114,7 @@ interface ScreenCSSClassEditProps {
 interface CSSClassUsageEntity {
 	id?: string | number;
 	type?: string;
+	blockPath?: number[];
 }
 
 interface CSSClassIssue {
@@ -1117,6 +1118,7 @@ export function ScreenCSSClassUsages( {
 												onNavigateToEntity?.( {
 													id: usage.entityId,
 													type: usage.entityType,
+													blockPath: usage.blockPath,
 												} )
 											}
 										>

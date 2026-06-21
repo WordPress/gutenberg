@@ -96,6 +96,10 @@ export default function useNavigateToEntityRecord() {
 			if ( isValidRequestedViewport ) {
 				queryArgs.viewport = requestedViewport;
 			}
+			if ( Array.isArray( params.selectedBlockPath ) ) {
+				queryArgs.selectedBlockPath =
+					params.selectedBlockPath.join( '.' );
+			}
 			const url = addQueryArgs(
 				`/${ params.postType }/${ params.postId }`,
 				queryArgs

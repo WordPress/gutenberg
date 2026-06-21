@@ -128,6 +128,7 @@ interface GlobalStylesUIProps {
 	onNavigateToEntity?: ( entity: {
 		id?: string | number;
 		type?: string;
+		blockPath?: number[];
 	} ) => void;
 	/** Callback to rename a CSS class in the current editor canvas. */
 	onRenameContentClassName?: ( oldName: string, newName: string ) => void;

@@ -254,11 +254,21 @@ test.describe( 'Global styles sidebar', () => {
 
 		await page
 			.getByRole( 'button', { name: /Usage page one/ } )
-			.first()
+			.nth( 1 )
 			.click();
 		await expect(
-			editor.canvas.getByText( 'First page first usage' )
+			editor.canvas.getByText( 'First page second usage' )
 		).toBeVisible();
+		await expect
+			.poll( async () =>
+				page.evaluate(
+					() =>
+						window.wp.data
+							.select( 'core/block-editor' )
+							.getSelectedBlock()?.attributes?.content
+				)
+			)
+			.toBe( 'First page second usage' );
 	} );
 
 	test( 'should show CSS class conflicts only for managed classes', async ( {

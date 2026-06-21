@@ -114,11 +114,17 @@ function gutenberg_get_css_class_usage_post_entity( WP_Post $post ): array {
  * @param array $path    Current block path.
  */
 function gutenberg_collect_css_class_usages_from_blocks( array $blocks, array $entity, array &$usages, array $path = array() ): void {
-	foreach ( $blocks as $index => $block ) {
-		$block_path  = array_merge( $path, array( $index ) );
-		$block_name  = isset( $block['blockName'] ) && is_string( $block['blockName'] ) ? $block['blockName'] : '';
+	$block_index = 0;
+	foreach ( $blocks as $block ) {
+		$block_name = isset( $block['blockName'] ) && is_string( $block['blockName'] ) ? $block['blockName'] : '';
+		if ( '' === $block_name ) {
+			continue;
+		}
+
+		$block_path  = array_merge( $path, array( $block_index ) );
 		$class_name  = isset( $block['attrs']['className'] ) && is_string( $block['attrs']['className'] ) ? $block['attrs']['className'] : '';
 		$class_names = preg_split( '/\s+/', $class_name, -1, PREG_SPLIT_NO_EMPTY );
+		++$block_index;
 
 		foreach ( $class_names as $name ) {
 			$normalized_name = gutenberg_normalize_managed_css_class_name( $name );
