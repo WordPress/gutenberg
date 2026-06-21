@@ -365,4 +365,84 @@ test.describe( 'Global styles sidebar', () => {
 			)
 			.toBe( 'featured-card handmade-card' );
 	} );
+
+	test( 'should browse managed, document, and site CSS classes from block Advanced settings', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		await updateGlobalStyles( requestUtils, {
+			cssClasses: [
+				{
+					name: 'managed-card',
+					css: 'color: rgb(255, 0, 0);',
+				},
+			],
+		} );
+		await requestUtils.createPage( {
+			title: 'Elsewhere class usage',
+			content: `<!-- wp:paragraph {"className":"elsewhere-card"} -->
+<p class="elsewhere-card">Elsewhere class paragraph</p>
+<!-- /wp:paragraph -->`,
+			status: 'publish',
+		} );
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//index',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
+
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'Document class source',
+				className: 'current-card',
+			},
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Class browser target' },
+		} );
+
+		const settingsPanel = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await editor.openDocumentSettingsSidebar();
+		await settingsPanel.getByRole( 'button', { name: 'Advanced' } ).click();
+		await settingsPanel
+			.getByRole( 'button', { name: 'Browse existing classes' } )
+			.click();
+
+		await expect(
+			settingsPanel.getByText( 'Managed classes' )
+		).toBeVisible();
+		await expect(
+			settingsPanel.getByText( 'Used in this document' )
+		).toBeVisible();
+		await expect(
+			settingsPanel.getByText( 'Used elsewhere on this site' )
+		).toBeVisible();
+
+		await settingsPanel
+			.getByRole( 'button', { name: '.managed-card' } )
+			.click();
+		await settingsPanel
+			.getByRole( 'button', { name: '.current-card' } )
+			.click();
+		await settingsPanel
+			.getByRole( 'button', { name: '.elsewhere-card' } )
+			.click();
+
+		await expect
+			.poll( async () =>
+				page.evaluate(
+					() =>
+						window.wp.data
+							.select( 'core/block-editor' )
+							.getSelectedBlock().attributes.className
+				)
+			)
+			.toBe( 'managed-card current-card elsewhere-card' );
+	} );
 } );

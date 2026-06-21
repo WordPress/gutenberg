@@ -7,10 +7,10 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import { FormTokenField } from '@wordpress/components';
+import { Button, FormTokenField } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { hasBlockSupport } from '@wordpress/blocks';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { normalizeCSSClassName } from '@wordpress/global-styles-engine';
 
@@ -64,18 +64,97 @@ function normalizeClassNameTokens( classNames ) {
 		);
 }
 
+function getBlockTreeClassNames( blocks = [] ) {
+	return normalizeClassNameTokens(
+		blocks.flatMap( ( block ) => [
+			block.attributes?.className ?? '',
+			...getBlockTreeClassNames( block.innerBlocks ),
+		] )
+	);
+}
+
+function getClassNamesDifference( classNames, excludedClassNames ) {
+	const excluded = new Set( excludedClassNames );
+	return classNames.filter(
+		( nextClassName ) => ! excluded.has( nextClassName )
+	);
+}
+
+function ClassNameBrowserGroup( { title, classNames, onSelect } ) {
+	if ( ! classNames.length ) {
+		return null;
+	}
+
+	return (
+		<div className="block-editor-hooks__custom-class-name-group">
+			<strong>{ title }</strong>
+			<div className="block-editor-hooks__custom-class-name-list">
+				{ classNames.map( ( nextClassName ) => (
+					<Button
+						key={ nextClassName }
+						__next40pxDefaultSize
+						size="compact"
+						variant="tertiary"
+						onClick={ () => onSelect( nextClassName ) }
+					>
+						{ `.${ nextClassName }` }
+					</Button>
+				) ) }
+			</div>
+		</div>
+	);
+}
+
 function CustomClassNameControlsPure( { className, setAttributes } ) {
 	const blockEditingMode = useBlockEditingMode();
-	const managedCssClasses = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getSettings()
-				.__experimentalManagedCssClasses ?? [],
-		[]
+	const [ isClassBrowserOpen, setIsClassBrowserOpen ] = useState( false );
+	const { currentDocumentCssClasses, managedCssClasses, siteCssClasses } =
+		useSelect( ( select ) => {
+			const { getBlocks, getSettings } = select( blockEditorStore );
+			const settings = getSettings();
+
+			return {
+				currentDocumentCssClasses: getBlockTreeClassNames(
+					getBlocks()
+				),
+				managedCssClasses:
+					settings.__experimentalManagedCssClasses ?? [],
+				siteCssClasses: settings.__experimentalSiteCssClasses ?? [],
+			};
+		}, [] );
+	const currentTokens = useMemo(
+		() => getClassNameTokens( className ),
+		[ className ]
 	);
 	const suggestions = useMemo(
 		() => normalizeClassNameTokens( managedCssClasses ),
 		[ managedCssClasses ]
 	);
+	const currentDocumentSuggestions = useMemo(
+		() =>
+			getClassNamesDifference( currentDocumentCssClasses, currentTokens ),
+		[ currentDocumentCssClasses, currentTokens ]
+	);
+	const siteSuggestions = useMemo(
+		() =>
+			getClassNamesDifference( siteCssClasses, [
+				...currentTokens,
+				...currentDocumentCssClasses,
+			] ),
+		[ currentDocumentCssClasses, currentTokens, siteCssClasses ]
+	);
+
+	function setClassNames( nextClassNames ) {
+		const classNames = normalizeClassNameTokens( nextClassNames );
+		setAttributes( {
+			className: classNames.length ? classNames.join( ' ' ) : undefined,
+		} );
+	}
+
+	function addClassName( nextClassName ) {
+		setClassNames( [ ...currentTokens, nextClassName ] );
+	}
+
 	if ( blockEditingMode !== 'default' ) {
 		return null;
 	}
@@ -85,19 +164,44 @@ function CustomClassNameControlsPure( { className, setAttributes } ) {
 			<FormTokenField
 				__next40pxDefaultSize
 				label={ __( 'Additional CSS class(es)' ) }
-				value={ getClassNameTokens( className ) }
+				value={ currentTokens }
 				suggestions={ suggestions }
 				tokenizeOnSpace
-				onChange={ ( nextValue ) => {
-					const classNames = normalizeClassNameTokens( nextValue );
-					setAttributes( {
-						className: classNames.length
-							? classNames.join( ' ' )
-							: undefined,
-					} );
-				} }
+				onChange={ setClassNames }
 				help={ __( 'Separate multiple classes with spaces.' ) }
 			/>
+			<Button
+				__next40pxDefaultSize
+				variant="tertiary"
+				onClick={ () =>
+					setIsClassBrowserOpen( ( isOpen ) => ! isOpen )
+				}
+				aria-expanded={ isClassBrowserOpen }
+			>
+				{ __( 'Browse existing classes' ) }
+			</Button>
+			{ isClassBrowserOpen && (
+				<div className="block-editor-hooks__custom-class-name-browser">
+					<ClassNameBrowserGroup
+						title={ __( 'Managed classes' ) }
+						classNames={ getClassNamesDifference(
+							suggestions,
+							currentTokens
+						) }
+						onSelect={ addClassName }
+					/>
+					<ClassNameBrowserGroup
+						title={ __( 'Used in this document' ) }
+						classNames={ currentDocumentSuggestions }
+						onSelect={ addClassName }
+					/>
+					<ClassNameBrowserGroup
+						title={ __( 'Used elsewhere on this site' ) }
+						classNames={ siteSuggestions }
+						onSelect={ addClassName }
+					/>
+				</div>
+			) }
 		</InspectorControls>
 	);
 }

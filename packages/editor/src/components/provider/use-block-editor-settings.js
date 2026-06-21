@@ -1,8 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useCallback } from '@wordpress/element';
+import { useMemo, useCallback, useEffect, useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
+import apiFetch from '@wordpress/api-fetch';
 import {
 	store as coreStore,
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
@@ -36,6 +37,7 @@ import { useGlobalStyles } from '../global-styles';
 const { store: mediaEditorStore } = unlock( mediaEditorPrivateApis );
 
 const EMPTY_OBJECT = {};
+const EMPTY_ARRAY = [];
 
 function __experimentalReusableBlocksSelect( select ) {
 	const { RECEIVE_INTERMEDIATE_RESULTS } = unlock( coreDataPrivateApis );
@@ -48,6 +50,40 @@ function __experimentalReusableBlocksSelect( select ) {
 
 function __experimentalUserPatternCategoriesSelect( select ) {
 	return select( coreStore ).getUserPatternCategories();
+}
+
+function useSiteCSSClassNames() {
+	const [ classNames, setClassNames ] = useState( EMPTY_ARRAY );
+
+	useEffect( () => {
+		let isMounted = true;
+
+		apiFetch( { path: '/wp/v2/css-class-usages' } )
+			.then( ( response ) => {
+				if ( ! isMounted ) {
+					return;
+				}
+
+				setClassNames(
+					Array.isArray( response?.classNames )
+						? response.classNames
+								.map( normalizeCSSClassName )
+								.filter( Boolean )
+						: EMPTY_ARRAY
+				);
+			} )
+			.catch( () => {
+				if ( isMounted ) {
+					setClassNames( EMPTY_ARRAY );
+				}
+			} );
+
+		return () => {
+			isMounted = false;
+		};
+	}, [] );
+
+	return classNames;
 }
 
 const BLOCK_EDITOR_SETTINGS = [
@@ -241,6 +277,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	const { merged: mergedGlobalStyles } = useGlobalStyles();
 	const globalStylesData = mergedGlobalStyles.styles ?? EMPTY_OBJECT;
 	const globalStylesLinksData = mergedGlobalStyles._links ?? EMPTY_OBJECT;
+	const siteCssClasses = useSiteCSSClassNames();
 	const managedCssClasses = useMemo( () => {
 		const cssClasses = mergedGlobalStyles.styles?.cssClasses;
 		if ( ! Array.isArray( cssClasses ) ) {
@@ -344,6 +381,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			[ globalStylesDataKey ]: globalStylesData,
 			[ globalStylesLinksDataKey ]: globalStylesLinksData,
 			__experimentalManagedCssClasses: managedCssClasses,
+			__experimentalSiteCssClasses: siteCssClasses,
 			allImageSizes,
 			bigImageSizeThreshold,
 			allowedBlockTypes,
@@ -461,6 +499,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		globalStylesData,
 		globalStylesLinksData,
 		managedCssClasses,
+		siteCssClasses,
 		renderingMode,
 		editMediaEntity,
 		openMediaEditorModal,
