@@ -52,6 +52,11 @@ export interface QueueItem {
 	abortController?: AbortController;
 	parentId?: QueueItemId;
 	subSizes?: SubSizeData[];
+	// Durable marker written into block attributes so a resumed upload can be
+	// re-linked to its block after a reload. Distinct from `id` (regenerated).
+	uploadId?: string;
+	// Post the upload belongs to, persisted for the resume summary notice.
+	postId?: number;
 }
 
 export interface State {
@@ -81,6 +86,8 @@ export enum Type {
 	UpdateProgress = 'UPDATE_PROGRESS',
 	AccumulateSubSize = 'ACCUMULATE_SUB_SIZE',
 	UpdateSettings = 'UPDATE_SETTINGS',
+	LoadPersisted = 'LOAD_PERSISTED',
+	RegisterCallbacks = 'REGISTER_CALLBACKS',
 }
 
 type Action< T = Type, Payload = Record< string, unknown > > = {
@@ -148,6 +155,53 @@ export type AccumulateSubSizeAction = Action<
 export type UpdateSettingsAction = Action<
 	Type.UpdateSettings,
 	{ settings: Partial< Settings > }
+>;
+
+/**
+ * The serializable subset of a QueueItem stored in IndexedDB.
+ *
+ * File/Blob members are structured-cloneable, so IndexedDB copies their bytes
+ * and they survive a reload. Non-serializable members (abortController, the
+ * on* callbacks, retry timers) are intentionally omitted and reconstructed on
+ * rehydrate.
+ */
+export interface PersistedQueueItem {
+	id: QueueItemId;
+	uploadId?: string;
+	postId?: number;
+	batchId?: string;
+	parentId?: QueueItemId;
+	file: File;
+	sourceFile: File;
+	originalHeicFile?: File;
+	poster?: File;
+	operations?: Operation[];
+	currentOperation?: OperationType;
+	status: ItemStatus;
+	attachment?: Partial< Attachment >;
+	subSizes?: SubSizeData[];
+	additionalData: AdditionalData;
+	retryCount?: number;
+	nextRetryTimestamp?: number;
+	progress?: number;
+	sourceUrl?: string;
+	sourceAttachmentId?: number;
+	// Wall-clock time the record was written, for stale pruning.
+	persistedAt: number;
+}
+
+export type LoadPersistedAction = Action<
+	Type.LoadPersisted,
+	{ items: QueueItem[] }
+>;
+export type RegisterCallbacksAction = Action<
+	Type.RegisterCallbacks,
+	{
+		id: QueueItemId;
+		onChange?: OnChangeHandler;
+		onSuccess?: OnSuccessHandler;
+		onError?: OnErrorHandler;
+	}
 >;
 
 interface UploadMediaArgs {
@@ -223,6 +277,9 @@ export interface Settings {
 	) => Promise< Partial< Attachment > | void >;
 	// Retry settings for automatic retry on failure.
 	retry?: RetrySettings;
+	// Whether to persist the upload queue to durable storage (IndexedDB) so
+	// interrupted uploads can be resumed after a reload or crash. Default true.
+	durableQueue?: boolean;
 	// Function for deleting an attachment from the server. Used to clean up
 	// the parent attachment when client-side sub-size processing fails after
 	// the parent file has already been uploaded.
@@ -282,6 +339,9 @@ export enum ItemStatus {
 	PendingRetry = 'PENDING_RETRY',
 	Uploaded = 'UPLOADED',
 	Error = 'ERROR',
+	// Loaded from durable storage on editor mount, inert until the user
+	// chooses to resume.
+	PendingResume = 'PENDING_RESUME',
 }
 
 export enum OperationType {
