@@ -50,7 +50,7 @@ export function useViewConfig(
 	// on each call would re-trigger the REST request on every store change.
 	// Keying on the joined string also removes any need for callers to pass a
 	// referentially-stable `fields` array.
-	const fieldsKey = fields?.join( ',' );
+	const fieldsKey = fields ? [ ...fields ].sort().join( ',' ) : undefined;
 	const options = useMemo(
 		() => ( { fields } ),
 		// eslint-disable-next-line react-hooks/exhaustive-deps
