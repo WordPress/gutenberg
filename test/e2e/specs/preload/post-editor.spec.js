@@ -9,17 +9,17 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 const { recordRequests } = require( './record-requests' );
 
 /**
- * Returns the major Chromium version from the browser's user agent, or 0 if
- * not Chromium.
+ * Returns the major Chromium version, or 0 if the browser is not Chromium.
  *
- * @param {import('@playwright/test').Page} page Playwright page object.
- * @return {Promise<number>} Major Chromium version.
+ * @param {import('@playwright/test').Browser} browser Playwright browser object.
+ * @return {number} Major Chromium version.
  */
-async function getChromiumMajorVersion( page ) {
-	return page.evaluate( () => {
-		const match = window.navigator.userAgent.match( /Chrome\/(\d+)/ );
-		return match ? parseInt( match[ 1 ], 10 ) : 0;
-	} );
+function getChromiumMajorVersion( browser ) {
+	if ( browser.browserType().name() !== 'chromium' ) {
+		return 0;
+	}
+	const match = browser.version().match( /^(\d+)/ );
+	return match ? parseInt( match[ 1 ], 10 ) : 0;
 }
 
 test.describe( 'Preload', () => {
@@ -34,7 +34,7 @@ test.describe( 'Preload', () => {
 		postId = post.id;
 	} );
 
-	test.beforeEach( async ( { page } ) => {
+	test.beforeEach( async ( { browser } ) => {
 		// These editor-startup request assertions time out in CI starting
 		// with the Playwright upgrade to Chrome for Testing 148/149 (#78632).
 		// Chrome >= 148 is the first CI browser to support
@@ -46,7 +46,7 @@ test.describe( 'Preload', () => {
 		// browsers until the wait is reworked off `networkidle` or the cause
 		// is found. See https://github.com/WordPress/gutenberg/pull/78632.
 		test.skip(
-			( await getChromiumMajorVersion( page ) ) >= 148,
+			getChromiumMajorVersion( browser ) >= 148,
 			'Editor startup never reaches networkidle under cross-origin isolation on Chromium 148+'
 		);
 	} );

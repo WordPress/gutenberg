@@ -41,17 +41,17 @@ async function probeUltraHdrUrl( url ) {
  */
 
 /**
- * Returns the major Chromium version from the browser's user agent, or 0 if
- * not Chromium.
+ * Returns the major Chromium version, or 0 if the browser is not Chromium.
  *
- * @param {Page} page Playwright page object.
- * @return {Promise<number>} Major Chromium version.
+ * @param {import('@playwright/test').Browser} browser Playwright browser object.
+ * @return {number} Major Chromium version.
  */
-async function getChromiumMajorVersion( page ) {
-	return page.evaluate( () => {
-		const match = window.navigator.userAgent.match( /Chrome\/(\d+)/ );
-		return match ? parseInt( match[ 1 ], 10 ) : 0;
-	} );
+function getChromiumMajorVersion( browser ) {
+	if ( browser.browserType().name() !== 'chromium' ) {
+		return 0;
+	}
+	const match = browser.version().match( /^(\d+)/ );
+	return match ? parseInt( match[ 1 ], 10 ) : 0;
 }
 
 const ASSETS_DIR = path.join( __dirname, '..', '..', '..', 'assets' );
@@ -157,7 +157,9 @@ class MediaProcessingUtils {
 		// not a user-facing regression. Tracked in
 		// https://github.com/WordPress/gutenberg/issues/79377; remove this
 		// version gate once the worker decode path is hardened.
-		const chromiumVersion = await getChromiumMajorVersion( this.page );
+		const chromiumVersion = getChromiumMajorVersion(
+			this.page.context().browser()
+		);
 
 		testInstance.skip(
 			! isActive || chromiumVersion >= 148,
