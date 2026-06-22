@@ -17,7 +17,8 @@ if ( ! function_exists( 'wp_get_icon' ) ) {
 	 *     Optional. Arguments for the icon.
 	 *
 	 *     @type int|null $size  Width and height in pixels. Pass null to leave the
-	 *                           SVG's intrinsic dimensions untouched. Default 24.
+	 *                           SVG's intrinsic dimensions untouched. Non-numeric
+	 *                           values are ignored. Default 24.
 	 *     @type string   $class Additional CSS class names. Multiple classes may be
 	 *                           provided as a space-separated string.
 	 *     @type string   $label Accessible label. If provided, the SVG gets
