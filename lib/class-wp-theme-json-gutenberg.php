@@ -1301,6 +1301,10 @@ class WP_Theme_JSON_Gutenberg {
 		if ( ! str_contains( $selector, ',' ) ) {
 			return $to_prepend . $selector;
 		}
+		// Fast path: no parentheses means all commas are top-level separators.
+		if ( ! str_contains( $selector, '(' ) ) {
+			return $to_prepend . str_replace( ',', ',' . $to_prepend, $selector );
+		}
 		$new_selectors = array();
 		$selectors     = static::split_selector_list( $selector );
 		foreach ( $selectors as $sel ) {

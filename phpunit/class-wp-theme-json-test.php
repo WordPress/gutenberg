@@ -8221,6 +8221,31 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'to_prepend' => '.pre ',
 				'expected'   => '.pre .a ,.pre   .b ,.pre  .c',
 			),
+			'where with internal commas no top-level comma'            => array(
+				'selector'   => ':where(.a, .b)',
+				'to_prepend' => '.scope ',
+				'expected'   => '.scope :where(.a, .b)',
+			),
+			'where with internal commas and top-level comma'           => array(
+				'selector'   => ':where(.a, .b),.c',
+				'to_prepend' => '.scope ',
+				'expected'   => '.scope :where(.a, .b),.scope .c',
+			),
+			'is with internal commas and top-level comma'              => array(
+				'selector'   => ':is(.x, .y),.z',
+				'to_prepend' => '.wrapper ',
+				'expected'   => '.wrapper :is(.x, .y),.wrapper .z',
+			),
+			'multiple parenthesized selectors with top-level comma'    => array(
+				'selector'   => ':where(.a, .b),:is(.c, .d)',
+				'to_prepend' => '.scope ',
+				'expected'   => '.scope :where(.a, .b),.scope :is(.c, .d)',
+			),
+			'nested parentheses with commas'                           => array(
+				'selector'   => ':where(:not(.a, .b), .c),.d',
+				'to_prepend' => '.scope ',
+				'expected'   => '.scope :where(:not(.a, .b), .c),.scope .d',
+			),
 		);
 	}
 }
