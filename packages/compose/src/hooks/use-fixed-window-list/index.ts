@@ -12,49 +12,58 @@ import { debounce } from '../../utils/debounce';
 
 const DEFAULT_INIT_WINDOW_SIZE = 30;
 
-/**
- * @typedef {Object} WPFixedWindowList
- *
- * @property {number}                  visibleItems Items visible in the current viewport
- * @property {number}                  start        Start index of the window
- * @property {number}                  end          End index of the window
- * @property {(index:number)=>boolean} itemInView   Returns true if item is in the window
- */
+interface FixedWindowList {
+	/** Items visible in the current viewport */
+	visibleItems: number;
+	/** Start index of the window */
+	start: number;
+	/** End index of the window */
+	end: number;
+	/** Returns true if item is in the window */
+	itemInView: ( index: number ) => boolean;
+}
+
+interface FixedWindowListOptions {
+	/** Renders windowOverscan number of items before and after the calculated visible window. */
+	windowOverscan?: number;
+	/** When false avoids calculating the window size */
+	useWindowing?: boolean;
+	/** Initial window size to use on first render before we can calculate the window size. */
+	initWindowSize?: number;
+	/** Used to recalculate the window size when the expanded state of a list changes. */
+	expandedState?: any;
+}
 
 /**
- * @typedef {Object} WPFixedWindowListOptions
  *
- * @property {number}  [windowOverscan] Renders windowOverscan number of items before and after the calculated visible window.
- * @property {boolean} [useWindowing]   When false avoids calculating the window size
- * @property {number}  [initWindowSize] Initial window size to use on first render before we can calculate the window size.
- * @property {any}     [expandedState]  Used to recalculate the window size when the expanded state of a list changes.
- */
-
-/**
- *
- * @param {React.RefObject<HTMLElement>} elementRef Used to find the closest scroll container that contains element.
- * @param { number }                     itemHeight Fixed item height in pixels
- * @param { number }                     totalItems Total items in list
- * @param { WPFixedWindowListOptions }   [options]  Options object
- * @return {[ WPFixedWindowList, setFixedListWindow:(nextWindow:WPFixedWindowList)=>void]} Array with the fixed window list and setter
+ * @param elementRef Used to find the closest scroll container that contains element.
+ * @param itemHeight Fixed item height in pixels
+ * @param totalItems Total items in list
+ * @param [options]  Options object
+ * @return Array with the fixed window list and setter
  */
 export default function useFixedWindowList(
-	elementRef,
-	itemHeight,
-	totalItems,
-	options
-) {
+	elementRef: React.RefObject< HTMLElement >,
+	itemHeight: number,
+	totalItems: number,
+	options?: FixedWindowListOptions
+): [
+	FixedWindowList,
+	React.Dispatch< React.SetStateAction< FixedWindowList > >,
+] {
 	const initWindowSize = options?.initWindowSize ?? DEFAULT_INIT_WINDOW_SIZE;
 	const useWindowing = options?.useWindowing ?? true;
 
-	const [ fixedListWindow, setFixedListWindow ] = useState( {
-		visibleItems: initWindowSize,
-		start: 0,
-		end: initWindowSize,
-		itemInView: ( /** @type {number} */ index ) => {
-			return index >= 0 && index <= initWindowSize;
-		},
-	} );
+	const [ fixedListWindow, setFixedListWindow ] = useState< FixedWindowList >(
+		{
+			visibleItems: initWindowSize,
+			start: 0,
+			end: initWindowSize,
+			itemInView: ( index: number ) => {
+				return index >= 0 && index <= initWindowSize;
+			},
+		}
+	);
 
 	useLayoutEffect( () => {
 		if ( ! useWindowing ) {
@@ -67,7 +76,7 @@ export default function useFixedWindowList(
 		 * @param {boolean} [initRender] Indicates if this is the initial render
 		 * @return {void}
 		 */
-		const measureWindow = ( initRender ) => {
+		const measureWindow = ( initRender?: boolean ) => {
 			if ( ! scrollContainer ) {
 				return;
 			}
@@ -91,7 +100,7 @@ export default function useFixedWindowList(
 					visibleItems,
 					start,
 					end,
-					itemInView: ( /** @type {number} */ index ) => {
+					itemInView: ( index: number ) => {
 						return start <= index && index <= end;
 					},
 				};
@@ -144,7 +153,7 @@ export default function useFixedWindowList(
 			return;
 		}
 		const scrollContainer = getScrollContainer( elementRef.current );
-		const handleKeyDown = ( /** @type {KeyboardEvent} */ event ) => {
+		const handleKeyDown = ( event: KeyboardEvent ) => {
 			switch ( event.keyCode ) {
 				case HOME: {
 					return scrollContainer?.scrollTo( { top: 0 } );

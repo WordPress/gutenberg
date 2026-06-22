@@ -15,7 +15,7 @@ import '@wordpress/dataviews/build-style/style.css';
 import { DataForm, useFormValidity } from '@wordpress/dataviews';
 import type { Field, Form } from '@wordpress/dataviews';
 import { Suspense, useId, useMemo, useState } from '@wordpress/element';
-import { wordpress } from '@wordpress/icons';
+import { globe } from '@wordpress/icons';
 import { Card, Icon, Stack } from '@wordpress/ui';
 
 /**
@@ -116,7 +116,7 @@ const demoWidgetType: WidgetType< DemoAttributes > = {
 	name: 'demo/hello-world',
 	title: 'Hello World',
 	description: 'Minimal widget that greets worlds near and far.',
-	icon: wordpress,
+	icon: globe,
 	renderModule: 'demo/widgets/hello-world/render',
 	attributes: [
 		{
@@ -140,7 +140,7 @@ const demoWidgetType: WidgetType< DemoAttributes > = {
 	},
 };
 
-// What `import( widget.renderModule )` resolves to on a WordPress page.
+// What `import( widget.renderModule )` resolves to in a real host.
 const resolveDemoModule = async () => ( {
 	default: DemoWidget as ComponentType< WidgetRenderProps< unknown > >,
 } );
@@ -162,7 +162,7 @@ const meta: Meta< typeof WidgetRender > = {
 
 A host provides three things:
 
-- \`widgetType\`: the widget's metadata, as declared by its author. On a WordPress page it arrives through \`useWidgetTypes()\`.
+- \`widgetType\`: the widget's metadata, as declared by its author. In a host it arrives through \`useWidgetTypes()\`.
 - \`resolveWidgetModule\`: how the render component is loaded. Dynamic \`import()\` against an import map, eagerly enqueued script modules, or a custom resolver are all valid strategies.
 - \`setAttributes\` (optional): grants the widget write access to its own attributes. Omit it and the widget renders read-only.
 `,
