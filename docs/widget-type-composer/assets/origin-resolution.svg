@@ -1,0 +1,93 @@
+<svg viewBox="0 0 912 700" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Widget Type Composer origin resolution: built-in, code-registered, and CPT origins converge through the registration helper into the widget type registry, exposed over REST and branched by the client renderer. Solid boxes are shipped; dashed boxes are planned.">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <rect x="6" y="6" width="900" height="688" rx="12" fill="#ffffff"/>
+
+  <!-- Origins (fan-in) -->
+  <!-- built-in -->
+  <rect x="24" y="34" width="268" height="68" rx="9" fill="#e2ecfd" stroke="#2f54a5" stroke-width="1.5"/>
+  <text x="42" y="62" font-family="ui-monospace, SFMono-Regular, monospace" font-size="13" font-weight="700" fill="#1e3a8a">built-in</text>
+  <text x="278" y="60" text-anchor="end" font-family="-apple-system, system-ui, sans-serif" font-size="10.5" fill="#2f54a5">step 02 ✓</text>
+  <text x="42" y="84" font-family="-apple-system, system-ui, sans-serif" font-size="11" fill="#2f54a5" opacity="0.85">build manifest → render module</text>
+
+  <!-- code-registered -->
+  <rect x="322" y="34" width="268" height="68" rx="9" fill="#d7f0ea" stroke="#2b8d79" stroke-width="1.5"/>
+  <text x="340" y="62" font-family="ui-monospace, SFMono-Regular, monospace" font-size="13" font-weight="700" fill="#1d6b5a">code-registered</text>
+  <text x="576" y="60" text-anchor="end" font-family="-apple-system, system-ui, sans-serif" font-size="10.5" fill="#1d6b5a">step 03 ✓</text>
+  <text x="340" y="84" font-family="-apple-system, system-ui, sans-serif" font-size="11" fill="#1d6b5a" opacity="0.9">register_widget_def() · in-memory</text>
+
+  <!-- cpt (planned) -->
+  <rect x="620" y="34" width="268" height="68" rx="9" fill="#fafbfc" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <text x="638" y="62" font-family="ui-monospace, SFMono-Regular, monospace" font-size="13" font-weight="700" fill="#475569">cpt</text>
+  <text x="874" y="60" text-anchor="end" font-family="-apple-system, system-ui, sans-serif" font-size="10.5" fill="#94a3b8">step 04 ⋯</text>
+  <text x="638" y="84" font-family="-apple-system, system-ui, sans-serif" font-size="11" fill="#64748b" opacity="0.9">widget_def post · definition_id</text>
+
+  <!-- converge into the resolver -->
+  <line x1="158" y1="102" x2="442" y2="148" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="456" y1="102" x2="456" y2="148" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="754" y1="102" x2="470" y2="148" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 5" marker-end="url(#arrow)"/>
+
+  <!-- resolver helper -->
+  <rect x="216" y="150" width="480" height="66" rx="9" fill="#f1f5f9" stroke="#64748b" stroke-width="1.5"/>
+  <text x="240" y="178" font-family="ui-monospace, SFMono-Regular, monospace" font-size="13" font-weight="700" fill="#334155">gutenberg_register_widget_type_if_new()</text>
+  <text x="240" y="199" font-family="-apple-system, system-ui, sans-serif" font-size="11" fill="#475569" opacity="0.9">validates name · earlier origin wins · runs on init (priority 30)</text>
+
+  <line x1="456" y1="216" x2="456" y2="254" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- registry -->
+  <rect x="216" y="256" width="480" height="66" rx="9" fill="#fff3d0" stroke="#b07020" stroke-width="1.5"/>
+  <text x="240" y="284" font-family="ui-monospace, SFMono-Regular, monospace" font-size="13" font-weight="700" fill="#855317">WP_Widget_Type_Registry</text>
+  <text x="240" y="305" font-family="-apple-system, system-ui, sans-serif" font-size="11" fill="#855317" opacity="0.85">all origins merged · server runtime source of truth</text>
+
+  <line x1="456" y1="322" x2="456" y2="360" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="472" y="345" font-family="ui-monospace, monospace" font-size="11" fill="#94a3b8">REST</text>
+
+  <!-- REST endpoint -->
+  <rect x="216" y="362" width="480" height="66" rx="9" fill="#fff8e6" stroke="#b07020" stroke-width="1.4" stroke-dasharray="6 5"/>
+  <text x="240" y="390" font-family="ui-monospace, SFMono-Regular, monospace" font-size="13" font-weight="700" fill="#855317">/wp/v2/widget-modules</text>
+  <text x="672" y="388" text-anchor="end" font-family="-apple-system, system-ui, sans-serif" font-size="10.5" fill="#b07020">new fields: step 05 ⋯</text>
+  <text x="240" y="410" font-family="ui-monospace, SFMono-Regular, monospace" font-size="11" fill="#855317" opacity="0.85">{ origin, content, definition_id, title, … }</text>
+
+  <line x1="456" y1="428" x2="456" y2="466" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="472" y="451" font-family="ui-monospace, monospace" font-size="11" fill="#94a3b8">client</text>
+
+  <!-- WidgetRender (planned) -->
+  <rect x="216" y="468" width="480" height="60" rx="9" fill="#d7f0ea" stroke="#2b8d79" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <text x="240" y="495" font-family="ui-monospace, SFMono-Regular, monospace" font-size="13" font-weight="700" fill="#1d6b5a">WidgetRender</text>
+  <text x="672" y="493" text-anchor="end" font-family="-apple-system, system-ui, sans-serif" font-size="10.5" fill="#2b8d79">step 08 ⋯</text>
+  <text x="240" y="515" font-family="-apple-system, system-ui, sans-serif" font-size="11" fill="#1d6b5a" opacity="0.9">branches on origin → render path</text>
+
+  <!-- fan-out to the two render paths -->
+  <line x1="404" y1="528" x2="252" y2="562" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 5" marker-end="url(#arrow)"/>
+  <line x1="508" y1="528" x2="660" y2="562" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 5" marker-end="url(#arrow)"/>
+
+  <!-- built-in render path -->
+  <rect x="64" y="564" width="360" height="62" rx="9" fill="#e2ecfd" stroke="#2f54a5" stroke-width="1.5"/>
+  <text x="86" y="592" font-family="ui-monospace, SFMono-Regular, monospace" font-size="12.5" font-weight="700" fill="#1e3a8a">built-in</text>
+  <text x="86" y="613" font-family="-apple-system, system-ui, sans-serif" font-size="11" fill="#2f54a5" opacity="0.85">import the render module (client side)</text>
+
+  <!-- server-defined render path (planned) -->
+  <rect x="488" y="564" width="360" height="62" rx="9" fill="#eef8f5" stroke="#2b8d79" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <text x="510" y="592" font-family="ui-monospace, SFMono-Regular, monospace" font-size="12.5" font-weight="700" fill="#1d6b5a">server-defined</text>
+  <text x="834" y="590" text-anchor="end" font-family="-apple-system, system-ui, sans-serif" font-size="10.5" fill="#2b8d79">step 09 ⋯</text>
+  <text x="510" y="613" font-family="-apple-system, system-ui, sans-serif" font-size="11" fill="#1d6b5a" opacity="0.9">AdminBlockRenderer · one React tree</text>
+
+  <!-- seam annotations -->
+  <line x1="712" y1="152" x2="712" y2="428" stroke="#e2c89a" stroke-width="1.2"/>
+  <line x1="712" y1="152" x2="704" y2="152" stroke="#e2c89a" stroke-width="1.2"/>
+  <line x1="712" y1="428" x2="704" y2="428" stroke="#e2c89a" stroke-width="1.2"/>
+  <text x="722" y="286" font-family="-apple-system, system-ui, sans-serif" font-size="11" fill="#b07020">server</text>
+  <text x="722" y="301" font-family="-apple-system, system-ui, sans-serif" font-size="11" fill="#b07020">(PHP)</text>
+
+  <line x1="712" y1="468" x2="712" y2="528" stroke="#7fc4b3" stroke-width="1.2"/>
+  <line x1="712" y1="468" x2="704" y2="468" stroke="#7fc4b3" stroke-width="1.2"/>
+  <line x1="712" y1="528" x2="704" y2="528" stroke="#7fc4b3" stroke-width="1.2"/>
+  <text x="722" y="502" font-family="-apple-system, system-ui, sans-serif" font-size="11" fill="#2b8d79">client</text>
+
+  <!-- legend -->
+  <text x="64" y="664" font-family="-apple-system, system-ui, sans-serif" font-size="11" fill="#94a3b8">Solid = shipped.   Dashed = planned (step NN).   Earlier origins shadow later ones on a name collision.</text>
+</svg>

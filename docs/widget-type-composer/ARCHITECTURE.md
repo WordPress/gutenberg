@@ -20,6 +20,8 @@ It builds on the existing widget framework (`@wordpress/widget-primitives` +
 `built-in` renders client-side from its module; `code-registered` and `cpt`
 render through the **admin block renderer**.
 
+![Origin resolution: built-in, code-registered, and CPT origins converge through the registration helper into the widget type registry, then over REST to the client renderer. Solid boxes are shipped; dashed boxes are planned.](assets/origin-resolution.svg)
+
 ## Layers (bottom to top)
 
 1. **Server framework**, the three origins, the resolver that merges them into
