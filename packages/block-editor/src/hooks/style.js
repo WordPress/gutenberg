@@ -17,7 +17,11 @@ import { getCSSRules, compileCSS } from '@wordpress/style-engine';
 /**
  * Internal dependencies
  */
-import { BACKGROUND_SUPPORT_KEY, BackgroundImagePanel } from './background';
+import {
+	BACKGROUND_SUPPORT_KEY,
+	BackgroundImagePanel,
+	getEffectiveBackgroundStyle,
+} from './background';
 import { BORDER_SUPPORT_KEY, BorderPanel, SHADOW_SUPPORT_KEY } from './border';
 import { COLOR_SUPPORT_KEY } from './color';
 import { ElementsEdit } from './elements';
@@ -52,6 +56,10 @@ import { useBlockEditingMode } from '../components/block-editing-mode';
 import { store as blockEditorStore } from '../store';
 import { globalStylesDataKey } from '../store/private-keys';
 import { unlock } from '../lock-unlock';
+import {
+	useInheritedStyleValue,
+	useOwnVariation,
+} from '../components/global-styles/inherited-value-context';
 
 const BORDER_SIDES = [ 'Top', 'Right', 'Bottom', 'Left' ];
 
@@ -865,7 +873,7 @@ export default {
 	edit: BlockStyleControls,
 	hasSupport: hasStyleSupport,
 	addSaveProps,
-	attributeKeys: [ 'style' ],
+	attributeKeys: [ 'className', 'style' ],
 	useBlockProps,
 };
 
@@ -962,14 +970,20 @@ function getElementCSSRules( blockElementStyles, blockName, baseSelector ) {
 	return rules.length > 0 ? rules.join( '' ) : undefined;
 }
 
-function useBlockProps( { name, style } ) {
+function useBlockProps( { name, className, style } ) {
+	const ownVariation = useOwnVariation( name, className );
+	const { value: inheritedValue } = useInheritedStyleValue( {
+		blockName: name,
+		ownVariation,
+	} );
+	const effectiveStyle = getEffectiveBackgroundStyle( style, inheritedValue );
 	const blockElementsContainerIdentifier = useInstanceId(
 		STYLE_BLOCK_PROPS_REFERENCE,
 		'wp-elements'
 	);
 
 	const baseElementSelector = `.${ blockElementsContainerIdentifier }`;
-	const blockElementStyles = style?.elements;
+	const blockElementStyles = effectiveStyle?.elements;
 
 	const styles = useMemo( () => {
 		const cssRules = [];
@@ -999,7 +1013,7 @@ function useBlockProps( { name, style } ) {
 	return addSaveProps(
 		{ className: blockElementsContainerIdentifier },
 		name,
-		{ style },
+		{ style: effectiveStyle },
 		skipSerializationPathsEdit
 	);
 }

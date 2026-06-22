@@ -15,6 +15,7 @@ import {
 import { useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { useMemo, useEffect } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import { getBlockSelector } from '@wordpress/global-styles-engine';
 
 /**
@@ -38,8 +39,14 @@ import {
 	usePrivateStyleOverride,
 } from './utils';
 import { default as StylesFiltersPanel } from '../components/global-styles/filters-panel';
+import {
+	InheritedValueProvider,
+	useInheritedValue,
+	useOwnVariation,
+} from '../components/global-styles/inherited-value-context';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
+import { store as blockEditorStore } from '../store';
 
 const EMPTY_ARRAY = [];
 
@@ -98,10 +105,20 @@ export function getDuotonePresetFromColors( colors, duotonePalette ) {
 	return preset ? `var:preset|duotone|${ preset.slug }` : undefined;
 }
 
-function DuotonePanelPure( { style, setAttributes, name } ) {
+function DuotonePanelPure( { style, setAttributes, name, clientId } ) {
 	const duotoneStyle = style?.color?.duotone;
 	const settings = useBlockSettings( name );
 	const blockEditingMode = useBlockEditingMode();
+
+	const className = useSelect(
+		( select ) =>
+			clientId
+				? select( blockEditorStore ).getBlockAttributes( clientId )
+						?.className
+				: undefined,
+		[ clientId ]
+	);
+	const ownVariation = useOwnVariation( name, className );
 
 	const duotonePalette = useMultiOriginPresets( {
 		presetSetting: 'color.duotone',
@@ -136,21 +153,28 @@ function DuotonePanelPure( { style, setAttributes, name } ) {
 	return (
 		<>
 			<InspectorControls group="filter">
-				<StylesFiltersPanel
-					value={ { filter: { duotone: duotonePresetOrColors } } }
-					onChange={ ( newDuotone ) => {
-						const newStyle = {
-							...style,
-							color: {
-								...newDuotone?.filter,
-							},
-						};
-						setAttributes( {
-							style: cleanEmptyObject( newStyle ),
-						} );
-					} }
-					settings={ settings }
-				/>
+				<InheritedValueProvider
+					blockName={ name }
+					ownVariation={ ownVariation }
+				>
+					<FiltersPanelWithInheritedValue
+						value={ {
+							filter: { duotone: duotonePresetOrColors },
+						} }
+						onChange={ ( newDuotone ) => {
+							const newStyle = {
+								...style,
+								color: {
+									...newDuotone?.filter,
+								},
+							};
+							setAttributes( {
+								style: cleanEmptyObject( newStyle ),
+							} );
+						} }
+						settings={ settings }
+					/>
+				</InheritedValueProvider>
 			</InspectorControls>
 			<BlockControls group="block" __experimentalShareWithChildBlocks>
 				<DuotoneControl
@@ -180,6 +204,26 @@ function DuotonePanelPure( { style, setAttributes, name } ) {
 				/>
 			</BlockControls>
 		</>
+	);
+}
+
+/**
+ * Internal bridge: consumes `InheritedValueContext` and threads the
+ * merged placeholder payload into the shared global-styles filters
+ * panel. Kept as a sibling component so the hook call sits strictly
+ * below the Provider, as required by React's context rules.
+ *
+ * @param {Object} props Passthrough props for `StylesFiltersPanel`.
+ */
+function FiltersPanelWithInheritedValue( props ) {
+	const { value: inheritedValue, sources: inheritedSources } =
+		useInheritedValue();
+	return (
+		<StylesFiltersPanel
+			{ ...props }
+			inheritedValue={ inheritedValue }
+			inheritedSources={ inheritedSources }
+		/>
 	);
 }
 

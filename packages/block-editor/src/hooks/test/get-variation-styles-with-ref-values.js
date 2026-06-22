@@ -88,4 +88,44 @@ describe( 'getVariationStylesWithRefValues', () => {
 			},
 		} );
 	} );
+
+	it( 'preserves falsy resolved ref values', () => {
+		const globalStyles = {
+			styles: {
+				typography: {
+					lineHeight: 0,
+				},
+				color: {
+					text: false,
+				},
+				blocks: {
+					'core/group': {
+						variations: {
+							custom: {
+								typography: {
+									lineHeight: {
+										ref: 'styles.typography.lineHeight',
+									},
+								},
+								color: {
+									text: { ref: 'styles.color.text' },
+								},
+							},
+						},
+					},
+				},
+			},
+		};
+
+		expect(
+			getVariationStylesWithRefValues(
+				globalStyles,
+				'core/group',
+				'custom'
+			)
+		).toEqual( {
+			typography: { lineHeight: 0 },
+			color: { text: false },
+		} );
+	} );
 } );

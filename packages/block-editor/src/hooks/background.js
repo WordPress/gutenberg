@@ -23,14 +23,20 @@ import {
 	useHasBackgroundPanel,
 	hasBackgroundImageValue,
 	hasBackgroundGradientValue,
+	mergeInheritedBackgroundStyle,
 } from '../components/global-styles/background-panel';
-import { globalStylesDataKey } from '../store/private-keys';
 import {
 	getStyleForState,
 	isDefaultBlockStyleState,
 	setStyleForState,
 	useBlockStyleState,
 } from './block-style-state';
+import {
+	InheritedValueProvider,
+	useInheritedValue,
+	useInheritedStyleValue,
+	useOwnVariation,
+} from '../components/global-styles/inherited-value-context';
 
 export const BACKGROUND_SUPPORT_KEY = 'background';
 
@@ -93,15 +99,28 @@ export function setBackgroundStyleDefaults( backgroundStyle ) {
 	return backgroundStylesWithDefaults;
 }
 
-function useBlockProps( { name, style } ) {
+export function getEffectiveBackgroundStyle( style, inheritedStyle ) {
+	return mergeInheritedBackgroundStyle( style, inheritedStyle );
+}
+
+function useBlockProps( { name, className, style } ) {
+	const ownVariation = useOwnVariation( name, className );
+	const { value: inheritedValue } = useInheritedStyleValue( {
+		blockName: name,
+		ownVariation,
+	} );
+	const effectiveStyle = getEffectiveBackgroundStyle( style, inheritedValue );
+
 	if (
 		! hasBackgroundSupport( name ) ||
-		! style?.background?.backgroundImage
+		! effectiveStyle?.background?.backgroundImage
 	) {
 		return;
 	}
 
-	const backgroundStyles = setBackgroundStyleDefaults( style?.background );
+	const backgroundStyles = setBackgroundStyleDefaults(
+		effectiveStyle?.background
+	);
 
 	if ( ! backgroundStyles ) {
 		return;
@@ -179,24 +198,21 @@ export function BackgroundImagePanel( {
 	asWrapper,
 } ) {
 	const selectedState = useBlockStyleState();
-	const { style, className, backgroundColor, gradient, inheritedValue } =
-		useSelect(
-			( select ) => {
-				const { getBlockAttributes, getSettings } =
-					select( blockEditorStore );
-				const _settings = getSettings();
-				const blockAttributes = getBlockAttributes( clientId );
-				return {
-					style: blockAttributes?.style,
-					className: blockAttributes?.className,
-					backgroundColor: blockAttributes?.backgroundColor,
-					gradient: blockAttributes?.gradient,
-					inheritedValue:
-						_settings[ globalStylesDataKey ]?.blocks?.[ name ],
-				};
-			},
-			[ clientId, name ]
-		);
+	const { style, className, backgroundColor, gradient } = useSelect(
+		( select ) => {
+			const { getBlockAttributes } = select( blockEditorStore );
+			const blockAttributes = getBlockAttributes( clientId );
+			return {
+				style: blockAttributes?.style,
+				className: blockAttributes?.className,
+				backgroundColor: blockAttributes?.backgroundColor,
+				gradient: blockAttributes?.gradient,
+			};
+		},
+		[ clientId ]
+	);
+
+	const ownVariation = useOwnVariation( name, className );
 
 	const backgroundGradientSupported = hasBackgroundSupport(
 		name,
@@ -378,26 +394,51 @@ export function BackgroundImagePanel( {
 	const Wrapper = asWrapper || BackgroundInspectorControl;
 
 	return (
+		<InheritedValueProvider
+			blockName={ name }
+			ownVariation={ ownVariation }
+			selectedState={ selectedState }
+		>
+			<BackgroundPanelWithInheritedValue
+				as={ Wrapper }
+				panelId={ clientId }
+				defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
+				settings={ updatedSettings }
+				onChange={ onChange }
+				defaultControls={ defaultControls }
+				value={
+					isStateSelected
+						? getStyleForState( style, selectedState )
+						: styleValue
+				}
+				contrastWarning={ contrastWarning }
+			/>
+		</InheritedValueProvider>
+	);
+}
+
+/**
+ * Internal bridge: consumes `InheritedValueContext` and threads the
+ * merged placeholder payload into the shared global-styles background
+ * panel. Kept as a sibling component so the hook call sits strictly
+ * below the Provider, as required by React's context rules.
+ *
+ * @param {Object} props Passthrough props for `StylesBackgroundPanel`.
+ */
+function BackgroundPanelWithInheritedValue( props ) {
+	const { value: inheritedValue, sources: inheritedSources } =
+		useInheritedValue();
+	return (
 		<StylesBackgroundPanel
+			{ ...props }
 			inheritedValue={ inheritedValue }
-			as={ Wrapper }
-			panelId={ clientId }
-			defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
-			settings={ updatedSettings }
-			onChange={ onChange }
-			defaultControls={ defaultControls }
-			value={
-				isStateSelected
-					? getStyleForState( style, selectedState )
-					: styleValue
-			}
-			contrastWarning={ contrastWarning }
+			inheritedSources={ inheritedSources }
 		/>
 	);
 }
 
 export default {
 	useBlockProps,
-	attributeKeys: [ 'style' ],
+	attributeKeys: [ 'className', 'style' ],
 	hasSupport: hasBackgroundSupport,
 };

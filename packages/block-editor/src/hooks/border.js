@@ -29,6 +29,11 @@ import {
 	useHasBorderPanelControls,
 	BorderPanel as StylesBorderPanel,
 } from '../components/global-styles';
+import {
+	InheritedValueProvider,
+	useInheritedValue,
+	useOwnVariation,
+} from '../components/global-styles/inherited-value-context';
 import { store as blockEditorStore } from '../store';
 import {
 	getStyleForState,
@@ -149,18 +154,27 @@ function BordersInspectorControl( { label, children, resetAllFilter } ) {
 export function BorderPanel( { clientId, name, setAttributes, settings } ) {
 	const selectedState = useBlockStyleState();
 	const isEnabled = useHasBorderPanel( settings );
-	const { style, borderColor } = useSelect(
+	const { style, borderColor, className } = useSelect(
 		( select ) => {
 			// Early return to avoid subscription when disabled
 			if ( ! isEnabled ) {
 				return {};
 			}
-			const { style: _style, borderColor: _borderColor } =
-				select( blockEditorStore ).getBlockAttributes( clientId ) || {};
-			return { style: _style, borderColor: _borderColor };
+			const {
+				style: _style,
+				borderColor: _borderColor,
+				className: _className,
+			} = select( blockEditorStore ).getBlockAttributes( clientId ) || {};
+			return {
+				style: _style,
+				borderColor: _borderColor,
+				className: _className,
+			};
 		},
 		[ clientId, isEnabled ]
 	);
+
+	const ownVariation = useOwnVariation( name, className );
 
 	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
 
@@ -197,13 +211,39 @@ export function BorderPanel( { clientId, name, setAttributes, settings } ) {
 	};
 
 	return (
+		<InheritedValueProvider
+			blockName={ name }
+			ownVariation={ ownVariation }
+			selectedState={ selectedState }
+		>
+			<BorderPanelWithInheritedValue
+				as={ BordersInspectorControl }
+				panelId={ clientId }
+				settings={ settings }
+				value={ value }
+				onChange={ onChange }
+				defaultControls={ defaultControls }
+			/>
+		</InheritedValueProvider>
+	);
+}
+
+/**
+ * Internal bridge: consumes `InheritedValueContext` and threads the
+ * merged placeholder payload into the shared global-styles border
+ * panel. Kept as a sibling component so the hook call sits strictly
+ * below the Provider, as required by React's context rules.
+ *
+ * @param {Object} props Passthrough props for `StylesBorderPanel`.
+ */
+function BorderPanelWithInheritedValue( props ) {
+	const { value: inheritedValue, sources: inheritedSources } =
+		useInheritedValue();
+	return (
 		<StylesBorderPanel
-			as={ BordersInspectorControl }
-			panelId={ clientId }
-			settings={ settings }
-			value={ value }
-			onChange={ onChange }
-			defaultControls={ defaultControls }
+			{ ...props }
+			inheritedValue={ inheritedValue }
+			inheritedSources={ inheritedSources }
 		/>
 	);
 }
