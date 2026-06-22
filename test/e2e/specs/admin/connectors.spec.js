@@ -553,7 +553,7 @@ test.describe( 'Connectors', () => {
 	} );
 
 	test.describe( 'Application password setup flow', () => {
-		const PLUGIN_SLUG = 'gutenberg-test-connectors-application-password';
+		const PLUGIN_SLUG = 'gutenberg-test-application-password-connector';
 		const USERNAME_SETTING =
 			'connectors_content_source_test_remote_wordpress_username';
 		const APPLICATION_PASSWORD_SETTING =
