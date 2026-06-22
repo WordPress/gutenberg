@@ -144,6 +144,7 @@
 -   `FormToggle`: Add stacking context isolation ([#77619](https://github.com/WordPress/gutenberg/pull/77619)).
 -   `CircularOptionPicker`: Add stacking context isolation ([#77715](https://github.com/WordPress/gutenberg/pull/77715)).
 -   `FormTokenField`: Add `help` prop to render additional help text below the field, and deprecate the `__experimentalShowHowTo` prop in favor of it. The `help` prop now defaults to the previous how-to text; pass an empty string to hide it ([#77552](https://github.com/WordPress/gutenberg/pull/77552)).
+-   `BoxControl`: per-side `BoxInputControl` now falls back to a user-supplied `placeholder` prop when the dynamic mixed-side placeholder is not in use, so consumers can supply a fallback placeholder string (for example to surface an inherited Global Styles value).
 
 ### Deprecations
 

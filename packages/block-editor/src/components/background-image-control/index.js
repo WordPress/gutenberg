@@ -39,6 +39,8 @@ import { getResolvedValue } from '@wordpress/global-styles-engine';
  * Internal dependencies
  */
 import { hasBackgroundImageValue } from '../global-styles/background-panel';
+import { InheritanceActionsDropdown } from '../global-styles/inheritance';
+import { useStylePushHandlers } from '../global-styles/inherited-value-context';
 import { setImmutably } from '../../utils/object';
 import MediaReplaceFlow from '../media-replace-flow';
 import { store as blockEditorStore } from '../../store';
@@ -193,6 +195,8 @@ function BackgroundControlsPanel( {
 	onToggle: onToggleCallback = noop,
 	hasImageValue,
 	onReset,
+	onPushToGlobalStyles,
+	hasLocalOverride,
 	containerRef,
 } ) {
 	if ( ! hasImageValue ) {
@@ -225,24 +229,53 @@ function BackgroundControlsPanel( {
 							as="button"
 							onToggleCallback={ onToggleCallback }
 						/>
-						{ onReset && (
-							<Button
-								__next40pxDefaultSize
-								label={ __( 'Reset' ) }
-								className="block-editor-global-styles-background-panel__reset"
-								size="small"
-								icon={ resetIcon }
-								onClick={ () => {
-									onReset();
-									// Close the dropdown if open.
-									if ( isOpen ) {
-										onToggle();
+						{ onReset &&
+							( hasLocalOverride ? (
+								<InheritanceActionsDropdown
+									className="block-editor-global-styles-background-panel__reset"
+									onResetToInherited={ () => {
+										onReset();
+										// Close the dropdown if open.
+										if ( isOpen ) {
+											onToggle();
+										}
+										// Focus the toggle button.
+										focusToggleButton( containerRef );
+									} }
+									onPushToGlobalStyles={
+										onPushToGlobalStyles
+											? () => {
+													onPushToGlobalStyles();
+													// Close the dropdown if open.
+													if ( isOpen ) {
+														onToggle();
+													}
+													// Focus the toggle button.
+													focusToggleButton(
+														containerRef
+													);
+											  }
+											: undefined
 									}
-									// Focus the toggle button.
-									focusToggleButton( containerRef );
-								} }
-							/>
-						) }
+								/>
+							) : (
+								<Button
+									__next40pxDefaultSize
+									label={ __( 'Reset' ) }
+									className="block-editor-global-styles-background-panel__reset"
+									size="small"
+									icon={ resetIcon }
+									onClick={ () => {
+										onReset();
+										// Close the dropdown if open.
+										if ( isOpen ) {
+											onToggle();
+										}
+										// Focus the toggle button.
+										focusToggleButton( containerRef );
+									} }
+								/>
+							) ) }
 					</>
 				);
 			} }
@@ -434,22 +467,29 @@ function BackgroundSizeControls( {
 	inheritedValue,
 	defaultValues,
 } ) {
-	const sizeValue =
-		style?.background?.backgroundSize ||
-		inheritedValue?.background?.backgroundSize;
-	const repeatValue =
-		style?.background?.backgroundRepeat ||
-		inheritedValue?.background?.backgroundRepeat;
+	/*
+	 * Read local and inherited values separately so each sub-control can
+	 * show the inherited value while marking the control as inherited.
+	 */
+	const localSizeValue = style?.background?.backgroundSize;
+	const localRepeatValue = style?.background?.backgroundRepeat;
+	const localPositionValue = style?.background?.backgroundPosition;
+	const localAttachmentValue = style?.background?.backgroundAttachment;
+	const inheritedSizeValue = inheritedValue?.background?.backgroundSize;
+	const inheritedRepeatValue = inheritedValue?.background?.backgroundRepeat;
+	const inheritedPositionValue =
+		inheritedValue?.background?.backgroundPosition;
+	const inheritedAttachmentValue =
+		inheritedValue?.background?.backgroundAttachment;
+
+	const sizeValue = localSizeValue || inheritedSizeValue;
+	const repeatValue = localRepeatValue || inheritedRepeatValue;
 	const imageValue =
 		style?.background?.backgroundImage?.url ||
 		inheritedValue?.background?.backgroundImage?.url;
 	const isUploadedImage = style?.background?.backgroundImage?.id;
-	const positionValue =
-		style?.background?.backgroundPosition ||
-		inheritedValue?.background?.backgroundPosition;
-	const attachmentValue =
-		style?.background?.backgroundAttachment ||
-		inheritedValue?.background?.backgroundAttachment;
+	const positionValue = localPositionValue || inheritedPositionValue;
+	const attachmentValue = localAttachmentValue || inheritedAttachmentValue;
 
 	/*
 	 * Set default values for uploaded images.
@@ -646,10 +686,7 @@ export default function BackgroundImagePanel( {
 	defaultValues = {},
 } ) {
 	/*
-	 * Resolve any inherited "ref" pointers.
-	 * Should the block editor need resolved, inherited values
-	 * across all controls, this could be abstracted into a hook,
-	 * e.g., useResolveGlobalStyle
+	 * Resolve inherited `ref` pointers for background controls.
 	 */
 	const { globalStyles, _links } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -683,14 +720,22 @@ export default function BackgroundImagePanel( {
 	}, [ globalStyles, _links, inheritedValue ] );
 
 	const resetBackground = () =>
-		onChange( setImmutably( value, [ 'background' ], {} ) );
+		onChange(
+			setImmutably( value, [ 'background' ], {
+				gradient: value?.background?.gradient,
+			} )
+		);
+
+	const getPushHandler = useStylePushHandlers( value );
 
 	const { title, url } = value?.background?.backgroundImage || {
 		...resolvedInheritedValue?.background?.backgroundImage,
 	};
+	const localHasImageValue = hasBackgroundImageValue( value );
 	const hasImageValue =
-		hasBackgroundImageValue( value ) ||
-		hasBackgroundImageValue( resolvedInheritedValue );
+		localHasImageValue || hasBackgroundImageValue( resolvedInheritedValue );
+	const hasLocalOverride =
+		localHasImageValue && hasBackgroundImageValue( resolvedInheritedValue );
 
 	const imageValue =
 		value?.background?.backgroundImage ||
@@ -723,7 +768,25 @@ export default function BackgroundImagePanel( {
 					url={ url }
 					onToggle={ setIsDropDownOpen }
 					hasImageValue={ hasImageValue }
-					onReset={ resetBackground }
+					hasLocalOverride={ hasLocalOverride }
+					onReset={ localHasImageValue ? resetBackground : undefined }
+					onPushToGlobalStyles={
+						localHasImageValue
+							? getPushHandler(
+									[
+										[ 'background', 'backgroundImage' ],
+										[ 'background', 'backgroundSize' ],
+										[ 'background', 'backgroundPosition' ],
+										[ 'background', 'backgroundRepeat' ],
+										[
+											'background',
+											'backgroundAttachment',
+										],
+									],
+									resetBackground
+							  )
+							: undefined
+					}
 					containerRef={ containerRef }
 				>
 					<VStack spacing={ 3 } className="single-column">

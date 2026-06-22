@@ -29,6 +29,8 @@ import { useSettings } from '../use-settings';
  * @property {SelectControlProps[]}         [options]          Aspect ratio options.
  * @property {string}                       [defaultValue]     Default aspect ratio value.
  * @property {boolean}                      [isShownByDefault] Whether the tool is shown by default.
+ * @property {string}                       [className]        Additional CSS class on the wrapping ToolsPanelItem.
+ * @property {string}                       [title]            Native browser tooltip applied to the wrapping ToolsPanelItem (e.g. "Inherited from Global Styles").
  */
 
 export default function AspectRatioTool( {
@@ -39,6 +41,8 @@ export default function AspectRatioTool( {
 	defaultValue = 'auto',
 	hasValue,
 	isShownByDefault = true,
+	className,
+	title,
 } ) {
 	// Match the CSS default so if the value is used directly in CSS it will look correct in the control.
 	const displayValue = value ?? 'auto';
@@ -79,6 +83,8 @@ export default function AspectRatioTool( {
 
 	return (
 		<ToolsPanelItem
+			className={ className }
+			title={ title }
 			hasValue={
 				hasValue ? hasValue : () => displayValue !== defaultValue
 			}

@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-} from '@wordpress/components';
+import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -21,6 +18,12 @@ import {
 	extractPresetSlug,
 	encodeColorValueWithPalette,
 } from '../../utils/color-values';
+import {
+	getInheritanceProps,
+	getInheritanceTooltipTextByPath,
+	InheritanceToolsPanelItem,
+} from './inheritance';
+import { useStylePushHandlers } from './inherited-value-context';
 
 const DEFAULT_CONTROLS = {
 	backgroundImage: true,
@@ -125,6 +128,70 @@ export function hasLegacyColorGradientValue( style ) {
 	return !! style?.color?.gradient;
 }
 
+const BACKGROUND_STYLE_KEYS = [
+	'backgroundImage',
+	'gradient',
+	'backgroundPosition',
+	'backgroundRepeat',
+	'backgroundSize',
+	'backgroundAttachment',
+];
+
+/**
+ * Merges a block's local background style with the inherited background style
+ * so that, when the block sets *any* background property locally, the remaining
+ * background properties fall back to the inherited (Global Styles) values
+ * rather than being dropped. Mirrors the cascade the editor renders, used by
+ * `hooks/background.js` to compute the effective background for block props.
+ *
+ * @param {Object} style          The block's local style object.
+ * @param {Object} inheritedStyle The inherited (Global Styles) style object.
+ * @return {Object} The style with background properties merged from inherited.
+ */
+export function mergeInheritedBackgroundStyle( style, inheritedStyle ) {
+	const hasLocalBackgroundStyle =
+		!! style?.color?.gradient ||
+		BACKGROUND_STYLE_KEYS.some(
+			( key ) => style?.background?.[ key ] !== undefined
+		);
+
+	if ( ! hasLocalBackgroundStyle ) {
+		return style;
+	}
+
+	const mergedBackground = BACKGROUND_STYLE_KEYS.reduce( ( acc, key ) => {
+		const value = style?.background?.[ key ];
+		const inheritedValue = inheritedStyle?.background?.[ key ];
+
+		if ( value !== undefined ) {
+			acc[ key ] = value;
+		} else if ( inheritedValue !== undefined ) {
+			acc[ key ] = inheritedValue;
+		}
+
+		return acc;
+	}, {} );
+
+	if (
+		mergedBackground.gradient === undefined &&
+		inheritedStyle?.color?.gradient !== undefined
+	) {
+		mergedBackground.gradient = inheritedStyle.color.gradient;
+	}
+
+	if ( Object.keys( mergedBackground ).length === 0 ) {
+		return style;
+	}
+
+	return {
+		...style,
+		background: {
+			...style?.background,
+			...mergedBackground,
+		},
+	};
+}
+
 export function BackgroundToolsPanel( {
 	resetAllFilter,
 	onChange,
@@ -162,12 +229,14 @@ export default function BackgroundImagePanel( {
 	value,
 	onChange,
 	inheritedValue = value,
+	inheritedSources = {},
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
 	defaultValues = {},
 	headerLabel = __( 'Background' ),
 	contrastWarning,
+	showInheritanceLabelIndicators = true,
 } ) {
 	const {
 		colors,
@@ -180,6 +249,7 @@ export default function BackgroundImagePanel( {
 		decodeValue,
 		encodeGradientValue,
 	} = useColorGradientSettings( settings );
+	const getPushHandler = useStylePushHandlers( value );
 
 	const hasBackgroundGradientControl = useHasBackgroundControl(
 		settings,
@@ -327,6 +397,18 @@ export default function BackgroundImagePanel( {
 		onChange( newValue );
 	};
 
+	const inheritanceProps = ( isInherited, hasLocalOverride, classNames ) =>
+		showInheritanceLabelIndicators
+			? getInheritanceProps( isInherited, hasLocalOverride, classNames )
+			: { className: classNames };
+	const tooltipText = ( path ) =>
+		getInheritanceTooltipTextByPath( inheritedSources, path );
+
+	const inheritedBackgroundImage = hasBackgroundImageValue( {
+		background: inheritedValue?.background,
+	} );
+	const hasLocalBackgroundImage = hasBackgroundImageValue( value );
+
 	return (
 		<Wrapper
 			resetAllFilter={ resetAllFilter }
@@ -336,10 +418,18 @@ export default function BackgroundImagePanel( {
 			headerLabel={ headerLabel }
 		>
 			{ showBackgroundImageControl && (
-				<ToolsPanelItem
-					className="block-editor-color-gradient-item"
+				<InheritanceToolsPanelItem
+					{ ...inheritanceProps(
+						inheritedBackgroundImage && ! hasLocalBackgroundImage,
+						hasLocalBackgroundImage && inheritedBackgroundImage,
+						'block-editor-color-gradient-item'
+					) }
+					showLocalOverrideActionsInLabel={ false }
 					hasValue={ () => hasBackgroundImageValue( value ) }
 					label={ __( 'Image' ) }
+					inheritanceTooltipText={ tooltipText(
+						'background.backgroundImage'
+					) }
 					onDeselect={ resetBackground }
 					isShownByDefault={ defaultControls.backgroundImage }
 					panelId={ panelId }
@@ -352,7 +442,7 @@ export default function BackgroundImagePanel( {
 						defaultControls={ defaultControls }
 						defaultValues={ defaultValues }
 					/>
-				</ToolsPanelItem>
+				</InheritanceToolsPanelItem>
 			) }
 			{ showBackgroundColorControl && (
 				<ColorGradientDropdownItem
@@ -362,12 +452,25 @@ export default function BackgroundImagePanel( {
 					isShownByDefault={ defaultControls.backgroundColor }
 					indicators={ [ userBackgroundColor ?? backgroundColor ] }
 					contrastWarning={ contrastWarning }
+					showInheritanceLabelIndicators={
+						showInheritanceLabelIndicators
+					}
+					inheritedSources={ inheritedSources }
+					isPlaceholder={
+						userBackgroundColor === undefined &&
+						backgroundColor !== undefined
+					}
+					hasInheritedValue={ backgroundColor !== undefined }
+					onPushToGlobalStyles={ getPushHandler(
+						[ [ 'color', 'background' ] ],
+						resetBackgroundColor
+					) }
 					tabs={ [
 						{
 							key: 'background',
 							label: __( 'Color' ),
-							inheritedValue:
-								userBackgroundColor ?? backgroundColor,
+							sourcePaths: [ 'color.background' ],
+							inheritedValue: backgroundColor,
 							// Resolve the slug from the same source as the
 							// displayed value (user value first, then the
 							// inherited fallback). For a block instance the
@@ -386,6 +489,9 @@ export default function BackgroundImagePanel( {
 								),
 							setValue: setBackgroundColor,
 							userValue: userBackgroundColor,
+							isPlaceholder:
+								userBackgroundColor === undefined &&
+								backgroundColor !== undefined,
 						},
 					] }
 					colorGradientControlSettings={ {
@@ -401,16 +507,38 @@ export default function BackgroundImagePanel( {
 					hasValue={ () => hasBackgroundGradientValue( value ) }
 					resetValue={ resetGradient }
 					isShownByDefault={ defaultControls.gradient }
-					indicators={ [ currentGradient ] }
+					indicators={ [ currentGradient ?? inheritedGradient ] }
+					showInheritanceLabelIndicators={
+						showInheritanceLabelIndicators
+					}
+					inheritedSources={ inheritedSources }
+					isPlaceholder={
+						currentGradient === undefined &&
+						inheritedGradient !== undefined
+					}
+					hasInheritedValue={ inheritedGradient !== undefined }
+					onPushToGlobalStyles={ getPushHandler(
+						[
+							[ 'background', 'gradient' ],
+							[ 'color', 'gradient' ],
+						],
+						resetGradient
+					) }
 					tabs={ [
 						{
 							key: 'gradient',
 							label: __( 'Gradient' ),
-							inheritedValue:
-								currentGradient ?? inheritedGradient,
+							sourcePaths: [
+								'background.gradient',
+								'color.gradient',
+							],
+							inheritedValue: inheritedGradient,
 							setValue: setGradient,
 							userValue: currentGradient,
 							isGradient: true,
+							isPlaceholder:
+								currentGradient === undefined &&
+								inheritedGradient !== undefined,
 						},
 					] }
 					colorGradientControlSettings={ {
@@ -429,15 +557,31 @@ export default function BackgroundImagePanel( {
 					indicators={ [
 						userLegacyColorGradient ?? legacyColorGradient,
 					] }
+					showInheritanceLabelIndicators={
+						showInheritanceLabelIndicators
+					}
+					inheritedSources={ inheritedSources }
+					isPlaceholder={
+						userLegacyColorGradient === undefined &&
+						legacyColorGradient !== undefined
+					}
+					hasInheritedValue={ legacyColorGradient !== undefined }
+					onPushToGlobalStyles={ getPushHandler(
+						[ [ 'color', 'gradient' ] ],
+						resetLegacyColorGradient
+					) }
 					tabs={ [
 						{
 							key: 'gradient',
 							label: __( 'Gradient' ),
-							inheritedValue:
-								userLegacyColorGradient ?? legacyColorGradient,
+							sourcePaths: [ 'color.gradient' ],
+							inheritedValue: legacyColorGradient,
 							setValue: setLegacyColorGradient,
 							userValue: userLegacyColorGradient,
 							isGradient: true,
+							isPlaceholder:
+								userLegacyColorGradient === undefined &&
+								legacyColorGradient !== undefined,
 						},
 					] }
 					colorGradientControlSettings={ {

@@ -8,9 +8,8 @@ import clsx from 'clsx';
  */
 import {
 	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-	__experimentalHStack as HStack,
-	__experimentalZStack as ZStack,
+	__experimentalHStack as HStack, // eslint-disable-line @wordpress/use-recommended-components
+	__experimentalZStack as ZStack, // eslint-disable-line @wordpress/use-recommended-components
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	MenuGroup,
 	ColorIndicator,
@@ -31,6 +30,12 @@ import { getValueFromVariable } from '@wordpress/global-styles-engine';
  */
 import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
+import {
+	getInheritanceProps,
+	getInheritanceTooltipTextByPath,
+	InheritanceToolsPanelItem,
+} from './inheritance';
+import { useStylePushHandlers } from './inherited-value-context';
 
 const EMPTY_ARRAY = [];
 function useMultiOriginColorPresets(
@@ -169,12 +174,21 @@ export default function FiltersPanel( {
 	value,
 	onChange,
 	inheritedValue = value,
+	inheritedSources = {},
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
+	showInheritanceLabelIndicators = true,
 } ) {
 	const decodeValue = ( rawValue ) =>
 		getValueFromVariable( { settings }, '', rawValue );
+	const inheritanceProps = ( isInherited, hasLocalOverride, className ) =>
+		showInheritanceLabelIndicators
+			? getInheritanceProps( isInherited, hasLocalOverride, className )
+			: {};
+	const tooltipText = ( path ) =>
+		getInheritanceTooltipTextByPath( inheritedSources, path );
+	const getPushHandler = useStylePushHandlers( value );
 
 	// Duotone
 	const hasDuotoneEnabled = useHasDuotoneControl( settings );
@@ -186,7 +200,11 @@ export default function FiltersPanel( {
 		presetSetting: 'palette',
 		defaultSetting: 'defaultPalette',
 	} );
-	const duotone = decodeValue( inheritedValue?.filter?.duotone );
+	const localDuotone = decodeValue( value?.filter?.duotone );
+	const inheritedDuotone = decodeValue( inheritedValue?.filter?.duotone );
+	const duotone = localDuotone ?? inheritedDuotone;
+	const isDuotonePlaceholder =
+		localDuotone === undefined && inheritedDuotone !== undefined;
 	const setDuotone = ( newValue ) => {
 		const duotonePreset = duotonePalette.find( ( { colors } ) => {
 			return colors === newValue;
@@ -197,6 +215,19 @@ export default function FiltersPanel( {
 		onChange(
 			setImmutably( value, [ 'filter', 'duotone' ], duotoneValue )
 		);
+	};
+	// Commit the inherited value when the user clicks the active preset
+	// while the picker is showing inherited duotone at rest.
+	const setDuotoneWithInheritedCommit = ( newValue ) => {
+		if (
+			newValue === undefined &&
+			isDuotonePlaceholder &&
+			inheritedDuotone !== undefined
+		) {
+			setDuotone( inheritedDuotone );
+			return;
+		}
+		setDuotone( newValue );
 	};
 	const hasDuotone = () => !! value?.filter?.duotone;
 	const resetDuotone = () => setDuotone( undefined );
@@ -219,10 +250,20 @@ export default function FiltersPanel( {
 			panelId={ panelId }
 		>
 			{ hasDuotoneEnabled && (
-				<ToolsPanelItem
+				<InheritanceToolsPanelItem
+					{ ...inheritanceProps(
+						isDuotonePlaceholder,
+						localDuotone !== undefined &&
+							inheritedDuotone !== undefined
+					) }
 					label={ __( 'Duotone' ) }
+					inheritanceTooltipText={ tooltipText( 'filter.duotone' ) }
 					hasValue={ hasDuotone }
 					onDeselect={ resetDuotone }
+					onPushToGlobalStyles={ getPushHandler(
+						[ [ 'filter', 'duotone' ] ],
+						resetDuotone
+					) }
 					isShownByDefault={ defaultControls.duotone }
 					panelId={ panelId }
 				>
@@ -245,13 +286,15 @@ export default function FiltersPanel( {
 										disableCustomColors
 										disableCustomDuotone
 										value={ duotone }
-										onChange={ setDuotone }
+										onChange={
+											setDuotoneWithInheritedCommit
+										}
 									/>
 								</MenuGroup>
 							</DropdownContentWrapper>
 						) }
 					/>
-				</ToolsPanelItem>
+				</InheritanceToolsPanelItem>
 			) }
 		</Wrapper>
 	);

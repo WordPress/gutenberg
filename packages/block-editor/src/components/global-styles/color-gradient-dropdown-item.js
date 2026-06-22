@@ -7,7 +7,6 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import {
-	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalHStack as HStack,
 	__experimentalZStack as ZStack,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
@@ -27,6 +26,12 @@ import { reset as resetIcon, caution as cautionIcon } from '@wordpress/icons';
  */
 import ColorGradientControl from '../colors-gradients/control';
 import { unlock } from '../../lock-unlock';
+import {
+	getInheritanceProps,
+	getCommonInheritanceTooltipText,
+	InheritanceActionsDropdown,
+	InheritanceToolsPanelItem,
+} from './inheritance';
 
 const { Tabs } = unlock( componentsPrivateApis );
 
@@ -48,8 +53,11 @@ function DropdownContent( {
 	contrastWarning,
 } ) {
 	const { key: firstTabKey, ...firstTab } = tabs[ 0 ] ?? {};
-	const defaultTabId = tabs.find(
-		( tab ) => tab.userValue !== undefined
+	const defaultTabId = (
+		tabs.find( ( tab ) => tab.userValue !== undefined ) ??
+		tabs.find(
+			( tab ) => tab.isPlaceholder || tab.inheritedValue !== undefined
+		)
 	)?.key;
 	return (
 		<DropdownContentWrapper paddingSize="none">
@@ -127,21 +135,47 @@ function ColorGradientTab( {
 	inheritedSlug,
 	userValue,
 	setValue,
+	isPlaceholder,
 	colorGradientControlSettings,
 	contrastWarning,
 } ) {
+	// Display value: prefer the user's local value when set; otherwise fall
+	// back to the inherited value so the at-rest preselection is visible
+	// inside the picker.
+	const displayed = userValue ?? inheritedValue;
+	// Display-without-commit interceptor. `ColorPalette` and `GradientPicker`
+	// fire `onChange( undefined )` when the user clicks the currently-selected
+	// option. At rest (placeholder mode), that click is the user's "accept
+	// inherited" gesture: the displayed value comes from `inheritedValue`, so
+	// re-route the `undefined` payload to a commit of the inherited value
+	// instead of the default "clear local" behaviour. Once a local value is
+	// set, the same click correctly clears local back to at rest.
+	const onChange = ( newValue, newSlug ) => {
+		if ( isPlaceholder && newValue === undefined ) {
+			setValue( inheritedValue );
+			return;
+		}
+		setValue( newValue, newSlug );
+	};
 	return (
 		<ColorGradientControl
 			{ ...colorGradientControlSettings }
 			showTitle={ false }
 			enableAlpha
 			__experimentalIsRenderedInSidebar
-			colorValue={ isGradient ? undefined : inheritedValue }
+			colorValue={ isGradient ? undefined : displayed }
 			colorSlug={ isGradient ? undefined : inheritedSlug }
-			gradientValue={ isGradient ? inheritedValue : undefined }
-			onColorChange={ isGradient ? undefined : setValue }
-			onGradientChange={ isGradient ? setValue : undefined }
-			clearable={ inheritedValue === userValue }
+			gradientValue={ isGradient ? displayed : undefined }
+			onColorChange={ isGradient ? undefined : onChange }
+			onGradientChange={ isGradient ? onChange : undefined }
+			/*
+			 * The control is clearable whenever a local value is set, so the
+			 * user can always reset their own override back to the inherited
+			 * (placeholder) value. In placeholder mode (no local value) there
+			 * is nothing local to clear; clicking the active swatch accepts the
+			 * inherited value via the onChange interceptor above instead.
+			 */
+			clearable={ userValue !== undefined }
 			headingLevel={ 3 }
 			noticeProps={
 				! isGradient && contrastWarning
@@ -165,6 +199,7 @@ export default function ColorGradientDropdownItem( {
 	label,
 	hasValue,
 	resetValue,
+	onPushToGlobalStyles,
 	isShownByDefault,
 	indicators,
 	tabs,
@@ -172,13 +207,33 @@ export default function ColorGradientDropdownItem( {
 	panelId,
 	contrastWarning,
 	className = 'block-editor-tools-panel-color-gradient-settings__item',
+	isPlaceholder = false,
+	hasInheritedValue = false,
+	showInheritanceLabelIndicators = true,
+	inheritedSources = {},
 } ) {
 	const colorGradientDropdownButtonRef = useRef( undefined );
+	const itemClassName = clsx( 'block-editor-color-gradient-item', className );
+	// A local override exists when the user has set a value that shadows an
+	// inherited one — only then do we offer the reset-to-inherited / push
+	// actions and the override label indicator.
+	const hasLocalOverride =
+		showInheritanceLabelIndicators && hasValue() && hasInheritedValue;
+	const inheritanceProps = showInheritanceLabelIndicators
+		? getInheritanceProps( isPlaceholder, hasLocalOverride, itemClassName )
+		: { className: itemClassName };
+	const tabSourcePaths = tabs.flatMap( ( tab ) => tab.sourcePaths ?? [] );
+	const inheritanceTooltipText = getCommonInheritanceTooltipText(
+		inheritedSources,
+		tabSourcePaths
+	);
 	return (
-		<ToolsPanelItem
-			className={ clsx( 'block-editor-color-gradient-item', className ) }
+		<InheritanceToolsPanelItem
+			{ ...inheritanceProps }
+			showLocalOverrideActionsInLabel={ false }
 			hasValue={ hasValue }
 			label={ label }
+			inheritanceTooltipText={ inheritanceTooltipText }
 			onDeselect={ resetValue }
 			isShownByDefault={ isShownByDefault }
 			panelId={ panelId }
@@ -208,22 +263,45 @@ export default function ColorGradientDropdownItem( {
 									label={ label }
 								/>
 							</Button>
-							{ hasValue() && (
-								<Button
-									__next40pxDefaultSize
-									label={ __( 'Reset' ) }
-									className="block-editor-panel-color-gradient-settings__reset"
-									size="small"
-									icon={ resetIcon }
-									onClick={ () => {
-										resetValue();
-										if ( isOpen ) {
-											onToggle();
+							{ hasValue() &&
+								( hasLocalOverride ? (
+									<InheritanceActionsDropdown
+										className="block-editor-panel-color-gradient-settings__reset"
+										onResetToInherited={ () => {
+											resetValue();
+											if ( isOpen ) {
+												onToggle();
+											}
+											colorGradientDropdownButtonRef.current?.focus();
+										} }
+										onPushToGlobalStyles={
+											onPushToGlobalStyles
+												? () => {
+														onPushToGlobalStyles();
+														if ( isOpen ) {
+															onToggle();
+														}
+														colorGradientDropdownButtonRef.current?.focus();
+												  }
+												: undefined
 										}
-										colorGradientDropdownButtonRef.current?.focus();
-									} }
-								/>
-							) }
+									/>
+								) : (
+									<Button
+										__next40pxDefaultSize
+										label={ __( 'Reset' ) }
+										className="block-editor-panel-color-gradient-settings__reset"
+										size="small"
+										icon={ resetIcon }
+										onClick={ () => {
+											resetValue();
+											if ( isOpen ) {
+												onToggle();
+											}
+											colorGradientDropdownButtonRef.current?.focus();
+										} }
+									/>
+								) ) }
 							{ contrastWarning && (
 								// An icon-only warning that stays visible while a
 								// contrast warning is in effect. It is not a menu;
@@ -253,6 +331,6 @@ export default function ColorGradientDropdownItem( {
 					/>
 				) }
 			/>
-		</ToolsPanelItem>
+		</InheritanceToolsPanelItem>
 	);
 }

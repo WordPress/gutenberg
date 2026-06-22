@@ -97,12 +97,24 @@
 		transition: opacity 0.1s ease-in-out;
 	}
 
+	&.has-local-override-from-global-styles__menu {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		top: 50%;
+		transform: translateY(-50%);
+		margin-block: 0;
+		margin-inline: 0 $grid-unit;
+		opacity: 1;
+	}
+
 	&.block-editor-global-styles-background-panel__reset {
 		border-radius: $radius-small;
 	}
 
 	.block-editor-global-styles-background-panel__dropdown-toggle:hover + &,
 	&:focus,
+	&:focus-within,
 	&:hover {
 		opacity: 1;
 	}

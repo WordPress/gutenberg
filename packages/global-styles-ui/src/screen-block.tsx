@@ -371,6 +371,7 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 					onChange={ setStyle }
 					settings={ settings }
 					defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
+					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasTypographyPanel && (
@@ -383,6 +384,7 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 					// paragraphs") when not editing a state-specific variation,
 					// because those settings are global and cannot be per-breakpoint.
 					isGlobalStyles={ ! hasSelectedState }
+					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasDimensionsPanel && (
@@ -392,6 +394,7 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 					onChange={ onChangeDimensions }
 					settings={ settings }
 					includeLayoutControls
+					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasBorderPanel && (
@@ -400,6 +403,7 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 					value={ style }
 					onChange={ onChangeBorders }
 					settings={ settings }
+					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ shouldShowFiltersPanel && (
@@ -409,6 +413,7 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 					onChange={ setStyle }
 					settings={ settings }
 					includeLayoutControls
+					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasColorPanel && (
@@ -417,6 +422,7 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 					value={ style }
 					onChange={ setStyle }
 					settings={ settings }
+					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasImageSettingsPanel && ! hasSelectedState && (
