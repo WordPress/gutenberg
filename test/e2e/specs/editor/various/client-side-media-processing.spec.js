@@ -37,6 +37,75 @@ async function probeUltraHdrUrl( url ) {
 }
 
 /**
+ * Generates a short WebM video file at runtime and writes it to a temp path.
+ *
+ * The clip is created in the browser via canvas + MediaRecorder so the test
+ * doesn't depend on committing a binary fixture of uncertain provenance. The
+ * resulting WebM (VP8/VP9) is decodable by Chromium, which is all the
+ * client-side poster generation needs.
+ *
+ * @param {Page} page Playwright page used to run MediaRecorder.
+ * @return {Promise<string>} Absolute path to the generated .webm file.
+ */
+async function createTestVideoFile( page ) {
+	const base64 = await page.evaluate( () => {
+		return new Promise( ( resolve, reject ) => {
+			const canvas = document.createElement( 'canvas' );
+			canvas.width = 320;
+			canvas.height = 240;
+			const ctx = canvas.getContext( '2d' );
+			const stream = canvas.captureStream( 30 );
+			const recorder = new window.MediaRecorder( stream, {
+				mimeType: 'video/webm',
+			} );
+			const chunks = [];
+			recorder.addEventListener( 'dataavailable', ( event ) => {
+				if ( event.data.size ) {
+					chunks.push( event.data );
+				}
+			} );
+			recorder.addEventListener( 'error', reject );
+			recorder.addEventListener( 'stop', () => {
+				const blob = new Blob( chunks, { type: 'video/webm' } );
+				blob.arrayBuffer().then( ( arrayBuffer ) => {
+					const bytes = new Uint8Array( arrayBuffer );
+					let binary = '';
+					for ( let i = 0; i < bytes.length; i++ ) {
+						binary += String.fromCharCode( bytes[ i ] );
+					}
+					resolve( btoa( binary ) );
+				}, reject );
+			} );
+
+			let frame = 0;
+			const draw = () => {
+				ctx.fillStyle = `hsl(${ ( frame * 8 ) % 360 }, 70%, 50%)`;
+				ctx.fillRect( 0, 0, canvas.width, canvas.height );
+				ctx.fillStyle = '#ffffff';
+				ctx.fillRect( frame % canvas.width, 100, 40, 40 );
+				frame++;
+			};
+
+			const interval = setInterval( draw, 1000 / 30 );
+			draw();
+			recorder.start();
+			// Record ~2s so there is content past the poster seek offset.
+			setTimeout( () => {
+				clearInterval( interval );
+				recorder.stop();
+			}, 2000 );
+		} );
+	} );
+
+	const tmpDirectory = await fs.mkdtemp(
+		path.join( os.tmpdir(), 'gutenberg-test-media-' )
+	);
+	const tmpFileName = path.join( tmpDirectory, `${ uuid() }.webm` );
+	await fs.writeFile( tmpFileName, Buffer.from( base64, 'base64' ) );
+	return tmpFileName;
+}
+
+/**
  * @typedef {import('@playwright/test').Page} Page
  */
 
@@ -752,5 +821,52 @@ test.describe( 'Client-side media processing', () => {
 		expect( createAttempts ).toBe( maxRetryAttempts + 1 );
 
 		await page.unroute( '**/wp/v2/media**' );
+	} );
+
+	test( 'generates a local poster when uploading a video', async ( {
+		page,
+		editor,
+		mediaProcessingUtils,
+	} ) => {
+		const videoFile = await createTestVideoFile( page );
+
+		await editor.insertBlock( { name: 'core/video' } );
+
+		const videoBlock = editor.canvas.locator(
+			'role=document[name="Block: Video"i]'
+		);
+		await expect( videoBlock ).toBeVisible();
+
+		const tmpDirectory = await fs.mkdtemp(
+			path.join( os.tmpdir(), 'gutenberg-test-media-' )
+		);
+		const uploadName = `${ uuid() }.webm`;
+		const uploadPath = path.join( tmpDirectory, uploadName );
+		await fs.copyFile( videoFile, uploadPath );
+		await videoBlock
+			.locator( 'data-testid=form-file-upload-input' )
+			.setInputFiles( uploadPath );
+
+		// The video uploads first (real URL on the block), then the poster is
+		// generated, uploaded, and applied. Wait for the whole queue to drain.
+		await mediaProcessingUtils.waitForUploadQueueEmpty();
+
+		// The block's poster attribute should be a real (non-blob) image URL
+		// pointing at the locally generated poster.
+		await expect
+			.poll(
+				async () =>
+					page.evaluate(
+						() =>
+							window.wp.data
+								.select( 'core/block-editor' )
+								.getBlocks()
+								.find(
+									( block ) => block.name === 'core/video'
+								)?.attributes?.poster
+					),
+				{ timeout: 30_000 }
+			)
+			.toMatch( /^https?:\/\/.+\.(jpe?g|png|webp)$/i );
 	} );
 } );
