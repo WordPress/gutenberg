@@ -12,3 +12,5 @@
     resolves widget types from host-supplied `WidgetModuleRecord[]`.
 -   Contract types: `WidgetType`, `WidgetName`, `WidgetIcon`,
     `WidgetRenderProps`, `ResolveWidgetModule`, `WidgetModuleRecord`.
+-   `defaultPlacement` widget metadata for declaring a preferred initial
+    tile size.

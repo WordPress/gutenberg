@@ -28,7 +28,25 @@ export type WidgetName = `${ string }/${ string }`;
 export type WidgetIcon = ReactElement< ComponentProps< 'svg' > >;
 
 /**
- * Literal contents of a widget's `widget.json` metadata file.
+ * Default tile size a host can use when inserting a widget into a layout.
+ *
+ * Hosts own ordering and any host-specific placement fields. Widget metadata
+ * only declares the preferred initial span.
+ */
+export interface WidgetDefaultPlacement {
+	/**
+	 * Preferred initial column span.
+	 */
+	width?: number;
+
+	/**
+	 * Preferred initial row span.
+	 */
+	height?: number;
+}
+
+/**
+ * Literal contents of a widget's metadata module.
  *
  * Captures the *authoring* shape only; module entry points and style
  * assets are discovered by convention from the widget directory, not
@@ -79,6 +97,13 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	 *   surrounding chrome.
 	 */
 	presentation?: 'framed' | 'content-bleed' | 'full-bleed';
+
+	/**
+	 * Preferred initial tile size when a host inserts a new widget instance.
+	 * Hosts may ignore this hint, and insertion order is intentionally not
+	 * part of the widget metadata contract.
+	 */
+	defaultPlacement?: WidgetDefaultPlacement;
 
 	/**
 	 * Search aliases hosts use to match the widget in their pickers.

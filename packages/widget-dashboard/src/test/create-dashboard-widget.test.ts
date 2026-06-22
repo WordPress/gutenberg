@@ -35,6 +35,39 @@ describe( 'createDashboardWidget', () => {
 		} );
 	} );
 
+	it( 'merges widget default placement values with the dashboard fallback', () => {
+		const instance = createDashboardWidget( {
+			...baseType,
+			defaultPlacement: {
+				width: 2,
+				height: 1,
+			},
+		} );
+
+		expect( instance.placement ).toEqual( {
+			width: 2,
+			height: 1,
+			order: 0,
+		} );
+	} );
+
+	it( 'ignores unsupported widget default placement fields', () => {
+		const instance = createDashboardWidget( {
+			...baseType,
+			defaultPlacement: {
+				width: 2,
+				height: 1,
+				order: 99,
+			} as WidgetType[ 'defaultPlacement' ] & { order: number },
+		} );
+
+		expect( instance.placement ).toEqual( {
+			width: 2,
+			height: 1,
+			order: 0,
+		} );
+	} );
+
 	it( 'uses initialAttributes when provided', () => {
 		const instance = createDashboardWidget< { greeting: string } >(
 			baseType,

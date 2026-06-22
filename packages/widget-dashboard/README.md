@@ -4,6 +4,7 @@
 This package is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes. While it is published as 0.x, breaking changes may ship in minor releases.
 
 This prerelease depends on WordPress core-private APIs and is built to run inside WordPress core. It is not yet safe to install and run as a standalone npm dependency from an external plugin.
+
 </div>
 
 Stateless rendering engine for widget dashboards. `WidgetDashboard` renders an editable grid of widget instances behind a consumer-controlled edit mode: drag-to-reorder, resize, a modal inserter, per-widget and grid-level settings, and command-palette integration.
@@ -179,7 +180,7 @@ import { Page } from '@wordpress/admin-ui';
 
 The "Add widget" button in `<WidgetDashboard.Actions />` opens a modal inserter. It lists every entry in the `widgetTypes` prop as a grid of live previews (each preview renders the type's `example` attributes through its own render module), supports search, and exposes a "Select" action with bulk support so users can insert one or several widgets in a single layout change.
 
-On confirmation, the inserter creates instances (using each type's `example.attributes` as the initial values) and appends them to the staged layout. The dialog closes after a successful insertion or when the user dismisses it.
+On confirmation, the inserter creates instances (using each type's `example.attributes` as the initial values) and appends them to the staged layout. A widget type may provide `defaultPlacement` metadata with `width` and `height` to control the initial tile size. The dashboard merges those fields with its fallback placement and keeps insertion order internal; an `order` value in widget metadata is ignored. The dialog closes after a successful insertion or when the user dismisses it.
 
 ## Grid settings
 

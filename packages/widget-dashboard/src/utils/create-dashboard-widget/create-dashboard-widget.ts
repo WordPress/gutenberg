@@ -22,9 +22,10 @@ const DEFAULT_PLACEMENT: GridTilePlacement = {
 /**
  * Create a new dashboard widget from a widget type.
  *
- * Generates a unique id and applies default placement. If no initial
- * attributes are provided, falls back to the type's `example.attributes`
- * (matching the `widget.json` schema).
+ * Generates a unique id and applies the dashboard fallback placement,
+ * overridden by the type's supported `defaultPlacement` fields. If no
+ * initial attributes are provided, falls back to the type's
+ * `example.attributes`.
  *
  * @param widgetType        Source widget type.
  * @param initialAttributes Initial attributes; default to the type's example.
@@ -33,11 +34,17 @@ export function createDashboardWidget< T >(
 	widgetType: WidgetType,
 	initialAttributes?: T
 ): DashboardWidget< T > {
+	const { width, height } = widgetType.defaultPlacement ?? {};
+
 	return {
 		uuid: uuid(),
 		type: widgetType.name,
 		attributes:
 			initialAttributes ?? ( widgetType.example?.attributes as T ),
-		placement: DEFAULT_PLACEMENT,
+		placement: {
+			...DEFAULT_PLACEMENT,
+			...( width !== undefined ? { width } : {} ),
+			...( height !== undefined ? { height } : {} ),
+		},
 	};
 }

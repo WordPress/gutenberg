@@ -15,3 +15,5 @@
 -   Grid-settings kit for host-side persistence: `WidgetGridSettings`,
     `DEFAULT_GRID`, `normalizeGridSettings`, `ROW_HEIGHT_PRESETS`,
     `DEFAULT_ROW_HEIGHT`, and `WIDGET_DASHBOARD_COLUMN_COUNT`.
+-   Widget insertion respects `defaultPlacement` metadata for the initial
+    tile size.
