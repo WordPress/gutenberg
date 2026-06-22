@@ -6,19 +6,15 @@
  */
 
 /**
- * Filters the block editor preload paths to include media processing fields.
- *
- * The packages/core-data/src/entities.js file requests additional fields
- * (image_sizes, image_size_threshold) on the root endpoint that are not
- * included in WordPress Core's default preload paths. This filter ensures
- * the preloaded URL matches exactly what the JavaScript requests.
+ * Filters the block editor preload paths.
  *
  * @since 20.1.0
  *
- * @param array $paths REST API paths to preload.
+ * @param array                   $paths   REST API paths to preload.
+ * @param WP_Block_Editor_Context $context Block editor context.
  * @return array Filtered preload paths.
  */
-function gutenberg_block_editor_preload_paths_root_fields( $paths ) {
+function gutenberg_block_editor_preload_paths_7_1( $paths, $context ) {
 	// Complete list of fields expected by packages/core-data/src/entities.js.
 	// This must match exactly for preloading to work (same fields, same order).
 	// @see packages/core-data/src/entities.js rootEntitiesConfig.__unstableBase
@@ -32,6 +28,20 @@ function gutenberg_block_editor_preload_paths_root_fields( $paths ) {
 		}
 	}
 
+	if ( 'core/edit-post' === $context->name && isset( $context->post ) ) {
+		$paths[] = '/wp/v2/templates/lookup?slug=front-page';
+		$paths[] = '/wp/v2/taxonomies?context=edit';
+		$paths[] = array( rest_get_route_for_post_type_items( $context->post->post_type ), 'OPTIONS' );
+
+		$author_id = (int) get_post_field( 'post_author', $context->post->ID );
+		if ( post_type_supports( $context->post->post_type, 'author' ) && $author_id > 0 ) {
+			$paths[] = sprintf(
+				'/wp/v2/users/%d?context=view&_fields=id,name',
+				$author_id
+			);
+		}
+	}
+
 	return $paths;
 }
-add_filter( 'block_editor_rest_api_preload_paths', 'gutenberg_block_editor_preload_paths_root_fields' );
+add_filter( 'block_editor_rest_api_preload_paths', 'gutenberg_block_editor_preload_paths_7_1', 10, 2 );

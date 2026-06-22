@@ -1060,12 +1060,12 @@ Pseudo selectors `:hover`, `:focus`, `:focus-visible`, `:visited`, `:active`, `:
 
 #### Responsive styles
 
-Block styles can be scoped to two named breakpoints: `mobile` and `tablet`. Any style property that is valid at the block or element level can be nested under one of these keys.
+Block styles can be scoped to two named breakpoints: `@mobile` and `@tablet`. Any style property that is valid at the block or element level can be nested under one of these keys.
 
 | Key | Media query applied |
 | --- | --- |
-| `mobile` | `@media (width <= 480px)` |
-| `tablet` | `@media (480px < width <= 782px)` |
+| `@mobile` | `@media (width <= 480px)` |
+| `@tablet` | `@media (480px < width <= 782px)` |
 
 Responsive overrides can be placed directly on a block node:
 
@@ -1078,7 +1078,7 @@ Responsive overrides can be placed directly on a block node:
 				"color": {
 					"text": "black"
 				},
-				"mobile": {
+				"@mobile": {
 					"color": {
 						"text": "hotpink"
 					}
@@ -1110,7 +1110,7 @@ They can also be placed on element nodes within a block:
 						}
 					}
 				},
-				"mobile": {
+				"@mobile": {
 					"elements": {
 						"link": {
 							"color": { "text": "red" },
