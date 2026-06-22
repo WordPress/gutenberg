@@ -27,7 +27,9 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		// Setup an empty testing instance of `WP_Navigation_Block_Renderer` and save the original.
 		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer_Gutenberg' );
 		$method     = $reflection->getMethod( 'get_markup_for_inner_block' );
-		$method->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
 		// Invoke the private method.
 		$result = $method->invoke( $reflection, $navigation_link_block );
 
@@ -61,7 +63,9 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		// Setup an empty testing instance of `WP_Navigation_Block_Renderer` and save the original.
 		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer_Gutenberg' );
 		$method     = $reflection->getMethod( 'get_markup_for_inner_block' );
-		$method->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
 		// Invoke the private method.
 		$result = $method->invoke( $reflection, $site_title_block );
 
@@ -99,7 +103,9 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		// Setup an empty testing instance of `WP_Navigation_Block_Renderer` and save the original.
 		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer_Gutenberg' );
 		$method     = $reflection->getMethod( 'get_markup_for_inner_block' );
-		$method->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
 		// Invoke the private method.
 		$result = $method->invoke( $reflection, $heading_block );
 
@@ -153,7 +159,9 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		// Setup an empty testing instance of `WP_Navigation_Block_Renderer` and save the original.
 		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer_Gutenberg' );
 		$method     = $reflection->getMethod( 'get_markup_for_inner_block' );
-		$method->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
 		// Invoke the private method.
 		$result = $method->invoke( $reflection, $heading_block );
 
@@ -175,7 +183,9 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 	public function test_gutenberg_get_inner_blocks_from_navigation_post_returns_empty_block_list() {
 		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer_Gutenberg' );
 		$method     = $reflection->getMethod( 'get_inner_blocks_from_navigation_post' );
-		$method->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
 		$attributes = array( 'ref' => 0 );
 
 		$actual   = $method->invoke( $reflection, $attributes );

@@ -1,13 +1,8 @@
 /**
  * WordPress dependencies
  */
-import {
-	Button,
-	Modal,
-	TextControl,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { Button, Modal, TextControl } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
@@ -96,7 +91,7 @@ export default function RenamePatternModal( {
 			size="small"
 		>
 			<form onSubmit={ onRename }>
-				<VStack spacing="5">
+				<Stack direction="column" gap="lg">
 					<TextControl
 						__next40pxDefaultSize
 						label={ __( 'Name' ) }
@@ -104,8 +99,7 @@ export default function RenamePatternModal( {
 						onChange={ setName }
 						required
 					/>
-
-					<HStack justify="right">
+					<Stack gap="sm" justify="end">
 						<Button
 							__next40pxDefaultSize
 							variant="tertiary"
@@ -113,7 +107,6 @@ export default function RenamePatternModal( {
 						>
 							{ __( 'Cancel' ) }
 						</Button>
-
 						<Button
 							__next40pxDefaultSize
 							variant="primary"
@@ -121,8 +114,8 @@ export default function RenamePatternModal( {
 						>
 							{ __( 'Save' ) }
 						</Button>
-					</HStack>
-				</VStack>
+					</Stack>
+				</Stack>
 			</form>
 		</Modal>
 	);
