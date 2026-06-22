@@ -121,9 +121,9 @@ export interface WidgetTypeMetadata< Item = unknown > {
  * Runtime widget type consumed by hosts.
  *
  * Extends `WidgetTypeMetadata` with runtime-only fields, notably
- * `renderModule`. The PHP layer (`widget-types.php`) emits these in
- * snake_case; `useWidgetTypes` is the single boundary that maps them to
- * camelCase.
+ * `renderModule`. Hosts supply the raw records in snake_case
+ * (`WidgetModuleRecord`); `useWidgetTypes` is the single boundary that
+ * resolves them into this camelCase shape.
  */
 export interface WidgetType< Item = unknown >
 	extends WidgetTypeMetadata< Item > {
@@ -169,9 +169,9 @@ export type ResolveWidgetModule = (
 ) => Promise< WidgetModule >;
 
 /**
- * Per-widget data a host feeds to `useWidgetTypes`, in snake_case wire
- * format. Matches the `/wp/v2/widget-modules` REST shape, so a WordPress
- * host can pass core-data records unchanged.
+ * Per-widget record a host feeds to `useWidgetTypes`, in snake_case wire
+ * format. The host fetches these however it likes; only the field shape is
+ * part of the contract.
  */
 export interface WidgetModuleRecord {
 	/**
