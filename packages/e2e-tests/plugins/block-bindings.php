@@ -82,6 +82,55 @@ function gutenberg_test_block_bindings_registration() {
 		)
 	);
 
+	/*
+	 * Inner-blocks example/test binding sources.
+	 *
+	 * The frontend counterpart of the JS sources registered in
+	 * `block-bindings/index.js`. These resolve the reserved `innerBlocks`
+	 * attribute to a fixed serialized block-markup string (and `null` for any
+	 * other attribute), proving the inner-block binding mechanism on the server
+	 * independently of `core/pattern-overrides`.
+	 *
+	 * They are deliberately CONTEXT-FREE: no `uses_context` is declared and the
+	 * value is resolved purely from the fixture, so resolution is identical
+	 * whether the bound block is top-level (`$parent_block === null`) or nested.
+	 * The fixture string is duplicated verbatim from the JS plugin so the
+	 * editor (`parse()`) and the frontend (`parse_blocks()`) produce the same
+	 * inner blocks for the same source state.
+	 */
+	$inner_blocks_fixture = "<!-- wp:paragraph -->\n<p>Source Paragraph 1</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:paragraph -->\n<p>Source Paragraph 2</p>\n<!-- /wp:paragraph -->";
+
+	$inner_blocks_get_value = function ( $source_args, $block_instance, $attribute_name ) use ( $inner_blocks_fixture ) {
+		if ( 'innerBlocks' === $attribute_name ) {
+			return $inner_blocks_fixture;
+		}
+		return null;
+	};
+
+	register_block_bindings_source(
+		'testing/inner-blocks-source',
+		array(
+			'label'              => 'Inner Blocks Source',
+			'get_value_callback' => $inner_blocks_get_value,
+		)
+	);
+	register_block_bindings_source(
+		'testing/inner-blocks-source-read-only',
+		array(
+			'label'              => 'Inner Blocks Source (Read Only)',
+			'get_value_callback' => $inner_blocks_get_value,
+		)
+	);
+	register_block_bindings_source(
+		'testing/inner-blocks-source-absence',
+		array(
+			'label'              => 'Inner Blocks Source (Absence)',
+			'get_value_callback' => function () {
+				return null;
+			},
+		)
+	);
+
 	// Register "movie" custom post type.
 	register_post_type(
 		'movie',

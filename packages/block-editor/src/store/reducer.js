@@ -21,6 +21,7 @@ import { PREFERENCES_DEFAULTS, SETTINGS_DEFAULTS } from './defaults';
 import { insertAt, moveTo } from './array';
 import { sectionRootClientIdKey, isIsolatedEditorKey } from './private-keys';
 import { unlock } from '../lock-unlock';
+import { getInnerBlocksBinding } from '../utils/block-bindings';
 
 const { isContentBlock } = unlock( blocksPrivateApis );
 
@@ -587,6 +588,25 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 			for ( const clientId of preservedControlledInnerBlocks ) {
 				// Only preserve if the parent block still exists.
 				if ( ! newState.byClientId.has( clientId ) ) {
+					continue;
+				}
+				// A reset that removes a block's `innerBlocks` binding
+				// releases the bound controller: the incoming block has
+				// re-taken ownership of its children (e.g. an undo landing
+				// before the binding was added), so preserving the old
+				// controlled sub-tree would clobber them — and a container
+				// that was empty before the binding must come back empty.
+				// Only the binding's presence in the block's own attributes
+				// signals this hand-back; incoming children alone do not,
+				// because root-level snapshots carry the controlled clones
+				// as children of every controlled container (template parts,
+				// patterns), and those must keep their controllers.
+				if (
+					getInnerBlocksBinding( state.attributes.get( clientId ) ) &&
+					! getInnerBlocksBinding(
+						newState.attributes.get( clientId )
+					)
+				) {
 					continue;
 				}
 				newState.controlledInnerBlocks.add( clientId );

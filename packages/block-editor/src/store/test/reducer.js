@@ -2603,6 +2603,279 @@ describe( 'state', () => {
 					).toEqual( [ 'content-inner' ] );
 				} );
 
+				it( 'should release a bound controlled block across RESET_BLOCKS when the incoming block drops the binding and carries its own children', () => {
+					const boundAttributes = {
+						metadata: {
+							bindings: {
+								innerBlocks: { source: 'core/test-source' },
+							},
+						},
+					};
+					const withControlledContent = blocks(
+						blocks(
+							blocks( undefined, {
+								type: 'RESET_BLOCKS',
+								blocks: [
+									{
+										clientId: 'chicken',
+										name: 'core/test-block',
+										attributes: boundAttributes,
+										innerBlocks: [],
+									},
+								],
+							} ),
+							{
+								type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+								clientId: 'chicken',
+								hasControlledInnerBlocks: true,
+							}
+						),
+						{
+							type: 'REPLACE_INNER_BLOCKS',
+							rootClientId: 'chicken',
+							blocks: [
+								{ clientId: 'content', innerBlocks: [] },
+							],
+						}
+					);
+
+					// Undo of "add binding": the incoming block drops the
+					// binding and carries the entity's restored (nested)
+					// children, which must win over the preserved bound tree.
+					const state = blocks( withControlledContent, {
+						type: 'RESET_BLOCKS',
+						blocks: [
+							{
+								clientId: 'chicken',
+								name: 'core/test-block',
+								attributes: {},
+								innerBlocks: [
+									{
+										clientId: 'own-child',
+										name: 'core/test-block',
+										attributes: {},
+										innerBlocks: [
+											{
+												clientId: 'own-grandchild',
+												name: 'core/test-block',
+												attributes: {},
+												innerBlocks: [],
+											},
+										],
+									},
+								],
+							},
+						],
+					} );
+
+					expect( state.controlledInnerBlocks.has( 'chicken' ) ).toBe(
+						false
+					);
+					expect(
+						getBlocks( { blocks: state }, 'chicken' ).map(
+							( b ) => b.clientId
+						)
+					).toEqual( [ 'own-child' ] );
+					expect(
+						getBlocks( { blocks: state }, 'own-child' ).map(
+							( b ) => b.clientId
+						)
+					).toEqual( [ 'own-grandchild' ] );
+				} );
+
+				it( 'should preserve a non-bound controlled block across RESET_BLOCKS when the incoming block carries snapshot children', () => {
+					const withControlledContent = blocks(
+						blocks(
+							blocks( undefined, {
+								type: 'RESET_BLOCKS',
+								blocks: [
+									{
+										clientId: 'chicken',
+										name: 'core/test-block',
+										attributes: {},
+										innerBlocks: [],
+									},
+								],
+							} ),
+							{
+								type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+								clientId: 'chicken',
+								hasControlledInnerBlocks: true,
+							}
+						),
+						{
+							type: 'REPLACE_INNER_BLOCKS',
+							rootClientId: 'chicken',
+							blocks: [
+								{ clientId: 'content', innerBlocks: [] },
+							],
+						}
+					);
+
+					// Root-level snapshots leak the controlled clones as
+					// children of a controlled container (the tree fix-up
+					// mutates its root-visible entry), so an undo can dispatch
+					// a reset whose incoming container carries those children.
+					// Without a binding hand-back, the entity controller
+					// (template part, pattern) must keep the container.
+					const state = blocks( withControlledContent, {
+						type: 'RESET_BLOCKS',
+						blocks: [
+							{
+								clientId: 'chicken',
+								name: 'core/test-block',
+								attributes: {},
+								innerBlocks: [
+									{
+										clientId: 'content',
+										name: 'core/test-block',
+										attributes: {},
+										innerBlocks: [],
+									},
+								],
+							},
+						],
+					} );
+
+					expect( state.controlledInnerBlocks.has( 'chicken' ) ).toBe(
+						true
+					);
+					expect(
+						getBlocks( { blocks: state }, 'chicken' ).map(
+							( b ) => b.clientId
+						)
+					).toEqual( [ 'content' ] );
+				} );
+
+				it( 'should preserve a controlled block across RESET_BLOCKS when the incoming children are an innerBlocks binding fallback', () => {
+					const boundAttributes = {
+						metadata: {
+							bindings: {
+								innerBlocks: { source: 'core/test-source' },
+							},
+						},
+					};
+					const withControlledContent = blocks(
+						blocks(
+							blocks( undefined, {
+								type: 'RESET_BLOCKS',
+								blocks: [
+									{
+										clientId: 'chicken',
+										name: 'core/test-block',
+										attributes: boundAttributes,
+										innerBlocks: [],
+									},
+								],
+							} ),
+							{
+								type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+								clientId: 'chicken',
+								hasControlledInnerBlocks: true,
+							}
+						),
+						{
+							type: 'REPLACE_INNER_BLOCKS',
+							rootClientId: 'chicken',
+							blocks: [
+								{ clientId: 'content', innerBlocks: [] },
+							],
+						}
+					);
+
+					// The incoming block still declares the binding: its
+					// serialized children are the binding's fallback content,
+					// not an ownership claim.
+					const state = blocks( withControlledContent, {
+						type: 'RESET_BLOCKS',
+						blocks: [
+							{
+								clientId: 'chicken',
+								name: 'core/test-block',
+								attributes: boundAttributes,
+								innerBlocks: [
+									{
+										clientId: 'fallback-child',
+										name: 'core/test-block',
+										attributes: {},
+										innerBlocks: [],
+									},
+								],
+							},
+						],
+					} );
+
+					expect( state.controlledInnerBlocks.has( 'chicken' ) ).toBe(
+						true
+					);
+					expect(
+						getBlocks( { blocks: state }, 'chicken' ).map(
+							( b ) => b.clientId
+						)
+					).toEqual( [ 'content' ] );
+				} );
+
+				it( 'should release a bound controlled block across RESET_BLOCKS when the incoming block drops the binding, even childless', () => {
+					const withControlledContent = blocks(
+						blocks(
+							blocks( undefined, {
+								type: 'RESET_BLOCKS',
+								blocks: [
+									{
+										clientId: 'chicken',
+										name: 'core/test-block',
+										attributes: {
+											metadata: {
+												bindings: {
+													innerBlocks: {
+														source: 'core/test-source',
+													},
+												},
+											},
+										},
+										innerBlocks: [],
+									},
+								],
+							} ),
+							{
+								type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+								clientId: 'chicken',
+								hasControlledInnerBlocks: true,
+							}
+						),
+						{
+							type: 'REPLACE_INNER_BLOCKS',
+							rootClientId: 'chicken',
+							blocks: [
+								{ clientId: 'content', innerBlocks: [] },
+							],
+						}
+					);
+
+					// Undo of "add binding" on a previously empty container:
+					// the incoming block is childless, but dropping the binding
+					// is itself the release — the container must come back
+					// empty, not keep the bound tree.
+					const state = blocks( withControlledContent, {
+						type: 'RESET_BLOCKS',
+						blocks: [
+							{
+								clientId: 'chicken',
+								name: 'core/test-block',
+								attributes: {},
+								innerBlocks: [],
+							},
+						],
+					} );
+
+					expect( state.controlledInnerBlocks.has( 'chicken' ) ).toBe(
+						false
+					);
+					expect(
+						getBlocks( { blocks: state }, 'chicken' )
+					).toHaveLength( 0 );
+				} );
+
 				it( 'should forget controlledInnerBlocks during full RESET_BLOCKS', () => {
 					const templateBlock = {
 						clientId: 'template',

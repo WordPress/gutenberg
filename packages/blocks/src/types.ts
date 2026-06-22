@@ -564,6 +564,28 @@ export interface ParseOptions {
 
 /**
  * An object describing a Block Bindings source.
+ *
+ * In addition to a block's attributes, a source's `getValues`, `setValues`, and
+ * `canUserEditValue` callbacks may operate on a block's **inner blocks** through
+ * the reserved `innerBlocks` key inside the block's `metadata.bindings` map (i.e.
+ * `metadata.bindings.innerBlocks = { source, args? }`). `innerBlocks` is **not**
+ * a block attribute: it is a reserved structural slot, so it never collides with
+ * an attribute of the same name and needs no separate source-registration flag.
+ *
+ * The canonical value for the reserved `innerBlocks` key is a **serialized
+ * block-markup string** — the same format `serialize()` produces and `parse()`
+ * consumes in JavaScript (and `serialize_blocks()`/`parse_blocks()` produce/consume
+ * in PHP) — so the editor and the frontend resolve to equivalent inner blocks for
+ * the same source state. Three states are distinguished:
+ *
+ * - `undefined` (absence): the source supplies nothing; the block falls back to
+ *   its own serialized inner blocks.
+ * - `''` (empty): an intentionally-empty inner-block area (`parse( '' )` → `[]`);
+ *   the serialized fallback is **not** used.
+ * - a serialized block-markup string: parsed into the inner-block tree.
+ *
+ * `undefined`/absence and `''`/empty are deliberately distinct: a source MUST
+ * return `undefined` (not `''`) to request the serialized fallback.
  */
 export interface BlockBindingsSource {
 	/**
@@ -580,14 +602,35 @@ export interface BlockBindingsSource {
 	usesContext?: string[];
 	/**
 	 * Optional function to get the values from the source.
+	 *
+	 * Called with `{ select, context, clientId, bindings }`. The returned object
+	 * is keyed by binding name, mapping each bound attribute name to its resolved
+	 * value. The reserved `innerBlocks` key is handled like any other binding key:
+	 * its value is a **serialized block-markup string** (the same format `parse()`
+	 * consumes), `undefined` for absence (the block falls back to its own
+	 * serialized inner blocks), or `''` for an intentionally-empty area. No
+	 * dedicated inner-block callback exists — inner blocks ride the reserved
+	 * `innerBlocks` key through this same callback.
 	 */
 	getValues?: Function;
 	/**
 	 * Optional function to update multiple values connected to the source.
+	 *
+	 * Called with `{ select, dispatch, context, clientId, bindings }`, where each
+	 * entry of `bindings` is `{ args, newValue }`. The reserved `innerBlocks` key
+	 * is handled like any other binding key: its `newValue` is the **serialized
+	 * block-markup string** of the edited inner-block subtree (the same format
+	 * `serialize()` produces). No dedicated inner-block callback exists — inner
+	 * blocks ride the reserved `innerBlocks` key through this same callback.
 	 */
 	setValues?: Function;
 	/**
 	 * Optional function to determine if the user can edit the value.
+	 *
+	 * Called with `{ select, context, clientId, attributeName }`. When invoked for
+	 * the reserved `innerBlocks` key, `attributeName` is `'innerBlocks'`; returning
+	 * `false` marks the bound inner-block area read-only in the editor (no appender,
+	 * children locked).
 	 */
 	canUserEditValue?: Function;
 	/**

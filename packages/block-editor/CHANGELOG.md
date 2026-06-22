@@ -31,6 +31,7 @@
 
 -   Grid: Add a "Fill available space" option to the grid layout that switches the auto-placement keyword from `auto-fill` to `auto-fit`, so columns stretch to fill the row instead of leaving empty tracks. ([#79356](https://github.com/WordPress/gutenberg/pull/79356))
 -   List View: a block that supports `listView` is now excluded from the List View when it has no inner blocks and disallows insertion (`allowedBlocks` is `[]` or `false`), since there is nothing to show, rearrange, or add. ([#78932](https://github.com/WordPress/gutenberg/pull/78932))
+-   Block Bindings: support binding an InnerBlocks area through `metadata.bindings.innerBlocks`, including source-supplied serialized block markup, write-back, and read-only locking. ([#79379](https://github.com/WordPress/gutenberg/pull/79379))
 
 ## 15.21.1 (2026-06-16)
 

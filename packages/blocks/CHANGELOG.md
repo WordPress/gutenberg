@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Block Bindings: document `innerBlocks` as a reserved binding key in `metadata.bindings`, using serialized block markup through existing source callbacks. ([#79379](https://github.com/WordPress/gutenberg/pull/79379))
+
 ## 15.23.0 (2026-07-01)
 
 ## 15.22.0 (2026-06-24)
