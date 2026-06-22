@@ -1736,6 +1736,36 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	}
 
 	/**
+	 * Verifies that a URL with no usable path bails with a 400 before any
+	 * download is attempted, rather than handing an empty filename to the
+	 * sideload handler.
+	 *
+	 * @covers ::create_item_from_url
+	 */
+	public function test_create_item_from_url_rejects_url_without_filename() {
+		wp_set_current_user( self::$admin_id );
+
+		// Fail loudly if the guard does not bail and a download is attempted.
+		$downloaded = false;
+		$track      = static function () use ( &$downloaded ) {
+			$downloaded = true;
+			return new WP_Error( 'http_request_failed', 'Should not be reached.' );
+		};
+		add_filter( 'pre_http_request', $track );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_param( 'url', 'https://example.com/?img=123' );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		remove_filter( 'pre_http_request', $track );
+
+		$this->assertSame( 'rest_invalid_url', $response->get_data()['code'] );
+		$this->assertSame( 400, $response->get_status() );
+		$this->assertFalse( $downloaded, 'No download should be attempted for a URL without a filename.' );
+	}
+
+	/**
 	 * Verifies that a user without the `upload_files` capability cannot sideload
 	 * an external image and that the request bails before any download happens.
 	 *

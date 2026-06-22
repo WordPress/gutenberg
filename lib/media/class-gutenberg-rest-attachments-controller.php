@@ -497,6 +497,17 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		$url     = $request['url'];
 		$post_id = ! empty( $request['post'] ) ? (int) $request['post'] : 0;
 
+		// Derive the filename from the URL path before downloading anything.
+		$url_path = wp_parse_url( $url, PHP_URL_PATH );
+		$filename = $url_path ? wp_basename( $url_path ) : '';
+		if ( '' === $filename ) {
+			return new WP_Error(
+				'rest_invalid_url',
+				__( 'Could not determine a filename from the provided URL.', 'gutenberg' ),
+				array( 'status' => 400 )
+			);
+		}
+
 		/*
 		 * Download the remote file with WordPress's HTTP API, which validates
 		 * the host and blocks requests to private or local addresses. This is
@@ -508,7 +519,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		}
 
 		$file_array = array(
-			'name'     => wp_basename( wp_parse_url( $url, PHP_URL_PATH ) ),
+			'name'     => $filename,
 			'tmp_name' => $tmp_file,
 		);
 
@@ -528,6 +539,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		$request->set_param( 'context', 'edit' );
 		$response = $this->prepare_item_for_response( get_post( $attachment_id ), $request );
 		$response->set_status( 201 );
+		$response->header( 'Location', rest_url( rest_get_route_for_post( $attachment_id ) ) );
 
 		return $response;
 	}
