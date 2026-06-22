@@ -71,6 +71,11 @@ function recordOverlay( record: WidgetModuleRecord ) {
 		...( record.description ? { description: record.description } : {} ),
 		...( record.help ? { help: record.help } : {} ),
 		...( record.keywords ? { keywords: record.keywords } : {} ),
+		...( record.origin ? { origin: record.origin } : {} ),
+		...( record.definition_id !== undefined
+			? { definitionId: record.definition_id }
+			: {} ),
+		...( record.content !== undefined ? { content: record.content } : {} ),
 	};
 }
 
@@ -81,6 +86,8 @@ function recordOverlay( record: WidgetModuleRecord ) {
  * module's default export with the runtime fields (`name`, `renderModule`).
  * A record without a metadata module resolves from its own fields alone,
  * so a widget declared entirely by its manifest needs no module stub.
+ * Server-defined origins (code-registered and cpt) resolve the same way,
+ * carrying their composition inline as `content`.
  * Attribute schemas pass through `resolveFields`, so attributes referencing
  * registered field types reach hosts as plain DataViews fields. Icon
  * references resolve through the registered icon resolver, off the loading
@@ -118,11 +125,14 @@ export function useWidgetTypes(
 					/*
 					 * No metadata module: the widget is declared entirely
 					 * by its manifest, so the record carries the metadata
-					 * and the render module carries the body. Without a
-					 * render module there is nothing to mount, and the
-					 * record drops.
+					 * and the body is the render module, or the inline
+					 * `content` for server-defined origins. With neither
+					 * there is nothing to mount, and the record drops.
 					 */
-					if ( ! record.render_module ) {
+					if (
+						! record.render_module &&
+						record.content === undefined
+					) {
 						return null;
 					}
 
