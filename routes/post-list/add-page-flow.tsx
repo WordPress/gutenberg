@@ -13,25 +13,40 @@ import {
 	Notice,
 	SelectControl,
 	TextControl,
-	Tooltip as WCTooltip,
 } from '@wordpress/components';
 import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useMemo, useState } from '@wordpress/element';
+import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __, sprintf } from '@wordpress/i18n';
 import { chevronDown, chevronLeft, plus } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
-import { useInvalidate, useNavigate } from '@wordpress/route';
+import { Link, useInvalidate, useNavigate } from '@wordpress/route';
 import { Card, CollapsibleCard, Text } from '@wordpress/ui';
 
+import { isPageApplicableTemplate } from './template-utils';
+
 const NAVIGATION_POST_TYPE = 'wp_navigation';
-const SCRATCH_LAYOUT_ID = '_scratch';
+const OTHER_PAGE_LAYOUT_TYPE = 'other';
+const PAGE_LAYOUT_PREVIEW_VIEWPORT_WIDTH = 720;
 
 type PageStartMode = 'layout' | 'scratch';
+type PageLayoutTypeSlug =
+	| 'homepage'
+	| 'landing-page'
+	| 'event'
+	| 'link-in-bio'
+	| 'personal'
+	| 'coming-soon'
+	| 'other';
 
 interface AddPageFlowProps {
 	onClose: () => void;
+}
+
+interface PageLayoutType {
+	slug: PageLayoutTypeSlug;
+	label: string;
 }
 
 interface BlockPattern {
@@ -41,17 +56,10 @@ interface BlockPattern {
 	description?: string;
 	blockTypes?: string[];
 	postTypes?: string[];
+	pageTypes?: string[];
 	categories?: string[];
 	inserter?: boolean;
 	viewportWidth?: number;
-	blocks?: unknown[];
-}
-
-interface ScratchLayout {
-	name: string;
-	title: string;
-	description: string;
-	isScratch: true;
 }
 
 interface PostRecord {
@@ -69,10 +77,143 @@ interface PostRecord {
 	};
 }
 
+function getPageLayoutTypes(): PageLayoutType[] {
+	return [
+		{ slug: 'homepage', label: __( 'Homepages' ) },
+		{ slug: 'landing-page', label: __( 'Landing pages' ) },
+		{ slug: 'event', label: __( 'Events' ) },
+		{ slug: 'link-in-bio', label: __( 'Link in bio' ) },
+		{ slug: 'personal', label: __( 'Personal' ) },
+		{ slug: 'coming-soon', label: __( 'Coming soon' ) },
+		{ slug: OTHER_PAGE_LAYOUT_TYPE, label: __( 'Other layouts' ) },
+	];
+}
+
+function normalizeLayoutText( value?: string ) {
+	return decodeEntities( value || '' ).toLowerCase();
+}
+
+function getKnownPageLayoutType( slug?: string ): PageLayoutTypeSlug | null {
+	switch ( slug ) {
+		case 'homepage':
+		case 'homepages':
+		case 'home':
+		case 'front-page':
+		case 'frontpage':
+			return 'homepage';
+		case 'landing-page':
+		case 'landing-pages':
+		case 'landing':
+			return 'landing-page';
+		case 'event':
+		case 'events':
+			return 'event';
+		case 'link-in-bio':
+		case 'linkinbio':
+		case 'link-in-bios':
+			return 'link-in-bio';
+		case 'personal':
+		case 'bio':
+		case 'cv':
+		case 'resume':
+			return 'personal';
+		case 'coming-soon':
+		case 'comingsoon':
+			return 'coming-soon';
+		case OTHER_PAGE_LAYOUT_TYPE:
+			return OTHER_PAGE_LAYOUT_TYPE;
+		default:
+			return null;
+	}
+}
+
+function inferPageLayoutTypes( pattern: BlockPattern ): PageLayoutTypeSlug[] {
+	const explicitTypes = ( pattern.pageTypes || [] )
+		.map( getKnownPageLayoutType )
+		.filter( Boolean ) as PageLayoutTypeSlug[];
+
+	if ( explicitTypes.length ) {
+		return [ ...new Set( explicitTypes ) ];
+	}
+
+	const categories = pattern.categories || [];
+	const categoryTypes = categories
+		.map( getKnownPageLayoutType )
+		.filter( Boolean ) as PageLayoutTypeSlug[];
+
+	if ( categoryTypes.length ) {
+		return [ ...new Set( categoryTypes ) ];
+	}
+
+	const patternText = [
+		normalizeLayoutText( pattern.name ),
+		normalizeLayoutText( pattern.title ),
+		...( pattern.categories || [] ).map( normalizeLayoutText ),
+	].join( ' ' );
+
+	if (
+		patternText.includes( 'event rsvp' ) ||
+		patternText.includes( 'event-rsvp' ) ||
+		patternText.includes( 'landing page for event' ) ||
+		patternText.includes( 'landing-event' )
+	) {
+		return [ 'event' ];
+	}
+
+	if (
+		patternText.includes( 'link in bio' ) ||
+		patternText.includes( 'link-in-bio' )
+	) {
+		return [ 'link-in-bio' ];
+	}
+
+	if (
+		patternText.includes( 'coming soon' ) ||
+		patternText.includes( 'coming-soon' )
+	) {
+		return [ 'coming-soon' ];
+	}
+
+	if (
+		patternText.includes( 'cv/bio' ) ||
+		patternText.includes( 'cv bio' ) ||
+		patternText.includes( 'cv-bio' )
+	) {
+		return [ 'personal' ];
+	}
+
+	if (
+		patternText.includes( 'business homepage' ) ||
+		patternText.includes( 'business-home' ) ||
+		patternText.includes( 'portfolio homepage' ) ||
+		patternText.includes( 'portfolio-home' ) ||
+		patternText.includes( 'shop homepage' ) ||
+		patternText.includes( 'shop-home' )
+	) {
+		return [ 'homepage' ];
+	}
+
+	if (
+		patternText.includes( 'landing page for book' ) ||
+		patternText.includes( 'landing-book' ) ||
+		patternText.includes( 'landing page for podcast' ) ||
+		patternText.includes( 'landing-podcast' )
+	) {
+		return [ 'landing-page' ];
+	}
+
+	return [ OTHER_PAGE_LAYOUT_TYPE ];
+}
+
 interface TemplateRecord {
 	id: number | string;
 	slug: string;
 	is_custom?: boolean;
+	post_types?: string[];
+	postTypes?: string[];
+	site_editor_template_context?: {
+		post_type?: string;
+	} | null;
 	title?: {
 		rendered?: string;
 		raw?: string;
@@ -159,9 +300,7 @@ function getPatternContent( pattern?: BlockPattern ) {
 		return '';
 	}
 
-	const blocks = pattern.blocks?.length
-		? pattern.blocks
-		: parse( pattern.content );
+	const blocks = parse( pattern.content );
 
 	return __unstableSerializeAndClean( blocks as any );
 }
@@ -203,9 +342,7 @@ function getPatternPreviewBlocks(
 	pattern: BlockPattern,
 	pageTemplateContent?: string
 ) {
-	const patternBlocks = pattern.blocks?.length
-		? pattern.blocks
-		: parse( pattern.content );
+	const patternBlocks = parse( pattern.content );
 
 	if ( ! pageTemplateContent ) {
 		return patternBlocks;
@@ -221,20 +358,306 @@ function getPatternPreviewBlocks(
 }
 
 function usePageLayoutPatterns() {
-	const patterns = useSelect(
-		( select ) => select( coreStore ).getBlockPatterns() as BlockPattern[],
-		[]
+	const { patterns, isResolving } = useSelect( ( select ) => {
+		const store = select( coreStore ) as any;
+		return {
+			patterns: store.getBlockPatterns() as BlockPattern[],
+			isResolving: store.isResolving( 'getBlockPatterns' ),
+		};
+	}, [] );
+
+	const pageLayoutPatterns = useMemo(
+		() => ( patterns || [] ).filter( isPageLayoutPattern ),
+		[ patterns ]
 	);
 
-	return useMemo(
+	return {
+		patterns: pageLayoutPatterns,
+		isResolving,
+	};
+}
+
+function PageLayoutPreviewPlaceholder() {
+	return (
+		<svg
+			className="apm-layout-preview-placeholder"
+			viewBox="0 0 720 960"
+			preserveAspectRatio="xMidYMin slice"
+			aria-hidden="true"
+			focusable="false"
+		>
+			<rect
+				className="apm-layout-preview-placeholder__page"
+				width="720"
+				height="960"
+				rx="10"
+			/>
+			<rect
+				className="apm-layout-preview-placeholder__heading"
+				x="72"
+				y="70"
+				width="258"
+				height="24"
+				rx="4"
+			/>
+			<rect
+				className="apm-layout-preview-placeholder__line"
+				x="426"
+				y="76"
+				width="68"
+				height="12"
+				rx="6"
+			/>
+			<rect
+				className="apm-layout-preview-placeholder__line"
+				x="518"
+				y="76"
+				width="68"
+				height="12"
+				rx="6"
+			/>
+			<rect
+				className="apm-layout-preview-placeholder__image"
+				x="72"
+				y="150"
+				width="576"
+				height="260"
+				rx="10"
+			/>
+			<rect
+				className="apm-layout-preview-placeholder__title"
+				x="72"
+				y="468"
+				width="410"
+				height="42"
+				rx="5"
+			/>
+			<rect
+				className="apm-layout-preview-placeholder__line"
+				x="72"
+				y="548"
+				width="520"
+				height="16"
+				rx="8"
+			/>
+			<rect
+				className="apm-layout-preview-placeholder__line"
+				x="72"
+				y="582"
+				width="470"
+				height="16"
+				rx="8"
+			/>
+			<rect
+				className="apm-layout-preview-placeholder__line"
+				x="72"
+				y="616"
+				width="320"
+				height="16"
+				rx="8"
+			/>
+			<rect
+				className="apm-layout-preview-placeholder__image"
+				x="72"
+				y="710"
+				width="248"
+				height="170"
+				rx="8"
+			/>
+			<rect
+				className="apm-layout-preview-placeholder__image"
+				x="400"
+				y="710"
+				width="248"
+				height="170"
+				rx="8"
+			/>
+		</svg>
+	);
+}
+
+function PageLayoutSidebarPlaceholder() {
+	return (
+		<svg
+			className="apm-layout-categories-placeholder"
+			viewBox="0 0 240 340"
+			preserveAspectRatio="none"
+			aria-hidden="true"
+			focusable="false"
+		>
+			<rect
+				className="apm-layout-categories-placeholder__selected"
+				x="0"
+				y="0"
+				width="240"
+				height="46"
+				rx="2"
+			/>
+			{ [ 0, 1, 2, 3, 4, 5 ].map( ( index ) => (
+				<g key={ index } transform={ `translate(0 ${ index * 58 })` }>
+					<rect
+						className="apm-layout-categories-placeholder__label"
+						x="16"
+						y="17"
+						width={ index === 0 ? 118 : 150 - index * 10 }
+						height="12"
+						rx="6"
+					/>
+					<rect
+						className="apm-layout-categories-placeholder__count"
+						x="206"
+						y="17"
+						width="18"
+						height="12"
+						rx="6"
+					/>
+				</g>
+			) ) }
+		</svg>
+	);
+}
+
+function PageLayoutCardPlaceholder() {
+	return (
+		<div className="apm-layout-card-placeholder" aria-hidden="true">
+			<div className="apm-layout-preview">
+				<div className="apm-layout-preview-page">
+					<PageLayoutPreviewPlaceholder />
+				</div>
+			</div>
+			<div className="apm-layout-card-placeholder__content">
+				<div className="apm-layout-card-placeholder__title" />
+				<div className="apm-layout-card-placeholder__line" />
+				<div className="apm-layout-card-placeholder__line is-short" />
+			</div>
+		</div>
+	);
+}
+
+function PageLayoutResultsPlaceholder() {
+	return (
+		<div
+			className="apm-layouts-grid apm-layouts-grid-placeholder"
+			aria-hidden="true"
+		>
+			{ [ 0, 1, 2, 3 ].map( ( index ) => (
+				<PageLayoutCardPlaceholder key={ index } />
+			) ) }
+		</div>
+	);
+}
+
+function useVisiblePreview() {
+	const previewRef = useRef< HTMLDivElement | null >( null );
+	const [ isVisible, setIsVisible ] = useState( false );
+
+	useEffect( () => {
+		if ( isVisible ) {
+			return;
+		}
+
+		const previewElement = previewRef.current;
+		if (
+			! previewElement ||
+			typeof window.IntersectionObserver === 'undefined'
+		) {
+			setIsVisible( true );
+			return;
+		}
+
+		const observer = new window.IntersectionObserver(
+			( entries ) => {
+				if ( entries.some( ( entry ) => entry.isIntersecting ) ) {
+					setIsVisible( true );
+					observer.disconnect();
+				}
+			},
+			{
+				rootMargin: '360px',
+			}
+		);
+
+		observer.observe( previewElement );
+
+		return () => observer.disconnect();
+	}, [ isVisible ] );
+
+	return { previewRef, isVisible };
+}
+
+function PageLayoutPreview( {
+	pattern,
+	pageTemplateContent,
+}: {
+	pattern: BlockPattern;
+	pageTemplateContent?: string;
+} ) {
+	const { previewRef, isVisible } = useVisiblePreview();
+	const previewBlocks = useMemo(
 		() =>
-			( patterns || [] )
-				.filter( isPageLayoutPattern )
-				.map( ( pattern ) => ( {
-					...pattern,
-					blocks: pattern.blocks || parse( pattern.content ),
-				} ) ),
-		[ patterns ]
+			isVisible
+				? getPatternPreviewBlocks( pattern, pageTemplateContent )
+				: undefined,
+		[ isVisible, pageTemplateContent, pattern ]
+	);
+
+	return (
+		<div ref={ previewRef } className="apm-layout-preview">
+			<div className="apm-layout-preview-page">
+				{ ! previewBlocks && <PageLayoutPreviewPlaceholder /> }
+				{ !! previewBlocks && (
+					<BlockPreview.Async
+						placeholder={ <PageLayoutPreviewPlaceholder /> }
+					>
+						<BlockPreview
+							blocks={ previewBlocks as any }
+							viewportWidth={
+								pattern.viewportWidth
+									? Math.min(
+											pattern.viewportWidth,
+											PAGE_LAYOUT_PREVIEW_VIEWPORT_WIDTH
+									  )
+									: PAGE_LAYOUT_PREVIEW_VIEWPORT_WIDTH
+							}
+						/>
+					</BlockPreview.Async>
+				) }
+			</div>
+		</div>
+	);
+}
+
+function PageLayoutCard( {
+	pattern,
+	pageTemplateContent,
+	onSelect,
+}: {
+	pattern: BlockPattern;
+	pageTemplateContent?: string;
+	onSelect: ( pattern: BlockPattern ) => void;
+} ) {
+	return (
+		<Button
+			variant="secondary"
+			className="apm-layout-card"
+			onClick={ () => onSelect( pattern ) }
+			__next40pxDefaultSize
+		>
+			<PageLayoutPreview
+				pattern={ pattern }
+				pageTemplateContent={ pageTemplateContent }
+			/>
+			<span className="apm-layout-card-content">
+				<Text variant="body-sm" className="apm-layout-name">
+					{ decodeEntities( pattern.title ) }
+				</Text>
+				{ !! pattern.description && (
+					<Text variant="body-sm" className="apm-layout-description">
+						{ decodeEntities( pattern.description ) }
+					</Text>
+				) }
+			</span>
+		</Button>
 	);
 }
 
@@ -257,7 +680,9 @@ function usePageTemplates() {
 			...( ( templates as TemplateRecord[] ) || [] )
 				.filter(
 					( template ) =>
-						template.is_custom && !! template.content?.raw
+						template.is_custom &&
+						!! template.content?.raw &&
+						isPageApplicableTemplate( template )
 				)
 				.map( ( template ) => ( {
 					label: getRecordTitle( template ),
@@ -273,6 +698,30 @@ function usePageTemplates() {
 	};
 }
 
+function getPageLayoutGroups( patterns: BlockPattern[] ) {
+	const groups = getPageLayoutTypes().map( ( type ) => ( {
+		...type,
+		patterns: [] as BlockPattern[],
+	} ) );
+	const groupBySlug = new Map(
+		groups.map( ( group ) => [ group.slug, group ] )
+	);
+
+	for ( const pattern of patterns ) {
+		for ( const pageType of inferPageLayoutTypes( pattern ) ) {
+			const group =
+				groupBySlug.get( pageType ) ||
+				groupBySlug.get( OTHER_PAGE_LAYOUT_TYPE );
+
+			if ( group && ! group.patterns.includes( pattern ) ) {
+				group.patterns.push( pattern );
+			}
+		}
+	}
+
+	return groups.filter( ( group ) => group.patterns.length );
+}
+
 export function AddPageFlow( { onClose }: AddPageFlowProps ) {
 	const navigate = useNavigate();
 	const invalidate = useInvalidate();
@@ -286,9 +735,18 @@ export function AddPageFlow( { onClose }: AddPageFlowProps ) {
 	const [ publishImmediately, setPublishImmediately ] = useState( true );
 	const [ addToMenu, setAddToMenu ] = useState( false );
 	const [ selectedTemplateSlug, setSelectedTemplateSlug ] = useState( '' );
+	const [ selectedPageType, setSelectedPageType ] =
+		useState< PageLayoutTypeSlug >();
 	const [ isBusy, setIsBusy ] = useState( false );
 	const [ validationError, setValidationError ] = useState< string >();
-	const pageLayoutPatterns = usePageLayoutPatterns();
+	const {
+		patterns: pageLayoutPatterns,
+		isResolving: isResolvingPageLayoutPatterns,
+	} = usePageLayoutPatterns();
+	const pageLayoutGroups = useMemo(
+		() => getPageLayoutGroups( pageLayoutPatterns ),
+		[ pageLayoutPatterns ]
+	);
 	const pageTemplates = usePageTemplates();
 	const pageTemplateContent = useSelect( ( select ) => {
 		const store = select( coreStore ) as any;
@@ -323,30 +781,31 @@ export function AddPageFlow( { onClose }: AddPageFlowProps ) {
 		order: 'asc',
 	} );
 
-	const layoutOptions = useMemo(
-		() => [
-			...pageLayoutPatterns,
-			{
-				name: SCRATCH_LAYOUT_ID,
-				title: __( 'Start from scratch' ),
-				description: __(
-					'Create a blank page and add content as you go'
-				),
-				isScratch: true,
-			} as ScratchLayout,
-		],
-		[ pageLayoutPatterns ]
+	const activePageType =
+		selectedPageType ||
+		pageLayoutGroups[ 0 ]?.slug ||
+		OTHER_PAGE_LAYOUT_TYPE;
+	const activePageLayoutGroup = pageLayoutGroups.find(
+		( group ) => group.slug === activePageType
 	);
-	const layoutPreviewBlocks = useMemo( () => {
-		const previews = new Map< string, unknown[] >();
-		for ( const pattern of pageLayoutPatterns ) {
-			previews.set(
-				pattern.name,
-				getPatternPreviewBlocks( pattern, pageTemplateContent )
-			);
+	const isLoadingPageLayouts =
+		isResolvingPageLayoutPatterns && ! pageLayoutGroups.length;
+	const hasActivePageLayouts = !! activePageLayoutGroup?.patterns.length;
+
+	useEffect( () => {
+		if ( selectedPath !== 'layout' || ! pageLayoutGroups.length ) {
+			return;
 		}
-		return previews;
-	}, [ pageLayoutPatterns, pageTemplateContent ] );
+
+		if (
+			! selectedPageType ||
+			! pageLayoutGroups.some(
+				( group ) => group.slug === selectedPageType
+			)
+		) {
+			setSelectedPageType( pageLayoutGroups[ 0 ].slug );
+		}
+	}, [ pageLayoutGroups, selectedPageType, selectedPath ] );
 
 	const handleSelectPath = ( path: PageStartMode ) => {
 		setSelectedPath( path );
@@ -369,16 +828,16 @@ export function AddPageFlow( { onClose }: AddPageFlowProps ) {
 		setValidationError( undefined );
 	};
 
-	const handleSelectLayout = ( option: BlockPattern | ScratchLayout ) => {
-		if ( 'isScratch' in option ) {
-			setSelectedPath( 'scratch' );
-			setSelectedLayout( undefined );
-			setPageTitle( '' );
-			return;
-		}
+	const handleStartBlank = () => {
+		setSelectedPath( 'scratch' );
+		setSelectedLayout( undefined );
+		setPageTitle( '' );
+		setValidationError( undefined );
+	};
 
-		setSelectedLayout( option );
-		setPageTitle( option.title );
+	const handleSelectLayout = ( pattern: BlockPattern ) => {
+		setSelectedLayout( pattern );
+		setPageTitle( pattern.title );
 	};
 
 	const persistPageInNavigation = async ( newPage: PostRecord ) => {
@@ -532,10 +991,27 @@ export function AddPageFlow( { onClose }: AddPageFlowProps ) {
 
 	return (
 		<Modal
-			title={ __( 'Add a new page' ) }
+			title={
+				isChoosingLayout
+					? __( 'Choose a layout' )
+					: __( 'Add a new page' )
+			}
 			onRequestClose={ onClose }
-			className="apm-modal"
+			className={ `apm-modal ${
+				isChoosingLayout ? 'is-layout-picker' : ''
+			}` }
 			size="large"
+			headerActions={
+				isChoosingLayout ? (
+					<Button
+						variant="secondary"
+						onClick={ handleStartBlank }
+						__next40pxDefaultSize
+					>
+						{ __( 'Start blank' ) }
+					</Button>
+				) : null
+			}
 		>
 			<div className="apm-modal-body">
 				{ isChoosingLayout && (
@@ -544,8 +1020,11 @@ export function AddPageFlow( { onClose }: AddPageFlowProps ) {
 						className="modal-subtitle apm-modal-subtitle"
 					>
 						{ __(
-							'Choose from predefined layouts built using Patterns that you can customize.'
-						) }
+							'Choose a page layout built with Patterns, or start with a blank page.'
+						) }{ ' ' }
+						<Link to="/patterns/list/all">
+							{ __( 'View all Patterns' ) }
+						</Link>
 					</Text>
 				) }
 				{ ! selectedPath && (
@@ -584,7 +1063,7 @@ export function AddPageFlow( { onClose }: AddPageFlowProps ) {
 							<Button
 								variant="secondary"
 								className="apm-option-card"
-								onClick={ () => handleSelectPath( 'scratch' ) }
+								onClick={ handleStartBlank }
 								__next40pxDefaultSize
 							>
 								<div className="apm-option-preview apm-preview-scratch">
@@ -622,58 +1101,86 @@ export function AddPageFlow( { onClose }: AddPageFlowProps ) {
 					</>
 				) }
 				{ isChoosingLayout && (
-					<div className="apm-layouts-grid">
-						{ layoutOptions.map( ( option ) => (
-							<WCTooltip
-								key={ option.name }
-								text={ option.description || '' }
-							>
-								<Button
-									variant="secondary"
-									className={ `apm-layout-card ${
-										'isScratch' in option
-											? 'apm-layout-scratch'
-											: ''
-									}` }
-									onClick={ () =>
-										handleSelectLayout( option )
-									}
-									__next40pxDefaultSize
+					<div className="apm-layout-picker">
+						<div className="apm-layout-browser">
+							{ isLoadingPageLayouts ? (
+								<PageLayoutSidebarPlaceholder />
+							) : (
+								<div
+									className="apm-layout-categories"
+									aria-label={ __( 'Page types' ) }
 								>
-									<div className="apm-layout-preview">
-										{ 'isScratch' in option ? (
-											<div className="pattern-scratch-icon">
-												<WCIcon icon={ plus } />
-											</div>
-										) : (
-											<BlockPreview.Async
-												placeholder={
-													<div className="block-editor-block-patterns-list__item is-placeholder" />
-												}
+									{ pageLayoutGroups.map( ( group ) => (
+										<Button
+											key={ group.slug }
+											variant="tertiary"
+											className={ `apm-layout-category ${
+												group.slug === activePageType
+													? 'is-selected'
+													: ''
+											}` }
+											onClick={ () =>
+												setSelectedPageType(
+													group.slug
+												)
+											}
+											aria-current={
+												group.slug === activePageType
+													? 'true'
+													: undefined
+											}
+											__next40pxDefaultSize
+										>
+											<span>{ group.label }</span>
+											<span className="apm-layout-category-count">
+												{ group.patterns.length }
+											</span>
+										</Button>
+									) ) }
+								</div>
+							) }
+							<div className="apm-layout-results">
+								{ isLoadingPageLayouts && (
+									<PageLayoutResultsPlaceholder />
+								) }
+								{ ! isLoadingPageLayouts &&
+									! hasActivePageLayouts && (
+										<div className="apm-layout-empty">
+											<Text variant="body-md">
+												{ __(
+													'No layouts found for this page type.'
+												) }
+											</Text>
+											<Button
+												variant="secondary"
+												onClick={ handleStartBlank }
+												__next40pxDefaultSize
 											>
-												<BlockPreview
-													blocks={
-														layoutPreviewBlocks.get(
-															option.name
-														) as any
-													}
-													viewportWidth={
-														option.viewportWidth ||
-														960
-													}
-												/>
-											</BlockPreview.Async>
-										) }
-									</div>
-									<Text
-										variant="body-sm"
-										className="apm-layout-name"
-									>
-										{ option.title }
-									</Text>
-								</Button>
-							</WCTooltip>
-						) ) }
+												{ __( 'Start blank' ) }
+											</Button>
+										</div>
+									) }
+								{ ! isLoadingPageLayouts &&
+									hasActivePageLayouts && (
+										<div className="apm-layouts-grid">
+											{ activePageLayoutGroup.patterns.map(
+												( pattern ) => (
+													<PageLayoutCard
+														key={ pattern.name }
+														pattern={ pattern }
+														pageTemplateContent={
+															pageTemplateContent
+														}
+														onSelect={
+															handleSelectLayout
+														}
+													/>
+												)
+											) }
+										</div>
+									) }
+							</div>
+						</div>
 					</div>
 				) }
 				{ isShowingForm && (
