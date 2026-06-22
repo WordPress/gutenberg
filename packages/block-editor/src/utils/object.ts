@@ -14,7 +14,7 @@ type ObjectPath = ObjectPathKey | ObjectPathKey[];
  * @return Cloned object with the new value set.
  */
 export function setImmutably(
-	object: ObjectOrArray,
+	object: ObjectOrArray | null | undefined,
 	path: ObjectPath,
 	value: unknown
 ): ObjectOrArray {
