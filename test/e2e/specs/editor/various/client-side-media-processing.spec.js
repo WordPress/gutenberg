@@ -698,6 +698,116 @@ test.describe( 'Client-side media processing', () => {
 		await page.unroute( '**/wp/v2/media**' );
 	} );
 
+	test( 'resumes an interrupted upload after a page reload', async ( {
+		page,
+		editor,
+		mediaProcessingUtils,
+	} ) => {
+		// Block all POST requests to /wp/v2/media so the upload stays
+		// in-flight (never completes) until after reload.
+		let blockUpload = true;
+		await page.route( '**/wp/v2/media**', async ( route ) => {
+			if (
+				blockUpload &&
+				route.request().method() === 'POST' &&
+				/\/wp\/v2\/media(\?|$)/.test( route.request().url() )
+			) {
+				await route.abort( 'failed' );
+				return;
+			}
+			await route.continue();
+		} );
+
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		// Use the suite helper so the file gets a unique temp-copy name.
+		await mediaProcessingUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+			'10x10_e2e_test_image_z9T8jK.png'
+		);
+
+		// Save the draft so the in-progress block (with its durable uploadId)
+		// survives the reload.
+		await editor.saveDraft();
+
+		// Reload; the persisted queue should be detected on page load.
+		await page.reload();
+
+		// Allow the upload to succeed when resumed.
+		blockUpload = false;
+
+		// The resume notice must appear; click Resume to re-trigger the upload.
+		const resumeButton = page.getByRole( 'button', { name: /resume/i } );
+		await expect( resumeButton ).toBeVisible( { timeout: 15_000 } );
+		await resumeButton.click();
+
+		// After resuming, the image block should resolve to a real server URL
+		// (not a blob: URL) once the upload pipeline finishes.
+		const img = editor.canvas
+			.locator( 'role=document[name="Block: Image"i]' )
+			.getByRole( 'img' );
+		await expect
+			.poll( async () => ( await img.getAttribute( 'src' ) ) ?? '', {
+				timeout: 60_000,
+			} )
+			.toMatch( /^https?:\/\// );
+
+		await page.unroute( '**/wp/v2/media**' );
+	} );
+
+	test( 'discards an interrupted upload when the user declines to resume', async ( {
+		page,
+		editor,
+		mediaProcessingUtils,
+	} ) => {
+		// Block all create requests so the upload never completes.
+		await page.route( '**/wp/v2/media**', async ( route ) => {
+			if (
+				route.request().method() === 'POST' &&
+				/\/wp\/v2\/media(\?|$)/.test( route.request().url() )
+			) {
+				await route.abort( 'failed' );
+				return;
+			}
+			await route.continue();
+		} );
+
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		await mediaProcessingUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+			'10x10_e2e_test_image_z9T8jK.png'
+		);
+
+		// Save the draft so the in-progress block survives reload.
+		await editor.saveDraft();
+
+		// Reload; the durable queue detects the interrupted upload.
+		await page.reload();
+
+		// Click Discard to dismiss the resume prompt.
+		const discardButton = page.getByRole( 'button', { name: /discard/i } );
+		await expect( discardButton ).toBeVisible( { timeout: 15_000 } );
+		await discardButton.click();
+
+		// The notice is gone and no Resume button remains visible.
+		await expect(
+			page.getByRole( 'button', { name: /resume/i } )
+		).toBeHidden();
+
+		await page.unroute( '**/wp/v2/media**' );
+	} );
+
 	test( 'surfaces an error after exhausting upload retries', async ( {
 		page,
 		editor,
