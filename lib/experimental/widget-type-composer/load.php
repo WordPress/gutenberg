@@ -14,5 +14,8 @@
  * @package gutenberg
  */
 
-// Server-defined widget definitions (code-registered now; CPT origin added later).
+// Server-defined widget definitions: code-registered + cpt origins and the render route.
 require_once __DIR__ . '/widget-definitions.php';
+
+// The `core/instance-attribute` binding source for per-instance attribute values.
+require_once __DIR__ . '/instance-attribute-source.php';
