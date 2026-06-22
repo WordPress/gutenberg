@@ -10,7 +10,9 @@ import stylelint from 'stylelint';
  * overrides the repo-root ignore that would otherwise skip the fixtures.
  *
  * The JSON formatter output is parsed so the returned shape matches what the
- * previous CLI-based helper produced.
+ * previous CLI-based helper produced. `quietDeprecationWarnings` silences
+ * stylelint's "CommonJS Node.js API is deprecated" notice, which it emits
+ * because Jest loads the CommonJS build.
  *
  * @param filename Fixture path relative to the `test` directory.
  * @param config   Inline stylelint config (plugin + rule under test).
@@ -25,6 +27,7 @@ export const getStylelintResult = (
 			config,
 			ignorePath: path.resolve( __dirname, '../', './.stylelintignore' ),
 			formatter: 'json',
+			quietDeprecationWarnings: true,
 		} )
 		.then( ( { errored, report } ) => ( {
 			errored,

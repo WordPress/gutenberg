@@ -12,7 +12,7 @@ const CONFIG = {
 describe( 'flags no warnings with valid wpds tokens css', () => {
 	let result: ReturnType< typeof getStylelintResult >;
 
-	beforeEach( () => {
+	beforeAll( () => {
 		result = getStylelintResult(
 			'./fixtures/no-unknown-ds-tokens-valid.css',
 			CONFIG
@@ -33,7 +33,7 @@ describe( 'flags no warnings with valid wpds tokens css', () => {
 describe( 'flags warnings with invalid wpds tokens css', () => {
 	let result: ReturnType< typeof getStylelintResult >;
 
-	beforeEach( () => {
+	beforeAll( () => {
 		result = getStylelintResult(
 			'./fixtures/no-unknown-ds-tokens-invalid.css',
 			CONFIG

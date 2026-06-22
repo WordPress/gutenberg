@@ -12,7 +12,7 @@ const CONFIG = {
 describe( 'flags no warnings with valid wpds custom properties css', () => {
 	let result: ReturnType< typeof getStylelintResult >;
 
-	beforeEach( () => {
+	beforeAll( () => {
 		result = getStylelintResult(
 			'./fixtures/no-setting-wpds-custom-properties-valid.css',
 			CONFIG
@@ -33,7 +33,7 @@ describe( 'flags no warnings with valid wpds custom properties css', () => {
 describe( 'flags warnings with invalid wpds custom properties css', () => {
 	let result: ReturnType< typeof getStylelintResult >;
 
-	beforeEach( () => {
+	beforeAll( () => {
 		result = getStylelintResult(
 			'./fixtures/no-setting-wpds-custom-properties-invalid.css',
 			CONFIG

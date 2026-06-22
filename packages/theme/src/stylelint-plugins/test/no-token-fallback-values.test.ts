@@ -12,7 +12,7 @@ const CONFIG = {
 describe( 'flags no warnings with valid css (no wpds fallbacks)', () => {
 	let result: ReturnType< typeof getStylelintResult >;
 
-	beforeEach( () => {
+	beforeAll( () => {
 		result = getStylelintResult(
 			'./fixtures/no-token-fallback-values-valid.css',
 			CONFIG
@@ -33,7 +33,7 @@ describe( 'flags no warnings with valid css (no wpds fallbacks)', () => {
 describe( 'flags warnings with invalid css (wpds fallbacks)', () => {
 	let result: ReturnType< typeof getStylelintResult >;
 
-	beforeEach( () => {
+	beforeAll( () => {
 		result = getStylelintResult(
 			'./fixtures/no-token-fallback-values-invalid.css',
 			CONFIG
