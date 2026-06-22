@@ -18,6 +18,7 @@
 
 -   `Button`: Fix `loading` state in forced colors mode ([#78820](https://github.com/WordPress/gutenberg/pull/78820)).
 -   `Button`: Fix `loading` prop affecting `unstyled` variant ([#78820](https://github.com/WordPress/gutenberg/pull/78820)).
+-   Remove usage of private APIs, which previously caused conflicts for some consumers ([#78958](https://github.com/WordPress/gutenberg/pull/78958)).
 
 ### Internal
 
@@ -41,7 +42,6 @@
 -   `AlertDialog`: Fix the footer collapsing to a row depending on stylesheet load order ([#78953](https://github.com/WordPress/gutenberg/pull/78953)).
 -   `Button.Icon`: Preserve icon view boxes so icons with non-standard `viewBox` values are not clipped ([#78614](https://github.com/WordPress/gutenberg/pull/78614)).
 -   `Tabs`: `onValueChange` now fires for automatic tab selection — when `Tabs` itself picks a tab without a consumer-supplied value (initial uncontrolled mount with no `defaultValue`, fallback to the first enabled tab when the first tab is disabled, or fallback when the currently selected tab is removed or becomes disabled) — inherited from [`@base-ui/react@1.5.0`](https://github.com/mui/base-ui/releases/tag/v1.5.0) ([#78448](https://github.com/WordPress/gutenberg/pull/78448)).
--   Remove usage of private APIs, which previously caused conflicts for some consumers ([#78958](https://github.com/WordPress/gutenberg/pull/78958)).
 
 ### Enhancements
 
