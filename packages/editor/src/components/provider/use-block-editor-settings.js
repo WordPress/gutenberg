@@ -31,6 +31,7 @@ import { default as mediaDelete } from '../../utils/media-delete';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useGlobalStyles } from '../global-styles';
+import setNestedValue from '../../utils/set-nested-value';
 
 const { store: mediaEditorStore } = unlock( mediaEditorPrivateApis );
 
@@ -106,6 +107,7 @@ const BLOCK_EDITOR_SETTINGS = [
 const {
 	globalStylesDataKey,
 	globalStylesLinksDataKey,
+	pushStylesToGlobalStylesKey,
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
 	userPatternCategoriesSelectKey,
@@ -238,9 +240,33 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		[ postType, postId, isLargeViewport, renderingMode ]
 	);
 
-	const { merged: mergedGlobalStyles } = useGlobalStyles();
+	const { merged: mergedGlobalStyles, setUser: setUserGlobalStyles } =
+		useGlobalStyles();
 	const globalStylesData = mergedGlobalStyles.styles ?? EMPTY_OBJECT;
 	const globalStylesLinksData = mergedGlobalStyles._links ?? EMPTY_OBJECT;
+
+	/**
+	 * Writes a single style value to the user's Global Styles config at the
+	 * supplied styles-relative path. Used by the block inspector's
+	 * "Push to global styles" action to promote an individual local override
+	 * to Global Styles.
+	 *
+	 * @param {string[]} path  Path relative to `styles` (e.g.
+	 *                         `[ 'blocks', 'core/heading', 'typography', 'fontSize' ]`).
+	 * @param {*}        value Value to assign at the path.
+	 */
+	const pushStylesToGlobalStyles = useCallback(
+		( path, value ) => {
+			setUserGlobalStyles( ( currentConfig ) => {
+				const nextStyles = structuredClone(
+					currentConfig.styles ?? {}
+				);
+				setNestedValue( nextStyles, path, value );
+				return { ...currentConfig, styles: nextStyles };
+			} );
+		},
+		[ setUserGlobalStyles ]
+	);
 
 	const settingsBlockPatterns =
 		settings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
@@ -334,6 +360,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			),
 			[ globalStylesDataKey ]: globalStylesData,
 			[ globalStylesLinksDataKey ]: globalStylesLinksData,
+			[ pushStylesToGlobalStylesKey ]: pushStylesToGlobalStyles,
 			allImageSizes,
 			bigImageSizeThreshold,
 			allowedBlockTypes,
@@ -451,6 +478,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		sectionRootClientId,
 		globalStylesData,
 		globalStylesLinksData,
+		pushStylesToGlobalStyles,
 		renderingMode,
 		editMediaEntity,
 		openMediaEditorModal,
