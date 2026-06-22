@@ -102,8 +102,14 @@ function VideoEdit( {
 			blob: undefined,
 			src: media.url,
 			id: media.id,
+			// `media.poster` is set by the upload pipeline (e.g. a locally
+			// generated poster); `media.image.src` comes from the media
+			// library model.
 			poster:
-				media.image?.src !== media.icon ? media.image?.src : undefined,
+				media.poster ||
+				( media.image?.src !== media.icon
+					? media.image?.src
+					: undefined ),
 			caption: media.caption,
 		} );
 		setTemporaryURL();

@@ -14,8 +14,14 @@ type WPDataRegistry = ReturnType< typeof createRegistry >;
 /**
  * Internal dependencies
  */
-import { cloneFile, convertBlobToFile, renameFile } from '../utils';
+import {
+	cloneFile,
+	convertBlobToFile,
+	getFileBasename,
+	renameFile,
+} from '../utils';
 import { canvasConvertToJpeg } from '../canvas-utils';
+import { getPosterFromVideo } from '../poster-utils';
 import {
 	isClientSideMediaSupported,
 	exceedsClientProcessingMemory,
@@ -99,6 +105,8 @@ type ActionCreators = {
 	updateItemProgress: typeof updateItemProgress;
 	revokeBlobUrls: typeof revokeBlobUrls;
 	detectUltraHdr: typeof detectUltraHdr;
+	addPosterForItem: typeof addPosterForItem;
+	uploadPosterForItem: typeof uploadPosterForItem;
 	< T = Record< string, unknown > >( args: T ): void;
 };
 
@@ -464,6 +472,14 @@ export function processItem( id: QueueItemId ) {
 			case OperationType.DetectUltraHdr:
 				dispatch.detectUltraHdr( id );
 				break;
+
+			case OperationType.AddPoster:
+				dispatch.addPosterForItem( id );
+				break;
+
+			case OperationType.UploadPoster:
+				dispatch.uploadPosterForItem( id );
+				break;
 		}
 	};
 }
@@ -791,6 +807,17 @@ export function prepareItem( id: QueueItemId ) {
 				OperationType.ThumbnailGeneration,
 				OperationType.Finalize
 			);
+		} else if ( file.type.startsWith( 'video/' ) ) {
+			// Generate a poster from the video's first frame client-side,
+			// upload the video, then upload the poster and apply it to the
+			// block. Poster generation is best-effort: if the browser can't
+			// decode a frame, the steps no-op and the video uploads without a
+			// poster.
+			operations.push(
+				OperationType.AddPoster,
+				OperationType.Upload,
+				OperationType.UploadPoster
+			);
 		} else {
 			operations.push( OperationType.Upload );
 		}
@@ -989,6 +1016,109 @@ export function sideloadItem( id: QueueItemId ) {
 				dispatch.cancelItem( id, error );
 			},
 		} );
+	};
+}
+
+/**
+ * Generates a poster image from a video item's first frame.
+ *
+ * Best-effort: if the browser cannot decode a frame (unsupported codec,
+ * seek timeout, or missing canvas support), the operation is skipped and the
+ * video uploads without a poster. The generated poster File is stashed on the
+ * item for the later `UploadPoster` operation.
+ *
+ * @param id Item ID.
+ */
+export function addPosterForItem( id: QueueItemId ) {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItem( id );
+		if ( ! item ) {
+			return;
+		}
+
+		// A poster may already have been provided by the consumer.
+		if ( item.poster ) {
+			dispatch.finishOperation( id, {} );
+			return;
+		}
+
+		let poster: File | undefined;
+		const blobUrl = createBlobURL( item.file );
+
+		try {
+			poster = await getPosterFromVideo(
+				blobUrl,
+				`${ getFileBasename( item.file.name ) }-poster`
+			);
+		} catch {
+			// Could not decode a frame (e.g. unsupported codec or a seek
+			// timeout). Continue without a poster.
+		} finally {
+			revokeBlobURL( blobUrl );
+		}
+
+		dispatch.finishOperation( id, poster ? { poster } : {} );
+	};
+}
+
+/**
+ * Uploads a previously generated poster as its own attachment and applies it
+ * to the video block.
+ *
+ * The poster is uploaded as a standalone image attachment. Once available, its
+ * URL is pushed to the block through the original item's `onChange` handler,
+ * which sets the block's `poster` attribute. The attribute is serialized into
+ * the post content, so the poster persists on reload.
+ *
+ * The poster upload runs independently, so the video item completes
+ * immediately rather than blocking on it.
+ *
+ * Note: linking the poster as the video attachment's `featured_media` (so it is
+ * also exposed to other consumers via the REST API) is intentionally left as a
+ * follow-up to keep this package free of direct REST calls (all server I/O is
+ * delegated to the injected `settings` callbacks).
+ *
+ * @param id Item ID.
+ */
+export function uploadPosterForItem( id: QueueItemId ) {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItem( id );
+		if ( ! item ) {
+			return;
+		}
+
+		const { poster, attachment, onChange } = item;
+
+		// Nothing to upload, or the video isn't a real (uploaded) attachment.
+		if ( ! poster || ! attachment?.id ) {
+			dispatch.finishOperation( id, {} );
+			return;
+		}
+
+		const videoAttachment = attachment;
+		const post = item.additionalData?.post as number | undefined;
+
+		dispatch.addItem( {
+			file: poster,
+			additionalData: post ? { post } : undefined,
+			onChange: ( [ posterAttachment ] ) => {
+				if (
+					! posterAttachment?.url ||
+					isBlobURL( posterAttachment.url )
+				) {
+					return;
+				}
+				// Apply the uploaded poster URL to the original video block.
+				onChange?.( [
+					{
+						...videoAttachment,
+						poster: posterAttachment.url,
+					},
+				] );
+			},
+		} );
+
+		dispatch.finishOperation( id, {} );
 	};
 }
 
