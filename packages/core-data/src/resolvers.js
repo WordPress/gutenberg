@@ -1368,7 +1368,7 @@ export const getViewConfig =
 	async ( { dispatch } ) => {
 		const query = { kind, name };
 		const fields = getNormalizedCommaSeparable( options.fields );
-		if ( fields ) {
+		if ( fields?.length ) {
 			query._fields = fields.join( ',' );
 		}
 		const config = await apiFetch( {
