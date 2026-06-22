@@ -314,7 +314,7 @@ export function ApplicationPasswordConnectorSettings( {
 		}
 	};
 
-	let applicationPasswordHelp = help;
+	let applicationPasswordHelp: ReactNode = help;
 	if ( readOnly ) {
 		applicationPasswordHelp = __(
 			'Your application password is stored securely.'
