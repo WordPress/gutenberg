@@ -1,0 +1,11 @@
+.wp-block-figure {
+	margin: 0;
+
+	&.is-caption-top > figcaption {
+		margin-bottom: 0.5em;
+	}
+
+	&.is-caption-bottom > figcaption {
+		margin-top: 0.5em;
+	}
+}

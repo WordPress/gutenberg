@@ -696,6 +696,12 @@
 		"parent": "core-blocks-embed"
 	},
 	{
+		"title": "Figure",
+		"slug": "core-block-figure",
+		"markdown_source": "../packages/block-library/src/figure/README.md",
+		"parent": "core-blocks-media"
+	},
+	{
 		"title": "File",
 		"slug": "core-block-file",
 		"markdown_source": "../packages/block-library/src/file/README.md",
