@@ -105,7 +105,7 @@ function writeInterstitialMessage( targetDocument, markup ) {
 }
 
 /**
- * Writes the preview interstitial into the preview window, working around
+ * Resolves the preview window's `document`, working around
  * `Document-Isolation-Policy` (DIP) isolation.
  *
  * The editor screen is served with `Document-Isolation-Policy:
@@ -115,22 +115,19 @@ function writeInterstitialMessage( targetDocument, markup ) {
  * `SecurityError`. Navigating the reused tab back to `about:blank` returns it to
  * the opener's agent cluster and restores access. That navigation is
  * asynchronous and we can't attach a cross-isolation `load` listener, so poll
- * until the document is reachable (up to a short timeout) before writing.
- *
- * The interstitial is a progressive enhancement: if the document never becomes
- * reachable we simply skip it, and the caller still navigates the preview to the
- * real content.
+ * the `document` access (the operation that throws) until it succeeds, up to a
+ * short timeout.
  *
  * @param {Window} previewWindow The preview window/tab.
+ *
+ * @return {?Document} The reachable preview document, or `null` if it never
+ *                     becomes reachable within the timeout.
  */
-async function writeInterstitialIntoPreviewWindow( previewWindow ) {
-	const markup = buildInterstitialMarkup();
-
+async function getPreviewDocument( previewWindow ) {
 	// A freshly opened tab is already on `about:blank` and accessible, so this
 	// succeeds on the first preview without any reset.
 	try {
-		writeInterstitialMessage( previewWindow.document, markup );
-		return;
+		return previewWindow.document;
 	} catch {
 		// The reused preview tab is isolated from the editor; reset it below.
 	}
@@ -143,12 +140,30 @@ async function writeInterstitialIntoPreviewWindow( previewWindow ) {
 	do {
 		await new Promise( ( resolve ) => setTimeout( resolve, intervalMs ) );
 		try {
-			writeInterstitialMessage( previewWindow.document, markup );
-			return;
+			return previewWindow.document;
 		} catch {
 			// Navigation to `about:blank` hasn't completed yet; keep polling.
 		}
 	} while ( Date.now() < deadline );
+
+	return null;
+}
+
+/**
+ * Writes the preview interstitial into the preview window, working around
+ * `Document-Isolation-Policy` (DIP) isolation.
+ *
+ * The interstitial is a progressive enhancement: if the document never becomes
+ * reachable we simply skip it, and the caller still navigates the preview to the
+ * real content.
+ *
+ * @param {Window} previewWindow The preview window/tab.
+ */
+async function writeInterstitialIntoPreviewWindow( previewWindow ) {
+	const previewDocument = await getPreviewDocument( previewWindow );
+	if ( previewDocument ) {
+		writeInterstitialMessage( previewDocument, buildInterstitialMarkup() );
+	}
 }
 
 /**
