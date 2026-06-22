@@ -16,7 +16,7 @@ import { useCallback } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { decodeEntities } from '@wordpress/html-entities';
-import { Icon, arrowUpLeft, arrowUpRight } from '@wordpress/icons';
+import { Icon, chevronLeft, chevronRight } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -232,8 +232,8 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 											<Icon
 												icon={
 													isRTL()
-														? arrowUpRight
-														: arrowUpLeft
+														? chevronRight
+														: chevronLeft
 												}
 											/>
 										</div>

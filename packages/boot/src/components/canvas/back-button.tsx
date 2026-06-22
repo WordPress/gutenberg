@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Button, Icon as WCIcon } from '@wordpress/components';
-import { arrowUpLeft, arrowUpRight } from '@wordpress/icons';
+import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { __, isRTL } from '@wordpress/i18n';
 
 /**
@@ -36,7 +36,7 @@ export default function BootBackButton( { length }: { length: number } ) {
 				__next40pxDefaultSize
 			/>
 			<div className="boot-canvas-back-button__icon">
-				<WCIcon icon={ isRTL() ? arrowUpRight : arrowUpLeft } />
+				<WCIcon icon={ isRTL() ? chevronRight : chevronLeft } />
 			</div>
 		</div>
 	);

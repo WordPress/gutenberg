@@ -9,18 +9,6 @@
 body.js.block-editor-page {
 	@include wp-admin-reset( ".block-editor" );
 
-	.editor-header:has(> .editor-header__back-button) {
-		grid-template-columns: $button-size-compact minmax(0, max-content) minmax(min-content, 1fr) $header-height;
-
-		&:has(> .editor-header__center) {
-			grid-template-columns: $button-size-compact min-content 1fr min-content $header-height;
-		}
-	}
-
-	.editor-header__back-button {
-		padding-left: $grid-unit;
-	}
-
 	&.is-fullscreen-mode {
 		@include break-medium {
 			&:has(.editor-editor-interface.is-distraction-free) {

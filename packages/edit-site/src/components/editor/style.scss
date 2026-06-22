@@ -27,10 +27,11 @@
 	/* stylelint-disable -- Disable reason: View Transitions not supported properly by stylelint. */
 	view-transition-name: toggle;
 	/* stylelint-enable */
+	position: relative;
 	top: 0;
 	left: 0;
-	height: $header-height;
-	width: $header-height;
+	height: $button-size-compact;
+	width: $button-size-compact;
 	z-index: 100;
 
 	.components-button {
@@ -62,8 +63,8 @@
 	position: absolute;
 	top: 0;
 	left: 0;
-	width: $header-height;
-	height: $header-height;
+	width: $button-size-compact;
+	height: $button-size-compact;
 	display: flex;
 	align-items: center;
 	justify-content: center;

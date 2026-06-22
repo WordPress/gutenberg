@@ -11,7 +11,7 @@ import { Button, __experimentalHStack as HStack } from '@wordpress/components';
 import { __, isRTL } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { memo, forwardRef, useContext } from '@wordpress/element';
-import { Icon, arrowUpLeft, arrowUpRight } from '@wordpress/icons';
+import { Icon, chevronLeft, chevronRight } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
@@ -101,7 +101,7 @@ export const SiteHubMobile = memo(
 							{ ...backButtonProps }
 						>
 							<Icon
-								icon={ isRTL() ? arrowUpRight : arrowUpLeft }
+								icon={ isRTL() ? chevronRight : chevronLeft }
 								size={ 48 }
 							/>
 						</Button>
