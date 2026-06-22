@@ -1,3 +1,5 @@
+/// <reference path="./postcss-urlrebase.d.ts" />
+
 /**
  * External dependencies
  */
@@ -6,6 +8,11 @@ import Processor from 'postcss/lib/processor';
 import CssSyntaxError from 'postcss/lib/css-syntax-error';
 import prefixSelector from 'postcss-prefix-selector';
 import rebaseUrl from 'postcss-urlrebase';
+
+/**
+ * Internal dependencies
+ */
+import type { EditorStyle, TransformOptions } from './types';
 
 const cacheByWrapperSelector = new Map();
 
@@ -33,12 +40,12 @@ const ROOT_SELECTOR_TOKENS = [
  * - If a classname, id, or something else is used as the prefix, all selectors
  *   will have the same specificity bump when transformed.
  *
- * @param {string} prefix   The prefix.
- * @param {string} selector The selector.
+ * @param prefix   The prefix.
+ * @param selector The selector.
  *
- * @return {string} The prefixed root selector.
+ * @return The prefixed root selector.
  */
-function prefixRootSelector( prefix, selector ) {
+function prefixRootSelector( prefix: string, selector: string ) {
 	// Use a tokenizer, since regular expressions are unreliable.
 	const tokenized = parsel.tokenize( selector );
 
@@ -74,7 +81,8 @@ function prefixRootSelector( prefix, selector ) {
 		{
 			type: 'combinator',
 			content: ' ',
-		},
+			pos: [ 0, 0 ],
+		} as parsel.Token,
 		...tokenizedPrefix
 	);
 
@@ -82,9 +90,9 @@ function prefixRootSelector( prefix, selector ) {
 }
 
 function transformStyle(
-	{ css, ignoredSelectors = [], baseURL },
+	{ css, ignoredSelectors = [], baseURL }: EditorStyle,
 	wrapperSelector = '',
-	transformOptions
+	transformOptions?: TransformOptions
 ) {
 	// When there is no wrapper selector and no base URL, there is no need
 	// to transform the CSS. This is most cases because in the default
@@ -136,7 +144,7 @@ function transformStyle(
 						},
 					} ),
 				baseURL && rebaseUrl( { rootUrl: baseURL } ),
-			].filter( Boolean )
+			].filter( Boolean ) as import('postcss').AcceptedPlugin[]
 		).process( css, {} ).css; // use sync PostCSS API
 	} catch ( error ) {
 		if ( error instanceof CssSyntaxError ) {
@@ -158,26 +166,18 @@ function transformStyle(
 }
 
 /**
- * @typedef {Object} EditorStyle
- * @property {string}    css              the CSS block(s), as a single string.
- * @property {?string}   baseURL          the base URL to be used as the reference when rewriting urls.
- * @property {?string[]} ignoredSelectors the selectors not to wrap.
- */
-
-/**
- * @typedef {Object} TransformOptions
- * @property {?string[]} ignoredSelectors the selectors not to wrap.
- */
-
-/**
  * Applies a series of CSS rule transforms to wrap selectors inside a given class and/or rewrite URLs depending on the parameters passed.
  *
- * @param {EditorStyle[]}    styles           CSS rules.
- * @param {string}           wrapperSelector  Wrapper selector.
- * @param {TransformOptions} transformOptions Additional options for style transformation.
- * @return {Array} converted rules.
+ * @param styles           CSS rules.
+ * @param wrapperSelector  Wrapper selector.
+ * @param transformOptions Additional options for style transformation.
+ * @return converted rules.
  */
-const transformStyles = ( styles, wrapperSelector = '', transformOptions ) => {
+const transformStyles = (
+	styles: EditorStyle[],
+	wrapperSelector = '',
+	transformOptions?: TransformOptions
+) => {
 	let cache = cacheByWrapperSelector.get( wrapperSelector );
 	if ( ! cache ) {
 		cache = new WeakMap();

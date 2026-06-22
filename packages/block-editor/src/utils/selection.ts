@@ -13,10 +13,12 @@ export const START_OF_SELECTED_AREA = '\u0086';
 /**
  * Retrieve the block attribute that contains the selection position.
  *
- * @param {Object} blockAttributes Block attributes.
- * @return {string|void} The name of the block attribute that was previously selected.
+ * @param blockAttributes Block attributes.
+ * @return The name of the block attribute that was previously selected.
  */
-export function retrieveSelectedAttribute( blockAttributes ) {
+export function retrieveSelectedAttribute(
+	blockAttributes: Record< string, unknown > | undefined
+) {
 	if ( ! blockAttributes ) {
 		return;
 	}
@@ -32,10 +34,15 @@ export function retrieveSelectedAttribute( blockAttributes ) {
 	} );
 }
 
-export function findRichTextAttributeKey( blockType ) {
+type BlockTypeWithAttributes = {
+	attributes: Record< string, { source?: string } >;
+};
+
+export function findRichTextAttributeKey( blockType: BlockTypeWithAttributes ) {
 	for ( const [ key, value ] of Object.entries( blockType.attributes ) ) {
 		if ( value.source === 'rich-text' || value.source === 'html' ) {
 			return key;
 		}
 	}
+	return undefined;
 }

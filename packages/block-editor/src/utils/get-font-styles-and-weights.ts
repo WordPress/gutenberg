@@ -8,6 +8,11 @@ import { _x, sprintf } from '@wordpress/i18n';
  */
 import { formatFontStyle } from './format-font-style';
 import { formatFontWeight } from './format-font-weight';
+import type {
+	FontFamilyFace,
+	FormattedFont,
+	CombinedStyleAndWeightOption,
+} from './types';
 
 const FONT_STYLES = [
 	{
@@ -67,13 +72,15 @@ const FONT_WEIGHTS = [
  * Builds a list of font style and weight options based on font family faces.
  * Defaults to the standard font styles and weights if no font family faces are provided.
  *
- * @param {Array} fontFamilyFaces font family faces array
- * @return {Object} new object with combined and separated font style and weight properties
+ * @param fontFamilyFaces font family faces array
+ * @return new object with combined and separated font style and weight properties
  */
-export function getFontStylesAndWeights( fontFamilyFaces ) {
-	let fontStyles = [];
-	let fontWeights = [];
-	const combinedStyleAndWeightOptions = [];
+export function getFontStylesAndWeights(
+	fontFamilyFaces: FontFamilyFace[] | undefined
+) {
+	let fontStyles: FormattedFont[] = [];
+	let fontWeights: FormattedFont[] = [];
+	const combinedStyleAndWeightOptions: CombinedStyleAndWeightOption[] = [];
 	const isSystemFont = ! fontFamilyFaces || fontFamilyFaces?.length === 0;
 	let isVariableFont = false;
 
@@ -86,13 +93,10 @@ export function getFontStylesAndWeights( fontFamilyFaces ) {
 			isVariableFont = true;
 
 			// Find font weight start and end values.
-			let [ startValue, endValue ] = face.fontWeight.split( ' ' );
-			startValue = parseInt( startValue.slice( 0, 1 ) );
-			if ( endValue === '1000' ) {
-				endValue = 10;
-			} else {
-				endValue = parseInt( endValue.slice( 0, 1 ) );
-			}
+			const [ startStr, endStr ] = face.fontWeight.split( ' ' );
+			const startValue = parseInt( startStr.slice( 0, 1 ) );
+			const endValue =
+				endStr === '1000' ? 10 : parseInt( endStr.slice( 0, 1 ) );
 
 			// Create font weight options for available variable weights.
 			for ( let i = startValue; i <= endValue; i++ ) {
@@ -140,7 +144,7 @@ export function getFontStylesAndWeights( fontFamilyFaces ) {
 	} );
 
 	// If there is no font weight of 600 or above, then include faux bold as an option.
-	if ( ! fontWeights.some( ( weight ) => weight.value >= '600' ) ) {
+	if ( ! fontWeights.some( ( weight ) => ( weight.value ?? '' ) >= '600' ) ) {
 		fontWeights.push( {
 			name: _x( 'Bold', 'font weight' ),
 			value: '700',
@@ -174,13 +178,13 @@ export function getFontStylesAndWeights( fontFamilyFaces ) {
 					: sprintf(
 							/* translators: 1: Font weight name. 2: Font style name. */
 							_x( '%1$s %2$s', 'font' ),
-							weightName,
-							styleName
+							weightName ?? '',
+							styleName ?? ''
 					  );
 
 			combinedStyleAndWeightOptions.push( {
 				key: `${ styleValue }-${ weightValue }`,
-				name: optionName,
+				name: optionName ?? '',
 				style: {
 					fontStyle: styleValue,
 					fontWeight: weightValue,
