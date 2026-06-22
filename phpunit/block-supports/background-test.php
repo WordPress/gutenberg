@@ -289,6 +289,36 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that Verse combines background gradient and image styles.
+	 *
+	 * @covers ::gutenberg_render_background_support
+	 */
+	public function test_verse_background_gradient_and_image_are_combined() {
+		$apos = $this->get_apostrophe_entity();
+
+		$block = array(
+			'blockName' => 'core/verse',
+			'attrs'     => array(
+				'style' => array(
+					'background' => array(
+						'backgroundImage' => array(
+							'url' => 'https://example.com/image.jpg',
+						),
+						'gradient'        => 'linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%)',
+					),
+				),
+			),
+		);
+
+		$actual = gutenberg_render_background_support( '<pre class="wp-block-verse">Verse</pre>', $block );
+
+		$this->assertSame(
+			'<pre style="background-image:linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%), url(' . $apos . 'https://example.com/image.jpg' . $apos . ');background-size:cover;" class="wp-block-verse has-background">Verse</pre>',
+			$actual
+		);
+	}
+
+	/**
 	 * Tests that combined background gradient and image CSS values pass KSES.
 	 *
 	 * WordPress's safecss_filter_attr() handles gradient and url() values
