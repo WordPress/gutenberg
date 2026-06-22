@@ -307,7 +307,7 @@ function _gutenberg_is_ai_api_key_valid( string $key, string $provider_id ): ?bo
 }
 
 /**
- * Masks and validates connector API keys in REST responses.
+ * Masks and validates connector credentials in REST responses.
  *
  * On every `/wp/v2/settings` response, masks connector API key values so raw
  * keys are never exposed via the REST API.
@@ -340,6 +340,15 @@ function _gutenberg_connectors_rest_settings_dispatch( WP_REST_Response $respons
 
 	foreach ( wp_get_connectors() as $connector_id => $connector_data ) {
 		$auth = $connector_data['authentication'];
+
+		if ( 'application_password' === $auth['method'] && ! empty( $auth['application_password_setting_name'] ) ) {
+			$setting_name = $auth['application_password_setting_name'];
+			if ( array_key_exists( $setting_name, $data ) && is_string( $data[ $setting_name ] ) && '' !== $data[ $setting_name ] ) {
+				$data[ $setting_name ] = _gutenberg_mask_api_key( $data[ $setting_name ] );
+			}
+			continue;
+		}
+
 		if ( 'api_key' !== $auth['method'] || empty( $auth['setting_name'] ) ) {
 			continue;
 		}
@@ -384,12 +393,7 @@ function _gutenberg_register_default_connector_settings(): void {
 
 	foreach ( wp_get_connectors() as $connector_data ) {
 		$auth = $connector_data['authentication'];
-		if ( 'api_key' !== $auth['method'] || empty( $auth['setting_name'] ) ) {
-			continue;
-		}
-
-		// Skip if the setting is already registered (e.g. by the connector's plugin).
-		if ( isset( $existing_settings[ $auth['setting_name'] ] ) ) {
+		if ( 'api_key' !== $auth['method'] && 'application_password' !== $auth['method'] ) {
 			continue;
 		}
 
@@ -401,10 +405,9 @@ function _gutenberg_register_default_connector_settings(): void {
 			continue;
 		}
 
-		register_setting(
-			'connectors',
-			$auth['setting_name'],
-			array(
+		$settings = array();
+		if ( 'api_key' === $auth['method'] && ! empty( $auth['setting_name'] ) ) {
+			$settings[ $auth['setting_name'] ] = array(
 				'type'              => 'string',
 				'label'             => sprintf(
 					/* translators: %s: Connector name. */
@@ -419,8 +422,49 @@ function _gutenberg_register_default_connector_settings(): void {
 				'default'           => '',
 				'show_in_rest'      => true,
 				'sanitize_callback' => 'sanitize_text_field',
-			)
-		);
+			);
+		} elseif ( 'application_password' === $auth['method'] && ! empty( $auth['username_setting_name'] ) && ! empty( $auth['application_password_setting_name'] ) ) {
+			$settings[ $auth['username_setting_name'] ] = array(
+				'type'              => 'string',
+				'label'             => sprintf(
+					/* translators: %s: Connector name. */
+					__( '%s Username', 'gutenberg' ),
+					$connector_data['name']
+				),
+				'description'       => sprintf(
+					/* translators: %s: Connector name. */
+					__( 'Username for the %s connector.', 'gutenberg' ),
+					$connector_data['name']
+				),
+				'default'           => '',
+				'show_in_rest'      => true,
+				'sanitize_callback' => 'sanitize_text_field',
+			);
+			$settings[ $auth['application_password_setting_name'] ] = array(
+				'type'              => 'string',
+				'label'             => sprintf(
+					/* translators: %s: Connector name. */
+					__( '%s Application Password', 'gutenberg' ),
+					$connector_data['name']
+				),
+				'description'       => sprintf(
+					/* translators: %s: Connector name. */
+					__( 'Application password for the %s connector.', 'gutenberg' ),
+					$connector_data['name']
+				),
+				'default'           => '',
+				'show_in_rest'      => true,
+				'sanitize_callback' => 'sanitize_text_field',
+			);
+		}
+
+		foreach ( $settings as $setting_name => $setting_args ) {
+			// Skip settings already registered by the connector's owning plugin.
+			if ( isset( $existing_settings[ $setting_name ] ) ) {
+				continue;
+			}
+			register_setting( 'connectors', $setting_name, $setting_args );
+		}
 	}
 }
 remove_action( 'init', '_wp_register_default_connector_settings', 20 );
@@ -522,6 +566,16 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 				// For non-AI connectors, consider connected if a key exists from any source.
 				$auth_out['isConnected'] = 'none' !== $auth_out['keySource'];
 			}
+		} elseif ( 'application_password' === $auth['method'] ) {
+			$username_setting_name             = $auth['username_setting_name'] ?? '';
+			$application_password_setting_name = $auth['application_password_setting_name'] ?? '';
+			$username                          = get_option( $username_setting_name, '' );
+			$application_password              = get_option( $application_password_setting_name, '' );
+
+			$auth_out['usernameSettingName']             = $username_setting_name;
+			$auth_out['applicationPasswordSettingName'] = $application_password_setting_name;
+			$auth_out['credentialsUrl']                 = $auth['credentials_url'] ?? null;
+			$auth_out['isConnected']                    = is_string( $username ) && '' !== $username && is_string( $application_password ) && '' !== $application_password;
 		}
 
 		$connector_out = array(

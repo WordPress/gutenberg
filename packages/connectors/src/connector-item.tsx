@@ -239,3 +239,165 @@ export function DefaultConnectorSettings( {
 		</VStack>
 	);
 }
+
+export interface ApplicationPasswordCredentials {
+	username: string;
+	applicationPassword: string;
+}
+
+export interface ApplicationPasswordConnectorSettingsProps {
+	onSave?: (
+		credentials: ApplicationPasswordCredentials
+	) => void | Promise< void >;
+	onRemove?: () => void;
+	initialUsername?: string;
+	helpUrl?: string;
+	helpLabel?: string;
+	readOnly?: boolean;
+}
+
+/**
+ * Default settings form for application password connectors.
+ *
+ * @param props                 - Component props.
+ * @param props.onSave          - Callback invoked with the username and application password.
+ * @param props.onRemove        - Callback invoked when the credentials are removed.
+ * @param props.initialUsername - Initial value for the username field.
+ * @param props.helpUrl         - URL where users can create an application password.
+ * @param props.helpLabel       - Custom label for the help link.
+ * @param props.readOnly        - Whether the form is in read-only mode.
+ */
+export function ApplicationPasswordConnectorSettings( {
+	onSave,
+	onRemove,
+	initialUsername = '',
+	helpUrl,
+	helpLabel,
+	readOnly = false,
+}: ApplicationPasswordConnectorSettingsProps ) {
+	const [ username, setUsername ] = useState( initialUsername );
+	const [ applicationPassword, setApplicationPassword ] = useState( '' );
+	const [ isSaving, setIsSaving ] = useState( false );
+	const [ saveError, setSaveError ] = useState< string | null >( null );
+
+	const helpLinkLabel = helpLabel || helpUrl?.replace( /^https?:\/\//, '' );
+	const help = helpUrl
+		? createInterpolateElement(
+				sprintf(
+					/* translators: %s: Link to the remote site's application passwords screen. */
+					__( 'Create an application password at %s' ),
+					'<a></a>'
+				),
+				{
+					a: (
+						<ExternalLink href={ helpUrl }>
+							{ helpLinkLabel }
+						</ExternalLink>
+					),
+				}
+		  )
+		: undefined;
+
+	const handleSave = async () => {
+		setSaveError( null );
+		setIsSaving( true );
+		try {
+			await onSave?.( { username, applicationPassword } );
+		} catch ( error ) {
+			setSaveError(
+				error instanceof Error
+					? error.message
+					: __( 'It was not possible to save these credentials.' )
+			);
+		} finally {
+			setIsSaving( false );
+		}
+	};
+
+	let applicationPasswordHelp = help;
+	if ( readOnly ) {
+		applicationPasswordHelp = __(
+			'Your application password is stored securely.'
+		);
+	}
+	if ( saveError ) {
+		applicationPasswordHelp = (
+			<span role="alert" className="connector-settings__error">
+				{ saveError }
+			</span>
+		);
+	}
+
+	return (
+		<VStack
+			spacing={ 4 }
+			className="connector-settings"
+			style={
+				readOnly
+					? {
+							'--wp-components-color-background': '#f0f0f0',
+					  }
+					: undefined
+			}
+		>
+			<TextControl
+				__next40pxDefaultSize
+				label={ __( 'Username' ) }
+				value={ username }
+				onChange={ ( value ) => {
+					if ( ! readOnly ) {
+						setSaveError( null );
+						setUsername( value );
+					}
+				} }
+				placeholder={ __( 'Enter your username' ) }
+				disabled={ readOnly || isSaving }
+				autoComplete="username"
+			/>
+			<TextControl
+				__next40pxDefaultSize
+				label={ __( 'Application password' ) }
+				value={ readOnly ? '••••••••••••••••' : applicationPassword }
+				onChange={ ( value ) => {
+					if ( ! readOnly ) {
+						setSaveError( null );
+						setApplicationPassword( value );
+					}
+				} }
+				type="password"
+				placeholder={ __( 'Enter your application password' ) }
+				disabled={ readOnly || isSaving }
+				autoComplete="new-password"
+				help={ applicationPasswordHelp }
+			/>
+			{ readOnly ? (
+				onRemove && (
+					<HStack justify="flex-start">
+						<Button
+							variant="link"
+							isDestructive
+							onClick={ onRemove }
+						>
+							{ __( 'Remove and replace' ) }
+						</Button>
+					</HStack>
+				)
+			) : (
+				<HStack justify="flex-start">
+					<Button
+						__next40pxDefaultSize
+						variant="primary"
+						disabled={
+							! username || ! applicationPassword || isSaving
+						}
+						accessibleWhenDisabled
+						isBusy={ isSaving }
+						onClick={ handleSave }
+					>
+						{ __( 'Save' ) }
+					</Button>
+				</HStack>
+			) }
+		</VStack>
+	);
+}

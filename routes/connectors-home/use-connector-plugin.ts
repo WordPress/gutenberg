@@ -14,6 +14,7 @@ export type PluginStatus = 'checking' | 'not-installed' | 'inactive' | 'active';
 interface UseConnectorPluginOptions {
 	file?: string;
 	settingName: string;
+	additionalSettingName?: string;
 	connectorName: string;
 	isInstalled?: boolean;
 	isActivated?: boolean;
@@ -29,6 +30,7 @@ interface UseConnectorPluginReturn {
 	setIsExpanded: ( expanded: boolean ) => void;
 	isBusy: boolean;
 	isConnected: boolean;
+	setIsConnected: ( connected: boolean ) => void;
 	currentApiKey: string;
 	keySource: ApiKeySource;
 	handleButtonClick: () => void;
@@ -40,6 +42,7 @@ interface UseConnectorPluginReturn {
 export function useConnectorPlugin( {
 	file: pluginFileFromServer,
 	settingName,
+	additionalSettingName,
 	connectorName,
 	isInstalled,
 	isActivated,
@@ -63,6 +66,7 @@ export function useConnectorPlugin( {
 		derivedPluginStatus,
 		canManagePlugins,
 		currentApiKey,
+		hasStoredCredentials,
 		canInstallPlugins,
 	} = useSelect(
 		( select ) => {
@@ -71,6 +75,13 @@ export function useConnectorPlugin( {
 				| Record< string, string >
 				| undefined;
 			const apiKey = siteSettings?.[ settingName ] ?? '';
+			const additionalSettingValue = additionalSettingName
+				? siteSettings?.[ additionalSettingName ] ?? ''
+				: undefined;
+			const credentialsExist =
+				!! apiKey &&
+				( additionalSettingValue === undefined ||
+					!! additionalSettingValue );
 
 			const canCreate = !! store.canUser( 'create', {
 				kind: 'root',
@@ -88,6 +99,7 @@ export function useConnectorPlugin( {
 						: 'checking' ) as PluginStatus,
 					canManagePlugins: undefined as boolean | undefined,
 					currentApiKey: apiKey,
+					hasStoredCredentials: credentialsExist,
 					canInstallPlugins: canCreate,
 				};
 			}
@@ -108,6 +120,7 @@ export function useConnectorPlugin( {
 					derivedPluginStatus: 'checking' as PluginStatus,
 					canManagePlugins: undefined as boolean | undefined,
 					currentApiKey: apiKey,
+					hasStoredCredentials: credentialsExist,
 					canInstallPlugins: canCreate,
 				};
 			}
@@ -124,6 +137,7 @@ export function useConnectorPlugin( {
 						: 'inactive' ) as PluginStatus,
 					canManagePlugins: true,
 					currentApiKey: apiKey,
+					hasStoredCredentials: credentialsExist,
 					canInstallPlugins: canCreate,
 				};
 			}
@@ -141,10 +155,18 @@ export function useConnectorPlugin( {
 				derivedPluginStatus: status,
 				canManagePlugins: false,
 				currentApiKey: apiKey,
+				hasStoredCredentials: credentialsExist,
 				canInstallPlugins: canCreate,
 			};
 		},
-		[ pluginBasename, settingName, isInstalled, isActivated ]
+		[
+			pluginFileFromServer,
+			pluginBasename,
+			settingName,
+			additionalSettingName,
+			isInstalled,
+			isActivated,
+		]
 	);
 
 	const pluginStatus = pluginStatusOverride ?? derivedPluginStatus;
@@ -154,9 +176,9 @@ export function useConnectorPlugin( {
 
 	const isConnected =
 		( pluginStatus === 'active' && connectedState ) ||
-		// After install/activate, if settings re-fetch reveals an existing key,
+		// After install/activate, if settings re-fetch reveals stored credentials,
 		// update connected state (mirrors what the server would report on page load).
-		( pluginStatusOverride === 'active' && !! currentApiKey );
+		( pluginStatusOverride === 'active' && hasStoredCredentials );
 
 	const { saveEntityRecord, invalidateResolution } = useDispatch( coreStore );
 	const { createSuccessNotice, createErrorNotice } =
@@ -388,6 +410,7 @@ export function useConnectorPlugin( {
 		setIsExpanded,
 		isBusy,
 		isConnected,
+		setIsConnected: setConnectedState,
 		currentApiKey,
 		keySource,
 		handleButtonClick,

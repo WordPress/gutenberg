@@ -13,6 +13,13 @@ export type ConnectorAuthentication =
 			keySource?: ApiKeySource;
 			isConnected?: boolean;
 	  }
+	| {
+			method: 'application_password';
+			usernameSettingName: string;
+			applicationPasswordSettingName: string;
+			credentialsUrl: string | null;
+			isConnected?: boolean;
+	  }
 	| { method: 'none' };
 
 export interface ConnectorPlugin {
