@@ -180,7 +180,7 @@ import { Page } from '@wordpress/admin-ui';
 
 The "Add widget" button in `<WidgetDashboard.Actions />` opens a modal inserter. It lists every entry in the `widgetTypes` prop as a grid of live previews (each preview renders the type's `example` attributes through its own render module), supports search, and exposes a "Select" action with bulk support so users can insert one or several widgets in a single layout change.
 
-On confirmation, the inserter creates instances (using each type's `example.attributes` as the initial values) and appends them to the staged layout. A widget type may provide `defaultPlacement` metadata with `width` and `height` to control the initial tile size. The dashboard merges those fields with its fallback placement and keeps insertion order internal; an `order` value in widget metadata is ignored. The dialog closes after a successful insertion or when the user dismisses it.
+On confirmation, the inserter creates instances (using each type's `example.attributes` as the initial values) and appends them to the staged layout. A widget type may provide `initialSize` metadata (`compact`, `regular`, `wide`, or `large`) to hint at its preferred initial form factor. The dashboard maps that semantic hint to its active layout model and keeps grid spans, lanes, and insertion order internal to the dashboard. The dialog closes after a successful insertion or when the user dismisses it.
 
 ## Grid settings
 

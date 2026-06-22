@@ -28,22 +28,16 @@ export type WidgetName = `${ string }/${ string }`;
 export type WidgetIcon = ReactElement< ComponentProps< 'svg' > >;
 
 /**
- * Default tile size a host can use when inserting a widget into a layout.
+ * Preferred initial size a host can use when inserting a widget into a
+ * layout. The values describe widget intent; hosts map them to their own
+ * layout model.
  *
- * Hosts own ordering and any host-specific placement fields. Widget metadata
- * only declares the preferred initial span.
+ * - `'compact'`: minimal footprint for simple summaries or controls.
+ * - `'regular'`: default footprint for standard widgets.
+ * - `'wide'`: extra horizontal space for widgets with side-by-side content.
+ * - `'large'`: extra horizontal and vertical space for dense widgets.
  */
-export interface WidgetDefaultPlacement {
-	/**
-	 * Preferred initial column span.
-	 */
-	width?: number;
-
-	/**
-	 * Preferred initial row span.
-	 */
-	height?: number;
-}
+export type WidgetInitialSize = 'compact' | 'regular' | 'wide' | 'large';
 
 /**
  * Literal contents of a widget's metadata module.
@@ -99,11 +93,10 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	presentation?: 'framed' | 'content-bleed' | 'full-bleed';
 
 	/**
-	 * Preferred initial tile size when a host inserts a new widget instance.
-	 * Hosts may ignore this hint, and insertion order is intentionally not
-	 * part of the widget metadata contract.
+	 * Preferred initial size when a host inserts a new widget instance.
+	 * Hosts may ignore this hint or map it to their own layout model.
 	 */
-	defaultPlacement?: WidgetDefaultPlacement;
+	initialSize?: WidgetInitialSize;
 
 	/**
 	 * Search aliases hosts use to match the widget in their pickers.

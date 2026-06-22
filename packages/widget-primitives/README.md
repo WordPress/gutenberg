@@ -50,15 +50,15 @@ With no records, or an empty list, `useWidgetTypes()` returns an empty list.
     loading), imports each record's metadata, and returns the resolved
     `WidgetType[]` plus a flag that is true while they are still resolving.
 -   Contract types: `WidgetType`, `WidgetName`, `WidgetIcon`,
-    `WidgetTypeMetadata`, `WidgetDefaultPlacement`, `WidgetRenderProps`,
+    `WidgetTypeMetadata`, `WidgetInitialSize`, `WidgetRenderProps`,
     `ResolveWidgetModule`, `WidgetModuleRecord`.
     `WidgetIcon` is a rendered SVG element; hosts pass it to their icon
     primitive as is.
 
 ## Widget metadata
 
-Widget metadata can include `defaultPlacement` to describe the preferred
-initial tile size when a host inserts a new widget instance:
+Widget metadata can include `initialSize` to describe the preferred form factor
+when a host inserts a new widget instance:
 
 ```ts
 import type { WidgetTypeMetadata } from '@wordpress/widget-primitives';
@@ -67,17 +67,16 @@ const metadata = {
 	apiVersion: 1,
 	name: 'my-plugin/orders',
 	title: 'Average items per order',
-	defaultPlacement: {
-		width: 2,
-		height: 1,
-	},
+	initialSize: 'wide',
 } satisfies WidgetTypeMetadata;
 
 export default metadata;
 ```
 
-`defaultPlacement` supports only `width` and `height`. Host-controlled fields
-such as insertion order are not part of the widget metadata contract.
+`initialSize` supports `compact`, `regular`, `wide`, and `large`. The values are
+semantic hints; each host maps them to its own layout model. Host-controlled
+fields such as grid spans, lanes, and insertion order are not part of the widget
+metadata contract.
 
 ## Architecture
 

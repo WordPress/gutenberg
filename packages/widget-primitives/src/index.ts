@@ -14,7 +14,7 @@ export { useWidgetTypes } from './hooks';
 export type {
 	WidgetName,
 	WidgetIcon,
-	WidgetDefaultPlacement,
+	WidgetInitialSize,
 	WidgetTypeMetadata,
 	WidgetType,
 	WidgetRenderProps,

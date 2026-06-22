@@ -35,13 +35,36 @@ describe( 'createDashboardWidget', () => {
 		} );
 	} );
 
-	it( 'merges widget default placement values with the dashboard fallback', () => {
+	it( 'maps compact initial size to a compact placement', () => {
 		const instance = createDashboardWidget( {
 			...baseType,
-			defaultPlacement: {
-				width: 2,
-				height: 1,
-			},
+			initialSize: 'compact',
+		} );
+
+		expect( instance.placement ).toEqual( {
+			width: 1,
+			height: 1,
+			order: 0,
+		} );
+	} );
+
+	it( 'maps regular initial size to the default placement', () => {
+		const instance = createDashboardWidget( {
+			...baseType,
+			initialSize: 'regular',
+		} );
+
+		expect( instance.placement ).toEqual( {
+			width: 1,
+			height: 2,
+			order: 0,
+		} );
+	} );
+
+	it( 'maps wide initial size to a wide placement', () => {
+		const instance = createDashboardWidget( {
+			...baseType,
+			initialSize: 'wide',
 		} );
 
 		expect( instance.placement ).toEqual( {
@@ -51,15 +74,25 @@ describe( 'createDashboardWidget', () => {
 		} );
 	} );
 
-	it( 'ignores unsupported widget default placement fields', () => {
+	it( 'maps large initial size to a large placement', () => {
 		const instance = createDashboardWidget( {
 			...baseType,
-			defaultPlacement: {
-				width: 2,
-				height: 1,
-				order: 99,
-			} as WidgetType[ 'defaultPlacement' ] & { order: number },
+			initialSize: 'large',
 		} );
+
+		expect( instance.placement ).toEqual( {
+			width: 2,
+			height: 2,
+			order: 0,
+		} );
+	} );
+
+	it( 'ignores unsupported runtime placement fields', () => {
+		const instance = createDashboardWidget( {
+			...baseType,
+			initialSize: 'wide',
+			order: 99,
+		} as WidgetType & { order: number } );
 
 		expect( instance.placement ).toEqual( {
 			width: 2,
