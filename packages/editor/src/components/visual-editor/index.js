@@ -42,6 +42,7 @@ import { useZoomOutModeExit } from './use-zoom-out-mode-exit';
 import { usePaddingAppender } from './use-padding-appender';
 import { useEditContentOnlySectionExit } from './use-edit-content-only-section-exit';
 import { SyncConnectionErrorModal } from '../sync-connection-error-modal';
+import { UnfilteredHTMLWarningModal } from '../unfiltered-html-warning-modal';
 
 const {
 	LayoutStyle,
@@ -401,6 +402,7 @@ function VisualEditor( {
 			) }
 		>
 			<SyncConnectionErrorModal />
+			<UnfilteredHTMLWarningModal />
 			<ResizableEditor enableResizing={ enableResizing } height="100%">
 				<BlockCanvas
 					shouldIframe={ ! disableIframe }

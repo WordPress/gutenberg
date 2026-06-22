@@ -1935,4 +1935,102 @@ describe( 'polling-manager', () => {
 			expect( beaconsSent.reduce( ( a, b ) => a + b, 0 ) ).toBe( 21 );
 		} );
 	} );
+
+	describe( 'room sync pause', () => {
+		it( 'excludes a paused room from sync requests entirely, then includes it after release', async () => {
+			let isPaused = true;
+			mockApplyFilters.mockImplementation( ( ...args: unknown[] ) => {
+				const [ hook, defaultValue, room ] = args;
+				if ( hook === 'sync.pollingProvider.pauseRoom' ) {
+					return isPaused && room === 'primary-room';
+				}
+				return defaultValue;
+			} );
+
+			mockPostSyncUpdate.mockResolvedValue( {
+				rooms: [
+					{
+						room: 'collection-room',
+						end_cursor: 1,
+						awareness: {},
+						updates: [],
+					},
+				],
+			} );
+
+			// Primary room is paused; a second (unpaused) room keeps the poll
+			// loop sending requests so we can observe what is included.
+			pollingManager.registerRoom( {
+				room: 'primary-room',
+				doc: createMockDoc( 1 ),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+
+			pollingManager.registerRoom( {
+				room: 'collection-room',
+				doc: createMockDoc( 2 ),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			await jest.advanceTimersByTimeAsync( 4000 );
+
+			// The paused room never appears in any request (no awareness, no
+			// updates, no receiving).
+			expect( mockPostSyncUpdate.mock.calls.length ).toBeGreaterThan( 0 );
+			for ( const call of mockPostSyncUpdate.mock.calls ) {
+				expect(
+					call[ 0 ].rooms.find(
+						( r: { room: string } ) => r.room === 'primary-room'
+					)
+				).toBeUndefined();
+			}
+
+			// Releasing the pause lets the room participate in sync again.
+			const callsBeforeRelease = mockPostSyncUpdate.mock.calls.length;
+			isPaused = false;
+			await jest.advanceTimersByTimeAsync( 4000 );
+
+			const included = mockPostSyncUpdate.mock.calls
+				.slice( callsBeforeRelease )
+				.some( ( call ) =>
+					call[ 0 ].rooms.some(
+						( r: { room: string } ) => r.room === 'primary-room'
+					)
+				);
+			expect( included ).toBe( true );
+		} );
+
+		it( 'skips the network request entirely when every room is paused', async () => {
+			mockApplyFilters.mockImplementation( ( ...args: unknown[] ) => {
+				const [ hook, defaultValue, room ] = args;
+				if ( hook === 'sync.pollingProvider.pauseRoom' ) {
+					return room === 'primary-room';
+				}
+				return defaultValue;
+			} );
+
+			mockPostSyncUpdate.mockResolvedValue( { rooms: [] } );
+
+			pollingManager.registerRoom( {
+				room: 'primary-room',
+				doc: createMockDoc( 1 ),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			await jest.advanceTimersByTimeAsync( 4000 );
+
+			expect( mockPostSyncUpdate ).not.toHaveBeenCalled();
+		} );
+	} );
 } );

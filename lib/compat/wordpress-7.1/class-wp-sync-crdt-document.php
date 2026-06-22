@@ -205,6 +205,29 @@ if ( ! class_exists( 'WP_Sync_CRDT_Document' ) ) {
 		}
 
 		/**
+		 * Determines whether sanitizing a base64-encoded V2 document snapshot
+		 * would change it.
+		 *
+		 * Mirrors sanitize_encoded_state(), but reports whether sanitization
+		 * altered the reconstructed document rather than returning the cleaned
+		 * bytes. Used to warn a user without the unfiltered_html capability, before
+		 * they make a change, that editing the document will strip its unfiltered
+		 * HTML.
+		 *
+		 * @since 7.1.0
+		 *
+		 * @param string $base64 Base64-encoded V2 full-state update.
+		 * @return bool True when sanitization would change the document.
+		 */
+		public static function encoded_state_would_change( string $base64 ): bool {
+			$document = new self();
+
+			Yjs\applyUpdateV2( $document->doc, Yjs\Lib0\Buffer::fromBase64( $base64 ), 'server-unfiltered-html-check' );
+
+			return $document->sanitize_html_content();
+		}
+
+		/**
 		 * Sanitizes HTML-bearing content in the authoritative document in place.
 		 *
 		 * Walks the synced record's rich-text fields and block tree, running

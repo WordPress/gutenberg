@@ -508,7 +508,10 @@ function handleVisibilityChange() {
  * @return The RoomStates to include in this request, in send order.
  */
 function selectRoomsForRequest(): RoomState[] {
-	const allRooms = Array.from( roomStates.values() );
+	// Paused rooms are excluded from sync entirely until unpaused.
+	const allRooms = Array.from( roomStates.values() ).filter(
+		( state ) => ! isRoomSyncPaused( state.room )
+	);
 
 	// Fast path: everything fits in a single request.
 	if ( allRooms.length <= MAX_ROOMS_PER_REQUEST ) {
@@ -540,6 +543,25 @@ const textEncoder = new TextEncoder();
 
 function getJsonByteLength( value: unknown ): number {
 	return textEncoder.encode( JSON.stringify( value ) ).byteLength;
+}
+
+/**
+ * Whether a room's sync is currently paused. A paused room is excluded from
+ * sync requests entirely: it broadcasts no awareness, transmits no document
+ * updates, and receives nothing, as if it had not yet connected. Its registered
+ * listeners stay in place, so it resumes seamlessly once unpaused.
+ *
+ * Consumers opt in via the `sync.pollingProvider.pauseRoom` filter. The editor
+ * uses this to avoid syncing (and so sanitizing server-side, or announcing the
+ * user's presence for) a document a user has loaded but not yet agreed to edit.
+ *
+ * @param room The room identifier.
+ * @return True when the room should be excluded from sync.
+ */
+function isRoomSyncPaused( room: string ): boolean {
+	return (
+		true === applyFilters( 'sync.pollingProvider.pauseRoom', false, room )
+	);
 }
 
 function createPayloadRoom(
@@ -656,6 +678,14 @@ function poll(): void {
 		const { payload, roomsInRequest } = buildPayloadForRequest(
 			selectRoomsForRequest()
 		);
+
+		// Every registered room is paused (e.g. awaiting the user's consent to
+		// edit). Nothing to send or receive this cycle, so skip the request and
+		// reschedule. The loop stays alive so a room resumes once unpaused.
+		if ( 0 === payload.rooms.length ) {
+			pollingTimeoutId = setTimeout( poll, pollInterval );
+			return;
+		}
 
 		// Emit 'connecting' status only for rooms in this request. Rooms
 		// rotated out of this poll keep their prior status.

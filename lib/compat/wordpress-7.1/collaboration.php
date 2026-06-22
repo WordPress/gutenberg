@@ -174,6 +174,83 @@ if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
 	add_action( 'admin_init', 'gutenberg_register_real_time_collaboration_setting' );
 }
 
+if ( ! function_exists( 'gutenberg_collaboration_post_contains_unfiltered_html' ) ) {
+	/**
+	 * Determines whether a post contains HTML that collaborative editing would
+	 * strip for a user without the unfiltered_html capability.
+	 *
+	 * Two signals are checked, and either one flags the post. The raw post
+	 * content is compared against its wp_kses_post output, and, when a CRDT
+	 * document has been persisted for the post, the real-time collaboration
+	 * sanitizer is dry-run against it. This catches unfiltered markup whether it
+	 * lives in the saved post content or only in the collaborative document.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param WP_Post $post Post to inspect.
+	 * @return bool True when the post contains unfiltered HTML.
+	 */
+	function gutenberg_collaboration_post_contains_unfiltered_html( WP_Post $post ): bool {
+		$content = $post->post_content;
+		if ( is_string( $content ) && '' !== $content && wp_kses_post( $content ) !== $content ) {
+			return true;
+		}
+
+		$persisted_doc = get_post_meta( $post->ID, WP_Sync_Save_Server::CRDT_DOC_META_KEY, true );
+		if ( ! is_string( $persisted_doc ) || '' === $persisted_doc ) {
+			return false;
+		}
+
+		$decoded = json_decode( $persisted_doc, true );
+		if ( ! is_array( $decoded ) || ! isset( $decoded['document'] ) || ! is_string( $decoded['document'] ) ) {
+			return false;
+		}
+
+		try {
+			return WP_Sync_CRDT_Document::encoded_state_would_change( $decoded['document'] );
+		} catch ( Throwable $error ) {
+			return false;
+		}
+	}
+}
+
+if ( ! function_exists( 'gutenberg_collaboration_inject_unfiltered_html_warning' ) ) {
+	/**
+	 * Adds an editor setting flagging that the current post contains unfiltered
+	 * HTML which collaborative editing will strip for the current user.
+	 *
+	 * The flag is only set for users who lack the unfiltered_html capability
+	 * while collaboration is enabled, so the editor can warn them before they
+	 * make a change that would remove existing CSS or JavaScript from a peer's
+	 * document. Capable users never have their content stripped, so they need no
+	 * warning and the (more expensive) detection is skipped for them.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param array                   $settings Block editor settings.
+	 * @param WP_Block_Editor_Context $context  Block editor context.
+	 * @return array Filtered block editor settings.
+	 */
+	function gutenberg_collaboration_inject_unfiltered_html_warning( $settings, $context ) {
+		if ( ! ( $context instanceof WP_Block_Editor_Context ) || ! ( $context->post instanceof WP_Post ) ) {
+			return $settings;
+		}
+
+		if ( ! wp_is_collaboration_enabled() || wp_is_post_type_collaboration_disabled( $context->post->post_type ) ) {
+			return $settings;
+		}
+
+		if ( current_user_can( 'unfiltered_html' ) || ! current_user_can( 'edit_post', $context->post->ID ) ) {
+			return $settings;
+		}
+
+		$settings['collaborationContainsUnfilteredHTML'] = gutenberg_collaboration_post_contains_unfiltered_html( $context->post );
+
+		return $settings;
+	}
+	add_filter( 'block_editor_settings_all', 'gutenberg_collaboration_inject_unfiltered_html_warning', 10, 2 );
+}
+
 if ( ! function_exists( 'wp_is_collaboration_enabled' ) ) {
 	/**
 	 * Determines whether real-time collaboration is enabled.
