@@ -552,6 +552,115 @@ test.describe( 'Connectors', () => {
 		} );
 	} );
 
+	test.describe( 'Application password setup flow', () => {
+		const PLUGIN_SLUG = 'gutenberg-test-connectors-application-password';
+		const USERNAME_SETTING =
+			'connectors_content_source_test_remote_wordpress_username';
+		const APPLICATION_PASSWORD_SETTING =
+			'connectors_content_source_test_remote_wordpress_application_password';
+		const APPLICATION_PASSWORD = 'abcd efgh ijkl mnop 1234';
+
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activatePlugin( PLUGIN_SLUG );
+		} );
+
+		test.afterEach( async ( { requestUtils } ) => {
+			await requestUtils.rest( {
+				path: '/wp/v2/settings',
+				method: 'POST',
+				data: {
+					[ USERNAME_SETTING ]: '',
+					[ APPLICATION_PASSWORD_SETTING ]: '',
+				},
+			} );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deactivatePlugin( PLUGIN_SLUG );
+		} );
+
+		test( 'should save, mask, reload, and remove both credentials', async ( {
+			page,
+			admin,
+			requestUtils,
+		} ) => {
+			await admin.visitAdminPage(
+				SETTINGS_PAGE_PATH,
+				CONNECTORS_PAGE_QUERY
+			);
+
+			const card = getConnectorCardByName(
+				page,
+				'Test Remote WordPress'
+			);
+			await card.getByRole( 'button', { name: 'Set up' } ).click();
+
+			const usernameInput = card.getByRole( 'textbox', {
+				name: 'Username',
+			} );
+			const passwordInput = card.getByLabel( 'Application password' );
+			const saveButton = card.getByRole( 'button', { name: 'Save' } );
+
+			await expect( saveButton ).toBeDisabled();
+			await usernameInput.fill( 'remote-user' );
+			await passwordInput.fill( APPLICATION_PASSWORD );
+			await expect( saveButton ).toBeEnabled();
+			await expect(
+				card.getByRole( 'link', {
+					name: 'example.com',
+				} )
+			).toHaveAttribute(
+				'href',
+				'https://example.com/wp-admin/profile.php'
+			);
+			await saveButton.click();
+
+			await expect(
+				card.getByText( 'Connected', { exact: true } )
+			).toBeVisible();
+			const editButton = card.getByRole( 'button', { name: 'Edit' } );
+			await expect( editButton ).toBeFocused();
+
+			const settings = await requestUtils.rest( {
+				path: '/wp/v2/settings',
+			} );
+			expect( settings[ USERNAME_SETTING ] ).toBe( 'remote-user' );
+			expect( settings[ APPLICATION_PASSWORD_SETTING ] ).not.toBe(
+				APPLICATION_PASSWORD
+			);
+			expect( settings[ APPLICATION_PASSWORD_SETTING ] ).toMatch(
+				/1234$/
+			);
+
+			await admin.visitAdminPage(
+				SETTINGS_PAGE_PATH,
+				CONNECTORS_PAGE_QUERY
+			);
+			const reloadedCard = getConnectorCardByName(
+				page,
+				'Test Remote WordPress'
+			);
+			await reloadedCard.getByRole( 'button', { name: 'Edit' } ).click();
+
+			await expect(
+				reloadedCard.getByRole( 'textbox', { name: 'Username' } )
+			).toHaveValue( 'remote-user' );
+			await expect(
+				reloadedCard.getByLabel( 'Application password' )
+			).not.toHaveValue( APPLICATION_PASSWORD );
+			await reloadedCard
+				.getByRole( 'button', { name: 'Remove and replace' } )
+				.click();
+
+			await expect(
+				reloadedCard.getByText( 'Connected', { exact: true } )
+			).toBeHidden();
+			await expect(
+				reloadedCard.getByRole( 'textbox', { name: 'Username' } )
+			).toHaveValue( '' );
+		} );
+	} );
+
 	test.describe( 'JS extensibility', () => {
 		const PLUGIN_SLUG = 'gutenberg-test-connectors-js-extensibility';
 

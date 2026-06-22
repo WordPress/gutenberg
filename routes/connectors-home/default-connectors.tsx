@@ -7,12 +7,15 @@ import {
 	__experimentalRegisterConnector as registerConnector,
 	__experimentalConnectorItem as ConnectorItem,
 	__experimentalDefaultConnectorSettings as DefaultConnectorSettings,
+	__experimentalApplicationPasswordConnectorSettings as ApplicationPasswordConnectorSettings,
 	privateApis as connectorsPrivateApis,
 	type ConnectorConfig,
 	type ConnectorRenderProps,
 } from '@wordpress/connectors';
-import { select } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+import { select, useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 import { Badge, Link } from '@wordpress/ui';
 import { unlock } from '@wordpress/routes-lock-unlock';
 
@@ -122,6 +125,21 @@ const PluginDirectoryLink = ( { slug }: { slug: string } ) => (
 );
 
 const UnavailableActionBadge = () => <Badge>{ __( 'Not available' ) }</Badge>;
+
+function getPluginSlug( pluginFile?: string ) {
+	const pluginBasename = pluginFile?.replace( /\.php$/, '' );
+	return pluginBasename?.includes( '/' )
+		? pluginBasename.split( '/' )[ 0 ]
+		: pluginBasename;
+}
+
+function getHelpLabel( helpUrl?: string ) {
+	try {
+		return helpUrl ? new URL( helpUrl ).hostname : undefined;
+	} catch {
+		return undefined;
+	}
+}
 
 function ApiKeyConnector( {
 	name,
@@ -248,6 +266,202 @@ function ApiKeyConnector( {
 	);
 }
 
+function ApplicationPasswordConnector( {
+	name,
+	description,
+	logo,
+	authentication,
+	plugin,
+}: ConnectorRenderProps ) {
+	const auth =
+		authentication?.method === 'application_password'
+			? authentication
+			: undefined;
+	const usernameSettingName = auth?.usernameSettingName ?? '';
+	const applicationPasswordSettingName =
+		auth?.applicationPasswordSettingName ?? '';
+	const helpUrl = auth?.credentialsUrl ?? undefined;
+	const helpLabel = getHelpLabel( helpUrl );
+	const pluginSlug = getPluginSlug( plugin?.file );
+
+	const currentUsername = useSelect(
+		( registrySelect ) => {
+			const siteSettings = registrySelect( coreStore ).getEntityRecord(
+				'root',
+				'site'
+			) as Record< string, string > | undefined;
+			return siteSettings?.[ usernameSettingName ] ?? '';
+		},
+		[ usernameSettingName ]
+	);
+
+	const {
+		pluginStatus,
+		canInstallPlugins,
+		canActivatePlugins,
+		isExpanded,
+		setIsExpanded,
+		isBusy,
+		isConnected,
+		setIsConnected,
+		handleButtonClick,
+		getButtonLabel,
+	} = useConnectorPlugin( {
+		file: plugin?.file,
+		settingName: usernameSettingName,
+		additionalSettingName: applicationPasswordSettingName,
+		connectorName: name,
+		isInstalled: plugin?.isInstalled,
+		isActivated: plugin?.isActivated,
+		initialIsConnected: auth?.isConnected,
+	} );
+
+	const { saveEntityRecord } = useDispatch( coreStore );
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
+	const actionButtonRef = useRef< HTMLButtonElement >( null );
+	const showUnavailableBadge =
+		( pluginStatus === 'not-installed' && canInstallPlugins === false ) ||
+		( pluginStatus === 'inactive' && canActivatePlugins === false );
+
+	const saveCredentials = async ( {
+		username,
+		applicationPassword,
+	}: {
+		username: string;
+		applicationPassword: string;
+	} ) => {
+		const updatedRecord = await saveEntityRecord(
+			'root',
+			'site',
+			{
+				[ usernameSettingName ]: username,
+				[ applicationPasswordSettingName ]: applicationPassword,
+			},
+			{ throwOnError: true }
+		);
+		const record = updatedRecord as Record< string, string > | undefined;
+		if (
+			record?.[ usernameSettingName ] !== username ||
+			! record?.[ applicationPasswordSettingName ]
+		) {
+			throw new Error(
+				__( 'It was not possible to save these credentials.' )
+			);
+		}
+
+		setIsConnected( true );
+		createSuccessNotice(
+			sprintf(
+				/* translators: %s: Name of the connector. */
+				__( '%s connected successfully.' ),
+				name
+			),
+			{
+				id: 'connector-connect-success',
+				type: 'snackbar',
+			}
+		);
+	};
+
+	const removeCredentials = async () => {
+		try {
+			await saveEntityRecord(
+				'root',
+				'site',
+				{
+					[ usernameSettingName ]: '',
+					[ applicationPasswordSettingName ]: '',
+				},
+				{ throwOnError: true }
+			);
+			setIsConnected( false );
+			createSuccessNotice(
+				sprintf(
+					/* translators: %s: Name of the connector. */
+					__( '%s disconnected.' ),
+					name
+				),
+				{
+					id: 'connector-disconnect-success',
+					type: 'snackbar',
+				}
+			);
+		} catch ( error ) {
+			createErrorNotice(
+				sprintf(
+					/* translators: %s: Name of the connector. */
+					__( 'Failed to disconnect %s.' ),
+					name
+				),
+				{
+					id: 'connector-disconnect-error',
+					type: 'snackbar',
+				}
+			);
+			throw error;
+		}
+	};
+
+	return (
+		<ConnectorItem
+			className={
+				pluginSlug ? `connector-item--${ pluginSlug }` : undefined
+			}
+			logo={ logo }
+			name={ name }
+			description={ description }
+			actionArea={
+				<HStack spacing={ 3 } expanded={ false }>
+					{ isConnected && <ConnectedBadge /> }
+					{ showUnavailableBadge &&
+						( pluginSlug ? (
+							<PluginDirectoryLink slug={ pluginSlug } />
+						) : (
+							<UnavailableActionBadge />
+						) ) }
+					{ ! showUnavailableBadge && (
+						<Button
+							ref={ actionButtonRef }
+							variant={
+								isExpanded || isConnected
+									? 'tertiary'
+									: 'secondary'
+							}
+							size="compact"
+							onClick={ handleButtonClick }
+							disabled={ pluginStatus === 'checking' || isBusy }
+							isBusy={ isBusy }
+							accessibleWhenDisabled
+						>
+							{ getButtonLabel() }
+						</Button>
+					) }
+				</HStack>
+			}
+		>
+			{ isExpanded && pluginStatus === 'active' && (
+				<ApplicationPasswordConnectorSettings
+					key={ isConnected ? 'connected' : 'setup' }
+					initialUsername={ currentUsername }
+					helpUrl={ helpUrl }
+					helpLabel={ helpLabel }
+					readOnly={ isConnected }
+					onRemove={ async () => {
+						await removeCredentials();
+						actionButtonRef.current?.focus();
+					} }
+					onSave={ async ( credentials ) => {
+						await saveCredentials( credentials );
+						setIsExpanded( false );
+						actionButtonRef.current?.focus();
+					} }
+				/>
+			) }
+		</ConnectorItem>
+	);
+}
+
 // Register connectors from server-provided connector data.
 export function registerDefaultConnectors() {
 	const connectors = getConnectorData();
@@ -281,6 +495,11 @@ export function registerDefaultConnectors() {
 		);
 		if ( authentication.method === 'api_key' && ! existing?.render ) {
 			args.render = ApiKeyConnector;
+		} else if (
+			authentication.method === 'application_password' &&
+			! existing?.render
+		) {
+			args.render = ApplicationPasswordConnector;
 		}
 
 		registerConnector( connectorName, args );
