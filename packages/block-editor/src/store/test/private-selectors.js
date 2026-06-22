@@ -227,12 +227,12 @@ describe( 'private selectors', () => {
 			const state = {
 				selectedBlockStyleState: {
 					clientId: 'client-1',
-					value: { viewport: 'mobile', pseudo: ':hover' },
+					value: { viewport: '@mobile', pseudo: ':hover' },
 				},
 			};
 
 			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
-				viewport: 'mobile',
+				viewport: '@mobile',
 				pseudo: ':hover',
 			} );
 		} );
@@ -287,7 +287,7 @@ describe( 'private selectors', () => {
 			const state = {
 				selectedBlockStyleState: {
 					clientId: 'client-1',
-					value: { viewport: 'mobile', pseudo: 'default' },
+					value: { viewport: '@mobile', pseudo: 'default' },
 				},
 			};
 
@@ -309,7 +309,7 @@ describe( 'private selectors', () => {
 			const state = {
 				selectedBlockStyleState: {
 					clientId: 'client-1',
-					value: { viewport: 'mobile', pseudo: ':hover' },
+					value: { viewport: '@mobile', pseudo: ':hover' },
 				},
 			};
 
