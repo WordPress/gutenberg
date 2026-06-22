@@ -313,7 +313,7 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 		$actual = gutenberg_render_background_support( '<pre class="wp-block-verse">Verse</pre>', $block );
 
 		$this->assertSame(
-			'<pre style="background-image:linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%), url(' . $apos . 'https://example.com/image.jpg' . $apos . ');background-size:cover;" class="wp-block-verse has-background">Verse</pre>',
+			'<pre class="wp-block-verse has-background" style="background-image:linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%), url(' . $apos . 'https://example.com/image.jpg' . $apos . ');background-size:cover">Verse</pre>',
 			$actual
 		);
 	}
