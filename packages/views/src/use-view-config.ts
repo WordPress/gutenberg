@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import type { View, SupportedLayouts, Form } from '@wordpress/dataviews';
 
@@ -43,14 +44,26 @@ export function useViewConfig(
 	view_list: Array< any >;
 	form: Form | undefined;
 } {
+	// Stabilize the options object passed to the resolver so resolution is
+	// deduplicated. The resolver keys its cache on the arguments array, and the
+	// data layer compares the `options` object by reference, so a fresh literal
+	// on each call would re-trigger the REST request on every store change.
+	// Keying on the joined string also removes any need for callers to pass a
+	// referentially-stable `fields` array.
+	const fieldsKey = fields?.join( ',' );
+	const options = useMemo(
+		() => ( { fields } ),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[ fieldsKey ]
+	);
 	return useSelect(
 		( select ) => {
-			return unlock( select( coreStore ) ).getViewConfig( kind, name, {
-				fields,
-			} );
+			return unlock( select( coreStore ) ).getViewConfig(
+				kind,
+				name,
+				options
+			);
 		},
-		// `fields` is expected to be a stable reference (e.g. a module-level
-		// constant) provided by the caller.
-		[ kind, name, fields ]
+		[ kind, name, options ]
 	);
 }
