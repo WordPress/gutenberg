@@ -1025,17 +1025,21 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_get_viewport_breakpoints_merges_sanitized_settings_with_defaults() {
+	public function test_get_responsive_media_queries_merges_sanitized_settings_with_defaults_and_can_include_desktop() {
 		$this->assertSame(
 			array(
-				'mobile' => '640px',
-				'tablet' => '782px',
+				'mobile'  => '@media (width <= 640px)',
+				'tablet'  => '@media (640px < width <= 782px)',
+				'desktop' => '@media (width > 782px)',
 			),
-			WP_Theme_JSON_Gutenberg::get_viewport_breakpoints(
+			WP_Theme_JSON_Gutenberg::get_responsive_media_queries(
 				array(
 					'mobile'  => ' 640px ',
 					'tablet'  => 'calc(100% - 1rem)',
 					'desktop' => '1200px',
+				),
+				array(
+					'include_desktop' => true,
 				)
 			)
 		);

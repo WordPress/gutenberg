@@ -43,11 +43,11 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 		}
 
 		$viewport_settings      = gutenberg_get_global_settings( array( 'viewport' ) );
-		$viewport_breakpoints   = WP_Theme_JSON_Gutenberg::get_viewport_breakpoints( $viewport_settings );
-		$viewport_media_queries = array(
-			'mobile'  => "@media (width <= {$viewport_breakpoints['mobile']})",
-			'tablet'  => "@media ({$viewport_breakpoints['mobile']} < width <= {$viewport_breakpoints['tablet']})",
-			'desktop' => "@media (width > {$viewport_breakpoints['tablet']})",
+		$viewport_media_queries = WP_Theme_JSON_Gutenberg::get_responsive_media_queries(
+			$viewport_settings,
+			array(
+				'include_desktop' => true,
+			)
 		);
 
 		$hidden_on = array();

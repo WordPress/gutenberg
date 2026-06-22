@@ -638,35 +638,38 @@ class WP_Theme_JSON_Gutenberg {
 	);
 
 	/**
-	 * Returns viewport breakpoint sizes.
-	 *
-	 * @since 7.1.0
-	 *
-	 * @param array|null $viewport_settings Viewport settings from theme.json.
-	 * @return array Viewport breakpoint sizes.
-	 */
-	public static function get_viewport_breakpoints( $viewport_settings = null ) {
-		return array_merge(
-			static::DEFAULT_VIEWPORT_BREAKPOINTS,
-			static::sanitize_viewport_settings( $viewport_settings )
-		);
-	}
-
-	/**
 	 * Returns media queries for responsive style states.
 	 *
 	 * @since 7.1.0
 	 *
 	 * @param array|null $viewport_settings Viewport settings from theme.json.
+	 * @param array      $options           {
+	 *     Optional. Options for generating media queries.
+	 *
+	 *     @type bool $include_desktop Whether to include the desktop media query. Default false.
+	 * }
 	 * @return array Responsive media queries.
 	 */
-	public static function get_responsive_media_queries( $viewport_settings = null ) {
-		$breakpoints = static::get_viewport_breakpoints( $viewport_settings );
+	public static function get_responsive_media_queries( $viewport_settings = null, $options = array() ) {
+		$breakpoints = array_merge(
+			static::DEFAULT_VIEWPORT_BREAKPOINTS,
+			static::sanitize_viewport_settings( $viewport_settings )
+		);
 
-		return array(
+		$responsive_media_queries = array(
 			'@mobile' => "@media (width <= {$breakpoints['mobile']})",
 			'@tablet' => "@media ({$breakpoints['mobile']} < width <= {$breakpoints['tablet']})",
 		);
+
+		if ( ! empty( $options['include_desktop'] ) ) {
+			$responsive_media_queries = array(
+				'mobile'  => $responsive_media_queries['@mobile'],
+				'tablet'  => $responsive_media_queries['@tablet'],
+				'desktop' => "@media (width > {$breakpoints['tablet']})",
+			);
+		}
+
+		return $responsive_media_queries;
 	}
 
 	/**
