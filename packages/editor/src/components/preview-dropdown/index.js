@@ -28,15 +28,12 @@ import { VisuallyHidden } from '@wordpress/ui';
  */
 import { store as editorStore } from '../../store';
 import PostPreviewButton from '../post-preview-button';
-import {
-	getDeviceTypeByCanvasWidth,
-	VIEWPORT_STATE_BY_DEVICE_TYPE,
-} from '../../utils/device-type';
+import { VIEWPORT_STATE_BY_DEVICE_TYPE } from '../../utils/device-type';
 import { unlock } from '../../lock-unlock';
 
 export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	const {
-		canvasWidth,
+		deviceType,
 		homeUrl,
 		isTemplate,
 		isViewable,
@@ -49,14 +46,14 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			getCurrentPostType,
 			getCurrentTemplateId,
 			getRenderingMode,
-			getCanvasWidth,
+			getDeviceType,
 			isResponsiveEditing: _isResponsiveEditing,
 		} = unlock( select( editorStore ) );
 		const { getEntityRecord, getPostType } = select( coreStore );
 		const { get } = select( preferencesStore );
 		const _currentPostType = getCurrentPostType();
 		return {
-			canvasWidth: getCanvasWidth(),
+			deviceType: getDeviceType(),
 			homeUrl: getEntityRecord( 'root', '__unstableBase' )?.home,
 			isTemplate: _currentPostType === 'wp_template',
 			isViewable: getPostType( _currentPostType )?.viewable ?? false,
@@ -86,8 +83,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		setResponsiveEditing( newIsResponsiveEditing );
 		setStyleStateViewport(
 			newIsResponsiveEditing
-				? VIEWPORT_STATE_BY_DEVICE_TYPE[ deviceTypeByCanvasWidth ] ??
-						'default'
+				? VIEWPORT_STATE_BY_DEVICE_TYPE[ deviceType ] ?? 'default'
 				: 'default'
 		);
 	};
@@ -96,8 +92,6 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	if ( isMobile ) {
 		return null;
 	}
-
-	const deviceTypeByCanvasWidth = getDeviceTypeByCanvasWidth( canvasWidth );
 
 	const popoverProps = {
 		placement: 'bottom-end',
@@ -158,12 +152,12 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		<DropdownMenu
 			className={ clsx(
 				'editor-preview-dropdown',
-				`editor-preview-dropdown--${ deviceTypeByCanvasWidth.toLowerCase() }`
+				`editor-preview-dropdown--${ deviceType.toLowerCase() }`
 			) }
 			popoverProps={ popoverProps }
 			toggleProps={ toggleProps }
 			menuProps={ menuProps }
-			icon={ deviceIcons[ deviceTypeByCanvasWidth.toLowerCase() ] }
+			icon={ deviceIcons[ deviceType.toLowerCase() ] }
 			label={ __( 'View' ) }
 			disableOpenOnArrowDown={ disabled }
 		>
@@ -172,7 +166,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 					<MenuGroup>
 						<MenuItemsChoice
 							choices={ choices }
-							value={ deviceTypeByCanvasWidth }
+							value={ deviceType }
 							onSelect={ handleDevicePreviewChange }
 						/>
 					</MenuGroup>
