@@ -13,6 +13,7 @@ import '@testing-library/jest-dom';
 import {
 	createWaveformContainer,
 	styleSvgIcons,
+	setupPlayButtonIcons,
 	setupPlayButtonAccessibility,
 	logPlayError,
 } from '../waveform-utils';
@@ -198,6 +199,113 @@ describe( 'Waveform utilities', () => {
 			styleSvgIcons( container, '#ffff00' );
 
 			expect( path ).toHaveStyle( { fill: '#000000' } );
+		} );
+	} );
+
+	describe( 'setupPlayButtonIcons', () => {
+		const playIconPath = 'm8 18 9-6-9-6z';
+		const pauseIconPath = 'M10 17.5H7v-11h3zm7 0h-3v-11h3z';
+
+		it( 'should set the WordPress play icon initially', () => {
+			const container = document.createElement( 'div' );
+			const playBtn = document.createElement( 'button' );
+			playBtn.className = 'waveform-btn';
+			container.appendChild( playBtn );
+
+			setupPlayButtonIcons( container, '#000000' );
+
+			expect( playBtn.querySelector( 'path' ) ).toHaveAttribute(
+				'd',
+				playIconPath
+			);
+		} );
+
+		it( 'should change to the WordPress pause icon on play', () => {
+			const container = document.createElement( 'div' );
+			const playBtn = document.createElement( 'button' );
+			playBtn.className = 'waveform-btn';
+			container.appendChild( playBtn );
+
+			setupPlayButtonIcons( container, '#000000' );
+			container.dispatchEvent( new CustomEvent( 'waveformplayer:play' ) );
+
+			expect( playBtn.querySelector( 'path' ) ).toHaveAttribute(
+				'd',
+				pauseIconPath
+			);
+		} );
+
+		it( 'should change back to the WordPress play icon on pause', () => {
+			const container = document.createElement( 'div' );
+			const playBtn = document.createElement( 'button' );
+			playBtn.className = 'waveform-btn';
+			container.appendChild( playBtn );
+
+			setupPlayButtonIcons( container, '#000000' );
+			container.dispatchEvent( new CustomEvent( 'waveformplayer:play' ) );
+			container.dispatchEvent(
+				new CustomEvent( 'waveformplayer:pause' )
+			);
+
+			expect( playBtn.querySelector( 'path' ) ).toHaveAttribute(
+				'd',
+				playIconPath
+			);
+		} );
+
+		it( 'should change back to the WordPress play icon on ended', () => {
+			const container = document.createElement( 'div' );
+			const playBtn = document.createElement( 'button' );
+			playBtn.className = 'waveform-btn';
+			container.appendChild( playBtn );
+
+			setupPlayButtonIcons( container, '#000000' );
+			container.dispatchEvent( new CustomEvent( 'waveformplayer:play' ) );
+			container.dispatchEvent(
+				new CustomEvent( 'waveformplayer:ended' )
+			);
+
+			expect( playBtn.querySelector( 'path' ) ).toHaveAttribute(
+				'd',
+				playIconPath
+			);
+		} );
+
+		it( 'should style the WordPress icon with a contrasting fill', () => {
+			const container = document.createElement( 'div' );
+			const playBtn = document.createElement( 'button' );
+			playBtn.className = 'waveform-btn';
+			container.appendChild( playBtn );
+
+			setupPlayButtonIcons( container, '#000000' );
+
+			expect( playBtn.querySelector( 'path' ) ).toHaveStyle( {
+				fill: '#ffffff',
+			} );
+		} );
+
+		it( 'should return cleanup function that removes listeners', () => {
+			const container = document.createElement( 'div' );
+			const playBtn = document.createElement( 'button' );
+			playBtn.className = 'waveform-btn';
+			container.appendChild( playBtn );
+
+			const cleanup = setupPlayButtonIcons( container, '#000000' );
+			cleanup();
+
+			container.dispatchEvent( new CustomEvent( 'waveformplayer:play' ) );
+			expect( playBtn.querySelector( 'path' ) ).toHaveAttribute(
+				'd',
+				playIconPath
+			);
+		} );
+
+		it( 'should do nothing when play button not found', () => {
+			const container = document.createElement( 'div' );
+
+			expect( () =>
+				setupPlayButtonIcons( container, '#000000' )
+			).not.toThrow();
 		} );
 	} );
 

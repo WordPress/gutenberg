@@ -14,6 +14,10 @@ import WaveformPlayerLib from '@arraypress/waveform-player';
  * Note: DEFAULT_WAVEFORM_HEIGHT should match $waveform-player-height in style.scss.
  */
 const DEFAULT_WAVEFORM_HEIGHT = 100;
+const PLAY_ICON_MARKUP =
+	'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m8 18 9-6-9-6z"></path></svg>';
+const PAUSE_ICON_MARKUP =
+	'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 17.5H7v-11h3zm7 0h-3v-11h3z"></path></svg>';
 
 /**
  * Get computed style for an element, using ownerDocument for iframe compatibility.
@@ -103,6 +107,39 @@ export function styleSvgIcons( container, buttonColor ) {
 	svgPaths.forEach( ( path ) => {
 		path.style.fill = iconColor;
 	} );
+}
+
+/**
+ * Set up the play button icon to use WordPress media control icons.
+ *
+ * @param {Element} container   - The waveform container element.
+ * @param {string}  buttonColor - The button background color (textColor).
+ */
+export function setupPlayButtonIcons( container, buttonColor ) {
+	const playBtn = container.querySelector( '.waveform-btn' );
+	if ( ! playBtn ) {
+		return;
+	}
+
+	const setIcon = ( iconMarkup ) => {
+		playBtn.innerHTML = iconMarkup;
+		styleSvgIcons( playBtn, buttonColor );
+	};
+
+	setIcon( PLAY_ICON_MARKUP );
+
+	const onPlay = () => setIcon( PAUSE_ICON_MARKUP );
+	const onPause = () => setIcon( PLAY_ICON_MARKUP );
+
+	container.addEventListener( 'waveformplayer:play', onPlay );
+	container.addEventListener( 'waveformplayer:pause', onPause );
+	container.addEventListener( 'waveformplayer:ended', onPause );
+
+	return () => {
+		container.removeEventListener( 'waveformplayer:play', onPlay );
+		container.removeEventListener( 'waveformplayer:pause', onPause );
+		container.removeEventListener( 'waveformplayer:ended', onPause );
+	};
 }
 
 /**
@@ -198,9 +235,13 @@ export function initWaveformPlayer(
 
 	// Set up event handlers.
 	let cleanupAccessibility;
+	let cleanupPlayButtonIcons;
 	const handlers = {
 		ready: () => {
-			styleSvgIcons( container, textColor );
+			cleanupPlayButtonIcons = setupPlayButtonIcons(
+				container,
+				textColor
+			);
 			cleanupAccessibility = setupPlayButtonAccessibility(
 				container,
 				labels
@@ -221,6 +262,7 @@ export function initWaveformPlayer(
 		container,
 		destroy: () => {
 			cleanupAccessibility?.();
+			cleanupPlayButtonIcons?.();
 			container.removeEventListener(
 				'waveformplayer:ready',
 				handlers.ready
