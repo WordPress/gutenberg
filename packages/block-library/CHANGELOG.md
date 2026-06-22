@@ -13,7 +13,7 @@
 
 ### Bug Fixes
 
--   Image: external images inserted by URL are now sideloaded on the server when uploaded to the media library, so the upload works when the editor is cross-origin isolated ([#29](https://github.com/adamsilverstein/gutenberg/pull/29)).
+-   Image: external images inserted by URL are now sideloaded on the server when uploaded to the media library, so the upload works when the editor is cross-origin isolated ([#79409](https://github.com/WordPress/gutenberg/pull/79409)).
 
 ## 9.48.1 (2026-06-16)
 
