@@ -13,11 +13,9 @@ const MANIFEST_JSON_PATH = path.join( __dirname, '..', 'src', 'manifest.json' );
 const LIBRARY_DIR = path.join( __dirname, '..', 'src', 'library' );
 
 /**
- * Deletes every SVG in the icon library that is not published by the icon
- * registry (i.e. not marked `public: true` in the manifest).
+ * Deletes every non-public SVG in the icon library.
  *
- * Used by the WordPress Core build (`IS_WORDPRESS_CORE=true`) so the artifact
- * ships only stable icons and stays smaller. Must run after icon collection
+ * Non-public icons are those not explicitly marked as `public: true` in the manifest. Must run after icon collection
  * validation, which expects the manifest and library to match 1:1.
  *
  * @param {Object} [options]              Options.

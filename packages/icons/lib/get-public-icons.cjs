@@ -1,9 +1,7 @@
 /**
- * Returns the icons from a parsed manifest that are published by the icon
- * registry (those explicitly marked `public: true`).
+ * Filters the list of registered icons marked as public.
  *
- * This is the single source of truth for the "public icon" rule, shared by
- * the manifest.php generator and the WordPress Core build prune step.
+ * Public icons are those explicitly marked `public: true` in the manifest file.
  *
  * @param {Array<Object>} manifest Parsed manifest.json array.
  * @return {Array<Object>} Icons with `public === true`.
