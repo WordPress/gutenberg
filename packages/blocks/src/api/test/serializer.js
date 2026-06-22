@@ -391,14 +391,11 @@ describe( 'block serializer', () => {
 
 			expect( serializeBlock( block ) ).toBe( '<!-- wp:quote /-->' );
 		} );
-		it( 'serializes blocks with innerContent support from their static fragments', () => {
-			registerBlockType( 'core/static-html', {
+		it( 'serializes the Custom HTML block from its static fragments', () => {
+			registerBlockType( 'core/html', {
 				apiVersion: 3,
 				category: 'text',
-				title: 'static html block',
-				supports: {
-					innerContent: true,
-				},
+				title: 'Custom HTML',
 				save: () => null,
 			} );
 			registerBlockType( 'core/fruit', {
@@ -414,28 +411,25 @@ describe( 'block serializer', () => {
 			} );
 
 			const block = createBlock(
-				'core/static-html',
+				'core/html',
 				{},
 				[ createBlock( 'core/fruit', { fruit: 'Bananas' } ) ],
 				[ '<div>', null, '</div>' ]
 			);
 
 			expect( serializeBlock( block ) ).toBe(
-				'<!-- wp:static-html -->\n' +
+				'<!-- wp:html -->\n' +
 					'<div><!-- wp:fruit {"fruit":"Bananas"} -->\n' +
 					'Bananas\n' +
 					'<!-- /wp:fruit --></div>\n' +
-					'<!-- /wp:static-html -->'
+					'<!-- /wp:html -->'
 			);
 		} );
 		it( 'appends inner blocks missing an innerContent placeholder', () => {
-			registerBlockType( 'core/static-html', {
+			registerBlockType( 'core/html', {
 				apiVersion: 3,
 				category: 'text',
-				title: 'static html block',
-				supports: {
-					innerContent: true,
-				},
+				title: 'Custom HTML',
 				save: () => null,
 			} );
 			registerBlockType( 'core/fruit', {
@@ -451,18 +445,18 @@ describe( 'block serializer', () => {
 			} );
 
 			const block = createBlock(
-				'core/static-html',
+				'core/html',
 				{},
 				[ createBlock( 'core/fruit', { fruit: 'Bananas' } ) ],
 				[ '<div></div>' ]
 			);
 
 			expect( serializeBlock( block ) ).toBe(
-				'<!-- wp:static-html -->\n' +
+				'<!-- wp:html -->\n' +
 					'<div></div><!-- wp:fruit {"fruit":"Bananas"} -->\n' +
 					'Bananas\n' +
 					'<!-- /wp:fruit -->\n' +
-					'<!-- /wp:static-html -->'
+					'<!-- /wp:html -->'
 			);
 		} );
 	} );

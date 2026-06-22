@@ -488,14 +488,11 @@ describe( 'block parser', () => {
 		} );
 	} );
 
-	describe( 'blocks with innerContent support', () => {
-		const staticHtmlBlockSettings = {
+	describe( 'Custom HTML block static inner content', () => {
+		const htmlBlockSettings = {
 			apiVersion: 3,
 			category: 'text',
-			title: 'static html block',
-			supports: {
-				innerContent: true,
-			},
+			title: 'Custom HTML',
 			save: () => null,
 		};
 
@@ -513,16 +510,16 @@ describe( 'block parser', () => {
 		};
 
 		it( 'should retain innerContent and mark the block valid', () => {
-			registerBlockType( 'core/static-html', staticHtmlBlockSettings );
+			registerBlockType( 'core/html', htmlBlockSettings );
 			registerBlockType( 'core/inner', innerBlockSettings );
 
 			const [ block ] = parse(
-				'<!-- wp:static-html -->\n' +
+				'<!-- wp:html -->\n' +
 					'<div><!-- wp:inner -->\nBananas\n<!-- /wp:inner --></div>\n' +
-					'<!-- /wp:static-html -->'
+					'<!-- /wp:html -->'
 			);
 
-			expect( block.name ).toBe( 'core/static-html' );
+			expect( block.name ).toBe( 'core/html' );
 			expect( block.isValid ).toBe( true );
 			expect( block.innerContent ).toEqual( [
 				'\n<div>',
@@ -537,27 +534,27 @@ describe( 'block parser', () => {
 		} );
 
 		it( 'should serialize parsed static HTML interleaved with inner blocks back to identical markup', () => {
-			registerBlockType( 'core/static-html', staticHtmlBlockSettings );
+			registerBlockType( 'core/html', htmlBlockSettings );
 			registerBlockType( 'core/inner', innerBlockSettings );
 
 			const content =
-				'<!-- wp:static-html -->\n' +
+				'<!-- wp:html -->\n' +
 				'<div class="banner"><h1>Static</h1><!-- wp:inner -->\n' +
 				'Editable\n' +
 				'<!-- /wp:inner --><footer>Footer</footer></div>\n' +
-				'<!-- /wp:static-html -->';
+				'<!-- /wp:html -->';
 
 			expect( serialize( parse( content ) ) ).toBe( content );
 		} );
 
 		it( 'should serialize parsed static HTML without inner blocks back to identical markup', () => {
-			registerBlockType( 'core/static-html', staticHtmlBlockSettings );
+			registerBlockType( 'core/html', htmlBlockSettings );
 
 			const content =
-				'<!-- wp:static-html -->\n' +
+				'<!-- wp:html -->\n' +
 				'<h1>Some HTML code</h1>\n' +
 				'<div>This is a div</div>\n' +
-				'<!-- /wp:static-html -->';
+				'<!-- /wp:html -->';
 
 			expect( serialize( parse( content ) ) ).toBe( content );
 		} );

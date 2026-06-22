@@ -188,25 +188,15 @@ describe( 'block factory', () => {
 			expect( block.attributes ).toEqual( {} );
 		} );
 
-		it( 'should attach innerContent when the block type supports it', () => {
-			registerBlockType( 'core/test-block', {
-				...defaultBlockSettings,
-				supports: {
-					innerContent: true,
-				},
-			} );
+		it( 'should attach innerContent for the Custom HTML block', () => {
+			registerBlockType( 'core/html', defaultBlockSettings );
 
-			const block = createBlock(
-				'core/test-block',
-				{},
-				[],
-				[ '<div></div>' ]
-			);
+			const block = createBlock( 'core/html', {}, [], [ '<div></div>' ] );
 
 			expect( block.innerContent ).toEqual( [ '<div></div>' ] );
 		} );
 
-		it( 'should ignore innerContent and warn when the block type lacks support', () => {
+		it( 'should ignore innerContent and warn for other blocks', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
 			const block = createBlock(

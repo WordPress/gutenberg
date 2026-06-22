@@ -16,7 +16,6 @@ import {
 	getBlockType,
 	getBlockTypes,
 	getGroupingBlockName,
-	hasBlockSupport,
 } from './registration';
 import {
 	isBlockRegistered,
@@ -45,7 +44,7 @@ const getBlockTypeWithTransformMetadata = (
  * @param innerBlocks  Nested blocks.
  * @param innerContent Static HTML fragments interleaved with inner blocks,
  *                     where `null` entries mark inner block positions. Only
- *                     applies to blocks with the `innerContent` support.
+ *                     applies to the Custom HTML block.
  *
  * @return Block object.
  */
@@ -81,11 +80,13 @@ export function createBlock(
 	};
 
 	if ( innerContent ) {
-		if ( hasBlockSupport( name, 'innerContent' ) ) {
+		// Static inner content is currently a Custom HTML block mechanism
+		// only; it isn't exposed as a block support.
+		if ( name === 'core/html' ) {
 			block.innerContent = innerContent;
 		} else {
 			warning(
-				`The "${ name }" block does not support inner content, so the innerContent argument passed to createBlock was ignored. Add the "innerContent" block support to use it.`
+				`The innerContent argument passed to createBlock for the "${ name }" block was ignored. Only the Custom HTML block stores static inner content.`
 			);
 		}
 	}

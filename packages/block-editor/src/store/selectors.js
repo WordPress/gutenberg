@@ -1907,11 +1907,10 @@ export function canInsertBlocks( state, clientIds, rootClientId = null ) {
 
 /**
  * Returns whether the given root block keeps its markup as static inner
- * content (`innerContent` block support). Its inner blocks are fixed at
- * their positions within the static markup: they can be edited in place,
- * but not moved or removed, and no blocks can be inserted alongside them.
- * This only applies to the direct children; deeper descendants are
- * unaffected.
+ * content (the Custom HTML block). Its inner blocks are fixed at their
+ * positions within the static markup: they can be edited in place, but not
+ * moved or removed, and no blocks can be inserted alongside them. This only
+ * applies to the direct children; deeper descendants are unaffected.
  *
  * @param {Object}  state        Editor state.
  * @param {?string} rootClientId Root block client ID.
@@ -1920,8 +1919,7 @@ export function canInsertBlocks( state, clientIds, rootClientId = null ) {
  */
 function isInnerContentRoot( state, rootClientId ) {
 	return (
-		!! rootClientId &&
-		hasBlockSupport( getBlockName( state, rootClientId ), 'innerContent' )
+		!! rootClientId && getBlockName( state, rootClientId ) === 'core/html'
 	);
 }
 

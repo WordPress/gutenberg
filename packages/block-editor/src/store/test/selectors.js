@@ -4802,32 +4802,29 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'static inner content (innerContent support)', () => {
+	describe( 'static inner content (Custom HTML block)', () => {
 		beforeEach( () => {
-			registerBlockType( 'core/test-inner-content-block', {
+			registerBlockType( 'core/html', {
 				apiVersion: 3,
 				save: () => null,
 				category: 'text',
-				title: 'Test Inner Content Block',
+				title: 'Custom HTML',
 				icon: 'test',
-				supports: {
-					innerContent: true,
-				},
 			} );
 		} );
 
 		afterEach( () => {
-			unregisterBlockType( 'core/test-inner-content-block' );
+			unregisterBlockType( 'core/html' );
 		} );
 
-		// An innerContent parent with a child container, which has a child
-		// of its own. The direct child is fixed in place; the grandchild
+		// The Custom HTML block parent with a child container, which has a
+		// child of its own. The direct child is fixed in place; the grandchild
 		// is regular, fully editable content.
 		const buildState = () => ( {
 			blocks: {
 				byClientId: new Map(
 					Object.entries( {
-						parent: { name: 'core/test-inner-content-block' },
+						parent: { name: 'core/html' },
 						child: { name: 'core/test-block-b' },
 						grandchild: { name: 'core/test-block-b' },
 					} )

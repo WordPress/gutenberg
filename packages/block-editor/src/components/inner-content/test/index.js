@@ -18,7 +18,7 @@ import {
 import InnerContent from '../';
 import { BlockEditorProvider } from '../../provider';
 
-const BLOCK_NAME = 'core/test-inner-content';
+const BLOCK_NAME = 'core/html';
 
 // These tests inspect the raw injected DOM to verify the static markup is
 // sanitized before being added to the editor canvas, so direct node access is
@@ -39,9 +39,8 @@ describe( 'InnerContent', () => {
 	beforeAll( () => {
 		registerBlockType( BLOCK_NAME, {
 			apiVersion: 3,
-			title: 'Test Inner Content',
+			title: 'Custom HTML',
 			category: 'text',
-			supports: { innerContent: true },
 			save: () => null,
 		} );
 	} );
