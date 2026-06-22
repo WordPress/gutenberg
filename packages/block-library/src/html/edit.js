@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import {
 	BlockControls,
 	BlockIcon,
@@ -13,6 +13,7 @@ import {
 } from '@wordpress/block-editor';
 import { parse, serialize, getBlockContent } from '@wordpress/blocks';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 import {
 	ToolbarButton,
 	ToolbarGroup,
@@ -30,7 +31,7 @@ import HTMLEditModal from './modal';
 
 const { InnerContent } = unlock( blockEditorPrivateApis );
 
-export default function HTMLEdit( { clientId } ) {
+export default function HTMLEdit( { clientId, attributes } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const registry = useRegistry();
 	const { updateBlock, replaceInnerBlocks } = useDispatch( blockEditorStore );
@@ -81,6 +82,41 @@ export default function HTMLEdit( { clientId } ) {
 			}
 		} );
 	};
+
+	// Migrate the deprecated `content` attribute. The block's markup now lives
+	// in its inner content, but a block created via `createBlock( 'core/html',
+	// { content } )` still arrives with a `content` attribute. As soon as it
+	// loads, move that markup into the block's inner content and clear the
+	// attribute.
+	useEffect( () => {
+		if ( ! attributes.content ) {
+			return;
+		}
+
+		deprecated( 'The content attribute on the Custom HTML block', {
+			since: '7.1',
+			alternative: 'inner content',
+		} );
+
+		const [ parsedBlock ] = parse(
+			`<!-- wp:html -->\n${ attributes.content }\n<!-- /wp:html -->`
+		);
+
+		registry.batch( () => {
+			updateBlock( clientId, {
+				attributes: { content: undefined },
+				innerContent: parsedBlock?.innerContent ?? [
+					attributes.content,
+				],
+			} );
+			replaceInnerBlocks(
+				clientId,
+				parsedBlock?.innerBlocks ?? [],
+				false
+			);
+		} );
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ attributes.content ] );
 
 	// Show placeholder when content is empty
 	if ( ! content?.trim() ) {

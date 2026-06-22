@@ -7,6 +7,12 @@
 	"description": "Add custom HTML code and preview it as you edit.",
 	"keywords": [ "embed" ],
 	"textdomain": "default",
+	"attributes": {
+		"content": {
+			"type": "string",
+			"role": "local"
+		}
+	},
 	"supports": {
 		"customClassName": false,
 		"className": false,
