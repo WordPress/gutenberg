@@ -279,7 +279,6 @@ export default function useBlockSync( {
 	// Clean up the changes made by setControlledBlocks() when the component
 	// containing useBlockSync() unmounts.
 	const unsetControlledBlocks = () => {
-		__unstableMarkNextChangeAsNotPersistent();
 		if ( clientId ) {
 			__unstableMarkNextChangeAsNotPersistent();
 			setHasControlledInnerBlocks( clientId, false );
