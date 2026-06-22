@@ -9,6 +9,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
+import { safeHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -31,10 +32,11 @@ const LAYOUT = { type: 'default', alignments: [] };
  *
  * Unlike `InnerBlocks`, the rendered blocks are not a contiguous list: they
  * live at arbitrary positions inside markup the block editor doesn't manage.
- * The static fragments are rendered as inert DOM (scripts don't execute and
- * inline event handlers are stripped), and the inner blocks are portalled
- * into placeholder elements. Inner blocks are locked: they can be edited in
- * place but not moved, removed, or added to.
+ * The static fragments are sanitized with `safeHTML` before being injected
+ * into the canvas — the same treatment block save content receives elsewhere
+ * in the editor — and the inner blocks are portalled into placeholder
+ * elements. Inner blocks are locked: they can be edited in place but not
+ * moved, removed, or added to.
  *
  * @param {Object} props          Component props.
  * @param {string} props.clientId Client ID of the block whose inner content
@@ -67,18 +69,11 @@ export default function InnerContent( { clientId } ) {
 
 	useLayoutEffect( () => {
 		const container = containerRef.current;
-		container.innerHTML = html;
 
-		// The static markup is rendered inert: assigning `innerHTML` never
-		// executes `<script>` elements, and inline event handlers are
-		// stripped here so they can't fire inside the editor canvas.
-		container.querySelectorAll( '*' ).forEach( ( element ) => {
-			for ( const attribute of [ ...element.attributes ] ) {
-				if ( attribute.name.startsWith( 'on' ) ) {
-					element.removeAttribute( attribute.name );
-				}
-			}
-		} );
+		// Sanitize before injecting into the canvas: `safeHTML` removes
+		// `<script>` elements and inline event handlers, matching how block
+		// save content is rendered elsewhere in the editor.
+		container.innerHTML = safeHTML( html );
 
 		setSlots(
 			Array.from( container.querySelectorAll( SLOT_TAG_NAME ) ).sort(
