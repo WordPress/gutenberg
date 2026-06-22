@@ -94,7 +94,12 @@ describe( 'EditPostPreferencesModal', () => {
 
 		expect(
 			await screen.findByRole( 'checkbox', {
-				name: 'Show collaborator presence notifications',
+				name: 'Show collaborator join notifications',
+			} )
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'checkbox', {
+				name: 'Show collaborator leave notifications',
 			} )
 		).toBeInTheDocument();
 		expect(

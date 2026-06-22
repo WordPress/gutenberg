@@ -90,6 +90,7 @@ describe( 'initializeEditor', () => {
 		const filter = jest.fn( ( defaults ) => ( {
 			...defaults,
 			fixedToolbar: true,
+			showCollaborationLeaveNotifications: false,
 			showCollaborationPostSaveNotifications: false,
 		} ) );
 		addFilter( FILTER_NAME, FILTER_NAMESPACE, filter );
@@ -103,7 +104,8 @@ describe( 'initializeEditor', () => {
 		expect( setDefaults ).toHaveBeenCalledWith(
 			'core',
 			expect.objectContaining( {
-				showCollaborationPresenceNotifications: true,
+				showCollaborationJoinNotifications: true,
+				showCollaborationLeaveNotifications: false,
 				showCollaborationPostSaveNotifications: false,
 				fixedToolbar: false,
 			} )

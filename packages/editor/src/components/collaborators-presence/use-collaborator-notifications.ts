@@ -71,7 +71,8 @@ export function useCollaboratorNotifications(
 	const {
 		postStatus,
 		isCollaborationEnabled,
-		showPresenceNotifications,
+		showJoinNotifications,
+		showLeaveNotifications,
 		showPostSaveNotifications,
 	} = useSelect( ( select ) => {
 		const {
@@ -83,10 +84,15 @@ export function useCollaboratorNotifications(
 				| string
 				| undefined,
 			isCollaborationEnabled: isCollaborationEnabledForCurrentPost(),
-			showPresenceNotifications:
+			showJoinNotifications:
 				select( preferencesStore ).get(
 					'core',
-					'showCollaborationPresenceNotifications'
+					'showCollaborationJoinNotifications'
+				) ?? true,
+			showLeaveNotifications:
+				select( preferencesStore ).get(
+					'core',
+					'showCollaborationLeaveNotifications'
 				) ?? true,
 			showPostSaveNotifications:
 				select( preferencesStore ).get(
@@ -100,15 +106,17 @@ export function useCollaboratorNotifications(
 
 	// Pass null when collaboration is disabled or a notification type is
 	// turned off to prevent the hooks from subscribing to awareness state.
-	const shouldShowPresenceNotifications =
-		isCollaborationEnabled && showPresenceNotifications;
+	const shouldShowJoinNotifications =
+		isCollaborationEnabled && showJoinNotifications;
+	const shouldShowLeaveNotifications =
+		isCollaborationEnabled && showLeaveNotifications;
 	const shouldShowPostSaveNotifications =
 		isCollaborationEnabled && showPostSaveNotifications;
 	// Null post IDs unsubscribe hooks; callback guards handle events already queued then.
-	const effectivePresencePostId = shouldShowPresenceNotifications
-		? postId
-		: null;
-	const effectivePresencePostType = shouldShowPresenceNotifications
+	const effectiveJoinPostId = shouldShowJoinNotifications ? postId : null;
+	const effectiveJoinPostType = shouldShowJoinNotifications ? postType : null;
+	const effectiveLeavePostId = shouldShowLeaveNotifications ? postId : null;
+	const effectiveLeavePostType = shouldShowLeaveNotifications
 		? postType
 		: null;
 	const effectivePostSavePostId = shouldShowPostSaveNotifications
@@ -119,14 +127,14 @@ export function useCollaboratorNotifications(
 		: null;
 
 	useOnCollaboratorJoin(
-		effectivePresencePostId,
-		effectivePresencePostType,
+		effectiveJoinPostId,
+		effectiveJoinPostType,
 		useCallback(
 			(
 				collaborator: PostEditorAwarenessState,
 				me?: PostEditorAwarenessState
 			) => {
-				if ( ! shouldShowPresenceNotifications ) {
+				if ( ! shouldShowJoinNotifications ) {
 					return;
 				}
 
@@ -157,16 +165,16 @@ export function useCollaboratorNotifications(
 					}
 				);
 			},
-			[ createNotice, shouldShowPresenceNotifications ]
+			[ createNotice, shouldShowJoinNotifications ]
 		)
 	);
 
 	useOnCollaboratorLeave(
-		effectivePresencePostId,
-		effectivePresencePostType,
+		effectiveLeavePostId,
+		effectiveLeavePostType,
 		useCallback(
 			( collaborator: PostEditorAwarenessState ) => {
-				if ( ! shouldShowPresenceNotifications ) {
+				if ( ! shouldShowLeaveNotifications ) {
 					return;
 				}
 
@@ -184,7 +192,7 @@ export function useCollaboratorNotifications(
 					}
 				);
 			},
-			[ createNotice, shouldShowPresenceNotifications ]
+			[ createNotice, shouldShowLeaveNotifications ]
 		)
 	);
 

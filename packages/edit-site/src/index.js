@@ -64,7 +64,8 @@ export function initializeEditor( id, settings ) {
 	const collaborationNotificationPreferenceDefaults = applyFilters(
 		'editor.CollaborationNotificationPreferenceDefaults',
 		{
-			showCollaborationPresenceNotifications: true,
+			showCollaborationJoinNotifications: true,
+			showCollaborationLeaveNotifications: true,
 			showCollaborationPostSaveNotifications: true,
 		},
 		'core/edit-site'
@@ -84,8 +85,10 @@ export function initializeEditor( id, settings ) {
 		showListViewByDefault: false,
 		enableChoosePatternModal: true,
 		showCollaborationCursor: false,
-		showCollaborationPresenceNotifications:
-			collaborationNotificationPreferenceDefaults.showCollaborationPresenceNotifications,
+		showCollaborationJoinNotifications:
+			collaborationNotificationPreferenceDefaults.showCollaborationJoinNotifications,
+		showCollaborationLeaveNotifications:
+			collaborationNotificationPreferenceDefaults.showCollaborationLeaveNotifications,
 		showCollaborationPostSaveNotifications:
 			collaborationNotificationPreferenceDefaults.showCollaborationPostSaveNotifications,
 	} );

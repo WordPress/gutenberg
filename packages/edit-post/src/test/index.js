@@ -125,7 +125,7 @@ describe( 'initializeEditor', () => {
 		const filter = jest.fn( ( defaults ) => ( {
 			...defaults,
 			showListViewByDefault: true,
-			showCollaborationPresenceNotifications: false,
+			showCollaborationJoinNotifications: false,
 		} ) );
 		addFilter( FILTER_NAME, FILTER_NAMESPACE, filter );
 
@@ -138,7 +138,8 @@ describe( 'initializeEditor', () => {
 		expect( setDefaults ).toHaveBeenCalledWith(
 			'core',
 			expect.objectContaining( {
-				showCollaborationPresenceNotifications: false,
+				showCollaborationJoinNotifications: false,
+				showCollaborationLeaveNotifications: true,
 				showCollaborationPostSaveNotifications: true,
 				showListViewByDefault: false,
 			} )

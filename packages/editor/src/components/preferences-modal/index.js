@@ -139,12 +139,22 @@ function PreferencesModalContents( { extraSections = {} } ) {
 										/>
 										<PreferenceToggleControl
 											scope="core"
-											featureName="showCollaborationPresenceNotifications"
+											featureName="showCollaborationJoinNotifications"
 											help={ __(
-												'Show notifications when collaborators join or leave the post.'
+												'Show notifications when collaborators join the post.'
 											) }
 											label={ __(
-												'Show collaborator presence notifications'
+												'Show collaborator join notifications'
+											) }
+										/>
+										<PreferenceToggleControl
+											scope="core"
+											featureName="showCollaborationLeaveNotifications"
+											help={ __(
+												'Show notifications when collaborators leave the post.'
+											) }
+											label={ __(
+												'Show collaborator leave notifications'
 											) }
 										/>
 										<PreferenceToggleControl

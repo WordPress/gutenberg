@@ -187,9 +187,9 @@ addFilter(
 
 ### `editor.CollaborationNotificationPreferenceDefaults`
 
-Use this filter to change the default collaboration notification preferences.
-These defaults seed the user preferences store, so saved user preferences still
-take precedence.
+Use this filter to change the default real-time collaboration notification
+preferences. These defaults initialize the user preferences store, so saved
+user preferences take precedence.
 
 ```js
 import { addFilter } from '@wordpress/hooks';
@@ -204,7 +204,9 @@ addFilter(
 
 		return {
 			...defaults,
-			showCollaborationPresenceNotifications: false,
+			showCollaborationJoinNotifications: false,
+			showCollaborationLeaveNotifications: false,
+			showCollaborationPostSaveNotifications: false,
 		};
 	}
 );
