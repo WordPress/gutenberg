@@ -4,13 +4,15 @@
 import deprecated from '@wordpress/deprecated';
 
 /**
- * Function to resize the editor window.
+ * Previously returned inline styles that sized the editor canvas to emulate a
+ * device preview width. Device preview is now handled by the editor's resizable
+ * canvas, so this hook is a no-op kept for backward compatibility.
  *
- * @deprecated This hook is deprecated and no longer does anything.
+ * @deprecated
  */
 export default function useResizeCanvas() {
 	deprecated( 'wp.blockEditor.useResizeCanvas', {
 		since: '7.1',
-		hint: 'This hook is deprecated and no longer does anything.',
+		hint: 'Device preview is now handled by the editor canvas. This hook no longer does anything.',
 	} );
 }
