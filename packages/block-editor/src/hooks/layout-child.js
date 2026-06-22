@@ -21,13 +21,17 @@ import { useBlockElement } from '../components/block-list/use-block-props/use-bl
 import useBlockVisibility from '../components/block-visibility/use-block-visibility';
 import { deviceTypeKey } from '../store/private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/constants';
+import {
+	DEFAULT_BLOCK_STYLE_STATE,
+	getStyleForState,
+} from './block-style-state';
 
 // Used for generating the instance ID
 const LAYOUT_CHILD_BLOCK_PROPS_REFERENCE = {};
 // Keep in sync with WP_Theme_JSON_Gutenberg::RESPONSIVE_BREAKPOINTS.
 const RESPONSIVE_BREAKPOINTS = {
-	mobile: '@media (width <= 480px)',
-	tablet: '@media (480px < width <= 782px)',
+	'@mobile': '@media (width <= 480px)',
+	'@tablet': '@media (480px < width <= 782px)',
 };
 
 // These are the serialized `selfStretch` values. `max` used to be called
@@ -254,7 +258,10 @@ export function getResponsiveChildLayoutStyles( {
 
 	return Object.entries( RESPONSIVE_BREAKPOINTS )
 		.map( ( [ viewport, mediaQuery ] ) => {
-			const viewportLayout = style?.[ viewport ]?.layout;
+			const viewportLayout = getStyleForState( style, {
+				viewport,
+				pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
+			} )?.layout;
 			if ( ! viewportLayout || ! Object.keys( viewportLayout ).length ) {
 				return '';
 			}
