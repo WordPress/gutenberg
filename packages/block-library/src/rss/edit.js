@@ -191,7 +191,6 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 						isShownByDefault
 					>
 						<ToggleControl
-							__next40pxDefaultSize
 							label={ __( 'Display featured image' ) }
 							checked={ displayFeaturedImage }
 							onChange={ toggleAttribute(
@@ -209,7 +208,6 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 						isShownByDefault
 					>
 						<ToggleControl
-							__next40pxDefaultSize
 							label={ __( 'Display author' ) }
 							checked={ displayAuthor }
 							onChange={ toggleAttribute( 'displayAuthor' ) }
@@ -225,7 +223,6 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 						isShownByDefault
 					>
 						<ToggleControl
-							__next40pxDefaultSize
 							label={ __( 'Display date' ) }
 							checked={ displayDate }
 							onChange={ toggleAttribute( 'displayDate' ) }
@@ -241,7 +238,6 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 						isShownByDefault
 					>
 						<ToggleControl
-							__next40pxDefaultSize
 							label={ __( 'Display excerpt' ) }
 							checked={ displayExcerpt }
 							onChange={ toggleAttribute( 'displayExcerpt' ) }
@@ -301,7 +297,6 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 						isShownByDefault
 					>
 						<ToggleControl
-							__next40pxDefaultSize
 							label={ __( 'Open links in new tab' ) }
 							checked={ openInNewTab }
 							onChange={ ( value ) =>

@@ -120,24 +120,49 @@ function render_block_core_rss( $attributes ) {
 
 			if ( empty( $image_url ) ) {
 				$thumbnail = $item->get_thumbnail();
-				if ( ! empty( $thumbnail ) ) {
-					$image_url = $thumbnail;
+				if ( ! empty( $thumbnail['url'] ) ) {
+					$image_url = $thumbnail['url'];
 				}
 			}
 
 			if ( empty( $image_url ) ) {
 				$content = $item->get_content();
 				if ( ! empty( $content ) ) {
-					if ( preg_match( '/<img[^>]+src=[\'"]([^\'"]+)[\'"][^>]*>/i', $content, $matches ) ) {
-						$image_url = $matches[1];
+					if ( preg_match_all(
+						'/<img[^>]+src=[\'"]([^\'"]+)[\'"][^>]*>/i',
+						$content,
+						$matches,
+						PREG_SET_ORDER
+					) ) {
+						foreach ( $matches as $match ) {
+							$img_tag = $match[0];
+							$src     = $match[1];
+
+							$width  = 0;
+							$height = 0;
+							if ( preg_match( '/\bwidth=[\'"]?(\d+)[\'"]?/i', $img_tag, $w ) ) {
+								$width = (int) $w[1];
+							}
+							if ( preg_match( '/\bheight=[\'"]?(\d+)[\'"]?/i', $img_tag, $h ) ) {
+								$height = (int) $h[1];
+							}
+
+							if ( ( $width > 0 && $width <= 1 ) || ( $height > 0 && $height <= 1 ) ) {
+								continue;
+							}
+
+							$image_url = $src;
+							break;
+						}
 					}
 				}
 			}
 
 			if ( ! empty( $image_url ) ) {
 				$featured_image = sprintf(
-					'<div class="wp-block-rss__item-featured-image"><img src="%s" alt="" /></div>',
-					esc_url( $image_url )
+					'<div class="wp-block-rss__item-featured-image"><img src="%s" alt="%s" /></div>',
+					esc_url( $image_url ),
+					esc_attr( $title )
 				);
 			}
 		}

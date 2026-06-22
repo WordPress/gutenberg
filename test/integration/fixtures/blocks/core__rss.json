@@ -11,7 +11,8 @@
 			"displayAuthor": true,
 			"displayDate": true,
 			"excerptLength": 20,
-			"openInNewTab": false
+			"openInNewTab": false,
+			"displayFeaturedImage": false
 		},
 		"innerBlocks": []
 	}
