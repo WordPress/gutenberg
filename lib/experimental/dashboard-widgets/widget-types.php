@@ -330,9 +330,13 @@ function gutenberg_register_widget_type_if_new( $name, $args ) {
  * `origin = 'code-registered'`, carrying inline composition `content` plus
  * display metadata. No database row.
  *
- * Both origins register through the same `gutenberg_register_widget_type_if_new()`
- * helper; earlier sources win on a name collision. The CPT origin is added in a
- * later step.
+ * CPT origin: walks published `widget_def` posts and registers each as a Widget
+ * Type named `widget-def/{post_slug}` with `origin = 'cpt'`, `definition_id`
+ * carrying the post ID, and the post content inline.
+ *
+ * All three origins register through the same
+ * `gutenberg_register_widget_type_if_new()` helper; earlier sources win on a name
+ * collision (built-in shadows code-registered shadows cpt).
  */
 function gutenberg_register_widget_types() {
 	if ( ! function_exists( 'gutenberg_get_registered_widget_modules' ) ) {
@@ -390,13 +394,45 @@ function gutenberg_register_widget_types() {
 			);
 		}
 	}
+
+	/* CPT origin: from `widget_def` posts. */
+	if ( post_type_exists( 'widget_def' ) ) {
+		$definitions = get_posts(
+			array(
+				'post_type'      => 'widget_def',
+				'post_status'    => 'publish',
+				'posts_per_page' => -1,
+				'orderby'        => 'title',
+				'order'          => 'ASC',
+				'no_found_rows'  => true,
+			)
+		);
+
+		foreach ( $definitions as $definition ) {
+			gutenberg_register_widget_type_if_new(
+				'widget-def/' . $definition->post_name,
+				array(
+					'render_module' => null,
+					'widget_module' => null,
+					'origin'        => 'cpt',
+					'definition_id' => $definition->ID,
+					/*
+					 * Carry the composition inline so the cpt origin renders
+					 * through the same path as code-registered, with per-instance
+					 * attributes seeded later. The post stays the editable source.
+					 */
+					'content'       => $definition->post_content,
+				)
+			);
+		}
+	}
 }
 
 /*
  * Runs at priority 30 so origin sources that populate the registry at earlier
- * priorities are in place first: code-registered definitions are declared via
- * `gutenberg_register_widget_def()` on `init` (before 30), and later origins
- * follow the same pattern.
+ * priorities are in place first: the `widget_def` CPT is registered on `init`
+ * (default priority) and code-registered definitions are declared via
+ * `gutenberg_register_widget_def()` on `init` (before 30).
  */
 if ( did_action( 'init' ) ) {
 	gutenberg_register_widget_types();
