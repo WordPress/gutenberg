@@ -75,6 +75,19 @@ function ResizableEditor( { className, enableResizing, height, children } ) {
 		[ setCanvasWidth ]
 	);
 
+	const updateCanvasWidth = useCallback(
+		( element ) => {
+			const currentWidth = element.offsetWidth;
+			const containerWidth = element.parentElement?.offsetWidth ?? 0;
+			setCanvasWidth(
+				isAtMaxWidth( currentWidth, containerWidth, 80 )
+					? undefined
+					: currentWidth
+			);
+		},
+		[ setCanvasWidth ]
+	);
+
 	return (
 		<ResizableBox
 			className={ clsx( 'editor-resizable-editor', className, {
@@ -92,15 +105,12 @@ function ResizableEditor( { className, enableResizing, height, children } ) {
 			onResizeStart={ () => {
 				setIsResizing( true );
 			} }
+			onResize={ ( event, direction, element ) => {
+				updateCanvasWidth( element );
+			} }
 			onResizeStop={ ( event, direction, element ) => {
 				setIsResizing( false );
-				const currentWidth = element.offsetWidth;
-				const containerWidth = element.parentElement?.offsetWidth ?? 0;
-				setCanvasWidth(
-					isAtMaxWidth( currentWidth, containerWidth, 80 )
-						? undefined
-						: currentWidth
-				);
+				updateCanvasWidth( element );
 			} }
 			minWidth={ 300 }
 			maxWidth="100%"
