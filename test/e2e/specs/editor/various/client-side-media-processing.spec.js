@@ -703,16 +703,18 @@ test.describe( 'Client-side media processing', () => {
 		editor,
 		mediaProcessingUtils,
 	} ) => {
-		// Block all POST requests to /wp/v2/media so the upload stays
-		// in-flight (never completes) until after reload.
-		let blockUpload = true;
+		// Hang all POST requests to /wp/v2/media so the upload stays
+		// in-flight (PROCESSING) and its IndexedDB record persists until
+		// after the reload — simulating a crash mid-upload. The browser
+		// aborts the pending request automatically on page navigation.
 		await page.route( '**/wp/v2/media**', async ( route ) => {
 			if (
-				blockUpload &&
 				route.request().method() === 'POST' &&
 				/\/wp\/v2\/media(\?|$)/.test( route.request().url() )
 			) {
-				await route.abort( 'failed' );
+				// Never fulfill: keep the upload in-flight so its persisted
+				// IndexedDB record survives until the reload.
+				await new Promise( () => {} );
 				return;
 			}
 			await route.continue();
@@ -731,15 +733,32 @@ test.describe( 'Client-side media processing', () => {
 			'10x10_e2e_test_image_z9T8jK.png'
 		);
 
+		// Wait until the durable upload marker is serialized onto the block.
+		// onUploadStart writes uploadId; saveDraft before this means the saved
+		// post won't carry the marker and reload finds nothing to resume.
+		await expect
+			.poll(
+				() =>
+					page.evaluate(
+						() =>
+							window.wp.data
+								.select( 'core/block-editor' )
+								.getSelectedBlock()?.attributes?.uploadId
+					),
+				{ timeout: 10_000 }
+			)
+			.toBeTruthy();
+
 		// Save the draft so the in-progress block (with its durable uploadId)
 		// survives the reload.
 		await editor.saveDraft();
 
+		// Remove the hanging route BEFORE reload so the resumed upload's POST
+		// reaches the real server and can succeed.
+		await page.unroute( '**/wp/v2/media**' );
+
 		// Reload; the persisted queue should be detected on page load.
 		await page.reload();
-
-		// Allow the upload to succeed when resumed.
-		blockUpload = false;
 
 		// The resume notice must appear; click Resume to re-trigger the upload.
 		const resumeButton = page.getByRole( 'button', { name: /resume/i } );
@@ -756,8 +775,6 @@ test.describe( 'Client-side media processing', () => {
 				timeout: 60_000,
 			} )
 			.toMatch( /^https?:\/\// );
-
-		await page.unroute( '**/wp/v2/media**' );
 	} );
 
 	test( 'discards an interrupted upload when the user declines to resume', async ( {
@@ -765,13 +782,17 @@ test.describe( 'Client-side media processing', () => {
 		editor,
 		mediaProcessingUtils,
 	} ) => {
-		// Block all create requests so the upload never completes.
+		// Hang all POST requests to /wp/v2/media so the upload stays
+		// in-flight (PROCESSING) and its IndexedDB record persists until
+		// after the reload — simulating a crash mid-upload.
 		await page.route( '**/wp/v2/media**', async ( route ) => {
 			if (
 				route.request().method() === 'POST' &&
 				/\/wp\/v2\/media(\?|$)/.test( route.request().url() )
 			) {
-				await route.abort( 'failed' );
+				// Never fulfill: keep the upload in-flight so its persisted
+				// IndexedDB record survives until the reload.
+				await new Promise( () => {} );
 				return;
 			}
 			await route.continue();
@@ -789,8 +810,27 @@ test.describe( 'Client-side media processing', () => {
 			'10x10_e2e_test_image_z9T8jK.png'
 		);
 
+		// Wait until the durable upload marker is serialized onto the block
+		// before saving, so the saved post carries the uploadId attribute.
+		await expect
+			.poll(
+				() =>
+					page.evaluate(
+						() =>
+							window.wp.data
+								.select( 'core/block-editor' )
+								.getSelectedBlock()?.attributes?.uploadId
+					),
+				{ timeout: 10_000 }
+			)
+			.toBeTruthy();
+
 		// Save the draft so the in-progress block survives reload.
 		await editor.saveDraft();
+
+		// Remove the hanging route before reload (discard needs no successful
+		// upload, but clearing it keeps teardown clean).
+		await page.unroute( '**/wp/v2/media**' );
 
 		// Reload; the durable queue detects the interrupted upload.
 		await page.reload();
@@ -804,8 +844,6 @@ test.describe( 'Client-side media processing', () => {
 		await expect(
 			page.getByRole( 'button', { name: /resume/i } )
 		).toBeHidden();
-
-		await page.unroute( '**/wp/v2/media**' );
 	} );
 
 	test( 'surfaces an error after exhausting upload retries', async ( {
