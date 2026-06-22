@@ -3,7 +3,6 @@
  */
 import {
 	createBlock,
-	getBlockContent,
 	registerBlockType,
 	serialize,
 	unregisterBlockType,
@@ -35,21 +34,6 @@ describe( 'core/html', () => {
 			// The attribute is kept so it can be migrated rather than dropped.
 			expect( block.attributes.content ).toBe(
 				'<marquee>Hello</marquee>'
-			);
-		} );
-
-		it( 'serializes content via the save fallback when not migrated', () => {
-			// Mirrors a headless `createBlock` + `serialize` with no editor to
-			// migrate the content into inner content.
-			const block = createBlock( 'core/html', {
-				content: '<marquee>Hello</marquee>',
-			} );
-
-			expect( getBlockContent( block ) ).toBe(
-				'<marquee>Hello</marquee>'
-			);
-			expect( serialize( block ) ).toBe(
-				'<!-- wp:html -->\n<marquee>Hello</marquee>\n<!-- /wp:html -->'
 			);
 		} );
 

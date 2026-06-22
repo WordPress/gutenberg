@@ -98,22 +98,9 @@ export default function HTMLEdit( { clientId, attributes } ) {
 			alternative: 'inner content',
 		} );
 
-		const [ parsedBlock ] = parse(
-			`<!-- wp:html -->\n${ attributes.content }\n<!-- /wp:html -->`
-		);
-
-		registry.batch( () => {
-			updateBlock( clientId, {
-				attributes: { content: undefined },
-				innerContent: parsedBlock?.innerContent ?? [
-					attributes.content,
-				],
-			} );
-			replaceInnerBlocks(
-				clientId,
-				parsedBlock?.innerBlocks ?? [],
-				false
-			);
+		updateBlock( clientId, {
+			attributes: { content: undefined },
+			innerContent: [ attributes.content ],
 		} );
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ attributes.content ] );
