@@ -3,6 +3,21 @@ type SortItem = Record< string, Comparable >;
 type SortField< T > = string | ( ( item: T ) => Comparable );
 
 /**
+ * Mirrors the `>` operator for `Comparable` values: lexicographic when both
+ * are strings, numeric otherwise (an `undefined` operand is never greater).
+ *
+ * @param a Left-hand value.
+ * @param b Right-hand value.
+ * @return Whether `a` is greater than `b`.
+ */
+function isGreater( a: Comparable, b: Comparable ): boolean {
+	if ( typeof a === 'string' && typeof b === 'string' ) {
+		return a > b;
+	}
+	return Number( a ) > Number( b );
+}
+
+/**
  * Recursive stable sorting comparator function.
  *
  * @param field Field to sort by.
@@ -26,9 +41,9 @@ const comparator = < T extends SortItem >(
 			cmpB = b[ field ];
 		}
 
-		if ( ( cmpA as number ) > ( cmpB as number ) ) {
+		if ( isGreater( cmpA, cmpB ) ) {
 			return order === 'asc' ? 1 : -1;
-		} else if ( ( cmpB as number ) > ( cmpA as number ) ) {
+		} else if ( isGreater( cmpB, cmpA ) ) {
 			return order === 'asc' ? -1 : 1;
 		}
 
