@@ -75,9 +75,14 @@ export default function MediaEditorImageControls( {
 	zoomFactor = DEFAULT_ZOOM_FACTOR,
 }: MediaEditorImageControlsProps ) {
 	const { state, setFlip, snapRotate90, setZoom } = useMediaEditor();
-	const { aspectRatioValue, setAspectRatioValue, aspectRatioOptions } =
-		useCropOptions( { aspectRatioPresets } );
-	const hasAspectRatioControl = ! withLabels && showAspectRatioControl;
+	const {
+		aspectRatioValue,
+		setAspectRatioValue,
+		cropShape,
+		aspectRatioOptions,
+	} = useCropOptions( { aspectRatioPresets } );
+	const hasAspectRatioControl =
+		! withLabels && showAspectRatioControl && cropShape === 'rectangle';
 	const minZoom = getMinZoom( state );
 	const zoomByFactor = ( factor: number ) => {
 		setZoom(

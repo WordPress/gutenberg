@@ -588,6 +588,8 @@ function MediaEditorContent( {
 	const {
 		aspectRatioValue,
 		setAspectRatioValue,
+		cropShape,
+		setCropShape,
 		aspectRatioOptions,
 		resetCropOptions,
 	} = useCropOptions( { aspectRatioPresets } );
@@ -675,7 +677,7 @@ function MediaEditorContent( {
 	const imageControls =
 		isImage && ! isWide ? (
 			<MediaEditorImageControls
-				showAspectRatioControl
+				showAspectRatioControl={ cropShape === 'rectangle' }
 				aspectRatioPresets={ aspectRatioPresets }
 			/>
 		) : null;
@@ -691,6 +693,8 @@ function MediaEditorContent( {
 						title: __( 'Crop' ),
 						render: () => (
 							<MediaEditorCropPanel
+								cropShape={ cropShape }
+								onCropShapeChange={ setCropShape }
 								aspectRatioValue={ aspectRatioValue }
 								onAspectRatioChange={ setAspectRatioValue }
 								aspectRatioOptions={ aspectRatioOptions }

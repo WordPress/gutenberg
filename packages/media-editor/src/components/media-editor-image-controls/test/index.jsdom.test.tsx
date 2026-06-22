@@ -1,16 +1,24 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import MediaEditorImageControls from '..';
 import type { MediaEditorImageControlsProps } from '..';
-import { MediaEditorStateProvider, useMediaEditor } from '../../../state';
+import {
+	MediaEditorStateProvider,
+	useMediaEditor,
+	type CropOptionsSlice,
+} from '../../../state';
 import type { CropperState } from '../../../image-editor';
 import { MAX_ZOOM } from '../../../image-editor/core/constants';
 
 function setup(
 	props: MediaEditorImageControlsProps = {},
-	initialCropperState?: Partial< CropperState >
+	initialCropperState?: Partial< CropperState >,
+	initialCropOptions?: Partial< CropOptionsSlice >
 ) {
 	render(
-		<MediaEditorStateProvider initialCropperState={ initialCropperState }>
+		<MediaEditorStateProvider
+			initialCropperState={ initialCropperState }
+			initialCropOptions={ initialCropOptions }
+		>
 			<MediaEditorImageControls { ...props } />
 			<CurrentState />
 		</MediaEditorStateProvider>
@@ -134,6 +142,16 @@ describe( 'MediaEditorImageControls', () => {
 		setup( {
 			withLabels: true,
 			showAspectRatioControl: true,
+		} );
+
+		expect(
+			screen.queryByRole( 'button', { name: 'Aspect ratio' } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'omits the aspect ratio dropdown for circle crops', () => {
+		setup( { showAspectRatioControl: true }, undefined, {
+			cropShape: 'circle',
 		} );
 
 		expect(

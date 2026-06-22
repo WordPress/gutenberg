@@ -16,6 +16,7 @@ function CropOptionsHarness() {
 			<div data-testid="aspect-ratio-value">
 				{ cropOptions.aspectRatioValue }
 			</div>
+			<div data-testid="crop-shape">{ cropOptions.cropShape }</div>
 			<div data-testid="resolved-aspect-ratio">
 				{ cropOptions.resolvedAspectRatio ?? 'undefined' }
 			</div>
@@ -38,6 +39,9 @@ function CropOptionsHarness() {
 			</button>
 			<button onClick={ () => cropOptions.setAspectRatioValue( '0' ) }>
 				Free
+			</button>
+			<button onClick={ () => cropOptions.setCropShape( 'circle' ) }>
+				Circle
 			</button>
 			<button onClick={ cropOptions.resetCropOptions }>Reset</button>
 		</div>
@@ -90,14 +94,28 @@ describe( 'useCropOptions', () => {
 		).toHaveTextContent( 'undefined' );
 	} );
 
+	it( 'reports circle as a square resolved aspect ratio', () => {
+		renderHarness();
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'Circle' } ) );
+
+		expect(
+			screen.getByTestId( 'resolved-aspect-ratio' )
+		).toHaveTextContent( '1' );
+	} );
+
 	it( 'reset returns cropOptions to defaults', () => {
 		renderHarness();
 
 		fireEvent.click( screen.getByRole( 'button', { name: 'Square' } ) );
+		fireEvent.click( screen.getByRole( 'button', { name: 'Circle' } ) );
 		fireEvent.click( screen.getByRole( 'button', { name: 'Reset' } ) );
 
 		expect( screen.getByTestId( 'aspect-ratio-value' ) ).toHaveTextContent(
 			'0'
+		);
+		expect( screen.getByTestId( 'crop-shape' ) ).toHaveTextContent(
+			'rectangle'
 		);
 	} );
 } );
