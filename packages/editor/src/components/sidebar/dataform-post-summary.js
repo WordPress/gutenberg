@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { DataForm } from '@wordpress/dataviews';
-import { __experimentalVStack as VStack } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { useMemo } from '@wordpress/element';
 import { useViewConfig } from '@wordpress/views';
 
@@ -299,7 +299,7 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 	};
 	return (
 		<PostPanelSection className="editor-post-summary">
-			<VStack spacing={ 4 }>
+			<Stack direction="column" gap="lg">
 				<PostCardPanel
 					postType={ postType }
 					postId={ postId }
@@ -312,7 +312,7 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 					onChange={ onChange }
 				/>
 				<PostTrash onActionPerformed={ onActionPerformed } />
-			</VStack>
+			</Stack>
 		</PostPanelSection>
 	);
 }
