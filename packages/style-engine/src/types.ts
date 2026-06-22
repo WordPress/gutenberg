@@ -58,6 +58,7 @@ export interface Style {
 		height?: CSSProperties[ 'height' ];
 		minHeight?: CSSProperties[ 'minHeight' ];
 		minWidth?: CSSProperties[ 'minWidth' ];
+		objectFit?: CSSProperties[ 'objectFit' ];
 		width?: CSSProperties[ 'width' ];
 	};
 	spacing?: {

@@ -1,17 +1,46 @@
 /**
  * External dependencies
  */
-// @ts-ignore
-import showdown from 'showdown';
+import { Marked, type Tokens } from 'marked';
 
-// Reuse the same showdown converter.
-const converter = new showdown.Converter( {
-	noHeaderId: true,
-	tables: true,
-	literalMidWordUnderscores: true,
-	omitExtraWLInCodeBlocks: true,
-	simpleLineBreaks: true,
-	strikethrough: true,
+// Skip escaping `"` and `'` so shortcodes like `[gallery ids="123"]` survive
+// for the shortcode converter to match.
+function escapeBodyText( value: string ): string {
+	return value
+		.replace( /&(?!#?\w+;)/g, '&amp;' )
+		.replace( /</g, '&lt;' )
+		.replace( />/g, '&gt;' );
+}
+
+const converter = new Marked( {
+	gfm: true,
+	breaks: true,
+	renderer: {
+		// Match showdown's `omitExtraWLInCodeBlocks`: marked appends `\n`
+		// before `</code>`, which leaks into the Code block's content as a
+		// trailing blank line.
+		code( { text, lang }: Tokens.Code ): string {
+			const language = ( lang || '' ).match( /^\S*/ )?.[ 0 ];
+			const cls = language
+				? ` class="${ language } language-${ language }"`
+				: '';
+			return `<pre><code${ cls }>${ escapeBodyText(
+				text
+			) }</code></pre>`;
+		},
+		text( token: Tokens.Text | Tokens.Escape ): string | false {
+			// Only the plain-text case differs (skip escaping quotes);
+			// defer inline tokens and already-escaped text to marked's
+			// default by returning `false`.
+			if (
+				( 'tokens' in token && token.tokens ) ||
+				( 'escaped' in token && token.escaped )
+			) {
+				return false;
+			}
+			return escapeBodyText( token.text );
+		},
+	},
 } );
 
 /**
@@ -63,10 +92,11 @@ const correctors = [
  * @return HTML.
  */
 export default function markdownConverter( text: string ): string {
-	return converter.makeHtml(
+	return converter.parse(
 		correctors.reduce(
 			( current, corrector ) => corrector( current ),
 			text
-		)
+		),
+		{ async: false }
 	);
 }

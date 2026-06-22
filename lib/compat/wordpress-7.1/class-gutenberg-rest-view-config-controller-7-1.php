@@ -47,7 +47,8 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 					),
 				),
 				'schema' => array( $this, 'get_public_item_schema' ),
-			)
+			),
+			true // override existing route defined by core, if it exists
 		);
 	}
 
@@ -84,13 +85,31 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 
 		$config = gutenberg_get_entity_view_config( $kind, $name );
 
+		/*
+		 * The schema types these as objects, but PHP encodes empty arrays as
+		 * JSON arrays ([]). Cast the object-typed values that may be empty so
+		 * they serialize as JSON objects ({}) and match the schema.
+		 */
+		$default_view = $config['default_view'];
+		if ( isset( $default_view['layout'] ) ) {
+			$default_view['layout'] = (object) $default_view['layout'];
+		}
+
+		$default_layouts = $config['default_layouts'];
+		foreach ( $default_layouts as $view_type => $layout ) {
+			if ( isset( $layout['layout'] ) ) {
+				$layout['layout'] = (object) $layout['layout'];
+			}
+			$default_layouts[ $view_type ] = (object) $layout;
+		}
+
 		$response = array(
 			'kind'            => $kind,
 			'name'            => $name,
-			'default_view'    => $config['default_view'],
-			'default_layouts' => $config['default_layouts'],
+			'default_view'    => $default_view,
+			'default_layouts' => $default_layouts,
 			'view_list'       => $config['view_list'],
-			'form'            => $config['form'],
+			'form'            => (object) $config['form'],
 		);
 
 		return rest_ensure_response( $response );
@@ -129,9 +148,10 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 					'readonly'    => true,
 					'properties'  => array_merge(
 						array(
-							'type' => array(
+							'type'   => array(
 								'type' => 'string',
 							),
+							'layout' => $this->get_combined_layout_schema(),
 						),
 						$view_base_properties
 					),
@@ -427,7 +447,8 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 			'type'       => 'object',
 			'properties' => array_merge(
 				$this->get_table_layout_schema()['properties'],
-				$this->get_grid_layout_schema()['properties']
+				$this->get_grid_layout_schema()['properties'],
+				$this->get_list_layout_schema()['properties']
 			),
 		);
 	}

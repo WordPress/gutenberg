@@ -1,7 +1,7 @@
 @use "@wordpress/base-styles/variables" as *;
 
 .edit-site-sidebar-navigation-item.components-item {
-	color: var(--wpds-color-fg-interactive-neutral-weak);
+	color: var(--wpds-color-foreground-interactive-neutral-weak);
 	// 6px right padding to align with + button
 	padding: $grid-unit-10 6px $grid-unit-10 $grid-unit-20;
 	border: none;
@@ -10,16 +10,16 @@
 	&:hover,
 	&:focus,
 	&[aria-current="true"] {
-		color: var(--wpds-color-fg-interactive-neutral-active);
+		color: var(--wpds-color-foreground-interactive-neutral-active);
 
 		.edit-site-sidebar-navigation-item__drilldown-indicator {
-			fill: var(--wpds-color-fg-interactive-neutral-active);
+			fill: var(--wpds-color-foreground-interactive-neutral-active);
 		}
 	}
 
 	&[aria-current="true"] {
-		background: var(--wpds-color-bg-interactive-neutral-weak-active);
-		color: var(--wpds-color-fg-interactive-neutral-active);
+		background: var(--wpds-color-background-interactive-neutral-weak-active);
+		color: var(--wpds-color-foreground-interactive-neutral-active);
 		font-weight: $font-weight-medium;
 	}
 
@@ -29,7 +29,7 @@
 	}
 
 	.edit-site-sidebar-navigation-item__drilldown-indicator {
-		fill: var(--wpds-color-fg-interactive-neutral-weak);
+		fill: var(--wpds-color-foreground-interactive-neutral-weak);
 	}
 
 	&.with-suffix {
