@@ -60,8 +60,7 @@ _Parameters_
 -   _params_ `Object`:
 -   _params.kind_ `string`: The kind of the entity.
 -   _params.name_ `string`: The name of the entity.
--   _options_ `[Object]`: Optional options.
--   _options.fields_ `?string[]`: Subset of top-level config properties to request (mapped to the REST API `_fields` parameter). When omitted, the full config is requested.
+-   _params.fields_ `[?string[]]`: Subset of top-level config properties to request (mapped to the REST API `_fields` parameter). When omitted, the full config is requested.
 
 _Returns_
 

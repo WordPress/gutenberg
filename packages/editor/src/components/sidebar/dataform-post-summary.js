@@ -97,13 +97,11 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 			postId: getCurrentPostId(),
 		};
 	}, [] );
-	const { form: formConfig } = useViewConfig(
-		{
-			kind: 'postType',
-			name: postType,
-		},
-		{ fields: VIEW_CONFIG_FIELDS }
-	);
+	const { form: formConfig } = useViewConfig( {
+		kind: 'postType',
+		name: postType,
+		fields: VIEW_CONFIG_FIELDS,
+	} );
 	const form = formConfig ?? EMPTY_FORM;
 	const record = useSelect(
 		( select ) => {

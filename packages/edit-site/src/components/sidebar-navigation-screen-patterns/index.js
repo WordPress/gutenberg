@@ -88,20 +88,16 @@ export default function SidebarNavigationScreenPatterns( { backPath } ) {
 			? PATTERN_DEFAULT_CATEGORY
 			: TEMPLATE_PART_ALL_AREAS_CATEGORY );
 
-	const { view_list: templatePartViews } = useViewConfig(
-		{
-			kind: 'postType',
-			name: TEMPLATE_PART_POST_TYPE,
-		},
-		{ fields: VIEW_CONFIG_FIELDS }
-	);
-	const { view_list: patternViews } = useViewConfig(
-		{
-			kind: 'postType',
-			name: PATTERN_TYPES.user,
-		},
-		{ fields: VIEW_CONFIG_FIELDS }
-	);
+	const { view_list: templatePartViews } = useViewConfig( {
+		kind: 'postType',
+		name: TEMPLATE_PART_POST_TYPE,
+		fields: VIEW_CONFIG_FIELDS,
+	} );
+	const { view_list: patternViews } = useViewConfig( {
+		kind: 'postType',
+		name: PATTERN_TYPES.user,
+		fields: VIEW_CONFIG_FIELDS,
+	} );
 
 	const { templatePartAreas, isLoading, hasTemplateParts } =
 		useTemplatePartAreas();

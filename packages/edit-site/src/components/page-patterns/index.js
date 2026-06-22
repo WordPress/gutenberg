@@ -74,13 +74,11 @@ export default function DataviewsPatterns() {
 	const history = useHistory();
 	const categoryId = categoryIdFromURL || PATTERN_DEFAULT_CATEGORY;
 	const { default_view: defaultView, default_layouts: defaultLayouts } =
-		useViewConfig(
-			{
-				kind: 'postType',
-				name: postType,
-			},
-			{ fields: VIEW_CONFIG_FIELDS }
-		);
+		useViewConfig( {
+			kind: 'postType',
+			name: postType,
+			fields: VIEW_CONFIG_FIELDS,
+		} );
 	const { view, updateView, isModified, resetToDefault } = useView( {
 		kind: 'postType',
 		name: postType,

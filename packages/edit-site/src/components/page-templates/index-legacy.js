@@ -36,13 +36,11 @@ export default function PageTemplates() {
 		default_view: defaultView,
 		default_layouts: defaultLayouts,
 		view_list: viewList,
-	} = useViewConfig(
-		{
-			kind: 'postType',
-			name: TEMPLATE_POST_TYPE,
-		},
-		{ fields: VIEW_CONFIG_FIELDS }
-	);
+	} = useViewConfig( {
+		kind: 'postType',
+		name: TEMPLATE_POST_TYPE,
+		fields: VIEW_CONFIG_FIELDS,
+	} );
 	const activeViewOverrides = useMemo(
 		() => viewList?.find( ( v ) => v.slug === activeView )?.view ?? {},
 		[ viewList, activeView ]
