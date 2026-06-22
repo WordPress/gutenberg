@@ -35,7 +35,7 @@ Parallelizable once their deps are on the feature branch: {3,4,5}, {11,12},
 | 02 | widget-type-origin | Server framework | 00 | done |
 | 03 | code-registered | Server framework | 02 | done |
 | 04 | cpt-defs | Server framework | 02 | done |
-| 05 | controller-fields | Server framework | 02 | todo |
+| 05 | controller-fields | Server framework | 02 | done |
 | 06 | render-endpoint | Server framework | 03, 04 | todo |
 | 07 | use-widget-types | Discovery | 01, 05 | todo |
 | 08 | widget-render-routing | Discovery | 07 | todo |

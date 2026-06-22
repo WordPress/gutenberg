@@ -200,7 +200,17 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 			}
 
 			if ( rest_is_field_included( 'title', $fields ) ) {
-				$data['title'] = $widget_type->title;
+				/*
+				 * Built-in and code-registered Widget Types carry their title
+				 * on the registry entry, translated at registration. CPT
+				 * definitions read it from the underlying post instead.
+				 */
+				if ( 'cpt' === ( $widget_type->origin ?? null ) && ! empty( $widget_type->definition_id ) ) {
+					$definition    = get_post( $widget_type->definition_id );
+					$data['title'] = $definition instanceof WP_Post ? $definition->post_title : '';
+				} else {
+					$data['title'] = $widget_type->title;
+				}
 			}
 
 			if ( rest_is_field_included( 'description', $fields ) ) {
@@ -221,6 +231,29 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 
 			if ( rest_is_field_included( 'keywords', $fields ) ) {
 				$data['keywords'] = $widget_type->keywords;
+			}
+
+			if ( rest_is_field_included( 'origin', $fields ) ) {
+				// Default to built-in when the resolver did not tag the entry.
+				$data['origin'] = $widget_type->origin ?? 'built-in';
+			}
+
+			if ( rest_is_field_included( 'definition_id', $fields ) ) {
+				$data['definition_id'] = isset( $widget_type->definition_id )
+					? (int) $widget_type->definition_id
+					: null;
+			}
+
+			if ( rest_is_field_included( 'content', $fields ) ) {
+				/*
+				 * Server-defined Widget Types (code-registered and cpt) ship
+				 * their composition inline; built-in Widget Types render
+				 * client-side from their module and carry no composition.
+				 */
+				$origin          = $widget_type->origin ?? null;
+				$data['content'] = ( 'code-registered' === $origin || 'cpt' === $origin )
+					? (string) ( $widget_type->content ?? '' )
+					: null;
 			}
 
 			$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
@@ -352,6 +385,28 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 						'description' => __( 'Alternative terms used to match the widget type when searching, e.g. "calendar" for an events widget. Translatable.', 'gutenberg' ),
 						'type'        => array( 'array', 'null' ),
 						'items'       => array( 'type' => 'string' ),
+						'context'     => array( 'view', 'edit', 'embed' ),
+						'readonly'    => true,
+					),
+
+					'origin'        => array(
+						'description' => __( 'Where this Widget Type comes from: a build-time module (`built-in`), an in-memory PHP registry populated by `gutenberg_register_widget_def()` (`code-registered`), or a `widget_def` post (`cpt`).', 'gutenberg' ),
+						'type'        => 'string',
+						'enum'        => array( 'built-in', 'code-registered', 'cpt' ),
+						'context'     => array( 'view', 'edit', 'embed' ),
+						'readonly'    => true,
+					),
+
+					'definition_id' => array(
+						'description' => __( 'For CPT-defined Widget Types, the underlying widget_def post ID. Null for the other origins.', 'gutenberg' ),
+						'type'        => array( 'integer', 'null' ),
+						'context'     => array( 'view', 'edit', 'embed' ),
+						'readonly'    => true,
+					),
+
+					'content'       => array(
+						'description' => __( 'Composition (raw block markup) for server-defined Widget Types, both code-registered and cpt. Null for built-in Widget Types, which render client-side from their module.', 'gutenberg' ),
+						'type'        => array( 'string', 'null' ),
 						'context'     => array( 'view', 'edit', 'embed' ),
 						'readonly'    => true,
 					),
