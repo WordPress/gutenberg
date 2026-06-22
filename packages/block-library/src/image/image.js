@@ -1458,12 +1458,10 @@ export default function Image( {
 
 	return (
 		<>
-			{ ! context.galleryId && (
-				<AnimatedGifConvertControl
-					attributes={ attributes }
-					clientId={ clientId }
-				/>
-			) }
+			<AnimatedGifConvertControl
+				attributes={ attributes }
+				clientId={ clientId }
+			/>
 			{ mediaReplaceFlow }
 			{ controls }
 			{ featuredImageControl }

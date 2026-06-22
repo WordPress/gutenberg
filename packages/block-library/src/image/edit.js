@@ -245,8 +245,15 @@ export function ImageEdit( {
 		// button is the path for converting those. `animated_video` is
 		// only ever set on GIF image attachments, so its presence is a
 		// sufficient signal that this swap applies.
+		//
+		// A gallery only accepts `core/image` children, so the swap is
+		// skipped there; the converted video is still sideloaded and
+		// stored for use elsewhere.
+		const rootClientId = getBlockRootClientId( clientId );
+		const isInGallery =
+			!! rootClientId && getBlockName( rootClientId ) === 'core/gallery';
 		if (
-			! context?.galleryId &&
+			! isInGallery &&
 			media.media_details?.animated_video &&
 			media.url
 		) {

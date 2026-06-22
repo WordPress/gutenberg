@@ -37,6 +37,19 @@ export default function AnimatedGifConvertControl( { attributes, clientId } ) {
 			if ( ! id ) {
 				return null;
 			}
+			// A gallery only accepts `core/image` children, so swapping the
+			// image for a video block there would be rejected. Hide the
+			// control inside a gallery; the converted video is still
+			// sideloaded and stored for use elsewhere.
+			const { getBlockRootClientId, getBlockName } =
+				select( blockEditorStore );
+			const rootClientId = getBlockRootClientId( clientId );
+			if (
+				rootClientId &&
+				getBlockName( rootClientId ) === 'core/gallery'
+			) {
+				return null;
+			}
 			const record = select( coreStore ).getEntityRecord(
 				'postType',
 				'attachment',
@@ -53,7 +66,7 @@ export default function AnimatedGifConvertControl( { attributes, clientId } ) {
 				poster: details.animated_video_poster,
 			};
 		},
-		[ id ]
+		[ id, clientId ]
 	);
 
 	if ( ! companion ) {
