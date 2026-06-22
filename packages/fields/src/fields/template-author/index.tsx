@@ -18,7 +18,7 @@ async function getAuthorElements(
 	const records = ( await resolveSelect( coreStore ).getEntityRecords(
 		'postType',
 		postType,
-		{ per_page: -1 }
+		{ per_page: -1, _fields: 'id,author_text' }
 	) ) as ( Template | TemplatePart )[] | null;
 
 	const seen = new Set< string >();
@@ -41,7 +41,6 @@ export const templateAuthorField: Field< Template > = {
 	id: 'author',
 	getValue: ( { item } ) => item.author_text,
 	render: TemplateAuthorView,
-	enableSorting: false,
 	getElements: () => getAuthorElements( 'wp_template' ),
 };
 

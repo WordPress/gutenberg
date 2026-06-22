@@ -1,8 +1,11 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import clsx from 'clsx';
 import { useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -19,9 +22,7 @@ import { Icon, Stack } from '@wordpress/ui';
  */
 import type { Template, TemplatePart } from '../../types';
 
-export function getIconForSource(
-	originalSource: Template[ 'original_source' ]
-) {
+function getIconForSource( originalSource: Template[ 'original_source' ] ) {
 	switch ( originalSource ) {
 		case 'theme':
 			return themeIcon;
@@ -69,7 +70,7 @@ export default function TemplateAuthorView( {
 	);
 
 	return (
-		<Stack align="center">
+		<Stack direction="row" align="center">
 			{ imageUrl && (
 				<div
 					className={ clsx( 'fields-controls__author-avatar', {
@@ -78,7 +79,7 @@ export default function TemplateAuthorView( {
 				>
 					<img
 						onLoad={ () => setIsImageLoaded( true ) }
-						alt={ __( 'Author avatar' ) }
+						alt=""
 						src={ imageUrl }
 					/>
 				</div>
