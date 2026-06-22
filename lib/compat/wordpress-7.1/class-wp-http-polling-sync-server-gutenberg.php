@@ -331,6 +331,14 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server_Gutenberg' ) ) {
 				'rooms' => array(),
 			);
 
+			/*
+			 * Whether the sending user may persist unfiltered HTML. Computed once
+			 * per request since it is a per-user capability. Users without it have
+			 * their updates sanitized server-side before broadcast, mirroring
+			 * core's wp_filter_post_kses on save.
+			 */
+			$can_use_unfiltered_html = current_user_can( 'unfiltered_html' );
+
 			foreach ( $rooms as $room_request ) {
 				$awareness = $room_request['awareness'];
 				$client_id = $room_request['client_id'];
@@ -349,7 +357,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server_Gutenberg' ) ) {
 
 				// Process each update according to its type.
 				foreach ( $room_request['updates'] as $update ) {
-					$result = $this->process_sync_update( $room, $client_id, $cursor, $update, $document );
+					$result = $this->process_sync_update( $room, $client_id, $cursor, $update, $document, $can_use_unfiltered_html );
 					if ( is_wp_error( $result ) ) {
 						return $result;
 					}
@@ -472,14 +480,15 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server_Gutenberg' ) ) {
 		 *
 		 * @since 7.0.0
 		 *
-		 * @param string                            $room      Room identifier.
-		 * @param int                               $client_id Client identifier.
-		 * @param int                               $cursor    Client cursor (marker of last seen update).
-		 * @param array{data: string, type: string} $update    Sync update.
-		 * @param object                            $document  CRDT document helper.
+		 * @param string                            $room                    Room identifier.
+		 * @param int                               $client_id               Client identifier.
+		 * @param int                               $cursor                  Client cursor (marker of last seen update).
+		 * @param array{data: string, type: string} $update                  Sync update.
+		 * @param object                            $document                CRDT document helper.
+		 * @param bool                              $can_use_unfiltered_html Whether the sending user may persist unfiltered HTML.
 		 * @return array<int, array{data: string, type: string}>|WP_Error Direct response updates on success, WP_Error on failure.
 		 */
-		private function process_sync_update( string $room, int $client_id, int $cursor, array $update, $document ) {
+		private function process_sync_update( string $room, int $client_id, int $cursor, array $update, $document, bool $can_use_unfiltered_html ) {
 			$data = $update['data'];
 			$type = $update['type'];
 
@@ -496,10 +505,23 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server_Gutenberg' ) ) {
 					case self::UPDATE_TYPE_SYNC_STEP2:
 						$state_vector_before = $document->state_vector();
 						$document->apply_polling_update( $data, $type );
+
+						/*
+						 * Sanitize before encoding the normalized update, so the single
+						 * stored update is already clean. Storing under the reserved
+						 * server client ID lets the correction reach the sending client
+						 * too (get_updates() would otherwise filter the sender's own
+						 * updates), so it converges on the sanitized content.
+						 */
+						$store_client_id = $client_id;
+						if ( ! $can_use_unfiltered_html && $document->sanitize_html_content() ) {
+							$store_client_id = self::SERVER_CLIENT_ID;
+						}
+
 						$normalized_update = $document->encode_diff( $state_vector_before );
 
 						if ( ! $document->is_empty_update( $normalized_update ) ) {
-							$result = $this->add_update( $room, $client_id, self::UPDATE_TYPE_UPDATE, $normalized_update );
+							$result = $this->add_update( $room, $store_client_id, self::UPDATE_TYPE_UPDATE, $normalized_update );
 							if ( is_wp_error( $result ) ) {
 								return $result;
 							}
@@ -509,6 +531,18 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server_Gutenberg' ) ) {
 
 					case self::UPDATE_TYPE_COMPACTION:
 						$document->apply_polling_update( $data, $type );
+
+						/*
+						 * For users without unfiltered_html, store a sanitized full-state
+						 * snapshot instead of the raw compaction bytes, attributed to the
+						 * server so the correction reaches every peer.
+						 */
+						$store_client_id = $client_id;
+						$store_data      = $data;
+						if ( ! $can_use_unfiltered_html && $document->sanitize_html_content() ) {
+							$store_client_id = self::SERVER_CLIENT_ID;
+							$store_data      = $document->encode_state_as_compaction();
+						}
 
 						/*
 						 * Compaction replaces updates the client has already seen. Only remove
@@ -537,7 +571,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server_Gutenberg' ) ) {
 								);
 							}
 
-							$result = $this->add_update( $room, $client_id, $type, $data );
+							$result = $this->add_update( $room, $store_client_id, $type, $store_data );
 							if ( is_wp_error( $result ) ) {
 								return $result;
 							}
@@ -552,7 +586,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server_Gutenberg' ) ) {
 						 * regular update. Y.applyUpdateV2 merges state-as-update blobs
 						 * idempotently, so overlap with the existing compaction is safe.
 						 */
-						$result = $this->add_update( $room, $client_id, self::UPDATE_TYPE_UPDATE, $data );
+						$result = $this->add_update( $room, $store_client_id, self::UPDATE_TYPE_UPDATE, $store_data );
 						if ( is_wp_error( $result ) ) {
 							return $result;
 						}
@@ -560,11 +594,34 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server_Gutenberg' ) ) {
 						return array();
 
 					case self::UPDATE_TYPE_UPDATE:
-						$document->apply_polling_update( $data, $type );
+						if ( $can_use_unfiltered_html ) {
+							$document->apply_polling_update( $data, $type );
 
-						$result = $this->add_update( $room, $client_id, $type, $data );
-						if ( is_wp_error( $result ) ) {
-							return $result;
+							$result = $this->add_update( $room, $client_id, $type, $data );
+							if ( is_wp_error( $result ) ) {
+								return $result;
+							}
+
+							return array();
+						}
+
+						/*
+						 * For users without unfiltered_html, apply the update, sanitize
+						 * the authoritative document, then store only the normalized
+						 * (already-sanitized) diff. The raw bytes are discarded, so peers
+						 * never receive unfiltered HTML. The diff is attributed to the
+						 * server so it also reaches the sending client.
+						 */
+						$state_vector_before = $document->state_vector();
+						$document->apply_polling_update( $data, $type );
+						$document->sanitize_html_content();
+						$normalized_update = $document->encode_diff( $state_vector_before );
+
+						if ( ! $document->is_empty_update( $normalized_update ) ) {
+							$result = $this->add_update( $room, self::SERVER_CLIENT_ID, self::UPDATE_TYPE_UPDATE, $normalized_update );
+							if ( is_wp_error( $result ) ) {
+								return $result;
+							}
 						}
 
 						return array();

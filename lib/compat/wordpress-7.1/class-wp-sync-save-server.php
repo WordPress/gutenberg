@@ -125,6 +125,19 @@ if ( ! class_exists( 'WP_Sync_Save_Server' ) ) {
 
 			$doc = $request['doc'];
 
+			/*
+			 * The save endpoint stores client-supplied CRDT bytes verbatim, so a
+			 * user without unfiltered_html could otherwise persist unfiltered HTML
+			 * by posting here directly (bypassing the sanitization the polling sync
+			 * server applies). Sanitize the snapshot before persisting it.
+			 */
+			if ( ! current_user_can( 'unfiltered_html' ) ) {
+				$doc = $this->sanitize_persisted_doc( $doc );
+				if ( is_wp_error( $doc ) ) {
+					return $doc;
+				}
+			}
+
 			$updated = update_post_meta( $post_id, self::CRDT_DOC_META_KEY, $doc );
 			if ( false === $updated && get_post_meta( $post_id, self::CRDT_DOC_META_KEY, true ) !== $doc ) {
 				return new WP_Error(
@@ -135,6 +148,46 @@ if ( ! class_exists( 'WP_Sync_Save_Server' ) ) {
 			}
 
 			return array();
+		}
+
+		/**
+		 * Sanitizes a serialized CRDT document payload so it carries no unfiltered
+		 * HTML.
+		 *
+		 * The payload is the JSON string produced by serializeCrdtDoc()
+		 * (`{ document: <base64 V2 update>, updateId }`). The base64 document is
+		 * reconstructed, sanitized, and re-encoded; the wrapper is preserved.
+		 *
+		 * @since 7.1.0
+		 *
+		 * @param string $doc Serialized CRDT document payload.
+		 * @return string|WP_Error Sanitized payload, or WP_Error when malformed.
+		 */
+		private function sanitize_persisted_doc( string $doc ) {
+			$decoded = json_decode( $doc, true );
+			if ( ! is_array( $decoded ) || ! isset( $decoded['document'] ) || ! is_string( $decoded['document'] ) ) {
+				return new WP_Error(
+					'rest_crdt_save_failed',
+					__( 'Malformed CRDT document.', 'gutenberg' ),
+					array( 'status' => 400 )
+				);
+			}
+
+			if ( ! class_exists( 'WP_Sync_CRDT_Document' ) ) {
+				require_once __DIR__ . '/class-wp-sync-crdt-document.php';
+			}
+
+			try {
+				$decoded['document'] = WP_Sync_CRDT_Document::sanitize_encoded_state( $decoded['document'] );
+			} catch ( Throwable $error ) {
+				return new WP_Error(
+					'rest_crdt_save_failed',
+					__( 'Failed to sanitize CRDT document.', 'gutenberg' ),
+					array( 'status' => 400 )
+				);
+			}
+
+			return wp_json_encode( $decoded );
 		}
 
 		/**
