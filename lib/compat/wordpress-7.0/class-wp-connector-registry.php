@@ -268,12 +268,20 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 			}
 
 			if ( 'application_password' === $args['authentication']['method'] ) {
-				$setting_names = array(
-					'username_setting_name'             => 'username',
-					'application_password_setting_name' => 'application_password',
+				$default_setting_names = array(
+					'username_setting_name'             => str_replace(
+						'-',
+						'_',
+						"connectors_{$connector['type']}_{$id}_username"
+					),
+					'application_password_setting_name' => str_replace(
+						'-',
+						'_',
+						"connectors_{$connector['type']}_{$id}_application_password"
+					),
 				);
 
-				foreach ( $setting_names as $setting_name_key => $setting_name_suffix ) {
+				foreach ( $default_setting_names as $setting_name_key => $default_setting_name ) {
 					if ( isset( $args['authentication'][ $setting_name_key ] ) ) {
 						if ( ! is_string( $args['authentication'][ $setting_name_key ] ) || '' === $args['authentication'][ $setting_name_key ] ) {
 							_doing_it_wrong(
@@ -290,7 +298,7 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 						}
 						$connector['authentication'][ $setting_name_key ] = $args['authentication'][ $setting_name_key ];
 					} else {
-						$connector['authentication'][ $setting_name_key ] = str_replace( '-', '_', "connectors_{$connector['type']}_{$id}_{$setting_name_suffix}" );
+						$connector['authentication'][ $setting_name_key ] = $default_setting_name;
 					}
 				}
 			}
