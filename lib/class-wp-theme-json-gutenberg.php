@@ -629,19 +629,19 @@ class WP_Theme_JSON_Gutenberg {
 	 * @var array
 	 */
 	const RESPONSIVE_BREAKPOINTS = array(
-		'mobile' => '@media (width <= 480px)',
-		'tablet' => '@media (480px < width <= 782px)',
+		'@mobile' => '@media (width <= 480px)',
+		'@tablet' => '@media (480px < width <= 782px)',
 	);
 
 	/**
 	 * Custom states for blocks that map to CSS class selectors rather than
-	 * CSS pseudo-selectors. Values use the '@' prefix (e.g. '@current') to
-	 * distinguish them from real CSS pseudo-selectors.
+	 * CSS pseudo-selectors. Values use the '-' prefix (e.g. '-current') to
+	 * distinguish them from real CSS pseudo-selectors and breakpoint states.
 	 *
 	 * The CSS selector for each state is defined in the block's block.json
 	 * under `selectors.states`, e.g.:
 	 *
-	 *   "selectors": { "states": { "@current": ".some-css-selector" } }
+	 *   "selectors": { "states": { "-current": ".some-css-selector" } }
 	 *
 	 * This constant controls which states are valid in theme.json for a given
 	 * block. Blocks listed here also inherit their VALID_BLOCK_PSEUDO_SELECTORS
@@ -651,7 +651,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @var array
 	 */
 	const VALID_BLOCK_CUSTOM_STATES = array(
-		'core/navigation-link' => array( '@current' ),
+		'core/navigation-link' => array( '-current' ),
 	);
 
 	/**
@@ -888,7 +888,10 @@ class WP_Theme_JSON_Gutenberg {
 			$origin = 'theme';
 		}
 
-		$this->theme_json    = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json, $origin );
+		$this->theme_json = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json, $origin );
+		if ( isset( $this->theme_json['styles'] ) ) {
+			$this->theme_json['styles'] = gutenberg_resolve_style_state_aliases( $this->theme_json['styles'] );
+		}
 		$blocks_metadata     = static::get_blocks_metadata();
 		$valid_block_names   = array_keys( $blocks_metadata );
 		$valid_element_names = array_keys( static::ELEMENTS );
@@ -1158,7 +1161,7 @@ class WP_Theme_JSON_Gutenberg {
 				}
 			}
 
-			// Add custom states for blocks that support them (e.g. '@current' for navigation).
+			// Add custom states for blocks that support them (e.g. '-current' for navigation).
 			if ( isset( static::VALID_BLOCK_CUSTOM_STATES[ $block ] ) ) {
 				foreach ( static::VALID_BLOCK_CUSTOM_STATES[ $block ] as $custom_state ) {
 					$custom_state_schema = $styles_non_top_level;
@@ -3307,7 +3310,7 @@ class WP_Theme_JSON_Gutenberg {
 					}
 				}
 
-				// Handle custom states (e.g. '@current' for navigation).
+				// Handle custom states (e.g. '-current' for navigation).
 				if ( isset( static::VALID_BLOCK_CUSTOM_STATES[ $name ] ) ) {
 					foreach ( static::VALID_BLOCK_CUSTOM_STATES[ $name ] as $custom_state ) {
 						if (
@@ -4284,6 +4287,9 @@ class WP_Theme_JSON_Gutenberg {
 		$sanitized = array();
 
 		$theme_json = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json, $origin );
+		if ( isset( $theme_json['styles'] ) ) {
+			$theme_json['styles'] = gutenberg_resolve_style_state_aliases( $theme_json['styles'] );
+		}
 
 		$blocks_metadata     = static::get_blocks_metadata();
 		$valid_block_names   = array_keys( $blocks_metadata );

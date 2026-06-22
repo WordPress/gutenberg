@@ -12,8 +12,8 @@ import { DEVICE_TYPES } from '../store/constants';
  */
 export const VIEWPORT_STATE_BY_DEVICE_TYPE = {
 	Desktop: 'default',
-	Tablet: 'tablet',
-	Mobile: 'mobile',
+	Tablet: '@tablet',
+	Mobile: '@mobile',
 };
 
 /**

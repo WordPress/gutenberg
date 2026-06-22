@@ -17,12 +17,22 @@ export const PSEUDO_STATE_LABELS = {
 	':active': __( 'Active' ),
 };
 
+export const RESPONSIVE_STATE_LABELS = {
+	'@tablet': __( 'Tablet' ),
+	'@mobile': __( 'Mobile' ),
+};
+
 // Viewport states are selected globally via the editor's device preview
-// (Responsive editing). 'default' maps to the Desktop device.
+// (Responsive editing). 'default' maps to the Desktop device, the remaining
+// options are derived from the shared responsive-state labels.
 const DEVICE_STATE_OPTIONS = [
 	{ value: 'default', label: __( 'Desktop' ) },
-	{ value: 'tablet', label: __( 'Tablet' ) },
-	{ value: 'mobile', label: __( 'Mobile' ) },
+	...Object.entries( RESPONSIVE_STATE_LABELS ).map(
+		( [ value, label ] ) => ( {
+			value,
+			label,
+		} )
+	),
 ];
 
 // Keep in sync with WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS

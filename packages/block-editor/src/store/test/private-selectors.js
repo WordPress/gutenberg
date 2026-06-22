@@ -84,8 +84,8 @@ describe( 'private selectors', () => {
 
 		it( 'returns the global viewport when set', () => {
 			expect(
-				getStyleStateViewport( { styleStateViewport: 'tablet' } )
-			).toBe( 'tablet' );
+				getStyleStateViewport( { styleStateViewport: '@tablet' } )
+			).toBe( '@tablet' );
 		} );
 	} );
 
@@ -238,7 +238,7 @@ describe( 'private selectors', () => {
 
 		it( 'returns the per-block pseudo with the global viewport', () => {
 			const state = {
-				styleStateViewport: 'mobile',
+				styleStateViewport: '@mobile',
 				selectedBlockStyleState: {
 					clientId: 'client-1',
 					value: { pseudo: ':hover' },
@@ -246,23 +246,23 @@ describe( 'private selectors', () => {
 			};
 
 			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
-				viewport: 'mobile',
+				viewport: '@mobile',
 				pseudo: ':hover',
 			} );
 		} );
 
 		it( 'always derives viewport from the global state, ignoring any per-block viewport', () => {
 			const state = {
-				styleStateViewport: 'tablet',
+				styleStateViewport: '@tablet',
 				selectedBlockStyleState: {
 					clientId: 'client-1',
-					value: { viewport: 'mobile', pseudo: ':hover' },
+					value: { viewport: '@mobile', pseudo: ':hover' },
 				},
 			};
 
 			expect(
 				getSelectedBlockStyleState( state, 'client-1' ).viewport
-			).toBe( 'tablet' );
+			).toBe( '@tablet' );
 		} );
 
 		it( 'returns default pseudo when the selected state has no value', () => {
@@ -280,7 +280,7 @@ describe( 'private selectors', () => {
 
 		it( 'returns the global viewport even when another block holds the per-block state', () => {
 			const state = {
-				styleStateViewport: 'mobile',
+				styleStateViewport: '@mobile',
 				selectedBlockStyleState: {
 					clientId: 'client-2',
 					value: { pseudo: ':hover' },
@@ -288,7 +288,7 @@ describe( 'private selectors', () => {
 			};
 
 			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
-				viewport: 'mobile',
+				viewport: '@mobile',
 				pseudo: 'default',
 			} );
 		} );
@@ -314,7 +314,7 @@ describe( 'private selectors', () => {
 
 		it( 'returns true when a global viewport state is selected', () => {
 			const state = {
-				styleStateViewport: 'mobile',
+				styleStateViewport: '@mobile',
 				selectedBlockStyleState: {
 					clientId: 'client-1',
 					value: { pseudo: 'default' },
@@ -337,7 +337,7 @@ describe( 'private selectors', () => {
 
 		it( 'returns true when global viewport and per-block pseudo states are selected', () => {
 			const state = {
-				styleStateViewport: 'mobile',
+				styleStateViewport: '@mobile',
 				selectedBlockStyleState: {
 					clientId: 'client-1',
 					value: { pseudo: ':hover' },

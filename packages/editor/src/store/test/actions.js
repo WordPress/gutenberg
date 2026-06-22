@@ -108,11 +108,11 @@ describe( 'Post actions', () => {
 
 			// A tablet-sized canvas selects the tablet viewport.
 			setCanvasWidth( 600 );
-			expect( getViewport() ).toBe( 'tablet' );
+			expect( getViewport() ).toBe( '@tablet' );
 
 			// A mobile-sized canvas selects the mobile viewport.
 			setCanvasWidth( 400 );
-			expect( getViewport() ).toBe( 'mobile' );
+			expect( getViewport() ).toBe( '@mobile' );
 
 			// A full-width (desktop) canvas resets to the default viewport.
 			setCanvasWidth( undefined );
