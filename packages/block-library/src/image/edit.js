@@ -30,7 +30,10 @@ import { store as uploadStore } from '@wordpress/upload-media';
 /**
  * Internal dependencies
  */
-import { useUploadMediaFromBlobURL } from '../utils/hooks';
+import {
+	useUploadMediaFromBlobURL,
+	useResumeUploadFromMarker,
+} from '../utils/hooks';
 import Image from './image';
 import { isValidFileType } from './utils';
 import { useMaxWidthObserver } from './use-max-width-observer';
@@ -353,6 +356,19 @@ export function ImageEdit( {
 		uploadId: attributes.uploadId,
 		onUploadStart: ( uploadId ) => setAttributes( { uploadId } ),
 	} );
+
+	const resumePreviewURL = useResumeUploadFromMarker( {
+		uploadId: attributes.uploadId,
+		onChange: onSelectImage,
+		onError: onUploadError,
+	} );
+
+	// Show the recreated preview while a resumed upload is pending.
+	useEffect( () => {
+		if ( resumePreviewURL && ! temporaryURL ) {
+			setTemporaryURL( resumePreviewURL );
+		}
+	}, [ resumePreviewURL, temporaryURL ] );
 
 	const isExternal = isExternalImage( id, url );
 	const src = isExternal ? url : undefined;

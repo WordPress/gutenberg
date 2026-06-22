@@ -6,12 +6,18 @@ import { v4 as uuidv4 } from 'uuid';
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useRegistry } from '@wordpress/data';
+import { store as uploadStore } from '@wordpress/upload-media';
 import { useLayoutEffect, useEffect, useRef } from '@wordpress/element';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { useViewportMatch } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../lock-unlock';
 
 /**
  * Returns whether the current user can edit the given entity.
@@ -133,4 +139,45 @@ export function useToolsPanelDropdownMenuProps() {
 				},
 		  }
 		: {};
+}
+
+/**
+ * Reconnects a block to an upload that was interrupted and is awaiting resume.
+ *
+ * When the block's durable `uploadId` matches a persisted (PendingResume) queue
+ * item, the block's callbacks are registered so the resumed upload routes its
+ * result back to the block. Returns a recreated preview URL while the resumed
+ * upload is pending, or undefined when there is no matching item.
+ *
+ * @param {Object}    options
+ * @param {?string}   options.uploadId Durable marker stored in block attributes.
+ * @param {Function}  options.onChange Called with the attachment when available.
+ * @param {?Function} options.onError  Called when the upload fails.
+ * @return {string|undefined} A recreated preview blob URL, if available.
+ */
+export function useResumeUploadFromMarker( { uploadId, onChange, onError } ) {
+	const registry = useRegistry();
+
+	const item = useSelect(
+		( select ) =>
+			uploadId
+				? unlock( select( uploadStore ) ).getItemByUploadId( uploadId )
+				: undefined,
+		[ uploadId ]
+	);
+
+	useEffect( () => {
+		if ( ! uploadId || ! item ) {
+			return;
+		}
+		unlock( registry.dispatch( uploadStore ) ).registerItemCallbacks(
+			uploadId,
+			{
+				onChange: ( attachments ) => onChange?.( attachments?.[ 0 ] ),
+				onError,
+			}
+		);
+	}, [ uploadId, item, onChange, onError, registry ] );
+
+	return item?.attachment?.url;
 }
