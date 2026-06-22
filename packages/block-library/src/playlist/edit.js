@@ -63,16 +63,14 @@ const PlaylistEdit = ( {
 	const waveformStyle =
 		attributes.className?.match( /is-style-([\w-]+)/ )?.[ 1 ] || 'bars';
 	const blockProps = useBlockProps();
-	const {
-		replaceInnerBlocks,
-		updateBlockAttributes,
-		__unstableMarkNextChangeAsNotPersistent,
-	} = useDispatch( blockEditorStore );
+	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const { innerBlockTracks } = useSelect(
 		( select ) => {
@@ -123,7 +121,6 @@ const PlaylistEdit = ( {
 		if ( tracks.length === 0 ) {
 			// If there are no tracks but currentTrack is set, set it to null.
 			if ( currentTrack !== null ) {
-				__unstableMarkNextChangeAsNotPersistent();
 				updateBlockAttributes( clientId, { currentTrack: null } );
 			}
 		} else if (
@@ -131,7 +128,6 @@ const PlaylistEdit = ( {
 			firstTrackId &&
 			firstTrackId !== currentTrack
 		) {
-			__unstableMarkNextChangeAsNotPersistent();
 			updateBlockAttributes( clientId, { currentTrack: firstTrackId } );
 		}
 	}, [
@@ -140,7 +136,6 @@ const PlaylistEdit = ( {
 		firstTrackId,
 		clientId,
 		updateBlockAttributes,
-		__unstableMarkNextChangeAsNotPersistent,
 	] );
 
 	const onSelectTracks = useCallback(
