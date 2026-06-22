@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `TextControl`: The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
+
 ### Enhancements
 
 -   `BaseControl`: Apply `text-wrap: pretty` to help text to avoid typographic widows ([#79112](https://github.com/WordPress/gutenberg/pull/79112)).
