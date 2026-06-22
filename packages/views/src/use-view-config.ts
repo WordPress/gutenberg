@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import type { View, SupportedLayouts, Form } from '@wordpress/dataviews';
 
@@ -35,40 +34,23 @@ export function useViewConfig( {
 	name: string;
 	fields?: string | string[];
 } ): {
-	default_view: View;
-	default_layouts: SupportedLayouts;
-	view_list: Array< any >;
+	default_view: View | undefined;
+	default_layouts: SupportedLayouts | undefined;
+	view_list: Array< any > | undefined;
 	form: Form | undefined;
 } {
-	// Stabilize the options object passed to the resolver so resolution is
-	// deduplicated. The resolver keys its cache on the arguments array, and the
-	// data layer compares the `options` object by reference, so a fresh literal
-	// on each call would re-trigger the REST request on every store change.
-	// Keying on the joined string also removes any need for callers to pass a
-	// referentially-stable `fields` array.
-	//
-	// Normalize a comma-separated string or array to an array, then sort before
-	// joining so the key is independent of the order in which callers list
-	// fields; `['title','author']` and `['author','title']` request the same
-	// data and should share a single cache entry. The resolver accepts either
-	// form too (via `getNormalizedCommaSeparable`), so keep the hook lenient.
+	// Sort fields so the cache key is independent of the order callers list
+	// them; `['title','author']` and `['author','title']` request the same data.
 	const fieldList = Array.isArray( fields ) ? fields : fields?.split( ',' );
 	const fieldsKey = fieldList
 		? [ ...fieldList ].sort().join( ',' )
 		: undefined;
-	const options = useMemo(
-		() => ( { fields } ),
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[ fieldsKey ]
-	);
 	return useSelect(
 		( select ) => {
-			return unlock( select( coreStore ) ).getViewConfig(
-				kind,
-				name,
-				options
-			);
+			return unlock( select( coreStore ) ).getViewConfig( kind, name, {
+				fields: fieldsKey,
+			} );
 		},
-		[ kind, name, options ]
+		[ kind, name, fieldsKey ]
 	);
 }
