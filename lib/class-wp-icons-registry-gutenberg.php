@@ -201,7 +201,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 		// supported by wp_kses() and matches any data attribute.
 		$core_attributes = $this->get_allowed_attribute_list( 'class', 'data-*', 'id', 'style' );
 
-		/*
+		/**
 		 * ARIA and accessibility attributes. wp_kses() does not support an
 		 * `aria-*` wildcard, so every ARIA state and property is listed
 		 * explicitly. The list mirrors the WAI-ARIA states and properties.
@@ -305,7 +305,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			'visibility',
 		);
 
-		/*
+		/**
 		 * Allowed tags for wp_kses(). WP_HTML_Processor::normalize() with
 		 * constraints (similar structure to this array) is proposed to improve
 		 * HTML/SVG sanitization in the future.
