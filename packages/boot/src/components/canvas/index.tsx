@@ -1238,9 +1238,17 @@ export default function Canvas( { canvas }: CanvasProps ) {
 					settings={ {
 						isPreviewMode: canvas.isPreview,
 						disableStartPageOptions: canvas.skipStartPageOptions,
-						styles: canvas.isPreview
-							? [ { css: 'body{min-height:100vh;}' } ]
-							: [],
+						// Only preview mode needs a local style override. In edit
+						// mode, passing an empty `styles` array here replaces the
+						// lazy editor's resolved theme/global styles, which can
+						// leave the editor iframe rendering with browser defaults.
+						...( canvas.isPreview
+							? {
+									styles: [
+										{ css: 'body{min-height:100vh;}' },
+									],
+							  }
+							: {} ),
 					} }
 					backButton={ backButton }
 				/>
