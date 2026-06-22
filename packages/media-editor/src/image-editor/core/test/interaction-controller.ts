@@ -291,6 +291,38 @@ describe( 'InteractionController', () => {
 			el._fire( 'pointerup', createPointerEvent() );
 		} );
 
+		it( 'ignores touch pointerdown so touch gestures own touch input', () => {
+			const state = makeState( { zoom: 2 } );
+			const onGestureStart = jest.fn();
+			const onStatusChange = jest.fn();
+			const { controller } = createController( state, {
+				onGestureStart,
+				onStatusChange,
+			} );
+			const el = createMockElement();
+			const event = createPointerEvent( {
+				clientX: 100,
+				clientY: 100,
+				pointerType: 'touch',
+			} );
+
+			controller.handlePointerDown( event, el );
+
+			expect( event.preventDefault ).not.toHaveBeenCalled();
+			expect( el.focus ).not.toHaveBeenCalled();
+			expect( el.setPointerCapture ).not.toHaveBeenCalled();
+			expect( el.addEventListener ).not.toHaveBeenCalled();
+			expect( onGestureStart ).not.toHaveBeenCalled();
+			expect( onStatusChange ).not.toHaveBeenCalled();
+
+			el._fire(
+				'pointermove',
+				createPointerEvent( { clientX: 150, clientY: 120 } )
+			);
+
+			expect( actionMocks.setPan ).not.toHaveBeenCalled();
+		} );
+
 		it( 'stops dispatching after pointerup', () => {
 			const state = makeState( { zoom: 2 } );
 			const { controller } = createController( state );
@@ -797,6 +829,26 @@ describe( 'InteractionController', () => {
 			expect( actionMocks.setPan ).toHaveBeenCalled();
 		} );
 
+		it( 'prevents default on touchmove so the page does not scroll mid-gesture', () => {
+			const state = makeState( { zoom: 2 } );
+			const { controller } = createController( state );
+			const doc = createMockDocument();
+			const rect = createContainerRect();
+
+			controller.handleTouchStart(
+				createTouchEvent( [ { clientX: 100, clientY: 100 } ] ),
+				rect,
+				doc
+			);
+
+			const moveEvent = createTouchEvent( [
+				{ clientX: 150, clientY: 120 },
+			] );
+			doc._fire( 'touchmove', moveEvent );
+
+			expect( moveEvent.preventDefault ).toHaveBeenCalled();
+		} );
+
 		it( 'calls onGestureStart/onGestureEnd for single-finger pan', () => {
 			const state = makeState( { zoom: 2 } );
 			const onGestureStart = jest.fn();
@@ -886,6 +938,54 @@ describe( 'InteractionController', () => {
 			);
 
 			expect( actionMocks.setZoomAtPoint ).toHaveBeenCalled();
+		} );
+
+		it( 'keeps a repeated pinch zoom anchored to the pinch-start midpoint from a zoomed and panned state', () => {
+			let state = makeState( {
+				zoom: 2,
+				pan: { x: 0.1, y: -0.05 },
+			} );
+			actionMocks.setZoomAtPoint.mockImplementation( ( zoom, pan ) => {
+				state = { ...state, zoom, pan };
+			} );
+			const { controller } = createController( state, {
+				getState: () => state,
+			} );
+			const doc = createMockDocument();
+			const rect = createContainerRect();
+
+			controller.handleTouchStart(
+				createTouchEvent( [
+					{ clientX: 300, clientY: 180 },
+					{ clientX: 400, clientY: 180 },
+				] ),
+				rect,
+				doc
+			);
+
+			doc._fire(
+				'touchmove',
+				createTouchEvent( [
+					{ clientX: 275, clientY: 180 },
+					{ clientX: 425, clientY: 180 },
+				] )
+			);
+			doc._fire(
+				'touchmove',
+				createTouchEvent( [
+					{ clientX: 250, clientY: 180 },
+					{ clientX: 450, clientY: 180 },
+				] )
+			);
+
+			expect( actionMocks.setZoomAtPoint ).toHaveBeenCalledTimes( 2 );
+			const [ zoom, pan ] =
+				actionMocks.setZoomAtPoint.mock.calls[
+					actionMocks.setZoomAtPoint.mock.calls.length - 1
+				];
+			expect( zoom ).toBeCloseTo( 4 );
+			expect( pan.x ).toBeCloseTo( 0 );
+			expect( pan.y ).toBeCloseTo( -0.2 );
 		} );
 
 		it( 'calls onGestureStart for pinch, onGestureEnd on touchend', () => {
