@@ -21,7 +21,7 @@ function UnforwardedTextControl(
 	ref: ForwardedRef< HTMLInputElement >
 ) {
 	const {
-		// Prevent passing this to `input`.
+		// Prevent passing legacy props to `input`.
 		__nextHasNoMarginBottom: _,
 		__next40pxDefaultSize: __,
 		label,
