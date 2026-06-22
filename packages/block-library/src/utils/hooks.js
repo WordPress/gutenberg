@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { v4 as uuidv4 } from 'uuid';
+
+/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
@@ -30,11 +35,13 @@ export function useCanEditEntity( kind, name, recordId ) {
 /**
  * Handles uploading a media file from a blob URL on mount.
  *
- * @param {Object}   args              Upload media arguments.
- * @param {string}   args.url          Blob URL.
- * @param {?Array}   args.allowedTypes Array of allowed media types.
- * @param {Function} args.onChange     Function called when the media is uploaded.
- * @param {Function} args.onError      Function called when an error happens.
+ * @param {Object}    args               Upload media arguments.
+ * @param {string}    args.url           Blob URL.
+ * @param {?Array}    args.allowedTypes  Array of allowed media types.
+ * @param {Function}  args.onChange      Function called when the media is uploaded.
+ * @param {Function}  args.onError       Function called when an error happens.
+ * @param {?string}   args.uploadId      Durable upload identifier. When omitted a new one is generated.
+ * @param {?Function} args.onUploadStart Function called with the resolved upload id when the upload starts.
  */
 export function useUploadMediaFromBlobURL( args = {} ) {
 	const latestArgsRef = useRef( args );
@@ -63,7 +70,14 @@ export function useUploadMediaFromBlobURL( args = {} ) {
 			return;
 		}
 
-		const { url, allowedTypes, onChange, onError } = latestArgsRef.current;
+		const {
+			url,
+			allowedTypes,
+			onChange,
+			onError,
+			uploadId,
+			onUploadStart,
+		} = latestArgsRef.current;
 		const { mediaUpload } = getSettings();
 
 		if ( ! mediaUpload ) {
@@ -72,9 +86,15 @@ export function useUploadMediaFromBlobURL( args = {} ) {
 
 		hasUploadStartedRef.current = true;
 
+		// Derive a durable upload identifier and notify the block so it can
+		// persist the marker to its attributes before the upload begins.
+		const resolvedUploadId = uploadId || uuidv4();
+		onUploadStart?.( resolvedUploadId );
+
 		mediaUpload( {
 			filesList: [ file ],
 			allowedTypes,
+			uploadId: resolvedUploadId,
 			onFileChange: ( [ media ] ) => {
 				if ( isBlobURL( media?.url ) ) {
 					return;

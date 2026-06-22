@@ -163,6 +163,7 @@ export function ImageEdit( {
 			id: undefined,
 			url: undefined,
 			blob: undefined,
+			uploadId: undefined,
 		} );
 	}
 
@@ -226,6 +227,7 @@ export function ImageEdit( {
 				title: undefined,
 				caption: undefined,
 				blob: undefined,
+				uploadId: undefined,
 			} );
 			setTemporaryURL();
 
@@ -318,6 +320,7 @@ export function ImageEdit( {
 
 		setAttributes( {
 			blob: undefined,
+			uploadId: undefined,
 			...mediaAttributes,
 			...additionalAttributes,
 			linkDestination,
@@ -333,6 +336,7 @@ export function ImageEdit( {
 		if ( normalizedNewURL !== url ) {
 			setAttributes( {
 				blob: undefined,
+				uploadId: undefined,
 				url: normalizedNewURL,
 				id: undefined,
 				sizeSlug: getSettings().imageDefaultSize,
@@ -346,6 +350,8 @@ export function ImageEdit( {
 		allowedTypes: ALLOWED_MEDIA_TYPES,
 		onChange: onSelectImage,
 		onError: onUploadError,
+		uploadId: attributes.uploadId,
+		onUploadStart: ( uploadId ) => setAttributes( { uploadId } ),
 	} );
 
 	const isExternal = isExternalImage( id, url );
