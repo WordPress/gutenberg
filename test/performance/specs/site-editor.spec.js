@@ -14,17 +14,17 @@ import { PerfUtils } from '../fixtures';
 const BROWSER_IDLE_WAIT = 1000;
 
 /**
- * Returns the major Chromium version from the browser's user agent, or 0 if
- * not Chromium.
+ * Returns the major Chromium version, or 0 if the browser is not Chromium.
  *
- * @param {import('@playwright/test').Page} page Playwright page object.
- * @return {Promise<number>} Major Chromium version.
+ * @param {import('@playwright/test').Browser} browser Playwright browser object.
+ * @return {number} Major Chromium version.
  */
-async function getChromiumMajorVersion( page ) {
-	return page.evaluate( () => {
-		const match = window.navigator.userAgent.match( /Chrome\/(\d+)/ );
-		return match ? parseInt( match[ 1 ], 10 ) : 0;
-	} );
+function getChromiumMajorVersion( browser ) {
+	if ( browser.browserType().name() !== 'chromium' ) {
+		return 0;
+	}
+	const match = browser.version().match( /^(\d+)/ );
+	return match ? parseInt( match[ 1 ], 10 ) : 0;
 }
 
 const results = {
@@ -290,7 +290,7 @@ test.describe( 'Site Editor Performance', () => {
 			await requestUtils.activateTheme( 'twentytwentyfour' );
 		} );
 
-		test.beforeEach( async ( { page } ) => {
+		test.beforeEach( async ( { browser } ) => {
 			// This site-editor measurement times out in CI starting with the
 			// Playwright upgrade to Chrome for Testing 148/149 (#78632).
 			// Chrome >= 148 is the first CI browser to support
@@ -300,7 +300,7 @@ test.describe( 'Site Editor Performance', () => {
 			// root-caused. Skip on the affected browsers until the cause is
 			// found. See https://github.com/WordPress/gutenberg/pull/78632.
 			test.skip(
-				( await getChromiumMajorVersion( page ) ) >= 148,
+				getChromiumMajorVersion( browser ) >= 148,
 				'Site editor never settles under cross-origin isolation on Chromium 148+'
 			);
 		} );
