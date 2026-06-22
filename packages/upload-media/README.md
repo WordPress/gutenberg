@@ -56,6 +56,8 @@ _Parameters_
 -   _$0.onError_ `[AddItemsArgs[ 'onError' ]]`: Function called when an error happens.
 -   _$0.additionalData_ `[AddItemsArgs[ 'additionalData' ]]`: Additional data to include in the request.
 -   _$0.allowedTypes_ `[AddItemsArgs[ 'allowedTypes' ]]`: Array with the types of media that can be uploaded, if unset all types are allowed.
+-   _$0.uploadId_ `[AddItemsArgs[ 'uploadId' ]]`: Durable upload marker for resumable uploads.
+-   _$0.postId_ `[AddItemsArgs[ 'postId' ]]`: Post ID that the uploaded media should be attached to.
 
 #### cancelItem
 

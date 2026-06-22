@@ -9,7 +9,7 @@ import { createRegistry } from '@wordpress/data';
 import { store as uploadStore } from '../';
 import { unlock } from '../../lock-unlock';
 import { getAllItems } from '../utils/persistence';
-import { buildIndexedDBMock } from '../utils/test/build-idb-mock';
+import { buildIndexedDBMock } from '../utils/test/fixtures/build-idb-mock';
 
 jest.mock( '@wordpress/blob', () => ( {
 	__esModule: true,
@@ -46,6 +46,20 @@ describe( 'persistence wiring', () => {
 		expect( persisted ).toHaveLength( 1 );
 		expect( persisted[ 0 ].uploadId ).toBe( 'upload-xyz' );
 		expect( persisted[ 0 ].postId ).toBe( 42 );
+	} );
+
+	it( 'addItems forwards uploadId and postId onto the queue item', async () => {
+		const file = new File( [ 'x' ], 'a.jpg', { type: 'image/jpeg' } );
+		registry.dispatch( uploadStore ).addItems( {
+			files: [ file ],
+			uploadId: 'u-batch',
+			postId: 7,
+		} );
+		await flush();
+
+		const [ item ] = unlock( registry.select( uploadStore ) ).getAllItems();
+		expect( item.uploadId ).toBe( 'u-batch' );
+		expect( item.postId ).toBe( 7 );
 	} );
 
 	it( 'deletes the persisted item when removed', async () => {

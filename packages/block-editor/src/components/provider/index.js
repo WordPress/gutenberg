@@ -149,6 +149,7 @@ function shouldEnableHeicCanvasProcessing() {
  * @param {Function}       $3.onFileChange   Function called each time a file or a temporary representation of the file is available.
  * @param {Function}       $3.onSuccess      Function called once a file has completely finished uploading, including thumbnails.
  * @param {Function}       $3.onBatchSuccess Function called once all files in a group have completely finished uploading, including thumbnails.
+ * @param {string}         [$3.uploadId]     Durable upload marker for resumable uploads.
  */
 function mediaUpload(
 	registry,
@@ -161,6 +162,7 @@ function mediaUpload(
 		onFileChange,
 		onSuccess,
 		onBatchSuccess,
+		uploadId,
 	}
 ) {
 	void registry.dispatch( uploadStore ).addItems( {
@@ -175,6 +177,8 @@ function mediaUpload(
 			onError( typeof error === 'string' ? error : error?.message ?? '' ),
 		additionalData,
 		allowedTypes,
+		uploadId,
+		postId: additionalData?.post,
 	} );
 }
 
@@ -195,6 +199,7 @@ function mediaUpload(
  * @param {Function}       $3.onFileChange   Function called each time a file or a temporary representation of the file is available.
  * @param {Function}       $3.onSuccess      Function called once a file has completely finished uploading, including thumbnails.
  * @param {Function}       $3.onBatchSuccess Function called once all files in a group have completely finished uploading, including thumbnails.
+ * @param {string}         [$3.uploadId]     Durable upload marker for resumable uploads.
  */
 function heicMediaUpload(
 	registry,
@@ -207,6 +212,7 @@ function heicMediaUpload(
 		onFileChange,
 		onSuccess,
 		onBatchSuccess,
+		uploadId,
 	}
 ) {
 	const files = Array.from( filesList );
@@ -247,6 +253,8 @@ function heicMediaUpload(
 				),
 			additionalData,
 			allowedTypes,
+			uploadId,
+			postId: additionalData?.post,
 		} );
 	}
 
