@@ -378,3 +378,81 @@ function &gutenberg_get_widget_def_registry_ref() {
 	static $registry = array();
 	return $registry;
 }
+
+/**
+ * Resolves raw block markup into rendered HTML via `do_blocks()`.
+ *
+ * The client posts a server-defined widget definition's `content` (carried
+ * inline on the Widget Type record for both code-registered and cpt origins)
+ * together with the instance `attributes`, and the server returns the resolved
+ * HTML with the per-instance values seeded into the block context.
+ *
+ * @param WP_REST_Request $request REST request carrying `content` and the
+ *                                 optional per-instance `attributes`.
+ * @return WP_REST_Response Response with the resolved HTML.
+ */
+function gutenberg_render_widget_def_markup( $request ) {
+	$content = (string) $request->get_param( 'content' );
+
+	if ( '' === $content ) {
+		return rest_ensure_response( array( 'rendered' => '' ) );
+	}
+
+	/*
+	 * Per-instance attribute values posted with the request. The
+	 * `core/instance-attribute` binding source reads them from the
+	 * `widget/instanceAttributes` block context, so seed that context for every
+	 * block in the composition before resolving. The closure is removed right
+	 * after `do_blocks()` so the seeding never leaks into other renders that run
+	 * in the same request.
+	 */
+	$attributes = $request->get_param( 'attributes' );
+	if ( ! is_array( $attributes ) ) {
+		$attributes = array();
+	}
+
+	$seed_instance_attributes = static function ( $context ) use ( $attributes ) {
+		$context['widget/instanceAttributes'] = $attributes;
+		return $context;
+	};
+
+	add_filter( 'render_block_context', $seed_instance_attributes );
+	$rendered = do_blocks( $content );
+	remove_filter( 'render_block_context', $seed_instance_attributes );
+
+	$rendered = wp_filter_content_tags( $rendered );
+
+	return rest_ensure_response( array( 'rendered' => $rendered ) );
+}
+
+/**
+ * Registers the REST route that resolves raw block markup for the host-agnostic
+ * render path of server-defined widget definitions.
+ */
+function gutenberg_register_widget_def_render_route() {
+	register_rest_route(
+		'wp/v2',
+		'/widget-defs/render',
+		array(
+			'methods'             => WP_REST_Server::CREATABLE,
+			'callback'            => 'gutenberg_render_widget_def_markup',
+			'permission_callback' => function () {
+				return current_user_can( 'read' );
+			},
+			'args'                => array(
+				'content'    => array(
+					'type'        => 'string',
+					'description' => __( 'Raw block markup to render.', 'gutenberg' ),
+					'required'    => true,
+				),
+				'attributes' => array(
+					'type'        => 'object',
+					'description' => __( 'Per-instance attribute values exposed to the composition through the `core/instance-attribute` binding source.', 'gutenberg' ),
+					'required'    => false,
+					'default'     => array(),
+				),
+			),
+		)
+	);
+}
+add_action( 'rest_api_init', 'gutenberg_register_widget_def_render_route' );
