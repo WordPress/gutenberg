@@ -64,7 +64,6 @@ export function initializeEditor( id, settings ) {
 	const collaborationNotificationPreferenceDefaults = applyFilters(
 		'editor.CollaborationNotificationPreferenceDefaults',
 		{
-			showCollaborationNotifications: true,
 			showCollaborationPresenceNotifications: true,
 			showCollaborationPostSaveNotifications: true,
 		},
@@ -85,8 +84,6 @@ export function initializeEditor( id, settings ) {
 		showListViewByDefault: false,
 		enableChoosePatternModal: true,
 		showCollaborationCursor: false,
-		showCollaborationNotifications:
-			collaborationNotificationPreferenceDefaults.showCollaborationNotifications,
 		showCollaborationPresenceNotifications:
 			collaborationNotificationPreferenceDefaults.showCollaborationPresenceNotifications,
 		showCollaborationPostSaveNotifications:

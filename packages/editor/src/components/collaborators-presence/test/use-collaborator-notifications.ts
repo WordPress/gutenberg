@@ -25,7 +25,6 @@ let lastSavePostId: unknown;
 let mockEditorState = {
 	postStatus: 'draft',
 	isCollaborationEnabled: true,
-	showCollaborationNotifications: true,
 	showCollaborationPresenceNotifications: true,
 	showCollaborationPostSaveNotifications: true,
 };
@@ -122,8 +121,6 @@ function buildMockSelect() {
 			return {
 				get: ( scope: string, name: string ) => {
 					const preferenceValues: Record< string, boolean > = {
-						showCollaborationNotifications:
-							mockEditorState.showCollaborationNotifications,
 						showCollaborationPresenceNotifications:
 							mockEditorState.showCollaborationPresenceNotifications,
 						showCollaborationPostSaveNotifications:
@@ -156,7 +153,6 @@ beforeEach( () => {
 	mockEditorState = {
 		postStatus: 'draft',
 		isCollaborationEnabled: true,
-		showCollaborationNotifications: true,
 		showCollaborationPresenceNotifications: true,
 		showCollaborationPostSaveNotifications: true,
 	};
@@ -380,35 +376,6 @@ describe( 'useCollaboratorNotifications', () => {
 	} );
 
 	describe( 'when notifications are disabled', () => {
-		it( 'passes null postId to hooks when showCollaborationNotifications preference is false', () => {
-			mockEditorState = {
-				...mockEditorState,
-				showCollaborationNotifications: false,
-			};
-			renderHook( () => useCollaboratorNotifications( 123, 'post' ) );
-
-			expect( lastJoinPostId ).toBeNull();
-			expect( lastLeavePostId ).toBeNull();
-			expect( lastSavePostId ).toBeNull();
-		} );
-
-		it( 'does not fire leave notification after global notifications are disabled', () => {
-			const alice = makeCollaborator();
-			const { rerender } = renderHook( () =>
-				useCollaboratorNotifications( 123, 'post' )
-			);
-
-			mockEditorState = {
-				...mockEditorState,
-				showCollaborationNotifications: false,
-			};
-			rerender();
-
-			mockOnLeaveCallback?.( alice );
-
-			expect( mockCreateNotice ).not.toHaveBeenCalled();
-		} );
-
 		it( 'passes null postId to join and leave hooks when presence notifications are disabled', () => {
 			mockEditorState = {
 				...mockEditorState,

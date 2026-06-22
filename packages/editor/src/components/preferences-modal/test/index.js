@@ -88,42 +88,12 @@ describe( 'EditPostPreferencesModal', () => {
 		).not.toBeInTheDocument();
 	} );
 
-	it( 'hides granular collaboration notification controls when the master notification control is off', async () => {
-		const user = setupActiveModal( {
-			showCollaborationNotifications: false,
-		} );
+	it( 'shows collaboration notification controls', async () => {
+		const user = setupActiveModal();
 		await user.click( screen.getByRole( 'tab', { name: 'General' } ) );
 
 		expect(
 			await screen.findByRole( 'checkbox', {
-				name: 'Show collaboration notifications',
-			} )
-		).toBeInTheDocument();
-		expect(
-			screen.queryByRole( 'checkbox', {
-				name: 'Show collaborator presence notifications',
-			} )
-		).not.toBeInTheDocument();
-		expect(
-			screen.queryByRole( 'checkbox', {
-				name: 'Show post update notifications',
-			} )
-		).not.toBeInTheDocument();
-	} );
-
-	it( 'shows granular collaboration notification controls when the master notification control is on', async () => {
-		const user = setupActiveModal( {
-			showCollaborationNotifications: true,
-		} );
-		await user.click( screen.getByRole( 'tab', { name: 'General' } ) );
-
-		expect(
-			await screen.findByRole( 'checkbox', {
-				name: 'Show collaboration notifications',
-			} )
-		).toBeInTheDocument();
-		expect(
-			screen.getByRole( 'checkbox', {
 				name: 'Show collaborator presence notifications',
 			} )
 		).toBeInTheDocument();

@@ -71,7 +71,6 @@ export function useCollaboratorNotifications(
 	const {
 		postStatus,
 		isCollaborationEnabled,
-		showNotifications,
 		showPresenceNotifications,
 		showPostSaveNotifications,
 	} = useSelect( ( select ) => {
@@ -84,11 +83,6 @@ export function useCollaboratorNotifications(
 				| string
 				| undefined,
 			isCollaborationEnabled: isCollaborationEnabledForCurrentPost(),
-			showNotifications:
-				select( preferencesStore ).get(
-					'core',
-					'showCollaborationNotifications'
-				) ?? true,
 			showPresenceNotifications:
 				select( preferencesStore ).get(
 					'core',
@@ -104,13 +98,12 @@ export function useCollaboratorNotifications(
 
 	const { createNotice } = useDispatch( noticesStore );
 
-	// Pass null when collaboration is disabled or notifications are
+	// Pass null when collaboration is disabled or a notification type is
 	// turned off to prevent the hooks from subscribing to awareness state.
-	const shouldSubscribe = isCollaborationEnabled && showNotifications;
 	const shouldShowPresenceNotifications =
-		shouldSubscribe && showPresenceNotifications;
+		isCollaborationEnabled && showPresenceNotifications;
 	const shouldShowPostSaveNotifications =
-		shouldSubscribe && showPostSaveNotifications;
+		isCollaborationEnabled && showPostSaveNotifications;
 	// Null post IDs unsubscribe hooks; callback guards handle events already queued then.
 	const effectivePresencePostId = shouldShowPresenceNotifications
 		? postId

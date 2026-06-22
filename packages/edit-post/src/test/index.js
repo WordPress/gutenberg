@@ -138,7 +138,6 @@ describe( 'initializeEditor', () => {
 		expect( setDefaults ).toHaveBeenCalledWith(
 			'core',
 			expect.objectContaining( {
-				showCollaborationNotifications: true,
 				showCollaborationPresenceNotifications: false,
 				showCollaborationPostSaveNotifications: true,
 				showListViewByDefault: false,
