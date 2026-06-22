@@ -143,6 +143,11 @@ export async function getAllItems(): Promise< PersistedQueueItem[] > {
 				request.onsuccess = () => {
 					stored = request.result as PersistedQueueItem[];
 				};
+				// A request-level failure aborts the transaction, which rejects via
+				// tx.onerror and degrades to an empty list in the catch below.
+				request.onerror = () => {
+					// Intentionally no-op: tx.onerror handles rejection.
+				};
 			},
 			() => stored
 		);
@@ -238,6 +243,12 @@ export function toPersistedRecord(
 		return null;
 	}
 	if ( ! PERSISTABLE_STATUSES.includes( item.status ) ) {
+		return null;
+	}
+	// Child sideload items (sub-sizes) are intentionally not persisted: the
+	// parent regenerates them on resume, and persisting them would resurrect
+	// orphaned top-level items on the next load.
+	if ( item.parentId ) {
 		return null;
 	}
 	return {

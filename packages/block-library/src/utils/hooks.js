@@ -6,13 +6,13 @@ import { v4 as uuidv4 } from 'uuid';
 /**
  * WordPress dependencies
  */
-import { useSelect, useRegistry } from '@wordpress/data';
-import { store as uploadStore } from '@wordpress/upload-media';
-import { useLayoutEffect, useEffect, useRef } from '@wordpress/element';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { store as coreStore } from '@wordpress/core-data';
 import { useViewportMatch } from '@wordpress/compose';
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect, useRegistry } from '@wordpress/data';
+import { useLayoutEffect, useEffect, useRef } from '@wordpress/element';
+import { store as uploadStore } from '@wordpress/upload-media';
 
 /**
  * Internal dependencies
@@ -170,6 +170,10 @@ export function useResumeUploadFromMarker( { uploadId, onChange, onError } ) {
 		if ( ! uploadId || ! item ) {
 			return;
 		}
+		// Only onChange and onError are registered here. The store fires onChange
+		// with the final attachment (which the block's onSelectImage uses to swap
+		// in the real URL and clear the marker) before onSuccess, so onSuccess is
+		// intentionally omitted.
 		unlock( registry.dispatch( uploadStore ) ).registerItemCallbacks(
 			uploadId,
 			{

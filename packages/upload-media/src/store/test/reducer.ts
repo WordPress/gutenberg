@@ -674,5 +674,26 @@ describe( 'reducer', () => {
 			} as any );
 			expect( state.queue[ 0 ].onChange ).toBe( onChange );
 		} );
+
+		it( 'preserves existing callbacks when an action field is undefined', () => {
+			const existingOnError = jest.fn();
+			const initial = {
+				...reducer( undefined, { type: Type.Unknown } as any ),
+				queue: [
+					{
+						id: 'p1',
+						status: ItemStatus.PendingResume,
+						onError: existingOnError,
+					} as any,
+				],
+			};
+			const state = reducer( initial, {
+				type: Type.RegisterCallbacks,
+				id: 'p1',
+				onChange: jest.fn(),
+				// onError deliberately omitted
+			} as any );
+			expect( state.queue[ 0 ].onError ).toBe( existingOnError );
+		} );
 	} );
 } );

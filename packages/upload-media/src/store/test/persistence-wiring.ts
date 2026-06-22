@@ -8,8 +8,9 @@ import { createRegistry } from '@wordpress/data';
  */
 import { store as uploadStore } from '../';
 import { unlock } from '../../lock-unlock';
-import { getAllItems } from '../utils/persistence';
+import { getAllItems, toPersistedRecord } from '../utils/persistence';
 import { buildIndexedDBMock } from '../utils/test/fixtures/build-idb-mock';
+import { ItemStatus } from '../types';
 
 jest.mock( '@wordpress/blob', () => ( {
 	__esModule: true,
@@ -28,7 +29,7 @@ describe( 'persistence wiring', () => {
 	beforeEach( () => {
 		( globalThis as any ).indexedDB = buildIndexedDBMock();
 		registry = createRegistry();
-		// @ts-ignore
+		// @ts-expect-error -- uploadStore type not assignable to createRegistry's store param
 		registry.register( uploadStore );
 		unlock( registry.dispatch( uploadStore ) ).pauseQueue();
 	} );
@@ -60,6 +61,37 @@ describe( 'persistence wiring', () => {
 		const [ item ] = unlock( registry.select( uploadStore ) ).getAllItems();
 		expect( item.uploadId ).toBe( 'u-batch' );
 		expect( item.postId ).toBe( 7 );
+	} );
+
+	it( 'does not persist child sideload items (those with a parentId)', () => {
+		const file = new File( [ 'x' ], 'thumb.jpg', { type: 'image/jpeg' } );
+
+		// Child item (has parentId) must return null.
+		const childRecord = toPersistedRecord(
+			{
+				id: 'c',
+				parentId: 'p',
+				status: ItemStatus.Processing,
+				file,
+				sourceFile: file,
+				additionalData: {},
+			} as any,
+			1000
+		);
+		expect( childRecord ).toBeNull();
+
+		// Top-level item (no parentId) must return a non-null record.
+		const topRecord = toPersistedRecord(
+			{
+				id: 'top',
+				status: ItemStatus.Processing,
+				file,
+				sourceFile: file,
+				additionalData: {},
+			} as any,
+			1000
+		);
+		expect( topRecord ).not.toBeNull();
 	} );
 
 	it( 'deletes the persisted item when removed', async () => {

@@ -307,13 +307,14 @@ function reducer(
 			};
 		}
 
-		case Type.LoadPersisted:
+		case Type.LoadPersisted: {
 			return {
 				...state,
 				queue: [ ...state.queue, ...action.items ],
 			};
+		}
 
-		case Type.RegisterCallbacks:
+		case Type.RegisterCallbacks: {
 			return {
 				...state,
 				queue: state.queue.map(
@@ -329,6 +330,7 @@ function reducer(
 							: item
 				),
 			};
+		}
 	}
 
 	return state;

@@ -145,6 +145,8 @@ export function addItems( {
 				continue;
 			}
 
+			// uploadId is meaningful only for single-file (per-block) re-uploads;
+			// multi-file callers should omit it (otherwise all files share one marker).
 			dispatch.addItem( {
 				file,
 				batchId,
