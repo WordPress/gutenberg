@@ -821,6 +821,7 @@ function BlockListBlockProvider( props ) {
 		bindableAttributes,
 		blockVisibility,
 		deviceType,
+		viewportSettings,
 	} = selectedProps;
 
 	const privateContext = {
@@ -860,6 +861,7 @@ function BlockListBlockProvider( props ) {
 		bindableAttributes,
 		blockVisibility,
 		deviceType,
+		viewportSettings,
 	};
 
 	if (
