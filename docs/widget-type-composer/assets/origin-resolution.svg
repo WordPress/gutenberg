@@ -20,16 +20,16 @@
   <text x="576" y="60" text-anchor="end" font-family="-apple-system, system-ui, sans-serif" font-size="10.5" fill="#1d6b5a">step 03 ✓</text>
   <text x="340" y="84" font-family="-apple-system, system-ui, sans-serif" font-size="11" fill="#1d6b5a" opacity="0.9">register_widget_def() · in-memory</text>
 
-  <!-- cpt (planned) -->
-  <rect x="620" y="34" width="268" height="68" rx="9" fill="#fafbfc" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 5"/>
-  <text x="638" y="62" font-family="ui-monospace, SFMono-Regular, monospace" font-size="13" font-weight="700" fill="#475569">cpt</text>
-  <text x="874" y="60" text-anchor="end" font-family="-apple-system, system-ui, sans-serif" font-size="10.5" fill="#94a3b8">step 04 ⋯</text>
-  <text x="638" y="84" font-family="-apple-system, system-ui, sans-serif" font-size="11" fill="#64748b" opacity="0.9">widget_def post · definition_id</text>
+  <!-- cpt (shipped) -->
+  <rect x="620" y="34" width="268" height="68" rx="9" fill="#fff3d0" stroke="#b07020" stroke-width="1.5"/>
+  <text x="638" y="62" font-family="ui-monospace, SFMono-Regular, monospace" font-size="13" font-weight="700" fill="#855317">cpt</text>
+  <text x="874" y="60" text-anchor="end" font-family="-apple-system, system-ui, sans-serif" font-size="10.5" fill="#b07020">step 04 ✓</text>
+  <text x="638" y="84" font-family="-apple-system, system-ui, sans-serif" font-size="11" fill="#855317" opacity="0.85">widget_def post · definition_id</text>
 
   <!-- converge into the resolver -->
   <line x1="158" y1="102" x2="442" y2="148" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
   <line x1="456" y1="102" x2="456" y2="148" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <line x1="754" y1="102" x2="470" y2="148" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 5" marker-end="url(#arrow)"/>
+  <line x1="754" y1="102" x2="470" y2="148" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <!-- resolver helper -->
   <rect x="216" y="150" width="480" height="66" rx="9" fill="#f1f5f9" stroke="#64748b" stroke-width="1.5"/>
