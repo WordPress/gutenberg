@@ -132,16 +132,25 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			value: 'Desktop',
 			label: __( 'Desktop' ),
 			icon: desktop,
+			info: isResponsiveEditing
+				? __( 'Edit across all breakpoints.' )
+				: __( 'Preview desktop viewport.' ),
 		},
 		{
 			value: 'Tablet',
 			label: __( 'Tablet' ),
 			icon: tablet,
+			info: isResponsiveEditing
+				? __( 'Make tablet exclusive changes.' )
+				: __( 'Preview tablet viewport.' ),
 		},
 		{
 			value: 'Mobile',
 			label: __( 'Mobile' ),
 			icon: mobile,
+			info: isResponsiveEditing
+				? __( 'Make mobile exclusive changes.' )
+				: __( 'Preview mobile viewport.' ),
 		},
 	];
 
