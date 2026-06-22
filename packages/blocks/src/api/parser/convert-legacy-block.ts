@@ -164,6 +164,10 @@ export function convertLegacyBlockNameAndAttributes(
 		};
 	}
 
+	// `normalizeStyleStateAliases` will return the same value when there are no
+	// aliases to resolve. Use an equality check to decide whether to update the
+	// property. The `if` statement also guards against `style` being set as an
+	// undefined property.
 	const normalizedStyle = normalizeStyleStateAliases( newAttributes.style );
 	if ( normalizedStyle !== newAttributes.style ) {
 		newAttributes.style = normalizedStyle;
