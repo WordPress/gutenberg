@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { buildIndexedDBMock } from './build-idb-mock';
+import { buildIndexedDBMock } from './fixtures/build-idb-mock';
 import {
 	isPersistenceAvailable,
 	persistItem,
