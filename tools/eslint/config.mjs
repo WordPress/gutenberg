@@ -162,7 +162,8 @@ const restrictedSyntax = [
 	{
 		selector:
 			'JSXElement[openingElement.name.name="TextControl"] JSXAttribute[name.name="__next40pxDefaultSize"]',
-		message: 'The `__next40pxDefaultSize` prop is no longer needed on `TextControl`.',
+		message:
+			'The `__next40pxDefaultSize` prop is no longer needed on `TextControl`.',
 	},
 	{
 		selector:
