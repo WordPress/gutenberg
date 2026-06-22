@@ -9,7 +9,7 @@
  * @package gutenberg-test-connectors-application-password
  */
 
-const GUTENBERG_TEST_CONNECTOR_USERNAME_SETTING = 'connectors_content_source_test_remote_wordpress_username';
+const GUTENBERG_TEST_CONNECTOR_USERNAME_SETTING             = 'connectors_content_source_test_remote_wordpress_username';
 const GUTENBERG_TEST_CONNECTOR_APPLICATION_PASSWORD_SETTING = 'connectors_content_source_test_remote_wordpress_application_password';
 
 add_action(
@@ -27,6 +27,29 @@ add_action(
 					'username_setting_name'             => GUTENBERG_TEST_CONNECTOR_USERNAME_SETTING,
 					'application_password_setting_name' => GUTENBERG_TEST_CONNECTOR_APPLICATION_PASSWORD_SETTING,
 				),
+			)
+		);
+	}
+);
+
+add_action(
+	'rest_api_init',
+	static function () {
+		register_rest_route(
+			'gutenberg-test-connectors/v1',
+			'/application-password',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => static function () {
+					return array(
+						'is_registered' => wp_is_connector_registered(
+							'test-remote-wordpress'
+						),
+					);
+				},
+				'permission_callback' => static function () {
+					return current_user_can( 'manage_options' );
+				},
 			)
 		);
 	}

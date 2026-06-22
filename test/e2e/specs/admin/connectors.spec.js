@@ -562,6 +562,15 @@ test.describe( 'Connectors', () => {
 
 		test.beforeAll( async ( { requestUtils } ) => {
 			await requestUtils.activatePlugin( PLUGIN_SLUG );
+			const status = await requestUtils.rest( {
+				path: '/gutenberg-test-connectors/v1/application-password',
+			} );
+			// The companion Core change can land independently of this UI.
+			// eslint-disable-next-line playwright/no-skipped-test
+			test.skip(
+				! status.is_registered,
+				'Requires application_password support in WordPress Core.'
+			);
 		} );
 
 		test.afterEach( async ( { requestUtils } ) => {

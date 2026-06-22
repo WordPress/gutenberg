@@ -424,7 +424,7 @@ function _gutenberg_register_default_connector_settings(): void {
 				'sanitize_callback' => 'sanitize_text_field',
 			);
 		} elseif ( 'application_password' === $auth['method'] && ! empty( $auth['username_setting_name'] ) && ! empty( $auth['application_password_setting_name'] ) ) {
-			$settings[ $auth['username_setting_name'] ] = array(
+			$settings[ $auth['username_setting_name'] ]             = array(
 				'type'              => 'string',
 				'label'             => sprintf(
 					/* translators: %s: Connector name. */
@@ -572,7 +572,7 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 			$username                          = get_option( $username_setting_name, '' );
 			$application_password              = get_option( $application_password_setting_name, '' );
 
-			$auth_out['usernameSettingName']             = $username_setting_name;
+			$auth_out['usernameSettingName']            = $username_setting_name;
 			$auth_out['applicationPasswordSettingName'] = $application_password_setting_name;
 			$auth_out['credentialsUrl']                 = $auth['credentials_url'] ?? null;
 			$auth_out['isConnected']                    = is_string( $username ) && '' !== $username && is_string( $application_password ) && '' !== $application_password;
