@@ -1,4 +1,4 @@
-# Step 01 — js-contract
+# Step 01: js-contract
 
 - Branch: `wtc/01-js-contract`
 - Status: done

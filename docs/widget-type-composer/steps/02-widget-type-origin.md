@@ -1,4 +1,4 @@
-# Step 02 — widget-type-origin
+# Step 02: widget-type-origin
 
 - Branch: `wtc/02-widget-type-origin`
 - Status: done

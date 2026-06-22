@@ -1,4 +1,4 @@
-# Step NN — <title>
+# Step NN: <title>
 
 - Branch: `wtc/NN-<slug>`
 - Status: in-progress | done
@@ -10,7 +10,7 @@
 
 ## What changed
 
-- `<path>` — <what / why>
+- `<path>`: <what / why>
 
 ## Decisions and deviations from the oracle
 

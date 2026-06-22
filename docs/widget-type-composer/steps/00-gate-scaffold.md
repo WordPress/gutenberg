@@ -1,4 +1,4 @@
-# Step 00 — gate-scaffold
+# Step 00: gate-scaffold
 
 - Branch: `wtc/00-gate-scaffold`
 - Status: done
