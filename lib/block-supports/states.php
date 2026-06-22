@@ -513,7 +513,7 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 	}
 
 	$supported_pseudo_states = WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ] ?? array();
-	$style                   = WP_Theme_JSON_Gutenberg::resolve_style_state_aliases(
+	$style                   = gutenberg_resolve_style_state_aliases(
 		$block['attrs']['style'] ?? array(),
 		$block_name
 	);

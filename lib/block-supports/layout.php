@@ -925,7 +925,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 	$block_type            = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	$block_supports_layout = block_has_support( $block_type, array( 'layout' ), false ) || block_has_support( $block_type, array( '__experimentalLayout' ), false );
-	$style_attr            = WP_Theme_JSON_Gutenberg::resolve_style_state_aliases(
+	$style_attr            = gutenberg_resolve_style_state_aliases(
 		$block['attrs']['style'] ?? array(),
 		$block['blockName']
 	);
