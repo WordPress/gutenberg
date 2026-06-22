@@ -1,0 +1,124 @@
+// Inherited Global Styles values — visual treatment for inspector
+// control labels.
+//
+// `.is-inherited-from-global-styles` marks controls that are displaying
+// inherited values. `.has-local-override-from-global-styles` marks controls
+// that locally override inherited values. The states are mutually exclusive.
+
+.is-inherited-from-global-styles {
+	.components-base-control__label,
+	.block-editor-panel-color-gradient-settings__color-name,
+	.block-editor-global-styles-background-panel__inspector-media-replace-title {
+		position: relative;
+	}
+
+	.components-base-control__label,
+	.block-editor-global-styles-background-panel__inspector-media-replace-title {
+		text-decoration-line: underline;
+		text-decoration-style: dotted;
+		text-decoration-thickness: 1px;
+		text-underline-offset: 0.2em;
+	}
+
+	.block-editor-panel-color-gradient-settings__color-name {
+		border-bottom: 1px dotted currentColor;
+	}
+}
+
+// The tooltip target overlays the visible label text only. This keeps
+// the inherited-value tooltip scoped to labels without wrapping the
+// full control or intercepting nested control tooltips.
+.global-styles-inheritance-tooltip-anchor {
+	display: inline-block;
+	position: absolute;
+	inset: 0;
+}
+
+.global-styles-inheritance-tooltip-anchor__text {
+	visibility: hidden;
+}
+
+.global-styles-inheritance-tooltip-content__line {
+	display: block;
+}
+
+// Local-override interactive dot menu — portaled into the label DOM
+// node so the trigger sits inline with the label text. The
+// `<Dropdown>` outer is a div, so we force it to inline-flex to keep
+// it on the same line as the label.
+.has-local-override-from-global-styles__menu {
+	display: inline-flex;
+	align-items: center;
+	vertical-align: middle;
+	margin-inline-start: 6px;
+
+	&.block-editor-panel-color-gradient-settings__reset {
+		align-items: center;
+		justify-content: center;
+		top: 50%;
+		transform: translateY(-50%);
+		margin-block: 0;
+		margin-inline-start: 0;
+		opacity: 1;
+	}
+
+	// `<Dropdown>` itself does not preserve text-transform overrides
+	// from its parent label. Belt-and-braces: ensure the trigger
+	// button never inherits an uppercase transform from a label that
+	// happens to use one (e.g. some uses of `BaseControl` in third-
+	// party blocks).
+	text-transform: none;
+	letter-spacing: normal;
+}
+
+// The dot toggle button. Override the default 24x24 IconButton
+// chrome so the trigger appears as a tight inline circle.
+.has-local-override-from-global-styles__toggle {
+	display: inline-flex !important;
+	align-items: center;
+	justify-content: center;
+	min-width: 14px !important;
+	width: 14px !important;
+	height: 14px !important;
+	padding: 0 !important;
+	border-radius: 50% !important;
+	background: transparent !important;
+	box-shadow: none !important;
+
+	// Don't let any Button hover ring expand the bounding box and
+	// shift sibling label text.
+	&:hover,
+	&:focus,
+	&[aria-expanded="true"] {
+		background: transparent !important;
+	}
+
+	&:focus-visible {
+		// Inset focus ring so it doesn't push other text around.
+		outline: 1.5px solid var(--wp-admin-theme-color, #007cba);
+		outline-offset: 1px;
+	}
+
+	// Some `<label>` rules style descendant text/buttons (legacy
+	// pre-existing CSS). Reset to the design-system pointer token
+	// for interactive controls.
+	cursor: var(--wpds-cursor-control);
+}
+
+.has-local-override-from-global-styles__dot {
+	display: block;
+	width: 8px;
+	height: 8px;
+	background-color: var(--wp-admin-theme-color, #007cba);
+	border-radius: 50%;
+	transition: transform 0.1s ease-out;
+}
+
+.has-local-override-from-global-styles__toggle:hover
+.has-local-override-from-global-styles__dot,
+.has-local-override-from-global-styles__toggle:focus
+.has-local-override-from-global-styles__dot,
+.has-local-override-from-global-styles__toggle[aria-expanded="true"]
+.has-local-override-from-global-styles__dot {
+	transform: scale(1.2);
+}
