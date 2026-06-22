@@ -37,9 +37,15 @@ import {
 	patternTitleField,
 	notesField,
 	scheduledDateField,
+	lastEditedDateField,
 	formatField,
 	postContentInfoField,
 	stickyField,
+	descriptionField,
+	readOnlyDescriptionField,
+	postsPerPageField,
+	siteDiscussionField,
+	postsPageTitleField,
 } from '@wordpress/fields';
 import {
 	altTextField,
@@ -47,7 +53,7 @@ import {
 	authorField as mediaAuthorField,
 	captionField,
 	dateAddedField,
-	descriptionField,
+	descriptionField as mediaDescriptionField,
 	filenameField,
 	filesizeField,
 	mediaDimensionsField,
@@ -164,7 +170,7 @@ const ORDERED_MEDIA_FIELDS = [
 	titleField,
 	altTextField,
 	captionField,
-	descriptionField,
+	mediaDescriptionField,
 ];
 
 export const registerPostTypeSchema =
@@ -262,12 +268,15 @@ export const registerPostTypeSchema =
 					currentTheme?.theme_supports?.[ 'post-thumbnails' ] &&
 					featuredImageField,
 				postTypeConfig.supports?.author && authorField,
-				statusField,
+				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
+					statusField,
 				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
 					dateField,
 				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
 					scheduledDateField,
-				slugField,
+				lastEditedDateField,
+				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
+					slugField,
 				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
 					postTypeConfig.supports?.excerpt &&
 					excerptField,
@@ -277,15 +286,27 @@ export const registerPostTypeSchema =
 				( postTypeConfig.supports?.comments ||
 					postTypeConfig.supports?.trackbacks ) &&
 					discussionField,
-				templateField,
+				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
+					templateField,
 				postTypeConfig.supports?.[ 'post-formats' ] &&
 					! disablePostFormats &&
 					formatField,
 				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
 					postTypeConfig.supports?.editor &&
 					postContentInfoField,
-				passwordField,
+				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
+					passwordField,
 				postTypeConfig.slug === 'post' && stickyField,
+				postTypeConfig.slug === 'wp_template' && descriptionField,
+				postTypeConfig.slug === 'wp_template' &&
+					readOnlyDescriptionField,
+				// The `home`/`index` template summary exposes a few fields that
+				// target other entities (`root/site` and the posts page).
+				// `DataFormPostSummary` overrides them to read/write the right
+				// entity and to control their visibility.
+				postTypeConfig.slug === 'wp_template' && postsPageTitleField,
+				postTypeConfig.slug === 'wp_template' && postsPerPageField,
+				postTypeConfig.slug === 'wp_template' && siteDiscussionField,
 				postTypeConfig.supports?.editor &&
 					postTypeConfig.viewable &&
 					postPreviewField,
