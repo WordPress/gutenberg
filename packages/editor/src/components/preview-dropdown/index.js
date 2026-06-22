@@ -167,6 +167,19 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 							onSelect={ handleDevicePreviewChange }
 						/>
 					</MenuGroup>
+					<MenuGroup>
+						<MenuItem
+							icon={ isResponsiveEditing ? check : undefined }
+							isSelected={ isResponsiveEditing }
+							role="menuitemcheckbox"
+							onClick={ handleResponsiveEditingChange }
+							info={ __(
+								'Edits apply only to the current state.'
+							) }
+						>
+							{ __( 'Responsive editing' ) }
+						</MenuItem>
+					</MenuGroup>
 					{ isTemplate && (
 						<MenuGroup>
 							<MenuItem
@@ -185,19 +198,6 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 							</MenuItem>
 						</MenuGroup>
 					) }
-					<MenuGroup>
-						<MenuItem
-							icon={ isResponsiveEditing ? check : undefined }
-							isSelected={ isResponsiveEditing }
-							role="menuitemcheckbox"
-							onClick={ handleResponsiveEditingChange }
-							info={ __(
-								'Edits apply only to the current state.'
-							) }
-						>
-							{ __( 'Responsive editing' ) }
-						</MenuItem>
-					</MenuGroup>
 					{ ! isTemplate && !! templateId && (
 						<MenuGroup>
 							<MenuItem
