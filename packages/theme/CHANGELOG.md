@@ -38,7 +38,6 @@
 
 -   Add unit tests for `ThemeProvider` and `useThemeProviderStyles` ([#79126](https://github.com/WordPress/gutenberg/pull/79126)).
 -   Run the stylelint plugin tests through the stylelint Node API instead of spawning the CLI via `child_process` ([#79199](https://github.com/WordPress/gutenberg/pull/79199)).
--   `ThemeProvider`: Apply scoped custom properties via inline `style` (and `document.documentElement.style` when `isRoot`) instead of a per-instance `<style>` element ([#78678](https://github.com/WordPress/gutenberg/pull/78678)).
 
 ### Documentation
 
@@ -46,6 +45,7 @@
 
 ### Code Quality
 
+-   `ThemeProvider`: Apply scoped custom properties via inline `style` (mirrored onto the wrapper's own document element when `isRoot`) instead of a per-instance `<style>` element ([#78678](https://github.com/WordPress/gutenberg/pull/78678)).
 -   `ThemeProvider`: Stop serializing `data-wpds-root-provider="false"` on non-root providers by only setting the attribute when `isRoot` is `true` ([#79253](https://github.com/WordPress/gutenberg/pull/79253)).
 -   Declare `postcss`, `esbuild`, and `vite` as optional peer dependencies for the bundler plugins, and move `@types/react` from `dependencies` to an optional peer dependency ([#79095](https://github.com/WordPress/gutenberg/pull/79095)).
 

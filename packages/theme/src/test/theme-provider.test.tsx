@@ -147,6 +147,66 @@ describe( 'ThemeProvider', () => {
 			expect( readProp( document.documentElement, BRAND_BG ) ).toBe( '' );
 		} );
 
+		it( "forwards tokens to the wrapper's own document, not the top document", () => {
+			const iframe = document.createElement( 'iframe' );
+			document.body.appendChild( iframe );
+			const iframeDoc = iframe.contentDocument!;
+
+			const { unmount } = render(
+				<ThemeProvider isRoot color={ { primary: PRIMARY } }>
+					<div>x</div>
+				</ThemeProvider>,
+				{ container: iframeDoc.body }
+			);
+
+			expect( readProp( iframeDoc.documentElement, BRAND_BG ) ).toBe(
+				PRIMARY
+			);
+			expect( readProp( document.documentElement, BRAND_BG ) ).toBe( '' );
+
+			unmount();
+			iframe.remove();
+		} );
+
+		it( 'warns when multiple root providers share a document', () => {
+			const warn = jest
+				.spyOn( console, 'warn' )
+				.mockImplementation( () => {} );
+
+			render(
+				<>
+					<ThemeProvider isRoot color={ { primary: PRIMARY } }>
+						<div>a</div>
+					</ThemeProvider>
+					<ThemeProvider isRoot color={ { primary: OTHER_PRIMARY } }>
+						<div>b</div>
+					</ThemeProvider>
+				</>
+			);
+
+			expect( warn ).toHaveBeenCalledWith(
+				expect.stringContaining( 'More than one root provider' )
+			);
+
+			warn.mockRestore();
+		} );
+
+		it( 'does not warn for a single root provider', () => {
+			const warn = jest
+				.spyOn( console, 'warn' )
+				.mockImplementation( () => {} );
+
+			render(
+				<ThemeProvider isRoot color={ { primary: PRIMARY } }>
+					<div>x</div>
+				</ThemeProvider>
+			);
+
+			expect( warn ).not.toHaveBeenCalled();
+
+			warn.mockRestore();
+		} );
+
 		// `cornerRadius` forwards to `:root` through the prebuilt CSS's
 		// `:root:has( [data-wpds-root-provider='true']… )` rule (not the JS
 		// mirror used for color/cursor), so load that stylesheet to exercise

@@ -1,8 +1,13 @@
-import { useMemo, useLayoutEffect } from '@wordpress/element';
+import { useMemo, useRef, useLayoutEffect } from '@wordpress/element';
 import { ThemeContext } from './context';
 import { useThemeProviderStyles } from './use-theme-provider-styles';
 import { type ThemeProviderProps } from './types';
 import styles from './style.module.css';
+
+// Dev-only: count active root providers per document so we can warn when more
+// than one is mounted on the same document (their forwarded `html` styles
+// would conflict). Keyed weakly so iframe documents don't leak.
+const rootProviderCountByDocument = new WeakMap< Document, number >();
 
 /**
  * Context provider that generates a theme from a set of seed color values and
@@ -31,16 +36,35 @@ export const ThemeProvider = ( {
 		[ resolvedSettings ]
 	);
 
-	// For root providers, mirror the wrapper's custom properties onto `html`
-	// so they reach portals and content outside the React app. `html` is
-	// shared, so set/remove individual properties (restoring any prior value)
-	// rather than assigning a whole style object. (Preset settings like
-	// `cornerRadius` are forwarded by the prebuilt CSS instead.)
+	const wrapperRef = useRef< HTMLDivElement >( null );
+
+	// For root providers, mirror the wrapper's custom properties onto the
+	// document element of the wrapper's own document (which may be an iframe)
+	// so they reach portals and content rendered outside the React subtree.
+	// `html` is shared, so set/remove individual properties (restoring any
+	// prior value) rather than assigning a whole style object. Preset settings
+	// like `cornerRadius` are forwarded by the prebuilt CSS instead.
 	useLayoutEffect( () => {
-		if ( ! isRoot || typeof document === 'undefined' ) {
+		if ( ! isRoot ) {
 			return;
 		}
-		const root = document.documentElement;
+		const doc = wrapperRef.current?.ownerDocument;
+		if ( ! doc ) {
+			return;
+		}
+		const root = doc.documentElement;
+
+		if ( process.env.NODE_ENV !== 'production' ) {
+			const active = rootProviderCountByDocument.get( doc ) ?? 0;
+			if ( active > 0 ) {
+				// eslint-disable-next-line no-console
+				console.warn(
+					'ThemeProvider: More than one root provider (`isRoot`) is mounted on the same document. Their forwarded document-level styles conflict, and unmounting one can reset the others. Render a single root provider per document.'
+				);
+			}
+			rootProviderCountByDocument.set( doc, active + 1 );
+		}
+
 		const previous = new Map< string, string >();
 		const applied: string[] = [];
 
@@ -60,6 +84,15 @@ export const ThemeProvider = ( {
 		}
 
 		return () => {
+			if ( process.env.NODE_ENV !== 'production' ) {
+				const active = rootProviderCountByDocument.get( doc ) ?? 1;
+				if ( active <= 1 ) {
+					rootProviderCountByDocument.delete( doc );
+				} else {
+					rootProviderCountByDocument.set( doc, active - 1 );
+				}
+			}
+
 			for ( const key of applied ) {
 				const prev = previous.get( key );
 				if ( prev ) {
@@ -73,7 +106,8 @@ export const ThemeProvider = ( {
 
 	return (
 		<div
-			data-wpds-root-provider={ isRoot ? 'true' : undefined }
+			ref={ wrapperRef }
+			data-wpds-root-provider={ isRoot || undefined }
 			data-wpds-corner-radius={ cornerRadiusPreset }
 			className={ styles.root }
 			style={ themeProviderStyles }
