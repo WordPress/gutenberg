@@ -12,12 +12,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
-import { isBlobURL } from '@wordpress/blob';
-
-/**
- * Internal dependencies
- */
-import { fetchMedia } from './media-util';
 
 function flattenBlocks( blocks ) {
 	const result = [];
@@ -113,10 +107,11 @@ export default function MaybeUploadMediaPanel() {
 	const [ isUploading, setIsUploading ] = useState( false );
 	const [ isAnimating, setIsAnimating ] = useState( false );
 	const [ hadUploadError, setHadUploadError ] = useState( false );
-	const { editorBlocks, mediaUpload } = useSelect(
+	const { editorBlocks, mediaSideloadFromUrl } = useSelect(
 		( select ) => ( {
 			editorBlocks: select( blockEditorStore ).getBlocks(),
-			mediaUpload: select( blockEditorStore ).getSettings().mediaUpload,
+			mediaSideloadFromUrl:
+				select( blockEditorStore ).getSettings().mediaSideloadFromUrl,
 		} ),
 		[]
 	);
@@ -127,7 +122,7 @@ export default function MaybeUploadMediaPanel() {
 	);
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
-	if ( ! mediaUpload || ! blocksWithExternalMedia.length ) {
+	if ( ! mediaSideloadFromUrl || ! blocksWithExternalMedia.length ) {
 		return null;
 	}
 
@@ -178,32 +173,20 @@ export default function MaybeUploadMediaPanel() {
 		);
 
 		// Create an upload promise for each URL, that we can wait for in all
-		// blocks that make use of that media.
+		// blocks that make use of that media. The server sideloads each URL,
+		// so this works even when the editor is cross-origin isolated.
 		const uploadPromises = Object.fromEntries(
-			Object.entries( fetchMedia( [ ...mediaUrls ] ) ).map(
-				( [ url, filePromise ] ) => {
-					const uploadPromise = filePromise.then(
-						( blob ) =>
-							new Promise( ( resolve, reject ) => {
-								mediaUpload( {
-									filesList: [ blob ],
-									onFileChange: ( [ media ] ) => {
-										if ( isBlobURL( media.url ) ) {
-											return;
-										}
+			[ ...mediaUrls ].map( ( url ) => {
+				const uploadPromise = new Promise( ( resolve, reject ) => {
+					mediaSideloadFromUrl( {
+						url,
+						onSuccess: ( media ) => resolve( media ),
+						onError: () => reject(),
+					} );
+				} );
 
-										resolve( media );
-									},
-									onError() {
-										reject();
-									},
-								} );
-							} )
-					);
-
-					return [ url, uploadPromise ];
-				}
-			)
+				return [ url, uploadPromise ];
+			} )
 		);
 
 		// Wait for all blocks to be updated with library media.
