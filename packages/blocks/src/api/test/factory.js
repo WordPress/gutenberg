@@ -26,6 +26,7 @@ import {
 	unregisterBlockType,
 	setGroupingBlockName,
 } from '../registration';
+import { logged as warningLoggedSet } from '../../../../warning/src/utils';
 
 const noop = () => {};
 
@@ -45,6 +46,11 @@ describe( 'block factory', () => {
 	beforeAll( () => {
 		// Load blocks store.
 		require( '../../store' );
+	} );
+
+	beforeEach( () => {
+		// Reset warning logging so deduped warnings fire within each test.
+		warningLoggedSet.clear();
 	} );
 
 	afterEach( () => {
@@ -200,7 +206,7 @@ describe( 'block factory', () => {
 			expect( block.innerContent ).toEqual( [ '<div></div>' ] );
 		} );
 
-		it( 'should ignore innerContent when the block type lacks support', () => {
+		it( 'should ignore innerContent and warn when the block type lacks support', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
 			const block = createBlock(
@@ -211,6 +217,7 @@ describe( 'block factory', () => {
 			);
 
 			expect( block.innerContent ).toBeUndefined();
+			expect( console ).toHaveWarned();
 		} );
 	} );
 

@@ -7,6 +7,7 @@ import { v4 as uuid } from 'uuid';
  * WordPress dependencies
  */
 import { createHooks, applyFilters } from '@wordpress/hooks';
+import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
@@ -79,8 +80,14 @@ export function createBlock(
 		innerBlocks,
 	};
 
-	if ( innerContent && hasBlockSupport( name, 'innerContent' ) ) {
-		block.innerContent = innerContent;
+	if ( innerContent ) {
+		if ( hasBlockSupport( name, 'innerContent' ) ) {
+			block.innerContent = innerContent;
+		} else {
+			warning(
+				`The "${ name }" block does not support inner content, so the innerContent argument passed to createBlock was ignored. Add the "innerContent" block support to use it.`
+			);
+		}
 	}
 
 	return block;
