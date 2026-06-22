@@ -151,12 +151,16 @@ describe( 'ThemeProvider', () => {
 			const iframe = document.createElement( 'iframe' );
 			document.body.appendChild( iframe );
 			const iframeDoc = iframe.contentDocument!;
+			// Mount into a child element (not the iframe `body` directly, which
+			// React warns against) so the wrapper's `ownerDocument` is the iframe.
+			const mount = iframeDoc.createElement( 'div' );
+			iframeDoc.body.appendChild( mount );
 
 			const { unmount } = render(
 				<ThemeProvider isRoot color={ { primary: PRIMARY } }>
 					<div>x</div>
 				</ThemeProvider>,
-				{ container: iframeDoc.body }
+				{ container: mount }
 			);
 
 			expect( readProp( iframeDoc.documentElement, BRAND_BG ) ).toBe(
