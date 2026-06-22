@@ -25,7 +25,6 @@ import {
 	isSectionBlock,
 	getParentSectionBlock,
 	getSelectedBlockStyleState,
-	getStyleStateViewport,
 	hasSelectedStyleState,
 	isSelectedBlockStyleStateShownOnCanvas,
 	shouldRenderBlockListView,
@@ -74,18 +73,6 @@ describe( 'private selectors', () => {
 				'123456',
 				'78910',
 			] );
-		} );
-	} );
-
-	describe( 'getStyleStateViewport', () => {
-		it( 'returns default when no global viewport is set', () => {
-			expect( getStyleStateViewport( {} ) ).toBe( 'default' );
-		} );
-
-		it( 'returns the global viewport when set', () => {
-			expect(
-				getStyleStateViewport( { styleStateViewport: '@tablet' } )
-			).toBe( '@tablet' );
 		} );
 	} );
 
@@ -249,20 +236,6 @@ describe( 'private selectors', () => {
 				viewport: '@mobile',
 				pseudo: ':hover',
 			} );
-		} );
-
-		it( 'always derives viewport from the global state, ignoring any per-block viewport', () => {
-			const state = {
-				styleStateViewport: '@tablet',
-				selectedBlockStyleState: {
-					clientId: 'client-1',
-					value: { viewport: '@mobile', pseudo: ':hover' },
-				},
-			};
-
-			expect(
-				getSelectedBlockStyleState( state, 'client-1' ).viewport
-			).toBe( '@tablet' );
 		} );
 
 		it( 'returns default pseudo when the selected state has no value', () => {
