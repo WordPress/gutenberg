@@ -34,7 +34,7 @@
 	border-radius: $radius-small;
 	color: $components-color-foreground;
 
-	&:not(.is-link) {
+	&:not(.is-link):not(.has-icon) {
 		// Minimum width to ensure visual balance for very short labels (like "Ok").
 		// 4ch (roughly 4 characters) + horizontal padding (12px * 2).
 		min-width: calc(4ch + 24px);
@@ -309,7 +309,7 @@
 		padding: 0 8px;
 		font-size: 11px;
 
-		&:not(.is-link) {
+		&:not(.is-link):not(.has-icon) {
 			min-width: calc(4ch + 16px);
 		}
 

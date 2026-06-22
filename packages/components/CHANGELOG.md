@@ -74,6 +74,7 @@
 ### Enhancements
 
 -   `BaseControl`: Apply `text-wrap: pretty` to help text to avoid typographic widows ([#79112](https://github.com/WordPress/gutenberg/pull/79112)).
+-   `Button`: Add a minimum width to text-based buttons to ensure visual balance for short labels ([#79286](https://github.com/WordPress/gutenberg/pull/79286)).
 -   `Button`, `DropdownMenu`, `FormToggle`, `Modal`, `Panel`, `RadioControl`, `Toolbar`: Migrate hardcoded border and stroke colors to WPDS tokens ([#79244](https://github.com/WordPress/gutenberg/pull/79244)).
 
 ### Bug Fixes
