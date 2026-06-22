@@ -11,22 +11,15 @@ const transforms = {
 			blocks: [ 'core/code' ],
 			transform: ( { content: html } ) => {
 				// The code block may output HTML formatting, so convert it
-				// to plain text.
+				// to plain text, then parse it so any block delimiters become
+				// editable inner blocks at their positions within the static
+				// HTML, rather than inert comment text.
 				const text = create( { html } ).text;
-
-				// Re-parse the markup so any block delimiters become editable
-				// inner blocks at their positions within the static HTML,
-				// rather than inert comment text.
 				const [ block ] = parse(
 					`<!-- wp:html -->\n${ text }\n<!-- /wp:html -->`
 				);
 
-				return createBlock(
-					'core/html',
-					{},
-					block?.innerBlocks ?? [],
-					block?.innerContent ?? [ text ]
-				);
+				return block ?? createBlock( 'core/html', {}, [], [ text ] );
 			},
 		},
 	],
