@@ -270,78 +270,6 @@ function setTimeMarker( marker, percent, label ) {
 }
 
 /**
- * Create marker data for WaveformPlayer's marker API.
- *
- * @param {number} currentTime - The current playback position.
- * @param {number} duration    - The track duration.
- * @param {string} color       - Marker color.
- * @return {Array} WaveformPlayer marker objects.
- */
-function createWaveformPlayerMarkers( currentTime, duration, color ) {
-	const clampedCurrentTime = clamp( currentTime, 0, duration );
-	return [
-		{
-			time: clampedCurrentTime,
-			label: formatTime( clampedCurrentTime ),
-			color,
-		},
-		{
-			time: duration,
-			label: formatTime( duration ),
-			color,
-		},
-	];
-}
-
-/**
- * Add Playlist-specific marker classes after WaveformPlayer renders markers.
- *
- * @param {Element} markersContainer - WaveformPlayer markers container.
- */
-function decorateWaveformPlayerMarkers( markersContainer ) {
-	const [ currentMarker, endMarker ] =
-		markersContainer.querySelectorAll( '.waveform-marker' );
-
-	if ( currentMarker ) {
-		currentMarker.classList.add(
-			'wp-block-playlist__time-marker',
-			'wp-block-playlist__time-marker--current',
-			'is-visible'
-		);
-		// These markers are decorative time labels, so keep them out of the
-		// tab order and hidden from assistive technology.
-		currentMarker.tabIndex = -1;
-		currentMarker.setAttribute( 'aria-hidden', 'true' );
-		currentMarker.style.color = toOpaqueColor(
-			currentMarker.style.backgroundColor
-		);
-		currentMarker.style.setProperty(
-			'--wp-playlist-time-marker-label-offset',
-			parseFloat( currentMarker.style.left ) < 5
-				? '0'
-				: 'calc(-100% - 0.35rem)'
-		);
-	}
-
-	if ( endMarker ) {
-		endMarker.classList.add(
-			'wp-block-playlist__time-marker',
-			'wp-block-playlist__time-marker--end',
-			'is-visible'
-		);
-		endMarker.tabIndex = -1;
-		endMarker.setAttribute( 'aria-hidden', 'true' );
-		endMarker.style.color = toOpaqueColor(
-			endMarker.style.backgroundColor
-		);
-		endMarker.style.setProperty(
-			'--wp-playlist-time-marker-label-offset',
-			'calc(-100% - 0.35rem)'
-		);
-	}
-}
-
-/**
  * Set up current, hover, and duration timestamp markers on the waveform.
  *
  * @param {Object}  instance  - The WaveformPlayer library instance.
@@ -361,14 +289,18 @@ export function setupWaveformTimeMarkers( instance, container ) {
 	hoverRegion.className = 'wp-block-playlist__waveform-hover-region';
 	waveformArea.prepend( hoverRegion );
 
+	const currentMarker = createTimeMarker( documentRef, 'current' );
+	const endMarker = createTimeMarker( documentRef, 'end' );
 	const hoverMarker = createTimeMarker( documentRef, 'hover' );
 
-	markersContainer.append( hoverMarker );
+	markersContainer.append( currentMarker, endMarker, hoverMarker );
 
-	const ensureHoverMarker = () => {
-		if ( ! hoverMarker.parentElement ) {
-			markersContainer.append( hoverMarker );
-		}
+	const ensureTimeMarkers = () => {
+		[ currentMarker, endMarker, hoverMarker ].forEach( ( marker ) => {
+			if ( ! marker.parentElement ) {
+				markersContainer.append( marker );
+			}
+		} );
 	};
 
 	const getDuration = () => {
@@ -389,31 +321,29 @@ export function setupWaveformTimeMarkers( instance, container ) {
 		);
 	};
 
-	const updateWaveformPlayerMarkers = () => {
+	const updateTimeMarkers = () => {
 		const durationSeconds = getDuration();
+		const currentTime = Number.isFinite( instance.audio.currentTime )
+			? instance.audio.currentTime
+			: 0;
+		const markerColor = toOpaqueColor( getMarkerColor() );
+
+		currentMarker.style.color = markerColor;
+		endMarker.style.color = markerColor;
+		ensureTimeMarkers();
 
 		if ( ! durationSeconds ) {
-			instance.options.markers = [];
-			instance.renderMarkers();
-			ensureHoverMarker();
+			setTimeMarker( currentMarker, 0, formatTime( currentTime ) );
+			endMarker.classList.remove( 'is-visible' );
 			return;
 		}
 
-		if ( ! hasDuration( instance.audio.duration ) ) {
-			instance.options.markers = [];
-			instance.renderMarkers();
-			ensureHoverMarker();
-			return;
-		}
-
-		instance.options.markers = createWaveformPlayerMarkers(
-			instance.audio.currentTime,
-			durationSeconds,
-			getMarkerColor()
+		setTimeMarker(
+			currentMarker,
+			currentTime / durationSeconds,
+			formatTime( clamp( currentTime, 0, durationSeconds ) )
 		);
-		instance.renderMarkers();
-		ensureHoverMarker();
-		decorateWaveformPlayerMarkers( markersContainer );
+		setTimeMarker( endMarker, 1, formatTime( durationSeconds ) );
 	};
 
 	const updateHoverMarker = ( event ) => {
@@ -431,11 +361,12 @@ export function setupWaveformTimeMarkers( instance, container ) {
 		);
 
 		const markerColor = getMarkerColor();
+		const opaqueMarkerColor = toOpaqueColor( markerColor );
 		waveformArea.classList.add( 'is-hovering' );
 		hoverRegion.style.width = `${ percent * 100 }%`;
-		hoverMarker.style.backgroundColor = markerColor;
-		hoverMarker.style.color = toOpaqueColor( markerColor );
-		ensureHoverMarker();
+		hoverMarker.style.backgroundColor = opaqueMarkerColor;
+		hoverMarker.style.color = opaqueMarkerColor;
+		ensureTimeMarkers();
 		setTimeMarker(
 			hoverMarker,
 			percent,
@@ -452,40 +383,31 @@ export function setupWaveformTimeMarkers( instance, container ) {
 	const previousOnTimeUpdate = instance.options.onTimeUpdate;
 	instance.options.onTimeUpdate = ( currentTime, trackDuration, player ) => {
 		previousOnTimeUpdate?.( currentTime, trackDuration, player );
-		updateWaveformPlayerMarkers();
+		updateTimeMarkers();
 	};
 
 	waveformArea.addEventListener( 'mousemove', updateHoverMarker );
 	waveformArea.addEventListener( 'mouseleave', hideHoverMarker );
-	instance.audio.addEventListener(
-		'loadedmetadata',
-		updateWaveformPlayerMarkers
-	);
-	instance.audio.addEventListener(
-		'durationchange',
-		updateWaveformPlayerMarkers
-	);
-	container.addEventListener(
-		'waveformplayer:ended',
-		updateWaveformPlayerMarkers
-	);
+	instance.audio.addEventListener( 'loadedmetadata', updateTimeMarkers );
+	instance.audio.addEventListener( 'durationchange', updateTimeMarkers );
+	container.addEventListener( 'waveformplayer:ended', updateTimeMarkers );
 
-	updateWaveformPlayerMarkers();
+	updateTimeMarkers();
 
 	return () => {
 		waveformArea.removeEventListener( 'mousemove', updateHoverMarker );
 		waveformArea.removeEventListener( 'mouseleave', hideHoverMarker );
 		instance.audio.removeEventListener(
 			'loadedmetadata',
-			updateWaveformPlayerMarkers
+			updateTimeMarkers
 		);
 		instance.audio.removeEventListener(
 			'durationchange',
-			updateWaveformPlayerMarkers
+			updateTimeMarkers
 		);
 		container.removeEventListener(
 			'waveformplayer:ended',
-			updateWaveformPlayerMarkers
+			updateTimeMarkers
 		);
 		instance.options.onTimeUpdate = previousOnTimeUpdate;
 		markersContainer

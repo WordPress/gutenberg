@@ -343,19 +343,7 @@ describe( 'Waveform utilities', () => {
 				color: 'rgb(0, 0, 0)',
 			} );
 			expect( endMarker ).toHaveTextContent( '3:00' );
-			expect( instance.renderMarkers ).toHaveBeenCalled();
-			expect( instance.options.markers ).toEqual( [
-				expect.objectContaining( {
-					time: 45,
-					label: '0:45',
-					color: 'rgba(0, 0, 0, 0.3)',
-				} ),
-				expect.objectContaining( {
-					time: 180,
-					label: '3:00',
-					color: 'rgba(0, 0, 0, 0.3)',
-				} ),
-			] );
+			expect( instance.renderMarkers ).not.toHaveBeenCalled();
 		} );
 
 		it( 'should clamp the current marker label to the duration', () => {
@@ -422,7 +410,7 @@ describe( 'Waveform utilities', () => {
 			expect( hoverRegion ).toHaveStyle( { width: '50%' } );
 		} );
 
-		it( 'should use fallback duration for the hover marker', () => {
+		it( 'should use fallback duration for time markers before metadata loads', () => {
 			const { container, instance, waveformArea } =
 				createMarkerTestContext( {
 					duration: Number.NaN,
@@ -440,14 +428,41 @@ describe( 'Waveform utilities', () => {
 			const hoverMarker = container.querySelector(
 				'.wp-block-playlist__time-marker--hover'
 			);
+			const currentMarker = container.querySelector(
+				'.wp-block-playlist__time-marker--current'
+			);
+			const endMarker = container.querySelector(
+				'.wp-block-playlist__time-marker--end'
+			);
 
+			expect( currentMarker ).toHaveClass( 'is-visible' );
+			expect( currentMarker ).toHaveStyle( { left: '0%' } );
+			expect( currentMarker ).toHaveTextContent( '0:00' );
 			expect( hoverMarker ).toHaveClass( 'is-visible' );
 			expect( hoverMarker ).toHaveTextContent( '1:00' );
-			expect(
-				container.querySelector(
-					'.wp-block-playlist__time-marker--end'
-				)
-			).toBeNull();
+			expect( endMarker ).toHaveClass( 'is-visible' );
+			expect( endMarker ).toHaveStyle( { left: '100%' } );
+			expect( endMarker ).toHaveTextContent( '2:00' );
+		} );
+
+		it( 'should show the current marker when duration is unavailable', () => {
+			const { container, instance } = createMarkerTestContext( {
+				duration: Number.NaN,
+			} );
+
+			setupWaveformTimeMarkers( instance, container );
+
+			const currentMarker = container.querySelector(
+				'.wp-block-playlist__time-marker--current'
+			);
+			const endMarker = container.querySelector(
+				'.wp-block-playlist__time-marker--end'
+			);
+
+			expect( currentMarker ).toHaveClass( 'is-visible' );
+			expect( currentMarker ).toHaveStyle( { left: '0%' } );
+			expect( currentMarker ).toHaveTextContent( '0:00' );
+			expect( endMarker ).not.toHaveClass( 'is-visible' );
 		} );
 
 		it( 'should hide the hover marker on mouse leave', () => {
