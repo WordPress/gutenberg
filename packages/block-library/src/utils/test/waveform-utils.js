@@ -313,6 +313,27 @@ describe( 'Waveform utilities', () => {
 			);
 
 			expect( instance.seekTo ).toHaveBeenCalledTimes( 1 );
+			expect( instance.seekTo ).toHaveBeenCalledWith( 5 );
+		} );
+
+		it( 'seeks from the current media time while playing', () => {
+			const { container, instance, seekControl } =
+				createSeekControlFixture( {
+					duration: 60,
+					currentTime: 10,
+				} );
+
+			setupSeekControlAccessibility( container, instance );
+
+			container.dispatchEvent( new CustomEvent( 'waveformplayer:play' ) );
+			seekControl.dispatchEvent(
+				new window.KeyboardEvent( 'keydown', {
+					key: 'ArrowRight',
+					bubbles: true,
+					cancelable: true,
+				} )
+			);
+
 			expect( instance.seekTo ).toHaveBeenCalledWith( 15 );
 		} );
 
@@ -332,7 +353,7 @@ describe( 'Waveform utilities', () => {
 					cancelable: true,
 				} )
 			);
-			expect( instance.seekTo ).toHaveBeenLastCalledWith( 15 );
+			expect( instance.seekTo ).toHaveBeenLastCalledWith( 5 );
 
 			seekControl.dispatchEvent(
 				new window.KeyboardEvent( 'keydown', {
@@ -341,7 +362,28 @@ describe( 'Waveform utilities', () => {
 					cancelable: true,
 				} )
 			);
-			expect( instance.seekTo ).toHaveBeenLastCalledWith( 5 );
+			expect( instance.seekTo ).toHaveBeenLastCalledWith( 0 );
+		} );
+
+		it( 'uses the larger seek step when shift is pressed', () => {
+			const { container, instance, seekControl } =
+				createSeekControlFixture( {
+					duration: 60,
+					currentTime: 10,
+				} );
+
+			setupSeekControlAccessibility( container, instance );
+
+			seekControl.dispatchEvent(
+				new window.KeyboardEvent( 'keydown', {
+					key: 'ArrowRight',
+					shiftKey: true,
+					bubbles: true,
+					cancelable: true,
+				} )
+			);
+
+			expect( instance.seekTo ).toHaveBeenCalledWith( 10 );
 		} );
 
 		it( 'updates the seek control label', () => {
@@ -372,7 +414,7 @@ describe( 'Waveform utilities', () => {
 			expect( seekControl ).toHaveFocus();
 		} );
 
-		it( 'renders a focus playhead at the current position with a timestamp', () => {
+		it( 'renders the initial focus playhead at the beginning with a timestamp', () => {
 			const { container, instance, seekControl } =
 				createSeekControlFixture( { duration: 180, currentTime: 45 } );
 
@@ -382,16 +424,17 @@ describe( 'Waveform utilities', () => {
 				'.waveform-seek-playhead'
 			);
 			expect( playhead ).not.toBeNull();
-			expect( playhead ).toHaveStyle( { left: '25%' } );
-			expect( playhead ).toHaveTextContent( '0:45' );
+			expect( playhead ).toHaveStyle( { left: '0%' } );
+			expect( playhead ).toHaveTextContent( '0:00' );
 		} );
 
-		it( 'moves the playhead as the current time changes', () => {
+		it( 'moves the playhead as the current time changes while playing', () => {
 			const { audio, container, instance, seekControl } =
 				createSeekControlFixture( { duration: 180, currentTime: 45 } );
 
 			setupSeekControlAccessibility( container, instance );
 
+			container.dispatchEvent( new CustomEvent( 'waveformplayer:play' ) );
 			audio.currentTime = 90;
 			instance.options.onTimeUpdate( 90, 180, instance );
 
@@ -400,6 +443,55 @@ describe( 'Waveform utilities', () => {
 			);
 			expect( playhead ).toHaveStyle( { left: '50%' } );
 			expect( playhead ).toHaveTextContent( '1:30' );
+		} );
+
+		it( 'resets the focus playhead when playback ends', () => {
+			const { audio, container, instance, seekControl } =
+				createSeekControlFixture( { duration: 180, currentTime: 45 } );
+
+			setupSeekControlAccessibility( container, instance );
+
+			container.dispatchEvent( new CustomEvent( 'waveformplayer:play' ) );
+			audio.currentTime = 90;
+			instance.options.onTimeUpdate( 90, 180, instance );
+			container.dispatchEvent(
+				new CustomEvent( 'waveformplayer:ended' )
+			);
+
+			const playhead = seekControl.querySelector(
+				'.waveform-seek-playhead'
+			);
+			expect( playhead ).toHaveStyle( { left: '0%' } );
+			expect( playhead ).toHaveTextContent( '0:00' );
+		} );
+
+		it( 'moves the focus playhead to the clicked position while stopped', () => {
+			const { container, instance, seekControl } =
+				createSeekControlFixture( { duration: 180, currentTime: 0 } );
+			seekControl.getBoundingClientRect = () => ( {
+				left: 0,
+				width: 200,
+				top: 0,
+				right: 200,
+				bottom: 100,
+				height: 100,
+			} );
+
+			setupSeekControlAccessibility( container, instance );
+
+			seekControl.dispatchEvent(
+				new window.MouseEvent( 'click', {
+					bubbles: true,
+					clientX: 100,
+				} )
+			);
+
+			const playhead = seekControl.querySelector(
+				'.waveform-seek-playhead'
+			);
+			expect( playhead ).toHaveStyle( { left: '50%' } );
+			expect( playhead ).toHaveTextContent( '1:30' );
+			expect( seekControl ).toHaveAttribute( 'aria-valuenow', '90' );
 		} );
 
 		it( 'shows a hover indicator and timestamp at the pointed position', () => {

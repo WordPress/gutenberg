@@ -220,6 +220,8 @@ export function setupSeekControlAccessibility(
 	};
 	const playhead = createOverlay( 'waveform-seek-playhead' );
 	const hover = createOverlay( 'waveform-seek-hover' );
+	let isPlaying = ! audio.paused;
+	let playheadTime = 0;
 
 	const positionOverlay = ( overlay, seconds, duration ) => {
 		const ratio = duration
@@ -229,12 +231,18 @@ export function setupSeekControlAccessibility(
 		overlay.tooltip.textContent = formatTimestamp( seconds );
 	};
 
-	const updateSeekControl = () => {
+	const updateSeekControl = ( {
+		syncPlayhead = isPlaying,
+		currentTimeOverride,
+	} = {} ) => {
 		const duration = getFiniteTime( audio.duration );
 		const currentTime = Math.min(
-			getFiniteTime( audio.currentTime ),
+			getFiniteTime( currentTimeOverride ?? audio.currentTime ),
 			duration
 		);
+		if ( syncPlayhead ) {
+			playheadTime = currentTime;
+		}
 
 		seekControl.setAttribute( 'aria-valuemax', String( duration ) );
 		seekControl.setAttribute( 'aria-valuenow', String( currentTime ) );
@@ -245,7 +253,7 @@ export function setupSeekControlAccessibility(
 			) }`
 		);
 
-		positionOverlay( playhead, currentTime, duration );
+		positionOverlay( playhead, playheadTime, duration );
 	};
 
 	seekControl.setAttribute( 'tabindex', '0' );
@@ -262,20 +270,30 @@ export function setupSeekControlAccessibility(
 	instance.options.onTimeUpdate = onTimeUpdate;
 
 	const seekTo = ( seconds ) => {
-		instance.seekTo(
-			Math.max( 0, Math.min( getFiniteTime( audio.duration ), seconds ) )
+		playheadTime = Math.max(
+			0,
+			Math.min( getFiniteTime( audio.duration ), seconds )
 		);
-		updateSeekControl();
+		instance.seekTo( playheadTime );
+		updateSeekControl( {
+			syncPlayhead: false,
+			currentTimeOverride: playheadTime,
+		} );
 	};
 
 	const onKeyDown = ( event ) => {
-		const currentTime = getFiniteTime( audio.currentTime );
+		const currentTime = isPlaying
+			? getFiniteTime( audio.currentTime )
+			: playheadTime;
 		const duration = getFiniteTime( audio.duration );
+		const step = event.shiftKey
+			? SEEK_LARGE_STEP_SECONDS
+			: SEEK_STEP_SECONDS;
 		const actions = {
-			ArrowLeft: () => seekTo( currentTime - SEEK_STEP_SECONDS ),
-			ArrowDown: () => seekTo( currentTime - SEEK_STEP_SECONDS ),
-			ArrowRight: () => seekTo( currentTime + SEEK_STEP_SECONDS ),
-			ArrowUp: () => seekTo( currentTime + SEEK_STEP_SECONDS ),
+			ArrowLeft: () => seekTo( currentTime - step ),
+			ArrowDown: () => seekTo( currentTime - step ),
+			ArrowRight: () => seekTo( currentTime + step ),
+			ArrowUp: () => seekTo( currentTime + step ),
 			PageDown: () => seekTo( currentTime - SEEK_LARGE_STEP_SECONDS ),
 			PageUp: () => seekTo( currentTime + SEEK_LARGE_STEP_SECONDS ),
 			Home: () => seekTo( 0 ),
@@ -299,6 +317,14 @@ export function setupSeekControlAccessibility(
 		}
 
 		seekControl.focus();
+		const seconds = getPointedSeconds( event );
+		if ( seconds !== undefined ) {
+			playheadTime = seconds;
+			updateSeekControl( {
+				syncPlayhead: false,
+				currentTimeOverride: playheadTime,
+			} );
+		}
 	};
 
 	// The library focuses the outer wrapper on click and can leave it in the
@@ -310,7 +336,7 @@ export function setupSeekControlAccessibility(
 		}
 	};
 
-	const onPointerMove = ( event ) => {
+	const getPointedSeconds = ( event ) => {
 		const rect = seekControl.getBoundingClientRect();
 		if ( ! rect.width ) {
 			return;
@@ -320,7 +346,16 @@ export function setupSeekControlAccessibility(
 			1,
 			Math.max( 0, ( event.clientX - rect.left ) / rect.width )
 		);
-		positionOverlay( hover, ratio * duration, duration );
+		return ratio * duration;
+	};
+
+	const onPointerMove = ( event ) => {
+		const seconds = getPointedSeconds( event );
+		if ( seconds === undefined ) {
+			return;
+		}
+		const duration = getFiniteTime( audio.duration );
+		positionOverlay( hover, seconds, duration );
 		seekControl.classList.add( 'is-seek-hovering' );
 	};
 
@@ -328,11 +363,30 @@ export function setupSeekControlAccessibility(
 		seekControl.classList.remove( 'is-seek-hovering' );
 	};
 
+	const onPlay = () => {
+		isPlaying = true;
+		updateSeekControl();
+	};
+	const onPause = () => {
+		isPlaying = false;
+	};
+	const onEnded = () => {
+		isPlaying = false;
+		playheadTime = 0;
+		updateSeekControl( {
+			syncPlayhead: false,
+			currentTimeOverride: playheadTime,
+		} );
+	};
+
 	seekControl.addEventListener( 'keydown', onKeyDown, true );
 	container.addEventListener( 'click', onContainerClick );
 	container.addEventListener( 'focusin', onContainerFocusIn );
 	seekControl.addEventListener( 'pointermove', onPointerMove );
 	seekControl.addEventListener( 'pointerleave', onPointerLeave );
+	container.addEventListener( 'waveformplayer:play', onPlay );
+	container.addEventListener( 'waveformplayer:pause', onPause );
+	container.addEventListener( 'waveformplayer:ended', onEnded );
 	audio.addEventListener( 'durationchange', updateSeekControl );
 	audio.addEventListener( 'loadedmetadata', updateSeekControl );
 
@@ -342,6 +396,9 @@ export function setupSeekControlAccessibility(
 		container.removeEventListener( 'focusin', onContainerFocusIn );
 		seekControl.removeEventListener( 'pointermove', onPointerMove );
 		seekControl.removeEventListener( 'pointerleave', onPointerLeave );
+		container.removeEventListener( 'waveformplayer:play', onPlay );
+		container.removeEventListener( 'waveformplayer:pause', onPause );
+		container.removeEventListener( 'waveformplayer:ended', onEnded );
 		audio.removeEventListener( 'durationchange', updateSeekControl );
 		audio.removeEventListener( 'loadedmetadata', updateSeekControl );
 		playhead.bar.remove();
