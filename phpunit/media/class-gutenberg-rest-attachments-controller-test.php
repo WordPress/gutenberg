@@ -1736,6 +1736,40 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	}
 
 	/**
+	 * Verifies that a user without the `upload_files` capability cannot sideload
+	 * an external image and that the request bails before any download happens.
+	 *
+	 * @covers ::create_item_from_url
+	 */
+	public function test_create_item_from_url_requires_upload_capability() {
+		$subscriber_id = self::factory()->user->create( array( 'role' => 'subscriber' ) );
+		wp_set_current_user( $subscriber_id );
+
+		// Fail loudly if the guard does not bail and a download is attempted.
+		$downloaded = false;
+		$track      = static function () use ( &$downloaded ) {
+			$downloaded = true;
+			return new WP_Error( 'http_request_failed', 'Should not be reached.' );
+		};
+		add_filter( 'pre_http_request', $track );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_param( 'url', 'https://example.com/denied.jpg' );
+
+		$controller = new Gutenberg_REST_Attachments_Controller( 'attachment' );
+		$method     = new ReflectionMethod( $controller, 'create_item_from_url' );
+		$method->setAccessible( true );
+		$result = $method->invoke( $controller, $request );
+
+		remove_filter( 'pre_http_request', $track );
+
+		$this->assertWPError( $result );
+		$this->assertSame( 'rest_cannot_create', $result->get_error_code() );
+		$this->assertSame( 403, $result->get_error_data()['status'] );
+		$this->assertFalse( $downloaded, 'No download should be attempted without upload_files.' );
+	}
+
+	/**
 	 * Verifies that the `url` argument is registered on the creatable media route
 	 * so requests can supply an external image URL to sideload.
 	 *
