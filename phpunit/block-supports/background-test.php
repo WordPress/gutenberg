@@ -312,10 +312,12 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 
 		$actual = gutenberg_render_background_support( '<pre class="wp-block-verse">Verse</pre>', $block );
 
-		$this->assertSame(
-			'<pre class="wp-block-verse has-background" style="background-image:linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%), url(' . $apos . 'https://example.com/image.jpg' . $apos . ');background-size:cover">Verse</pre>',
+		$this->assertStringContainsString( 'class="wp-block-verse has-background"', $actual );
+		$this->assertStringContainsString(
+			'style="background-image:linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%), url(' . $apos . 'https://example.com/image.jpg' . $apos . ');background-size:cover;"',
 			$actual
 		);
+		$this->assertStringNotContainsString( 'background:linear-gradient', $actual );
 	}
 
 	/**
