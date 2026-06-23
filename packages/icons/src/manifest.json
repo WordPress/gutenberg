@@ -181,7 +181,8 @@
 	{
 		"slug": "brush",
 		"label": "Brush",
-		"filePath": "library/brush.svg"
+		"filePath": "library/brush.svg",
+		"public": true
 	},
 	{
 		"slug": "bug",
@@ -491,7 +492,8 @@
 	{
 		"slug": "dashboard",
 		"label": "Dashboard",
-		"filePath": "library/dashboard.svg"
+		"filePath": "library/dashboard.svg",
+		"public": true
 	},
 	{
 		"slug": "desktop",
@@ -695,7 +697,8 @@
 	{
 		"slug": "grid",
 		"label": "Grid",
-		"filePath": "library/grid.svg"
+		"filePath": "library/grid.svg",
+		"public": true
 	},
 	{
 		"slug": "group",
@@ -918,7 +921,8 @@
 	{
 		"slug": "link",
 		"label": "Link",
-		"filePath": "library/link.svg"
+		"filePath": "library/link.svg",
+		"public": true
 	},
 	{
 		"slug": "link-off",
@@ -979,7 +983,8 @@
 	{
 		"slug": "media",
 		"label": "Media",
-		"filePath": "library/media.svg"
+		"filePath": "library/media.svg",
+		"public": true
 	},
 	{
 		"slug": "media-and-text",
@@ -1064,7 +1069,8 @@
 	{
 		"slug": "page",
 		"label": "Page",
-		"filePath": "library/page.svg"
+		"filePath": "library/page.svg",
+		"public": true
 	},
 	{
 		"slug": "page-break",
@@ -1128,7 +1134,8 @@
 	{
 		"slug": "plugins",
 		"label": "Plugins",
-		"filePath": "library/plugins.svg"
+		"filePath": "library/plugins.svg",
+		"public": true
 	},
 	{
 		"slug": "play",
@@ -1170,7 +1177,8 @@
 	{
 		"slug": "post",
 		"label": "Post",
-		"filePath": "library/post.svg"
+		"filePath": "library/post.svg",
+		"public": true
 	},
 	{
 		"slug": "post-author",
@@ -1688,7 +1696,8 @@
 	{
 		"slug": "tool",
 		"label": "Tool",
-		"filePath": "library/tool.svg"
+		"filePath": "library/tool.svg",
+		"public": true
 	},
 	{
 		"slug": "trash",
@@ -1733,7 +1742,8 @@
 	{
 		"slug": "update",
 		"label": "Update",
-		"filePath": "library/update.svg"
+		"filePath": "library/update.svg",
+		"public": true
 	},
 	{
 		"slug": "upload",
@@ -1765,6 +1775,7 @@
 	{
 		"slug": "wordpress",
 		"label": "WordPress",
-		"filePath": "library/wordpress.svg"
+		"filePath": "library/wordpress.svg",
+		"public": true
 	}
 ]
