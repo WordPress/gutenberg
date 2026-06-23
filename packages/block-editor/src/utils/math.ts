@@ -1,14 +1,14 @@
 /**
  * A string representing the name of an edge.
- *
- * @typedef {'top'|'right'|'bottom'|'left'} WPEdgeName
  */
+type EdgeName = 'top' | 'right' | 'bottom' | 'left';
 
-/**
- * @typedef  {Object} WPPoint
- * @property {number} x The horizontal position.
- * @property {number} y The vertical position.
- */
+interface Point {
+	/** The horizontal position. */
+	x: number;
+	/** The vertical position. */
+	y: number;
+}
 
 /**
  * Given a point, a DOMRect and the name of an edge, returns the distance to
@@ -23,11 +23,15 @@
  * - Lateral, meaning the axis running vertically when an edge is vertical
  *   and horizontally when an edge is horizontal.
  *
- * @param {WPPoint}    point The point to measure distance from.
- * @param {DOMRect}    rect  A DOM Rect containing edge positions.
- * @param {WPEdgeName} edge  The edge to measure to.
+ * @param point The point to measure distance from.
+ * @param rect  A DOM Rect containing edge positions.
+ * @param edge  The edge to measure to.
  */
-export function getDistanceFromPointToEdge( point, rect, edge ) {
+export function getDistanceFromPointToEdge(
+	point: Point,
+	rect: DOMRect,
+	edge: EdgeName
+) {
 	const isHorizontal = edge === 'top' || edge === 'bottom';
 	const { x, y } = point;
 	const pointLateralPosition = isHorizontal ? x : y;
@@ -62,21 +66,21 @@ export function getDistanceFromPointToEdge( point, rect, edge ) {
  * Given a point, a DOMRect and a list of allowed edges returns the name of and
  * distance to the nearest edge.
  *
- * @param {WPPoint}      point        The point to measure distance from.
- * @param {DOMRect}      rect         A DOM Rect containing edge positions.
- * @param {WPEdgeName[]} allowedEdges A list of the edges included in the
- *                                    calculation. Defaults to all edges.
+ * @param point        The point to measure distance from.
+ * @param rect         A DOM Rect containing edge positions.
+ * @param allowedEdges A list of the edges included in the
+ *                     calculation. Defaults to all edges.
  *
- * @return {[number, string]} An array where the first value is the distance
- *                              and a second is the edge name.
+ * @return An array where the first value is the distance
+ *         and a second is the edge name.
  */
 export function getDistanceToNearestEdge(
-	point,
-	rect,
-	allowedEdges = [ 'top', 'bottom', 'left', 'right' ]
+	point: Point,
+	rect: DOMRect,
+	allowedEdges: EdgeName[] = [ 'top', 'bottom', 'left', 'right' ]
 ) {
-	let candidateDistance;
-	let candidateEdge;
+	let candidateDistance: number | undefined;
+	let candidateEdge: EdgeName | undefined;
 
 	allowedEdges.forEach( ( edge ) => {
 		const distance = getDistanceFromPointToEdge( point, rect, edge );
@@ -93,12 +97,12 @@ export function getDistanceToNearestEdge(
 /**
  * Is the point contained by the rectangle.
  *
- * @param {WPPoint} point The point.
- * @param {DOMRect} rect  The rectangle.
+ * @param point The point.
+ * @param rect  The rectangle.
  *
- * @return {boolean} True if the point is contained by the rectangle, false otherwise.
+ * @return True if the point is contained by the rectangle, false otherwise.
  */
-export function isPointContainedByRect( point, rect ) {
+export function isPointContainedByRect( point: Point, rect: DOMRect ) {
 	return (
 		rect.left <= point.x &&
 		rect.right >= point.x &&
@@ -110,11 +114,14 @@ export function isPointContainedByRect( point, rect ) {
 /**
  * Is the point within the top and bottom boundaries of the rectangle.
  *
- * @param {WPPoint} point The point.
- * @param {DOMRect} rect  The rectangle.
+ * @param point The point.
+ * @param rect  The rectangle.
  *
- * @return {boolean} True if the point is within top and bottom of rectangle, false otherwise.
+ * @return True if the point is within top and bottom of rectangle, false otherwise.
  */
-export function isPointWithinTopAndBottomBoundariesOfRect( point, rect ) {
+export function isPointWithinTopAndBottomBoundariesOfRect(
+	point: Point,
+	rect: DOMRect
+) {
 	return rect.top <= point.y && rect.bottom >= point.y;
 }

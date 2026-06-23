@@ -38,6 +38,7 @@ const { usePostActions, patternTitleField } = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
+const VIEW_CONFIG_FIELDS = [ 'default_view', 'default_layouts' ];
 
 function usePagePatternsHeader( type, categoryId ) {
 	const { patternCategories } = usePatternCategories();
@@ -76,6 +77,7 @@ export default function DataviewsPatterns() {
 		useViewConfig( {
 			kind: 'postType',
 			name: postType,
+			fields: VIEW_CONFIG_FIELDS,
 		} );
 	const { view, updateView, isModified, resetToDefault } = useView( {
 		kind: 'postType',

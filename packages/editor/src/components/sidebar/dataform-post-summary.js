@@ -21,6 +21,7 @@ import { usePostTemplatePanelMode } from '../post-template/hooks';
 import revisionsField from '../../dataviews/fields/revisions';
 
 const EMPTY_FORM = { layout: { type: 'panel' }, fields: [] };
+const VIEW_CONFIG_FIELDS = [ 'form' ];
 
 // Some post types expose summary fields that edit entities other than the one
 // being edited. Keyed by the post type that needs them, the related records are
@@ -99,6 +100,7 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 	const { form: formConfig } = useViewConfig( {
 		kind: 'postType',
 		name: postType,
+		fields: VIEW_CONFIG_FIELDS,
 	} );
 	const form = formConfig ?? EMPTY_FORM;
 	const record = useSelect(

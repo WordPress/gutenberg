@@ -542,6 +542,20 @@ function _gutenberg_get_entity_view_config_post_type_wp_template_part( $config )
 
 	$config['view_list'] = $view_list;
 
+	$config['form'] = array(
+		'layout' => array( 'type' => 'panel' ),
+		'fields' => array(
+			array(
+				'id'     => 'last_edited_date',
+				'layout' => array(
+					'type'          => 'panel',
+					'labelPosition' => 'none',
+				),
+			),
+			'revisions',
+		),
+	);
+
 	return $config;
 }
 

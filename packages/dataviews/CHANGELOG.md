@@ -8,6 +8,7 @@
 
 ### Bug Fix
 
+- DataForm panel layout: fix double-clicking a field row leaving the flyout stuck open. [#79348](https://github.com/WordPress/gutenberg/pull/79348)
 - DataForm panel layout: use `overflow: clip` on field controls so focus rings of inner elements are no longer clipped. [#79275](https://github.com/WordPress/gutenberg/pull/79275)
 
 ### Code Quality

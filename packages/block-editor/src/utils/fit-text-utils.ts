@@ -3,14 +3,19 @@
  * Uses callback-based approach for maximum code reuse between editor and frontend.
  */
 
+type ApplyFontSize = ( size: number ) => void;
+
 /**
  * Find optimal font size using simple binary search between 0-2400px.
  *
- * @param {HTMLElement} textElement   The text element
- * @param {Function}    applyFontSize Function that receives font size in pixels
- * @return {number} Optimal font size
+ * @param textElement   The text element
+ * @param applyFontSize Function that receives font size in pixels
+ * @return Optimal font size
  */
-function findOptimalFontSize( textElement, applyFontSize ) {
+function findOptimalFontSize(
+	textElement: HTMLElement,
+	applyFontSize: ApplyFontSize
+) {
 	const alreadyHasScrollableHeight =
 		textElement.scrollHeight > textElement.clientHeight;
 	let minSize = 0;
@@ -85,10 +90,13 @@ function findOptimalFontSize( textElement, applyFontSize ) {
  * Complete fit text optimization for a single text element.
  * Handles the full flow using callbacks for font size application.
  *
- * @param {HTMLElement} textElement   The text element (paragraph, heading, etc.)
- * @param {Function}    applyFontSize Function that receives font size in pixels (0 to clear, >0 to apply)
+ * @param textElement   The text element (paragraph, heading, etc.)
+ * @param applyFontSize Function that receives font size in pixels (0 to clear, >0 to apply)
  */
-export function optimizeFitText( textElement, applyFontSize ) {
+export function optimizeFitText(
+	textElement: HTMLElement | null,
+	applyFontSize: ApplyFontSize
+) {
 	if ( ! textElement ) {
 		return;
 	}

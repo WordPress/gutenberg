@@ -4,12 +4,19 @@
 import { _x } from '@wordpress/i18n';
 
 /**
+ * Internal dependencies
+ */
+import type { FormattedFont } from './types';
+
+/**
  * Formats font weights to human readable names.
  *
- * @param {string} fontWeight font weight string
- * @return {Object} new object with formatted font weight
+ * @param fontWeight font weight string
+ * @return new object with formatted font weight
  */
-export function formatFontWeight( fontWeight ) {
+export function formatFontWeight(
+	fontWeight: FormattedFont | string | undefined
+): FormattedFont {
 	if ( ! fontWeight ) {
 		return {};
 	}
