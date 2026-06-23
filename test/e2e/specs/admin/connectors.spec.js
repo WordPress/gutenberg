@@ -667,6 +667,14 @@ test.describe( 'Connectors', () => {
 			await expect(
 				reloadedCard.getByRole( 'textbox', { name: 'Username' } )
 			).toHaveValue( '' );
+
+			const clearedSettings = await requestUtils.rest( {
+				path: '/wp/v2/settings',
+			} );
+			expect( clearedSettings[ USERNAME_SETTING ] ).toBe( '' );
+			expect( clearedSettings[ APPLICATION_PASSWORD_SETTING ] ).toBe(
+				''
+			);
 		} );
 	} );
 
