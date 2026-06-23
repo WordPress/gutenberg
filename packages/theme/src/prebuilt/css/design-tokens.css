@@ -273,6 +273,10 @@
 	--wpds-dimension-size-md: 32px;
 	/* Default size for buttons and inputs */
 	--wpds-dimension-size-lg: 40px;
+	/* For large media and interface elements */
+	--wpds-dimension-size-xl: 48px;
+	/* For extra large media and interface elements */
+	--wpds-dimension-size-2xl: 64px;
 	/* Extra small surface width */
 	--wpds-dimension-surface-width-xs: 240px;
 	/* Small surface width */

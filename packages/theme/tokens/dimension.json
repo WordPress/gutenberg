@@ -42,6 +42,10 @@
 				"90": {
 					"$value": { "value": 48, "unit": "px" },
 					"$description": "12x base spacing"
+				},
+				"100": {
+					"$value": { "value": 64, "unit": "px" },
+					"$description": "16x base spacing"
 				}
 			}
 		},
@@ -204,6 +208,20 @@
 			"lg": {
 				"$value": "{wpds-dimension.primitive.space.80}",
 				"$description": "Default size for buttons and inputs",
+				"$extensions": {
+					"com.figma.scopes": [ "WIDTH_HEIGHT" ]
+				}
+			},
+			"xl": {
+				"$value": "{wpds-dimension.primitive.space.90}",
+				"$description": "For large media and interface elements",
+				"$extensions": {
+					"com.figma.scopes": [ "WIDTH_HEIGHT" ]
+				}
+			},
+			"2xl": {
+				"$value": "{wpds-dimension.primitive.space.100}",
+				"$description": "For extra large media and interface elements",
 				"$extensions": {
 					"com.figma.scopes": [ "WIDTH_HEIGHT" ]
 				}

@@ -277,6 +277,8 @@ The interactive state of the element. The default (no modifier) is the idle stat
 | `--wpds-dimension-size-sm`           | For icons and small buttons                                              |
 | `--wpds-dimension-size-md`           | For medium-sized buttons and inputs                                      |
 | `--wpds-dimension-size-lg`           | Default size for buttons and inputs                                      |
+| `--wpds-dimension-size-xl`           | For large media and interface elements                                   |
+| `--wpds-dimension-size-2xl`          | For extra large media and interface elements                             |
 | `--wpds-dimension-surface-width-xs`  | Extra small surface width                                                |
 | `--wpds-dimension-surface-width-sm`  | Small surface width                                                      |
 | `--wpds-dimension-surface-width-md`  | Medium surface width                                                     |

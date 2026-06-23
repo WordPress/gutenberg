@@ -24,7 +24,9 @@ export type ElementSize =
 	| 'xs'
 	| 'sm'
 	| 'md'
-	| 'lg';
+	| 'lg'
+	| 'xl'
+	| '2xl';
 
 /**
  * Size scale for surface width tokens.
