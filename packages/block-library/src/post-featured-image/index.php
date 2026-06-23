@@ -32,7 +32,7 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 			$attr['alt'] = trim( strip_tags( $title ) );
 		} else {
 			$attr['alt'] = sprintf(
-				// translators: %d is the post ID.
+				/* translators: %d is the post ID. */
 				__( 'Untitled post %d' ),
 				$post_ID
 			);

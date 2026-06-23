@@ -129,7 +129,7 @@ function render_block_core_template_part( $attributes ) {
 
 	if ( isset( $seen_ids[ $template_part_id ] ) ) {
 		return $is_debug ?
-			// translators: Visible only in the front end, this warning takes the place of a faulty block.
+			/* translators: Visible only in the front end, this warning takes the place of a faulty block. */
 			__( '[block rendering halted]' ) :
 			'';
 	}

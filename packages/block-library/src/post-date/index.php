@@ -61,10 +61,10 @@ function render_block_core_post_date( $attributes, $content, $block ) {
 
 	if ( isset( $attributes['format'] ) && 'human-diff' === $attributes['format'] ) {
 		if ( $post_timestamp > time() ) {
-			// translators: %s: human-readable time difference.
+			/* translators: %s: human-readable time difference. */
 			$formatted_date = sprintf( __( '%s from now' ), human_time_diff( $post_timestamp ) );
 		} else {
-			// translators: %s: human-readable time difference.
+			/* translators: %s: human-readable time difference. */
 			$formatted_date = sprintf( __( '%s ago' ), human_time_diff( $post_timestamp ) );
 		}
 	} else {

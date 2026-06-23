@@ -109,7 +109,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				_doing_it_wrong(
 					__METHOD__,
 					sprintf(
-						// translators: %s is the name of any user-provided key
+						/* translators: %s is the name of any user-provided key */
 						__( 'Invalid icon property: "%s".', 'gutenberg' ),
 						$key
 					),

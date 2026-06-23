@@ -30,7 +30,7 @@ function render_block_core_post_content( $attributes, $content, $block ) {
 		$is_debug = WP_DEBUG && WP_DEBUG_DISPLAY;
 
 		return $is_debug ?
-			// translators: Visible only in the front end, this warning takes the place of a faulty block.
+			/* translators: Visible only in the front end, this warning takes the place of a faulty block. */
 			__( '[block rendering halted]' ) :
 			'';
 	}

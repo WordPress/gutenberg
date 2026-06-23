@@ -50,7 +50,7 @@ function render_block_core_pattern( $attributes ) {
 		$is_debug = WP_DEBUG && WP_DEBUG_DISPLAY;
 
 		return $is_debug ?
-			// translators: Visible only in the front end, this warning takes the place of a faulty block. %s represents a pattern's slug.
+			/* translators: Visible only in the front end, this warning takes the place of a faulty block. %s represents a pattern's slug. */
 			sprintf( __( '[block rendering halted for pattern "%s"]' ), $slug ) :
 			'';
 	}
