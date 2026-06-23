@@ -13,7 +13,7 @@ import {
 	Spinner,
 } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	DataViews,
 	filterSortAndPaginate,
@@ -40,7 +40,6 @@ import useNavigationLocations, {
 import useNavigationTemplateParts from './use-navigation-template-parts';
 import {
 	assignNavigationMenuToFirstBlock,
-	compareTemplatePartsByArea,
 	getLocationLabel,
 	getTemplatePartTitle,
 	getTemplatePartRawContent,
@@ -62,13 +61,32 @@ type LocationCandidate = {
 type LocationModalMode = 'choose' | 'update';
 
 const EMPTY_SELECTED_LOCATION_IDS: string[] = [];
-
-const LOCATION_AREA_OPTIONS = [
-	{ value: 'header', label: __( 'Header' ) },
-	{ value: 'footer', label: __( 'Footer' ) },
-	{ value: 'sidebar', label: __( 'Side area' ) },
-	{ value: 'other', label: __( 'Other' ) },
+const EMPTY_TEMPLATE_PART_AREAS: TemplatePartAreaDefinition[] = [];
+const UNCATEGORIZED_TEMPLATE_PART_AREA = 'uncategorized';
+const PREFERRED_TEMPLATE_PART_AREA_ORDER = [
+	'header',
+	'footer',
+	'sidebar',
+	'navigation-overlay',
+	UNCATEGORIZED_TEMPLATE_PART_AREA,
 ];
+
+type TemplatePartAreaDefinition = {
+	area: string;
+	label: string;
+	description?: string;
+	icon?: string;
+};
+
+type TemplatePartAreaRegistry = {
+	areas: TemplatePartAreaDefinition[];
+	areasBySlug: Map< string, TemplatePartAreaDefinition >;
+};
+
+type LocationAreaFilterOption = {
+	value: string;
+	label: string;
+};
 
 const DEFAULT_LOCATION_VIEW: View = {
 	type: 'grid',
@@ -85,28 +103,231 @@ const DEFAULT_LOCATION_VIEW: View = {
 	},
 };
 
-function getAreaValue( part: TemplatePartRecord ) {
-	if (
-		part.area === 'header' ||
-		part.area === 'footer' ||
-		part.area === 'sidebar'
-	) {
-		return part.area;
-	}
-
-	return 'other';
+function getFallbackTemplatePartAreas(): TemplatePartAreaDefinition[] {
+	return [
+		{ area: 'header', label: __( 'Header' ) },
+		{ area: 'footer', label: __( 'Footer' ) },
+		{ area: 'sidebar', label: __( 'Side area' ) },
+		{ area: 'navigation-overlay', label: __( 'Navigation Overlay' ) },
+		{ area: UNCATEGORIZED_TEMPLATE_PART_AREA, label: __( 'General' ) },
+	];
 }
 
-function getAreaLabel( area: string ) {
+function getTemplatePartAreaValue( part: TemplatePartRecord ) {
+	return part.area || UNCATEGORIZED_TEMPLATE_PART_AREA;
+}
+
+function getKnownPluralAreaLabel( area: string ) {
+	switch ( area ) {
+		case 'header':
+			return __( 'Headers' );
+		case 'footer':
+			return __( 'Footers' );
+		case 'sidebar':
+			return __( 'Side areas' );
+		case 'navigation-overlay':
+			return __( 'Navigation overlays' );
+		case UNCATEGORIZED_TEMPLATE_PART_AREA:
+			return __( 'General areas' );
+	}
+}
+
+function getTitleFromSlug( slug: string ) {
+	return slug
+		.split( /[-_]/ )
+		.filter( Boolean )
+		.map( ( part ) => part.charAt( 0 ).toUpperCase() + part.slice( 1 ) )
+		.join( ' ' );
+}
+
+function getAreaDefinition( area: string, registry: TemplatePartAreaRegistry ) {
+	return registry.areasBySlug.get( area );
+}
+
+function getSingularAreaLabel(
+	area: string,
+	registry: TemplatePartAreaRegistry
+) {
 	return (
-		LOCATION_AREA_OPTIONS.find( ( option ) => option.value === area )
-			?.label ?? __( 'Other' )
+		getAreaDefinition( area, registry )?.label || getTitleFromSlug( area )
 	);
+}
+
+function getPluralAreaLabel(
+	area: string,
+	registry: TemplatePartAreaRegistry
+) {
+	const knownLabel = getKnownPluralAreaLabel( area );
+
+	if ( knownLabel ) {
+		return knownLabel;
+	}
+
+	const label = getSingularAreaLabel( area, registry );
+
+	// WordPress exposes singular template part area labels. For custom areas in
+	// this prototype, keep the registered label intact and make the grouping
+	// read as plural without changing the underlying area slug.
+	if ( label.endsWith( 's' ) ) {
+		return label;
+	}
+
+	/* translators: %s: Template part area label, for example Hero or Utility. */
+	return sprintf( __( '%s areas' ), label );
+}
+
+function createTemplatePartAreaRegistry(
+	registeredAreas: TemplatePartAreaDefinition[]
+): TemplatePartAreaRegistry {
+	const fallbackAreas = getFallbackTemplatePartAreas();
+	const areasBySlug = new Map< string, TemplatePartAreaDefinition >();
+
+	for ( const area of [ ...registeredAreas, ...fallbackAreas ] ) {
+		if ( ! area.area || areasBySlug.has( area.area ) ) {
+			continue;
+		}
+
+		areasBySlug.set( area.area, area );
+	}
+
+	const areas = Array.from( areasBySlug.values() ).sort( ( first, second ) =>
+		compareAreaValues( first.area, second.area, { areasBySlug, areas: [] } )
+	);
+
+	return {
+		areas,
+		areasBySlug,
+	};
+}
+
+function useTemplatePartAreaRegistry() {
+	const registeredAreas = useSelect(
+		( select ) =>
+			select( coreStore ).getCurrentTheme()
+				?.default_template_part_areas ?? EMPTY_TEMPLATE_PART_AREAS,
+		[]
+	) as TemplatePartAreaDefinition[];
+
+	return useMemo(
+		() => createTemplatePartAreaRegistry( registeredAreas ),
+		[ registeredAreas ]
+	);
+}
+
+function getAreaOrder( area: string, registry: TemplatePartAreaRegistry ) {
+	const preferredIndex = PREFERRED_TEMPLATE_PART_AREA_ORDER.indexOf( area );
+
+	if ( preferredIndex !== -1 ) {
+		return preferredIndex;
+	}
+
+	const registeredIndex = registry.areas.findIndex(
+		( registeredArea ) => registeredArea.area === area
+	);
+
+	return registeredIndex === -1
+		? PREFERRED_TEMPLATE_PART_AREA_ORDER.length + registry.areas.length
+		: PREFERRED_TEMPLATE_PART_AREA_ORDER.length + registeredIndex;
+}
+
+function compareAreaValues(
+	firstArea: string,
+	secondArea: string,
+	registry: TemplatePartAreaRegistry
+) {
+	const firstOrder = getAreaOrder( firstArea, registry );
+	const secondOrder = getAreaOrder( secondArea, registry );
+
+	if ( firstOrder !== secondOrder ) {
+		return firstOrder - secondOrder;
+	}
+
+	return getPluralAreaLabel( firstArea, registry ).localeCompare(
+		getPluralAreaLabel( secondArea, registry )
+	);
+}
+
+function normalizeMatchValue( value: string | number | undefined ) {
+	return String( value ?? '' )
+		.toLowerCase()
+		.replace( /[^a-z0-9]+/g, '' );
+}
+
+function getTemplatePartAreaMatchScore(
+	part: TemplatePartRecord,
+	registry: TemplatePartAreaRegistry
+) {
+	const area = getTemplatePartAreaValue( part );
+	const normalizedArea = normalizeMatchValue( area );
+	const normalizedAreaLabel = normalizeMatchValue(
+		getSingularAreaLabel( area, registry )
+	);
+	const targets = [ normalizedArea, normalizedAreaLabel ].filter( Boolean );
+	const candidates = [ getTemplatePartTitle( part ), part.slug, part.id ].map(
+		normalizeMatchValue
+	);
+
+	let bestScore = 3;
+
+	for ( const candidate of candidates ) {
+		for ( const target of targets ) {
+			if ( candidate === target ) {
+				bestScore = Math.min( bestScore, 0 );
+			} else if ( candidate.startsWith( target ) ) {
+				bestScore = Math.min( bestScore, 1 );
+			} else if ( candidate.includes( target ) ) {
+				bestScore = Math.min( bestScore, 2 );
+			}
+		}
+	}
+
+	return bestScore;
+}
+
+function compareTemplatePartsByRegisteredArea(
+	firstPart: TemplatePartRecord,
+	secondPart: TemplatePartRecord,
+	registry: TemplatePartAreaRegistry
+) {
+	const firstArea = getTemplatePartAreaValue( firstPart );
+	const secondArea = getTemplatePartAreaValue( secondPart );
+	const areaComparison = compareAreaValues( firstArea, secondArea, registry );
+
+	if ( areaComparison !== 0 ) {
+		return areaComparison;
+	}
+
+	const scoreComparison =
+		getTemplatePartAreaMatchScore( firstPart, registry ) -
+		getTemplatePartAreaMatchScore( secondPart, registry );
+
+	if ( scoreComparison !== 0 ) {
+		return scoreComparison;
+	}
+
+	return getLocationLabel( firstPart ).localeCompare(
+		getLocationLabel( secondPart )
+	);
+}
+
+function getAreaFilterOptions(
+	areas: Iterable< string >,
+	registry: TemplatePartAreaRegistry
+): LocationAreaFilterOption[] {
+	return Array.from( new Set( areas ) )
+		.sort( ( firstArea, secondArea ) =>
+			compareAreaValues( firstArea, secondArea, registry )
+		)
+		.map( ( area ) => ( {
+			value: area,
+			label: getPluralAreaLabel( area, registry ),
+		} ) );
 }
 
 function getLocationCandidates(
 	templateParts: TemplatePartRecord[],
-	editedContentByPartId: Record< string, string | { raw?: string } >
+	editedContentByPartId: Record< string, string | { raw?: string } >,
+	areaRegistry: TemplatePartAreaRegistry
 ) {
 	return templateParts
 		.reduce< LocationCandidate[] >( ( locations, part ) => {
@@ -116,7 +337,7 @@ function getLocationCandidates(
 				return locations;
 			}
 
-			const area = getAreaValue( part );
+			const area = getTemplatePartAreaValue( part );
 			const title =
 				getTemplatePartTitle( part ) || getLocationLabel( part );
 
@@ -125,14 +346,14 @@ function getLocationCandidates(
 				part,
 				location: title,
 				area,
-				areaLabel: getAreaLabel( area ),
+				areaLabel: getPluralAreaLabel( area, areaRegistry ),
 				description:
-					area === 'other'
-						? __( 'Custom site area' )
+					area === UNCATEGORIZED_TEMPLATE_PART_AREA
+						? __( 'General site area' )
 						: sprintf(
 								/* translators: %s: Site area type, for example Header or Footer. */
-								__( '%s area of your site' ),
-								getAreaLabel( area )
+								__( '%s location on your site' ),
+								getSingularAreaLabel( area, areaRegistry )
 						  ),
 				previewContent: getTemplatePartRawContent(
 					part,
@@ -143,11 +364,69 @@ function getLocationCandidates(
 			return locations;
 		}, [] )
 		.sort( ( firstLocation, secondLocation ) =>
-			compareTemplatePartsByArea(
+			compareTemplatePartsByRegisteredArea(
 				firstLocation.part,
-				secondLocation.part
+				secondLocation.part,
+				areaRegistry
 			)
 		);
+}
+
+function getLocationFields(
+	areaFilterOptions: LocationAreaFilterOption[]
+): Field< LocationCandidate >[] {
+	return [
+		{
+			id: 'preview',
+			type: 'media',
+			label: __( 'Preview' ),
+			enableHiding: false,
+			enableSorting: false,
+			enableGlobalSearch: false,
+			filterBy: false,
+			render: ( { item } ) => (
+				<div className="routes-navigation-choose-location-modal__preview">
+					<Preview
+						content={ item.previewContent }
+						description={ item.location }
+					/>
+				</div>
+			),
+		},
+		{
+			id: 'location',
+			type: 'text',
+			label: __( 'Location' ),
+			enableHiding: false,
+			enableSorting: false,
+			enableGlobalSearch: true,
+			getValue: ( { item } ) => item.location,
+			render: ( { item } ) => <Text weight="600">{ item.location }</Text>,
+		},
+		{
+			id: 'area',
+			type: 'text',
+			label: __( 'Location type' ),
+			elements: areaFilterOptions,
+			filterBy: {
+				operators: [ 'isAny' ],
+				isPrimary: true,
+			},
+			enableSorting: false,
+			enableGlobalSearch: false,
+			getValue: ( { item } ) => item.area,
+			render: ( { item } ) => item.areaLabel,
+		},
+		{
+			id: 'description',
+			type: 'text',
+			label: __( 'Details' ),
+			filterBy: false,
+			enableSorting: false,
+			enableGlobalSearch: true,
+			getValue: ( { item } ) => item.description,
+		},
+	];
 }
 
 function LocationPreviewCard( { location }: { location: NavigationLocation } ) {
@@ -196,59 +475,6 @@ function LocationPreviewCard( { location }: { location: NavigationLocation } ) {
 		</div>
 	);
 }
-
-const locationFields: Field< LocationCandidate >[] = [
-	{
-		id: 'preview',
-		type: 'media',
-		label: __( 'Preview' ),
-		enableHiding: false,
-		enableSorting: false,
-		enableGlobalSearch: false,
-		filterBy: false,
-		render: ( { item } ) => (
-			<div className="routes-navigation-choose-location-modal__preview">
-				<Preview
-					content={ item.previewContent }
-					description={ item.location }
-				/>
-			</div>
-		),
-	},
-	{
-		id: 'location',
-		type: 'text',
-		label: __( 'Location' ),
-		enableHiding: false,
-		enableSorting: false,
-		enableGlobalSearch: true,
-		getValue: ( { item } ) => item.location,
-		render: ( { item } ) => <Text weight="600">{ item.location }</Text>,
-	},
-	{
-		id: 'area',
-		type: 'text',
-		label: __( 'Area' ),
-		elements: LOCATION_AREA_OPTIONS,
-		filterBy: {
-			operators: [ 'isAny' ],
-			isPrimary: true,
-		},
-		enableSorting: false,
-		enableGlobalSearch: false,
-		getValue: ( { item } ) => item.area,
-		render: ( { item } ) => item.areaLabel,
-	},
-	{
-		id: 'description',
-		type: 'text',
-		label: __( 'Details' ),
-		filterBy: false,
-		enableSorting: false,
-		enableGlobalSearch: true,
-		getValue: ( { item } ) => item.description,
-	},
-];
 
 function getLocationActionLabel( count: number, mode: LocationModalMode ) {
 	if ( mode === 'update' ) {
@@ -302,6 +528,7 @@ function ChooseLocationModal( {
 	);
 	const { templateParts, editedContentByPartId, isResolving } =
 		useNavigationTemplateParts();
+	const areaRegistry = useTemplatePartAreaRegistry();
 	const { editEntityRecord } = useDispatch( coreStore ) as {
 		editEntityRecord: (
 			kind: string,
@@ -312,8 +539,25 @@ function ChooseLocationModal( {
 	};
 
 	const candidates = useMemo(
-		() => getLocationCandidates( templateParts, editedContentByPartId ),
-		[ editedContentByPartId, templateParts ]
+		() =>
+			getLocationCandidates(
+				templateParts,
+				editedContentByPartId,
+				areaRegistry
+			),
+		[ areaRegistry, editedContentByPartId, templateParts ]
+	);
+	const areaFilterOptions = useMemo(
+		() =>
+			getAreaFilterOptions(
+				candidates.map( ( candidate ) => candidate.area ),
+				areaRegistry
+			),
+		[ areaRegistry, candidates ]
+	);
+	const locationFields = useMemo(
+		() => getLocationFields( areaFilterOptions ),
+		[ areaFilterOptions ]
 	);
 	const initialSelectionSignature = initialSelectedLocationIds.join( ',' );
 
@@ -323,7 +567,7 @@ function ChooseLocationModal( {
 
 	const { data: shownCandidates, paginationInfo } = useMemo(
 		() => filterSortAndPaginate( candidates, view, locationFields ),
-		[ candidates, view ]
+		[ candidates, locationFields, view ]
 	);
 	const selectedCandidates = useMemo(
 		() =>
@@ -579,6 +823,7 @@ export default function NavigationLocationsCanvas( {
 	navigationId?: number;
 } ) {
 	const { locationsMap, isResolving } = useNavigationLocations();
+	const areaRegistry = useTemplatePartAreaRegistry();
 	const [ selectedArea, setSelectedArea ] = useState< string | 'all' >(
 		'all'
 	);
@@ -587,8 +832,17 @@ export default function NavigationLocationsCanvas( {
 	>();
 
 	const locations = useMemo(
-		() => ( navigationId ? locationsMap[ navigationId ] ?? [] : [] ),
-		[ locationsMap, navigationId ]
+		() =>
+			[
+				...( navigationId ? locationsMap[ navigationId ] ?? [] : [] ),
+			].sort( ( firstLocation, secondLocation ) =>
+				compareTemplatePartsByRegisteredArea(
+					firstLocation.part,
+					secondLocation.part,
+					areaRegistry
+				)
+			),
+		[ areaRegistry, locationsMap, navigationId ]
 	);
 	const locationsSignature = locations
 		.map( ( location ) => location.id )
@@ -600,41 +854,42 @@ export default function NavigationLocationsCanvas( {
 
 	useEffect( () => {
 		setSelectedArea( 'all' );
-	}, [ locations, locations.length, locationsSignature, navigationId ] );
+	}, [ areaRegistry, locations.length, locationsSignature, navigationId ] );
 
 	const areaFilterOptions = useMemo( () => {
 		const areaCounts = locations.reduce< Map< string, number > >(
 			( counts, location ) => {
-				const area = getAreaValue( location.part );
+				const area = getTemplatePartAreaValue( location.part );
 				counts.set( area, ( counts.get( area ) ?? 0 ) + 1 );
 				return counts;
 			},
 			new Map()
 		);
 
-		return LOCATION_AREA_OPTIONS.filter( ( option ) =>
-			areaCounts.has( option.value )
-		).map( ( option ) => {
-			const count = areaCounts.get( option.value ) ?? 0;
+		return getAreaFilterOptions( areaCounts.keys(), areaRegistry ).map(
+			( option ) => {
+				const count = areaCounts.get( option.value ) ?? 0;
 
-			return {
-				value: option.value,
-				label: sprintf(
-					/* translators: 1: Location type, 2: Number of matching locations. */
-					__( '%1$s (%2$d)' ),
-					option.label,
-					count
-				),
-			};
-		} );
-	}, [ locations ] );
+				return {
+					value: option.value,
+					label: sprintf(
+						/* translators: 1: Location type, 2: Number of matching locations. */
+						__( '%1$s (%2$d)' ),
+						option.label,
+						count
+					),
+				};
+			}
+		);
+	}, [ areaRegistry, locations ] );
 
 	const visibleLocations =
 		selectedArea === 'all'
 			? locations
 			: locations.filter(
 					( location ) =>
-						getAreaValue( location.part ) === selectedArea
+						getTemplatePartAreaValue( location.part ) ===
+						selectedArea
 			  );
 	const showLocationFilter =
 		locations.length > 1 && areaFilterOptions.length > 1;

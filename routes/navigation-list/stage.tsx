@@ -13,6 +13,8 @@ import { DataViews } from '@wordpress/dataviews';
 import { Button } from '@wordpress/components';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { unlock } from '@wordpress/routes-lock-unlock';
+import { navigation as navigationIcon } from '@wordpress/icons';
+import { EmptyState } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -126,6 +128,29 @@ function NavigationList() {
 
 	const selection =
 		( searchParams.ids ?? [] ).map( ( id: number ) => id.toString() ) ?? [];
+	const emptyState =
+		! isResolving && totalItems === 0 ? (
+			<EmptyState.Root>
+				<EmptyState.Icon icon={ navigationIcon } />
+				<EmptyState.Title>
+					{ __( 'No navigation menus yet' ) }
+				</EmptyState.Title>
+				<EmptyState.Description>
+					{ __(
+						'Create your first menu to start adding links to your site navigation.'
+					) }
+				</EmptyState.Description>
+				<EmptyState.Actions>
+					<Button
+						variant="primary"
+						onClick={ () => setShowAddModal( true ) }
+						__next40pxDefaultSize
+					>
+						{ __( 'Add your first menu' ) }
+					</Button>
+				</EmptyState.Actions>
+			</EmptyState.Root>
+		) : undefined;
 
 	// Get the first navigation from the canvas loader if no selection
 	const firstNavigationId = useMemo( () => {
@@ -174,6 +199,7 @@ function NavigationList() {
 					defaultLayouts={ {
 						list: true,
 					} }
+					empty={ emptyState }
 					getItemId={ getItemId }
 					selection={ selection }
 					onReset={ isModified ? resetToDefault : false }

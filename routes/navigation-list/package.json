@@ -22,6 +22,7 @@
 		"@wordpress/routes-lock-unlock": "file:../lock-unlock",
 		"@wordpress/notices": "file:../../packages/notices",
 		"@wordpress/route": "file:../../packages/route",
+		"@wordpress/ui": "file:../../packages/ui",
 		"@wordpress/views": "file:../../packages/views"
 	}
 }

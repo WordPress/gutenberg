@@ -57,8 +57,14 @@ function getTemplatePartAreaPriority( part: TemplatePartRecord ) {
 			return 0;
 		case 'footer':
 			return 1;
-		default:
+		case 'sidebar':
 			return 2;
+		case 'navigation-overlay':
+			return 3;
+		case 'uncategorized':
+			return 4;
+		default:
+			return 5;
 	}
 }
 
@@ -95,6 +101,10 @@ export function getLocationLabel( part: TemplatePartRecord ) {
 			return __( 'Footer' );
 		case 'sidebar':
 			return __( 'Side area' );
+		case 'navigation-overlay':
+			return __( 'Navigation overlay' );
+		case 'uncategorized':
+			return __( 'General area' );
 	}
 
 	return getTemplatePartTitle( part ) || __( 'Site area' );

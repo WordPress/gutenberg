@@ -113,6 +113,70 @@ function gutenberg_site_editor_ensure_static_home_page() {
 add_action( 'site-editor-v2_init', 'gutenberg_site_editor_ensure_static_home_page', 1 );
 
 /**
+ * Check whether the prototype already has an editable Navigation menu.
+ *
+ * @return bool Whether a published or draft wp_navigation post exists.
+ */
+function gutenberg_site_editor_has_navigation_menu() {
+	$navigation_menus = get_posts(
+		array(
+			'fields'         => 'ids',
+			'no_found_rows'  => true,
+			'post_status'    => array( 'publish', 'draft' ),
+			'post_type'      => 'wp_navigation',
+			'posts_per_page' => 1,
+		)
+	);
+
+	return ! empty( $navigation_menus );
+}
+
+/**
+ * Ensure the Site Editor prototype starts with a standard Navigation menu.
+ *
+ * The Navigation block already has a server-side fallback system which can
+ * create or select a sensible wp_navigation post. This prototype wants that
+ * fallback to exist as an editable menu before users reach Navigation Menus, so
+ * the route is never an unexplained blank list after a clean wp-env reset.
+ *
+ * If Core's fallback class is unavailable or does not create a persistent menu,
+ * fall back to a small Page List based menu. The Page List block is intentional:
+ * it mirrors the default Navigation fallback and stays useful as pages are
+ * created during prototype testing.
+ */
+function gutenberg_site_editor_ensure_default_navigation_menu() {
+	if ( gutenberg_site_editor_has_navigation_menu() ) {
+		return;
+	}
+
+	if ( class_exists( 'WP_Navigation_Fallback' ) && method_exists( 'WP_Navigation_Fallback', 'get_fallback' ) ) {
+		$fallback_navigation = WP_Navigation_Fallback::get_fallback();
+
+		if (
+			$fallback_navigation instanceof WP_Post &&
+			'wp_navigation' === $fallback_navigation->post_type
+		) {
+			return;
+		}
+	}
+
+	if ( gutenberg_site_editor_has_navigation_menu() ) {
+		return;
+	}
+
+	wp_insert_post(
+		array(
+			'post_content' => '<!-- wp:page-list /-->',
+			'post_name'    => 'main-menu',
+			'post_status'  => 'publish',
+			'post_title'   => __( 'Main menu', 'gutenberg' ),
+			'post_type'    => 'wp_navigation',
+		)
+	);
+}
+add_action( 'site-editor-v2_init', 'gutenberg_site_editor_ensure_default_navigation_menu', 2 );
+
+/**
  * Check whether the current wp-admin request is embedded as a Site Editor
  * compatibility bridge.
  *

@@ -1237,7 +1237,15 @@ export default function Canvas( { canvas }: CanvasProps ) {
 					postId={ canvas.postId }
 					settings={ {
 						isPreviewMode: canvas.isPreview,
-						disableStartPageOptions: canvas.skipStartPageOptions,
+						// The Extensible Site Editor has its own "Choose a
+						// layout" page-creation flow. Core's existing
+						// "Choose a pattern" starter modal is a separate
+						// editor affordance and competes with that flow, so
+						// suppress it by default for canvases rendered here.
+						// Routes can still explicitly opt back in by setting
+						// `skipStartPageOptions` to false.
+						disableStartPageOptions:
+							canvas.skipStartPageOptions ?? true,
 						// Only preview mode needs a local style override. In edit
 						// mode, passing an empty `styles` array here replaces the
 						// lazy editor's resolved theme/global styles, which can
