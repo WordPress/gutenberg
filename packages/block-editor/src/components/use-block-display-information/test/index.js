@@ -18,7 +18,6 @@ import { isIsolatedEditorKey } from '../../../store/private-keys';
 
 jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
 jest.mock( '../../../lock-unlock', () => ( {
-	lock: ( value ) => value,
 	unlock: ( value ) => ( {
 		registerPrivateActions: jest.fn(),
 		registerPrivateSelectors: jest.fn(),
