@@ -25,6 +25,7 @@ import {
 	getRenderingMode,
 	getCurrentPost,
 	getCurrentPostType,
+	getCurrentPostId,
 	getEditorSettings,
 	getCurrentPostRevisionsCount,
 } from './selectors';
@@ -598,13 +599,22 @@ export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
 		}
 
 		const currentPostType = getCurrentPostType( state );
+		const currentPostId = getCurrentPostId( state );
 		const entityConfig = select( coreStore ).getEntityConfig(
 			'postType',
 			currentPostType
 		);
+		const syncConfig = entityConfig?.syncConfig;
 
 		return Boolean(
-			entityConfig?.syncConfig && window._wpCollaborationEnabled
+			syncConfig &&
+				syncConfig.supportsPersistence &&
+				window._wpCollaborationEnabled &&
+				false !==
+					syncConfig.shouldSync?.(
+						`postType/${ currentPostType }`,
+						currentPostId
+					)
 		);
 	}
 );

@@ -58,6 +58,7 @@ module.exports = {
 	testEnvironmentOptions: {
 		url: 'http://localhost/',
 	},
+	testLocationInResults: true,
 	testPathIgnorePatterns: [
 		'/.git/',
 		'/node_modules/',
@@ -73,7 +74,7 @@ module.exports = {
 		'^.+\\.m?[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
 	},
 	transformIgnorePatterns: [
-		'/node_modules/(?!(docker-compose|yaml|preact|@preact|parsel-js|comctx|uuid)/)',
+		'/node_modules/(?!(docker-compose|yaml|preact|@preact|parsel-js|comctx|uuid|marked)/)',
 		'\\.pnp\\.[^\\/]+$',
 	],
 	snapshotSerializers: [
@@ -91,5 +92,14 @@ module.exports = {
 	reporters: [
 		'default',
 		'<rootDir>packages/scripts/config/jest-github-actions-reporter/index.js',
-	],
+		process.env.CI
+			? [
+					'@flakiness/jest',
+					{
+						flakinessProject: 'WordPress/gutenberg',
+						duplicates: 'rename',
+					},
+			  ]
+			: undefined,
+	].filter( Boolean ),
 };
