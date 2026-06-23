@@ -190,7 +190,14 @@ const SpacerEdit = ( {
 	const style = {
 		height:
 			inheritedOrientation === 'horizontal'
-				? 24
+				? /*
+				   * When horizontal (inside a Row), the flex axis controls width
+				   * via flexBasis. Height must be set independently from the
+				   * `height` attribute so the user can control it from the
+				   * inspector — fall back to a visible minimum so the block
+				   * remains selectable when no height is set.
+				   */
+				  getSpacingPresetCssVar( temporaryHeight || height ) || 24
 				: getHeightForVerticalBlocks(),
 		width:
 			inheritedOrientation === 'horizontal'
@@ -362,15 +369,16 @@ const SpacerEdit = ( {
 				{ blockEditingMode === 'default' &&
 					resizableBoxWithOrientation( inheritedOrientation ) }
 			</View>
-			{ ! isFlexLayout && (
-				<SpacerControls
-					setAttributes={ setAttributes }
-					height={ temporaryHeight || height }
-					width={ temporaryWidth || width }
-					orientation={ inheritedOrientation }
-					isResizing={ isResizing }
-				/>
-			) }
+			<SpacerControls
+				setAttributes={ setAttributes }
+				height={ temporaryHeight || height }
+				width={ temporaryWidth || width }
+				orientation={ inheritedOrientation }
+				isResizing={ isResizing }
+				isFlexLayout={ isFlexLayout }
+				blockStyle={ blockStyle }
+				layout={ layout }
+			/>
 		</>
 	);
 };

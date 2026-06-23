@@ -90,8 +90,34 @@ export default function SpacerControls( {
 	height,
 	width,
 	isResizing,
+	isFlexLayout,
+	blockStyle,
+	layout,
 } ) {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	const isHorizontal = orientation === 'horizontal';
+
+	const handleWidthChange = ( nextWidth ) => {
+		if ( isFlexLayout ) {
+			setAttributes( {
+				width: nextWidth,
+				style: {
+					...blockStyle,
+					layout: {
+						...layout,
+						flexSize: nextWidth,
+						selfStretch: 'fixed',
+					},
+				},
+			} );
+		} else {
+			setAttributes( { width: nextWidth } );
+		}
+	};
+
+	const handleHeightChange = ( nextHeight ) => {
+		setAttributes( { height: nextHeight } );
+	};
 
 	return (
 		<InspectorControls>
@@ -105,7 +131,7 @@ export default function SpacerControls( {
 				} }
 				dropdownMenuProps={ dropdownMenuProps }
 			>
-				{ orientation === 'horizontal' && (
+				{ isHorizontal && (
 					<ToolsPanelItem
 						label={ __( 'Width' ) }
 						isShownByDefault
@@ -117,14 +143,18 @@ export default function SpacerControls( {
 						<DimensionInput
 							label={ __( 'Width' ) }
 							value={ width }
-							onChange={ ( nextWidth ) =>
-								setAttributes( { width: nextWidth } )
-							}
+							onChange={ handleWidthChange }
 							isResizing={ isResizing }
 						/>
 					</ToolsPanelItem>
 				) }
-				{ orientation !== 'horizontal' && (
+				{ /*
+				 * Height is always shown, including when the Spacer is a direct
+				 * descendant of a Row block (horizontal flex layout). A spacer
+				 * inside a wrapping Row still needs height control — e.g. to add
+				 * extra vertical space on mobile when the row's flex items stack.
+				 */ }
+				{ ( ! isHorizontal || isFlexLayout ) && (
 					<ToolsPanelItem
 						label={ __( 'Height' ) }
 						isShownByDefault
@@ -136,9 +166,7 @@ export default function SpacerControls( {
 						<DimensionInput
 							label={ __( 'Height' ) }
 							value={ height }
-							onChange={ ( nextHeight ) =>
-								setAttributes( { height: nextHeight } )
-							}
+							onChange={ handleHeightChange }
 							isResizing={ isResizing }
 						/>
 					</ToolsPanelItem>
