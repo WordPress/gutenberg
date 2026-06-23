@@ -23,9 +23,16 @@ import type {
 	OnSuccessHandler,
 	QueueItemId,
 	RetryItemAction,
+	ScheduleRetryAction,
 	State,
 } from './types';
-import { OperationType, Type } from './types';
+import { ItemStatus, OperationType, Type } from './types';
+import {
+	calculateRetryDelay,
+	clearRetryTimer,
+	retryTimers,
+	shouldRetryError,
+} from './utils/retry';
 import type {
 	addItem,
 	processItem,
@@ -33,7 +40,8 @@ import type {
 	revokeBlobUrls,
 } from './private-actions';
 import { maybeRecycleVipsWorker, vipsCancelOperations } from './utils';
-import { UploadError } from '../upload-error';
+import { debug } from './utils/debug-logger';
+import { ErrorCode, UploadError } from '../upload-error';
 import { validateMimeType } from '../validate-mime-type';
 import { validateMimeTypeForUser } from '../validate-mime-type-for-user';
 import { validateFileSize } from '../validate-file-size';
@@ -45,6 +53,8 @@ type ActionCreators = {
 	processItem: typeof processItem;
 	cancelItem: typeof cancelItem;
 	retryItem: typeof retryItem;
+	scheduleRetry: typeof scheduleRetry;
+	executeRetry: typeof executeRetry;
 	revokeBlobUrls: typeof revokeBlobUrls;
 	< T = Record< string, unknown > >( args: T ): void;
 };
@@ -140,6 +150,10 @@ export function addItems( {
 /**
  * Cancels an item in the queue based on an error.
  *
+ * If the error is retryable and the item hasn't exceeded the maximum
+ * retry attempts, it will be scheduled for automatic retry instead
+ * of being cancelled.
+ *
  * @param id     Item ID.
  * @param error  Error instance.
  * @param silent Whether to cancel the item silently,
@@ -160,6 +174,30 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 			return;
 		}
 
+		// Clear any pending retry timer for this item.
+		clearRetryTimer( id );
+
+		// Check if we should automatically retry instead of cancelling.
+		// Child sideload items are excluded: the parent owns the upload
+		// lifecycle and decides whether a sub-size failure should cancel
+		// the whole attachment or keep the partially-uploaded sub-sizes.
+		// Items whose primary upload already finished (attachment exists)
+		// are also excluded — the cancellation is cleanup, not a retry.
+		if ( ! silent && error && ! item.parentId && ! item.attachment?.id ) {
+			const settings = select.getSettings();
+			const retrySettings = settings.retry;
+
+			if ( retrySettings ) {
+				const retryCount = item.retryCount ?? 0;
+				const maxRetries = retrySettings.maxRetryAttempts;
+
+				if ( shouldRetryError( error, retryCount, maxRetries ) ) {
+					dispatch.scheduleRetry( id, error );
+					return;
+				}
+			}
+		}
+
 		item.abortController?.abort();
 
 		// Cancel any ongoing vips operations for this item.
@@ -175,6 +213,12 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 				// eslint-disable-next-line no-console -- Deliberately log errors here.
 				console.error( 'Upload cancelled', error );
 			}
+		} else {
+			debug(
+				`Item cancelled: ${ item.file.name } (item ${ id }): ${
+					error instanceof Error ? error.message : error
+				}`
+			);
 		}
 
 		const { currentOperation, parentId, batchId } = item;
@@ -269,7 +313,7 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 							code:
 								( error instanceof UploadError &&
 									error.code ) ||
-								'UPLOAD_ERROR',
+								ErrorCode.GENERAL,
 							message:
 								error?.message ||
 								__( 'The image could not be uploaded.' ),
@@ -283,6 +327,7 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 
 		// All items of this batch were cancelled or finished.
 		if ( batchId && select.isBatchUploaded( batchId ) ) {
+			debug( `Batch completed: ${ batchId }` );
 			item.onBatchSuccess?.();
 		}
 	};
@@ -311,6 +356,94 @@ export function retryItem( id: QueueItemId ) {
 			id,
 		} );
 
+		dispatch.processItem( id );
+	};
+}
+
+/**
+ * Schedules an automatic retry for a failed item.
+ *
+ * Uses exponential backoff with jitter to determine the retry delay.
+ * The item will be placed in PendingRetry status and automatically
+ * retried after the calculated delay.
+ *
+ * @param id    Item ID.
+ * @param error The error that caused the failure.
+ */
+export function scheduleRetry( id: QueueItemId, error: Error ) {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItem( id );
+		if ( ! item ) {
+			return;
+		}
+
+		const settings = select.getSettings();
+		const retrySettings = settings.retry;
+
+		if ( ! retrySettings ) {
+			return;
+		}
+
+		const currentRetryCount = item.retryCount ?? 0;
+
+		const delay = calculateRetryDelay( {
+			attempt: currentRetryCount + 1,
+			initialDelay: retrySettings.initialRetryDelayMs,
+			maxDelay: retrySettings.maxRetryDelayMs,
+			multiplier: retrySettings.backoffMultiplier,
+			jitter: retrySettings.retryJitter,
+		} );
+
+		// Schedule the retry execution and store timer ID for cleanup.
+		const timerId = setTimeout( () => {
+			retryTimers.delete( id );
+			dispatch.executeRetry( id );
+		}, delay );
+		retryTimers.set( id, timerId );
+
+		dispatch< ScheduleRetryAction >( {
+			type: Type.ScheduleRetry,
+			id,
+			error,
+			retryCount: currentRetryCount,
+			nextRetryTimestamp: Date.now() + delay,
+		} );
+	};
+}
+
+/**
+ * Executes a scheduled retry for an item.
+ *
+ * This is called by the timer set in scheduleRetry.
+ * It verifies the item is still in PendingRetry status before
+ * proceeding with the retry.
+ *
+ * @param id Item ID.
+ */
+export function executeRetry( id: QueueItemId ) {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItem( id );
+
+		// Verify item exists and is still pending retry
+		// (user may have manually cancelled or retried).
+		if ( ! item || item.status !== ItemStatus.PendingRetry ) {
+			return;
+		}
+
+		// If the queue is paused, leave the item in PendingRetry without
+		// mutating state. resumeQueue will re-trigger executeRetry for
+		// items in this status when the queue resumes.
+		if ( select.isPaused() ) {
+			return;
+		}
+
+		// Reset the item to Processing status and clear the error.
+		dispatch< RetryItemAction >( {
+			type: Type.RetryItem,
+			id,
+		} );
+
+		// Re-process the item.
 		dispatch.processItem( id );
 	};
 }

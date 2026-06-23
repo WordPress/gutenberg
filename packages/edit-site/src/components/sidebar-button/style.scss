@@ -1,7 +1,5 @@
-@use "@wordpress/base-styles/colors" as *;
-
 .edit-site-sidebar-button {
-	color: $gray-200;
+	color: var(--wpds-color-foreground-interactive-neutral);
 	flex-shrink: 0;
 
 	// Focus (resets default button focus and use focus-visible).
@@ -21,6 +19,6 @@
 	&:focus,
 	&:not(:disabled,[aria-disabled="true"]):active,
 	&[aria-expanded="true"] {
-		color: $gray-100;
+		color: var(--wpds-color-foreground-interactive-neutral-active);
 	}
 }

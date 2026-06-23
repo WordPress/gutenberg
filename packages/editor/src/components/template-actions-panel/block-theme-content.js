@@ -17,9 +17,9 @@ import {
 import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
+import { ENTER, SPACE } from '@wordpress/keycodes';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
 import { Tooltip } from '@wordpress/ui';
 
 /**
@@ -127,7 +127,15 @@ export default function TemplateActionsPanelContent() {
 								tabIndex={ 0 }
 								aria-label={ tooltipText }
 								onClick={ () => setIsSwapModalOpen( true ) }
-								onKeyPress={ () => setIsSwapModalOpen( true ) }
+								onKeyDown={ ( event ) => {
+									if (
+										event.keyCode === ENTER ||
+										event.keyCode === SPACE
+									) {
+										event.preventDefault();
+										setIsSwapModalOpen( true );
+									}
+								} }
 							>
 								{ previewContent }
 							</div>

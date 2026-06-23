@@ -19,8 +19,8 @@ export const PSEUDO_STATE_LABELS = {
 };
 
 export const RESPONSIVE_STATE_LABELS = {
-	tablet: __( 'Tablet' ),
-	mobile: __( 'Mobile' ),
+	'@tablet': __( 'Tablet' ),
+	'@mobile': __( 'Mobile' ),
 };
 
 // Keep in sync with WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS

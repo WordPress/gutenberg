@@ -7,7 +7,6 @@ import userEvent from '@testing-library/user-event';
 /**
  * WordPress dependencies
  */
-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
 import { Tooltip } from '@wordpress/ui';
 
 /**
@@ -16,13 +15,18 @@ import { Tooltip } from '@wordpress/ui';
 import Avatar from '..';
 
 /**
- * Wraps the avatar in a `Tooltip.Provider` with `delay={ 0 }` so hover-based
- * tooltip-presence assertions don't have to wait for the real-world delay.
+ * Wraps the avatar in a `Tooltip.Provider` with `delay={ 0 }` and
+ * `closeDelay={ 0 }` so hover-based tooltip-presence assertions don't have to
+ * wait for the real-world open/close delay.
  *
  * @param ui The avatar element (or anything else) to render.
  */
 function renderAvatar( ui: React.ReactElement ): ReturnType< typeof render > {
-	return render( <Tooltip.Provider delay={ 0 }>{ ui }</Tooltip.Provider> );
+	return render(
+		<Tooltip.Provider delay={ 0 } closeDelay={ 0 }>
+			{ ui }
+		</Tooltip.Provider>
+	);
 }
 
 /**

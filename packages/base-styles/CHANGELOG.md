@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+## 10.0.1 (2026-06-16)
+
+## 10.0.0 (2026-06-10)
+
+### Breaking Changes
+
+-   Remove the following entries from the `z-index()` helper ([#77773](https://github.com/WordPress/gutenberg/pull/77773)):
+   -   `.nux-dot-tip`
+
+## 9.0.0 (2026-05-27)
+
 ### Breaking Changes
 
 -   Remove the following entries from the `z-index()` helper ([#78315](https://github.com/WordPress/gutenberg/pull/78315), [#78362](https://github.com/WordPress/gutenberg/pull/78362)):

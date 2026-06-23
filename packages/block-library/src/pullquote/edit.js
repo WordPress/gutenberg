@@ -1,53 +1,26 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	AlignmentControl,
-	BlockControls,
-	RichText,
-	useBlockProps,
-} from '@wordpress/block-editor';
+import { RichText, useBlockProps } from '@wordpress/block-editor';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
-import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { Figure } from './figure';
 import { BlockQuote } from './blockquote';
+import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
-const isWebPlatform = Platform.OS === 'web';
-
-function PullQuoteEdit( {
-	attributes,
-	setAttributes,
-	isSelected,
-	insertBlocksAfter,
-} ) {
-	const { textAlign, citation, value } = attributes;
-	const blockProps = useBlockProps( {
-		className: clsx( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
-	} );
+function PullQuoteEdit( props ) {
+	const { attributes, setAttributes, isSelected, insertBlocksAfter } = props;
+	useDeprecatedTextAlign( props );
+	const { citation, value } = attributes;
+	const blockProps = useBlockProps();
 	const shouldShowCitation = ! RichText.isEmpty( citation ) || isSelected;
 
 	return (
 		<>
-			<BlockControls group="block">
-				<AlignmentControl
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
-				/>
-			</BlockControls>
 			<Figure { ...blockProps }>
 				<BlockQuote>
 					<RichText
@@ -64,12 +37,11 @@ function PullQuoteEdit( {
 							// translators: placeholder text used for the quote
 							__( 'Add quote' )
 						}
-						textAlign="center"
 					/>
 					{ shouldShowCitation && (
 						<RichText
 							identifier="citation"
-							tagName={ isWebPlatform ? 'cite' : undefined }
+							tagName="cite"
 							style={ { display: 'block' } }
 							value={ citation }
 							aria-label={ __( 'Pullquote citation text' ) }
@@ -83,8 +55,6 @@ function PullQuoteEdit( {
 								} )
 							}
 							className="wp-block-pullquote__citation"
-							__unstableMobileNoFocusOnMount
-							textAlign="center"
 							__unstableOnSplitAtEnd={ () =>
 								insertBlocksAfter(
 									createBlock( getDefaultBlockName() )

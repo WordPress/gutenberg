@@ -12,7 +12,6 @@ extend( [ a11yPlugin ] );
  */
 import { Icon as WCIcon } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
 import { Tooltip } from '@wordpress/ui';
 
 /**
