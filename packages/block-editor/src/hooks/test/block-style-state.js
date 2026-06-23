@@ -12,10 +12,7 @@ describe( 'getStyleForState', () => {
 		const style = { color: { text: '#000000' } };
 
 		expect(
-			getStyleForState( style, {
-				viewport: 'default',
-				pseudo: 'default',
-			} )
+			getStyleForState( style, { pseudo: 'default' }, 'default' )
 		).toBe( style );
 	} );
 
@@ -26,10 +23,7 @@ describe( 'getStyleForState', () => {
 		};
 
 		expect(
-			getStyleForState( style, {
-				viewport: 'default',
-				pseudo: ':hover',
-			} )
+			getStyleForState( style, { pseudo: ':hover' }, 'default' )
 		).toEqual( {
 			color: { text: '#ff0000' },
 		} );
@@ -42,10 +36,7 @@ describe( 'getStyleForState', () => {
 		};
 
 		expect(
-			getStyleForState( style, {
-				viewport: '@mobile',
-				pseudo: 'default',
-			} )
+			getStyleForState( style, { pseudo: 'default' }, '@mobile' )
 		).toEqual( {
 			color: { text: '#ff0000' },
 		} );
@@ -59,10 +50,7 @@ describe( 'getStyleForState', () => {
 		};
 
 		expect(
-			getStyleForState( style, {
-				viewport: '@mobile',
-				pseudo: ':hover',
-			} )
+			getStyleForState( style, { pseudo: ':hover' }, '@mobile' )
 		).toEqual( {
 			color: { text: '#ff0000' },
 		} );
@@ -74,10 +62,11 @@ describe( 'setStyleForState', () => {
 		expect(
 			setStyleForState(
 				{ color: { text: '#000000' } },
-				{ viewport: 'default', pseudo: 'default' },
+				{ pseudo: 'default' },
 				{
 					typography: { fontSize: '32px' },
-				}
+				},
+				'default'
 			)
 		).toEqual( {
 			typography: { fontSize: '32px' },
@@ -91,8 +80,9 @@ describe( 'setStyleForState', () => {
 					color: { text: '#000000' },
 					':hover': { color: { text: '#ff0000' } },
 				},
-				{ viewport: 'default', pseudo: ':hover' },
-				{ typography: { fontSize: '32px' } }
+				{ pseudo: ':hover' },
+				{ typography: { fontSize: '32px' } },
+				'default'
 			)
 		).toEqual( {
 			color: { text: '#000000' },
@@ -107,8 +97,9 @@ describe( 'setStyleForState', () => {
 					color: { text: '#000000' },
 					'@mobile': { color: { text: '#ff0000' } },
 				},
-				{ viewport: '@mobile', pseudo: 'default' },
-				{ typography: { fontSize: '32px' } }
+				{ pseudo: 'default' },
+				{ typography: { fontSize: '32px' } },
+				'@mobile'
 			)
 		).toEqual( {
 			color: { text: '#000000' },
@@ -126,8 +117,9 @@ describe( 'setStyleForState', () => {
 						':hover': { color: { text: '#00ff00' } },
 					},
 				},
-				{ viewport: '@mobile', pseudo: ':hover' },
-				{ typography: { fontSize: '32px' } }
+				{ pseudo: ':hover' },
+				{ typography: { fontSize: '32px' } },
+				'@mobile'
 			)
 		).toEqual( {
 			color: { text: '#000000' },
@@ -145,8 +137,9 @@ describe( 'setStyleForState', () => {
 					color: { text: '#000000' },
 					':hover': { color: { text: '#ff0000' } },
 				},
-				{ viewport: 'default', pseudo: ':hover' },
-				{ color: { text: undefined } }
+				{ pseudo: ':hover' },
+				{ color: { text: undefined } },
+				'default'
 			)
 		).toEqual( {
 			color: { text: '#000000' },
@@ -176,7 +169,8 @@ describe( 'scopeResetAllFilterToState', () => {
 		};
 
 		const result = scopeResetAllFilterToState(
-			{ viewport: 'default', pseudo: ':hover' },
+			{ pseudo: ':hover' },
+			'default',
 			innerReset
 		)( attributes );
 
@@ -204,7 +198,8 @@ describe( 'scopeResetAllFilterToState', () => {
 		};
 
 		const result = scopeResetAllFilterToState(
-			{ viewport: 'default', pseudo: ':hover' },
+			{ pseudo: ':hover' },
+			'default',
 			innerReset
 		)( attributes );
 
@@ -222,7 +217,8 @@ describe( 'scopeResetAllFilterToState', () => {
 		};
 
 		scopeResetAllFilterToState(
-			{ viewport: 'default', pseudo: ':hover' },
+			{ pseudo: ':hover' },
+			'default',
 			innerReset
 		)( attributes );
 
@@ -242,7 +238,8 @@ describe( 'scopeResetAllFilterToState', () => {
 		};
 
 		const result = scopeResetAllFilterToState(
-			{ viewport: '@mobile', pseudo: ':hover' },
+			{ pseudo: ':hover' },
+			'@mobile',
 			innerReset
 		)( attributes );
 
@@ -262,7 +259,8 @@ describe( 'scopeResetAllFilterToState', () => {
 
 		expect(
 			scopeResetAllFilterToState(
-				{ viewport: 'default', pseudo: 'default' },
+				{ pseudo: 'default' },
+				'default',
 				innerReset
 			)
 		).toBe( innerReset );

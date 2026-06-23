@@ -75,8 +75,11 @@ function DimensionsInspectorControl( { children, resetAllFilter } ) {
 }
 
 export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
-	const selectedState = useBlockStyleState();
-	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
+	const { selectedState, viewportState } = useBlockStyleState();
+	const isStateSelected = ! isDefaultBlockStyleState(
+		selectedState,
+		viewportState
+	);
 	const isEnabled = useHasDimensionsPanel( settings, selectedState );
 	const style = useSelect(
 		( select ) => {
@@ -91,12 +94,17 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 	);
 	const [ visualizedProperty, setVisualizedProperty ] = useVisualizer();
 	const value = isStateSelected
-		? getStyleForState( style, selectedState )
+		? getStyleForState( style, selectedState, viewportState )
 		: style;
 	const onChange = isStateSelected
 		? ( newStyle ) => {
 				setAttributes( {
-					style: setStyleForState( style, selectedState, newStyle ),
+					style: setStyleForState(
+						style,
+						selectedState,
+						newStyle,
+						viewportState
+					),
 				} );
 		  }
 		: ( newStyle ) => {
@@ -136,6 +144,7 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 				onChange={ onChange }
 				defaultControls={ defaultControls }
 				styleState={ selectedState }
+				viewportState={ viewportState }
 				onVisualize={
 					isStateSelected ? undefined : setVisualizedProperty
 				}

@@ -609,13 +609,11 @@ export function setCanvasWidth( width ) {
 		} );
 
 		// While Responsive editing is enabled, the canvas width also drives the
-		// viewport style state, whether changed via the device preview or by
+		// viewport state, whether changed via the device preview or by
 		// manually resizing the canvas.
 		if ( select.isResponsiveEditing() ) {
 			const deviceType = getDeviceTypeByCanvasWidth( width );
-			unlock(
-				registry.dispatch( blockEditorStore )
-			).setStyleStateViewport(
+			unlock( registry.dispatch( blockEditorStore ) ).setViewportState(
 				VIEWPORT_STATE_BY_DEVICE_TYPE[ deviceType ] ?? 'default'
 			);
 		}

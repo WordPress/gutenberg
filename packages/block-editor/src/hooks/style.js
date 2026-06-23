@@ -40,8 +40,9 @@ import {
 import {
 	BlockStyleStateProvider,
 	DEFAULT_BLOCK_STYLE_STATE,
+	DEFAULT_VIEWPORT,
 	getStyleForState,
-	hasViewportBlockStyleState,
+	hasViewportState,
 	hasPseudoBlockStyleState,
 } from './block-style-state';
 import { VALID_BLOCK_PSEUDO_STATES } from './states';
@@ -418,11 +419,12 @@ export function getResponsiveStateCSSRules( style, name, baseSelector ) {
 	const nestedStateKeys = [ 'elements', ...validPseudoStates ];
 
 	Object.entries( RESPONSIVE_BREAKPOINTS ).forEach(
-		( [ viewport, mediaQuery ] ) => {
-			const viewportStyles = getStyleForState( style, {
-				viewport,
-				pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
-			} );
+		( [ viewportState, mediaQuery ] ) => {
+			const viewportStyles = getStyleForState(
+				style,
+				DEFAULT_BLOCK_STYLE_STATE,
+				viewportState
+			);
 			if ( ! viewportStyles ) {
 				return;
 			}
@@ -470,23 +472,29 @@ export function getResponsiveStateCSSRules( style, name, baseSelector ) {
  * For example, selecting `@mobile + :hover` should preview styles from
  * `:hover`, with `@mobile.:hover` values layered on top when present.
  *
- * @param {Object} style         Block style object.
- * @param {Object} selectedState Selected block style state.
+ * @param {Object} style              Block style object.
+ * @param {Object} selectedBlockState Selected per-block style state.
+ * @param {string} viewportState      Selected viewport state.
  * @return {Object|undefined} Style value for the canvas preview.
  */
-export function getCanvasStateStyleValue( style, selectedState ) {
-	const stateValue = getStyleForState( style, selectedState );
-	if ( ! hasViewportBlockStyleState( selectedState ) ) {
+export function getCanvasStateStyleValue(
+	style,
+	selectedBlockState,
+	viewportState
+) {
+	const stateValue = getStyleForState(
+		style,
+		selectedBlockState,
+		viewportState
+	);
+	if ( ! hasViewportState( viewportState ) ) {
 		return stateValue;
 	}
 
-	const defaultViewportState = {
-		...selectedState,
-		viewport: DEFAULT_BLOCK_STYLE_STATE.viewport,
-	};
 	const defaultViewportStateValue = getStyleForState(
 		style,
-		defaultViewportState
+		selectedBlockState,
+		DEFAULT_VIEWPORT
 	);
 
 	if ( defaultViewportStateValue && stateValue ) {
@@ -761,11 +769,17 @@ function BlockStyleControls( {
 } ) {
 	const settings = useBlockSettings( name, __unstableParentLayout );
 	const blockEditingMode = useBlockEditingMode();
-	const { globalBlockStyles, selectedState, showStateOnCanvas } = useSelect(
+	const {
+		globalBlockStyles,
+		selectedState,
+		viewportState,
+		showStateOnCanvas,
+	} = useSelect(
 		( select ) => {
 			const blockEditorSelect = select( blockEditorStore );
 			const {
 				getSelectedBlockStyleState,
+				getViewportState,
 				isSelectedBlockStyleStateShownOnCanvas,
 			} = unlock( blockEditorSelect );
 			const editorSettings = blockEditorSelect.getSettings();
@@ -773,6 +787,7 @@ function BlockStyleControls( {
 				globalBlockStyles:
 					editorSettings?.[ globalStylesDataKey ]?.blocks?.[ name ],
 				selectedState: getSelectedBlockStyleState( clientId ),
+				viewportState: getViewportState(),
 				showStateOnCanvas:
 					isSelectedBlockStyleStateShownOnCanvas( clientId ),
 			};
@@ -780,6 +795,13 @@ function BlockStyleControls( {
 		[ clientId, name ]
 	);
 	const isPseudoSelectorState = hasPseudoBlockStyleState( selectedState );
+
+	// Provide the per-block pseudo state alongside the globally selected
+	// viewport so a single context subscription exposes both.
+	const blockStyleStateContext = useMemo(
+		() => ( { selectedState, viewportState } ),
+		[ selectedState, viewportState ]
+	);
 
 	// Inject state styles onto the editor canvas so the selected state is
 	// visible while editing. Scoped to this block instance via data-block so
@@ -792,11 +814,13 @@ function BlockStyleControls( {
 
 		const globalStateValue = getCanvasStateStyleValue(
 			globalBlockStyles,
-			selectedState
+			selectedState,
+			viewportState
 		);
 		const instanceStateValue = getCanvasStateStyleValue(
 			style,
-			selectedState
+			selectedState,
+			viewportState
 		);
 		let stateValue;
 
@@ -823,6 +847,7 @@ function BlockStyleControls( {
 		globalBlockStyles,
 		style,
 		selectedState,
+		viewportState,
 		clientId,
 		name,
 	] );
@@ -850,7 +875,7 @@ function BlockStyleControls( {
 	};
 
 	return (
-		<BlockStyleStateProvider value={ selectedState }>
+		<BlockStyleStateProvider value={ blockStyleStateContext }>
 			<ColorEdit { ...passedProps } />
 			<BackgroundImagePanel { ...passedProps } />
 			<TypographyPanel { ...passedProps } />

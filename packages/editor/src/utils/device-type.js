@@ -4,7 +4,7 @@
 import { DEVICE_TYPES } from '../store/constants';
 
 /**
- * Maps a device preview type to its corresponding viewport style state. Used
+ * Maps a device preview type to its corresponding viewport state. Used
  * when Responsive editing is enabled so the device preview drives which
  * viewport block style edits are applied to.
  *

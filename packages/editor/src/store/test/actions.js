@@ -91,12 +91,12 @@ describe( 'Post actions', () => {
 	} );
 
 	describe( 'setCanvasWidth', () => {
-		it( 'syncs the viewport style state while Responsive editing is enabled', () => {
+		it( 'syncs the viewport state while Responsive editing is enabled', () => {
 			const registry = createRegistryWithStores();
 			const getViewport = () =>
 				unlock(
 					registry.select( blockEditorStore )
-				).getStyleStateViewport();
+				).getViewportState();
 			const setCanvasWidth = ( width ) =>
 				unlock( registry.dispatch( editorStore ) ).setCanvasWidth(
 					width
@@ -119,12 +119,12 @@ describe( 'Post actions', () => {
 			expect( getViewport() ).toBe( 'default' );
 		} );
 
-		it( 'leaves the viewport style state untouched while Responsive editing is disabled', () => {
+		it( 'leaves the viewport state untouched while Responsive editing is disabled', () => {
 			const registry = createRegistryWithStores();
 			const getViewport = () =>
 				unlock(
 					registry.select( blockEditorStore )
-				).getStyleStateViewport();
+				).getViewportState();
 
 			unlock( registry.dispatch( editorStore ) ).setCanvasWidth( 400 );
 

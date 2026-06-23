@@ -257,11 +257,12 @@ export function getResponsiveChildLayoutStyles( {
 	const baseLayout = style?.layout ?? {};
 
 	return Object.entries( RESPONSIVE_BREAKPOINTS )
-		.map( ( [ viewport, mediaQuery ] ) => {
-			const viewportLayout = getStyleForState( style, {
-				viewport,
-				pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
-			} )?.layout;
+		.map( ( [ viewportState, mediaQuery ] ) => {
+			const viewportLayout = getStyleForState(
+				style,
+				DEFAULT_BLOCK_STYLE_STATE,
+				viewportState
+			)?.layout;
 			if ( ! viewportLayout || ! Object.keys( viewportLayout ).length ) {
 				return '';
 			}

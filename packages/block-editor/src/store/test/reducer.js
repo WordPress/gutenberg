@@ -43,7 +43,7 @@ import {
 	withDerivedBlockEditingModes,
 	viewportModalClientIds,
 	selectedBlockStyleState,
-	styleStateViewport,
+	viewportState,
 } from '../reducer';
 import { getBlockOrder, getBlocks } from '../selectors';
 import { unlock } from '../../lock-unlock';
@@ -6223,15 +6223,15 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'styleStateViewport', () => {
+	describe( 'viewportState', () => {
 		it( 'defaults to "default"', () => {
-			expect( styleStateViewport( undefined, {} ) ).toBe( 'default' );
+			expect( viewportState( undefined, {} ) ).toBe( 'default' );
 		} );
 
 		it( 'stores the selected viewport', () => {
 			expect(
-				styleStateViewport( 'default', {
-					type: 'SET_STYLE_STATE_VIEWPORT',
+				viewportState( 'default', {
+					type: 'SET_VIEWPORT_STATE',
 					viewport: '@tablet',
 				} )
 			).toBe( '@tablet' );
@@ -6239,15 +6239,15 @@ describe( 'state', () => {
 
 		it( 'falls back to "default" when no viewport is provided', () => {
 			expect(
-				styleStateViewport( '@tablet', {
-					type: 'SET_STYLE_STATE_VIEWPORT',
+				viewportState( '@tablet', {
+					type: 'SET_VIEWPORT_STATE',
 				} )
 			).toBe( 'default' );
 		} );
 
 		it( 'ignores unrelated actions', () => {
 			expect(
-				styleStateViewport( '@mobile', { type: 'SOME_OTHER_ACTION' } )
+				viewportState( '@mobile', { type: 'SOME_OTHER_ACTION' } )
 			).toBe( '@mobile' );
 		} );
 	} );

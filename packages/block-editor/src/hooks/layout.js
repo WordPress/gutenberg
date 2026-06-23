@@ -39,9 +39,10 @@ import { globalStylesDataKey } from '../store/private-keys';
 import { getVariationNameFromClass } from './block-style-variation';
 import {
 	DEFAULT_BLOCK_STYLE_STATE,
+	DEFAULT_VIEWPORT,
 	getStyleForState,
 	hasPseudoBlockStyleState,
-	hasViewportBlockStyleState,
+	hasViewportState,
 	isDefaultBlockStyleState,
 	setStyleForState,
 } from './block-style-state';
@@ -251,11 +252,12 @@ export function getResponsiveLayoutStyles( {
 	globalBlockGapValue,
 } ) {
 	return Object.entries( RESPONSIVE_BREAKPOINTS )
-		.map( ( [ viewport, mediaQuery ] ) => {
-			const viewportStyle = getStyleForState( attributes?.style, {
-				viewport,
-				pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
-			} );
+		.map( ( [ viewportState, mediaQuery ] ) => {
+			const viewportStyle = getStyleForState(
+				attributes?.style,
+				DEFAULT_BLOCK_STYLE_STATE,
+				viewportState
+			);
 			const viewportLayout = getLayoutContainerValues(
 				viewportStyle?.layout
 			);
@@ -301,33 +303,38 @@ function LayoutPanelPure( {
 	const settings = useBlockSettings( blockName );
 	// Block settings come from theme.json under settings.[blockName].
 	const { layout: layoutSettings } = settings;
-	const { themeSupportsLayout, activeBlockVariation, selectedState } =
-		useSelect(
-			( select ) => {
-				const blockEditorSelect = select( blockEditorStore );
-				const { getBlockAttributes, getSettings } = blockEditorSelect;
-				const { getSelectedBlockStyleState } =
-					unlock( blockEditorSelect );
-				return {
-					activeBlockVariation: select(
-						blocksStore
-					).getActiveBlockVariation(
-						blockName,
-						getBlockAttributes( clientId ) || {},
-						'block'
-					),
-					themeSupportsLayout: getSettings().supportsLayout,
-					selectedState:
-						getSelectedBlockStyleState?.( clientId ) ??
-						DEFAULT_BLOCK_STYLE_STATE,
-				};
-			},
-			[ blockName, clientId ]
-		);
+	const {
+		themeSupportsLayout,
+		activeBlockVariation,
+		selectedState,
+		viewportState,
+	} = useSelect(
+		( select ) => {
+			const blockEditorSelect = select( blockEditorStore );
+			const { getBlockAttributes, getSettings } = blockEditorSelect;
+			const { getSelectedBlockStyleState, getViewportState } =
+				unlock( blockEditorSelect );
+			return {
+				activeBlockVariation: select(
+					blocksStore
+				).getActiveBlockVariation(
+					blockName,
+					getBlockAttributes( clientId ) || {},
+					'block'
+				),
+				themeSupportsLayout: getSettings().supportsLayout,
+				selectedState:
+					getSelectedBlockStyleState?.( clientId ) ??
+					DEFAULT_BLOCK_STYLE_STATE,
+				viewportState: getViewportState?.() ?? DEFAULT_VIEWPORT,
+			};
+		},
+		[ blockName, clientId ]
+	);
 
 	const blockEditingMode = useBlockEditingMode();
 	const isViewportLayoutState =
-		hasViewportBlockStyleState( selectedState ) &&
+		hasViewportState( viewportState ) &&
 		! hasPseudoBlockStyleState( selectedState );
 	const resetLayoutFilter = useCallback(
 		( ...resetArgs ) => {
@@ -338,7 +345,8 @@ function LayoutPanelPure( {
 				const existingStateStyle =
 					getStyleForState(
 						attributes.style ?? style,
-						selectedState
+						selectedState,
+						viewportState
 					) || {};
 				const nextStateStyle = cleanEmptyObject( {
 					...existingStateStyle,
@@ -349,7 +357,8 @@ function LayoutPanelPure( {
 					style: setStyleForState(
 						attributes.style ?? style,
 						selectedState,
-						nextStateStyle
+						nextStateStyle,
+						viewportState
 					),
 				};
 			}
@@ -373,6 +382,7 @@ function LayoutPanelPure( {
 			activeBlockVariation,
 			isViewportLayoutState,
 			selectedState,
+			viewportState,
 			style,
 		]
 	);
@@ -408,7 +418,7 @@ function LayoutPanelPure( {
 	 */
 	const baseLayout = layout || defaultBlockLayout || {};
 	const stateStyle = isViewportLayoutState
-		? getStyleForState( style, selectedState )
+		? getStyleForState( style, selectedState, viewportState )
 		: undefined;
 	const stateLayout = stateStyle?.layout;
 	const usedLayout = isViewportLayoutState
@@ -457,7 +467,7 @@ function LayoutPanelPure( {
 		! usedLayout.type && ( contentSize || inherit );
 	const hasContentSizeOrLegacySettings = !! inherit || !! contentSize;
 	const showLayoutTypeSwitcher =
-		isDefaultBlockStyleState( selectedState ) &&
+		isDefaultBlockStyleState( selectedState, viewportState ) &&
 		! inherit &&
 		allowSwitching;
 
@@ -472,7 +482,12 @@ function LayoutPanelPure( {
 				),
 			} );
 			setAttributes( {
-				style: setStyleForState( style, selectedState, nextStateStyle ),
+				style: setStyleForState(
+					style,
+					selectedState,
+					nextStateStyle,
+					viewportState
+				),
 			} );
 			return;
 		}

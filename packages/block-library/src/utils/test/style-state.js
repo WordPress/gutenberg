@@ -56,11 +56,9 @@ describe( 'style state dimension utilities', () => {
 		};
 
 		expect(
-			resetStateDimensions(
-				style,
-				{ viewport: '@mobile', pseudo: 'default' },
-				[ 'aspectRatio' ]
-			)
+			resetStateDimensions( style, { pseudo: 'default' }, '@mobile', [
+				'aspectRatio',
+			] )
 		).toEqual( {
 			dimensions: {
 				aspectRatio: '1',
@@ -93,11 +91,9 @@ describe( 'style state dimension utilities', () => {
 		};
 
 		expect(
-			setStateDimensions(
-				style,
-				{ viewport: '@mobile', pseudo: 'default' },
-				{ height: '100px' }
-			)
+			setStateDimensions( style, { pseudo: 'default' }, '@mobile', {
+				height: '100px',
+			} )
 		).toEqual( {
 			'@mobile': {
 				dimensions: {
@@ -114,9 +110,9 @@ describe( 'style state dimension utilities', () => {
 	} );
 
 	it( 'generates a stable key for selected style states', () => {
-		expect(
-			getStyleStateKey( { viewport: '@mobile', pseudo: ':hover' } )
-		).toBe( '@mobile::hover' );
+		expect( getStyleStateKey( { pseudo: ':hover' }, '@mobile' ) ).toBe(
+			'@mobile::hover'
+		);
 		expect( getStyleStateKey( undefined ) ).toBe( 'default:default' );
 	} );
 
@@ -145,7 +141,8 @@ describe( 'style state dimension utilities', () => {
 						},
 					},
 				},
-				selectedState: { viewport: '@mobile', pseudo: 'default' },
+				selectedState: { pseudo: 'default' },
+				viewportState: '@mobile',
 				hasSelectedStyleState: true,
 				attributeKey: 'scale',
 				styleKey: 'objectFit',
@@ -163,7 +160,8 @@ describe( 'style state dimension utilities', () => {
 						},
 					},
 				},
-				selectedState: { viewport: '@mobile', pseudo: 'default' },
+				selectedState: { pseudo: 'default' },
+				viewportState: '@mobile',
 				hasSelectedStyleState: true,
 				nextDimensions: {
 					scale: 'contain',
@@ -214,7 +212,8 @@ describe( 'style state dimension utilities', () => {
 						},
 					},
 				},
-				selectedState: { viewport: '@mobile', pseudo: 'default' },
+				selectedState: { pseudo: 'default' },
+				viewportState: '@mobile',
 				hasSelectedStyleState: true,
 				nextDimensions: {
 					aspectRatio: '16/9',
@@ -255,7 +254,8 @@ describe( 'style state dimension utilities', () => {
 						},
 					},
 				},
-				selectedState: { viewport: '@mobile', pseudo: 'default' },
+				selectedState: { pseudo: 'default' },
+				viewportState: '@mobile',
 				hasSelectedStyleState: true,
 				keys: [ 'width' ],
 				defaultAttributes: {
