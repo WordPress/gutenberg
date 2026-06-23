@@ -885,26 +885,9 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			return '';
 		}
 
-		// Skip leading comments, XML declarations, doctype, and whitespace to
-		// reach the root SVG element.
-		while ( $processor->next_token() ) {
-			$token_type = $processor->get_token_type();
-			if ( '#tag' === $token_type ) {
-				break;
-			}
-			if (
-				'#comment' === $token_type
-				|| '#doctype' === $token_type
-				|| ( '#text' === $token_type && '' === trim( $processor->get_modifiable_text() ) )
-			) {
-				continue;
-			}
-			// Any other leading token (e.g. non-whitespace text) is invalid.
-			return '';
-		}
-
-		// Require the SVG namespace to reject a foreign-namespaced `<svg>`.
-		if ( 'SVG' !== $processor->get_tag() || 'svg' !== $processor->get_namespace() ) {
+		// Find the first SVG root, ignoring surrounding content. The namespace
+		// check rejects a foreign-namespaced `<svg>`, such as in `<math><svg>`.
+		if ( ! $processor->next_tag( 'SVG' ) || 'svg' !== $processor->get_namespace() ) {
 			return '';
 		}
 
@@ -920,6 +903,15 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			return '';
 		}
 		$svg .= '</svg>';
+
+		// Reject more than one top-level SVG. Nested SVGs were extracted above,
+		// so only sibling roots remain to be found.
+		while ( $processor->next_tag( 'SVG' ) ) {
+			if ( 'svg' === $processor->get_namespace() ) {
+				return '';
+			}
+		}
+
 		return wp_kses( $svg, $allowed_tags );
 	}
 
