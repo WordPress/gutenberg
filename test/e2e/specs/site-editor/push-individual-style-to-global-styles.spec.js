@@ -34,6 +34,10 @@ test.describe( 'Push individual style to Global Styles', () => {
 	} );
 
 	test.beforeEach( async ( { requestUtils } ) => {
+		// Clear any user-saved templates so the index template this spec edits
+		// and saves cannot leak into other specs sharing the database.
+		await requestUtils.deleteAllTemplates( 'wp_template' );
+
 		// Seed an inherited block-level value so the instance override below
 		// produces a local override (which is what surfaces the dot menu).
 		await setUserGlobalStyles( requestUtils, {
@@ -43,6 +47,12 @@ test.describe( 'Push individual style to Global Styles', () => {
 				},
 			},
 		} );
+	} );
+
+	test.afterEach( async ( { requestUtils } ) => {
+		// The test saves the `emptytheme//index` template; remove it so it does
+		// not surface in unrelated specs (e.g. the template grid views).
+		await requestUtils.deleteAllTemplates( 'wp_template' );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
