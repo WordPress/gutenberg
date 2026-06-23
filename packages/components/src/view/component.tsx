@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import styled from '@emotion/styled';
-
-/**
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
@@ -12,14 +7,25 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import type { WordPressComponentProps } from '../context';
+import { PolymorphicElement } from '../utils/polymorphic-element';
 
-const PolymorphicDiv = styled.div``;
+type ViewProps< T extends React.ElementType > = WordPressComponentProps<
+	{},
+	T
+> & {
+	/**
+	 * Legacy Emotion prop accepted by `View`. It is intentionally consumed here
+	 * so it does not leak to the rendered element after Emotion is removed.
+	 */
+	css?: unknown;
+};
 
 function UnforwardedView< T extends React.ElementType = 'div' >(
-	{ as, ...restProps }: WordPressComponentProps< {}, T >,
+	{ css: _css, ...restProps }: ViewProps< T >,
 	ref: React.ForwardedRef< any >
 ) {
-	return <PolymorphicDiv as={ as } ref={ ref } { ...restProps } />;
+	void _css;
+	return <PolymorphicElement ref={ ref } { ...restProps } />;
 }
 
 /**
