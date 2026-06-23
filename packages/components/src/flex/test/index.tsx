@@ -9,11 +9,6 @@ import { render, screen } from '@testing-library/react';
 import { View } from '../../view';
 import { Flex, FlexBlock, FlexItem } from '../';
 
-const getGeneratedEmotionClassNames = ( element: HTMLElement ) =>
-	Array.from( element.classList ).filter( ( className ) =>
-		/^(css|emotion)-/.test( className )
-	);
-
 describe( 'props', () => {
 	test( 'should render correctly', () => {
 		render(
@@ -28,103 +23,86 @@ describe( 'props', () => {
 
 	test( 'should render + wrap non Flex children', () => {
 		render(
-			<Flex data-testid="base-flex">
-				<FlexItem>Item</FlexItem>
-				<FlexBlock>Item</FlexBlock>
-			</Flex>
-		);
-
-		render(
 			<Flex data-testid="flex">
 				<FlexItem>Item</FlexItem>
-				<View />
-				<div />
+				<View data-testid="view-child" />
+				<div data-testid="div-child" />
 				<FlexBlock>Item</FlexBlock>
 			</Flex>
 		);
 
-		expect( screen.getByTestId( 'flex' ) ).toMatchDiffSnapshot(
-			screen.getByTestId( 'base-flex' )
-		);
+		expect( screen.getByTestId( 'view-child' ) ).toBeInTheDocument();
+		expect( screen.getByTestId( 'div-child' ) ).toBeInTheDocument();
 	} );
 
 	test( 'should render align', () => {
-		render(
-			<Flex data-testid="base-flex">
-				<FlexItem>Item</FlexItem>
-				<FlexBlock>Item</FlexBlock>
-			</Flex>
-		);
-
 		render(
 			<Flex align="flex-start" data-testid="flex">
 				<FlexItem>Item</FlexItem>
 				<FlexBlock>Item</FlexBlock>
 			</Flex>
 		);
-		expect( screen.getByTestId( 'flex' ) ).toMatchStyleDiffSnapshot(
-			screen.getByTestId( 'base-flex' )
-		);
+		expect( screen.getByTestId( 'flex' ) ).toHaveStyle( {
+			'--wp-components-flex-align': 'flex-start',
+		} );
 	} );
 
 	test( 'should render justify', () => {
-		render(
-			<Flex data-testid="base-flex">
-				<FlexItem>Item</FlexItem>
-				<FlexBlock>Item</FlexBlock>
-			</Flex>
-		);
-
 		render(
 			<Flex justify="flex-start" data-testid="flex">
 				<FlexItem>Item</FlexItem>
 				<FlexBlock>Item</FlexBlock>
 			</Flex>
 		);
-		expect( screen.getByTestId( 'flex' ) ).toMatchStyleDiffSnapshot(
-			screen.getByTestId( 'base-flex' )
-		);
+		expect( screen.getByTestId( 'flex' ) ).toHaveStyle( {
+			'--wp-components-flex-justify': 'flex-start',
+		} );
 	} );
 
 	test( 'should render spacing', () => {
 		render(
-			<Flex data-testid="base-flex">
+			<Flex gap={ 5 } data-testid="flex">
 				<FlexItem>Item</FlexItem>
 				<FlexBlock>Item</FlexBlock>
 			</Flex>
 		);
 
-		render(
-			<>
-				<Flex>
-					<FlexItem>Item</FlexItem>
-					<FlexBlock data-testid="flex-block">Item</FlexBlock>
-				</Flex>
-				<Flex gap={ 5 }>
-					<FlexItem>Item</FlexItem>
-					<FlexBlock data-testid="flex-block-with-gap">
-						Item
-					</FlexBlock>
-				</Flex>
-			</>
-		);
-		expect( screen.getByTestId( 'flex-block' ) ).toMatchStyleDiffSnapshot(
-			screen.getByTestId( 'flex-block-with-gap' )
-		);
+		expect( screen.getByTestId( 'flex' ) ).toHaveStyle( {
+			'--wp-components-flex-gap': 'calc(4px * 5)',
+		} );
 	} );
 
-	test( 'should compose flex item styles in a single generated class', () => {
+	test( 'should render column direction', () => {
+		render(
+			<Flex direction="column" data-testid="flex">
+				<FlexItem data-testid="flex-item">Item</FlexItem>
+			</Flex>
+		);
+
+		expect( screen.getByTestId( 'flex' ) ).toHaveAttribute(
+			'data-layout',
+			'column'
+		);
+		expect( screen.getByTestId( 'flex' ) ).toHaveStyle( {
+			'--wp-components-flex-align': 'normal',
+			'--wp-components-flex-direction': 'column',
+		} );
+		expect( screen.getByTestId( 'flex-item' ) ).toHaveStyle( {
+			'--wp-components-flex-item-display': 'block',
+		} );
+	} );
+
+	test( 'should render flex item display', () => {
 		render(
 			<Flex>
-				<FlexItem isBlock display="inline-flex" data-testid="item">
+				<FlexItem display="inline-flex" data-testid="item">
 					Item
 				</FlexItem>
 			</Flex>
 		);
 
-		const item = screen.getByTestId( 'item' );
-
-		expect( getGeneratedEmotionClassNames( item ) ).toHaveLength( 1 );
-		expect( item ).toHaveStyle( { display: 'inline-flex' } );
+		expect( screen.getByTestId( 'item' ) ).toHaveStyle( {
+			'--wp-components-flex-item-display': 'inline-flex',
+		} );
 	} );
 } );

@@ -1,12 +1,8 @@
 /**
  * External dependencies
  */
-import { css } from '@emotion/react';
-
-/**
- * WordPress dependencies
- */
-import { useMemo } from '@wordpress/element';
+import clsx from 'clsx';
+import type { CSSProperties } from 'react';
 import deprecated from '@wordpress/deprecated';
 
 /**
@@ -16,9 +12,20 @@ import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import { useResponsiveValue } from '../../utils/use-responsive-value';
 import { space } from '../../utils/space';
-import * as styles from '../styles';
-import { useCx } from '../../utils';
 import type { FlexProps } from '../types';
+import styles from '../style.module.scss';
+
+type FlexCustomProperty =
+	| '--wp-components-flex-align'
+	| '--wp-components-flex-direction'
+	| '--wp-components-flex-wrap'
+	| '--wp-components-flex-gap'
+	| '--wp-components-flex-justify';
+
+type FlexStyle = CSSProperties &
+	Partial<
+		Record< FlexCustomProperty, CSSProperties[ keyof CSSProperties ] >
+	>;
 
 function useDeprecatedProps(
 	props: WordPressComponentProps< FlexProps, 'div' >
@@ -47,6 +54,7 @@ export function useFlex( props: WordPressComponentProps< FlexProps, 'div' > ) {
 		expanded = true,
 		gap = 2,
 		justify = 'space-between',
+		style,
 		wrap = false,
 		...otherProps
 	} = useContextSystem( useDeprecatedProps( props ), 'Flex' );
@@ -59,36 +67,26 @@ export function useFlex( props: WordPressComponentProps< FlexProps, 'div' > ) {
 	const isColumn =
 		typeof direction === 'string' && !! direction.includes( 'column' );
 
-	const cx = useCx();
+	const flexStyle: FlexStyle = {
+		'--wp-components-flex-align':
+			align ?? ( isColumn ? 'normal' : 'center' ),
+		'--wp-components-flex-direction': direction,
+		...( wrap && { '--wp-components-flex-wrap': 'wrap' } ),
+		'--wp-components-flex-gap': space( gap ),
+		'--wp-components-flex-justify': justify,
+		...style,
+	};
 
-	const classes = useMemo( () => {
-		const base = css( {
-			alignItems: align ?? ( isColumn ? 'normal' : 'center' ),
-			flexDirection: direction,
-			flexWrap: wrap ? 'wrap' : undefined,
-			gap: space( gap ),
-			justifyContent: justify,
-			height: isColumn && expanded ? '100%' : undefined,
-			width: ! isColumn && expanded ? '100%' : undefined,
-		} );
-
-		return cx(
-			styles.Flex,
-			base,
-			isColumn ? styles.ItemsColumn : styles.ItemsRow,
+	return {
+		...otherProps,
+		className: clsx(
+			styles.flex,
+			isColumn ? styles.itemsColumn : styles.itemsRow,
 			className
-		);
-	}, [
-		align,
-		className,
-		cx,
-		direction,
-		expanded,
-		gap,
+		),
+		'data-expanded': expanded ? true : undefined,
+		'data-layout': isColumn ? 'column' : 'row',
+		style: flexStyle,
 		isColumn,
-		justify,
-		wrap,
-	] );
-
-	return { ...otherProps, className: classes, isColumn };
+	};
 }
