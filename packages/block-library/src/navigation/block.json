@@ -67,6 +67,10 @@
 			"type": "boolean",
 			"default": true
 		},
+		"overlayOpenButtonDisplay": {
+			"type": "string",
+			"enum": [ "icon", "text", "both" ]
+		},
 		"__unstableLocation": {
 			"type": "string"
 		},

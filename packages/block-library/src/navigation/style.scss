@@ -786,6 +786,8 @@ button.wp-block-navigation-item__content {
 // Button to open the menu.
 .wp-block-navigation__responsive-container-open {
 	display: flex;
+	align-items: center;
+	gap: 0.5em;
 
 	// When set to collapse into a text button, it should inherit the parent font.
 	// This needs specificity to override inherited properties by the button element and component.
@@ -804,6 +806,9 @@ button.wp-block-navigation-item__content {
 
 // Button to close the menus.
 .wp-block-navigation__responsive-container-close {
+	display: flex;
+	align-items: center;
+	gap: 0.5em;
 	position: absolute;
 	top: 0;
 	right: 0;

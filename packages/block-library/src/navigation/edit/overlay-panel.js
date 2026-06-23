@@ -26,7 +26,8 @@ import OverlayPreview from './overlay-preview';
  * @param {Function} props.onNavigateToEntityRecord  Function to navigate to template part editor.
  * @param {boolean}  props.overlayMenuPreview        Whether overlay menu preview is open.
  * @param {Function} props.setOverlayMenuPreview     Function to toggle overlay menu preview.
- * @param {boolean}  props.hasIcon                   Whether the overlay menu has an icon.
+ * @param {boolean}  props.hasIcon                   Whether the overlay menu has an icon (legacy).
+ * @param {string}   props.overlayOpenButtonDisplay  Display mode for the toggle button ('icon', 'text', or 'both').
  * @param {string}   props.icon                      Icon type for overlay menu.
  * @param {string}   props.overlayMenuPreviewClasses CSS classes for overlay menu preview button.
  * @param {string}   props.overlayMenuPreviewId      ID for overlay menu preview.
@@ -43,6 +44,7 @@ export default function OverlayPanel( {
 	overlayMenuPreview,
 	setOverlayMenuPreview,
 	hasIcon,
+	overlayOpenButtonDisplay,
 	icon,
 	overlayMenuPreviewClasses,
 	overlayMenuPreviewId,
@@ -66,6 +68,7 @@ export default function OverlayPanel( {
 						overlayMenuPreview={ overlayMenuPreview }
 						setOverlayMenuPreview={ setOverlayMenuPreview }
 						hasIcon={ hasIcon }
+						overlayOpenButtonDisplay={ overlayOpenButtonDisplay }
 						icon={ icon }
 						setAttributes={ setAttributes }
 						overlayMenuPreviewClasses={ overlayMenuPreviewClasses }

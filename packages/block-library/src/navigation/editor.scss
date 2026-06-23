@@ -721,3 +721,10 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 .wp-block-navigation__overlay-help-text-wrapper {
 	margin-top: $grid-unit-10;
 }
+
+// Overlay menu preview button - toggle button styling for icon and text alignment
+.wp-block-navigation__toggle-button-preview {
+	display: flex;
+	align-items: center;
+	gap: 0.5em;
+}
