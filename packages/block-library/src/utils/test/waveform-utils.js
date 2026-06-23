@@ -13,6 +13,7 @@ import '@testing-library/jest-dom';
 import {
 	createWaveformContainer,
 	formatTime,
+	getWaveformColors,
 	parseTime,
 	styleSvgIcons,
 	setupWaveformTimeMarkers,
@@ -24,7 +25,7 @@ import {
 const basePlayerData = {
 	url: 'https://example.com/song.mp3',
 	waveformColor: 'rgba(0, 0, 0, 0.3)',
-	progressColor: 'rgba(0, 0, 0, 0.6)',
+	progressColor: 'rgba(255, 255, 255, 0.3)',
 	buttonColor: '#000000',
 };
 
@@ -80,7 +81,7 @@ describe( 'Waveform utilities', () => {
 			);
 			expect( container ).toHaveAttribute(
 				'data-progress-color',
-				'rgba(0, 0, 0, 0.6)'
+				'rgba(255, 255, 255, 0.3)'
 			);
 			expect( container ).toHaveAttribute(
 				'data-button-color',
@@ -122,6 +123,26 @@ describe( 'Waveform utilities', () => {
 			} );
 
 			expect( container ).toHaveAttribute( 'data-height', '150' );
+		} );
+	} );
+
+	describe( 'getWaveformColors', () => {
+		it( 'should use an inverted color scheme for progress', () => {
+			const wrapper = document.createElement( 'div' );
+			const element = document.createElement( 'div' );
+
+			wrapper.style.backgroundColor = 'rgb(240, 250, 255)';
+			element.style.color = 'rgb(10, 20, 30)';
+			wrapper.appendChild( element );
+			document.body.appendChild( wrapper );
+
+			expect( getWaveformColors( element ) ).toEqual( {
+				textColor: 'rgb(10, 20, 30)',
+				waveformColor: 'rgba(10, 20, 30, 0.3)',
+				progressColor: 'rgba(240, 250, 255, 0.3)',
+			} );
+
+			wrapper.remove();
 		} );
 	} );
 
@@ -265,11 +286,13 @@ describe( 'Waveform utilities', () => {
 				value: currentTime,
 			} );
 
+			const canvas = container.querySelector( 'canvas' );
 			const instance = {
 				audio,
+				canvas,
 				options: {
 					waveformColor: 'rgba(0, 0, 0, 0.3)',
-					progressColor: 'rgba(0, 0, 0, 0.6)',
+					progressColor: 'rgba(255, 255, 255, 0.3)',
 					buttonColor: '#000000',
 				},
 				renderMarkers: jest.fn( () => {
@@ -324,11 +347,14 @@ describe( 'Waveform utilities', () => {
 			const endMarker = container.querySelector(
 				'.wp-block-playlist__time-marker--end'
 			);
+			const progressRegion = container.querySelector(
+				'.wp-block-playlist__waveform-progress-region'
+			);
 
 			expect( currentMarker ).toHaveClass( 'is-visible' );
 			expect( currentMarker ).toHaveStyle( { left: '25%' } );
 			expect( currentMarker ).toHaveStyle( {
-				color: 'rgb(0, 0, 0)',
+				color: 'rgb(255, 255, 255)',
 			} );
 			expect( currentMarker ).toHaveTextContent( '0:45' );
 			expect( endMarker ).toHaveClass( 'is-visible' );
@@ -343,6 +369,10 @@ describe( 'Waveform utilities', () => {
 				color: 'rgb(0, 0, 0)',
 			} );
 			expect( endMarker ).toHaveTextContent( '3:00' );
+			expect( progressRegion ).toHaveStyle( {
+				backgroundColor: 'rgb(0, 0, 0)',
+				width: '25%',
+			} );
 			expect( instance.renderMarkers ).not.toHaveBeenCalled();
 		} );
 
@@ -376,9 +406,16 @@ describe( 'Waveform utilities', () => {
 			const currentMarker = container.querySelector(
 				'.wp-block-playlist__time-marker--current'
 			);
+			const progressRegion = container.querySelector(
+				'.wp-block-playlist__waveform-progress-region'
+			);
 
 			expect( currentMarker ).toHaveStyle( { left: '50%' } );
+			expect( currentMarker ).toHaveStyle( {
+				color: 'rgb(255, 255, 255)',
+			} );
 			expect( currentMarker ).toHaveTextContent( '1:00' );
+			expect( progressRegion ).toHaveStyle( { width: '50%' } );
 		} );
 
 		it( 'should update the hover marker on mouse move', () => {
@@ -399,6 +436,9 @@ describe( 'Waveform utilities', () => {
 			const hoverRegion = container.querySelector(
 				'.wp-block-playlist__waveform-hover-region'
 			);
+			const hoverCanvas = container.querySelector(
+				'.wp-block-playlist__waveform-hover-canvas'
+			);
 
 			expect( waveformArea ).toHaveClass( 'is-hovering' );
 			expect( hoverMarker ).toHaveClass( 'is-visible' );
@@ -408,6 +448,100 @@ describe( 'Waveform utilities', () => {
 			} );
 			expect( hoverMarker ).toHaveTextContent( '1:00' );
 			expect( hoverRegion ).toHaveStyle( { width: '50%' } );
+			expect( hoverCanvas.style.clipPath ).toBe(
+				'inset(0 50% 0 0)'
+			);
+		} );
+
+		it( 'should match the hover timestamp color to played preview bars', () => {
+			const { container, instance, waveformArea } =
+				createMarkerTestContext( {
+					currentTime: 60,
+				} );
+
+			setupWaveformTimeMarkers( instance, container );
+
+			waveformArea.dispatchEvent(
+				new window.MouseEvent( 'mousemove', {
+					clientX: 60,
+				} )
+			);
+
+			const hoverMarker = container.querySelector(
+				'.wp-block-playlist__time-marker--hover'
+			);
+
+			expect( hoverMarker ).toHaveStyle( {
+				color: 'rgb(255, 255, 255)',
+			} );
+		} );
+
+		it( 'should hide the hover timestamp after seeking with a waveform click', () => {
+			jest.useFakeTimers();
+			try {
+				const { container, instance, waveformArea } =
+					createMarkerTestContext();
+
+				setupWaveformTimeMarkers( instance, container );
+
+				waveformArea.dispatchEvent(
+					new window.MouseEvent( 'mousemove', {
+						clientX: 110,
+					} )
+				);
+
+				const hoverMarker = container.querySelector(
+					'.wp-block-playlist__time-marker--hover'
+				);
+
+				expect( hoverMarker ).toHaveClass( 'is-visible' );
+
+				waveformArea.dispatchEvent( new window.MouseEvent( 'click' ) );
+
+				jest.runOnlyPendingTimers();
+
+				expect( hoverMarker ).not.toHaveClass( 'is-visible' );
+			} finally {
+				jest.useRealTimers();
+			}
+		} );
+
+		it( 'should refresh the hover waveform when playback position changes', () => {
+			const { audio, container, instance, waveformArea } =
+				createMarkerTestContext();
+
+			setupWaveformTimeMarkers( instance, container );
+
+			const hoverCanvas = container.querySelector(
+				'.wp-block-playlist__waveform-hover-canvas'
+			);
+			const context = {
+				clearRect: jest.fn(),
+				drawImage: jest.fn(),
+				getImageData: jest.fn( () => ( {
+					data: new Uint8ClampedArray( [ 0, 0, 0, 127 ] ),
+				} ) ),
+				putImageData: jest.fn(),
+			};
+			hoverCanvas.getContext = jest.fn( () => context );
+
+			waveformArea.dispatchEvent(
+				new window.MouseEvent( 'mousemove', {
+					clientX: 110,
+				} )
+			);
+
+			Object.defineProperty( audio, 'currentTime', {
+				configurable: true,
+				value: 60,
+			} );
+			instance.options.onTimeUpdate( 60, 120, instance );
+
+			expect( context.drawImage ).toHaveBeenCalledTimes( 2 );
+			expect( context.putImageData ).toHaveBeenCalledTimes( 2 );
+			expect( hoverCanvas.style.clipPath ).toBe(
+				'inset(0 50% 0 0)'
+			);
 		} );
 
 		it( 'should use fallback duration for time markers before metadata loads', () => {
@@ -437,11 +571,17 @@ describe( 'Waveform utilities', () => {
 
 			expect( currentMarker ).toHaveClass( 'is-visible' );
 			expect( currentMarker ).toHaveStyle( { left: '0%' } );
+			expect( currentMarker ).toHaveStyle( {
+				color: 'rgb(255, 255, 255)',
+			} );
 			expect( currentMarker ).toHaveTextContent( '0:00' );
 			expect( hoverMarker ).toHaveClass( 'is-visible' );
 			expect( hoverMarker ).toHaveTextContent( '1:00' );
 			expect( endMarker ).toHaveClass( 'is-visible' );
 			expect( endMarker ).toHaveStyle( { left: '100%' } );
+			expect( endMarker ).toHaveStyle( {
+				color: 'rgb(0, 0, 0)',
+			} );
 			expect( endMarker ).toHaveTextContent( '2:00' );
 		} );
 
@@ -461,6 +601,9 @@ describe( 'Waveform utilities', () => {
 
 			expect( currentMarker ).toHaveClass( 'is-visible' );
 			expect( currentMarker ).toHaveStyle( { left: '0%' } );
+			expect( currentMarker ).toHaveStyle( {
+				color: 'rgb(0, 0, 0)',
+			} );
 			expect( currentMarker ).toHaveTextContent( '0:00' );
 			expect( endMarker ).not.toHaveClass( 'is-visible' );
 		} );
@@ -484,10 +627,16 @@ describe( 'Waveform utilities', () => {
 			const hoverRegion = container.querySelector(
 				'.wp-block-playlist__waveform-hover-region'
 			);
+			const hoverCanvas = container.querySelector(
+				'.wp-block-playlist__waveform-hover-canvas'
+			);
 
 			expect( waveformArea ).not.toHaveClass( 'is-hovering' );
 			expect( hoverMarker ).not.toHaveClass( 'is-visible' );
 			expect( hoverRegion ).toHaveStyle( { width: '0' } );
+			expect( hoverCanvas.style.clipPath ).toBe(
+				'inset(0 100% 0 0)'
+			);
 		} );
 
 		it( 'should remove marker elements on cleanup', () => {
@@ -502,6 +651,16 @@ describe( 'Waveform utilities', () => {
 			expect(
 				container.querySelector(
 					'.wp-block-playlist__waveform-hover-region'
+				)
+			).toBeNull();
+			expect(
+				container.querySelector(
+					'.wp-block-playlist__waveform-progress-region'
+				)
+			).toBeNull();
+			expect(
+				container.querySelector(
+					'.wp-block-playlist__waveform-hover-canvas'
 				)
 			).toBeNull();
 		} );

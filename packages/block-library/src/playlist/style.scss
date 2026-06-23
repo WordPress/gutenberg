@@ -32,6 +32,7 @@ $waveform-player-height: 100px;
 		min-width: $waveform-player-height;
 		background: currentColor;
 		margin: 0;
+		opacity: 1;
 
 		&:hover:not(:disabled) {
 			transform: none;
@@ -42,19 +43,33 @@ $waveform-player-height: 100px;
 		margin-bottom: 0;
 	}
 
+	.wp-block-playlist__waveform-progress-region,
 	.wp-block-playlist__waveform-hover-region {
 		position: absolute;
 		inset: 0 auto 0 0;
 		width: 0;
+		pointer-events: none;
+		z-index: 0;
+	}
+
+	.wp-block-playlist__waveform-hover-region {
 		background: transparent;
 		opacity: 0;
-		pointer-events: none;
 		transition: opacity 0.12s ease;
-		z-index: 0;
 	}
 
 	.waveform-container.is-hovering .wp-block-playlist__waveform-hover-region {
 		opacity: 0;
+	}
+
+	.wp-block-playlist__waveform-hover-canvas {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		clip-path: inset(0 100% 0 0);
+		pointer-events: none;
+		z-index: 2;
 	}
 
 	.wp-block-playlist__time-marker {
@@ -64,7 +79,8 @@ $waveform-player-height: 100px;
 		pointer-events: none;
 
 		&.wp-block-playlist__time-marker--current,
-		&.wp-block-playlist__time-marker--end {
+		&.wp-block-playlist__time-marker--end,
+		&.wp-block-playlist__time-marker--hover {
 			background: transparent !important;
 		}
 
@@ -92,7 +108,6 @@ $waveform-player-height: 100px;
 		font-weight: 500;
 		line-height: 1.2;
 		white-space: nowrap;
-		text-shadow: 0 0 0.35em Canvas;
 		opacity: 1;
 	}
 

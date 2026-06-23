@@ -69,10 +69,36 @@ function getComputedStyle( element ) {
  */
 export function getWaveformColors( element ) {
 	const textColor = getComputedStyle( element ).color;
+	const backgroundColor = getBackgroundColor( element, textColor );
 	const waveformColor = colord( textColor ).alpha( 0.3 ).toRgbString();
-	const progressColor = colord( textColor ).alpha( 0.6 ).toRgbString();
+	const progressColor = colord( backgroundColor ).alpha( 0.3 ).toRgbString();
 
 	return { textColor, waveformColor, progressColor };
+}
+
+/**
+ * Get the nearest opaque background color for an element.
+ *
+ * @param {Element} element   - The element to inspect.
+ * @param {string}  textColor - The text color used to infer a fallback.
+ * @return {string} The resolved background color.
+ */
+function getBackgroundColor( element, textColor ) {
+	let currentElement = element;
+
+	while ( currentElement ) {
+		const backgroundColor =
+			getComputedStyle( currentElement ).backgroundColor;
+		const parsedBackgroundColor = colord( backgroundColor );
+
+		if ( parsedBackgroundColor.toRgb().a > 0 ) {
+			return parsedBackgroundColor.alpha( 1 ).toRgbString();
+		}
+
+		currentElement = currentElement.parentElement;
+	}
+
+	return colord( textColor ).isDark() ? '#ffffff' : '#000000';
 }
 
 /**
@@ -223,6 +249,20 @@ function toOpaqueColor( color ) {
 }
 
 /**
+ * Get a 2D canvas context when available.
+ *
+ * @param {HTMLCanvasElement} canvas - The canvas element.
+ * @return {CanvasRenderingContext2D|null} The canvas context.
+ */
+function getCanvasContext( canvas ) {
+	try {
+		return canvas.getContext?.( '2d' ) ?? null;
+	} catch {
+		return null;
+	}
+}
+
+/**
  * Create a positioned timestamp marker for the waveform.
  *
  * @param {Document} documentRef - Document used to create elements.
@@ -285,13 +325,24 @@ export function setupWaveformTimeMarkers( instance, container ) {
 	}
 
 	const documentRef = container.ownerDocument;
+	const progressRegion = documentRef.createElement( 'div' );
+	progressRegion.className = 'wp-block-playlist__waveform-progress-region';
+	waveformArea.prepend( progressRegion );
+
 	const hoverRegion = documentRef.createElement( 'div' );
 	hoverRegion.className = 'wp-block-playlist__waveform-hover-region';
 	waveformArea.prepend( hoverRegion );
 
+	const hoverCanvas = documentRef.createElement( 'canvas' );
+	hoverCanvas.className = 'wp-block-playlist__waveform-hover-canvas';
+	hoverCanvas.setAttribute( 'aria-hidden', 'true' );
+	waveformArea.append( hoverCanvas );
+
 	const currentMarker = createTimeMarker( documentRef, 'current' );
 	const endMarker = createTimeMarker( documentRef, 'end' );
 	const hoverMarker = createTimeMarker( documentRef, 'hover' );
+	let hoverPercent = null;
+	let hideHoverMarkerTimeout;
 
 	markersContainer.append( currentMarker, endMarker, hoverMarker );
 
@@ -315,10 +366,71 @@ export function setupWaveformTimeMarkers( instance, container ) {
 
 	const getMarkerColor = () => {
 		return (
+			instance.options.buttonColor ||
 			instance.options.waveformColor ||
-			instance.options.progressColor ||
-			instance.options.buttonColor
+			instance.options.progressColor
 		);
+	};
+
+	const getSectionMarkerColor = ( percent, progress ) => {
+		const color =
+			percent <= progress
+				? instance.options.progressColor || getMarkerColor()
+				: instance.options.waveformColor || getMarkerColor();
+
+		return toOpaqueColor( color );
+	};
+
+	const clearHoverWaveform = () => {
+		hoverCanvas.style.clipPath = 'inset(0 100% 0 0)';
+
+		const context = getCanvasContext( hoverCanvas );
+		context?.clearRect( 0, 0, hoverCanvas.width, hoverCanvas.height );
+	};
+
+	const updateHoverWaveform = ( percent ) => {
+		const sourceCanvas = instance.canvas;
+
+		hoverCanvas.style.clipPath = `inset(0 ${
+			( 1 - percent ) * 100
+		}% 0 0)`;
+
+		if ( ! sourceCanvas ) {
+			return;
+		}
+
+		const width = sourceCanvas.width;
+		const height = sourceCanvas.height;
+		const context = getCanvasContext( hoverCanvas );
+
+		if ( ! width || ! height || ! context ) {
+			return;
+		}
+
+		if ( hoverCanvas.width !== width ) {
+			hoverCanvas.width = width;
+		}
+		if ( hoverCanvas.height !== height ) {
+			hoverCanvas.height = height;
+		}
+
+		try {
+			context.clearRect( 0, 0, width, height );
+			context.drawImage( sourceCanvas, 0, 0 );
+
+			const imageData = context.getImageData( 0, 0, width, height );
+			const { data } = imageData;
+
+			for ( let index = 3; index < data.length; index += 4 ) {
+				if ( data[ index ] > 0 ) {
+					data[ index ] = 255;
+				}
+			}
+
+			context.putImageData( imageData, 0, 0 );
+		} catch {
+			context.clearRect( 0, 0, width, height );
+		}
 	};
 
 	const updateTimeMarkers = () => {
@@ -326,11 +438,23 @@ export function setupWaveformTimeMarkers( instance, container ) {
 		const currentTime = Number.isFinite( instance.audio.currentTime )
 			? instance.audio.currentTime
 			: 0;
-		const markerColor = toOpaqueColor( getMarkerColor() );
+		const progress = durationSeconds
+			? clamp( currentTime / durationSeconds, 0, 1 )
+			: 0;
 
-		currentMarker.style.color = markerColor;
-		endMarker.style.color = markerColor;
+		currentMarker.style.color = durationSeconds
+			? getSectionMarkerColor( progress, progress )
+			: toOpaqueColor( instance.options.waveformColor );
+		endMarker.style.color = getSectionMarkerColor( 1, progress );
+		progressRegion.style.backgroundColor = toOpaqueColor(
+			instance.options.buttonColor
+		);
+		progressRegion.style.width = `${ progress * 100 }%`;
 		ensureTimeMarkers();
+
+		if ( hoverPercent !== null ) {
+			updateHoverWaveform( hoverPercent );
+		}
 
 		if ( ! durationSeconds ) {
 			setTimeMarker( currentMarker, 0, formatTime( currentTime ) );
@@ -340,7 +464,7 @@ export function setupWaveformTimeMarkers( instance, container ) {
 
 		setTimeMarker(
 			currentMarker,
-			currentTime / durationSeconds,
+			progress,
 			formatTime( clamp( currentTime, 0, durationSeconds ) )
 		);
 		setTimeMarker( endMarker, 1, formatTime( durationSeconds ) );
@@ -359,13 +483,16 @@ export function setupWaveformTimeMarkers( instance, container ) {
 			0,
 			1
 		);
+		const currentTime = Number.isFinite( instance.audio.currentTime )
+			? instance.audio.currentTime
+			: 0;
+		const progress = clamp( currentTime / durationSeconds, 0, 1 );
 
-		const markerColor = getMarkerColor();
-		const opaqueMarkerColor = toOpaqueColor( markerColor );
+		hoverPercent = percent;
 		waveformArea.classList.add( 'is-hovering' );
 		hoverRegion.style.width = `${ percent * 100 }%`;
-		hoverMarker.style.backgroundColor = opaqueMarkerColor;
-		hoverMarker.style.color = opaqueMarkerColor;
+		hoverMarker.style.color = getSectionMarkerColor( percent, progress );
+		updateHoverWaveform( percent );
 		ensureTimeMarkers();
 		setTimeMarker(
 			hoverMarker,
@@ -374,10 +501,19 @@ export function setupWaveformTimeMarkers( instance, container ) {
 		);
 	};
 
+	const hideHoverMarkerAfterSeek = () => {
+		clearTimeout( hideHoverMarkerTimeout );
+		hideHoverMarkerTimeout = setTimeout( () => {
+			hoverMarker.classList.remove( 'is-visible' );
+		}, 0 );
+	};
+
 	const hideHoverMarker = () => {
 		waveformArea.classList.remove( 'is-hovering' );
 		hoverMarker.classList.remove( 'is-visible' );
+		hoverPercent = null;
 		hoverRegion.style.width = '0';
+		clearHoverWaveform();
 	};
 
 	const previousOnTimeUpdate = instance.options.onTimeUpdate;
@@ -387,6 +523,7 @@ export function setupWaveformTimeMarkers( instance, container ) {
 	};
 
 	waveformArea.addEventListener( 'mousemove', updateHoverMarker );
+	waveformArea.addEventListener( 'click', hideHoverMarkerAfterSeek );
 	waveformArea.addEventListener( 'mouseleave', hideHoverMarker );
 	instance.audio.addEventListener( 'loadedmetadata', updateTimeMarkers );
 	instance.audio.addEventListener( 'durationchange', updateTimeMarkers );
@@ -395,7 +532,9 @@ export function setupWaveformTimeMarkers( instance, container ) {
 	updateTimeMarkers();
 
 	return () => {
+		clearTimeout( hideHoverMarkerTimeout );
 		waveformArea.removeEventListener( 'mousemove', updateHoverMarker );
+		waveformArea.removeEventListener( 'click', hideHoverMarkerAfterSeek );
 		waveformArea.removeEventListener( 'mouseleave', hideHoverMarker );
 		instance.audio.removeEventListener(
 			'loadedmetadata',
@@ -409,12 +548,15 @@ export function setupWaveformTimeMarkers( instance, container ) {
 			'waveformplayer:ended',
 			updateTimeMarkers
 		);
+		clearHoverWaveform();
 		instance.options.onTimeUpdate = previousOnTimeUpdate;
 		markersContainer
 			.querySelectorAll( '.wp-block-playlist__time-marker' )
 			.forEach( ( marker ) => marker.remove() );
 		hoverMarker.remove();
 		hoverRegion.remove();
+		hoverCanvas.remove();
+		progressRegion.remove();
 	};
 }
 
