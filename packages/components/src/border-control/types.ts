@@ -110,19 +110,6 @@ export type BorderControlProps = ColorProps &
 		 * `RangeControl` for additional control over a border's width.
 		 */
 		withSlider?: boolean;
-		/**
-		 * Start opting into the larger default height that will become the default size in a future version.
-		 *
-		 * @default false
-		 */
-		__next40pxDefaultSize?: boolean;
-		/**
-		 * Do not throw a warning for the deprecated 36px default size.
-		 * For internal components of other components that already throw the warning.
-		 *
-		 * @ignore
-		 */
-		__shouldNotWarnDeprecated36pxSize?: boolean;
 	};
 
 export type DropdownProps = ColorProps &

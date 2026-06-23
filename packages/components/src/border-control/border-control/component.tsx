@@ -39,7 +39,6 @@ const UnconnectedBorderControl = (
 	forwardedRef: React.ForwardedRef< any >
 ) => {
 	const {
-		__next40pxDefaultSize = false,
 		colors,
 		disableCustomColors,
 		disableUnits,
@@ -75,7 +74,7 @@ const UnconnectedBorderControl = (
 			/>
 			<HStack spacing={ 4 } className={ innerWrapperClassName }>
 				<UnitControl
-					__next40pxDefaultSize={ __next40pxDefaultSize }
+					__next40pxDefaultSize
 					__shouldNotWarnDeprecated36pxSize
 					prefix={
 						<Spacer marginRight={ 1 } marginBottom={ 0 }>
@@ -122,7 +121,7 @@ const UnconnectedBorderControl = (
 						step={ [ 'px', '%' ].includes( widthUnit ) ? 1 : 0.1 }
 						value={ widthValue || undefined }
 						withInputField={ false }
-						__next40pxDefaultSize={ __next40pxDefaultSize }
+						__next40pxDefaultSize
 						__shouldNotWarnDeprecated36pxSize
 					/>
 				) }
@@ -156,7 +155,6 @@ const UnconnectedBorderControl = (
  *
  * 	return (
  * 		<BorderControl
- * 			__next40pxDefaultSize
  * 			colors={ colors }
  * 			label={ __( 'Border' ) }
  * 			onChange={ onChange }
