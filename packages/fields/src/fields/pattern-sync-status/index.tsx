@@ -3,16 +3,16 @@
  */
 import type { Field } from '@wordpress/dataviews';
 import { __, _x } from '@wordpress/i18n';
+// @ts-ignore
+import { privateApis as patternPrivateApis } from '@wordpress/patterns';
 
 /**
  * Internal dependencies
  */
 import type { Pattern } from '../../types';
+import { unlock } from '../../lock-unlock';
 
-const PATTERN_SYNC_TYPES = {
-	full: 'fully',
-	unsynced: 'unsynced',
-};
+const { PATTERN_SYNC_TYPES } = unlock( patternPrivateApis );
 
 function getPatternSyncStatus( item: Pattern ) {
 	if ( item.meta?.wp_pattern_sync_status === PATTERN_SYNC_TYPES.unsynced ) {
