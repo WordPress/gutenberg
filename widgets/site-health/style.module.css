@@ -6,6 +6,9 @@
 }
 
 .loading {
-	min-height: var(--wpds-dimension-surface-width-xs);
+	/* TODO: Look into a WPDS token once one exists that fits a vertical
+	   (height) measure; the `surface-width` tokens are width-oriented and
+	   don't exactly match this value. */
+	min-height: 220px;
 	height: 100%;
 }
