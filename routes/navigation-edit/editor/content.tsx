@@ -11,20 +11,25 @@ import {
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
+	Modal,
 	Popover,
 	TextControl,
 } from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 // @ts-expect-error - No type declarations available for @wordpress/blocks
 import { createBlock } from '@wordpress/blocks';
 import {
+	createInterpolateElement,
 	type ComponentType,
 	type Ref,
 	useCallback,
+	useEffect,
 	useLayoutEffect,
 	useRef,
 	useState,
 } from '@wordpress/element';
+import { Link } from '@wordpress/route';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import {
 	addSubmenu as addSubmenuIcon,
@@ -34,9 +39,10 @@ import {
 	page,
 	postCategories,
 	plus,
+	update as syncIcon,
 } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
-import { EmptyState } from '@wordpress/ui';
+import { EmptyState, Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -114,7 +120,21 @@ type NavigationTreeAppenderProps = {
 	isEmptyBranch?: boolean;
 } & Record< string, unknown >;
 
+type PageRecord = {
+	id: number;
+	title: {
+		rendered: string;
+	};
+	link: string;
+	type: string;
+	parent?: number;
+};
+
 type BlockLibraryPrivateApis = {
+	convertToNavigationLinks?: (
+		pages?: PageRecord[],
+		parentPageID?: number | null
+	) => Block[];
 	NavigationLinkControls?: ComponentType< NavigationLinkControlsProps >;
 	NavigationLinkUI?: ComponentType< NavigationLinkUIProps >;
 };
@@ -129,6 +149,18 @@ type PopoverAnchor =
 			getBoundingClientRect: () => DOMRect;
 			ownerDocument?: Document;
 	  };
+
+const PAGE_QUERY = {
+	context: 'edit',
+	order: 'asc',
+	orderby: 'menu_order',
+	per_page: -1,
+	status: 'publish',
+};
+
+export function isAutoMenuBlockList( blocks: Block[] | undefined ) {
+	return blocks?.length === 1 && blocks[ 0 ]?.name === 'core/page-list';
+}
 
 function deferUntilDropdownCloses( callback: () => void ) {
 	window.requestAnimationFrame( callback );
@@ -426,14 +458,53 @@ function NavigationTreeAdditionalContent( {
 	);
 }
 
+function AutoMenuState( {
+	isCustomizeDisabled,
+	onCustomize,
+}: {
+	isCustomizeDisabled: boolean;
+	onCustomize: () => void;
+} ) {
+	return (
+		<EmptyState.Root className="navigation-edit-editor__auto-menu">
+			<EmptyState.Icon icon={ syncIcon } />
+			<EmptyState.Title>{ __( 'Auto-menu' ) }</EmptyState.Title>
+			<EmptyState.Description>
+				{ createInterpolateElement(
+					__(
+						'This menu is kept in sync with your current <pagesLink>Pages</pagesLink>. When you add, rename, or remove pages, this menu updates automatically.'
+					),
+					{
+						// @ts-ignore Children are injected by createInterpolateElement.
+						pagesLink: <Link to="/types/page/list/all" />,
+					}
+				) }
+			</EmptyState.Description>
+			<EmptyState.Actions>
+				<Button
+					variant="primary"
+					onClick={ onCustomize }
+					disabled={ isCustomizeDisabled }
+					accessibleWhenDisabled
+					__next40pxDefaultSize
+				>
+					{ __( 'Customize' ) }
+				</Button>
+			</EmptyState.Actions>
+		</EmptyState.Root>
+	);
+}
+
 export default function NavigationMenuContent( {
 	isAddingItems,
 	navigationMenu,
 	onCloseAddMenuItems,
+	onAutoMenuChange,
 }: {
 	isAddingItems: boolean;
 	navigationMenu: NavigationMenuRecord;
 	onCloseAddMenuItems: () => void;
+	onAutoMenuChange: ( isAutoMenu: boolean ) => void;
 } ) {
 	const registry = useRegistry();
 	const { hasMenuItems, navigationBlocks } = useSelect( ( select ) => {
@@ -442,6 +513,29 @@ export default function NavigationMenuContent( {
 		return {
 			hasMenuItems: getBlockCount( null ) > 0,
 			navigationBlocks: getBlocks( null ),
+		};
+	}, [] );
+	const isAutoMenu = isAutoMenuBlockList( navigationBlocks );
+	const { pages, hasResolvedPages } = useSelect( ( select ) => {
+		const store = select( coreStore ) as {
+			getEntityRecords: (
+				kind: string,
+				name: string,
+				query: typeof PAGE_QUERY
+			) => PageRecord[] | undefined;
+			hasFinishedResolution: (
+				selectorName: string,
+				args: unknown[]
+			) => boolean;
+		};
+		const selectorArgs = [ 'postType', 'page', PAGE_QUERY ];
+
+		return {
+			pages: store.getEntityRecords( 'postType', 'page', PAGE_QUERY ),
+			hasResolvedPages: store.hasFinishedResolution(
+				'getEntityRecords',
+				selectorArgs
+			),
 		};
 	}, [] );
 	const {
@@ -458,6 +552,8 @@ export default function NavigationMenuContent( {
 		string | null
 	>( null );
 	const [ labelOnlySubmenuLabel, setLabelOnlySubmenuLabel ] = useState( '' );
+	const [ isCustomizeAutoMenuModalOpen, setIsCustomizeAutoMenuModalOpen ] =
+		useState( false );
 	const [ addMenuItemsTargetClientId, setAddMenuItemsTargetClientId ] =
 		useState< ClientId >( undefined );
 	const [ anchorElement, setAnchorElement ] = useState< Element | null >(
@@ -466,6 +562,10 @@ export default function NavigationMenuContent( {
 	const [ labelOnlyAnchorElement, setLabelOnlyAnchorElement ] =
 		useState< PopoverAnchor | null >( null );
 	const listViewRef = useRef< HTMLDivElement >( null );
+
+	useEffect( () => {
+		onAutoMenuChange( isAutoMenu );
+	}, [ isAutoMenu, onAutoMenuChange ] );
 
 	const editingBlockAttributes = useSelect(
 		( select ) => {
@@ -635,8 +735,34 @@ export default function NavigationMenuContent( {
 		},
 		[ offCanvasOnselect ]
 	);
-	const { NavigationLinkControls, NavigationLinkUI } =
-		getBlockLibraryPrivateApis();
+	const {
+		convertToNavigationLinks,
+		NavigationLinkControls,
+		NavigationLinkUI,
+	} = getBlockLibraryPrivateApis();
+	const customizeAutoMenu = useCallback( () => {
+		if ( ! convertToNavigationLinks || ! hasResolvedPages ) {
+			return;
+		}
+
+		const pageListBlock = navigationBlocks[ 0 ];
+		const parentPageID =
+			typeof pageListBlock?.attributes?.parentPageID === 'number'
+				? pageListBlock.attributes.parentPageID
+				: null;
+
+		replaceBlockList(
+			null,
+			convertToNavigationLinks( pages ?? [], parentPageID )
+		);
+		setIsCustomizeAutoMenuModalOpen( false );
+	}, [
+		convertToNavigationLinks,
+		hasResolvedPages,
+		navigationBlocks,
+		pages,
+		replaceBlockList,
+	] );
 	const selectInsertedSubmenu = useCallback(
 		( block: Block | null | undefined ) => {
 			if ( block?.name !== 'core/navigation-submenu' ) {
@@ -794,47 +920,100 @@ export default function NavigationMenuContent( {
 		[ NavigationLinkUI, selectInsertedSubmenu ]
 	);
 
+	let content;
+	if ( isAutoMenu ) {
+		content = (
+			<AutoMenuState
+				isCustomizeDisabled={
+					! hasResolvedPages || ! convertToNavigationLinks
+				}
+				onCustomize={ () => setIsCustomizeAutoMenuModalOpen( true ) }
+			/>
+		);
+	} else if ( hasMenuItems ) {
+		content = (
+			<div
+				ref={ listViewRef }
+				className="navigation-edit-editor__list-view"
+			>
+				<PrivateListView
+					rootClientId={ null }
+					onSelect={ handleSelect }
+					blockSettingsMenu={ LeafMoreMenu }
+					showAppender
+					renderAppender={ renderNavigationTreeAppender }
+					appenderParentClientId={ activeSubmenuClientId }
+					additionalBlockContent={
+						renderNavigationTreeAdditionalContent
+					}
+					isExpanded
+				/>
+			</div>
+		);
+	} else {
+		content = (
+			<EmptyState.Root>
+				<EmptyState.Icon icon={ navigationIcon } />
+				<EmptyState.Title>
+					{ __( 'No menu items yet' ) }
+				</EmptyState.Title>
+				<EmptyState.Description>
+					{ __(
+						'Add pages, links, or other content to start building this navigation menu.'
+					) }
+				</EmptyState.Description>
+				<EmptyState.Actions>
+					<Button
+						variant="primary"
+						onClick={ () => openAddMenuItemsModal( null ) }
+						__next40pxDefaultSize
+					>
+						{ __( 'Add menu items' ) }
+					</Button>
+				</EmptyState.Actions>
+			</EmptyState.Root>
+		);
+	}
+
 	return (
 		<>
-			{ hasMenuItems ? (
-				<div
-					ref={ listViewRef }
-					className="navigation-edit-editor__list-view"
+			{ content }
+			{ isCustomizeAutoMenuModalOpen && (
+				<Modal
+					title={ __( 'Customize this menu?' ) }
+					overlayClassName="navigation-edit-editor__customize-auto-menu-modal"
+					onRequestClose={ () =>
+						setIsCustomizeAutoMenuModalOpen( false )
+					}
 				>
-					<PrivateListView
-						rootClientId={ null }
-						onSelect={ handleSelect }
-						blockSettingsMenu={ LeafMoreMenu }
-						showAppender
-						renderAppender={ renderNavigationTreeAppender }
-						appenderParentClientId={ activeSubmenuClientId }
-						additionalBlockContent={
-							renderNavigationTreeAdditionalContent
-						}
-						isExpanded
-					/>
-				</div>
-			) : (
-				<EmptyState.Root>
-					<EmptyState.Icon icon={ navigationIcon } />
-					<EmptyState.Title>
-						{ __( 'No menu items yet' ) }
-					</EmptyState.Title>
-					<EmptyState.Description>
+					<p>
 						{ __(
-							'Add pages, links, or other content to start building this navigation menu.'
+							"Your menu won't be automatically kept in sync with your pages anymore, but you will be able to customize it manually."
 						) }
-					</EmptyState.Description>
-					<EmptyState.Actions>
+					</p>
+					<Stack direction="row" justify="flex-end" gap="sm">
 						<Button
-							variant="primary"
-							onClick={ () => openAddMenuItemsModal( null ) }
+							variant="tertiary"
+							onClick={ () =>
+								setIsCustomizeAutoMenuModalOpen( false )
+							}
 							__next40pxDefaultSize
 						>
-							{ __( 'Add menu items' ) }
+							{ __( 'Cancel' ) }
 						</Button>
-					</EmptyState.Actions>
-				</EmptyState.Root>
+						<Button
+							variant="primary"
+							onClick={ customizeAutoMenu }
+							disabled={
+								! hasResolvedPages || ! convertToNavigationLinks
+							}
+							accessibleWhenDisabled
+							__next40pxDefaultSize
+						>
+							{ __( 'Customize menu' ) }
+						</Button>
+					</Stack>
+				</Modal>
 			) }
 			{ editingBlockClientId &&
 				editingBlockAttributes &&

@@ -23,6 +23,7 @@ export default function NavigationMenuEditor( {
 	isAddingItems,
 	navigationMenu,
 	onCloseAddMenuItems,
+	onAutoMenuChange,
 }: {
 	id: number;
 	isAddingItems: boolean;
@@ -38,6 +39,7 @@ export default function NavigationMenuEditor( {
 		};
 	};
 	onCloseAddMenuItems: () => void;
+	onAutoMenuChange: ( isAutoMenu: boolean ) => void;
 } ) {
 	const { isReady: assetsReady } = useEditorAssets();
 	const { isReady: settingsReady, editorSettings } = useEditorSettings();
@@ -92,6 +94,7 @@ export default function NavigationMenuEditor( {
 				isAddingItems={ isAddingItems }
 				navigationMenu={ navigationMenu }
 				onCloseAddMenuItems={ onCloseAddMenuItems }
+				onAutoMenuChange={ onAutoMenuChange }
 			/>
 		</BlockEditorProvider>
 	);

@@ -65,6 +65,10 @@
 	margin-top: 12px;
 }
 
+.components-modal__frame.navigation-edit-editor__customize-auto-menu-modal {
+	width: min(420px, calc(100vw - 48px));
+}
+
 .components-modal__frame.navigation-add-items-modal {
 	width: min(1120px, calc(100vw - 48px));
 	height: min(760px, calc(100vh - 48px));

@@ -17,7 +17,7 @@ import {
 	Modal,
 	TextControl,
 } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { moreVertical, pencil, postCategories, trash } from '@wordpress/icons';
 import { Stack } from '@wordpress/ui';
 
@@ -41,6 +41,9 @@ function NavigationEditStage() {
 	const [ isDeleting, setIsDeleting ] = useState( false );
 	const [ renameTitle, setRenameTitle ] = useState( '' );
 	const [ isBusy, setIsBusy ] = useState( false );
+	const [ isAutoMenu, setIsAutoMenu ] = useState< boolean | undefined >(
+		undefined
+	);
 	const { navigationMenu } = useSelect(
 		( select ) => {
 			const { getEntityRecord } = select( coreStore );
@@ -58,6 +61,10 @@ function NavigationEditStage() {
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
+
+	useEffect( () => {
+		setIsAutoMenu( undefined );
+	}, [ navigationId ] );
 
 	if ( ! navigationMenu ) {
 		return;
@@ -193,15 +200,17 @@ function NavigationEditStage() {
 						{ ( { onClose } ) => (
 							<>
 								<MenuGroup>
-									<MenuItem
-										icon={ postCategories }
-										onClick={ () => {
-											setIsAddingItems( true );
-											onClose();
-										} }
-									>
-										{ __( 'Add menu items' ) }
-									</MenuItem>
+									{ isAutoMenu === false && (
+										<MenuItem
+											icon={ postCategories }
+											onClick={ () => {
+												setIsAddingItems( true );
+												onClose();
+											} }
+										>
+											{ __( 'Add menu items' ) }
+										</MenuItem>
+									) }
 									<MenuItem
 										icon={ pencil }
 										onClick={ () => {
@@ -234,6 +243,7 @@ function NavigationEditStage() {
 					isAddingItems={ isAddingItems }
 					navigationMenu={ navigationMenu }
 					onCloseAddMenuItems={ () => setIsAddingItems( false ) }
+					onAutoMenuChange={ setIsAutoMenu }
 				/>
 			</Page>
 			{ isRenaming && (
