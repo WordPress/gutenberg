@@ -307,9 +307,68 @@ function createStyleBundlingPlugins( workingDir ) {
 }
 
 /**
- * Plugin to inline WASM files as base64 data URLs.
- * This eliminates the need for separate WASM file downloads and avoids
- * issues with hosts not serving WASM files with the correct MIME type.
+ * Encode a binary buffer as a compact UTF-8 JavaScript string literal.
+ *
+ * Each byte is emitted as its UTF-8 representation (1 byte for 0x00-0x7F,
+ * 2 bytes for 0x80-0xFF), escaping only the characters that are not valid
+ * unescaped inside a JS string literal. When the source file is parsed as
+ * UTF-8 the resulting string holds one code point (0-255) per original byte,
+ * so it can be decoded back to bytes with `charCodeAt`.
+ *
+ * Unlike base64 (which inflates binary by ~33% and misaligns byte patterns so
+ * it compresses poorly), this encoding preserves the original byte stream and
+ * therefore compresses much better with gzip and brotli. This mirrors
+ * Emscripten's `SINGLE_FILE_BINARY_ENCODE` option.
+ *
+ * @see https://emscripten.org/docs/tools_reference/settings_reference.html#single-file-binary-encode
+ *
+ * @param {Buffer} data Binary data to encode.
+ * @return {string} A JavaScript string literal (including surrounding quotes).
+ */
+function binaryEncode( data ) {
+	// Pick the quote character that needs the fewest escapes.
+	let singleQuotes = 0;
+	let doubleQuotes = 0;
+	for ( const byte of data ) {
+		if ( byte === 0x27 ) {
+			singleQuotes++;
+		} else if ( byte === 0x22 ) {
+			doubleQuotes++;
+		}
+	}
+	const quote = singleQuotes < doubleQuotes ? 0x27 : 0x22;
+
+	const out = [ quote ];
+	for ( const byte of data ) {
+		if ( byte === quote || byte === 0x5c /* \ */ ) {
+			out.push( 0x5c, byte );
+		} else if ( byte === 0x0d /* \r */ ) {
+			out.push( 0x5c, 0x72 );
+		} else if ( byte === 0x0a /* \n */ ) {
+			out.push( 0x5c, 0x6e );
+		} else if ( byte < 0x80 ) {
+			out.push( byte );
+		} else {
+			// Encode 0x80-0xFF as two-byte UTF-8 (code points U+0080-U+00FF).
+			// Arithmetic form of `0xc0 | (byte >> 6)` and `0x80 | (byte & 0x3f)`.
+			out.push(
+				0xc0 + Math.floor( byte / 0x40 ),
+				0x80 + ( byte % 0x40 )
+			);
+		}
+	}
+	out.push( quote );
+
+	return Buffer.from( out ).toString( 'utf8' );
+}
+
+/**
+ * Plugin to inline WASM files into the bundle.
+ *
+ * This eliminates the need for separate WASM file downloads and avoids issues
+ * with hosts not serving WASM files with the correct MIME type. The binary is
+ * embedded using a compact UTF-8 encoding (rather than base64) so it compresses
+ * well, and is decoded back to a `Uint8Array` at runtime.
  *
  * @return {Object} esbuild plugin.
  */
@@ -339,18 +398,23 @@ const wasmInlinePlugin = {
 			return null;
 		} );
 
-		// Load WASM files and convert to base64 data URLs.
+		// Load WASM files, embed them as a compact UTF-8 string, and decode
+		// back to a Uint8Array at runtime.
 		build.onLoad(
 			{ filter: /.*/, namespace: 'wasm-inline' },
 			async ( args ) => {
 				const wasmBuffer = await readFile(
 					args.pluginData.resolvedPath
 				);
-				const base64 = wasmBuffer.toString( 'base64' );
-				const dataUrl = `data:application/wasm;base64,${ base64 }`;
+				const encoded = binaryEncode( wasmBuffer );
 
 				return {
-					contents: `export default "${ dataUrl }";`,
+					contents: `const s = ${ encoded };
+const bytes = new Uint8Array( s.length );
+for ( let i = 0; i < s.length; i++ ) {
+	bytes[ i ] = s.charCodeAt( i );
+}
+export default bytes;`,
 					loader: 'js',
 				};
 			}
@@ -650,6 +714,10 @@ async function bundlePackage( packageName, options = {} ) {
 						`${ fileName }.min.js`
 					),
 					bundle: true,
+					// Emit UTF-8 so binary-encoded inlined WASM (e.g. the vips
+					// worker) stays compact; ASCII output would escape high
+					// bytes as \uXXXX and defeat the compression.
+					charset: 'utf8',
 					sourcemap: ! isWasmWorker,
 					format: 'esm',
 					target,
@@ -677,6 +745,7 @@ async function bundlePackage( packageName, options = {} ) {
 							`${ fileName }.js`
 						),
 						bundle: true,
+						charset: 'utf8',
 						sourcemap: true,
 						format: 'esm',
 						target,
@@ -1395,6 +1464,9 @@ async function transpilePackage( packageName ) {
 				outbase: srcDir,
 				outExtension: { '.js': '.cjs' },
 				bundle: true,
+				// Emit UTF-8 so binary-encoded inlined WASM stays compact
+				// (ASCII output would escape high bytes as \uXXXX).
+				charset: 'utf8',
 				platform: 'node',
 				format: 'cjs',
 				sourcemap: true,
@@ -1426,6 +1498,9 @@ async function transpilePackage( packageName ) {
 				outbase: srcDir,
 				outExtension: { '.js': '.mjs' },
 				bundle: true,
+				// Emit UTF-8 so binary-encoded inlined WASM stays compact
+				// (ASCII output would escape high bytes as \uXXXX).
+				charset: 'utf8',
 				platform: 'neutral',
 				format: 'esm',
 				sourcemap: true,

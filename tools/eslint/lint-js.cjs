@@ -20,6 +20,45 @@ const args = userArgs.some( ( arg ) =>
 	: [ '--suppressions-location', SUPPRESSIONS_FILE, ...userArgs ];
 const wpScriptsBin = require.resolve( '@wordpress/scripts/bin/wp-scripts.js' );
 
+const FORMAT_FLAGS = [ '-f', '--format' ];
+
+function resolveFormatter( name ) {
+	if (
+		name.startsWith( '/' ) ||
+		name.startsWith( './' ) ||
+		name.startsWith( '../' ) ||
+		/^[A-Za-z]:\\/.test( name )
+	) {
+		return name;
+	}
+
+	for ( const candidate of [ name, `eslint-formatter-${ name }` ] ) {
+		try {
+			return require.resolve( candidate, { paths: [ __dirname ] } );
+		} catch {}
+	}
+
+	throw new Error(
+		`Formatter "${ name }" not found. Install the corresponding eslint-formatter-<name> package in tools/eslint/ or use a built-in formatter (stylish, json, etc.).`
+	);
+}
+
+const childArgs = args.map( ( arg, index ) => {
+	if ( FORMAT_FLAGS.includes( args[ index - 1 ] ) ) {
+		return resolveFormatter( arg );
+	}
+
+	for ( const flag of FORMAT_FLAGS ) {
+		if ( arg.startsWith( `${ flag }=` ) ) {
+			return `${ flag }=${ resolveFormatter(
+				arg.slice( flag.length + 1 )
+			) }`;
+		}
+	}
+
+	return arg;
+} );
+
 // Detect stale suppressions by scanning the child's output for ESLint's
 // own `--prune-suppressions` hint. A small sliding tail buffer is used so
 // the child's output can be streamed straight to the user instead of being
@@ -39,10 +78,14 @@ if (
 	childEnv.FORCE_COLOR = '1';
 }
 
-const child = spawn( process.execPath, [ wpScriptsBin, 'lint-js', ...args ], {
-	stdio: [ 'inherit', 'pipe', 'pipe' ],
-	env: childEnv,
-} );
+const child = spawn(
+	process.execPath,
+	[ wpScriptsBin, 'lint-js', ...childArgs ],
+	{
+		stdio: [ 'inherit', 'pipe', 'pipe' ],
+		env: childEnv,
+	}
+);
 
 child.stdout.on( 'data', handleChunk( process.stdout ) );
 child.stderr.on( 'data', handleChunk( process.stderr ) );

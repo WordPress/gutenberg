@@ -19,11 +19,13 @@ import AddNewTemplate from '../add-new-template-legacy';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 import { useEditPostAction } from '../dataviews-actions';
-import { authorField, descriptionField, previewField } from './fields';
+import { authorField, previewField } from './fields';
 
-const { usePostActions, templateTitleField } = unlock( editorPrivateApis );
+const { usePostActions, usePostFields } = unlock( editorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );
+
+const VIEW_CONFIG_FIELDS = [ 'default_view', 'default_layouts', 'view_list' ];
 
 export default function PageTemplates() {
 	const { path, query } = useLocation();
@@ -37,6 +39,7 @@ export default function PageTemplates() {
 	} = useViewConfig( {
 		kind: 'postType',
 		name: TEMPLATE_POST_TYPE,
+		fields: VIEW_CONFIG_FIELDS,
 	} );
 	const activeViewOverrides = useMemo(
 		() => viewList?.find( ( v ) => v.slug === activeView )?.view ?? {},
@@ -97,18 +100,26 @@ export default function PageTemplates() {
 		} ) );
 	}, [ records ] );
 
-	const fields = useMemo(
-		() => [
+	const postFields = usePostFields( { postType: TEMPLATE_POST_TYPE } );
+	const fields = useMemo( () => {
+		const __fields = [
 			previewField,
-			templateTitleField,
-			descriptionField,
 			{
 				...authorField,
 				elements: authors,
 			},
-		],
-		[ authors ]
-	);
+		];
+		// TODO: Only `description` and `title` are sourced from the shared
+		// `@wordpress/fields` registry so far. The remaining local fields
+		// (e.g. `previewField`, `authorField`) should also be evaluated for
+		// migration to the shared registry.
+		return [
+			...__fields,
+			...( postFields || [] ).filter( ( field ) =>
+				[ 'description', 'title' ].includes( field.id )
+			),
+		];
+	}, [ authors, postFields ] );
 
 	const { data, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( records, view, fields );
