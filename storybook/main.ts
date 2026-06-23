@@ -36,7 +36,7 @@ const stories = [
 	'../packages/ui/src/**/stories/*.mdx',
 	'../packages/ui/src/**/stories/*.story.@(ts|tsx)',
 	'../packages/admin-ui/src/**/stories/*.story.@(ts|tsx)',
-].filter( Boolean );
+];
 
 const config: StorybookConfig = {
 	core: {
