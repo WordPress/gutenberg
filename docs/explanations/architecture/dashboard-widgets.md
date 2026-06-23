@@ -8,13 +8,13 @@ This document explains how the pieces of the dashboard widget system relate to e
 
 ## Overview
 
-A widget travels through five stations, each owned by a different part of the codebase:
+A widget travels through five stages, each owned by a different part of the codebase:
 
 ![The widget pipeline: from the widgets folder, through the build and the server registry, to the client package and hosts](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/explanations/architecture/assets/dashboard-widgets-pipeline.svg)
 
-No station knows the internals of the next. Each consumes a narrow artifact: a folder convention, a manifest, a registry, a REST record, a `WidgetType`.
+Each stage hands the next a narrow artifact, and nothing else: a folder convention, a manifest, a registry, a REST record, a `WidgetType`. No stage reaches into how another works.
 
-That separation lets each piece evolve independently. It is also why the client contract lives in its own package.
+That separation lets each stage evolve independently. It is also why the client contract lives in its own package.
 
 ## Authoring: a widget is a folder
 
