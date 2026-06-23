@@ -290,6 +290,19 @@ export function getRegisteredInserterMediaCategories( state ) {
 }
 
 /**
+ * Returns the inserter media panel component injected via settings,
+ * if available. This allows the editor package to provide a DataViews-based
+ * media panel that replaces the default category-based media tab.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Function|undefined} The inserter media panel component, or undefined.
+ */
+export function getInserterMediaPanel( state ) {
+	return state.settings.inserterMediaPanel;
+}
+
+/**
  * Returns an array containing the allowed inserter media categories.
  * It merges the registered media categories from extenders with the
  * core ones. It also takes into account the allowed `mime_types`, which

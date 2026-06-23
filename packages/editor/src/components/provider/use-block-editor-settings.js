@@ -23,6 +23,7 @@ import { privateApis as mediaEditorPrivateApis } from '@wordpress/media-editor';
  * Internal dependencies
  */
 import inserterMediaCategories from '../media-categories';
+import InserterMediaPanel from '../inserter-media-panel';
 import { mediaUpload } from '../../utils';
 import mediaUploadOnSuccess from '../../utils/media-upload/on-success';
 import { default as mediaSideload } from '../../utils/media-sideload';
@@ -377,6 +378,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
 				fetchLinkSuggestions( search, searchOptions, settings ),
 			inserterMediaCategories,
+			inserterMediaPanel: InserterMediaPanel,
 			__experimentalFetchRichUrlData: fetchUrlData,
 			// Todo: This only checks the top level post, not the post within a template or any other entity that can be edited.
 			// This might be better as a generic "canUser" selector.
