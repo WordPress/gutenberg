@@ -13,6 +13,10 @@ import { SelectionContext } from './selection-context';
 
 const noop = () => {};
 
+// Undo can replace the selected block before every matching controlled list
+// restores selection, so remember which controller last held the selection.
+const lastSelectedControlledParentByRegistry = new WeakMap();
+
 /**
  * Clones a block and its inner blocks, building a bidirectional mapping
  * between external (original) and internal (cloned) client IDs.
@@ -93,6 +97,47 @@ function restoreSelectionIds( selectionState, mapping ) {
 }
 
 /**
+ * Find the nearest controlled inner block controller for a block.
+ * A block can be nested inside multiple controlled lists, so prefer
+ * the innermost parent.
+ *
+ * @param {string}   blockClientId            The block client ID.
+ * @param {Function} getBlockParents          Selector returning parent IDs.
+ * @param {Function} areInnerBlocksControlled Selector checking controlled blocks.
+ * @return {string|undefined}                  The nearest controlled parent client ID.
+ */
+function getNearestControlledParent(
+	blockClientId,
+	getBlockParents,
+	areInnerBlocksControlled
+) {
+	const parents = blockClientId ? getBlockParents( blockClientId ) : [];
+
+	for ( let i = parents.length - 1; i >= 0; i-- ) {
+		if ( areInnerBlocksControlled( parents[ i ] ) ) {
+			return parents[ i ];
+		}
+	}
+}
+
+function getLastSelectedControlledParent(
+	registry,
+	getBlockName,
+	areInnerBlocksControlled
+) {
+	const controlledParent =
+		lastSelectedControlledParentByRegistry.get( registry );
+
+	if (
+		controlledParent &&
+		getBlockName( controlledParent ) &&
+		areInnerBlocksControlled( controlledParent )
+	) {
+		return controlledParent;
+	}
+}
+
+/**
  * A function to call when the block value has been updated in the block-editor
  * store.
  *
@@ -158,8 +203,14 @@ export default function useBlockSync( {
 		setHasControlledInnerBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
 	} = registry.dispatch( blockEditorStore );
-	const { getBlockName, getBlocks, getSelectionStart, getSelectionEnd } =
-		registry.select( blockEditorStore );
+	const {
+		areInnerBlocksControlled,
+		getBlockName,
+		getBlockParents,
+		getBlocks,
+		getSelectionStart,
+		getSelectionEnd,
+	} = registry.select( blockEditorStore );
 
 	const pendingChangesRef = useRef( { incoming: null, outgoing: [] } );
 	const subscribedRef = useRef( false );
@@ -200,6 +251,28 @@ export default function useBlockSync( {
 		const isOurs = clientId
 			? idMappingRef.current.externalToInternal.has( startClientId )
 			: !! getBlockName( startClientId );
+
+		if ( clientId && isOurs ) {
+			// Entity selections use external client IDs, so the same
+			// selection can look valid to multiple controlled block lists
+			// rendering the same entity. If the current editor selection is
+			// already inside another controller, do not steal it.
+			const selectedControllerId =
+				getNearestControlledParent(
+					getSelectionStart()?.clientId,
+					getBlockParents,
+					areInnerBlocksControlled
+				) ||
+				getLastSelectedControlledParent(
+					registry,
+					getBlockName,
+					areInnerBlocksControlled
+				);
+
+			if ( selectedControllerId && selectedControllerId !== clientId ) {
+				return;
+			}
+		}
 
 		if ( isOurs ) {
 			appliedSelectionRef.current = selection;
@@ -344,8 +417,6 @@ export default function useBlockSync( {
 			isLastBlockChangePersistent,
 			__unstableGetLastBlockChangeHistoryMode,
 			__unstableIsLastBlockChangeIgnored,
-			areInnerBlocksControlled,
-			getBlockParents,
 		} = registry.select( blockEditorStore );
 
 		let blocks = getBlocks( clientId );
@@ -404,6 +475,19 @@ export default function useBlockSync( {
 				newSelectionEnd !== prevSelectionEnd;
 
 			if ( selectionChanged ) {
+				const selectedControllerId = getNearestControlledParent(
+					newSelectionStart?.clientId,
+					getBlockParents,
+					areInnerBlocksControlled
+				);
+
+				if ( selectedControllerId ) {
+					lastSelectedControlledParentByRegistry.set(
+						registry,
+						selectedControllerId
+					);
+				}
+
 				prevSelectionStart = newSelectionStart;
 				prevSelectionEnd = newSelectionEnd;
 			}

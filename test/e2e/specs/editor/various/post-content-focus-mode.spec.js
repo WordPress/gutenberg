@@ -9,6 +9,22 @@ test.use( {
 	},
 } );
 
+const TEMPLATE_PART_CONTENT = [
+	'<!-- wp:post-title /-->',
+	'<!-- wp:post-content {"layout":{"inherit":true}} /-->',
+].join( '\n' );
+
+const SINGULAR_TEMPLATE_WITH_NESTED_POST_CONTENT = [
+	'<!-- wp:template-part {"slug":"header","tagName":"header","theme":"emptytheme"} /-->',
+	'<!-- wp:template-part {"slug":"content-area","theme":"emptytheme"} /-->',
+].join( '\n' );
+
+const SINGULAR_TEMPLATE_WITH_DUPLICATE_POST_CONTENT = [
+	'<!-- wp:template-part {"slug":"header","tagName":"header","theme":"emptytheme"} /-->',
+	'<!-- wp:post-content {"layout":{"inherit":true}} /-->',
+	'<!-- wp:template-part {"slug":"content-area","theme":"emptytheme"} /-->',
+].join( '\n' );
+
 // Post content focus mode (aka the 'Show template' option when editing a post or page).
 test.describe( 'Post Content focus mode', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
@@ -103,20 +119,14 @@ test.describe( 'Post Content focus mode', () => {
 			await requestUtils.createTemplate( 'wp_template_part', {
 				slug: 'content-area',
 				title: 'Content Area',
-				content: [
-					'<!-- wp:post-title /-->',
-					'<!-- wp:post-content {"layout":{"inherit":true}} /-->',
-				].join( '\n' ),
+				content: TEMPLATE_PART_CONTENT,
 			} );
 
 			// Override the singular template so post-content is inside a template part.
 			await requestUtils.createTemplate( 'wp_template', {
 				slug: 'singular',
 				title: 'Singular',
-				content: [
-					'<!-- wp:template-part {"slug":"header","tagName":"header","theme":"emptytheme"} /-->',
-					'<!-- wp:template-part {"slug":"content-area","theme":"emptytheme"} /-->',
-				].join( '\n' ),
+				content: SINGULAR_TEMPLATE_WITH_NESTED_POST_CONTENT,
 			} );
 		} );
 
@@ -348,6 +358,84 @@ test.describe( 'Post Content focus mode', () => {
 					await postContentFocusMode.getTemplatePartInnerBlockNames()
 				).toEqual( expectedTemplatePart );
 			} );
+		} );
+
+		test( 'keeps selection in the edited Post Content instance after typing', async ( {
+			admin,
+			editor,
+			page,
+			pageUtils,
+			postContentFocusMode,
+			requestUtils,
+		} ) => {
+			await requestUtils.createTemplate( 'wp_template', {
+				slug: 'single',
+				title: 'Single',
+				content: SINGULAR_TEMPLATE_WITH_DUPLICATE_POST_CONTENT,
+			} );
+
+			await admin.createNewPost();
+
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Tracked paragraph' },
+			} );
+
+			await postContentFocusMode.enableShowTemplate();
+
+			const rootPostContent = await page.evaluate( () => {
+				const {
+					getBlocksByName,
+					getBlockOrder,
+					getBlockParents,
+					getBlockName,
+				} = window.wp.data.select( 'core/block-editor' );
+				const clientId = getBlocksByName( 'core/post-content' ).find(
+					( postContentClientId ) =>
+						! getBlockParents( postContentClientId ).some(
+							( parentClientId ) =>
+								getBlockName( parentClientId ) ===
+								'core/template-part'
+						)
+				);
+
+				return {
+					clientId,
+					innerBlockClientId: getBlockOrder( clientId )[ 0 ],
+				};
+			} );
+
+			await editor.canvas
+				.locator(
+					`[data-block="${ rootPostContent.innerBlockClientId }"]`
+				)
+				.click();
+			await page.keyboard.press( 'End' );
+			await page.keyboard.type( ' edited' );
+
+			const getSelectedPostContentClientId = () =>
+				page.evaluate( () => {
+					const {
+						getSelectedBlockClientId,
+						getBlockParents,
+						getBlockName,
+					} = window.wp.data.select( 'core/block-editor' );
+					return getBlockParents( getSelectedBlockClientId() ).find(
+						( parentClientId ) =>
+							getBlockName( parentClientId ) ===
+							'core/post-content'
+					);
+				} );
+
+			await expect
+				.poll( getSelectedPostContentClientId )
+				.toBe( rootPostContent.clientId );
+
+			await pageUtils.pressKeys( 'primary+z' );
+
+			await expect
+				.poll( getSelectedPostContentClientId )
+				.toBe( rootPostContent.clientId );
 		} );
 	} );
 } );
