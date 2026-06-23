@@ -202,6 +202,24 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 				return null;
 			}
 
+			if ( 'application_password' !== $args['authentication']['method'] ) {
+				foreach ( array( 'username_setting_name', 'application_password_setting_name' ) as $setting_name_key ) {
+					if ( array_key_exists( $setting_name_key, $args['authentication'] ) ) {
+						_doing_it_wrong(
+							__METHOD__,
+							sprintf(
+								/* translators: 1: Connector ID, 2: Authentication setting name key. */
+								__( 'Connector "%1$s" authentication %2$s can only be provided when authentication method is "application_password".' ),
+								esc_html( $id ),
+								esc_html( $setting_name_key )
+							),
+							'7.0.0'
+						);
+						return null;
+					}
+				}
+			}
+
 			if ( 'ai_provider' === $args['type'] && ! class_exists( '\WordPress\AiClient\AiClient' ) ) {
 				// No need for a doing_it_wrong as AI support is disabled intentionally.
 				return null;
