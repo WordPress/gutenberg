@@ -25,6 +25,11 @@ function useInterval( callback, intervalInSeconds ) {
 	}, [ callback ] );
 
 	useEffect( () => {
+		// Interval can be undefined before editor settings are populated.
+		if ( ! intervalInSeconds ) {
+			return;
+		}
+
 		const id = setInterval(
 			() => callbackRef.current(),
 			intervalInSeconds * 1000
