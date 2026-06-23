@@ -25,6 +25,7 @@
 ### Documentation
 
 -   `Menu`: Fix `overriden` typo to `overridden` in `CheckboxItemProps` and `RadioItemProps`. ([#79331](https://github.com/WordPress/gutenberg/pull/79331))
+-   Add component documentation for `ColorPicker`, `CustomSelectControl`, `Navigator`, `NumberControl`, `ResizableBox`, and `Slot` components ([#79460](https://github.com/WordPress/gutenberg/pull/79460)).
 
 ### Code Quality
 
