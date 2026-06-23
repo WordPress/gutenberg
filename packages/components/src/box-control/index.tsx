@@ -10,7 +10,7 @@ import warning from '@wordpress/warning';
  * Internal dependencies
  */
 import { BaseControl } from '../base-control';
-import InputControl from './input-control';
+import BoxInputControl from './box-input-control';
 import LinkedButton from './linked-button';
 import { Grid } from '../grid';
 import {
@@ -158,8 +158,7 @@ function BoxControl( {
 			</BaseControl.VisualLabel>
 			{ isLinked && (
 				<InputWrapper>
-					{ /* eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop -- hardcoded on embedded primitives */ }
-					<InputControl side="all" { ...inputControlProps } />
+					<BoxInputControl side="all" { ...inputControlProps } />
 				</InputWrapper>
 			) }
 			{ ! hasOneSide && (
@@ -174,8 +173,7 @@ function BoxControl( {
 			{ ! isLinked &&
 				splitOnAxis &&
 				[ 'vertical', 'horizontal' ].map( ( axis ) => (
-					// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop -- hardcoded on embedded primitives
-					<InputControl
+					<BoxInputControl
 						key={ axis }
 						side={ axis as 'horizontal' | 'vertical' }
 						{ ...inputControlProps }
@@ -184,8 +182,7 @@ function BoxControl( {
 			{ ! isLinked &&
 				! splitOnAxis &&
 				Array.from( sidesToRender ).map( ( axis ) => (
-					// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop -- hardcoded on embedded primitives
-					<InputControl
+					<BoxInputControl
 						key={ axis }
 						side={ axis }
 						{ ...inputControlProps }
