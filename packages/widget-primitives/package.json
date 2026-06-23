@@ -44,11 +44,8 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@wordpress/core-data": "file:../core-data",
-		"@wordpress/data": "file:../data",
 		"@wordpress/dataviews": "file:../dataviews",
-		"@wordpress/element": "file:../element",
-		"@wordpress/i18n": "file:../i18n"
+		"@wordpress/element": "file:../element"
 	},
 	"devDependencies": {
 		"@storybook/addon-docs": "^10.4.3",
