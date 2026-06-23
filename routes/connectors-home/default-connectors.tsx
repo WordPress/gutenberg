@@ -152,19 +152,8 @@ function ApiKeyConnector( {
 		authentication?.method === 'api_key' ? authentication : undefined;
 	const settingName = auth?.settingName ?? '';
 	const helpUrl = auth?.credentialsUrl ?? undefined;
-	const pluginFile = plugin?.file?.replace( /\.php$/, '' );
-	const pluginSlug = pluginFile?.includes( '/' )
-		? pluginFile.split( '/' )[ 0 ]
-		: pluginFile;
-
-	let helpLabel: string | undefined;
-	try {
-		if ( helpUrl ) {
-			helpLabel = new URL( helpUrl ).hostname;
-		}
-	} catch {
-		// Invalid URL — leave helpLabel undefined.
-	}
+	const helpLabel = getHelpLabel( helpUrl );
+	const pluginSlug = getPluginSlug( plugin?.file );
 
 	const {
 		pluginStatus,
