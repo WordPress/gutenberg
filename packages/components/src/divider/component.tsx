@@ -14,11 +14,6 @@ import { space } from '../utils/space';
 import type { DividerProps } from './types';
 import styles from './style.module.scss';
 
-type DividerStyle = React.CSSProperties & {
-	'--wp-components-divider-margin-start'?: ReturnType< typeof space >;
-	'--wp-components-divider-margin-end'?: ReturnType< typeof space >;
-};
-
 function UnconnectedDivider(
 	props: WordPressComponentProps< DividerProps, 'hr', false >,
 	forwardedRef: ForwardedRef< any >
@@ -32,7 +27,7 @@ function UnconnectedDivider(
 		...contextProps
 	} = useContextSystem( props, 'Divider' );
 
-	const dividerStyle: DividerStyle = { ...style };
+	const dividerStyle = { ...style };
 	const resolvedMarginStart = space( marginStart ?? margin );
 	const resolvedMarginEnd = space( marginEnd ?? margin );
 
