@@ -39,7 +39,7 @@ Parallelizable once their deps are on the feature branch: {3,4,5}, {11,12},
 | 06 | render-endpoint | Server framework | 03, 04 | done |
 | 07 | use-widget-types | Discovery | 01, 05 | done |
 | 08 | widget-render-routing | Discovery | 07 | done |
-| 09 | renderer-core | Renderer core | 08 | todo |
+| 09 | renderer-core | Renderer core | 08 | done |
 | 10 | ssr-fallback | Renderer core | 09, 06 | todo |
 | 11 | block-context | Renderer core | 09 | todo |
 | 12 | ui-primitives | Primitive blocks | 09 | todo |

@@ -43,8 +43,11 @@
 	"wpScript": false,
 	"wpScriptModuleExports": "./build-module/index.mjs",
 	"types": "build-types",
-	"sideEffects": false,
+	"sideEffects": [
+		"**/admin-block-renderer/**"
+	],
 	"dependencies": {
+		"@wordpress/block-serialization-default-parser": "file:../block-serialization-default-parser",
 		"@wordpress/dataviews": "file:../dataviews",
 		"@wordpress/element": "file:../element"
 	},
