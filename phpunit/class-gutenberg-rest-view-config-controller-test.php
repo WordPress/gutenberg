@@ -298,6 +298,48 @@ class Tests_REST_View_Config_Controller extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * The pattern form config exposes the fields shown in the pattern summary.
+	 *
+	 * @covers ::get_items
+	 */
+	public function test_wp_block_config_includes_pattern_summary_form() {
+		wp_set_current_user( self::$editor_id );
+
+		$response = $this->dispatch_request( 'postType', 'wp_block' );
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame(
+			array(
+				array(
+					'id'     => 'excerpt',
+					'layout' => array(
+						'type'          => 'regular',
+						'labelPosition' => 'none',
+					),
+				),
+				array(
+					'id'     => 'post-content-info',
+					'layout' => array(
+						'type'          => 'regular',
+						'labelPosition' => 'none',
+					),
+				),
+				array(
+					'id'     => 'last_edited_date',
+					'layout' => array(
+						'type'          => 'panel',
+						'labelPosition' => 'none',
+					),
+				),
+				'revisions',
+				'sync-status',
+			),
+			$data['form']['fields']
+		);
+	}
+
+	/**
 	 * Empty object-typed config values serialize as JSON objects ({}), not arrays ([]).
 	 *
 	 * @covers ::get_items
