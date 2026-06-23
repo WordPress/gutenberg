@@ -1,0 +1,24 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"types": [ "gutenberg-env" ],
+		"checkJs": false
+	},
+	"references": [
+		{ "path": "../a11y" },
+		{ "path": "../block-editor" },
+		{ "path": "../components" },
+		{ "path": "../compose" },
+		{ "path": "../data" },
+		{ "path": "../element" },
+		{ "path": "../html-entities" },
+		{ "path": "../i18n" },
+		{ "path": "../icons" },
+		{ "path": "../latex-to-mathml" },
+		{ "path": "../private-apis" },
+		{ "path": "../rich-text" },
+		{ "path": "../ui" },
+		{ "path": "../url" }
+	]
+}

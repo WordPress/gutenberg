@@ -4,8 +4,14 @@ import {
 	RichTextToolbarButton,
 	RichTextShortcut,
 	__unstableRichTextInputEvent,
+	// @ts-ignore
 } from '@wordpress/block-editor';
 import { formatBold } from '@wordpress/icons';
+
+/*
+ * Internal dependencies
+ */
+import type { BoldEditProps } from '../types';
 
 const name = 'core/bold';
 const title = __( 'Bold' );
@@ -15,9 +21,15 @@ export const bold = {
 	title,
 	tagName: 'strong',
 	className: null,
-	edit( { isActive, value, onChange, onFocus, isVisible = true } ) {
+	edit( {
+		isActive,
+		value,
+		onChange,
+		onFocus,
+		isVisible = true,
+	}: BoldEditProps ): JSX.Element {
 		function onToggle() {
-			onChange( toggleFormat( value, { type: name, title } ) );
+			onChange( toggleFormat( value, { type: name } ) );
 		}
 
 		function onClick() {

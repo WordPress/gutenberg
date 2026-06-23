@@ -41,7 +41,8 @@
 		{ "path": "packages/widget-dashboard" },
 		{ "path": "packages/widget-primitives" },
 		{ "path": "packages/wordcount" },
-		{ "path": "packages/worker-threads" }
+		{ "path": "packages/worker-threads" },
+		{ "path": "packages/format-library" }
 	],
 	"files": []
 }
