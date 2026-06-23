@@ -189,8 +189,8 @@
  */
 
 @mixin outset-ring__focus() {
-	outline: wpds.wpds-var("--wpds-border-width-focus") solid wpds.wpds-var("--wpds-color-stroke-focus-brand");
-	outline-offset: 1px;
+	outline: wpds.wpds-var("--wpds-border-width-focus") solid wpds.wpds-var("--wpds-color-stroke-focus");
+	outline-offset: wpds.wpds-var("--wpds-border-width-focus");
 }
 
 
