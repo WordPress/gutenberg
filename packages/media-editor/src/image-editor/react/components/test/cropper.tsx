@@ -66,9 +66,13 @@ describe( 'Cropper', () => {
 				MouseEvent
 			) {
 				pointerId: number;
+				pointerType: string;
+				isPrimary: boolean;
 				constructor( type: string, init: PointerEventInit = {} ) {
 					super( type, init );
 					this.pointerId = init.pointerId ?? 0;
+					this.pointerType = init.pointerType ?? '';
+					this.isPrimary = init.isPrimary ?? false;
 				}
 			};
 		}
@@ -341,7 +345,7 @@ describe( 'Cropper', () => {
 		);
 	} );
 
-	it( 'clears settling state when a new resize starts before the settle timer fires', async () => {
+	it( 'clears settling state when a new resize starts before the settle fallback fires', async () => {
 		jest.useFakeTimers();
 
 		render(
@@ -372,7 +376,7 @@ describe( 'Cropper', () => {
 		// The settle transition should now be active on the stage.
 		expect( stage ).toHaveStyle( 'transition: transform 200ms ease-out' );
 
-		// Start a new resize before the 200 ms settle timer fires.
+		// Start a new resize before the settle fallback fires.
 		fireEvent.pointerDown( handle, {
 			button: 0,
 			clientX: 100,
@@ -385,14 +389,143 @@ describe( 'Cropper', () => {
 			'transition: transform 200ms ease-out'
 		);
 
-		// Advance past the old settle timer; it was cancelled so the stage
+		// Advance past the old settle fallback; it was cancelled so the stage
 		// should still have no transition.
-		act( () => jest.advanceTimersByTime( 200 ) );
+		act( () => jest.advanceTimersByTime( 300 ) );
 		expect( stage ).not.toHaveStyle(
 			'transition: transform 200ms ease-out'
 		);
 
 		fireEvent.pointerUp( handle, { pointerId: 1 } );
+
+		jest.useRealTimers();
+	} );
+
+	it( 'keeps settling active until the settle transform transition ends', async () => {
+		jest.useFakeTimers();
+
+		render(
+			<Cropper
+				src="test.jpg"
+				controller={ createController() }
+				showDimming={ false }
+				freeformCrop
+			/>
+		);
+
+		const handle = await screen.findByRole( 'button', {
+			name: 'Resize top-left corner',
+		} );
+		const stage = screen.getByTestId( 'cropper-stage' );
+
+		fireEvent.pointerDown( handle, {
+			button: 0,
+			clientX: 100,
+			clientY: 100,
+			pointerId: 1,
+		} );
+		fireEvent.pointerUp( handle, { pointerId: 1 } );
+
+		expect( stage ).toHaveStyle( 'transition: transform 200ms ease-out' );
+
+		act( () => jest.advanceTimersByTime( 200 ) );
+		expect( stage ).toHaveStyle( 'transition: transform 200ms ease-out' );
+
+		// The transform transition runs on the image and bubbles up to the
+		// stage handler, so fire from the image to exercise the real path.
+		const image = screen.getByTestId( 'cropper-image' );
+		const transitionEndEvent = new Event( 'transitionend', {
+			bubbles: true,
+		} );
+		Object.defineProperty( transitionEndEvent, 'propertyName', {
+			value: 'transform',
+		} );
+		fireEvent( image, transitionEndEvent );
+
+		expect( stage ).not.toHaveStyle(
+			'transition: transform 200ms ease-out'
+		);
+
+		jest.useRealTimers();
+	} );
+
+	it( 'clears settling via the fallback timer when no transitionend fires', async () => {
+		jest.useFakeTimers();
+
+		render(
+			<Cropper
+				src="test.jpg"
+				controller={ createController() }
+				showDimming={ false }
+				freeformCrop
+			/>
+		);
+
+		const handle = await screen.findByRole( 'button', {
+			name: 'Resize top-left corner',
+		} );
+		const stage = screen.getByTestId( 'cropper-stage' );
+
+		fireEvent.pointerDown( handle, {
+			button: 0,
+			clientX: 100,
+			clientY: 100,
+			pointerId: 1,
+		} );
+		fireEvent.pointerUp( handle, { pointerId: 1 } );
+
+		expect( stage ).toHaveStyle( 'transition: transform 200ms ease-out' );
+
+		// Without a transitionend, settling persists past the CSS duration...
+		act( () => jest.advanceTimersByTime( 200 ) );
+		expect( stage ).toHaveStyle( 'transition: transform 200ms ease-out' );
+
+		// ...and is cleared by the fallback timer (CSS duration + 100ms).
+		act( () => jest.advanceTimersByTime( 100 ) );
+		expect( stage ).not.toHaveStyle(
+			'transition: transform 200ms ease-out'
+		);
+
+		jest.useRealTimers();
+	} );
+
+	it( 'ignores non-transform transitionend events while settling', async () => {
+		jest.useFakeTimers();
+
+		render(
+			<Cropper
+				src="test.jpg"
+				controller={ createController() }
+				showDimming={ false }
+				freeformCrop
+			/>
+		);
+
+		const handle = await screen.findByRole( 'button', {
+			name: 'Resize top-left corner',
+		} );
+		const stage = screen.getByTestId( 'cropper-stage' );
+
+		fireEvent.pointerDown( handle, {
+			button: 0,
+			clientX: 100,
+			clientY: 100,
+			pointerId: 1,
+		} );
+		fireEvent.pointerUp( handle, { pointerId: 1 } );
+
+		expect( stage ).toHaveStyle( 'transition: transform 200ms ease-out' );
+
+		// A stencil left/top/width/height transitionend must not clear settling.
+		const stencilTransitionEnd = new Event( 'transitionend', {
+			bubbles: true,
+		} );
+		Object.defineProperty( stencilTransitionEnd, 'propertyName', {
+			value: 'left',
+		} );
+		fireEvent( stage, stencilTransitionEnd );
+
+		expect( stage ).toHaveStyle( 'transition: transform 200ms ease-out' );
 
 		jest.useRealTimers();
 	} );
@@ -474,6 +607,146 @@ describe( 'Cropper', () => {
 		expect( controller.setZoomAtPoint ).not.toHaveBeenCalled();
 
 		fireEvent.pointerUp( resizeHandle, { pointerId: 1 } );
+	} );
+
+	it( 'does not start canvas drag from touch pointer events', async () => {
+		const controller = createController();
+		render(
+			<Cropper
+				src="test.jpg"
+				controller={ controller }
+				showDimming
+				showGrid="interactive"
+				freeformCrop
+			/>
+		);
+
+		await screen.findByRole( 'button', {
+			name: 'Resize top-left corner',
+		} );
+		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
+
+		fireEvent.pointerDown( canvas, {
+			button: 0,
+			clientX: 100,
+			clientY: 100,
+			pointerId: 1,
+			pointerType: 'touch',
+			isPrimary: true,
+		} );
+		fireEvent.pointerMove( canvas, {
+			button: 0,
+			clientX: 150,
+			clientY: 120,
+			pointerId: 1,
+			pointerType: 'touch',
+			isPrimary: true,
+		} );
+
+		expect( canvas ).not.toHaveClass( SHOW_GRID_CLASS );
+		expect( controller.setPan ).not.toHaveBeenCalled();
+	} );
+
+	it( 'cancels handle resize when a touch gesture becomes a pinch', async () => {
+		const originalRAF = globalThis.requestAnimationFrame;
+		const originalCAF = globalThis.cancelAnimationFrame;
+		globalThis.requestAnimationFrame = ( cb: FrameRequestCallback ) => {
+			cb( 0 );
+			return 0;
+		};
+		globalThis.cancelAnimationFrame = jest.fn();
+
+		try {
+			const controller = createController();
+			const onGestureEnd = jest.fn();
+			render(
+				<Cropper
+					src="test.jpg"
+					controller={ controller }
+					showDimming={ false }
+					freeformCrop
+					onGestureEnd={ onGestureEnd }
+				/>
+			);
+
+			const resizeHandle = await screen.findByRole( 'button', {
+				name: 'Resize top-left corner',
+			} );
+			const canvas = screen.getByRole( 'group', {
+				name: 'Crop area',
+			} );
+
+			fireEvent.pointerDown( resizeHandle, {
+				button: 0,
+				clientX: 100,
+				clientY: 100,
+				pointerId: 1,
+				pointerType: 'touch',
+				isPrimary: true,
+			} );
+
+			( controller.setPan as jest.Mock ).mockClear();
+			fireEvent.pointerDown( canvas, {
+				button: 0,
+				clientX: 250,
+				clientY: 200,
+				pointerId: 2,
+				pointerType: 'touch',
+				isPrimary: false,
+			} );
+			fireEvent.pointerMove( canvas, {
+				button: 0,
+				clientX: 275,
+				clientY: 200,
+				pointerId: 2,
+				pointerType: 'touch',
+				isPrimary: false,
+			} );
+
+			expect( controller.setPan ).not.toHaveBeenCalled();
+
+			fireEvent.touchStart( canvas, {
+				touches: [
+					{ clientX: 250, clientY: 200 },
+					{ clientX: 350, clientY: 200 },
+				],
+			} );
+
+			await act( async () => {
+				await Promise.resolve();
+			} );
+
+			expect( controller.settleCrop ).not.toHaveBeenCalled();
+			expect( onGestureEnd ).not.toHaveBeenCalled();
+
+			( controller.setCropRect as jest.Mock ).mockClear();
+			( controller.setZoomAtPoint as jest.Mock ).mockClear();
+
+			fireEvent.pointerMove( resizeHandle, {
+				button: 0,
+				clientX: 60,
+				clientY: 60,
+				pointerId: 1,
+				pointerType: 'touch',
+				isPrimary: true,
+			} );
+			fireEvent.touchMove( document, {
+				touches: [
+					{ clientX: 225, clientY: 200 },
+					{ clientX: 375, clientY: 200 },
+				],
+			} );
+
+			expect( controller.setCropRect ).not.toHaveBeenCalled();
+			expect( controller.setZoomAtPoint ).toHaveBeenCalled();
+
+			fireEvent.touchEnd( canvas, { touches: [] } );
+
+			expect( onGestureEnd ).toHaveBeenCalledTimes( 1 );
+		} finally {
+			globalThis.requestAnimationFrame = originalRAF;
+			globalThis.cancelAnimationFrame = originalCAF;
+		}
 	} );
 
 	// View-scale: at rest, the scene magnifies so an under-filling crop fills

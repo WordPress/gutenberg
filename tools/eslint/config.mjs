@@ -161,6 +161,12 @@ const restrictedSyntax = [
 	},
 	{
 		selector:
+			'JSXElement[openingElement.name.name="TextControl"] JSXAttribute[name.name="__next40pxDefaultSize"]',
+		message:
+			'The `__next40pxDefaultSize` prop is no longer needed on `TextControl`.',
+	},
+	{
+		selector:
 			'CallExpression[callee.name="withDispatch"] > :function > BlockStatement > :not(VariableDeclaration,ReturnStatement)',
 		message:
 			'withDispatch must return an object with consistent keys. Avoid performing logic in `mapDispatchToProps`.',

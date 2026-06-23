@@ -125,7 +125,6 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 					NumberControl,
 					RangeControl,
 					SelectControl,
-					TextControl,
 					ToggleGroupControl,
 					UnitControl,
 				} from '@wordpress/components';
@@ -145,7 +144,6 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 					<NumberControl __next40pxDefaultSize />
 					<RangeControl __next40pxDefaultSize />
 					<SelectControl __next40pxDefaultSize />
-					<TextControl __next40pxDefaultSize />
 					<ToggleGroupControl __next40pxDefaultSize />
 					<UnitControl __next40pxDefaultSize />
 				</>
@@ -208,13 +206,13 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 		// Aliased import without __next40pxDefaultSize
 		{
 			code: `
-				import { TextControl as MyTextControl } from '@wordpress/components';
-				<MyTextControl />
+				import { InputControl as MyInputControl } from '@wordpress/components';
+				<MyInputControl />
 			`,
 			errors: [
 				{
 					messageId: 'missingProp',
-					data: { component: 'TextControl' },
+					data: { component: 'InputControl' },
 				},
 			],
 		},
