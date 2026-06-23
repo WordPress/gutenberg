@@ -19,7 +19,7 @@ import AddNewTemplate from '../add-new-template-legacy';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 import { useEditPostAction } from '../dataviews-actions';
-import { authorField, previewField } from './fields';
+import { previewField } from './fields';
 
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
@@ -86,40 +86,10 @@ export default function PageTemplates() {
 		[ history, path, view?.type ]
 	);
 
-	const authors = useMemo( () => {
-		if ( ! records ) {
-			return [];
-		}
-		const authorsSet = new Set();
-		records.forEach( ( template ) => {
-			authorsSet.add( template.author_text );
-		} );
-		return Array.from( authorsSet ).map( ( author ) => ( {
-			value: author,
-			label: author,
-		} ) );
-	}, [ records ] );
-
 	const postFields = usePostFields( { postType: TEMPLATE_POST_TYPE } );
 	const fields = useMemo( () => {
-		const __fields = [
-			previewField,
-			{
-				...authorField,
-				elements: authors,
-			},
-		];
-		// TODO: Only `description` and `title` are sourced from the shared
-		// `@wordpress/fields` registry so far. The remaining local fields
-		// (e.g. `previewField`, `authorField`) should also be evaluated for
-		// migration to the shared registry.
-		return [
-			...__fields,
-			...( postFields || [] ).filter( ( field ) =>
-				[ 'description', 'title' ].includes( field.id )
-			),
-		];
-	}, [ authors, postFields ] );
+		return [ previewField, ...( postFields || [] ) ];
+	}, [ postFields ] );
 
 	const { data, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( records, view, fields );
