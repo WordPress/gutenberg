@@ -270,6 +270,8 @@ test.describe( 'Patterns', () => {
 			page,
 			requestUtils,
 		} ) => {
+			const updatedDescription =
+				'Updated pattern description from DataForm.';
 			const pattern = await requestUtils.createBlock( {
 				title: 'DataForm pattern summary',
 				status: 'publish',
@@ -325,10 +327,13 @@ test.describe( 'Patterns', () => {
 			await settingsSidebar
 				.getByRole( 'button', { name: 'Edit Description' } )
 				.click();
-			await expect(
-				page.getByRole( 'textbox', { name: 'Description' } )
-			).toBeVisible();
+			const descriptionTextbox = page.getByRole( 'textbox', {
+				name: 'Description',
+			} );
+			await expect( descriptionTextbox ).toBeVisible();
+			await descriptionTextbox.fill( updatedDescription );
 			await page.keyboard.press( 'Escape' );
+			await expect( settingsSidebar ).toContainText( updatedDescription );
 			await expect( settingsSidebar ).toContainText(
 				'8 words, 1 minute read time.'
 			);
@@ -352,6 +357,22 @@ test.describe( 'Patterns', () => {
 					name: 'Pattern Categories',
 				} )
 			).toBeVisible();
+
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Save' } )
+				.click();
+			await page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Pattern updated' } )
+				.click();
+
+			await page.reload();
+			await editor.openDocumentSettingsSidebar();
+			await settingsSidebar
+				.getByRole( 'tab', { name: 'Pattern' } )
+				.click();
+			await expect( settingsSidebar ).toContainText( updatedDescription );
 		} );
 	} );
 } );
