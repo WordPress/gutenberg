@@ -15,8 +15,8 @@ import type { DividerProps } from './types';
 import styles from './style.module.scss';
 
 type DividerStyle = React.CSSProperties & {
-	'--wp-components-divider-margin-start'?: string;
-	'--wp-components-divider-margin-end'?: string;
+	'--wp-components-divider-margin-start'?: ReturnType< typeof space >;
+	'--wp-components-divider-margin-end'?: ReturnType< typeof space >;
 };
 
 function UnconnectedDivider(
