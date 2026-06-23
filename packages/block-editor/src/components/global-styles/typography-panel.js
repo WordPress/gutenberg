@@ -371,17 +371,30 @@ export default function TypographyPanel( {
 	// Text Indent
 	const hasTextIndentControl = useHasTextIndentControl( settings );
 	const textIndent = decodeValue( inheritedValue?.typography?.textIndent );
+	const setTextIndent = ( newValue ) => {
+		onChange(
+			setImmutably(
+				value,
+				[ 'typography', 'textIndent' ],
+				newValue || undefined
+			)
+		);
+	};
 
 	// Get the setting value - can be 'subsequent' (default), 'all', or false.
 	// The setting determines which CSS selector is used for the text-indent style.
 	const textIndentSetting = settings?.typography?.textIndent ?? 'subsequent';
 	const isTextIndentAll = textIndentSetting === 'all';
 
-	const setTextIndentValue = ( newValue ) => {
+	const textColumnMinWidth = decodeValue(
+		inheritedValue?.typography?.textColumnMinWidth
+	);
+
+	const setTextColumnMinWidth = ( newValue ) => {
 		onChange(
 			setImmutably(
 				value,
-				[ 'typography', 'textIndent' ],
+				[ 'typography', 'textColumnMinWidth' ],
 				newValue || undefined
 			)
 		);
@@ -605,7 +618,7 @@ export default function TypographyPanel( {
 				>
 					<TextIndentControl
 						value={ textIndent }
-						onChange={ setTextIndentValue }
+						onChange={ setTextIndent }
 						size="__unstable-large"
 						__unstableInputWidth="auto"
 						withSlider
@@ -639,6 +652,13 @@ export default function TypographyPanel( {
 						spinControls="custom"
 						value={ textColumns }
 						initialPosition={ 1 }
+					/>
+
+					<NumberControl
+						label={ __( 'Column minimum width' ) }
+						onChange={ setTextColumnMinWidth }
+						value={ textColumnMinWidth }
+						size="__unstable-large"
 					/>
 				</ToolsPanelItem>
 			) }
