@@ -35,20 +35,19 @@ const VIEW_CONFIG_FIELDS = [ 'form' ];
 function useInspectorPanelVisibility( form ) {
 	const {
 		isPostStatusRemoved,
-		featuredImagePanelEnabled,
-		excerptPanelEnabled,
-		discussionPanelEnabled,
-		pageAttributesPanelEnabled,
+		featuredImageEnabled,
+		excerptEnabled,
+		discussionEnabled,
+		pageAttributesEnabled,
 	} = useSelect( ( select ) => {
 		const { isEditorPanelRemoved, isEditorPanelEnabled } =
 			select( editorStore );
 		return {
 			isPostStatusRemoved: isEditorPanelRemoved( 'post-status' ),
-			featuredImagePanelEnabled: isEditorPanelEnabled( 'featured-image' ),
-			excerptPanelEnabled: isEditorPanelEnabled( 'post-excerpt' ),
-			discussionPanelEnabled: isEditorPanelEnabled( 'discussion-panel' ),
-			pageAttributesPanelEnabled:
-				isEditorPanelEnabled( 'page-attributes' ),
+			featuredImageEnabled: isEditorPanelEnabled( 'featured-image' ),
+			excerptEnabled: isEditorPanelEnabled( 'post-excerpt' ),
+			discussionEnabled: isEditorPanelEnabled( 'discussion-panel' ),
+			pageAttributesEnabled: isEditorPanelEnabled( 'page-attributes' ),
 		};
 	}, [] );
 
@@ -56,31 +55,20 @@ function useInspectorPanelVisibility( form ) {
 		if ( ! form.fields?.length ) {
 			return form;
 		}
-		const isFieldVisible = ( id ) => {
-			// `featured_media` and `excerpt` fields are tied to their own panel switches.
-			if ( id === 'featured_media' ) {
-				return featuredImagePanelEnabled;
-			}
-			if ( id === 'excerpt' ) {
-				return excerptPanelEnabled;
-			}
-			if ( id === 'post-content-info' ) {
-				return true; // This field was always present.
-			}
-			// `removeEditorPanel( 'post-status' )` hid the rest of the summary
-			// as a unit.
-			if ( isPostStatusRemoved ) {
-				return false;
-			}
-			// If `post-status` panel is not removed, its nested panels honor their own switch.
-			if ( id === 'discussion' ) {
-				return discussionPanelEnabled;
-			}
-			if ( id === 'parent' ) {
-				return pageAttributesPanelEnabled;
-			}
-			return true;
+		// `featured_media`/`excerpt` are their own top-level panels and
+		// `post-content-info` is always shown, so they survive. Everything else
+		// belongs to the `post-status` summary panel: `discussion`/`parent` honor
+		// their own switch, but every one of them is hidden while the `post-status`
+		// panel is removed.
+		const visibilityById = {
+			featured_media: featuredImageEnabled,
+			excerpt: excerptEnabled,
+			'post-content-info': true,
+			discussion: discussionEnabled && ! isPostStatusRemoved,
+			parent: pageAttributesEnabled && ! isPostStatusRemoved,
 		};
+		const isFieldVisible = ( id ) =>
+			id in visibilityById ? visibilityById[ id ] : ! isPostStatusRemoved;
 		// Recurse into `children` so a panel-tied field is dropped wherever it
 		// sits in the form: the PHP view-config filter can nest such a field
 		// inside another field's group.
@@ -110,10 +98,10 @@ function useInspectorPanelVisibility( form ) {
 	}, [
 		form,
 		isPostStatusRemoved,
-		featuredImagePanelEnabled,
-		excerptPanelEnabled,
-		discussionPanelEnabled,
-		pageAttributesPanelEnabled,
+		featuredImageEnabled,
+		excerptEnabled,
+		discussionEnabled,
+		pageAttributesEnabled,
 	] );
 
 	return visibleForm;
