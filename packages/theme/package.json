@@ -27,6 +27,7 @@
 		"build",
 		"build-module",
 		"build-types",
+		"design-token-fallbacks.scss",
 		"*.md"
 	],
 	"main": "build/index.cjs",
@@ -38,8 +39,11 @@
 			"default": "./build/index.cjs"
 		},
 		"./design-tokens.css": "./src/prebuilt/css/design-tokens.css",
-		"./design-token-fallbacks": "./src/prebuilt/scss/design-token-fallbacks.scss",
-		"./src/prebuilt/scss/design-token-fallbacks": "./src/prebuilt/scss/design-token-fallbacks.scss",
+		"./design-token-fallbacks": {
+			"sass": "./design-token-fallbacks.scss",
+			"style": "./design-token-fallbacks.scss",
+			"default": "./design-token-fallbacks.scss"
+		},
 		"./design-tokens.js": {
 			"types": "./build-types/prebuilt/js/design-tokens.d.ts",
 			"import": "./build-module/prebuilt/js/design-tokens.mjs",

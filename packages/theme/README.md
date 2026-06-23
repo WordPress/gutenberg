@@ -314,13 +314,13 @@ An alternative to loading the [design tokens stylesheet](#outside-wordpress), us
 
 You do not need this helper if you already load the design tokens stylesheet or use fallback injection via the build plugins or `@wordpress/build`. In those cases, write bare `var(--wpds-*)` references in your source.
 
-The `@wordpress/theme/design-token-fallbacks` export provides a generated `wpds-var()` function that wraps token references with the same fallback map used by the build plugins — for example, `wpds.wpds-var('--wpds-color-fg-content-neutral')` compiles to `var(--wpds-color-fg-content-neutral, #1e1e1e)`.
+The `@wordpress/theme/design-token-fallbacks` export provides a generated `wpds-var()` function that wraps token references with the same fallback map used by the build plugins. For example, `wpds.wpds-var('--wpds-color-foreground-content-neutral')` compiles to `var(--wpds-color-foreground-content-neutral, #1e1e1e)`.
 
 ```scss
 @use '@wordpress/theme/design-token-fallbacks' as wpds;
 
 .example {
-	color: wpds.wpds-var( '--wpds-color-fg-content-neutral' );
+	color: wpds.wpds-var( '--wpds-color-foreground-content-neutral' );
 }
 ```
 
@@ -330,11 +330,7 @@ When using Sass with [`NodePackageImporter`](https://sass-lang.com/documentation
 @use 'pkg:@wordpress/theme/design-token-fallbacks' as wpds;
 ```
 
-For Sass setups that resolve packages from `node_modules` with a load path, use:
-
-```scss
-@use '@wordpress/theme/src/prebuilt/scss/design-token-fallbacks' as wpds;
-```
+The same `@wordpress/theme/design-token-fallbacks` import also supports Sass setups that resolve packages from `node_modules` with a load path.
 
 ## Contributing to this package
 
