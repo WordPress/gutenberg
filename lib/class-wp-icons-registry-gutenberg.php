@@ -903,7 +903,8 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			return '';
 		}
 
-		if ( 'SVG' !== $processor->get_tag() ) {
+		// Require the SVG namespace to reject a foreign-namespaced `<svg>`.
+		if ( 'SVG' !== $processor->get_tag() || 'svg' !== $processor->get_namespace() ) {
 			return '';
 		}
 
