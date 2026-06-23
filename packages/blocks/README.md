@@ -97,6 +97,7 @@ _Parameters_
 -   _blockTypeOrName_ `string | BlockType`: Block type or name.
 -   _innerHTML_ `string | Node`: Raw block content.
 -   _attributes_ `Record< string, unknown >`: Known block attributes (from delimiters).
+-   _parsedBody_ `Node | null`: Optional pre-parsed DOM node for innerHTML. When provided, the internal HTML parse is skipped. Useful for sharing a single parse across multiple callers operating on the same innerHTML string (e.g. block validation, deprecation iteration). Note: hpq uses a single shared document body, so a parsed node held across other parses will be detached. Detached nodes still respond correctly to attribute and class reads.
 
 _Returns_
 

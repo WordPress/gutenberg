@@ -17,7 +17,7 @@ import { validateBlock } from '../validation';
 import { createBlock } from '../factory';
 import { convertLegacyBlockNameAndAttributes } from './convert-legacy-block';
 import { serializeRawBlock } from './serialize-raw-block';
-import { getBlockAttributes } from './get-block-attributes';
+import { getBlockAttributes, parseHtml } from './get-block-attributes';
 import { applyBlockDeprecatedVersions } from './apply-block-deprecated-versions';
 import { applyBuiltInValidationFixes } from './apply-built-in-validation-fixes';
 import type { Block, BlockType, RawBlock, ParseOptions } from '../../types';
@@ -129,11 +129,15 @@ function createMissingBlockType( rawBlock: RawBlock ): RawBlock {
  *
  * @param unvalidatedBlock
  * @param blockType
+ * @param parsedBody       Pre-parsed body element of the block's
+ *                         originalContent, if available. Threaded down to the
+ *                         built-in fixes so they don't have to re-parse.
  * @return validated block, with auto-fixes if initially invalid
  */
 function applyBlockValidation(
 	unvalidatedBlock: Block,
-	blockType: BlockType
+	blockType: BlockType,
+	parsedBody?: Element | null
 ): Block {
 	// Attempt to validate the block.
 	const [ isValid ] = validateBlock( unvalidatedBlock, blockType );
@@ -146,7 +150,8 @@ function applyBlockValidation(
 	// like custom classNames handling.
 	const fixedBlock = applyBuiltInValidationFixes(
 		unvalidatedBlock,
-		blockType
+		blockType,
+		parsedBody
 	);
 	// Attempt to validate the block once again after the built-in fixes.
 	const [ isFixedValid, validationIssues ] = validateBlock(
@@ -197,25 +202,52 @@ export function parseRawBlock(
 		return;
 	}
 
-	// Parse inner blocks recursively.
+	// Parse inner blocks recursively. This must happen *before* parsing this
+	// block's HTML — hpq uses a single shared document body, so each parse
+	// clobbers the previous one. We need this block's parsed body to remain
+	// stable through getBlockAttributes / validation / deprecation, so the
+	// recursion (which clobbers the body for each inner block) has to run
+	// first.
 	const parsedInnerBlocks = normalizedBlock.innerBlocks
 		.map( ( innerBlock ) => parseRawBlock( innerBlock, options ) )
 		// See https://github.com/WordPress/gutenberg/pull/17164.
 		.filter( ( innerBlock ) => !! innerBlock );
+
+	// Parse this block's innerHTML once and share the result with attribute
+	// extraction, validation fixes, and deprecation handling. Capture the
+	// root element eagerly: subsequent parses (e.g. of freshly serialized
+	// content inside the validation fixes) detach this element from the
+	// shared body, but detached elements still respond correctly to
+	// attribute and class reads.
+	// Parse via hpq, then deep-clone so the captured body is independent of
+	// hpq's shared document. Subsequent parses elsewhere in the pipeline
+	// (notably `fixCustomClassname`'s fallback path, which renders and
+	// re-parses save content) reset hpq's shared body — without the clone,
+	// `parsedBody` would silently change content under our feet between
+	// deprecation iterations.
+	const innerHTML = normalizedBlock.innerHTML;
+	const sharedBody = parseHtml( innerHTML ) as Element;
+	const parsedBody =
+		( sharedBody?.cloneNode( true ) as Element | null ) ?? null;
 
 	// Get the fully parsed block.
 	const parsedBlock = createBlock(
 		normalizedBlock.blockName!,
 		getBlockAttributes(
 			blockType,
-			normalizedBlock.innerHTML,
-			normalizedBlock.attrs
+			innerHTML,
+			normalizedBlock.attrs,
+			parsedBody
 		),
 		parsedInnerBlocks
 	);
-	parsedBlock.originalContent = normalizedBlock.innerHTML;
+	parsedBlock.originalContent = innerHTML;
 
-	const validatedBlock = applyBlockValidation( parsedBlock, blockType );
+	const validatedBlock = applyBlockValidation(
+		parsedBlock,
+		blockType,
+		parsedBody
+	);
 	const { validationIssues } = validatedBlock;
 
 	// Run the block deprecation and migrations.
@@ -225,7 +257,8 @@ export function parseRawBlock(
 	const updatedBlock = applyBlockDeprecatedVersions(
 		validatedBlock,
 		normalizedBlock,
-		blockType
+		blockType,
+		parsedBody
 	);
 
 	if ( ! updatedBlock.isValid ) {

@@ -259,7 +259,7 @@ export const matcherFromSource = memoize(
  *
  * @return Parsed DOM node.
  */
-function parseHtml( innerHTML: string | Node ): Node {
+export function parseHtml( innerHTML: string | Node ): Node {
 	return hpqParse( innerHTML, ( h: Node ) => h );
 }
 
@@ -287,15 +287,24 @@ export function parseWithAttributeSchema(
  * @param blockTypeOrName Block type or name.
  * @param innerHTML       Raw block content.
  * @param attributes      Known block attributes (from delimiters).
+ * @param parsedBody      Optional pre-parsed DOM node for innerHTML. When
+ *                        provided, the internal HTML parse is skipped. Useful
+ *                        for sharing a single parse across multiple callers
+ *                        operating on the same innerHTML string (e.g. block
+ *                        validation, deprecation iteration). Note: hpq uses a
+ *                        single shared document body, so a parsed node held
+ *                        across other parses will be detached. Detached nodes
+ *                        still respond correctly to attribute and class reads.
  *
  * @return All block attributes.
  */
 export function getBlockAttributes(
 	blockTypeOrName: string | BlockType,
 	innerHTML: string | Node,
-	attributes: Record< string, unknown > = {}
+	attributes: Record< string, unknown > = {},
+	parsedBody?: Node | null
 ): Record< string, unknown > {
-	const doc = parseHtml( innerHTML );
+	const doc = parsedBody ?? parseHtml( innerHTML );
 	const blockType = normalizeBlockType( blockTypeOrName );
 
 	const blockAttributes = Object.fromEntries(

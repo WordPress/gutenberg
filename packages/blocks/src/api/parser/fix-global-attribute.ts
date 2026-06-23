@@ -37,6 +37,9 @@ export function getHTMLRootElement(
  * @param supportKey      The block support key to check and attribute key to set.
  * @param dataAttribute   The data attribute name to use as wrapper.
  * @param attributeSchema The attribute schema configuration.
+ * @param rootElement     Pre-parsed root element of innerHTML, if available.
+ *                        When provided, the attribute is read directly off the
+ *                        root element, avoiding a wrap-and-reparse.
  *
  * @return Filtered block attributes.
  */
@@ -46,17 +49,26 @@ export function fixGlobalAttribute(
 	innerHTML: string,
 	supportKey: string,
 	dataAttribute: string,
-	attributeSchema: BlockAttribute
+	attributeSchema: BlockAttribute,
+	rootElement?: Element | null
 ): Record< string, unknown > {
 	if ( ! hasBlockSupport( blockType, supportKey, false ) ) {
 		return blockAttributes;
 	}
 	const modifiedBlockAttributes = { ...blockAttributes };
-	const attributeValue = getHTMLRootElement(
-		innerHTML,
-		dataAttribute,
-		attributeSchema
-	);
+	let attributeValue: unknown;
+	if ( rootElement !== undefined ) {
+		const attrName = attributeSchema.attribute as string | undefined;
+		attributeValue = attrName
+			? rootElement?.getAttribute( attrName ) ?? undefined
+			: undefined;
+	} else {
+		attributeValue = getHTMLRootElement(
+			innerHTML,
+			dataAttribute,
+			attributeSchema
+		);
+	}
 	if ( attributeValue ) {
 		modifiedBlockAttributes[ supportKey ] = attributeValue;
 	}
