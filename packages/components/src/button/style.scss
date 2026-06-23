@@ -35,7 +35,6 @@
 
 	height: $button-size;
 	align-items: center;
-	justify-content: center;
 	box-sizing: border-box;
 	padding: 4px $button-padding-x; // Allows 32px min-height.
 	border-radius: $radius-small;
@@ -43,6 +42,7 @@
 
 	&:not(.is-link):not(.has-icon) {
 		// Minimum width to ensure visual balance for very short labels (like "Ok").
+		justify-content: center;
 		min-width: calc(4ch + #{ $button-padding-x * 2 });
 	}
 
@@ -244,7 +244,6 @@
 		background: none;
 		outline: none;
 		text-align: left;
-		justify-content: flex-start;
 		font-weight: $font-weight-regular;
 		color: $components-color-accent;
 		text-decoration: underline;
