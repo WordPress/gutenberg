@@ -299,6 +299,7 @@ function block_core_image_render_lightbox( $block_content, array $block, WP_Bloc
 			class="lightbox-trigger"
 			type="button"
 			aria-haspopup="dialog"
+			aria-label="' . esc_attr__( 'Enlarge' ) . '"
 			data-wp-bind--aria-label="state.thisImage.triggerButtonAriaLabel"
 			data-wp-init="callbacks.initTriggerButton"
 			data-wp-on--click="actions.showLightbox"
