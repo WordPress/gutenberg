@@ -22,23 +22,12 @@ import { unlock } from '../lock-unlock';
 function PatternsManageButton( { clientId, onClose } ) {
 	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
 
-	const {
-		attributes,
-		canDetach,
-		isVisible,
-		managePatternsUrl,
-		isSyncedPattern,
-		isUnsyncedPattern,
-		canEdit,
-	} = useSelect(
+	const { canDetach, isVisible, managePatternsUrl, canEdit } = useSelect(
 		( select ) => {
 			const { canRemoveBlock, getBlock, canEditBlock } =
 				select( blockEditorStore );
 			const { canUser } = select( coreStore );
 			const block = getBlock( clientId );
-
-			const _isUnsyncedPattern =
-				!! block?.attributes?.metadata?.patternName;
 
 			const _isSyncedPattern =
 				!! block &&
@@ -50,17 +39,9 @@ function PatternsManageButton( { clientId, onClose } ) {
 				} );
 
 			return {
-				attributes: block.attributes,
 				canEdit: canEditBlock( clientId ),
-				// For unsynced patterns, detaching is simply removing the `patternName` attribute.
-				// For synced patterns, the `core:block` block is replaced with its inner blocks,
-				// so checking whether `canRemoveBlock` is possible is required.
-				canDetach:
-					_isUnsyncedPattern ||
-					( _isSyncedPattern && canRemoveBlock( clientId ) ),
-				isUnsyncedPattern: _isUnsyncedPattern,
-				isSyncedPattern: _isSyncedPattern,
-				isVisible: _isUnsyncedPattern || _isSyncedPattern,
+				canDetach: _isSyncedPattern && canRemoveBlock( clientId ),
+				isVisible: _isSyncedPattern,
 				// The site editor and templates both check whether the user
 				// has edit_theme_options capabilities. We can leverage that here
 				// and omit the manage patterns link if the user can't access it.
@@ -79,8 +60,6 @@ function PatternsManageButton( { clientId, onClose } ) {
 		[ clientId ]
 	);
 
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-
 	// Ignore reason: false positive of the lint rule.
 	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
 	const { convertSyncedPatternToStatic } = unlock(
@@ -92,17 +71,7 @@ function PatternsManageButton( { clientId, onClose } ) {
 	}
 
 	const handleDetach = () => {
-		if ( isSyncedPattern ) {
-			convertSyncedPatternToStatic( clientId );
-		}
-
-		if ( isUnsyncedPattern ) {
-			const { patternName, ...attributesWithoutPatternName } =
-				attributes?.metadata ?? {};
-			updateBlockAttributes( clientId, {
-				metadata: attributesWithoutPatternName,
-			} );
-		}
+		convertSyncedPatternToStatic( clientId );
 		onClose?.();
 		setShowConfirmDialog( false );
 	};
@@ -123,13 +92,9 @@ function PatternsManageButton( { clientId, onClose } ) {
 						title={ __( 'Detach pattern?' ) }
 						__experimentalHideHeader={ false }
 					>
-						{ isSyncedPattern
-							? __(
-									'The blocks will be separated from the original pattern and will be fully editable. Future changes to the pattern will not apply here.'
-							  )
-							: __(
-									'Blocks will no longer be associated with this pattern and will be fully editable.'
-							  ) }
+						{ __(
+							'The blocks will be separated from the original pattern and will be fully editable. Future changes to the pattern will not apply here.'
+						) }
 					</ConfirmDialog>
 				</>
 			) }
