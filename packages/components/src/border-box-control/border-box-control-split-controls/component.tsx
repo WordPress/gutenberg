@@ -67,7 +67,6 @@ const BorderBoxControlSplitControls = (
 		isCompact: true,
 		__experimentalIsRenderedInSidebar,
 		size,
-		__shouldNotWarnDeprecated36pxSize: true,
 	};
 
 	const mergedRef = useMergeRefs( [ setPopoverAnchor, forwardedRef ] );
@@ -76,9 +75,9 @@ const BorderBoxControlSplitControls = (
 		<Grid { ...otherProps } ref={ mergedRef } gap={ 3 }>
 			<BorderBoxControlVisualizer value={ value } size={ size } />
 
-			{ /* Disable reason: BorderControl's size is being controlled via the `size` prop by the parent component  */ }
-			{ /* eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop */ }
 			<BorderControl
+				__next40pxDefaultSize
+				__shouldNotWarnDeprecated36pxSize
 				className={ centeredClassName }
 				hideLabelFromVision
 				label={ __( 'Top border' ) }
@@ -87,9 +86,9 @@ const BorderBoxControlSplitControls = (
 				value={ value?.top }
 				{ ...sharedBorderControlProps }
 			/>
-			{ /* Disable reason: BorderControl's size is being controlled via the `size` prop by the parent component  */ }
-			{ /* eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop */ }
 			<BorderControl
+				__next40pxDefaultSize
+				__shouldNotWarnDeprecated36pxSize
 				hideLabelFromVision
 				label={ __( 'Left border' ) }
 				onChange={ ( newBorder ) => onChange( newBorder, 'left' ) }
@@ -97,9 +96,9 @@ const BorderBoxControlSplitControls = (
 				value={ value?.left }
 				{ ...sharedBorderControlProps }
 			/>
-			{ /* Disable reason: BorderControl's size is being controlled via the `size` prop by the parent component  */ }
-			{ /* eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop */ }
 			<BorderControl
+				__next40pxDefaultSize
+				__shouldNotWarnDeprecated36pxSize
 				className={ rightAlignedClassName }
 				hideLabelFromVision
 				label={ __( 'Right border' ) }
@@ -108,9 +107,9 @@ const BorderBoxControlSplitControls = (
 				value={ value?.right }
 				{ ...sharedBorderControlProps }
 			/>
-			{ /* Disable reason: BorderControl's size is being controlled via the `size` prop by the parent component  */ }
-			{ /* eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop */ }
 			<BorderControl
+				__next40pxDefaultSize
+				__shouldNotWarnDeprecated36pxSize
 				className={ centeredClassName }
 				hideLabelFromVision
 				label={ __( 'Bottom border' ) }

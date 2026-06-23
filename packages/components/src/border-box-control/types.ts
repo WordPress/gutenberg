@@ -20,9 +20,22 @@ export type AnyBorder = Border | Borders | undefined;
 export type BorderProp = keyof Border;
 export type BorderSide = keyof Borders;
 
+export type BorderSide = keyof Borders;
+
+type DeprecatedBorderBoxControlProps = {
+	/**
+	 * Start opting into the larger default height that will become the default size in a future version.
+	 *
+	 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
+	 * @ignore
+	 */
+	__next40pxDefaultSize?: boolean;
+};
+
 export type BorderBoxControlProps = ColorProps &
 	LabelProps &
-	Pick< BorderControlProps, 'enableStyle' | 'size' > & {
+	Pick< BorderControlProps, 'enableStyle' | 'size' > &
+	DeprecatedBorderBoxControlProps & {
 		/**
 		 * A callback function invoked when any border value is changed. The value
 		 * received may be a "flat" border object, one that has properties defining
@@ -45,12 +58,6 @@ export type BorderBoxControlProps = ColorProps &
 		 * properties but for each side; `top`, `right`, `bottom`, and `left`.
 		 */
 		value: AnyBorder;
-		/**
-		 * Start opting into the larger default height that will become the default size in a future version.
-		 *
-		 * @default false
-		 */
-		__next40pxDefaultSize?: boolean;
 	};
 
 export type LinkedButtonProps = Pick< BorderBoxControlProps, 'size' > & {

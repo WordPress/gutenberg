@@ -118,6 +118,7 @@ const UnconnectedBorderBoxControl = (
 						__experimentalIsRenderedInSidebar={
 							__experimentalIsRenderedInSidebar
 						}
+						__next40pxDefaultSize
 						__shouldNotWarnDeprecated36pxSize
 						size={ size }
 					/>
@@ -176,7 +177,6 @@ const UnconnectedBorderBoxControl = (
  *
  * 	return (
  * 		<BorderBoxControl
- * 			__next40pxDefaultSize
  * 			colors={ colors }
  * 			label={ __( 'Borders' ) }
  * 			onChange={ onChange }
