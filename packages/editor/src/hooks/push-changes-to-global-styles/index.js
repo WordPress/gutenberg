@@ -9,7 +9,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
-import { BaseControl, Button } from '@wordpress/components';
+import { BaseControl, Button, Notice } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	__EXPERIMENTAL_STYLE_PROPERTY,
@@ -17,7 +17,7 @@ import {
 	hasBlockSupport,
 	store as blocksStore,
 } from '@wordpress/blocks';
-import { useMemo, useCallback } from '@wordpress/element';
+import { useMemo, useCallback, useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
@@ -252,6 +252,19 @@ function PushChangesToGlobalStylesControl( {
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
+	const hasGlobalStylesEdits = useSelect( ( select ) => {
+		const {
+			__experimentalGetCurrentGlobalStylesId,
+			hasEditsForEntityRecord,
+		} = select( coreStore );
+		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
+
+		return globalStylesId
+			? hasEditsForEntityRecord( 'root', 'globalStyles', globalStylesId )
+			: false;
+	}, [] );
+
+	const [ hasAppliedGlobally, setHasAppliedGlobally ] = useState( false );
 
 	const pushChanges = useCallback( () => {
 		if ( changes.length === 0 ) {
@@ -290,6 +303,7 @@ function PushChangesToGlobalStylesControl( {
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( newBlockAttributes );
 			setUserConfig( newUserConfig, { undoIgnore: true } );
+			setHasAppliedGlobally( true );
 			createSuccessNotice(
 				sprintf(
 					// translators: %s: Title of the block e.g. 'Heading'.
@@ -307,6 +321,7 @@ function PushChangesToGlobalStylesControl( {
 								setUserConfig( userConfig, {
 									undoIgnore: true,
 								} );
+								setHasAppliedGlobally( false );
 							},
 						},
 					],
@@ -325,29 +340,46 @@ function PushChangesToGlobalStylesControl( {
 	] );
 
 	return (
-		<BaseControl
-			className="editor-push-changes-to-global-styles-control"
-			help={ sprintf(
-				// translators: %s: Title of the block e.g. 'Heading'.
-				__(
-					'Apply this block’s typography, spacing, dimensions, and color styles to all %s blocks.'
-				),
-				getBlockType( name ).title
+		<>
+			{ hasAppliedGlobally && hasGlobalStylesEdits && (
+				<Notice
+					className="editor-push-changes-to-global-styles-notice"
+					status="info"
+					isDismissible={ false }
+				>
+					{ sprintf(
+						// translators: %s: Title of the block e.g. 'Heading'.
+						__(
+							'These styles will apply to all %s blocks across the site when you save.'
+						),
+						getBlockType( name ).title
+					) }
+				</Notice>
 			) }
-		>
-			<BaseControl.VisualLabel>
-				{ __( 'Styles' ) }
-			</BaseControl.VisualLabel>
-			<Button
-				__next40pxDefaultSize
-				variant="secondary"
-				accessibleWhenDisabled
-				disabled={ changes.length === 0 }
-				onClick={ pushChanges }
+			<BaseControl
+				className="editor-push-changes-to-global-styles-control"
+				help={ sprintf(
+					// translators: %s: Title of the block e.g. 'Heading'.
+					__(
+						'Apply this block’s typography, spacing, dimensions, and color styles to all %s blocks.'
+					),
+					getBlockType( name ).title
+				) }
 			>
-				{ __( 'Apply globally' ) }
-			</Button>
-		</BaseControl>
+				<BaseControl.VisualLabel>
+					{ __( 'Styles' ) }
+				</BaseControl.VisualLabel>
+				<Button
+					__next40pxDefaultSize
+					variant="secondary"
+					accessibleWhenDisabled
+					disabled={ changes.length === 0 }
+					onClick={ pushChanges }
+				>
+					{ __( 'Apply globally' ) }
+				</Button>
+			</BaseControl>
+		</>
 	);
 }
 
