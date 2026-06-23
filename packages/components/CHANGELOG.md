@@ -5,7 +5,7 @@
 ### Breaking Changes
 
 -   `TextControl`: The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed ([#79386](https://github.com/WordPress/gutenberg/pull/79386)).
--   `BoxControl`: The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed (TBD).
+-   `BoxControl`: The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed ([#79419](https://github.com/WordPress/gutenberg/pull/79419)).
 
 ### Enhancements
 
