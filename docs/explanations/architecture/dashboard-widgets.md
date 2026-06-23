@@ -43,7 +43,7 @@ export default function HelloWorld( { attributes, setAttributes } ) { ... }
 1. Discovers every directory under `widgets/` and reads its `widget.json`.
 2. Compiles two ES script modules per widget: `render` (from `render.*`) and `widget` (from `widget.*`), each with an `*.asset.php` carrying module dependencies and a version hash. Missing source files simply produce no module; both are optional.
 3. Emits `build/widgets/registry.php`, the manifest: one entry per widget with its directory name, metadata, and which modules were built.
-4. Emits `widget-registration.php`, which at `init` calls `wp_register_script_module()` for every built module, with IDs derived from the folder name (`<prefix>/widgets/<dir>/render` and `<prefix>/widgets/<dir>/widget`).
+4. Emits `build/widgets.php`, which at `init` calls `wp_register_script_module()` for every built module, with IDs derived from the folder name (`<prefix>/widgets/<dir>/render` and `<prefix>/widgets/<dir>/widget`).
 
 The output of the build is therefore two things: registered script modules (loadable by the browser through the import map) and a manifest (readable by PHP without executing any JavaScript).
 
