@@ -7,6 +7,11 @@ import {
 } from '@wordpress/block-editor';
 import { formatItalic } from '@wordpress/icons';
 
+/*
+ * Internal dependencies
+ */
+import type { BoldEditProps } from '../types';
+
 const name = 'core/italic';
 const title = __( 'Italic' );
 
@@ -15,9 +20,15 @@ export const italic = {
 	title,
 	tagName: 'em',
 	className: null,
-	edit( { isActive, value, onChange, onFocus, isVisible = true } ) {
+	edit( {
+		isActive,
+		value,
+		onChange,
+		onFocus,
+		isVisible = true,
+	}: BoldEditProps ) {
 		function onToggle() {
-			onChange( toggleFormat( value, { type: name, title } ) );
+			onChange( toggleFormat( value, { type: name } ) );
 		}
 
 		function onClick() {
