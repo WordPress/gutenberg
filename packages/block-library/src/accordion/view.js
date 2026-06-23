@@ -18,7 +18,7 @@ const { actions } = store(
 				);
 				return accordionItem ? accordionItem.isOpen : false;
 			},
-			get hiddenAttribute() {
+			get isHidden() {
 				const { id, accordionItems } = getContext();
 				const accordionItem = accordionItems.find(
 					( item ) => item.id === id
@@ -93,13 +93,19 @@ const { actions } = store(
 			},
 			handleBeforeMatch: () => {
 				const context = getContext();
-				const { id, accordionItems } = context;
+				const { id, autoclose, accordionItems } = context;
 				const accordionItem = accordionItems.find(
 					( item ) => item.id === id
 				);
 
 				if ( accordionItem ) {
-					accordionItem.isOpen = true;
+					if ( autoclose ) {
+						accordionItems.forEach( ( item ) => {
+							item.isOpen = item.id === id;
+						} );
+					} else {
+						accordionItem.isOpen = true;
+					}
 				}
 			},
 		},

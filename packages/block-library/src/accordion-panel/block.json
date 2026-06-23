@@ -63,6 +63,5 @@
 			"default": false
 		}
 	},
-	"textdomain": "default",
-	"style": "wp-block-accordion-panel"
+	"textdomain": "default"
 }
