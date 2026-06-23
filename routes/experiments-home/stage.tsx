@@ -6,9 +6,15 @@ import { Spinner } from '@wordpress/components';
 import { useEntityRecord } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
 import { DataForm } from '@wordpress/dataviews';
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import {
+	createInterpolateElement,
+	useEffect,
+	useMemo,
+	useState,
+} from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
+import { Link } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -155,12 +161,29 @@ function ExperimentsPage() {
 	}
 
 	return (
-		<Page
-			title={ __( 'Experimental settings' ) }
-			subTitle={ __(
-				"The block editor includes experimental features that are usable while they're in development. Select the ones you'd like to enable. These features are likely to change, so avoid using them in production."
-			) }
-		>
+		<Page title={ __( 'Gutenberg experiments' ) }>
+			<div className="experiments-page__intro">
+				<p>
+					{ __(
+						'The Gutenberg plugin adds editing, customization, and site building to WordPress, and gives early adopters access to the latest block and full site editing features before they ship in a WordPress release. The experiments below are in active development, so expect rough edges and changes over time.'
+					) }
+				</p>
+				<p>
+					{ createInterpolateElement(
+						__(
+							'To learn more about the project and how to build with blocks, see the <a>Block Editor Handbook</a>.'
+						),
+						{
+							a: (
+								<Link
+									href="https://developer.wordpress.org/block-editor/"
+									openInNewTab
+								/>
+							),
+						}
+					) }
+				</p>
+			</div>
 			<div className="experiments-page__form">
 				<DataForm
 					data={ settings }

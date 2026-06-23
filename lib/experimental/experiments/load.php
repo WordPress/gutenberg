@@ -187,21 +187,6 @@ function gutenberg_initialize_experiments_settings() {
 add_action( 'rest_api_init', 'gutenberg_initialize_experiments_settings' );
 
 /**
- * Registers the Experiments submenu page under the Gutenberg menu.
- */
-function gutenberg_experiments_menu() {
-	add_submenu_page(
-		'gutenberg',
-		__( 'Experiments Settings', 'gutenberg' ),
-		__( 'Experiments', 'gutenberg' ),
-		'manage_options',
-		'experiments-wp-admin',
-		'gutenberg_experiments_wp_admin_render_page'
-	);
-}
-add_action( 'admin_menu', 'gutenberg_experiments_menu' );
-
-/**
  * Allows the legacy `gutenberg-experiments` route. Without this, accessing
  * `?page=gutenberg-experiments` results in an HTTP 403 error.
  *

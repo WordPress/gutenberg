@@ -8,7 +8,11 @@
 /**
  * Gutenberg's Menu.
  *
- * Adds a new wp-admin menu page for the Gutenberg editor.
+ * Adds a top-level "Gutenberg" wp-admin menu that links directly to the
+ * Experiments screen. The Experiments page is rendered by the auto-generated
+ * `gutenberg_experiments_wp_admin_render_page()` callback (see
+ * `lib/experimental/experiments/load.php`), and the menu uses its
+ * `experiments-wp-admin` slug so no separate submenu is needed.
  *
  * @since 0.1.0
  */
@@ -16,36 +20,10 @@ function gutenberg_menu() {
 	add_menu_page(
 		__( 'Gutenberg', 'gutenberg' ),
 		__( 'Gutenberg', 'gutenberg' ),
-		'edit_posts',
-		'gutenberg',
-		'',
+		'manage_options',
+		'experiments-wp-admin',
+		'gutenberg_experiments_wp_admin_render_page',
 		'dashicons-edit'
 	);
-
-	add_submenu_page(
-		'gutenberg',
-		__( 'Demo', 'gutenberg' ),
-		__( 'Demo', 'gutenberg' ),
-		'edit_posts',
-		'gutenberg',
-		'__return_null',
-	);
-
-	if ( current_user_can( 'edit_posts' ) ) {
-		add_submenu_page(
-			'gutenberg',
-			__( 'Support', 'gutenberg' ),
-			__( 'Support', 'gutenberg' ),
-			'edit_posts',
-			__( 'https://wordpress.org/support/plugin/gutenberg/', 'gutenberg' )
-		);
-		add_submenu_page(
-			'gutenberg',
-			__( 'Documentation', 'gutenberg' ),
-			__( 'Documentation', 'gutenberg' ),
-			'edit_posts',
-			'https://developer.wordpress.org/block-editor/'
-		);
-	}
 }
 add_action( 'admin_menu', 'gutenberg_menu', 9 );

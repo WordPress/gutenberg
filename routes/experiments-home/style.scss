@@ -1,4 +1,18 @@
+@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
+
+.experiments-page__intro {
+	box-sizing: border-box;
+	width: 100%;
+	max-width: 680px;
+	margin: 0 auto;
+	padding: $grid-unit-30 $grid-unit-30 0;
+
+	p {
+		margin: 0 0 $grid-unit-15;
+		color: $gray-700;
+	}
+}
 
 .experiments-page__form {
 	box-sizing: border-box;
