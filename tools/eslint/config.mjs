@@ -128,19 +128,6 @@ const restrictedImports = [
 	},
 ];
 
-const componentsEmotionImports = [
-	'@emotion/cache',
-	'@emotion/css',
-	'@emotion/react',
-	'@emotion/serialize',
-	'@emotion/styled',
-	'@emotion/utils',
-].map( ( name ) => ( {
-	name,
-	message:
-		'Do not add new Emotion usage in `@wordpress/components`. Use SCSS Modules for component-local styles instead.',
-} ) );
-
 const componentsEmotionImportPatterns = [
 	{
 		group: [ '@emotion/**' ],
@@ -149,89 +136,12 @@ const componentsEmotionImportPatterns = [
 	},
 ];
 
-const componentsEmotionMigrationAllowlist = [
-	'packages/components/src/base-control/styles/base-control-styles.ts',
-	'packages/components/src/border-box-control/styles.ts',
-	'packages/components/src/border-control/styles.ts',
-	'packages/components/src/box-control/styles/box-control-icon-styles.ts',
-	'packages/components/src/box-control/styles/box-control-styles.ts',
-	'packages/components/src/card/card/component.tsx',
-	'packages/components/src/card/get-padding-by-size.ts',
-	'packages/components/src/card/styles.ts',
-	'packages/components/src/color-palette/styles.ts',
-	'packages/components/src/color-picker/styles.ts',
-	'packages/components/src/combobox-control/styles.ts',
-	'packages/components/src/confirm-dialog/styles.ts',
-	'packages/components/src/context/test/context-system-provider.js',
-	'packages/components/src/custom-gradient-picker/styles/custom-gradient-picker-styles.tsx',
-	'packages/components/src/custom-select-control-v2/styles.ts',
-	'packages/components/src/date-time/date-picker/styles.ts',
-	'packages/components/src/date-time/date-time/styles.ts',
-	'packages/components/src/date-time/time-picker/styles.ts',
-	'packages/components/src/disabled/styles/disabled-styles.tsx',
-	'packages/components/src/divider/styles.ts',
-	'packages/components/src/dropdown/styles.ts',
-	'packages/components/src/elevation/hook.ts',
-	'packages/components/src/elevation/styles.ts',
-	'packages/components/src/flex/flex-item/hook.ts',
-	'packages/components/src/flex/flex/hook.ts',
-	'packages/components/src/flex/styles.ts',
-	'packages/components/src/focal-point-picker/styles/focal-point-picker-style.ts',
-	'packages/components/src/focal-point-picker/styles/focal-point-style.ts',
-	'packages/components/src/font-size-picker/styles.ts',
-	'packages/components/src/form-token-field/styles.ts',
-	'packages/components/src/grid/hook.ts',
-	'packages/components/src/input-control/styles/input-control-styles.tsx',
-	'packages/components/src/item-group/styles.ts',
-	'packages/components/src/menu/stories/index.story.tsx',
-	'packages/components/src/menu/styles.ts',
-	'packages/components/src/navigator/styles.ts',
-	'packages/components/src/number-control/styles/number-control-styles.ts',
-	'packages/components/src/palette-edit/styles.ts',
-	'packages/components/src/progress-bar/styles.ts',
-	'packages/components/src/range-control/styles/range-control-styles.ts',
-	'packages/components/src/resizable-box/resize-tooltip/styles/resize-tooltip.styles.ts',
-	'packages/components/src/scrollable/styles.ts',
-	'packages/components/src/search-control/styles.ts',
-	'packages/components/src/select-control/styles/select-control-styles.ts',
-	'packages/components/src/spacer/hook.ts',
-	'packages/components/src/spinner/styles.ts',
-	'packages/components/src/style-provider/index.tsx',
-	'packages/components/src/surface/styles.ts',
-	'packages/components/src/tabs/styles.ts',
-	'packages/components/src/text/hook.ts',
-	'packages/components/src/text/styles.ts',
-	'packages/components/src/textarea-control/styles/textarea-control-styles.ts',
-	'packages/components/src/theme/styles.ts',
-	'packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts',
-	'packages/components/src/toggle-group-control/toggle-group-control/styles.ts',
-	'packages/components/src/tools-panel/stories/index.story.tsx',
-	'packages/components/src/tools-panel/styles.ts',
-	'packages/components/src/truncate/hook.ts',
-	'packages/components/src/truncate/styles.ts',
-	'packages/components/src/unit-control/styles/unit-control-styles.ts',
-	'packages/components/src/utils/base-label.ts',
-	'packages/components/src/utils/box-sizing.ts',
-	'packages/components/src/utils/hooks/emotion.d.ts',
-	'packages/components/src/utils/hooks/test/use-cx.js',
-	'packages/components/src/utils/hooks/use-cx.ts',
-	'packages/components/src/utils/rtl.js',
-	'packages/components/src/view/component.tsx',
-	'packages/components/src/z-stack/styles.ts',
-];
-
 const componentsSourceRestrictedImports = [
 	...restrictedImports.filter(
 		( { name } ) =>
-			! [
-				'@ariakit/react',
-				'framer-motion',
-				...componentsEmotionImports.map(
-					( { name: emotionPackage } ) => emotionPackage
-				),
-			].includes( name )
+			! [ '@ariakit/react', 'framer-motion' ].includes( name ) &&
+			! name.startsWith( '@emotion/' )
 	),
-	...componentsEmotionImports,
 ];
 
 // Common `no-restricted-imports` configuration for `@wordpress/ui` paths,
@@ -783,7 +693,6 @@ export default dedupePlugins( [
 	// Emotion styles are migrated incrementally.
 	{
 		files: [ 'packages/components/src/**/*.[tj]s?(x)' ],
-		ignores: componentsEmotionMigrationAllowlist,
 		rules: {
 			'no-restricted-imports': [
 				'error',
