@@ -169,29 +169,28 @@
 }
 
 .apm-modal .components-modal__content {
-	overflow-x: hidden;
-	overflow-y: auto;
-}
-
-.apm-modal.is-layout-picker .components-modal__content {
 	box-sizing: border-box;
 	display: flex;
 	flex-direction: column;
-	height: 100%;
+	min-height: 0;
 	overflow: hidden;
 }
 
-.apm-modal.is-layout-picker .components-modal__header,
-.apm-modal.is-layout-picker .apm-modal-subtitle,
-.apm-modal.is-layout-picker .apm-modal-footer {
+.apm-modal .components-modal__header,
+.apm-modal .apm-modal-footer {
 	flex: 0 0 auto;
 }
 
-.apm-modal.is-layout-picker .apm-modal-body {
+.apm-modal .apm-modal-body {
 	display: flex;
 	flex: 1 1 auto;
 	flex-direction: column;
 	min-height: 0;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+.apm-modal.is-layout-picker .apm-modal-body {
 	overflow: hidden;
 }
 
@@ -276,10 +275,12 @@
 }
 
 .apm-layout-results {
+	display: flex;
+	flex-direction: column;
+	gap: $grid-unit-20;
 	height: 100%;
 	min-height: 0;
-	overflow-y: auto;
-	padding-block-end: $grid-unit-40;
+	overflow: hidden;
 	padding-inline-end: $grid-unit-05;
 }
 
@@ -316,11 +317,20 @@
 
 .apm-modal .apm-layout-card.components-button {
 	align-items: stretch;
+	border: $border-width solid $gray-300;
+	box-shadow: none;
+	box-sizing: border-box;
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-start;
+	overflow: hidden;
 	padding: 0 0 $grid-unit-20;
 	text-align: start;
+
+	&:hover:not(:disabled) {
+		border-color: $gray-400;
+		box-shadow: none;
+	}
 }
 
 .apm-option-preview,
@@ -413,13 +423,29 @@
 	display: grid;
 	gap: $grid-unit-40;
 	grid-template-columns: repeat(2, minmax(0, 1fr));
+	min-height: 0;
+	overflow: hidden;
+}
+
+.apm-layout-pagination {
+	align-items: center;
+	display: flex;
+	flex: 0 0 auto;
+	gap: $grid-unit-05;
+	justify-content: flex-end;
+}
+
+.apm-layout-pagination-label {
+	color: $gray-700;
+	min-width: 104px;
+	text-align: center;
 }
 
 .apm-layout-preview {
 	align-items: flex-start;
 	border-end-end-radius: 0;
 	border-end-start-radius: 0;
-	height: 700px;
+	height: 400px;
 	margin-bottom: $grid-unit-20;
 	padding: 0;
 }
@@ -427,14 +453,17 @@
 .apm-layout-preview-page {
 	background: $white;
 	height: 100%;
-	overflow: hidden;
+	overflow-x: hidden;
+	overflow-y: auto;
 	width: 100%;
 }
 
 .apm-layout-preview-page .block-editor-block-preview__container {
 	align-items: flex-start;
 	display: flex;
-	height: 100%;
+	height: auto;
+	min-height: 100%;
+	overflow: visible;
 	width: 100%;
 }
 
@@ -644,7 +673,7 @@
 	}
 
 	.apm-layout-preview {
-		height: 560px;
+		height: 400px;
 	}
 }
 

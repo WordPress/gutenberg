@@ -16,10 +16,16 @@ import {
 } from '@wordpress/components';
 import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
+import {
+	createInterpolateElement,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __, sprintf } from '@wordpress/i18n';
-import { chevronDown, chevronLeft, plus } from '@wordpress/icons';
+import { chevronDown, chevronLeft, chevronRight, plus } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { Link, useInvalidate, useNavigate } from '@wordpress/route';
 import { Card, CollapsibleCard, Text } from '@wordpress/ui';
@@ -28,7 +34,8 @@ import { isPageApplicableTemplate } from './template-utils';
 
 const NAVIGATION_POST_TYPE = 'wp_navigation';
 const OTHER_PAGE_LAYOUT_TYPE = 'other';
-const PAGE_LAYOUT_PREVIEW_VIEWPORT_WIDTH = 720;
+const PAGE_LAYOUTS_PER_PAGE = 2;
+const PAGE_LAYOUT_PREVIEW_VIEWPORT_WIDTH = 960;
 
 type PageStartMode = 'layout' | 'scratch';
 type PageLayoutTypeSlug =
@@ -737,6 +744,7 @@ export function AddPageFlow( { onClose }: AddPageFlowProps ) {
 	const [ selectedTemplateSlug, setSelectedTemplateSlug ] = useState( '' );
 	const [ selectedPageType, setSelectedPageType ] =
 		useState< PageLayoutTypeSlug >();
+	const [ pageLayoutPage, setPageLayoutPage ] = useState( 1 );
 	const [ isBusy, setIsBusy ] = useState( false );
 	const [ validationError, setValidationError ] = useState< string >();
 	const {
@@ -788,9 +796,38 @@ export function AddPageFlow( { onClose }: AddPageFlowProps ) {
 	const activePageLayoutGroup = pageLayoutGroups.find(
 		( group ) => group.slug === activePageType
 	);
+	const activePageLayouts = activePageLayoutGroup?.patterns || [];
+	const pageLayoutPageCount = Math.max(
+		1,
+		Math.ceil( activePageLayouts.length / PAGE_LAYOUTS_PER_PAGE )
+	);
+	const currentPageLayoutPage = Math.min(
+		pageLayoutPage,
+		pageLayoutPageCount
+	);
+	const visiblePageLayouts = activePageLayouts.slice(
+		( currentPageLayoutPage - 1 ) * PAGE_LAYOUTS_PER_PAGE,
+		currentPageLayoutPage * PAGE_LAYOUTS_PER_PAGE
+	);
+	const firstVisiblePageLayoutIndex =
+		( currentPageLayoutPage - 1 ) * PAGE_LAYOUTS_PER_PAGE + 1;
+	const lastVisiblePageLayoutIndex = Math.min(
+		currentPageLayoutPage * PAGE_LAYOUTS_PER_PAGE,
+		activePageLayouts.length
+	);
 	const isLoadingPageLayouts =
 		isResolvingPageLayoutPatterns && ! pageLayoutGroups.length;
 	const hasActivePageLayouts = !! activePageLayoutGroup?.patterns.length;
+
+	useEffect( () => {
+		setPageLayoutPage( 1 );
+	}, [ activePageType ] );
+
+	useEffect( () => {
+		if ( pageLayoutPage > pageLayoutPageCount ) {
+			setPageLayoutPage( pageLayoutPageCount );
+		}
+	}, [ pageLayoutPage, pageLayoutPageCount ] );
 
 	useEffect( () => {
 		if ( selectedPath !== 'layout' || ! pageLayoutGroups.length ) {
@@ -812,6 +849,7 @@ export function AddPageFlow( { onClose }: AddPageFlowProps ) {
 		setSelectedLayout( undefined );
 		setPageTitle( '' );
 		setSelectedTemplateSlug( '' );
+		setPageLayoutPage( 1 );
 		setValidationError( undefined );
 	};
 
@@ -832,12 +870,23 @@ export function AddPageFlow( { onClose }: AddPageFlowProps ) {
 		setSelectedPath( 'scratch' );
 		setSelectedLayout( undefined );
 		setPageTitle( '' );
+		setPageLayoutPage( 1 );
 		setValidationError( undefined );
 	};
 
 	const handleSelectLayout = ( pattern: BlockPattern ) => {
 		setSelectedLayout( pattern );
 		setPageTitle( pattern.title );
+	};
+
+	const goToPreviousPageLayouts = () => {
+		setPageLayoutPage( ( page ) => Math.max( 1, page - 1 ) );
+	};
+
+	const goToNextPageLayouts = () => {
+		setPageLayoutPage( ( page ) =>
+			Math.min( pageLayoutPageCount, page + 1 )
+		);
 	};
 
 	const persistPageInNavigation = async ( newPage: PostRecord ) => {
@@ -1019,12 +1068,14 @@ export function AddPageFlow( { onClose }: AddPageFlowProps ) {
 						variant="body-sm"
 						className="modal-subtitle apm-modal-subtitle"
 					>
-						{ __(
-							'Choose a page layout built with Patterns, or start with a blank page.'
-						) }{ ' ' }
-						<Link to="/patterns/list/all">
-							{ __( 'View all Patterns' ) }
-						</Link>
+						{ createInterpolateElement(
+							__(
+								'Choose a page layout built with <patternsLink>patterns</patternsLink>, or start with a blank page.'
+							),
+							{
+								patternsLink: <Link to="/patterns/list/all" />,
+							}
+						) }
 					</Text>
 				) }
 				{ ! selectedPath && (
@@ -1119,11 +1170,12 @@ export function AddPageFlow( { onClose }: AddPageFlowProps ) {
 													? 'is-selected'
 													: ''
 											}` }
-											onClick={ () =>
+											onClick={ () => {
 												setSelectedPageType(
 													group.slug
-												)
-											}
+												);
+												setPageLayoutPage( 1 );
+											} }
 											aria-current={
 												group.slug === activePageType
 													? 'true'
@@ -1162,22 +1214,80 @@ export function AddPageFlow( { onClose }: AddPageFlowProps ) {
 									) }
 								{ ! isLoadingPageLayouts &&
 									hasActivePageLayouts && (
-										<div className="apm-layouts-grid">
-											{ activePageLayoutGroup.patterns.map(
-												( pattern ) => (
-													<PageLayoutCard
-														key={ pattern.name }
-														pattern={ pattern }
-														pageTemplateContent={
-															pageTemplateContent
+										<>
+											{ pageLayoutPageCount > 1 && (
+												<div
+													className="apm-layout-pagination"
+													role="navigation"
+													aria-label={ __(
+														'Layout pages'
+													) }
+												>
+													<Button
+														variant="tertiary"
+														icon={ chevronLeft }
+														label={ __(
+															'Previous layouts'
+														) }
+														onClick={
+															goToPreviousPageLayouts
 														}
-														onSelect={
-															handleSelectLayout
+														disabled={
+															currentPageLayoutPage ===
+															1
 														}
+														accessibleWhenDisabled
+														__next40pxDefaultSize
 													/>
-												)
+													<Text
+														variant="body-sm"
+														className="apm-layout-pagination-label"
+													>
+														{ sprintf(
+															/* translators: 1: First visible layout number. 2: Last visible layout number. 3: Total number of layouts. */
+															__(
+																'%1$d-%2$d of %3$d layouts'
+															),
+															firstVisiblePageLayoutIndex,
+															lastVisiblePageLayoutIndex,
+															activePageLayouts.length
+														) }
+													</Text>
+													<Button
+														variant="tertiary"
+														icon={ chevronRight }
+														label={ __(
+															'Next layouts'
+														) }
+														onClick={
+															goToNextPageLayouts
+														}
+														disabled={
+															currentPageLayoutPage ===
+															pageLayoutPageCount
+														}
+														accessibleWhenDisabled
+														__next40pxDefaultSize
+													/>
+												</div>
 											) }
-										</div>
+											<div className="apm-layouts-grid">
+												{ visiblePageLayouts.map(
+													( pattern ) => (
+														<PageLayoutCard
+															key={ pattern.name }
+															pattern={ pattern }
+															pageTemplateContent={
+																pageTemplateContent
+															}
+															onSelect={
+																handleSelectLayout
+															}
+														/>
+													)
+												) }
+											</div>
+										</>
 									) }
 							</div>
 						</div>
