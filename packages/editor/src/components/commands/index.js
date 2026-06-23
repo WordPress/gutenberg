@@ -184,8 +184,8 @@ const getEditorCommandLoader = () =>
 		commands.push( {
 			name: 'core/toggle-pattern-editing',
 			label: disableContentOnlyForUnsyncedPatterns
-				? __( 'Disable pattern editing' )
-				: __( 'Enable pattern editing' ),
+				? __( 'Enable content-only editing for patterns' )
+				: __( 'Disable content-only editing for patterns' ),
 			icon: symbol,
 			category: 'command',
 			callback: ( { close } ) => {
