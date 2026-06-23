@@ -937,12 +937,12 @@ Applies a series of CSS rule transforms to wrap selectors inside a given class a
 _Parameters_
 
 -   _styles_ `EditorStyle[]`: CSS rules.
--   _wrapperSelector_ `string`: Wrapper selector.
+-   _wrapperSelector_ Wrapper selector.
 -   _transformOptions_ `TransformOptions`: Additional options for style transformation.
 
 _Returns_
 
--   `Array`: converted rules.
+-   converted rules.
 
 ### Typewriter
 
