@@ -25,6 +25,15 @@ const MyThemableComponent = ( props: MyThemableComponentProps ) => {
 };
 
 describe( 'Theme', () => {
+	it( 'should support the as prop', () => {
+		render( <Theme as="section" data-testid="theme" /> );
+
+		expect( screen.getByTestId( 'theme' ) ).toHaveProperty(
+			'tagName',
+			'SECTION'
+		);
+	} );
+
 	describe( 'accent color', () => {
 		it( 'does not define the accent color (and its variations) as a CSS variable when the `accent` prop is undefined', () => {
 			render(
