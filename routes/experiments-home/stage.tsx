@@ -161,7 +161,7 @@ function ExperimentsPage() {
 	}
 
 	return (
-		<Page title={ __( 'Gutenberg experiments' ) }>
+		<Page title={ __( 'Gutenberg Experiments' ) }>
 			<div className="experiments-page__intro">
 				<p>
 					{ __(
