@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Block Library: Restore the optimization that prevents experimental block code from being bundled in WordPress core builds by adding an ESBuild plugin ([#79203](https://github.com/WordPress/gutenberg/issues/79203)).
+-   Block Library: Restore the optimization that prevents experimental block code from being bundled in WordPress core builds via a built-in ESBuild plugin in `@wordpress/build` ([#79306](https://github.com/WordPress/gutenberg/pull/79306)).
 
 ### Breaking Changes
 

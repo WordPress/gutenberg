@@ -1328,6 +1328,76 @@ async function generatePagesPhp( pageData, replacements ) {
 }
 
 /**
+ * Creates an ESBuild plugin that stubs out experimental block imports from
+ * the block-library's `src/index.js` during WordPress core builds
+ * (IS_GUTENBERG_PLUGIN=false). This prevents experimental block code from
+ * being included in stable WordPress bundles.
+ *
+ * Imports of the form `import * as foo from './foo'` are intercepted; if
+ * `./foo/block.json` has `__experimental: true`, the import is resolved to an
+ * empty module so ESBuild's tree-shaking eliminates the code entirely.
+ *
+ * @see https://github.com/WordPress/gutenberg/issues/79203
+ *
+ * @param {Object} options
+ * @param {string} options.packageDir Absolute path to the block-library package.
+ * @return {import('esbuild').Plugin} ESBuild plugin.
+ */
+function createExperimentalBlocksPlugin( { packageDir } ) {
+	return {
+		name: 'experimental-blocks',
+		setup( build ) {
+			const srcIndexJs = path.join( packageDir, 'src', 'index.js' );
+			const srcDir = path.join( packageDir, 'src' );
+
+			// Intercept single-level relative imports (e.g. `./tabs`) originating
+			// from the block-library index entry point only.
+			build.onResolve( { filter: /^\.\/[^/]+$/ }, async ( args ) => {
+				if ( args.importer !== srcIndexJs ) {
+					return null;
+				}
+
+				const blockJsonPath = path.join(
+					srcDir,
+					args.path,
+					'block.json'
+				);
+
+				let blockJson;
+				try {
+					blockJson = JSON.parse(
+						await readFile( blockJsonPath, 'utf8' )
+					);
+				} catch {
+					// Not a block directory or no block.json — skip.
+					return null;
+				}
+
+				if (
+					blockJson &&
+					'__experimental' in blockJson &&
+					blockJson.__experimental !== false
+				) {
+					return {
+						path: args.path,
+						namespace: 'experimental-block-stub',
+					};
+				}
+
+				return null;
+			} );
+
+			// Return an empty module for experimental blocks so the tree-shaker
+			// can eliminate them from the final bundle.
+			build.onLoad(
+				{ filter: /.*/, namespace: 'experimental-block-stub' },
+				() => ( { contents: '', loader: 'js' } )
+			);
+		},
+	};
+}
+
+/**
  * Transpile a single package's source files and copy JSON files.
  *
  * @param {string} packageName Package name.
@@ -1442,21 +1512,18 @@ async function transpilePackage( packageName ) {
 			} );
 		},
 	};
-	// Load package-specific ESBuild plugin if configured in package.json.
-	let packageEsbuildPlugin = null;
-	if ( packageJson.wpEsbuildPlugin ) {
-		const pluginPath = path.resolve(
-			packageDir,
-			packageJson.wpEsbuildPlugin
-		);
-		const { default: createPlugin } = await import( pluginPath );
-		packageEsbuildPlugin = createPlugin( {
-			packageDir,
-			isGutenbergPlugin: JSON.parse(
-				baseDefine[ 'globalThis.IS_GUTENBERG_PLUGIN' ]
-			),
-		} );
-	}
+	// When building for WordPress core (IS_GUTENBERG_PLUGIN=false), experimental
+	// blocks in block-library should be excluded from the bundle. This plugin
+	// intercepts their imports from src/index.js and replaces them with empty
+	// module stubs so ESBuild's tree-shaking can eliminate the code.
+	// See https://github.com/WordPress/gutenberg/issues/79203
+	const isCoreBuild = ! JSON.parse(
+		baseDefine[ 'globalThis.IS_GUTENBERG_PLUGIN' ]
+	);
+	const experimentalBlocksPlugin =
+		packageName === 'block-library' && isCoreBuild
+			? createExperimentalBlocksPlugin( { packageDir } )
+			: null;
 
 	const plugins = [
 		// Note: dsTokenFallbacksJs and emotionPlugin both use esbuild's onLoad
@@ -1465,7 +1532,7 @@ async function transpilePackage( packageName ) {
 		// Avoid using design tokens in Emotion styles until Emotion is removed.
 		dsTokenFallbacksJs,
 		needsEmotionPlugin && emotionPlugin,
-		packageEsbuildPlugin,
+		experimentalBlocksPlugin,
 		wasmInlinePlugin,
 		// CSS modules import @wordpress/style-runtime in generated JS. Resolve
 		// that alias before externalizing imports so the runtime is bundled.

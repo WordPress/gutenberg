@@ -42,7 +42,6 @@
 		"./package.json": "./package.json"
 	},
 	"wpScript": true,
-	"wpEsbuildPlugin": "./esbuild-plugin.mjs",
 	"wpScriptModuleExports": {
 		"./accordion/view": "./build-module/accordion/view.mjs",
 		"./file/view": "./build-module/file/view.mjs",
