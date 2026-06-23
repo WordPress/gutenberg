@@ -732,11 +732,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/divider/styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
 	"packages/components/src/draggable/index.tsx": {
 		"react-hooks/refs": {
 			"count": 1
