@@ -25,6 +25,7 @@ import {
 	RECEIVE_INTERMEDIATE_RESULTS,
 	isNumericID,
 	normalizeQueryForResolution,
+	saveCRDTDoc,
 } from './utils';
 import { fetchBlockPatterns } from './fetch';
 import { restoreSelection, getSelectionHistory } from './utils/crdt-selection';
@@ -250,9 +251,15 @@ export const getEntityRecord =
 						// persistence. As we add support for syncing additional entity,
 						// we'll need to revisit where persisted CRDT documents are stored.
 						persistCRDTDoc: () => {
-							resolveSelect
+							if (
+								! entityConfig.syncConfig?.supportsPersistence
+							) {
+								return;
+							}
+
+							return resolveSelect
 								.getEditedEntityRecord( kind, name, key )
-								.then( ( editedRecord ) => {
+								.then( async ( editedRecord ) => {
 									// Don't persist the CRDT document if the record is still an
 									// auto-draft or if the entity does not support meta.
 									const { meta, status } = editedRecord;
@@ -260,19 +267,14 @@ export const getEntityRecord =
 										return;
 									}
 
-									// Trigger a minimal save to persist the CRDT document. The
-									// entity's pre-persist hooks will create the persisted CRDT
-									// document and apply it to the record's meta.
 									const entityIdKey =
 										entityConfig.key || DEFAULT_ENTITY_KEY;
-									dispatch.saveEntityRecord(
-										kind,
-										name,
-										{
-											[ entityIdKey ]:
-												editedRecord[ entityIdKey ],
-										},
-										{ __unstableSkipSyncUpdate: true }
+									const entityId =
+										editedRecord[ entityIdKey ];
+
+									await saveCRDTDoc(
+										`${ kind }/${ name }`,
+										entityId
 									);
 								} );
 						},
@@ -286,6 +288,11 @@ export const getEntityRecord =
 									selectionHistory
 								);
 							}
+						},
+						onUndoStackChange: ( undoState ) => {
+							dispatch.__unstableNotifySyncUndoManagerChange(
+								undoState
+							);
 						},
 						restoreUndoMeta: ( ydoc, meta ) => {
 							const selectionHistory =
@@ -1032,10 +1039,14 @@ export const getDefaultTemplateId =
 	};
 
 getDefaultTemplateId.shouldInvalidate = ( action ) => {
+	// Only invalidate on real saves; `persistedEdits` is absent on
+	// initial fetches so the kickoff's own site read doesn't wipe
+	// the just-resolved template id.
 	return (
 		action.type === 'RECEIVE_ITEMS' &&
 		action.kind === 'root' &&
-		action.name === 'site'
+		action.name === 'site' &&
+		!! action.persistedEdits
 	);
 };
 
@@ -1344,14 +1355,24 @@ export const getEditorAssets =
 /**
  * Requests view config for a given entity type from the REST API.
  *
- * @param {string} kind Entity kind.
- * @param {string} name Entity name.
+ * @param {string}    kind           Entity kind.
+ * @param {string}    name           Entity name.
+ * @param {?Object}   options        Optional options.
+ * @param {?string[]} options.fields Optional subset of top-level config
+ *                                   properties to request, mapped to the REST
+ *                                   API `_fields` parameter. When omitted, the
+ *                                   full config is requested.
  */
 export const getViewConfig =
-	( kind, name ) =>
+	( kind, name, options = {} ) =>
 	async ( { dispatch } ) => {
+		const query = { kind, name };
+		const fields = getNormalizedCommaSeparable( options.fields );
+		if ( fields?.length ) {
+			query._fields = fields.join( ',' );
+		}
 		const config = await apiFetch( {
-			path: addQueryArgs( '/wp/v2/view-config', { kind, name } ),
+			path: addQueryArgs( '/wp/v2/view-config', query ),
 		} );
 		dispatch.receiveViewConfig( kind, name, config );
 	};

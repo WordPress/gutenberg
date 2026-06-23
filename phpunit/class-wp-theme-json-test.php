@@ -975,7 +975,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'styles'  => array(
 					'blocks' => array(
 						'test/responsive-feature' => array(
-							'mobile' => array(
+							'@mobile' => array(
 								'color' => array(
 									'text' => 'red',
 								),
@@ -997,7 +997,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$mobile_metadata = array(
 			'name'        => 'test/responsive-feature',
-			'path'        => array( 'styles', 'blocks', 'test/responsive-feature', 'mobile' ),
+			'path'        => array( 'styles', 'blocks', 'test/responsive-feature', '@mobile' ),
 			'selector'    => '.wp-block-test-responsive-feature',
 			'selectors'   => array(
 				'color' => '.wp-block-test-responsive-feature .color-target',
@@ -1035,7 +1035,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 							'spacing' => array(
 								'blockGap' => '5rem',
 							),
-							'mobile'  => array(
+							'@mobile' => array(
 								'spacing' => array(
 									'blockGap' => '2rem',
 								),
@@ -1055,7 +1055,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$mobile_metadata = array(
 			'name'        => 'core/group',
-			'path'        => array( 'styles', 'blocks', 'core/group', 'mobile' ),
+			'path'        => array( 'styles', 'blocks', 'core/group', '@mobile' ),
 			'selector'    => '.wp-block-group',
 			'css'         => '.wp-block-group',
 			'media_query' => '@media (width <= 480px)',
@@ -1071,6 +1071,30 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertStringContainsString( '@media (width <= 480px)', $actual_styles );
 		$this->assertStringContainsString( $mobile_gap, $actual_styles );
 		$this->assertLessThan( strpos( $actual_styles, $mobile_gap ), strpos( $actual_styles, $default_gap ) );
+	}
+
+	public function test_get_stylesheet_outputs_legacy_responsive_block_styles() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/group' => array(
+							'mobile' => array(
+								'color' => array(
+									'text' => 'red',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$this->assertStringContainsString(
+			'@media (width <= 480px){:root :where(.wp-block-group){color: red;}}',
+			$theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) )
+		);
 	}
 
 	public function test_get_styles_for_block_responsive_element_pseudo_styles_preserve_order_and_do_not_duplicate_pseudo() {
@@ -1092,7 +1116,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 									),
 								),
 							),
-							'mobile'   => array(
+							'@mobile'  => array(
 								'elements' => array(
 									'link' => array(
 										'color'  => array(
@@ -1121,7 +1145,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$mobile_link_node = array(
-			'path'        => array( 'styles', 'blocks', 'core/group', 'mobile', 'elements', 'link' ),
+			'path'        => array( 'styles', 'blocks', 'core/group', '@mobile', 'elements', 'link' ),
 			'selector'    => $link_selector,
 			'media_query' => '@media (width <= 480px)',
 		);
@@ -1132,7 +1156,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$mobile_hover_node = array(
-			'path'        => array( 'styles', 'blocks', 'core/group', 'mobile', 'elements', 'link' ),
+			'path'        => array( 'styles', 'blocks', 'core/group', '@mobile', 'elements', 'link' ),
 			'selector'    => $link_selector . ':hover',
 			'media_query' => '@media (width <= 480px)',
 		);
@@ -1183,7 +1207,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 									'spacing' => array(
 										'blockGap' => '5rem',
 									),
-									'mobile'  => array(
+									'@mobile' => array(
 										'spacing' => array(
 											'blockGap' => '2rem',
 										),
@@ -1236,7 +1260,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'styles'  => array(
 					'blocks' => array(
 						'test/tablet-only' => array(
-							'tablet' => array(
+							'@tablet' => array(
 								'color' => array(
 									'text' => 'purple',
 								),
@@ -1249,7 +1273,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$tablet_metadata = array(
 			'name'        => 'test/tablet-only',
-			'path'        => array( 'styles', 'blocks', 'test/tablet-only', 'tablet' ),
+			'path'        => array( 'styles', 'blocks', 'test/tablet-only', '@tablet' ),
 			'selector'    => '.wp-block-test-tablet-only',
 			'media_query' => '@media (480px < width <= 782px)',
 		);
@@ -1750,7 +1774,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'styles'  => array(
 					'blocks' => array(
 						'core/button' => array(
-							'mobile' => array(
+							'@mobile' => array(
 								':hover' => array(
 									'typography' => array(
 										'writingMode' => 'vertical-rl',
@@ -3089,15 +3113,15 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						'core/group' => array(
 							'elements' => array(
 								'link' => array(
-									'color'  => array(
+									'color'   => array(
 										'text' => 'var:preset|color|dark-gray',
 									),
-									'mobile' => array(
+									'@mobile' => array(
 										'color' => array(
 											'text' => 'var:preset|color|dark-pink',
 										),
 									),
-									'tablet' => array(
+									'@tablet' => array(
 										'color' => array(
 											'text' => 'var:preset|color|dark-red',
 										),
@@ -3117,15 +3141,15 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'core/group' => array(
 						'elements' => array(
 							'link' => array(
-								'color'  => array(
+								'color'   => array(
 									'text' => 'var(--wp--preset--color--dark-gray)',
 								),
-								'mobile' => array(
+								'@mobile' => array(
 									'color' => array(
 										'text' => 'var(--wp--preset--color--dark-pink)',
 									),
 								),
-								'tablet' => array(
+								'@tablet' => array(
 									'color' => array(
 										'text' => 'var(--wp--preset--color--dark-red)',
 									),
@@ -3150,7 +3174,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'styles'  => array(
 					'blocks' => array(
 						'core/group' => array(
-							'mobile' => array(
+							'@mobile' => array(
 								'elements' => array(
 									'link' => array(
 										'color' => array(
@@ -3170,7 +3194,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'styles'  => array(
 				'blocks' => array(
 					'core/group' => array(
-						'mobile' => array(
+						'@mobile' => array(
 							'elements' => array(
 								'link' => array(
 									'color' => array(
@@ -4213,7 +4237,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$reflection_class = new ReflectionClass( WP_Theme_JSON_Gutenberg::class );
 
 		$get_property_value_method = $reflection_class->getMethod( 'get_property_value' );
-		$get_property_value_method->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$get_property_value_method->setAccessible( true );
+		}
 		$result = $get_property_value_method->invoke( null, $styles, $path );
 
 		$this->assertSame( '', $result );
@@ -5088,7 +5114,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 											'background' => 'red',
 										),
 									),
-									'tablet'     => array(
+									'@tablet'    => array(
 										'dimensions' => array(
 											'width' => '30rem',
 										),
@@ -6614,7 +6640,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 		$reflection = new ReflectionMethod( $theme_json, 'process_blocks_custom_css' );
-		$reflection->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$reflection->setAccessible( true );
+		}
 
 		$this->assertSame( $expected, $reflection->invoke( $theme_json, $input['css'], $input['selector'] ) );
 	}
@@ -6939,7 +6967,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$theme_json = new ReflectionClass( 'WP_Theme_JSON_Gutenberg' );
 
 		$func = $theme_json->getMethod( 'get_block_style_variation_selector' );
-		$func->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$func->setAccessible( true );
+		}
 
 		$actual = $func->invoke( null, 'custom', $selector );
 
@@ -7019,7 +7049,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$theme_json = new ReflectionClass( 'WP_Theme_JSON_Gutenberg' );
 
 		$func = $theme_json->getMethod( 'scope_style_node_selectors' );
-		$func->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$func->setAccessible( true );
+		}
 
 		$node = array(
 			'name'      => 'core/image',
@@ -7066,7 +7098,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$theme_json = new ReflectionClass( 'WP_Theme_JSON_Gutenberg' );
 
 		$func = $theme_json->getMethod( 'get_block_nodes' );
-		$func->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$func->setAccessible( true );
+		}
 
 		$theme_json = array(
 			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -7100,7 +7134,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$theme_json = new ReflectionClass( 'WP_Theme_JSON_Gutenberg' );
 
 		$func = $theme_json->getMethod( 'get_block_nodes' );
-		$func->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$func->setAccessible( true );
+		}
 
 		$theme_json = array(
 			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -7143,7 +7179,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$theme_json = new ReflectionClass( 'WP_Theme_JSON_Gutenberg' );
 
 		$func = $theme_json->getMethod( 'get_block_nodes' );
-		$func->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$func->setAccessible( true );
+		}
 
 		$theme_json = array(
 			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -7195,7 +7233,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$theme_json = new ReflectionClass( 'WP_Theme_JSON_Gutenberg' );
 
 		$func = $theme_json->getMethod( 'get_block_nodes' );
-		$func->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$func->setAccessible( true );
+		}
 
 		$theme_json = array(
 			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -7549,11 +7589,35 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that block custom states (e.g. @current) are processed correctly.
+	 * Test that block custom states (e.g. -current) are processed correctly.
 	 */
 	public function test_block_custom_states_are_processed() {
-		// Only @current styles — no base block styles — so we can assert the
+		// Only -current styles — no base block styles — so we can assert the
 		// output uses the current-menu-item selector and not the block selector.
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/navigation-link' => array(
+							'-current' => array(
+								'color' => array(
+									'text'       => 'red',
+									'background' => 'blue',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+		$expected   = ':root :where(.wp-block-navigation .current-menu-item){background-color: blue;color: red;}';
+		$this->assertSameCSS( $expected, $stylesheet );
+	}
+
+	public function test_legacy_block_custom_states_are_processed() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -7578,7 +7642,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that block custom states compound correctly with pseudo-selectors (e.g. @current + :hover).
+	 * Test that block custom states compound correctly with pseudo-selectors (e.g. -current + :hover).
 	 */
 	public function test_block_custom_states_compound_with_pseudo_selectors() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
@@ -7587,7 +7651,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'styles'  => array(
 					'blocks' => array(
 						'core/navigation-link' => array(
-							'@current' => array(
+							'-current' => array(
 								'color'  => array(
 									'text'       => 'red',
 									'background' => 'blue',
@@ -7630,7 +7694,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 							'color'  => array(
 								'text' => 'black',
 							),
-							'@bogus' => array(
+							'-bogus' => array(
 								'color' => array(
 									'text' => 'yellow',
 								),
@@ -7644,7 +7708,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$stylesheet_bogus = $theme_json_bogus_state->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
 		$expected_bogus   = ':root :where(.wp-block-navigation-link){color: black;}';
 		$this->assertSameCSS( $expected_bogus, $stylesheet_bogus );
-		$this->assertStringNotContainsString( '@bogus', $stylesheet_bogus );
+		$this->assertStringNotContainsString( '-bogus', $stylesheet_bogus );
 		$this->assertStringNotContainsString( 'yellow', $stylesheet_bogus );
 
 		// A valid custom state key on a block that does not support custom states.
@@ -7657,7 +7721,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 							'color'    => array(
 								'text' => 'black',
 							),
-							'@current' => array(
+							'-current' => array(
 								'color' => array(
 									'text' => 'red',
 								),
@@ -7671,7 +7735,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$stylesheet_unsupported = $theme_json_unsupported_block->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
 		$expected               = ':root :where(p){color: black;}';
 		$this->assertSameCSS( $expected, $stylesheet_unsupported );
-		$this->assertStringNotContainsString( '@current', $stylesheet_unsupported );
+		$this->assertStringNotContainsString( '-current', $stylesheet_unsupported );
 		$this->assertStringNotContainsString( 'current-menu-item', $stylesheet_unsupported );
 	}
 
@@ -7991,7 +8055,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 */
 	public function test_to_ruleset_skips_non_scalar_values_and_casts_numerics() {
 		$reflection = new ReflectionMethod( WP_Theme_JSON_Gutenberg::class, 'to_ruleset' );
-		$reflection->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$reflection->setAccessible( true );
+		}
 		$declarations = array(
 			array(
 				'name'  => 'color',

@@ -10,6 +10,7 @@ import { isBlobURL } from '@wordpress/blob';
 import {
 	createInterpolateElement,
 	useEffect,
+	useRef,
 	useState,
 } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
@@ -73,7 +74,9 @@ const SiteLogo = ( {
 	const isResizable = ! isWideAligned && isLargeViewport;
 	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
-	const { toggleSelection } = useDispatch( blockEditorStore );
+	const cropButtonRef = useRef();
+	const { toggleSelection, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	// Check if we're in contentOnly mode
@@ -106,6 +109,7 @@ const SiteLogo = ( {
 		// fallen out of sync. This can happen if the toggle is saved in the `on` position,
 		// but changes are later made to the site icon in the Customizer.
 		if ( shouldSyncIcon && logoId !== iconId ) {
+			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( { shouldSyncIcon: false } );
 		}
 	}, [] );
@@ -401,12 +405,15 @@ const SiteLogo = ( {
 				shouldShowCropAndDimensions && (
 					<BlockControls group="block">
 						<ToolbarButton
+							ref={ cropButtonRef }
 							onClick={
 								openMediaEditorModal && logoId
 									? () =>
 											openMediaEditorModal( {
 												id: logoId,
 												onUpdate: handleMediaUpdate,
+												onClose: () =>
+													cropButtonRef.current?.focus(),
 											} )
 									: () => setIsEditingImage( true )
 							}

@@ -63,14 +63,11 @@ test.describe( 'Preload', () => {
 		await page.waitForLoadState( 'networkidle' );
 		stop();
 
-		// Only collab side effects (CRDT save + first wp-sync poll)
+		// Only collab side effects (CRDT persist + first wp-sync poll)
 		// should escape before mount — they're detached promise chains
 		// off `receiveEntityRecords`.
 		expect( Array.from( new Set( requestsUntilMount ) ).sort() ).toEqual(
-			[
-				`POST /wp/v2/posts/${ postId }`,
-				'POST /wp-sync/v1/updates',
-			].sort()
+			[ 'POST /wp-sync/v1/save', 'POST /wp-sync/v1/updates' ].sort()
 		);
 		// Every preloaded path should be consumed by the kickoff.
 		expect( preloadStatus ).toBe(
@@ -83,12 +80,7 @@ test.describe( 'Preload', () => {
 		expect( Array.from( new Set( requests ) ).sort() ).toEqual(
 			[
 				`GET /wp/v2/comments?context=edit&post=${ postId }&type=note&status=all&per_page=100`,
-				'GET /wp/v2/taxonomies?context=edit&per_page=100',
-				'GET /wp/v2/templates/lookup?slug=front-page',
-				'GET /wp/v2/users/1?context=view&_fields=id%2Cname',
-				'GET /wp/v2/wp_pattern_category?context=view&per_page=100&_fields=id%2Cname%2Cdescription%2Cslug',
-				'OPTIONS /wp/v2/posts',
-				`POST /wp/v2/posts/${ postId }`,
+				'POST /wp-sync/v1/save',
 				'POST /wp-sync/v1/updates',
 				'POST /wp/v2/users/me',
 			].sort()

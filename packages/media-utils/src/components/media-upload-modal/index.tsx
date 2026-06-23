@@ -655,7 +655,7 @@ export function MediaUploadModal( {
 						onDismissError={ dismissError }
 						onOpenChange={ handlePopoverOpenChange }
 					/>
-					<DataViewsPicker.BulkActionToolbar />
+					<DataViewsPicker.Footer />
 				</div>
 			</DataViewsPicker>
 			{ createPortal(

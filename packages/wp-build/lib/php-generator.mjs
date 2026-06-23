@@ -48,7 +48,7 @@ export async function getPhpReplacements( rootDir, baseUrlExpression ) {
 export function applyTemplateReplacements( template, replacements ) {
 	let content = template;
 	for ( const [ placeholder, value ] of Object.entries( replacements ) ) {
-		content = content.replaceAll( placeholder, value );
+		content = content.split( placeholder ).join( value );
 	}
 	return content;
 }

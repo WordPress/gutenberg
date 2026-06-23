@@ -27,7 +27,6 @@ import { parseContent, serializeContent } from './utils';
 const { Tabs } = unlock( componentsPrivateApis );
 
 export default function HTMLEditModal( {
-	isOpen,
 	onRequestClose,
 	content,
 	setAttributes,
@@ -53,10 +52,6 @@ export default function HTMLEditModal( {
 	// Determine if we should show a warning about CSS/JS content being stripped
 	const hasRestrictedContent =
 		! canUserUseUnfilteredHTML && ( css.trim() || js.trim() );
-
-	if ( ! isOpen ) {
-		return null;
-	}
 
 	const handleUpdate = () => {
 		// For users without unfiltered_html capability, strip CSS and JS content

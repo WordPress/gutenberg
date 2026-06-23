@@ -1,24 +1,34 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+import type { ReactNode } from 'react';
+
+/**
  * WordPress dependencies
  */
 import { autop } from '@wordpress/autop';
-import { Spinner } from '@wordpress/components';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { DataForm, useFormValidity } from '@wordpress/dataviews';
-import type { Field, Form } from '@wordpress/dataviews';
+import {
+	DataForm,
+	useFormValidity,
+	type Field,
+	type Form,
+} from '@wordpress/dataviews';
 import { useMemo, useState } from '@wordpress/element';
 import { escapeHTML } from '@wordpress/escape-html';
-import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
-import { Button, Stack } from '@wordpress/ui'; // eslint-disable-line @wordpress/use-recommended-components
+import { chevronLeft, chevronRight } from '@wordpress/icons';
+import { Button, Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
-import { ExistingDraftPrompt, SavedPost } from './components';
+import { DraftsList, SavedPost } from './components';
 import { QuickDraftContentField } from './fields';
-import styles from './styles.module.css';
+import { useWidgetSize } from './hooks';
+import styles from './style.module.css';
 
 /*
  * Serializes plain text into one or more `core/paragraph` blocks so the saved
@@ -39,18 +49,6 @@ function textToParagraphBlocks( text: string ): string {
 	);
 }
 
-/**
- * Start of today in the user's local time, formatted without a timezone offset
- * so the WP REST `after` filter compares against site-local `post_date`.
- */
-function getTodayStartISO() {
-	const now = new Date();
-	const year = now.getFullYear();
-	const month = String( now.getMonth() + 1 ).padStart( 2, '0' );
-	const day = String( now.getDate() ).padStart( 2, '0' );
-	return `${ year }-${ month }-${ day }T00:00:00`;
-}
-
 type QuickDraftData = {
 	title: string;
 	content: string;
@@ -68,9 +66,12 @@ const INITIAL_DATA: QuickDraftData = {
 
 /**
  * Quick Draft widget. Lets the user draft a post (title + content) without
- * leaving the dashboard. Branches between a loading spinner, a prompt when a
- * draft already exists from today, a confirmation after saving, and the form
- * itself.
+ * leaving the dashboard, and adapts to its own tile size: at compact sizes it
+ * shows the form plus a link (when drafts exist) that reveals the recent
+ * drafts in place; when the tile is wide it places the drafts list beside the
+ * form, and when it is tall it stacks the list underneath. The drafts request
+ * only runs when the list is actually shown, since `DraftsList` mounts only
+ * then.
  */
 export default function QuickDraft() {
 	const [ data, setData ] = useState< QuickDraftData >( INITIAL_DATA );
@@ -79,40 +80,41 @@ export default function QuickDraft() {
 		id: number;
 		title: string;
 	} | null >( null );
-	const [ hasDismissedPrompt, setHasDismissedPrompt ] = useState( false );
+	const [ isListOpenInCompact, setIsListOpenInCompact ] = useState( false );
+
+	const { ref, isWide, isTall } = useWidgetSize();
+
+	/*
+	 * Whether there is room to show the drafts list inline, and how to place it.
+	 * A wide tile sets the list beside the form (each column scrolls, so width
+	 * is what it needs, not height); a tall but narrow tile stacks it below. A
+	 * tile that is neither wide nor tall stays compact, reaching the list from a
+	 * button in the form's action row that only shows when drafts exist.
+	 */
+	const showDraftsList = isWide || isTall;
+	const listBeside = isWide;
 
 	const { saveEntityRecord } = useDispatch( coreDataStore );
 
-	const { existingDraft, isLoadingDrafts } = useSelect( ( select ) => {
-		const { getCurrentUser, getEntityRecords, hasFinishedResolution } =
-			select( coreDataStore );
-		const currentUser = getCurrentUser();
-
-		if ( ! currentUser?.id ) {
-			return { existingDraft: null, isLoadingDrafts: true };
-		}
-
-		const query = {
-			status: 'draft',
-			author: currentUser.id,
-			after: getTodayStartISO(),
-			orderby: 'date',
-			order: 'desc',
-			per_page: 1,
-		};
-		const records = getEntityRecords( 'postType', 'post', query ) as
-			| Array< { id: number; title: { rendered: string } } >
-			| undefined;
-
-		return {
-			existingDraft: records?.[ 0 ] ?? null,
-			isLoadingDrafts: ! hasFinishedResolution( 'getEntityRecords', [
-				'postType',
-				'post',
-				query,
-			] ),
-		};
-	}, [] );
+	/*
+	 * The "Draft posts" reveal only shows in compact mode, so check whether any
+	 * drafts exist (site-wide, as DraftsList lists them) only there. One record
+	 * is enough to know the list is non-empty.
+	 */
+	const { hasDrafts } = useSelect(
+		( select ) => {
+			if ( showDraftsList ) {
+				return { hasDrafts: false };
+			}
+			const { getEntityRecords } = select( coreDataStore );
+			const anyDrafts = getEntityRecords( 'postType', 'post', {
+				status: 'draft',
+				per_page: 1,
+			} ) as Array< { id: number } > | undefined;
+			return { hasDrafts: ( anyDrafts?.length ?? 0 ) > 0 };
+		},
+		[ showDraftsList ]
+	);
 
 	const fields = useMemo< Field< QuickDraftData >[] >(
 		() => [
@@ -158,9 +160,6 @@ export default function QuickDraft() {
 				setCreatedPost( { id: newId, title: data.title } );
 			}
 			setData( INITIAL_DATA );
-			// The newly saved draft would re-trigger the prompt on the next
-			// render; skip it for the rest of this session.
-			setHasDismissedPrompt( true );
 		} finally {
 			setIsSaving( false );
 		}
@@ -170,67 +169,115 @@ export default function QuickDraft() {
 		setCreatedPost( null );
 	};
 
-	if ( isLoadingDrafts ) {
-		return (
-			<Stack
-				direction="column"
-				align="center"
-				justify="center"
-				className={ styles.body }
-			>
-				<Spinner />
-			</Stack>
-		);
-	}
-
-	if ( existingDraft && ! hasDismissedPrompt ) {
-		return (
-			<ExistingDraftPrompt
-				postId={ existingDraft.id }
-				postTitle={ decodeEntities( existingDraft.title.rendered ) }
-				onWriteAnother={ () => setHasDismissedPrompt( true ) }
-			/>
-		);
-	}
-
+	/*
+	 * The most relevant state for the tile: the post-save confirmation or the
+	 * form. Composed with the drafts list according to the room the tile has.
+	 */
+	let primary: ReactNode;
 	if ( createdPost !== null ) {
-		return (
+		primary = (
 			<SavedPost
 				postId={ createdPost.id }
 				postTitle={ createdPost.title }
 				onWriteAnother={ writeAnother }
 			/>
 		);
+	} else {
+		primary = (
+			<Stack
+				direction="column"
+				gap="md"
+				justify="space-between"
+				className={ styles.fill }
+			>
+				<Stack direction="column" className={ styles.formContainer }>
+					<DataForm< QuickDraftData >
+						data={ data }
+						fields={ fields }
+						form={ FORM }
+						validity={ validity }
+						onChange={ ( edits ) =>
+							setData( ( prev ) => ( { ...prev, ...edits } ) )
+						}
+					/>
+				</Stack>
+
+				<Stack direction="row" gap="md" justify="flex-start">
+					<Button
+						variant="solid"
+						onClick={ saveDraftPost }
+						loading={ isSaving }
+						disabled={ ! canSave }
+					>
+						{ __( 'Save as draft' ) }
+					</Button>
+					{ ! showDraftsList && hasDrafts && (
+						<Button
+							variant="minimal"
+							onClick={ () => setIsListOpenInCompact( true ) }
+						>
+							{ __( 'Draft posts' ) }
+							<Button.Icon icon={ chevronRight } />
+						</Button>
+					) }
+				</Stack>
+			</Stack>
+		);
 	}
 
+	// No room for the list inline, but it was revealed in place from compact.
+	if ( ! showDraftsList && isListOpenInCompact ) {
+		return (
+			<Stack ref={ ref } direction="column" className={ styles.body }>
+				<Stack direction="column" className={ styles.listPane }>
+					<DraftsList />
+				</Stack>
+				<Stack
+					direction="row"
+					justify="flex-start"
+					className={ styles.backRow }
+				>
+					<Button
+						variant="minimal"
+						tone="neutral"
+						size="compact"
+						onClick={ () => setIsListOpenInCompact( false ) }
+					>
+						<Button.Icon icon={ chevronLeft } />
+						{ __( 'Back' ) }
+					</Button>
+				</Stack>
+			</Stack>
+		);
+	}
+
+	// Compact tile: just the primary pane; drafts are reached from the action row.
+	if ( ! showDraftsList ) {
+		return (
+			<Stack ref={ ref } direction="column" className={ styles.body }>
+				<Stack direction="column" className={ styles.primaryPane }>
+					{ primary }
+				</Stack>
+			</Stack>
+		);
+	}
+
+	// Room for the list: beside the form when wide, otherwise stacked below.
 	return (
 		<Stack
-			direction="column"
-			gap="md"
-			justify="space-between"
-			className={ styles.body }
+			ref={ ref }
+			direction={ listBeside ? 'row' : 'column' }
+			className={ clsx(
+				styles.body,
+				listBeside ? styles.row : styles.column
+			) }
 		>
-			<Stack className={ styles.formContainer }>
-				<DataForm< QuickDraftData >
-					data={ data }
-					fields={ fields }
-					form={ FORM }
-					validity={ validity }
-					onChange={ ( edits ) =>
-						setData( ( prev ) => ( { ...prev, ...edits } ) )
-					}
-				/>
+			<Stack direction="column" className={ styles.primaryPane }>
+				{ primary }
 			</Stack>
 
-			<Stack direction="row" gap="md" justify="flex-start">
-				<Button
-					variant="solid"
-					onClick={ saveDraftPost }
-					loading={ isSaving }
-					disabled={ ! canSave }
-				>
-					{ __( 'Save as draft' ) }
-				</Button>
+			<Stack direction="column" className={ styles.listPane }>
+				<DraftsList />
 			</Stack>
 		</Stack>
 	);

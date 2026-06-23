@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { CSSProperties } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useMemo, useId } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { ThemeContext } from './context';
 import { useThemeProviderStyles } from './use-theme-provider-styles';
 import { type ThemeProviderProps } from './types';
@@ -45,19 +34,27 @@ function generateCSSSelector( {
 	return selectors.join( ',' );
 }
 
+/**
+ * Context provider that generates a theme from a set of seed color values and
+ * configuration, producing a set of design token overrides as CSS custom
+ * properties.
+ */
 export const ThemeProvider = ( {
 	children,
 	color = {},
 	cursor,
+	cornerRadius,
 	isRoot = false,
-	density,
 }: ThemeProviderProps ) => {
 	const instanceId = useId();
 
 	const { themeProviderStyles, resolvedSettings } = useThemeProviderStyles( {
 		color,
 		cursor,
+		cornerRadius,
 	} );
+
+	const cornerRadiusPreset = resolvedSettings.cornerRadius ?? 'subtle';
 
 	const contextValue = useMemo(
 		() => ( {
@@ -78,8 +75,8 @@ export const ThemeProvider = ( {
 			) : null }
 			<div
 				data-wpds-theme-provider-id={ instanceId }
-				data-wpds-root-provider={ isRoot }
-				data-wpds-density={ density }
+				data-wpds-root-provider={ isRoot || undefined }
+				data-wpds-corner-radius={ cornerRadiusPreset }
 				className={ styles.root }
 			>
 				<ThemeContext.Provider value={ contextValue }>

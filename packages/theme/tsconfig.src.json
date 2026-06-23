@@ -7,9 +7,5 @@
 	},
 	"exclude": [],
 	"files": [ "global.d.ts" ],
-	"references": [
-		{ "path": "../element" },
-		{ "path": "../private-apis" },
-		{ "path": "../style-runtime" }
-	]
+	"references": [ { "path": "../element" }, { "path": "../style-runtime" } ]
 }

@@ -16,7 +16,6 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	BaseControl,
-	Tooltip as WCTooltip,
 } from '@wordpress/components';
 import { isBlobURL, getBlobTypeByURL } from '@wordpress/blob';
 import { store as coreStore, type Attachment } from '@wordpress/core-data';
@@ -41,7 +40,7 @@ import {
 	chevronLeft,
 	chevronRight,
 } from '@wordpress/icons';
-import { VisuallyHidden } from '@wordpress/ui';
+import { VisuallyHidden, Tooltip } from '@wordpress/ui';
 import {
 	MediaUpload,
 	uploadMedia,
@@ -193,9 +192,10 @@ function MediaPickerButton( {
 		return mediaPickerButton;
 	}
 	return (
-		<WCTooltip text={ label } placement="top">
-			{ mediaPickerButton }
-		</WCTooltip>
+		<Tooltip.Root>
+			<Tooltip.Trigger render={ mediaPickerButton } />
+			<Tooltip.Popup>{ label }</Tooltip.Popup>
+		</Tooltip.Root>
 	);
 }
 

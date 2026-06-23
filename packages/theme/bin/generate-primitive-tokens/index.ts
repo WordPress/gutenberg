@@ -1,14 +1,7 @@
-/**
- * External dependencies
- */
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { ColorSpace, to, sRGB, getAll } from 'colorjs.io/fn';
-
-/**
- * Internal dependencies
- */
 import {
 	DEFAULT_SEED_COLORS,
 	buildBgRamp,
@@ -52,15 +45,18 @@ function generatePrimitiveColorTokens() {
 		);
 
 		// Build the ramps
-		const bgRamp = buildBgRamp( DEFAULT_SEED_COLORS.bg );
+		const bgRamp = buildBgRamp( DEFAULT_SEED_COLORS.background );
 		const accentRamps = [ ...Object.entries( DEFAULT_SEED_COLORS ) ]
-			.filter( ( [ scaleName ] ) => scaleName !== 'bg' )
+			.filter( ( [ scaleName ] ) => scaleName !== 'background' )
 			.map( ( [ scaleName, seed ] ) => ( {
 				scaleName,
 				ramp: buildAccentRamp( seed, bgRamp ),
 			} ) );
 
-		// Convert the ramp values in a DTCG compatible format
+		// Convert the ramp values in a DTCG compatible format.
+		// Note: the background seed maps to the `bg` primitive ramp group,
+		// whose name is kept abbreviated even though the semantic tokens it
+		// feeds are exposed under the spelled-out `background` group.
 		[
 			{
 				scaleName: 'bg',
