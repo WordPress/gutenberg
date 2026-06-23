@@ -3,17 +3,24 @@ import { toggleFormat } from '@wordpress/rich-text';
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import { button } from '@wordpress/icons';
 
+/*
+ * Internal dependencies
+ */
+import type { CodeEditProps } from '../types';
+
 const name = 'core/keyboard';
 const title = __( 'Keyboard input' );
+const RichTextToolbarButtonUnsafe =
+	RichTextToolbarButton as React.ComponentType< any >;
 
 export const keyboard = {
 	name,
 	title,
 	tagName: 'kbd',
 	className: null,
-	edit( { isActive, value, onChange, onFocus } ) {
+	edit( { isActive, value, onChange, onFocus }: CodeEditProps ) {
 		function onToggle() {
-			onChange( toggleFormat( value, { type: name, title } ) );
+			onChange( toggleFormat( value, { type: name } ) );
 		}
 
 		function onClick() {
@@ -22,7 +29,7 @@ export const keyboard = {
 		}
 
 		return (
-			<RichTextToolbarButton
+			<RichTextToolbarButtonUnsafe
 				icon={ button }
 				title={ title }
 				onClick={ onClick }
