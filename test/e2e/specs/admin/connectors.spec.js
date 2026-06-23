@@ -634,11 +634,8 @@ test.describe( 'Connectors', () => {
 				path: '/wp/v2/settings',
 			} );
 			expect( settings[ USERNAME_SETTING ] ).toBe( 'remote-user' );
-			expect( settings[ APPLICATION_PASSWORD_SETTING ] ).not.toBe(
-				APPLICATION_PASSWORD
-			);
-			expect( settings[ APPLICATION_PASSWORD_SETTING ] ).toMatch(
-				/1234$/
+			expect( settings[ APPLICATION_PASSWORD_SETTING ] ).toBe(
+				'\u2022'.repeat( 16 )
 			);
 
 			await admin.visitAdminPage(
