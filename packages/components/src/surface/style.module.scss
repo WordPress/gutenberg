@@ -1,0 +1,40 @@
+.surface {
+	background-color: #fff;
+	color: #1e1e1e;
+	position: relative;
+
+	&[data-border-bottom] {
+		border-block-end: 1px solid rgba(0, 0, 0, 0.1);
+	}
+
+	&[data-border-left] {
+		border-inline-start: 1px solid rgba(0, 0, 0, 0.1);
+	}
+
+	&[data-border-right] {
+		border-inline-end: 1px solid rgba(0, 0, 0, 0.1);
+	}
+
+	&[data-border-top] {
+		border-block-start: 1px solid rgba(0, 0, 0, 0.1);
+	}
+
+	&[data-variant="secondary"] {
+		background: #f5f5f5;
+	}
+
+	&[data-variant="tertiary"] {
+		background: #fff;
+	}
+
+	&[data-variant="dotted"] {
+		background: linear-gradient(90deg, #fff var(--wp-components-surface-background-size-dotted), transparent 1%) center, linear-gradient(#fff var(--wp-components-surface-background-size-dotted), transparent 1%) center, rgba(0, 0, 0, 0.15);
+		background-size: var(--wp-components-surface-background-size) var(--wp-components-surface-background-size);
+	}
+
+	&[data-variant="grid"] {
+		background: #fff;
+		background-image: linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+		background-size: var(--wp-components-surface-background-size) var(--wp-components-surface-background-size);
+	}
+}

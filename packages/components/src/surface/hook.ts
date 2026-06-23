@@ -1,16 +1,21 @@
 /**
- * WordPress dependencies
+ * External dependencies
  */
-import { useMemo } from '@wordpress/element';
+import clsx from 'clsx';
+import type { CSSProperties } from 'react';
 
 /**
  * Internal dependencies
  */
 import { useContextSystem } from '../context';
-import * as styles from './styles';
-import { useCx } from '../utils/hooks/use-cx';
 import type { SurfaceProps } from './types';
 import type { WordPressComponentProps } from '../context';
+import styles from './style.module.scss';
+
+type SurfaceStyle = CSSProperties & {
+	'--wp-components-surface-background-size'?: string;
+	'--wp-components-surface-background-size-dotted'?: string;
+};
 
 export function useSurface(
 	props: WordPressComponentProps< SurfaceProps, 'div' >
@@ -22,42 +27,30 @@ export function useSurface(
 		borderRight = false,
 		borderTop = false,
 		className,
+		style,
 		variant = 'primary',
 		...otherProps
 	} = useContextSystem( props, 'Surface' );
 
-	const cx = useCx();
+	const hasPatternBackground = variant === 'dotted' || variant === 'grid';
+	const surfaceStyle: SurfaceStyle | undefined = hasPatternBackground
+		? {
+				...style,
+				'--wp-components-surface-background-size': `${ backgroundSize }px`,
+				'--wp-components-surface-background-size-dotted': `${
+					backgroundSize - 1
+				}px`,
+		  }
+		: style;
 
-	const classes = useMemo( () => {
-		const sx = {
-			borders: styles.getBorders( {
-				borderBottom,
-				borderLeft,
-				borderRight,
-				borderTop,
-			} ),
-		};
-
-		return cx(
-			styles.Surface,
-			sx.borders,
-			styles.getVariant(
-				variant,
-				`${ backgroundSize }px`,
-				`${ backgroundSize - 1 }px`
-			),
-			className
-		);
-	}, [
-		backgroundSize,
-		borderBottom,
-		borderLeft,
-		borderRight,
-		borderTop,
-		className,
-		cx,
-		variant,
-	] );
-
-	return { ...otherProps, className: classes };
+	return {
+		...otherProps,
+		className: clsx( styles.surface, className ),
+		'data-border-bottom': borderBottom ? true : undefined,
+		'data-border-left': borderLeft ? true : undefined,
+		'data-border-right': borderRight ? true : undefined,
+		'data-border-top': borderTop ? true : undefined,
+		'data-variant': variant === 'primary' ? undefined : variant,
+		style: surfaceStyle,
+	};
 }
