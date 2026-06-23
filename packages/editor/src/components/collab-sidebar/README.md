@@ -2,8 +2,9 @@
 
 The Notes sidebar (a.k.a. collab sidebar) lets users attach threaded notes to individual blocks. It renders in two modes:
 
-- **All notes** - a full sidebar (opened from the editor's More menu) listing every note thread on the current post.
-- **Floating notes** - on larger viewports, unresolved notes also float next to their associated blocks in the canvas, positioned to track scroll and avoid overlap.
+-   **All notes** - a full sidebar (opened from the editor's More menu) listing every note thread on the current post.
+-   **Floating notes** - on larger viewports, unresolved notes also float next to their associated blocks in the canvas, positioned to track scroll and avoid overlap.
+-   **List View indicators** - blocks with unresolved notes show a compact note icon in List View, giving long documents a passive discovery path before the block is selected.
 
 Notes are stored as WordPress comments (`type: 'note'`) attached to the post. A block references its thread via `metadata.noteId` on block attributes. Each thread has a top-level note plus replies; threads can be resolved (stored as status `approved`) or reopened.
 
@@ -25,7 +26,7 @@ collab-sidebar/
 ├── floating-container.js           FloatingContainer - stack wrapper that applies `top` in floating mode
 │
 ├── hooks.js                        useNoteThreads, useNoteActions, useFloatingBoard, useEnableFloatingSidebar
-├── utils.js                        focusNoteThread, getNoteExcerpt, sanitizeNoteContent, calculateNotePositions, getAvatarBorderColor
+├── utils.js                        focusNoteThread, getNoteExcerpt, sanitizeNoteContent, calculateNotePositions, getAvatarBorderColor, getUnresolvedNoteCountsByBlock
 ├── board-store.js                  createBoardStore - ResizeObserver + ref registry for floating layout
 ├── constants.js                    sidebar identifier strings
 ├── style.scss
@@ -66,20 +67,21 @@ Three layers cooperate:
 
 A plain JS module returning a store created via `createBoardStore()` (one per mounted `Notes`). Holds:
 
-- `blockRefs: Map<noteId, HTMLElement>` - each note's associated block element.
-- `floatingRefs: Map<noteId, HTMLElement>` - each note's floating DOM node.
-- `idByElement: WeakMap<HTMLElement, noteId>` - reverse lookup for the `ResizeObserver`.
-- `heights: { [noteId]: number }` - observed heights of floating elements.
-- `snapshot: { ... }` - frozen shallow copy of `heights` (for `useSyncExternalStore`).
+-   `blockRefs: Map<noteId, HTMLElement>` - each note's associated block element.
+-   `floatingRefs: Map<noteId, HTMLElement>` - each note's floating DOM node.
+-   `idByElement: WeakMap<HTMLElement, noteId>` - reverse lookup for the `ResizeObserver`.
+-   `heights: { [noteId]: number }` - observed heights of floating elements.
+-   `snapshot: { ... }` - frozen shallow copy of `heights` (for `useSyncExternalStore`).
 
 A single shared `ResizeObserver` watches every registered floating element; when a floating note changes height, it updates `heights`, snapshots, and calls every `listener` in the store's `Set`.
 
 API:
-- `subscribe(listener)` / `getSnapshot()` - wired to React via `useSyncExternalStore`. Disconnects the observer when the last subscriber leaves.
-- `registerThread(id, blockEl, floatingEl)` - called by each `NoteThread` once mounted. Adds the block ref, swaps the floating ref (unobserving the previous one), starts observing the new one, emits.
-- `unregisterThread(id)` - inverse; called on unmount.
-- `getBlockRects()` - returns a batched snapshot of block `getBoundingClientRect()` values. Batches reads so subsequent CSS writes don't trigger layout thrash.
-- `getFirstBlockElement()` - the first registered block, used to locate the canvas scroll container.
+
+-   `subscribe(listener)` / `getSnapshot()` - wired to React via `useSyncExternalStore`. Disconnects the observer when the last subscriber leaves.
+-   `registerThread(id, blockEl, floatingEl)` - called by each `NoteThread` once mounted. Adds the block ref, swaps the floating ref (unobserving the previous one), starts observing the new one, emits.
+-   `unregisterThread(id)` - inverse; called on unmount.
+-   `getBlockRects()` - returns a batched snapshot of block `getBoundingClientRect()` values. Batches reads so subsequent CSS writes don't trigger layout thrash.
+-   `getFirstBlockElement()` - the first registered block, used to locate the canvas scroll container.
 
 The store owns DOM references directly, not through React - floating note height changes must update layout without re-rendering the thread list.
 
@@ -89,9 +91,9 @@ Lives inside `Notes`. Holds one store instance (`useState(createBoardStore)`) an
 
 1. Subscribes to `heights` via `useSyncExternalStore(store.subscribe, store.getSnapshot)`.
 2. In a `useEffect` keyed on `threads + heights + selectedNoteId + isFloating + sidebarRef`:
-   - Resolves the canvas scroll container by climbing from the first registered block to `.is-root-container` and calling `getScrollContainer()` on it.
-   - Schedules a single `requestAnimationFrame` that calls `calculateNotePositions({ threads, selectedNoteId, blockRects: store.getBlockRects(), heights, scrollTop })` (pure function in `utils.js`) and stores the result in React state (`notePositions`).
-   - Attaches a capture-phase `scroll` listener on the canvas's `defaultView` that writes a CSS variable `--canvas-scroll` to the sidebar panel. (`window` capture catches scrolls on the document root, which don't bubble.)
+    - Resolves the canvas scroll container by climbing from the first registered block to `.is-root-container` and calling `getScrollContainer()` on it.
+    - Schedules a single `requestAnimationFrame` that calls `calculateNotePositions({ threads, selectedNoteId, blockRects: store.getBlockRects(), heights, scrollTop })` (pure function in `utils.js`) and stores the result in React state (`notePositions`).
+    - Attaches a capture-phase `scroll` listener on the canvas's `defaultView` that writes a CSS variable `--canvas-scroll` to the sidebar panel. (`window` capture catches scrolls on the document root, which don't bubble.)
 3. Returns `{ notePositions, registerThread, unregisterThread }` - the positions flow down as props; the two register callbacks flow to each `NoteThread`.
 
 ### 3. `calculateNotePositions` - pure layout math (in `utils.js`)
@@ -111,7 +113,7 @@ Renders a `Stack` with `top: floating.y` when in floating mode. CSS uses the `--
 
 ### Why this shape
 
-- `ResizeObserver` is canonical for height changes that must drive layout without polling.
-- `useSyncExternalStore` is the right React 18 primitive for "external mutable source with snapshot" - gives concurrent-mode-safe subscriptions without a provider.
-- The scroll listener updates a CSS variable rather than React state, so scrolling doesn't re-render. Per-note `top` only recomputes when threads, heights, selection, or structural inputs change.
-- Batching `getBoundingClientRect` reads inside the `rAF` and separating them from style writes avoids forced layout.
+-   `ResizeObserver` is canonical for height changes that must drive layout without polling.
+-   `useSyncExternalStore` is the right React 18 primitive for "external mutable source with snapshot" - gives concurrent-mode-safe subscriptions without a provider.
+-   The scroll listener updates a CSS variable rather than React state, so scrolling doesn't re-render. Per-note `top` only recomputes when threads, heights, selection, or structural inputs change.
+-   Batching `getBoundingClientRect` reads inside the `rAF` and separating them from style writes avoids forced layout.

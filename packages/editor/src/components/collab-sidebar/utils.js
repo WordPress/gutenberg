@@ -144,6 +144,23 @@ export function pickPrimaryNote( threads ) {
 }
 
 /**
+ * Counts unresolved note threads by their associated block client ID.
+ *
+ * @param {Array} threads Ordered list of thread objects.
+ * @return {Object<string, number>} Unresolved note counts keyed by client ID.
+ */
+export function getUnresolvedNoteCountsByBlock( threads ) {
+	return threads.reduce( ( counts, thread ) => {
+		if ( thread.status !== 'hold' || ! thread.blockClientId ) {
+			return counts;
+		}
+		counts[ thread.blockClientId ] =
+			( counts[ thread.blockClientId ] ?? 0 ) + 1;
+		return counts;
+	}, {} );
+}
+
+/**
  * Removes a note ID from the metadata.
  *
  * @param {Object} metadata Existing block metadata

@@ -81,6 +81,7 @@ export const BLOCK_LIST_ITEM_HEIGHT = 32;
  * @param {string}         props.description            Optional accessible description for the tree grid component.
  * @param {?Function}      props.onSelect               Optional callback to be invoked when a block is selected. Receives the block object that was selected.
  * @param {?ComponentType} props.additionalBlockContent Component that renders additional block content UI.
+ * @param {?ComponentType} props.additionalBlockIndicators Component that renders additional indicators beside the block title.
  * @param {Ref}            ref                          Forwarded ref
  */
 function ListViewComponent(
@@ -96,6 +97,7 @@ function ListViewComponent(
 		description,
 		onSelect,
 		additionalBlockContent: AdditionalBlockContent,
+		additionalBlockIndicators: AdditionalBlockIndicators,
 	},
 	ref
 ) {
@@ -298,6 +300,7 @@ function ListViewComponent(
 			BlockSettingsMenu,
 			listViewInstanceId: instanceId,
 			AdditionalBlockContent,
+			AdditionalBlockIndicators,
 			insertedBlock,
 			setInsertedBlock,
 			treeGridElementRef: elementRef,
@@ -316,6 +319,7 @@ function ListViewComponent(
 			BlockSettingsMenu,
 			instanceId,
 			AdditionalBlockContent,
+			AdditionalBlockIndicators,
 			insertedBlock,
 			setInsertedBlock,
 			rootClientId,
@@ -417,6 +421,7 @@ export default forwardRef( ( props, ref ) => {
 			rootClientId={ null }
 			onSelect={ null }
 			additionalBlockContent={ null }
+			additionalBlockIndicators={ null }
 			blockSettingsMenu={ undefined }
 		/>
 	);
