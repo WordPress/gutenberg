@@ -126,4 +126,39 @@ class Tests_Blocks_Render_Image extends WP_UnitTestCase {
 		$rendered_block = gutenberg_render_block_core_image( $attributes, $content, $block );
 		$this->assertSame( '<figure class="wp-block-image"><img src="canola.jpg"/></figure>', $rendered_block );
 	}
+
+	/**
+	 * Lightbox trigger button must carry a static aria-label for pre-hydration accessibility.
+	 *
+	 * The button uses data-wp-bind--aria-label for its runtime label (set by the Interactivity
+	 * API after JS hydration). Before hydration — and in no-JS environments — the button needs
+	 * a static fallback so screen readers can announce it. Without the fix, the button has no
+	 * accessible name, violating WCAG 4.1.2.
+	 *
+	 * Delete-the-fix test: remove the static aria-label from block_core_image_render_lightbox()
+	 * in packages/block-library/src/image/index.php and this assertion fails because the
+	 * button output no longer contains aria-label="Enlarge".
+	 *
+	 * @covers ::block_core_image_render_lightbox
+	 */
+	public function test_lightbox_trigger_button_has_static_aria_label() {
+		$content = '<figure class="wp-block-image"><img src="http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/2021/04/canola.jpg" /></figure>';
+
+		$parsed_blocks = parse_blocks( '<!-- wp:image -->' );
+		$parsed_block  = $parsed_blocks[0];
+		$block         = new WP_Block( $parsed_block );
+
+		$result = block_core_image_render_lightbox( $content, $parsed_block, $block );
+
+		$this->assertStringContainsString(
+			'aria-label="Enlarge"',
+			$result,
+			'Lightbox trigger button must have a static aria-label before JS hydration (WCAG 4.1.2).'
+		);
+		$this->assertStringContainsString(
+			'data-wp-bind--aria-label="state.thisImage.triggerButtonAriaLabel"',
+			$result,
+			'Interactivity API directive must remain so the runtime label still overrides the static fallback.'
+		);
+	}
 }
