@@ -1,10 +1,21 @@
 import { __ } from '@wordpress/i18n';
+import type { ReactElement } from 'react';
 import { toggleFormat, remove, applyFormat } from '@wordpress/rich-text';
 import {
 	RichTextToolbarButton,
 	RichTextShortcut,
+	// @ts-ignore
 } from '@wordpress/block-editor';
 import { code as codeIcon } from '@wordpress/icons';
+import type { RichTextValue } from '@wordpress/rich-text';
+
+/*
+ * Internal dependencies
+ */
+import type { CodeEditProps } from '../types';
+
+const RichTextToolbarButtonUnsafe =
+	RichTextToolbarButton as React.ComponentType< any >;
 
 const name = 'core/code';
 const title = __( 'Inline code' );
@@ -14,7 +25,7 @@ export const code = {
 	title,
 	tagName: 'code',
 	className: null,
-	__unstableInputRule( value ) {
+	__unstableInputRule( value: RichTextValue ): RichTextValue {
 		const BACKTICK = '`';
 		const { start, text } = value;
 		const characterBefore = text[ start - 1 ];
@@ -46,9 +57,14 @@ export const code = {
 
 		return value;
 	},
-	edit( { value, onChange, onFocus, isActive } ) {
+	edit( {
+		value,
+		onChange,
+		onFocus,
+		isActive,
+	}: CodeEditProps ): ReactElement {
 		function onClick() {
-			onChange( toggleFormat( value, { type: name, title } ) );
+			onChange( toggleFormat( value, { type: name } ) );
 			onFocus();
 		}
 
@@ -59,7 +75,7 @@ export const code = {
 					character="x"
 					onUse={ onClick }
 				/>
-				<RichTextToolbarButton
+				<RichTextToolbarButtonUnsafe
 					icon={ codeIcon }
 					title={ title }
 					onClick={ onClick }
