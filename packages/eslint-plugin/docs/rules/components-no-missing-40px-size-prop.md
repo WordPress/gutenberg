@@ -10,7 +10,6 @@ The following components are checked by this rule:
 
 -   BorderBoxControl
 -   BorderControl
--   BoxControl
 -   Button
 -   ComboboxControl
 -   CustomSelectControl

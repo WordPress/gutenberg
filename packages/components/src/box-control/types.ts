@@ -94,12 +94,6 @@ export type BoxControlProps = Pick< UnitControlProps, 'units' > &
 		 * The current values of the control, expressed as an object of `top`, `right`, `bottom`, and `left` values.
 		 */
 		values?: BoxControlValue;
-		/**
-		 * Start opting into the larger default height that will become the default size in a future version.
-		 *
-		 * @default false
-		 */
-		__next40pxDefaultSize?: boolean;
 	} & (
 		| {
 				/**

@@ -27,7 +27,6 @@ import {
 } from './utils';
 import { useControlledState } from '../utils/hooks';
 import type { BoxControlProps, BoxControlValue } from './types';
-import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
 
 const defaultInputProps = {
 	min: 0,
@@ -58,17 +57,12 @@ function useUniqueId( idProp?: string ) {
  *   } );
  *
  *   return (
- *     <BoxControl
- *       __next40pxDefaultSize
- *       values={ values }
- *       onChange={ setValues }
- *     />
+ *     <BoxControl values={ values } onChange={ setValues } />
  *   );
  * };
  * ```
  */
 function BoxControl( {
-	__next40pxDefaultSize = false,
 	id: idProp,
 	inputProps = defaultInputProps,
 	onChange = noop,
@@ -137,16 +131,10 @@ function BoxControl( {
 		setSelectedUnits,
 		sides,
 		values: inputValues,
-		__next40pxDefaultSize,
 		presets,
 		presetKey,
 	};
 
-	maybeWarnDeprecated36pxSize( {
-		componentName: 'BoxControl',
-		__next40pxDefaultSize,
-		size: undefined,
-	} );
 	const sidesToRender = getAllowedSides( sides );
 
 	if ( ( presets && ! presetKey ) || ( ! presets && presetKey ) ) {
@@ -170,8 +158,7 @@ function BoxControl( {
 			</BaseControl.VisualLabel>
 			{ isLinked && (
 				<InputWrapper>
-					{ /* Disable reason: the parent component is handling the __next40pxDefaultSize prop */ }
-					{ /* eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop */ }
+					{ /* eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop -- hardcoded on embedded primitives */ }
 					<InputControl side="all" { ...inputControlProps } />
 				</InputWrapper>
 			) }
@@ -187,8 +174,7 @@ function BoxControl( {
 			{ ! isLinked &&
 				splitOnAxis &&
 				[ 'vertical', 'horizontal' ].map( ( axis ) => (
-					// Disable reason: the parent component is handling the __next40pxDefaultSize prop
-					// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop
+					// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop -- hardcoded on embedded primitives
 					<InputControl
 						key={ axis }
 						side={ axis as 'horizontal' | 'vertical' }
@@ -198,8 +184,7 @@ function BoxControl( {
 			{ ! isLinked &&
 				! splitOnAxis &&
 				Array.from( sidesToRender ).map( ( axis ) => (
-					// Disable reason: the parent component is handling the __next40pxDefaultSize prop
-					// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop
+					// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop -- hardcoded on embedded primitives
 					<InputControl
 						key={ axis }
 						side={ axis }
