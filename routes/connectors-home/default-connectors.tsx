@@ -22,7 +22,7 @@ import { unlock } from '@wordpress/routes-lock-unlock';
 /**
  * Internal dependencies
  */
-import { useConnectorPlugin } from './use-connector-plugin';
+import { useConnectorPlugin, type PluginStatus } from './use-connector-plugin';
 import {
 	OpenAILogo,
 	ClaudeLogo,
@@ -126,6 +126,59 @@ const PluginDirectoryLink = ( { slug }: { slug: string } ) => (
 
 const UnavailableActionBadge = () => <Badge>{ __( 'Not available' ) }</Badge>;
 
+interface ConnectorActionAreaProps {
+	isConnected: boolean;
+	showUnavailableBadge: boolean;
+	pluginSlug?: string;
+	isExpanded: boolean;
+	isBusy: boolean;
+	pluginStatus: PluginStatus;
+	actionButtonRef: {
+		current: HTMLButtonElement | null;
+	};
+	handleButtonClick: () => void;
+	getButtonLabel: () => string;
+}
+
+function ConnectorActionArea( {
+	isConnected,
+	showUnavailableBadge,
+	pluginSlug,
+	isExpanded,
+	isBusy,
+	pluginStatus,
+	actionButtonRef,
+	handleButtonClick,
+	getButtonLabel,
+}: ConnectorActionAreaProps ) {
+	return (
+		<HStack spacing={ 3 } expanded={ false }>
+			{ isConnected && <ConnectedBadge /> }
+			{ showUnavailableBadge &&
+				( pluginSlug ? (
+					<PluginDirectoryLink slug={ pluginSlug } />
+				) : (
+					<UnavailableActionBadge />
+				) ) }
+			{ ! showUnavailableBadge && (
+				<Button
+					ref={ actionButtonRef }
+					variant={
+						isExpanded || isConnected ? 'tertiary' : 'secondary'
+					}
+					size="compact"
+					onClick={ handleButtonClick }
+					disabled={ pluginStatus === 'checking' || isBusy }
+					isBusy={ isBusy }
+					accessibleWhenDisabled
+				>
+					{ getButtonLabel() }
+				</Button>
+			) }
+		</HStack>
+	);
+}
+
 function getPluginSlug( pluginFile?: string ) {
 	const pluginBasename = pluginFile?.replace( /\.php$/, '' );
 	return pluginBasename?.includes( '/' )
@@ -183,7 +236,6 @@ function ApiKeyConnector( {
 	const showUnavailableBadge =
 		( pluginStatus === 'not-installed' && canInstallPlugins === false ) ||
 		( pluginStatus === 'inactive' && canActivatePlugins === false );
-	const showActionButton = ! showUnavailableBadge;
 
 	const actionButtonRef = useRef< HTMLButtonElement >( null );
 
@@ -196,32 +248,17 @@ function ApiKeyConnector( {
 			name={ name }
 			description={ description }
 			actionArea={
-				<HStack spacing={ 3 } expanded={ false }>
-					{ isConnected && <ConnectedBadge /> }
-					{ showUnavailableBadge &&
-						( pluginSlug ? (
-							<PluginDirectoryLink slug={ pluginSlug } />
-						) : (
-							<UnavailableActionBadge />
-						) ) }
-					{ showActionButton && (
-						<Button
-							ref={ actionButtonRef }
-							variant={
-								isExpanded || isConnected
-									? 'tertiary'
-									: 'secondary'
-							}
-							size="compact"
-							onClick={ handleButtonClick }
-							disabled={ pluginStatus === 'checking' || isBusy }
-							isBusy={ isBusy }
-							accessibleWhenDisabled
-						>
-							{ getButtonLabel() }
-						</Button>
-					) }
-				</HStack>
+				<ConnectorActionArea
+					isConnected={ isConnected }
+					showUnavailableBadge={ showUnavailableBadge }
+					pluginSlug={ pluginSlug }
+					isExpanded={ isExpanded }
+					isBusy={ isBusy }
+					pluginStatus={ pluginStatus }
+					actionButtonRef={ actionButtonRef }
+					handleButtonClick={ handleButtonClick }
+					getButtonLabel={ getButtonLabel }
+				/>
 			}
 		>
 			{ isExpanded && pluginStatus === 'active' && (
@@ -401,32 +438,17 @@ function ApplicationPasswordConnector( {
 			name={ name }
 			description={ description }
 			actionArea={
-				<HStack spacing={ 3 } expanded={ false }>
-					{ isConnected && <ConnectedBadge /> }
-					{ showUnavailableBadge &&
-						( pluginSlug ? (
-							<PluginDirectoryLink slug={ pluginSlug } />
-						) : (
-							<UnavailableActionBadge />
-						) ) }
-					{ ! showUnavailableBadge && (
-						<Button
-							ref={ actionButtonRef }
-							variant={
-								isExpanded || isConnected
-									? 'tertiary'
-									: 'secondary'
-							}
-							size="compact"
-							onClick={ handleButtonClick }
-							disabled={ pluginStatus === 'checking' || isBusy }
-							isBusy={ isBusy }
-							accessibleWhenDisabled
-						>
-							{ getButtonLabel() }
-						</Button>
-					) }
-				</HStack>
+				<ConnectorActionArea
+					isConnected={ isConnected }
+					showUnavailableBadge={ showUnavailableBadge }
+					pluginSlug={ pluginSlug }
+					isExpanded={ isExpanded }
+					isBusy={ isBusy }
+					pluginStatus={ pluginStatus }
+					actionButtonRef={ actionButtonRef }
+					handleButtonClick={ handleButtonClick }
+					getButtonLabel={ getButtonLabel }
+				/>
 			}
 		>
 			{ isExpanded && pluginStatus === 'active' && (
