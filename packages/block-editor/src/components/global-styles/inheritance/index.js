@@ -12,9 +12,9 @@ import {
 	MenuGroup,
 	MenuItem,
 	NavigableMenu,
-	Tooltip as WCTooltip,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
+import { Tooltip } from '@wordpress/ui';
 import {
 	createPortal,
 	useLayoutEffect,
@@ -349,22 +349,25 @@ function PortaledInheritanceControls( {
 				createPortal(
 					<>
 						{ isInherited && (
-							<WCTooltip
-								text={
+							<Tooltip.Root>
+								<Tooltip.Trigger
+									render={
+										<span className="global-styles-inheritance-tooltip-anchor">
+											<span className="global-styles-inheritance-tooltip-anchor__text">
+												{ labelEl.textContent }
+											</span>
+										</span>
+									}
+								/>
+								<Tooltip.Popup>
 									<InheritanceTooltipContent
 										text={
 											inheritanceTooltipText ??
 											GENERIC_INHERITANCE_TOOLTIP_TEXT
 										}
 									/>
-								}
-							>
-								<span className="global-styles-inheritance-tooltip-anchor">
-									<span className="global-styles-inheritance-tooltip-anchor__text">
-										{ labelEl.textContent }
-									</span>
-								</span>
-							</WCTooltip>
+								</Tooltip.Popup>
+							</Tooltip.Root>
 						) }
 						{ onResetToInherited && (
 							<InheritanceActionsDropdown
