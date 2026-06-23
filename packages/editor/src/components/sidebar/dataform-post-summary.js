@@ -23,6 +23,102 @@ import revisionsField from '../../dataviews/fields/revisions';
 const EMPTY_FORM = { layout: { type: 'panel' }, fields: [] };
 const VIEW_CONFIG_FIELDS = [ 'form' ];
 
+/**
+ * Bridges the legacy editor-panel visibility controls onto the DataForm summary,
+ * returning the form with the hidden fields removed. The new inspector has no
+ * concept of the Preferences → Panels switches or of `removeEditorPanel`, so we
+ * reproduce their effect on the form.
+ *
+ * @param {Object} form The DataForm summary form configuration.
+ * @return {Object} The form with the hidden fields removed.
+ */
+function useInspectorPanelVisibility( form ) {
+	const {
+		isPostStatusRemoved,
+		featuredImagePanelEnabled,
+		excerptPanelEnabled,
+		discussionPanelEnabled,
+		pageAttributesPanelEnabled,
+	} = useSelect( ( select ) => {
+		const { isEditorPanelRemoved, isEditorPanelEnabled } =
+			select( editorStore );
+		return {
+			isPostStatusRemoved: isEditorPanelRemoved( 'post-status' ),
+			featuredImagePanelEnabled: isEditorPanelEnabled( 'featured-image' ),
+			excerptPanelEnabled: isEditorPanelEnabled( 'post-excerpt' ),
+			discussionPanelEnabled: isEditorPanelEnabled( 'discussion-panel' ),
+			pageAttributesPanelEnabled:
+				isEditorPanelEnabled( 'page-attributes' ),
+		};
+	}, [] );
+
+	const visibleForm = useMemo( () => {
+		if ( ! form.fields?.length ) {
+			return form;
+		}
+		const isFieldVisible = ( id ) => {
+			// `featured_media` and `excerpt` fields are tied to their own panel switches.
+			if ( id === 'featured_media' ) {
+				return featuredImagePanelEnabled;
+			}
+			if ( id === 'excerpt' ) {
+				return excerptPanelEnabled;
+			}
+			if ( id === 'post-content-info' ) {
+				return true; // This field was always present.
+			}
+			// `removeEditorPanel( 'post-status' )` hid the rest of the summary
+			// as a unit.
+			if ( isPostStatusRemoved ) {
+				return false;
+			}
+			// If `post-status` panel is not removed, its nested panels honor their own switch.
+			if ( id === 'discussion' ) {
+				return discussionPanelEnabled;
+			}
+			if ( id === 'parent' ) {
+				return pageAttributesPanelEnabled;
+			}
+			return true;
+		};
+		// Recurse into `children` so a panel-tied field is dropped wherever it
+		// sits in the form: the PHP view-config filter can nest such a field
+		// inside another field's group.
+		const filterFields = ( fields ) =>
+			fields.reduce( ( acc, field ) => {
+				const id = typeof field === 'string' ? field : field.id;
+				if ( ! isFieldVisible( id ) ) {
+					return acc;
+				}
+				if (
+					typeof field !== 'string' &&
+					Array.isArray( field.children )
+				) {
+					const children = filterFields( field.children );
+					// A group whose children were all removed would render as
+					// an empty panel, so drop it too.
+					if ( ! children.length ) {
+						return acc;
+					}
+					acc.push( { ...field, children } );
+					return acc;
+				}
+				acc.push( field );
+				return acc;
+			}, [] );
+		return { ...form, fields: filterFields( form.fields ) };
+	}, [
+		form,
+		isPostStatusRemoved,
+		featuredImagePanelEnabled,
+		excerptPanelEnabled,
+		discussionPanelEnabled,
+		pageAttributesPanelEnabled,
+	] );
+
+	return visibleForm;
+}
+
 // Some post types expose summary fields that edit entities other than the one
 // being edited. Keyed by the post type that needs them, the related records are
 // merged into the form data under a `${ kind }_${ name }` namespace key so that
@@ -90,11 +186,13 @@ function bindFieldToNamespace( field, namespace, isVisible = () => true ) {
 }
 
 export default function DataFormPostSummary( { onActionPerformed } ) {
-	const { postType, postId } = useSelect( ( select ) => {
-		const { getCurrentPostType, getCurrentPostId } = select( editorStore );
+	const { postType, postId, isPostStatusRemoved } = useSelect( ( select ) => {
+		const { getCurrentPostType, getCurrentPostId, isEditorPanelRemoved } =
+			select( editorStore );
 		return {
 			postType: getCurrentPostType(),
 			postId: getCurrentPostId(),
+			isPostStatusRemoved: isEditorPanelRemoved( 'post-status' ),
 		};
 	}, [] );
 	const { form: formConfig } = useViewConfig( {
@@ -102,7 +200,9 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 		name: postType,
 		fields: VIEW_CONFIG_FIELDS,
 	} );
-	const form = formConfig ?? EMPTY_FORM;
+	// Bridge the legacy editor-panel visibility (Preferences → Panels and
+	// programmatic panel removal) onto the form by dropping hidden fields.
+	const form = useInspectorPanelVisibility( formConfig ?? EMPTY_FORM );
 	const record = useSelect(
 		( select ) => {
 			if ( ! postType || ! postId ) {
@@ -313,7 +413,9 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 					form={ form }
 					onChange={ onChange }
 				/>
-				<PostTrash onActionPerformed={ onActionPerformed } />
+				{ ! isPostStatusRemoved && (
+					<PostTrash onActionPerformed={ onActionPerformed } />
+				) }
 			</Stack>
 		</PostPanelSection>
 	);
