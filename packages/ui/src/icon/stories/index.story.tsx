@@ -6,12 +6,17 @@ const meta: Meta< typeof Icon > = {
 	title: 'Design System/Components/Icon',
 	component: Icon,
 	tags: [ 'manifest' ],
+	// Temporary: Due to an upstream bug, render the root explicitly so the
+	// components manifest extractor can resolve props from the JSX.
+	//
+	// See: https://github.com/storybookjs/storybook/issues/34877
+	render: ( args ) => <Icon { ...args } />,
 	decorators: [
 		( Story ) => {
 			return (
 				<div
 					style={ {
-						color: 'var( --wpds-color-fg-content-neutral )',
+						color: 'var( --wpds-color-foreground-content-neutral )',
 					} }
 				>
 					<Story />

@@ -25,7 +25,6 @@ const { Consumer, Provider } = Context;
  *
  *	let input = (
  *		<TextControl
- *			__next40pxDefaultSize
  *			label="Input"
  *			onChange={ () => {} }
  *		/>
@@ -61,7 +60,7 @@ function Disabled( {
 		<Provider value={ isDisabled }>
 			<div
 				// @ts-ignore Reason: inert is a recent HTML attribute
-				inert={ isDisabled ? true : undefined }
+				inert={ isDisabled ? 'true' : undefined }
 				className={
 					isDisabled
 						? cx( disabledStyles, className, 'components-disabled' )

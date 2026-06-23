@@ -21,8 +21,8 @@ import { unlock } from '../lock-unlock';
 export * from '../dataviews/store/private-actions';
 
 const DEVICE_TYPE_BY_VIEWPORT_STATE = {
-	mobile: 'Mobile',
-	tablet: 'Tablet',
+	'@mobile': 'Mobile',
+	'@tablet': 'Tablet',
 };
 
 /**

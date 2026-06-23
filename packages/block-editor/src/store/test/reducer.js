@@ -2236,6 +2236,52 @@ describe( 'state', () => {
 					expect( subsequentState.isPersistentChange ).toBe( true );
 				} );
 
+				it( 'should flag ignored history for an explicitly marked not persistent change', () => {
+					let original = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									clientId: 'kumquat',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						} )
+					);
+					original = blocks( original, {
+						type: 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT',
+						history: 'ignore',
+					} );
+
+					const nextState = blocks( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: {
+							updated: true,
+						},
+					} );
+
+					expect( nextState.isPersistentChange ).toBe( false );
+					expect( nextState.lastBlockChangeHistoryMode ).toBe(
+						'ignore'
+					);
+
+					// A subsequent change should clear the ignored history.
+					const subsequentState = blocks( nextState, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: {
+							other: true,
+						},
+					} );
+
+					expect( subsequentState.isPersistentChange ).toBe( true );
+					expect(
+						subsequentState.lastBlockChangeHistoryMode
+					).toBeUndefined();
+				} );
+
 				it( 'should retain reference for same state, same persistence', () => {
 					const original = deepFreeze(
 						blocks( undefined, {
@@ -5814,6 +5860,57 @@ describe( 'state', () => {
 				);
 			} );
 		} );
+
+		describe( 'template parts with disableContentOnlyForTemplateParts enabled', () => {
+			let initialState;
+			beforeAll( () => {
+				initialState = dispatchActions(
+					[
+						{
+							type: 'UPDATE_SETTINGS',
+							settings: {
+								disableContentOnlyForTemplateParts: true,
+							},
+						},
+						{
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									name: 'core/template-part',
+									clientId: 'template-part',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						},
+						{
+							type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+							clientId: 'template-part',
+							hasControlledInnerBlocks: true,
+						},
+						{
+							type: 'REPLACE_INNER_BLOCKS',
+							rootClientId: 'template-part',
+							blocks: [
+								{
+									name: 'core/paragraph',
+									clientId: 'template-part-paragraph',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						},
+					],
+					testReducer
+				);
+			} );
+
+			it( 'returns no derived editing modes for template parts when disableContentOnlyForTemplateParts is true', () => {
+				expect( initialState.derivedBlockEditingModes ).toEqual(
+					new Map()
+				);
+			} );
+		} );
 	} );
 
 	describe( 'selectedBlockStyleState', () => {
@@ -5827,14 +5924,14 @@ describe( 'state', () => {
 			const state = selectedBlockStyleState( undefined, {
 				type: 'SET_SELECTED_BLOCK_STYLE_STATE',
 				clientId: 'client-1',
-				value: { viewport: 'mobile' },
+				value: { viewport: '@mobile' },
 			} );
 
 			expect( state ).toEqual( {
 				clientId: 'client-1',
 				showStateOnCanvas: true,
 				value: {
-					viewport: 'mobile',
+					viewport: '@mobile',
 					pseudo: 'default',
 				},
 			} );
@@ -5861,7 +5958,7 @@ describe( 'state', () => {
 			const state = selectedBlockStyleState(
 				{
 					clientId: 'client-1',
-					value: { viewport: 'mobile', pseudo: 'default' },
+					value: { viewport: '@mobile', pseudo: 'default' },
 				},
 				{
 					type: 'SET_SELECTED_BLOCK_STYLE_STATE',
@@ -5874,7 +5971,7 @@ describe( 'state', () => {
 				clientId: 'client-1',
 				showStateOnCanvas: true,
 				value: {
-					viewport: 'mobile',
+					viewport: '@mobile',
 					pseudo: ':hover',
 				},
 			} );
@@ -5884,7 +5981,7 @@ describe( 'state', () => {
 			const state = selectedBlockStyleState(
 				{
 					clientId: 'client-1',
-					value: { viewport: 'mobile', pseudo: ':hover' },
+					value: { viewport: '@mobile', pseudo: ':hover' },
 				},
 				{
 					type: 'SET_SELECTED_BLOCK_STYLE_STATE',
@@ -5907,7 +6004,7 @@ describe( 'state', () => {
 			const state = selectedBlockStyleState(
 				{
 					clientId: 'client-1',
-					value: { viewport: 'mobile', pseudo: ':hover' },
+					value: { viewport: '@mobile', pseudo: ':hover' },
 				},
 				{
 					type: 'SET_SELECTED_BLOCK_STYLE_STATE',
@@ -6140,7 +6237,7 @@ describe( 'state', () => {
 			const state = selectedBlockStyleState(
 				{
 					clientId: 'client-1',
-					value: { viewport: 'mobile', pseudo: ':hover' },
+					value: { viewport: '@mobile', pseudo: ':hover' },
 				},
 				{
 					type: 'SET_SELECTED_BLOCK_STYLE_STATE_CANVAS_PREVIEW',
@@ -6152,7 +6249,7 @@ describe( 'state', () => {
 			expect( state ).toEqual( {
 				clientId: 'client-1',
 				showStateOnCanvas: false,
-				value: { viewport: 'mobile', pseudo: ':hover' },
+				value: { viewport: '@mobile', pseudo: ':hover' },
 			} );
 		} );
 
@@ -6161,7 +6258,7 @@ describe( 'state', () => {
 				{
 					clientId: 'client-1',
 					showStateOnCanvas: false,
-					value: { viewport: 'mobile', pseudo: 'default' },
+					value: { viewport: '@mobile', pseudo: 'default' },
 				},
 				{
 					type: 'SET_SELECTED_BLOCK_STYLE_STATE',
@@ -6173,7 +6270,7 @@ describe( 'state', () => {
 			expect( state ).toEqual( {
 				clientId: 'client-1',
 				showStateOnCanvas: false,
-				value: { viewport: 'mobile', pseudo: ':hover' },
+				value: { viewport: '@mobile', pseudo: ':hover' },
 			} );
 		} );
 	} );

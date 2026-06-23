@@ -106,7 +106,7 @@
 ::view-transition-new(boot--inspector),
 ::view-transition-old(boot--inspector) {
 	background: colors.$white;
-	border-radius: 8px;
+	border-radius: var(--wpds-border-radius-xl);
 	width: 100%;
 	height: 100%;
 	object-fit: none;

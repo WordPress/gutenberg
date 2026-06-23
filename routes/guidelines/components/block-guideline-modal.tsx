@@ -20,13 +20,13 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { store as noticesStore } from '@wordpress/notices';
+import { unlock } from '@wordpress/routes-lock-unlock';
 
 /**
  * Internal dependencies
  */
 import { saveGuidelines } from '../api';
 import { store as coreGuidelinesStore } from '../store';
-import { unlock } from '../../lock-unlock';
 import './block-guideline-modal.scss';
 
 const { isContentBlock } = unlock( blocksPrivateApis );
@@ -140,7 +140,6 @@ export default function BlockGuidelineModal( {
 			<VStack spacing={ 4 }>
 				{ isEditing ? (
 					<TextControl
-						__next40pxDefaultSize
 						label={ __( 'Block' ) }
 						value={ selectedBlockLabel }
 						onChange={ () => {} }
