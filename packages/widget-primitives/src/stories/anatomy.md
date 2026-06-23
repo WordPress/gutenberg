@@ -30,7 +30,7 @@ How the widget asks to sit in the host's frame. Today this layer holds one prope
 
 ![In content-bleed, the host still paints the identity header while the widget's content fills its area with no padding. Shown with Quick Draft.](./assets/presentation-content-bleed.svg)
 
-`full-bleed`: no header at all; the widget owns the whole tile. The dashboard, the host shipping today, keeps the identity it did not paint in a VisuallyHidden node, so assistive tech still names the tile. Welcome uses it.
+`full-bleed`: no visible header; the widget owns the whole tile. The dashboard, the host shipping today, keeps the identity it did not paint in a VisuallyHidden node, so assistive tech still names the tile. Welcome uses it.
 
 ![In full-bleed, the widget owns the tile edge to edge while the host keeps the identity header in a VisuallyHidden node for accessibility. Shown with Welcome.](./assets/presentation-full-bleed.svg)
 

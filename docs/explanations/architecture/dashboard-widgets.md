@@ -41,7 +41,7 @@ export default function HelloWorld( { attributes, setAttributes } ) { ... }
 `@wordpress/build` (`packages/wp-build/`) is the generic build tool for packages, routes, and widgets. For widgets specifically, it:
 
 1. Discovers every directory under `widgets/` and reads its `widget.json`.
-2. Compiles two ES script modules per widget: `render` (from `render.*`) and `widget` (from `widget.*`), each with an `*.asset.php` carrying module dependencies and a version hash. Missing source files simply produce no module; both are optional.
+2. Compiles two ES script modules per widget: `render` (from `render.*`) and `widget` (from `widget.*`), each with an `*.asset.php` carrying module dependencies and a version hash. Missing source files produce no module; both are optional.
 3. Emits `build/widgets/registry.php`, the manifest: one entry per widget with its directory name, metadata, and which modules were built.
 4. Emits `build/widgets.php`, which at `init` calls `wp_register_script_module()` for every built module, with IDs derived from the folder name (`<prefix>/widgets/<dir>/render` and `<prefix>/widgets/<dir>/widget`).
 
