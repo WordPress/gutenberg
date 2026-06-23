@@ -139,6 +139,7 @@ export function MediaPlaceholder( {
 	onDoubleClick,
 	onFilesPreUpload = noop,
 	onHTMLDrop: deprecatedOnHTMLDrop,
+	onBlocksDrop,
 	children,
 	mediaLibraryButton,
 	placeholder,
@@ -151,14 +152,18 @@ export function MediaPlaceholder( {
 		} );
 	}
 
-	const { mediaUpload, allowedMimeTypes } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		const settings = getSettings();
-		return {
-			mediaUpload: settings.mediaUpload,
-			allowedMimeTypes: settings.allowedMimeTypes,
-		};
-	}, [] );
+	const { mediaUpload, allowedMimeTypes, getBlock } = useSelect(
+		( select ) => {
+			const { getSettings } = select( blockEditorStore );
+			const settings = getSettings();
+			return {
+				mediaUpload: settings.mediaUpload,
+				allowedMimeTypes: settings.allowedMimeTypes,
+				getBlock: select( blockEditorStore ).getBlock,
+			};
+		},
+		[]
+	);
 	const [ src, setSrc ] = useState( '' );
 
 	useEffect( () => {
@@ -247,14 +252,32 @@ export function MediaPlaceholder( {
 	};
 
 	async function handleBlocksDrop( event ) {
-		const { blocks } = parseDropEvent( event );
+		const { blocks, srcClientIds } = parseDropEvent( event );
+		let droppedBlocks = blocks;
 
-		if ( ! blocks?.length ) {
+		if ( ! droppedBlocks?.length && srcClientIds?.length ) {
+			droppedBlocks = srcClientIds
+				.map( ( clientId ) => getBlock( clientId ) )
+				.filter( Boolean );
+		}
+
+		if ( ! droppedBlocks?.length ) {
+			return;
+		}
+
+		if ( onBlocksDrop ) {
+			const { srcRootClientId, type } = parseDropEvent( event );
+			onBlocksDrop( {
+				blocks: droppedBlocks,
+				srcClientIds,
+				srcRootClientId,
+				type,
+			} );
 			return;
 		}
 
 		const uploadedMediaList = await Promise.all(
-			blocks.map( ( block ) => {
+			droppedBlocks.map( ( block ) => {
 				const blockType = block.name.split( '/' )[ 1 ];
 				if ( block.attributes.id ) {
 					block.attributes.type = blockType;
