@@ -15,26 +15,37 @@ describe( 'props', () => {
 	} );
 
 	test( 'should render marginStart', () => {
-		render( <Divider /> );
 		render( <Divider marginStart={ 5 } /> );
 
-		const dividers = screen.getAllByRole( 'separator' );
-		expect( dividers[ 0 ] ).toMatchStyleDiffSnapshot( dividers[ 1 ] );
+		expect( screen.getByRole( 'separator' ) ).toHaveStyle( {
+			'--wp-components-divider-margin-start': 'calc(4px * 5)',
+		} );
 	} );
 
 	test( 'should render marginEnd', () => {
-		render( <Divider /> );
 		render( <Divider marginEnd={ 5 } /> );
 
-		const dividers = screen.getAllByRole( 'separator' );
-		expect( dividers[ 0 ] ).toMatchStyleDiffSnapshot( dividers[ 1 ] );
+		expect( screen.getByRole( 'separator' ) ).toHaveStyle( {
+			'--wp-components-divider-margin-end': 'calc(4px * 5)',
+		} );
 	} );
 
 	test( 'should render margin', () => {
-		render( <Divider /> );
 		render( <Divider margin={ 7 } /> );
 
-		const dividers = screen.getAllByRole( 'separator' );
-		expect( dividers[ 0 ] ).toMatchStyleDiffSnapshot( dividers[ 1 ] );
+		expect( screen.getByRole( 'separator' ) ).toHaveStyle( {
+			'--wp-components-divider-margin-start': 'calc(4px * 7)',
+			'--wp-components-divider-margin-end': 'calc(4px * 7)',
+		} );
+	} );
+
+	test( 'should render vertical orientation', () => {
+		render( <Divider orientation="vertical" marginStart={ 3 } /> );
+
+		const divider = screen.getByRole( 'separator' );
+		expect( divider ).toHaveAttribute( 'aria-orientation', 'vertical' );
+		expect( divider ).toHaveStyle( {
+			'--wp-components-divider-margin-start': 'calc(4px * 3)',
+		} );
 	} );
 } );
