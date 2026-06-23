@@ -23,8 +23,9 @@ import type { ThemeProviderProps } from './types';
 
 type Entry = [ string, string ];
 
-// `buildAccentRamp` caches by both arguments, so `getCachedBgRamp` must keep
-// equivalent background seeds on the same ramp reference for accent cache hits.
+// `buildAccentRamp` includes the `bgRamp` object reference in its cache key.
+// Memoizing the background ramp first lets the same background seed reuse the
+// same object reference, so accent ramps can be reused across renders.
 const getCachedBgRamp = memoize( buildBgRamp, { maxSize: 10 } );
 const getCachedAccentRamp = memoize( buildAccentRamp, { maxSize: 10 } );
 
