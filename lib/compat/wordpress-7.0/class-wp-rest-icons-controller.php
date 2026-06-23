@@ -146,7 +146,7 @@ if ( ! class_exists( 'WP_REST_Icons_Controller' ) ) {
 				return new WP_Error(
 					'rest_icon_not_found',
 					sprintf(
-						/* translators: %s is the name of any user-provided name */
+						/* translators: %s is the name of any user-provided name. */
 						__( 'Icon not found: "%s".', 'gutenberg' ),
 						$name
 					),
