@@ -309,11 +309,12 @@ function _gutenberg_is_ai_api_key_valid( string $key, string $provider_id ): ?bo
 /**
  * Masks and validates connector credentials in REST responses.
  *
- * On every `/wp/v2/settings` response, masks connector API key values so raw
- * keys are never exposed via the REST API.
+ * On every `/wp/v2/settings` response, masks connector API key and application
+ * password values so raw credentials are never exposed via the REST API.
  *
- * On POST or PUT requests, validates each updated key against the provider
- * before masking. If validation fails, the key is reverted to an empty string.
+ * On POST or PUT requests, validates each updated AI provider API key before
+ * masking. If validation fails, the key is reverted to an empty string.
+ * Application password values are masked but not validated.
  *
  * @access private
  *
