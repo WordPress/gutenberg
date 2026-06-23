@@ -314,8 +314,8 @@ class Tests_REST_View_Config_Controller extends WP_Test_REST_TestCase {
 				array(
 					'id'     => 'excerpt',
 					'layout' => array(
-						'type'          => 'regular',
-						'labelPosition' => 'none',
+						'type'          => 'panel',
+						'labelPosition' => 'top',
 					),
 				),
 				array(
@@ -326,14 +326,13 @@ class Tests_REST_View_Config_Controller extends WP_Test_REST_TestCase {
 					),
 				),
 				array(
-					'id'     => 'last_edited_date',
+					'id'     => 'sync-status',
 					'layout' => array(
-						'type'          => 'panel',
-						'labelPosition' => 'none',
+						'type'          => 'regular',
+						'labelPosition' => 'side',
 					),
 				),
 				'revisions',
-				'sync-status',
 			),
 			$data['form']['fields']
 		);

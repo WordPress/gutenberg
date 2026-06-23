@@ -3,7 +3,6 @@
  */
 import type { Field } from '@wordpress/dataviews';
 import { __, _x } from '@wordpress/i18n';
-import { Text } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -30,15 +29,16 @@ function getPatternSyncStatusLabel( syncStatus: string ) {
 
 const patternSyncStatusField: Field< Pattern > = {
 	id: 'sync-status',
+	type: 'text',
 	label: __( 'Sync status' ),
 	readOnly: true,
 	enableSorting: false,
 	enableHiding: false,
 	filterBy: false,
 	render: ( { item } ) => (
-		<Text>
+		<span>
 			{ getPatternSyncStatusLabel( getPatternSyncStatus( item ) ) }
-		</Text>
+		</span>
 	),
 };
 
