@@ -961,7 +961,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$block['attrs']['style'] ?? array(),
 		$block['blockName']
 	);
-	$viewport_settings        = gutenberg_get_global_settings( array( 'viewport' ) );
+	$global_settings          = gutenberg_get_global_settings();
+	$viewport_settings        = $global_settings['viewport'] ?? null;
 	$responsive_media_queries = WP_Theme_JSON_Gutenberg::get_responsive_media_queries( $viewport_settings );
 	// If there is any value in style -> layout, the block has a child layout.
 	$child_layout = $style_attr['layout'] ?? null;
