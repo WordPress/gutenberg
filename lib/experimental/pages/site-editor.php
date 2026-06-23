@@ -21,6 +21,98 @@ function gutenberg_register_site_editor_admin_page() {
 add_action( 'admin_menu', 'gutenberg_register_site_editor_admin_page' );
 
 /**
+ * Get the page the Site Editor prototype should use as the static homepage.
+ *
+ * This is prototype bootstrap behavior for the Extensible Site Editor. WordPress
+ * core still defaults new installs to latest posts, but the prototype assumes a
+ * static front page so that the Homepage route, preview toolbar, and homepage
+ * configuration flow all start from the same predictable state.
+ *
+ * The helper is intentionally idempotent: it reuses an existing page named Home
+ * where possible, publishes it if needed, and only creates a page when none can
+ * be found. It does not touch page_for_posts because the prototype only needs a
+ * stable static front page baseline.
+ *
+ * @return int Home page ID, or 0 if the page could not be found or created.
+ */
+function gutenberg_site_editor_get_or_create_home_page() {
+	$home_page = get_page_by_path( 'home', OBJECT, 'page' );
+
+	if ( ! $home_page ) {
+		$home_pages = get_posts(
+			array(
+				'fields'         => 'ids',
+				'order'          => 'ASC',
+				'orderby'        => 'ID',
+				'post_status'    => 'any',
+				'post_type'      => 'page',
+				'posts_per_page' => 1,
+				'title'          => 'Home',
+			)
+		);
+
+		if ( ! empty( $home_pages ) ) {
+			$home_page = get_post( (int) $home_pages[0] );
+		}
+	}
+
+	if ( $home_page ) {
+		if ( 'publish' !== $home_page->post_status ) {
+			wp_update_post(
+				array(
+					'ID'          => $home_page->ID,
+					'post_status' => 'publish',
+				)
+			);
+		}
+
+		return (int) $home_page->ID;
+	}
+
+	$home_page_id = wp_insert_post(
+		array(
+			'post_name'    => 'home',
+			'post_status'  => 'publish',
+			'post_title'   => 'Home',
+			'post_type'    => 'page',
+			'post_content' => '',
+		),
+		true
+	);
+
+	if ( is_wp_error( $home_page_id ) ) {
+		return 0;
+	}
+
+	return (int) $home_page_id;
+}
+
+/**
+ * Ensure the Site Editor prototype starts with a static Home page.
+ *
+ * This runs on the Site Editor v2 boot hook rather than during general
+ * WordPress initialization. That keeps the prototype-specific default scoped to
+ * the prototype while still running early enough for preloaded settings and
+ * route rendering to see the configured static front page.
+ */
+function gutenberg_site_editor_ensure_static_home_page() {
+	$home_page_id = gutenberg_site_editor_get_or_create_home_page();
+
+	if ( ! $home_page_id ) {
+		return;
+	}
+
+	if ( 'page' !== get_option( 'show_on_front' ) ) {
+		update_option( 'show_on_front', 'page' );
+	}
+
+	if ( $home_page_id !== (int) get_option( 'page_on_front' ) ) {
+		update_option( 'page_on_front', $home_page_id );
+	}
+}
+add_action( 'site-editor-v2_init', 'gutenberg_site_editor_ensure_static_home_page', 1 );
+
+/**
  * Check whether the current wp-admin request is embedded as a Site Editor
  * compatibility bridge.
  *
