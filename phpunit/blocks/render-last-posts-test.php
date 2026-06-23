@@ -112,4 +112,141 @@ class Tests_Blocks_RenderLastPosts extends WP_UnitTestCase {
 		$this->assertContains( self::$posts[0]->ID, $last_args[1], 'Ensure that post is in array of post ids that are primed' );
 		$this->assertNotContains( self::$sticky_post->ID, $last_args[1], 'Ensure that sticky post is not in array of post ids that are primed' );
 	}
+
+	/**
+	 * @covers ::render_block_core_latest_posts
+	 * @covers ::block_core_latest_posts_get_full_post_content
+	 */
+	public function test_render_block_core_latest_posts_renders_full_post_content_blocks() {
+		$category_id = $this->factory()->category->create();
+		$embed_url   = 'https://example.com/watch/latest-posts-embed';
+
+		$this->factory()->post->create(
+			array(
+				'post_category' => array( $category_id ),
+				'post_content'  => '<!-- wp:embed {"url":"' . $embed_url . '","type":"video","providerNameSlug":"youtube","responsive":true} -->' . "\n" .
+					'<figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube"><div class="wp-block-embed__wrapper">' . "\n" .
+					$embed_url . "\n" .
+					'</div></figure>' . "\n" .
+					'<!-- /wp:embed -->',
+				'post_status'   => 'publish',
+				'post_title'    => 'Post with rendered embed',
+			)
+		);
+
+		wp_embed_register_handler(
+			'gutenberg_test_latest_posts_embed',
+			'#https://example\.com/watch/([^\s<]+)#i',
+			static function ( $matches ) {
+				return sprintf(
+					'<iframe title="Embedded test" src="https://example.com/embed/%s"></iframe>',
+					esc_attr( $matches[1] )
+				);
+			},
+			1
+		);
+
+		$attributes = array(
+			'addLinkToFeaturedImage'  => false,
+			'categories'              => array(
+				array(
+					'id' => $category_id,
+				),
+			),
+			'displayFeaturedImage'    => false,
+			'displayPostContent'      => true,
+			'displayPostContentRadio' => 'full_post',
+			'excerptLength'           => 0,
+			'featuredImageSizeSlug'   => '',
+			'order'                   => 'DESC',
+			'orderBy'                 => 'date',
+			'postsToShow'             => 1,
+		);
+
+		$markup = gutenberg_render_block_core_latest_posts( $attributes );
+
+		wp_embed_unregister_handler( 'gutenberg_test_latest_posts_embed', 1 );
+
+		$this->assertStringContainsString( '<iframe title="Embedded test"', $markup );
+		$this->assertStringNotContainsString( $embed_url, $markup );
+	}
+
+	/**
+	 * @covers ::render_block_core_latest_posts
+	 * @covers ::block_core_latest_posts_get_full_post_content
+	 */
+	public function test_render_block_core_latest_posts_keeps_password_protected_full_content_hidden() {
+		$category_id = $this->factory()->category->create();
+
+		$this->factory()->post->create(
+			array(
+				'post_category' => array( $category_id ),
+				'post_content'  => 'Protected latest posts content.',
+				'post_password' => 'password',
+				'post_status'   => 'publish',
+				'post_title'    => 'Password protected post',
+			)
+		);
+
+		$attributes = array(
+			'addLinkToFeaturedImage'  => false,
+			'categories'              => array(
+				array(
+					'id' => $category_id,
+				),
+			),
+			'displayFeaturedImage'    => false,
+			'displayPostContent'      => true,
+			'displayPostContentRadio' => 'full_post',
+			'excerptLength'           => 0,
+			'featuredImageSizeSlug'   => '',
+			'order'                   => 'DESC',
+			'orderBy'                 => 'date',
+			'postsToShow'             => 1,
+		);
+
+		$markup = gutenberg_render_block_core_latest_posts( $attributes );
+
+		$this->assertStringContainsString( 'This content is password protected.', $markup );
+		$this->assertStringNotContainsString( 'Protected latest posts content.', $markup );
+	}
+
+	/**
+	 * @covers ::render_block_core_latest_posts
+	 */
+	public function test_render_block_core_latest_posts_restores_global_post() {
+		$category_id      = $this->factory()->category->create();
+		$original_post_id = $this->factory()->post->create();
+		$GLOBALS['post']  = get_post( $original_post_id );
+
+		$this->factory()->post->create(
+			array(
+				'post_category' => array( $category_id ),
+				'post_content'  => 'Latest post content.',
+				'post_status'   => 'publish',
+				'post_title'    => 'Latest post',
+			)
+		);
+
+		$attributes = array(
+			'addLinkToFeaturedImage'  => false,
+			'categories'              => array(
+				array(
+					'id' => $category_id,
+				),
+			),
+			'displayFeaturedImage'    => false,
+			'displayPostContent'      => true,
+			'displayPostContentRadio' => 'full_post',
+			'excerptLength'           => 0,
+			'featuredImageSizeSlug'   => '',
+			'order'                   => 'DESC',
+			'orderBy'                 => 'date',
+			'postsToShow'             => 1,
+		);
+
+		gutenberg_render_block_core_latest_posts( $attributes );
+
+		$this->assertSame( $original_post_id, $GLOBALS['post']->ID );
+	}
 }

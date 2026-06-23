@@ -31,6 +31,38 @@ function block_core_latest_posts_get_excerpt_length() {
 }
 
 /**
+ * Renders the full content for a post listed in the Latest Posts block.
+ *
+ * @since 6.9.0
+ *
+ * @param WP_Post $post The post object.
+ *
+ * @return string The rendered post content.
+ */
+function block_core_latest_posts_get_full_post_content( $post ) {
+	static $seen_posts = array();
+
+	if ( post_password_required( $post ) ) {
+		return __( 'This content is password protected.' );
+	}
+
+	if ( isset( $seen_posts[ $post->ID ] ) ) {
+		return '';
+	}
+
+	$seen_posts[ $post->ID ] = true;
+
+	$post_content = html_entity_decode( $post->post_content, ENT_QUOTES, get_option( 'blog_charset' ) );
+
+	/** This filter is documented in wp-includes/post-template.php */
+	$post_content = apply_filters( 'the_content', str_replace( ']]>', ']]&gt;', $post_content ) );
+
+	unset( $seen_posts[ $post->ID ] );
+
+	return $post_content;
+}
+
+/**
  * Renders the `core/latest-posts` block on server.
  *
  * @since 5.0.0
@@ -72,6 +104,7 @@ function render_block_core_latest_posts( $attributes ) {
 	}
 
 	$list_items_markup = '';
+	$previous_post     = $post;
 
 	foreach ( $recent_posts as $post ) {
 		$post_link = esc_url( get_permalink( $post ) );
@@ -183,20 +216,16 @@ function render_block_core_latest_posts( $attributes ) {
 		if ( isset( $attributes['displayPostContent'] ) && $attributes['displayPostContent']
 			&& isset( $attributes['displayPostContentRadio'] ) && 'full_post' === $attributes['displayPostContentRadio'] ) {
 
-			$post_content = html_entity_decode( $post->post_content, ENT_QUOTES, get_option( 'blog_charset' ) );
-
-			if ( post_password_required( $post ) ) {
-				$post_content = __( 'This content is password protected.' );
-			}
-
 			$list_items_markup .= sprintf(
 				'<div class="wp-block-latest-posts__post-full-content">%1$s</div>',
-				wp_kses_post( $post_content )
+				block_core_latest_posts_get_full_post_content( $post )
 			);
 		}
 
 		$list_items_markup .= "</li>\n";
 	}
+
+	$post = $previous_post;
 
 	remove_filter( 'excerpt_length', 'block_core_latest_posts_get_excerpt_length', 20 );
 
