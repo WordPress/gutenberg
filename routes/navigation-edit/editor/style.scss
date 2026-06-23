@@ -65,6 +65,48 @@
 	margin-top: 12px;
 }
 
+.navigation-edit-editor__auto-menu-preview {
+	box-sizing: border-box;
+	width: min(100%, 360px);
+	margin-top: 24px;
+	padding-inline: 8px;
+	text-align: start;
+}
+
+.navigation-edit-editor__auto-menu-preview-empty {
+	color: #757575;
+	font-size: 12px;
+	line-height: 1.4;
+}
+
+.navigation-edit-editor__auto-menu-preview-list {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.navigation-edit-editor__auto-menu-preview-list
+.navigation-edit-editor__auto-menu-preview-list {
+	margin-top: 6px;
+	margin-inline-start: 24px;
+}
+
+.navigation-edit-editor__auto-menu-preview-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	min-height: 24px;
+	color: #757575;
+	font-size: 13px;
+}
+
+.navigation-edit-editor__auto-menu-preview-row svg {
+	fill: currentColor;
+}
+
 .components-modal__frame.navigation-edit-editor__customize-auto-menu-modal {
 	width: min(420px, calc(100vw - 48px));
 }

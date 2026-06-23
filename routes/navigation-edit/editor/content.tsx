@@ -9,6 +9,7 @@ import {
 import {
 	Button,
 	DropdownMenu,
+	Icon as WCIcon,
 	MenuGroup,
 	MenuItem,
 	Modal,
@@ -17,6 +18,7 @@ import {
 } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
 // @ts-expect-error - No type declarations available for @wordpress/blocks
 import { createBlock } from '@wordpress/blocks';
 import {
@@ -26,9 +28,11 @@ import {
 	useCallback,
 	useEffect,
 	useLayoutEffect,
+	useMemo,
 	useRef,
 	useState,
 } from '@wordpress/element';
+import { decodeEntities } from '@wordpress/html-entities';
 import { Link } from '@wordpress/route';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import {
@@ -160,6 +164,13 @@ const PAGE_QUERY = {
 
 export function isAutoMenuBlockList( blocks: Block[] | undefined ) {
 	return blocks?.length === 1 && blocks[ 0 ]?.name === 'core/page-list';
+}
+
+function getPageListParentPageId( blocks: Block[] | undefined ) {
+	const pageListBlock = blocks?.[ 0 ];
+	return typeof pageListBlock?.attributes?.parentPageID === 'number'
+		? pageListBlock.attributes.parentPageID
+		: null;
 }
 
 function deferUntilDropdownCloses( callback: () => void ) {
@@ -460,10 +471,14 @@ function NavigationTreeAdditionalContent( {
 
 function AutoMenuState( {
 	isCustomizeDisabled,
+	hasResolvedPages,
 	onCustomize,
+	previewBlocks,
 }: {
+	hasResolvedPages: boolean;
 	isCustomizeDisabled: boolean;
 	onCustomize: () => void;
+	previewBlocks: Block[];
 } ) {
 	return (
 		<EmptyState.Root className="navigation-edit-editor__auto-menu">
@@ -491,7 +506,89 @@ function AutoMenuState( {
 					{ __( 'Customize' ) }
 				</Button>
 			</EmptyState.Actions>
+			<AutoMenuPreviewTree
+				hasResolvedPages={ hasResolvedPages }
+				blocks={ previewBlocks }
+			/>
 		</EmptyState.Root>
+	);
+}
+
+function getPreviewBlockIcon( blockName: string ) {
+	return blockName === 'core/navigation-submenu' ? addSubmenuIcon : page;
+}
+
+function getPreviewBlockLabel( block: Block ) {
+	const label =
+		typeof block.attributes.label === 'string'
+			? block.attributes.label
+			: __( '(no title)' );
+	const decodedLabel = decodeEntities(
+		label.replace( /<[^>]*>/g, '' )
+	).trim();
+
+	return decodedLabel || __( '(no title)' );
+}
+
+function AutoMenuPreviewTree( {
+	blocks,
+	hasResolvedPages,
+}: {
+	blocks: Block[];
+	hasResolvedPages: boolean;
+} ) {
+	return (
+		<div
+			className="navigation-edit-editor__auto-menu-preview"
+			aria-label={ __( 'Current menu preview' ) }
+		>
+			{ ! hasResolvedPages && (
+				<div className="navigation-edit-editor__auto-menu-preview-empty">
+					{ __( 'Loading pages…' ) }
+				</div>
+			) }
+			{ hasResolvedPages && blocks.length === 0 && (
+				<div className="navigation-edit-editor__auto-menu-preview-empty">
+					{ __( 'No pages to show yet.' ) }
+				</div>
+			) }
+			{ hasResolvedPages && blocks.length > 0 && (
+				<ul className="navigation-edit-editor__auto-menu-preview-list">
+					{ blocks.map( ( block ) => (
+						<AutoMenuPreviewTreeItem
+							key={ block.clientId }
+							block={ block }
+						/>
+					) ) }
+				</ul>
+			) }
+		</div>
+	);
+}
+
+function AutoMenuPreviewTreeItem( { block }: { block: Block } ) {
+	const hasChildren = !! block.innerBlocks?.length;
+
+	return (
+		<li className="navigation-edit-editor__auto-menu-preview-item">
+			<div className="navigation-edit-editor__auto-menu-preview-row">
+				<WCIcon
+					icon={ getPreviewBlockIcon( block.name ) }
+					size={ 20 }
+				/>
+				<span>{ getPreviewBlockLabel( block ) }</span>
+			</div>
+			{ hasChildren && (
+				<ul className="navigation-edit-editor__auto-menu-preview-list">
+					{ block.innerBlocks?.map( ( childBlock ) => (
+						<AutoMenuPreviewTreeItem
+							key={ childBlock.clientId }
+							block={ childBlock }
+						/>
+					) ) }
+				</ul>
+			) }
+		</li>
 	);
 }
 
@@ -545,6 +642,7 @@ export default function NavigationMenuContent( {
 		updateBlockAttributes,
 		__unstableMarkNextChangeAsNotPersistent,
 	} = useDispatch( blockEditorStore );
+	const { createSuccessNotice } = useDispatch( noticesStore );
 	const [ editingBlockClientId, setEditingBlockClientId ] = useState<
 		string | null
 	>( null );
@@ -740,24 +838,41 @@ export default function NavigationMenuContent( {
 		NavigationLinkControls,
 		NavigationLinkUI,
 	} = getBlockLibraryPrivateApis();
+	const autoMenuPreviewBlocks = useMemo( () => {
+		if ( ! convertToNavigationLinks || ! hasResolvedPages ) {
+			return [];
+		}
+
+		return convertToNavigationLinks(
+			pages ?? [],
+			getPageListParentPageId( navigationBlocks )
+		);
+	}, [
+		convertToNavigationLinks,
+		hasResolvedPages,
+		navigationBlocks,
+		pages,
+	] );
 	const customizeAutoMenu = useCallback( () => {
 		if ( ! convertToNavigationLinks || ! hasResolvedPages ) {
 			return;
 		}
 
-		const pageListBlock = navigationBlocks[ 0 ];
-		const parentPageID =
-			typeof pageListBlock?.attributes?.parentPageID === 'number'
-				? pageListBlock.attributes.parentPageID
-				: null;
-
 		replaceBlockList(
 			null,
-			convertToNavigationLinks( pages ?? [], parentPageID )
+			convertToNavigationLinks(
+				pages ?? [],
+				getPageListParentPageId( navigationBlocks )
+			)
 		);
 		setIsCustomizeAutoMenuModalOpen( false );
+		createSuccessNotice(
+			__( 'Menu converted. You can now customize it manually.' ),
+			{ type: 'snackbar' }
+		);
 	}, [
 		convertToNavigationLinks,
+		createSuccessNotice,
 		hasResolvedPages,
 		navigationBlocks,
 		pages,
@@ -927,7 +1042,9 @@ export default function NavigationMenuContent( {
 				isCustomizeDisabled={
 					! hasResolvedPages || ! convertToNavigationLinks
 				}
+				hasResolvedPages={ hasResolvedPages }
 				onCustomize={ () => setIsCustomizeAutoMenuModalOpen( true ) }
+				previewBlocks={ autoMenuPreviewBlocks }
 			/>
 		);
 	} else if ( hasMenuItems ) {
