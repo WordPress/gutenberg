@@ -51,6 +51,7 @@ test.describe( 'Shortcode', () => {
 		await expect( transformations ).toHaveText( [
 			'Columns',
 			'Details',
+			'Figure',
 			'Group',
 		] );
 	} );
@@ -74,6 +75,7 @@ test.describe( 'Shortcode', () => {
 		await expect( transformations ).toHaveText( [
 			'Columns',
 			'Details',
+			'Figure',
 			'Group',
 		] );
 	} );
