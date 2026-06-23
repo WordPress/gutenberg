@@ -128,22 +128,6 @@ const restrictedImports = [
 	},
 ];
 
-const componentsEmotionImportPatterns = [
-	{
-		group: [ '@emotion/**' ],
-		message:
-			'Do not add new Emotion usage in `@wordpress/components`. Use SCSS Modules for component-local styles instead.',
-	},
-];
-
-const componentsSourceRestrictedImports = [
-	...restrictedImports.filter(
-		( { name } ) =>
-			! [ '@ariakit/react', 'framer-motion' ].includes( name ) &&
-			! name.startsWith( '@emotion/' )
-	),
-];
-
 // Common `no-restricted-imports` configuration for `@wordpress/ui` paths,
 // which occur across multiple override configs. The exclusion here allows
 // Base UI to be imported directly in `@wordpress/ui`, which is the intended
@@ -679,8 +663,13 @@ export default dedupePlugins( [
 			'no-restricted-imports': [
 				'error',
 				{
-					paths: componentsSourceRestrictedImports,
-					patterns: componentsEmotionImportPatterns,
+					paths: restrictedImports.filter(
+						( { name } ) =>
+							! [ '@ariakit/react', 'framer-motion' ].includes(
+								name
+							) && ! name.startsWith( '@emotion/' )
+					),
+					patterns: [ '@emotion/**' ],
 				},
 			],
 		},
