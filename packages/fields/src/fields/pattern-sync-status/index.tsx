@@ -15,6 +15,8 @@ import { unlock } from '../../lock-unlock';
 const { PATTERN_SYNC_TYPES } = unlock( patternPrivateApis );
 
 function getPatternSyncStatus( item: Pattern ) {
+	// When the post is first created, the top-level sync status is not set yet,
+	// so fall back to the meta value.
 	if ( item.meta?.wp_pattern_sync_status === PATTERN_SYNC_TYPES.unsynced ) {
 		return PATTERN_SYNC_TYPES.unsynced;
 	}

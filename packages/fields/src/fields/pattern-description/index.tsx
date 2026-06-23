@@ -26,7 +26,7 @@ const patternDescriptionField: Field< Pattern > = {
 	getValue: ( { item } ) => getPatternDescription( item ),
 	render: ( { item } ) => {
 		const description = getPatternDescription( item );
-		return description && <Text>{ description }</Text>;
+		return description ? <Text>{ description }</Text> : null;
 	},
 	Edit: {
 		control: 'textarea',
