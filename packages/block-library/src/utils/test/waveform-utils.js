@@ -256,6 +256,25 @@ describe( 'Waveform utilities', () => {
 	} );
 
 	describe( 'setupWaveformTimeMarkers', () => {
+		let getContextSpy;
+
+		beforeEach( () => {
+			getContextSpy = jest
+				.spyOn( window.HTMLCanvasElement.prototype, 'getContext' )
+				.mockImplementation( () => ( {
+					clearRect: jest.fn(),
+					drawImage: jest.fn(),
+					getImageData: jest.fn( () => ( {
+						data: new Uint8ClampedArray( [ 0, 0, 0, 127 ] ),
+					} ) ),
+					putImageData: jest.fn(),
+				} ) );
+		} );
+
+		afterEach( () => {
+			getContextSpy.mockRestore();
+		} );
+
 		function createMarkerTestContext( {
 			duration = 120,
 			currentTime = 0,
@@ -448,9 +467,9 @@ describe( 'Waveform utilities', () => {
 			} );
 			expect( hoverMarker ).toHaveTextContent( '1:00' );
 			expect( hoverRegion ).toHaveStyle( { width: '50%' } );
-			expect( hoverCanvas.style.clipPath ).toBe(
-				'inset(0 50% 0 0)'
-			);
+			expect( hoverCanvas ).toHaveStyle( {
+				clipPath: 'inset(0 50% 0 0)',
+			} );
 		} );
 
 		it( 'should match the hover timestamp color to played preview bars', () => {
@@ -539,9 +558,9 @@ describe( 'Waveform utilities', () => {
 
 			expect( context.drawImage ).toHaveBeenCalledTimes( 2 );
 			expect( context.putImageData ).toHaveBeenCalledTimes( 2 );
-			expect( hoverCanvas.style.clipPath ).toBe(
-				'inset(0 50% 0 0)'
-			);
+			expect( hoverCanvas ).toHaveStyle( {
+				clipPath: 'inset(0 50% 0 0)',
+			} );
 		} );
 
 		it( 'should use fallback duration for time markers before metadata loads', () => {
@@ -634,9 +653,9 @@ describe( 'Waveform utilities', () => {
 			expect( waveformArea ).not.toHaveClass( 'is-hovering' );
 			expect( hoverMarker ).not.toHaveClass( 'is-visible' );
 			expect( hoverRegion ).toHaveStyle( { width: '0' } );
-			expect( hoverCanvas.style.clipPath ).toBe(
-				'inset(0 100% 0 0)'
-			);
+			expect( hoverCanvas ).toHaveStyle( {
+				clipPath: 'inset(0 100% 0 0)',
+			} );
 		} );
 
 		it( 'should remove marker elements on cleanup', () => {

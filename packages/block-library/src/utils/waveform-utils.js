@@ -391,9 +391,7 @@ export function setupWaveformTimeMarkers( instance, container ) {
 	const updateHoverWaveform = ( percent ) => {
 		const sourceCanvas = instance.canvas;
 
-		hoverCanvas.style.clipPath = `inset(0 ${
-			( 1 - percent ) * 100
-		}% 0 0)`;
+		hoverCanvas.style.clipPath = `inset(0 ${ ( 1 - percent ) * 100 }% 0 0)`;
 
 		if ( ! sourceCanvas ) {
 			return;
