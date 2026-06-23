@@ -17,6 +17,12 @@ import { ScreenHeader } from './screen-header';
 import TypographyPreview from './typography-preview';
 
 const elements = {
+	default: {
+		description: __(
+			'Set the default font that will be applied to all typography elements on the site.'
+		),
+		title: __( 'Default' ),
+	},
 	text: {
 		description: __( 'Manage the fonts used on the site.' ),
 		title: __( 'Text' ),

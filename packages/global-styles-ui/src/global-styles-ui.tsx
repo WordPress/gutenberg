@@ -23,6 +23,7 @@ import ScreenBlockList from './screen-block-list';
 import ScreenBlock from './screen-block';
 import ScreenTypography from './screen-typography';
 import ScreenTypographyElement from './screen-typography-element';
+import ScreenTypographyDefault from './screen-typography-default';
 import ScreenColors from './screen-colors';
 import ScreenColorPalette from './screen-color-palette';
 import ScreenBackground from './screen-background';
@@ -205,6 +206,9 @@ export function GlobalStylesUI( {
 					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/background">
 						<ScreenBackground />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/typography/default">
+						<ScreenTypographyDefault />
 					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/typography/text">
 						<ScreenTypographyElement element="text" />
