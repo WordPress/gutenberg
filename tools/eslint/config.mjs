@@ -557,7 +557,7 @@ export default dedupePlugins( [
 	// component always receives props and returns a React element, and its
 	// props should be documented through its TypeScript props types.
 	{
-		files: [ '**/*.tsx' ],
+		files: [ '**/@(storybook|stories)/**', '**/*.tsx' ],
 		rules: {
 			'jsdoc/require-param': 'off',
 		},
