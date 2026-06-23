@@ -252,6 +252,87 @@ test.describe( 'Patterns', () => {
 			'Starter',
 		] );
 	} );
+
+	test.describe( 'DataForm inspector', () => {
+		test.beforeEach( async ( { requestUtils } ) => {
+			await requestUtils.setGutenbergExperiments( [
+				'gutenberg-dataform-inspector',
+			] );
+		} );
+
+		test.afterEach( async ( { requestUtils } ) => {
+			await requestUtils.setGutenbergExperiments( [] );
+		} );
+
+		test( 'shows pattern summary fields', async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			const pattern = await requestUtils.createBlock( {
+				title: 'DataForm pattern summary',
+				status: 'publish',
+				excerpt: 'Pattern description for DataForm.',
+				meta: { wp_pattern_sync_status: 'unsynced' },
+				content: `<!-- wp:paragraph -->\n<p>Pattern summary content before revisions.</p>\n<!-- /wp:paragraph -->`,
+				wp_pattern_category: [],
+			} );
+
+			await requestUtils.rest( {
+				method: 'POST',
+				path: `/wp/v2/blocks/${ pattern.id }`,
+				data: {
+					content: `<!-- wp:paragraph -->\n<p>Pattern summary content after one revision.</p>\n<!-- /wp:paragraph -->`,
+				},
+			} );
+			await requestUtils.rest( {
+				method: 'POST',
+				path: `/wp/v2/blocks/${ pattern.id }`,
+				data: {
+					content: `<!-- wp:paragraph -->\n<p>Pattern summary content with eight words here again.</p>\n<!-- /wp:paragraph -->`,
+				},
+			} );
+
+			await admin.visitSiteEditor( {
+				postId: pattern.id,
+				postType: 'wp_block',
+				canvas: 'edit',
+			} );
+			await editor.openDocumentSettingsSidebar();
+
+			const settingsSidebar = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			await settingsSidebar
+				.getByRole( 'tab', { name: 'Pattern' } )
+				.click();
+
+			await expect(
+				settingsSidebar.getByRole( 'heading', {
+					name: 'DataForm pattern summary',
+					level: 2,
+				} )
+			).toBeVisible();
+			await expect( settingsSidebar ).toContainText(
+				'Pattern description for DataForm.'
+			);
+			await expect( settingsSidebar ).toContainText(
+				'8 words, 1 minute read time.'
+			);
+			await expect( settingsSidebar ).toContainText( 'Last edited' );
+			await expect(
+				settingsSidebar.getByText( 'Revisions', { exact: true } )
+			).toBeVisible();
+			await expect( settingsSidebar ).toContainText( 'Sync status' );
+			await expect( settingsSidebar ).toContainText( 'Not synced' );
+			await expect(
+				settingsSidebar.getByRole( 'button', {
+					name: 'Pattern Categories',
+				} )
+			).toBeVisible();
+		} );
+	} );
 } );
 
 class Patterns {
