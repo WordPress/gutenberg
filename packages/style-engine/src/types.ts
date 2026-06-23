@@ -73,6 +73,7 @@ export interface Style {
 		letterSpacing?: CSSProperties[ 'letterSpacing' ];
 		lineHeight?: CSSProperties[ 'lineHeight' ];
 		textColumns?: CSSProperties[ 'columnCount' ];
+		textColumnMinWidth?: CSSProperties[ 'columnWidth' ];
 		textDecoration?: CSSProperties[ 'textDecoration' ];
 		textTransform?: CSSProperties[ 'textTransform' ];
 		writingMode?: CSSProperties[ 'writingMode' ];

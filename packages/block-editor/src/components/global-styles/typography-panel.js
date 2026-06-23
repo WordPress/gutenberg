@@ -3,7 +3,6 @@
  */
 import {
 	FontSizePicker,
-	__experimentalNumberControl as NumberControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	Notice,
@@ -25,6 +24,7 @@ import TextTransformControl from '../text-transform-control';
 import TextDecorationControl from '../text-decoration-control';
 import TextIndentControl from '../text-indent-control';
 import WritingModeControl from '../writing-mode-control';
+import TextColumnsControl from '../text-columns-control';
 import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 import {
@@ -32,9 +32,6 @@ import {
 	findNearestStyleAndWeight,
 } from './typography-utils';
 import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights';
-
-const MIN_TEXT_COLUMNS = 1;
-const MAX_TEXT_COLUMNS = 6;
 
 export function useHasTypographyPanel( settings ) {
 	const hasFontFamily = useHasFontFamilyControl( settings );
@@ -413,17 +410,58 @@ export default function TypographyPanel( {
 	// Text Columns
 	const hasTextColumnsControl = useHasTextColumnsControl( settings );
 	const textColumns = decodeValue( inheritedValue?.typography?.textColumns );
-	const setTextColumns = ( newValue ) => {
+	const textColumnMinWidth = inheritedValue?.typography?.textColumnMinWidth;
+	const setTextColumnMinWidth = ( newValue ) => {
 		onChange(
 			setImmutably(
 				value,
-				[ 'typography', 'textColumns' ],
+				[ 'typography', 'textColumnMinWidth' ],
 				newValue || undefined
 			)
 		);
 	};
-	const hasTextColumns = () => !! value?.typography?.textColumns;
-	const resetTextColumns = () => setTextColumns( undefined );
+	const setTextColumns = ( newValue ) => {
+		let newStyle = setImmutably(
+			value,
+			[ 'typography', 'textColumns' ],
+			newValue || undefined
+		);
+		if (
+			newValue &&
+			newValue > 1 &&
+			! value?.typography?.textColumnMinWidth
+		) {
+			newStyle = setImmutably(
+				newStyle,
+				[ 'typography', 'textColumnMinWidth' ],
+				'16em'
+			);
+		}
+		if ( ! newValue || newValue <= 1 ) {
+			newStyle = setImmutably(
+				newStyle,
+				[ 'typography', 'textColumnMinWidth' ],
+				undefined
+			);
+		}
+		onChange( newStyle );
+	};
+	const hasTextColumns = () =>
+		!! value?.typography?.textColumns ||
+		!! value?.typography?.textColumnMinWidth;
+	const resetTextColumns = () => {
+		let newStyle = setImmutably(
+			value,
+			[ 'typography', 'textColumns' ],
+			undefined
+		);
+		newStyle = setImmutably(
+			newStyle,
+			[ 'typography', 'textColumnMinWidth' ],
+			undefined
+		);
+		onChange( newStyle );
+	};
 
 	// Text Transform
 	const hasTextTransformControl = useHasTextTransformControl( settings );
@@ -630,15 +668,11 @@ export default function TypographyPanel( {
 					isShownByDefault={ defaultControls.textColumns }
 					panelId={ panelId }
 				>
-					<NumberControl
-						label={ __( 'Columns' ) }
-						max={ MAX_TEXT_COLUMNS }
-						min={ MIN_TEXT_COLUMNS }
-						onChange={ setTextColumns }
-						size="__unstable-large"
-						spinControls="custom"
-						value={ textColumns }
-						initialPosition={ 1 }
+					<TextColumnsControl
+						textColumns={ textColumns }
+						setTextColumns={ setTextColumns }
+						textColumnMinWidth={ textColumnMinWidth }
+						setTextColumnMinWidth={ setTextColumnMinWidth }
 					/>
 				</ToolsPanelItem>
 			) }
