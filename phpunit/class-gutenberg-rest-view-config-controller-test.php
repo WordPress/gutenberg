@@ -311,30 +311,33 @@ class Tests_REST_View_Config_Controller extends WP_Test_REST_TestCase {
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertSame(
 			array(
-				array(
-					'id'     => 'excerpt',
-					'layout' => array(
-						'type'          => 'panel',
-						'labelPosition' => 'top',
+				'layout' => array( 'type' => 'panel' ),
+				'fields' => array(
+					array(
+						'id'     => 'excerpt',
+						'layout' => array(
+							'type'          => 'panel',
+							'labelPosition' => 'top',
+						),
 					),
-				),
-				array(
-					'id'     => 'post-content-info',
-					'layout' => array(
-						'type'          => 'regular',
-						'labelPosition' => 'none',
+					array(
+						'id'     => 'post-content-info',
+						'layout' => array(
+							'type'          => 'regular',
+							'labelPosition' => 'none',
+						),
 					),
-				),
-				array(
-					'id'     => 'sync-status',
-					'layout' => array(
-						'type'          => 'regular',
-						'labelPosition' => 'side',
+					array(
+						'id'     => 'sync-status',
+						'layout' => array(
+							'type'          => 'regular',
+							'labelPosition' => 'side',
+						),
 					),
+					'revisions',
 				),
-				'revisions',
 			),
-			$data['form']['fields']
+			$data['form']
 		);
 	}
 
