@@ -1,12 +1,10 @@
 /**
- * Shared cache of blocks parsed from an entity's `content` string, keyed by
- * `kind:name:id`. Populated both eagerly by the `getEntityRecord` resolver
- * (when the sync manager parses content for transient edits) and lazily by
- * `useEntityBlockEditor`. The stored `content` string acts as a validator so
- * stale entries are discarded when the underlying record changes.
+ * Cache of blocks parsed from an entity's `content` string. Keyed by the
+ * record's `content` object reference (the `{ raw, rendered }` value from
+ * the REST response), which the queried-data reducer preserves across
+ * receives via `conservativeMapItem` and replaces whenever content changes.
+ * That gives us free eviction when content is replaced and survival across
+ * unrelated record updates. Populated both eagerly by the `getEntityRecord`
+ * resolver and lazily by `useEntityBlockEditor`.
  */
-export const parsedBlocksCache = new Map();
-
-export function getCacheKey( kind, name, id ) {
-	return `${ kind }:${ name }:${ id }`;
-}
+export const parsedBlocksCache = new WeakMap();

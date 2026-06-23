@@ -29,7 +29,7 @@ import {
 } from './utils';
 import { fetchBlockPatterns } from './fetch';
 import { restoreSelection, getSelectionHistory } from './utils/crdt-selection';
-import { parsedBlocksCache, getCacheKey } from './parsed-blocks-cache';
+import { parsedBlocksCache } from './parsed-blocks-cache';
 
 /**
  * Requests authors from the REST API.
@@ -159,6 +159,7 @@ export const getEntityRecord =
 			}
 
 			// Entity supports syncing.
+			let recordWithTransients;
 			if ( entityConfig.syncConfig && isNumericID( key ) && ! query ) {
 				const objectType = `${ kind }/${ name }`;
 				const objectId = key;
@@ -167,7 +168,7 @@ export const getEntityRecord =
 				// the sync manager. Otherwise these transients are not available
 				// if / until the record is edited. Use a copy of the record so that
 				// it does not change the behavior outside this experimental flag.
-				const recordWithTransients = { ...record };
+				recordWithTransients = { ...record };
 				Object.entries( entityConfig.transientEdits ?? {} )
 					.filter(
 						( [ propName, transientConfig ] ) =>
@@ -181,18 +182,6 @@ export const getEntityRecord =
 						recordWithTransients[ propName ] =
 							transientConfig.read( recordWithTransients );
 					} );
-
-				// Share the parsed blocks with `useEntityBlockEditor` so the
-				// editor doesn't re-parse the same `content` string.
-				if (
-					recordWithTransients.blocks &&
-					typeof recordWithTransients.content?.raw === 'string'
-				) {
-					parsedBlocksCache.set( getCacheKey( kind, name, key ), {
-						content: recordWithTransients.content.raw,
-						blocks: recordWithTransients.blocks,
-					} );
-				}
 
 				// Load the entity record for syncing. Do not await promise.
 				void getSyncManager()?.load(
@@ -319,6 +308,28 @@ export const getEntityRecord =
 				dispatch.receiveUserPermissions( receiveUserPermissionArgs );
 				dispatch.finishResolutions( 'canUser', canUserResolutionsArgs );
 			} );
+
+			// Share the parsed blocks with `useEntityBlockEditor` keyed on
+			// the stored content reference, so the editor doesn't re-parse.
+			// Must run after the receive so the stored content object is in
+			// state — the WeakMap key has to match what `getEntityRecord`
+			// will return to the hook.
+			if (
+				recordWithTransients?.blocks &&
+				typeof record.content?.raw === 'string'
+			) {
+				const storedContent = select.getEntityRecord(
+					kind,
+					name,
+					key
+				)?.content;
+				if ( storedContent ) {
+					parsedBlocksCache.set(
+						storedContent,
+						recordWithTransients.blocks
+					);
+				}
+			}
 		} finally {
 			dispatch.__unstableReleaseStoreLock( lock );
 		}
