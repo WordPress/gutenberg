@@ -141,6 +141,14 @@ const componentsEmotionImports = [
 		'Do not add new Emotion usage in `@wordpress/components`. Use SCSS Modules for component-local styles instead.',
 } ) );
 
+const componentsEmotionImportPatterns = [
+	{
+		group: [ '@emotion/**' ],
+		message:
+			'Do not add new Emotion usage in `@wordpress/components`. Use SCSS Modules for component-local styles instead.',
+	},
+];
+
 const componentsEmotionMigrationAllowlist = [
 	'packages/components/src/base-control/styles/base-control-styles.ts',
 	'packages/components/src/border-box-control/styles.ts',
@@ -781,6 +789,7 @@ export default dedupePlugins( [
 				'error',
 				{
 					paths: componentsSourceRestrictedImports,
+					patterns: componentsEmotionImportPatterns,
 				},
 			],
 		},
