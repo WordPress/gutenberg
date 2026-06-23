@@ -1,0 +1,20 @@
+.truncate {
+	display: block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.lineClamp {
+	-webkit-box-orient: block-axis;
+	-webkit-line-clamp: var(--wp-components-truncate-lines);
+	display: -webkit-box;
+	overflow: hidden;
+
+	// The `word-break: break-all` property first makes sure a text line
+	// breaks even when it contains 'unbreakable' content such as long URLs.
+	// See https://github.com/WordPress/gutenberg/issues/60860.
+	&[data-lines="1"] {
+		word-break: break-all;
+	}
+}
