@@ -221,6 +221,51 @@ test.describe( 'Template Part', () => {
 		await expect( templatePartWithParagraph ).toBeHidden();
 	} );
 
+	test( 'shows the source block for a pattern wrapper in focus mode', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const templatePart = await requestUtils.createTemplate(
+			'wp_template_part',
+			{
+				slug: 'pattern-header',
+				title: 'Pattern Header',
+				content: `<!-- wp:group {"metadata":{"patternName":"theme/header-wrapper","name":"Header"},"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:paragraph -->
+<p>Template part content</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->`,
+			}
+		);
+
+		await admin.visitSiteEditor( {
+			postId: templatePart.id,
+			postType: 'wp_template_part',
+			canvas: 'edit',
+		} );
+
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Group' } )
+		);
+		await editor.openDocumentSettingsSidebar();
+
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		const blockCard = editorSettings
+			.locator( '.block-editor-block-card' )
+			.first();
+
+		await expect(
+			blockCard.locator( '.block-editor-block-card__name' )
+		).toHaveText( 'Header' );
+		await expect(
+			blockCard.locator( '.components-badge__content' )
+		).toHaveText( 'Group' );
+	} );
+
 	test( 'shows changes in a template when a template part it contains is modified', async ( {
 		admin,
 		editor,

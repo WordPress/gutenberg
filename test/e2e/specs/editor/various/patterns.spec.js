@@ -463,6 +463,50 @@ test.describe( 'Unsynced pattern', () => {
 		).toBeVisible();
 	} );
 
+	test( 'shows the source block in the inspector when editing a pattern', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.setContent( `<!-- wp:group {"metadata":{"patternName":"theme/header-wrapper","name":"Header"},"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:paragraph -->
+<p>Pattern content</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->` );
+
+		await pageUtils.pressKeys( 'access+o' );
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+		await listView
+			.getByRole( 'gridcell', { name: 'Header', exact: true } )
+			.click();
+
+		await editor.openDocumentSettingsSidebar();
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		const blockCard = editorSettings
+			.locator( '.block-editor-block-card' )
+			.first();
+		const blockCardName = blockCard.locator(
+			'.block-editor-block-card__name'
+		);
+		const blockCardBadge = blockCard.locator(
+			'.components-badge__content'
+		);
+
+		await expect( blockCardName ).toHaveText( 'Header' );
+		await expect( blockCardBadge ).toHaveText( 'Pattern' );
+
+		await editorSettings
+			.getByRole( 'button', { name: 'Edit pattern' } )
+			.click();
+
+		await expect( blockCardName ).toHaveText( 'Header' );
+		await expect( blockCardBadge ).toHaveText( 'Group' );
+	} );
+
 	test( 'detaches an unsynced pattern via the block options menu', async ( {
 		editor,
 		page,
