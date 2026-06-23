@@ -8102,7 +8102,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$theme_json = new ReflectionClass( 'WP_Theme_JSON_Gutenberg' );
 
 		$func = $theme_json->getMethod( 'prepend_to_selector' );
-		$func->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$func->setAccessible( true );
+		}
 
 		$actual = $func->invoke( null, $selector, $to_prepend );
 
@@ -8116,37 +8118,37 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 */
 	public function data_prepend_to_selector() {
 		return array(
-			'single class selector'                                    => array(
+			'single class selector'                        => array(
 				'selector'   => '.inner',
 				'to_prepend' => '.wrapper ',
 				'expected'   => '.wrapper .inner',
 			),
-			'single element selector'                                  => array(
+			'single element selector'                      => array(
 				'selector'   => 'p',
 				'to_prepend' => '.wrapper ',
 				'expected'   => '.wrapper p',
 			),
-			'single id selector'                                       => array(
+			'single id selector'                           => array(
 				'selector'   => '#main',
 				'to_prepend' => '.wrapper ',
 				'expected'   => '.wrapper #main',
 			),
-			'two comma-separated selectors without spaces'             => array(
+			'two comma-separated selectors without spaces' => array(
 				'selector'   => 'h1,h2',
 				'to_prepend' => '.wrapper ',
 				'expected'   => '.wrapper h1,.wrapper h2',
 			),
-			'three comma-separated selectors without spaces'           => array(
+			'three comma-separated selectors without spaces' => array(
 				'selector'   => 'h1,h2,h3',
 				'to_prepend' => '.some-class ',
 				'expected'   => '.some-class h1,.some-class h2,.some-class h3',
 			),
-			'comma-separated class selectors without spaces'           => array(
+			'comma-separated class selectors without spaces' => array(
 				'selector'   => '.foo,.bar',
 				'to_prepend' => '.prefix ',
 				'expected'   => '.prefix .foo,.prefix .bar',
 			),
-			'prepend without trailing space'                           => array(
+			'prepend without trailing space'               => array(
 				'selector'   => '.child',
 				'to_prepend' => '.parent',
 				'expected'   => '.parent.child',
@@ -8156,92 +8158,92 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'to_prepend' => '.parent',
 				'expected'   => '.parent.a,.parent.b',
 			),
-			'descendant selector prepended'                            => array(
+			'descendant selector prepended'                => array(
 				'selector'   => '.block .inner',
 				'to_prepend' => '.scope ',
 				'expected'   => '.scope .block .inner',
 			),
-			'descendant selectors comma-separated without spaces'      => array(
+			'descendant selectors comma-separated without spaces' => array(
 				'selector'   => '.block .inner,.block .alt',
 				'to_prepend' => '.scope ',
 				'expected'   => '.scope .block .inner,.scope .block .alt',
 			),
-			'empty selector'                                           => array(
+			'empty selector'                               => array(
 				'selector'   => '',
 				'to_prepend' => '.prefix ',
 				'expected'   => '.prefix ',
 			),
-			'empty prepend'                                            => array(
+			'empty prepend'                                => array(
 				'selector'   => '.child',
 				'to_prepend' => '',
 				'expected'   => '.child',
 			),
-			'both empty'                                               => array(
+			'both empty'                                   => array(
 				'selector'   => '',
 				'to_prepend' => '',
 				'expected'   => '',
 			),
-			'attribute selector'                                       => array(
+			'attribute selector'                           => array(
 				'selector'   => '[data-type="example"]',
 				'to_prepend' => '.scope ',
 				'expected'   => '.scope [data-type="example"]',
 			),
-			'pseudo-class selector'                                    => array(
+			'pseudo-class selector'                        => array(
 				'selector'   => ':where(.is-layout-flex)',
 				'to_prepend' => '.editor ',
 				'expected'   => '.editor :where(.is-layout-flex)',
 			),
-			'many comma-separated selectors without spaces'            => array(
+			'many comma-separated selectors without spaces' => array(
 				'selector'   => 'h1,h2,h3,h4,h5,h6',
 				'to_prepend' => '.content ',
 				'expected'   => '.content h1,.content h2,.content h3,.content h4,.content h5,.content h6',
 			),
-			'real world block element selector'                        => array(
+			'real world block element selector'            => array(
 				'selector'   => 'p',
 				'to_prepend' => '.wp-block-group ',
 				'expected'   => '.wp-block-group p',
 			),
-			'real world compound block element selectors'              => array(
+			'real world compound block element selectors'  => array(
 				'selector'   => 'a,.wp-element-button',
 				'to_prepend' => '.wp-block-group ',
 				'expected'   => '.wp-block-group a,.wp-block-group .wp-element-button',
 			),
-			'spaces after commas are preserved'                        => array(
+			'spaces after commas are preserved'            => array(
 				'selector'   => 'h1, h2, h3',
 				'to_prepend' => '.some-class ',
 				'expected'   => '.some-class h1,.some-class  h2,.some-class  h3',
 			),
-			'spaces after commas preserved with class selectors'       => array(
+			'spaces after commas preserved with class selectors' => array(
 				'selector'   => '.foo, .bar',
 				'to_prepend' => '.prefix ',
 				'expected'   => '.prefix .foo,.prefix  .bar',
 			),
-			'mixed whitespace around commas preserved'                 => array(
+			'mixed whitespace around commas preserved'     => array(
 				'selector'   => '.a ,  .b , .c',
 				'to_prepend' => '.pre ',
 				'expected'   => '.pre .a ,.pre   .b ,.pre  .c',
 			),
-			'where with internal commas no top-level comma'            => array(
+			'where with internal commas no top-level comma' => array(
 				'selector'   => ':where(.a, .b)',
 				'to_prepend' => '.scope ',
 				'expected'   => '.scope :where(.a, .b)',
 			),
-			'where with internal commas and top-level comma'           => array(
+			'where with internal commas and top-level comma' => array(
 				'selector'   => ':where(.a, .b),.c',
 				'to_prepend' => '.scope ',
 				'expected'   => '.scope :where(.a, .b),.scope .c',
 			),
-			'is with internal commas and top-level comma'              => array(
+			'is with internal commas and top-level comma'  => array(
 				'selector'   => ':is(.x, .y),.z',
 				'to_prepend' => '.wrapper ',
 				'expected'   => '.wrapper :is(.x, .y),.wrapper .z',
 			),
-			'multiple parenthesized selectors with top-level comma'    => array(
+			'multiple parenthesized selectors with top-level comma' => array(
 				'selector'   => ':where(.a, .b),:is(.c, .d)',
 				'to_prepend' => '.scope ',
 				'expected'   => '.scope :where(.a, .b),.scope :is(.c, .d)',
 			),
-			'nested parentheses with commas'                           => array(
+			'nested parentheses with commas'               => array(
 				'selector'   => ':where(:not(.a, .b), .c),.d',
 				'to_prepend' => '.scope ',
 				'expected'   => '.scope :where(:not(.a, .b), .c),.scope .d',
