@@ -29,18 +29,17 @@ export default (
 				{ [ key: string ]: any } | undefined
 			>( undefined );
 
-			// Derived from fallbackStyles: the grab is complete once every
-			// mapped value has resolved to a truthy style.
-			const grabStylesCompleted =
-				!! fallbackStyles &&
-				Object.values( fallbackStyles ).every( Boolean );
+			const nodeRef = useRef< HTMLDivElement >( null );
 
-			const nodeRef = useRef< HTMLDivElement | null >( null );
-
-			// Runs before paint, matching the original componentDidMount /
-			// componentDidUpdate, so the fallback styles apply without a flash.
+			// Runs before paint, so the fallback styles apply without a flash.
 			useIsomorphicLayoutEffect( () => {
 				const node = props.node ?? nodeRef.current;
+				// Derived from fallbackStyles: the grab is complete once every
+				// mapped value has resolved to a truthy style.
+				const grabStylesCompleted =
+					!! fallbackStyles &&
+					Object.values( fallbackStyles ).every( Boolean );
+
 				if ( node && ! grabStylesCompleted ) {
 					const newFallbackStyles = mapNodeToProps( node, props );
 
