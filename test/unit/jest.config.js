@@ -30,8 +30,9 @@ const transpiledPackageNames = glob(
 	return relative.split( path.sep )[ 1 ];
 } );
 
-// Make sure the tests run in UTC timezone, regardless of the system timezone.
-process.env.TZ = 'UTC';
+// Make sure the tests run in UTC timezone, unless some other
+// timezone is set explicitly.
+process.env.TZ ??= 'UTC';
 
 module.exports = {
 	rootDir: '../../',
