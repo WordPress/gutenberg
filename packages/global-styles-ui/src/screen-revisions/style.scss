@@ -70,8 +70,7 @@
 		}
 
 		.global-styles-ui-screen-revisions__changes > li,
-		.global-styles-ui-screen-revisions__meta,
-		.global-styles-ui-screen-revisions__applied-text {
+		.global-styles-ui-screen-revisions__meta {
 			color: $gray-900;
 		}
 	}
@@ -98,15 +97,14 @@
 }
 
 .global-styles-ui-screen-revisions__apply-button.is-primary,
-.global-styles-ui-screen-revisions__applied-text {
+.global-styles-ui-screen-revisions__active-badge {
 	align-self: flex-start;
 	// Left margin = left padding of .global-styles-ui-screen-revisions__revision-item-wrapper.
-	margin: $grid-unit-05 $grid-unit-15 $grid-unit-15 $grid-unit-50;
+	margin: 0 $grid-unit-15 $grid-unit-15 $grid-unit-50;
 }
 
 .global-styles-ui-screen-revisions__changes,
-.global-styles-ui-screen-revisions__meta,
-.global-styles-ui-screen-revisions__applied-text {
+.global-styles-ui-screen-revisions__meta {
 	color: $gray-700;
 	font-size: 12px;
 }

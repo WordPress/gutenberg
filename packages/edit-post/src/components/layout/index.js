@@ -49,7 +49,6 @@ import {
 	useRefEffect,
 	useViewportMatch,
 } from '@wordpress/compose';
-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
 import { Tooltip, VisuallyHidden } from '@wordpress/ui';
 
 /**
@@ -73,7 +72,8 @@ import { useMetaBoxInitialization } from '../meta-boxes/use-meta-box-initializat
 const { useCommandContext } = unlock( commandsPrivateApis );
 /** @type {{} & {useDrag: import('@use-gesture/react').useDrag}} */
 const { useDrag } = unlock( componentsPrivateApis );
-const { Editor, FullscreenMode } = unlock( editorPrivateApis );
+const { Editor, FullscreenMode, UploadProgressSnackbar } =
+	unlock( editorPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 const DESIGN_POST_TYPES = [
 	'wp_template',
@@ -623,6 +623,7 @@ function Layout( {
 							<PostEditorMoreMenu />
 							{ backButton }
 							<SnackbarNotices className="edit-post-layout__snackbar" />
+							<UploadProgressSnackbar />
 						</Editor>
 					</div>
 				</ErrorBoundary>

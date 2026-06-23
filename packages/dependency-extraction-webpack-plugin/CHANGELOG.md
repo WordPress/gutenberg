@@ -6,6 +6,10 @@
 
 - Added detection of dynamic imports of script modules
 
+## 6.48.1 (2026-06-16)
+
+## 6.48.0 (2026-06-10)
+
 ## 6.47.0 (2026-05-27)
 
 ## 6.46.0 (2026-05-14)

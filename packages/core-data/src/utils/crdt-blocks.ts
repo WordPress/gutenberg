@@ -69,6 +69,10 @@ export type YBlocks = Y.Array< YBlock >;
 // Attribute values will be typed as the union of `Y.Text` and `unknown`.
 export type YBlockAttributes = Y.Map< Y.Text | unknown >;
 
+interface MergeCrdtBlocksOptions {
+	preserveClientIds?: boolean;
+}
+
 /**
  * Optional description of where a cursor falls.
  *
@@ -420,11 +424,13 @@ function createNewYBlock( block: Block ): YBlock {
  * @param attributeCursor When provided, describes a selection cursor falling within a
  *                        RichText field associated with a specific block and attribute.
  *                        Derived from the changes that produced the blocks.
+ * @param options         Optional settings for the merge operation.
  */
 export function mergeCrdtBlocks(
 	yblocks: YBlocks,
 	incomingBlocks: Block[],
-	attributeCursor: MergeCursorPosition
+	attributeCursor: MergeCursorPosition,
+	options: MergeCrdtBlocksOptions = {}
 ): void {
 	// Ensure we are working with serializable block data.
 	if ( ! serializableBlocksCache.has( incomingBlocks ) ) {
@@ -594,32 +600,31 @@ export function mergeCrdtBlocks(
 						mergeCrdtBlocks(
 							yInnerBlocks,
 							incomingBlockPropertyValue ?? [],
-							attributeCursor
+							attributeCursor,
+							options
 						);
 						break;
 					}
 
 					case 'clientId': {
-						// Never overwrite the local block's clientId with the
-						// incoming one. Some callers (e.g. the Code Editor flow
-						// that parses raw HTML into blocks on every keystroke)
-						// produce randomized clientIds for blocks whose content
-						// has changed on every sync. Without this case the default
-						// branch would replace the stable Y.Doc clientId with
-						// a new one, causing remote peers to remount the block
-						// and flash the block's content on reload.
-						//
-						// This mirrors the clientId exclusion in `areBlocksEqual`.
-						// Convergence is preserved. Because we're not writing
-						// to the clientId, Yjs doesn't send an update to peers
-						// telling them to change the clientId, so everyone
-						// sees the same clientId per block.
-						// Inserts still use a new clientId via createNewYBlock,
-						// and the duplicate-clientId sweep below catches any
-						// edge cases. The clientId is anchored to the
-						// slot in the array rather than to specific content,
-						// which is consistent with areBlocksEqual ignoring
-						// clientId when diffing.
+						// Code Editor changes reparse raw HTML on every
+						// keystroke and regenerate fresh clientIds. Keep Y.Doc
+						// clientIds stable for the code editor so peers do not
+						// remount unchanged blocks on every edit.
+						if ( options.preserveClientIds ) {
+							break;
+						}
+
+						// Otherwise, accept new clientIds from updates
+						if (
+							incomingBlockPropertyValue !==
+							localYBlock.get( incomingBlockProperty )
+						) {
+							localYBlock.set(
+								incomingBlockProperty,
+								incomingBlockPropertyValue
+							);
+						}
 						break;
 					}
 

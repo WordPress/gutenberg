@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/nux",
-	"version": "9.47.0",
+	"version": "10.0.1",
 	"description": "Deprecated no-op NUX (New User eXperience) compatibility module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -40,7 +40,6 @@
 		"./package.json": "./package.json",
 		"./build-style/": "./build-style/"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"sideEffects": [
 		"build-style/**",
@@ -56,9 +55,14 @@
 		"@wordpress/data": "file:../data",
 		"@wordpress/deprecated": "file:../deprecated"
 	},
+	"devDependencies": {
+		"@testing-library/dom": "^10.4.1",
+		"@testing-library/react": "^16.3.2",
+		"@testing-library/user-event": "^14.6.1"
+	},
 	"peerDependencies": {
-		"react": "^19.2.4",
-		"react-dom": "^19.2.4"
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

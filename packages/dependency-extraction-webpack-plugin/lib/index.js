@@ -338,8 +338,10 @@ class DependencyExtractionWebpackPlugin {
 								m
 							);
 
-						(isStatic ? chunkScriptModuleStaticDeps : chunkScriptModuleDynamicDeps)
-							.add(userRequest);
+						( isStatic
+							? chunkScriptModuleStaticDeps
+							: chunkScriptModuleDynamicDeps
+						).add( userRequest );
 					} else {
 						chunkStaticDeps.add(
 							this.mapRequestToDependency( userRequest )

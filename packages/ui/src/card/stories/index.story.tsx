@@ -16,7 +16,7 @@ function Text( { children }: { children: React.ReactNode } ) {
 				fontWeight: 'var(--wpds-typography-font-weight-regular)',
 				lineHeight: 'var(--wpds-typography-line-height-sm)',
 				textWrap: 'pretty',
-				color: 'var(--wpds-color-fg-content-neutral-weak)',
+				color: 'var(--wpds-color-foreground-content-neutral-weak)',
 			} }
 		>
 			{ children }
@@ -34,6 +34,11 @@ const meta: Meta< typeof Card.Root > = {
 		'Card.FullBleed': Card.FullBleed,
 		'Card.Title': Card.Title,
 	},
+	// Temporary: Due to an upstream bug, render the root explicitly so the
+	// components manifest extractor can resolve props from the JSX.
+	//
+	// See: https://github.com/storybookjs/storybook/issues/34877
+	render: ( args ) => <Card.Root { ...args } />,
 	parameters: {
 		componentStatus: {
 			status: 'recommended',
