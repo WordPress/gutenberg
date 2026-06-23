@@ -63,8 +63,10 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 This is a [**static block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). The markup is saved directly in the post content.
 
 ```html
-<!-- wp:figure {"caption":"","captionPosition":"bottom"} -->
-<!-- Content... -->
+<!-- wp:figure -->
+<figure class="wp-block-figure is-caption-bottom">
+	<div class="wp-block-figure__content"></div>
+</figure>
 <!-- /wp:figure -->
 ```
 

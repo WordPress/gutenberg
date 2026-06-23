@@ -1,0 +1,11 @@
+[
+	{
+		"name": "core/figure",
+		"isValid": true,
+		"attributes": {
+			"caption": "",
+			"captionPosition": "bottom"
+		},
+		"innerBlocks": []
+	}
+]
