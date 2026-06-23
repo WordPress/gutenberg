@@ -26,18 +26,24 @@
 	cursor: var(--wpds-cursor-control);
 	appearance: none;
 	background: none;
+
+	@media not ( prefers-reduced-motion ) {
+		transition: box-shadow 0.1s linear;
+	}
+
+	$button-padding-x: 12px;
+
 	height: $button-size;
 	align-items: center;
 	justify-content: center;
 	box-sizing: border-box;
-	padding: 4px 12px; // Allows 32px min-height.
+	padding: 4px $button-padding-x; // Allows 32px min-height.
 	border-radius: $radius-small;
 	color: $components-color-foreground;
 
 	&:not(.is-link):not(.has-icon) {
 		// Minimum width to ensure visual balance for very short labels (like "Ok").
-		// 4ch (roughly 4 characters) + horizontal padding (12px * 2).
-		min-width: calc(4ch + 24px);
+		min-width: calc(4ch + #{ $button-padding-x * 2 });
 	}
 
 	&.is-next-40px-default-size {
@@ -304,13 +310,15 @@
 	}
 
 	&.is-small {
+		$button-padding-x-small: 8px;
+
 		height: var(--wpds-dimension-size-sm);
 		line-height: 22px;
-		padding: 0 8px;
+		padding: 0 $button-padding-x-small;
 		font-size: 11px;
 
 		&:not(.is-link):not(.has-icon) {
-			min-width: calc(4ch + 16px);
+			min-width: calc(4ch + #{ $button-padding-x-small * 2 });
 		}
 
 		&.has-icon:not(.has-text) {
