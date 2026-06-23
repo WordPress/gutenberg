@@ -269,17 +269,6 @@ function _gutenberg_mask_api_key( string $key ): string {
 }
 
 /**
- * Masks an application password without revealing any characters.
- *
- * @access private
- *
- * @return string The masked application password.
- */
-function _gutenberg_mask_application_password(): string {
-	return str_repeat( "\u{2022}", 16 );
-}
-
-/**
  * Checks whether an API key is valid for a given provider.
  *
  * @access private
@@ -356,7 +345,7 @@ function _gutenberg_connectors_rest_settings_dispatch( WP_REST_Response $respons
 		if ( 'application_password' === $auth['method'] && ! empty( $auth['application_password_setting_name'] ) ) {
 			$setting_name = $auth['application_password_setting_name'];
 			if ( array_key_exists( $setting_name, $data ) && is_string( $data[ $setting_name ] ) && '' !== $data[ $setting_name ] ) {
-				$data[ $setting_name ] = _gutenberg_mask_application_password();
+				$data[ $setting_name ] = str_repeat( "\u{2022}", 16 );
 			}
 			continue;
 		}
