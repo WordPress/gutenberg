@@ -79,6 +79,7 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
+		"@wordpress/compose": "file:../compose",
 		"@wordpress/element": "file:../element",
 		"@wordpress/style-runtime": "file:../style-runtime",
 		"colorjs.io": "^0.6.0",

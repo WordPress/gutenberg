@@ -1,4 +1,5 @@
-import { useMemo, useRef, useLayoutEffect } from '@wordpress/element';
+import { useMemo, useRef } from '@wordpress/element';
+import { useIsomorphicLayoutEffect } from '@wordpress/compose';
 import { ThemeContext } from './context';
 import { useThemeProviderStyles } from './use-theme-provider-styles';
 import { type ThemeProviderProps } from './types';
@@ -44,7 +45,7 @@ export const ThemeProvider = ( {
 	// `html` is shared, so set/remove individual properties (restoring any
 	// prior value) rather than assigning a whole style object. Preset settings
 	// like `cornerRadius` are forwarded by the prebuilt CSS instead.
-	useLayoutEffect( () => {
+	useIsomorphicLayoutEffect( () => {
 		if ( ! isRoot ) {
 			return;
 		}
