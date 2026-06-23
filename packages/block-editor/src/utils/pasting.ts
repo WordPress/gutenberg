@@ -7,10 +7,10 @@ import { getFilesFromDataTransfer } from '@wordpress/dom';
  * Normalizes a given string of HTML to remove the Windows-specific "Fragment"
  * comments and any preceding and trailing content.
  *
- * @param {string} html the html to be normalized
- * @return {string} the normalized html
+ * @param html the html to be normalized
+ * @return the normalized html
  */
-function removeWindowsFragments( html ) {
+function removeWindowsFragments( html: string ) {
 	const startStr = '<!--StartFragment-->';
 	const startIdx = html.indexOf( startStr );
 	if ( startIdx > -1 ) {
@@ -35,10 +35,10 @@ function removeWindowsFragments( html ) {
  * - https://github.com/WordPress/gutenberg/issues/33585
  * - https://bugs.chromium.org/p/chromium/issues/detail?id=1264616#c4
  *
- * @param {string} html the html to be stripped of the meta tag.
- * @return {string} the cleaned html
+ * @param html the html to be stripped of the meta tag.
+ * @return the cleaned html
  */
-function removeCharsetMetaTag( html ) {
+function removeCharsetMetaTag( html: string ) {
 	const metaTag = `<meta charset='utf-8'>`;
 
 	if ( html.startsWith( metaTag ) ) {
@@ -48,7 +48,11 @@ function removeCharsetMetaTag( html ) {
 	return html;
 }
 
-export function getPasteEventData( { clipboardData } ) {
+export function getPasteEventData( {
+	clipboardData,
+}: {
+	clipboardData: DataTransfer;
+} ) {
 	let plainText = '';
 	let html = '';
 
@@ -88,11 +92,14 @@ export function getPasteEventData( { clipboardData } ) {
  * content and not the screenshot, since this allows Gutenberg to insert
  * meaningful blocks, like paragraphs, lists or even tables.
  *
- * @param {File[]} files File objects obtained from a paste event
- * @param {string} html  HTML content obtained from a paste event
- * @return {boolean}     True if the files should be dismissed
+ * @param files File objects obtained from a paste event
+ * @param html  HTML content obtained from a paste event
+ * @return      True if the files should be dismissed
  */
-export function shouldDismissPastedFiles( files, html /*, plainText */ ) {
+export function shouldDismissPastedFiles(
+	files: File[],
+	html: string /*, plainText */
+) {
 	// The question is only relevant when there is actual HTML content and when
 	// there is exactly one image file.
 	if (

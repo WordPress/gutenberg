@@ -870,11 +870,6 @@
 			"count": 3
 		}
 	},
-	"packages/edit-site/src/components/page-patterns/fields.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/edit-site/src/components/page-templates/fields.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
