@@ -5,12 +5,12 @@ const BLOCK_APPENDER_CLASS = '.block-editor-button-block-appender';
 /**
  * Returns true if two elements are contained within the same block.
  *
- * @param {Element} a First element.
- * @param {Element} b Second element.
+ * @param a First element.
+ * @param b Second element.
  *
- * @return {boolean} Whether elements are in the same block.
+ * @return Whether elements are in the same block.
  */
-export function isInSameBlock( a, b ) {
+export function isInSameBlock( a: Element, b: Element ) {
 	return a.closest( BLOCK_SELECTOR ) === b.closest( BLOCK_SELECTOR );
 }
 
@@ -18,13 +18,13 @@ export function isInSameBlock( a, b ) {
  * Returns true if an element is considered part of the block and not its inner
  * blocks or appender.
  *
- * @param {Element} blockElement Block container element.
- * @param {Element} element      Element.
+ * @param blockElement Block container element.
+ * @param element      Element.
  *
- * @return {boolean} Whether an element is considered part of the block and not
- *                   its inner blocks or appender.
+ * @return Whether an element is considered part of the block and not
+ *         its inner blocks or appender.
  */
-export function isInsideRootBlock( blockElement, element ) {
+export function isInsideRootBlock( blockElement: Element, element: Element ) {
 	const parentBlock = element.closest(
 		[ BLOCK_SELECTOR, APPENDER_SELECTOR, BLOCK_APPENDER_CLASS ].join( ',' )
 	);
@@ -34,12 +34,12 @@ export function isInsideRootBlock( blockElement, element ) {
 /**
  * Finds the block client ID given any DOM node inside the block.
  *
- * @param {Node?} node DOM node.
+ * @param node DOM node.
  *
- * @return {string|undefined} Client ID or undefined if the node is not part of
- *                            a block.
+ * @return Client ID or undefined if the node is not part of
+ *         a block.
  */
-export function getBlockClientId( node ) {
+export function getBlockClientId( node: Node | null ) {
 	while ( node && node.nodeType !== node.ELEMENT_NODE ) {
 		node = node.parentNode;
 	}
@@ -48,7 +48,7 @@ export function getBlockClientId( node ) {
 		return;
 	}
 
-	const elementNode = /** @type {Element} */ ( node );
+	const elementNode = node as Element;
 	const blockNode = elementNode.closest( BLOCK_SELECTOR );
 
 	if ( ! blockNode ) {
@@ -61,11 +61,11 @@ export function getBlockClientId( node ) {
 /**
  * Calculates the union of two rectangles.
  *
- * @param {DOMRect} rect1 First rectangle.
- * @param {DOMRect} rect2 Second rectangle.
- * @return {DOMRect} Union of the two rectangles.
+ * @param rect1 First rectangle.
+ * @param rect2 Second rectangle.
+ * @return Union of the two rectangles.
  */
-export function rectUnion( rect1, rect2 ) {
+export function rectUnion( rect1: DOMRect, rect2: DOMRect ) {
 	const left = Math.min( rect1.left, rect2.left );
 	const right = Math.max( rect1.right, rect2.right );
 	const bottom = Math.max( rect1.bottom, rect2.bottom );
@@ -77,10 +77,10 @@ export function rectUnion( rect1, rect2 ) {
 /**
  * Returns whether an element is visible.
  *
- * @param {Element} element Element.
- * @return {boolean} Whether the element is visible.
+ * @param element Element.
+ * @return Whether the element is visible.
  */
-export function isElementVisible( element ) {
+export function isElementVisible( element: Element ) {
 	const viewport = element.ownerDocument.defaultView;
 	if ( ! viewport ) {
 		return false;
@@ -121,10 +121,10 @@ export function isElementVisible( element ) {
 /**
  * Checks if the element is scrollable.
  *
- * @param {Element} element Element.
- * @return {boolean} True if the element is scrollable.
+ * @param element Element.
+ * @return True if the element is scrollable.
  */
-function isScrollable( element ) {
+function isScrollable( element: Element ) {
 	const style = window.getComputedStyle( element );
 	return (
 		style.overflowX === 'auto' ||
@@ -145,10 +145,10 @@ export const WITH_OVERFLOW_ELEMENT_BLOCKS = [ 'core/navigation' ];
  * The returned rect represents the full extent of the element and its visible
  * children, which may extend beyond the viewport.
  *
- * @param {Element} element Element.
- * @return {DOMRect} Bounding client rect of the element and its visible children.
+ * @param element Element.
+ * @return Bounding client rect of the element and its visible children.
  */
-export function getElementBounds( element ) {
+export function getElementBounds( element: Element ) {
 	const viewport = element.ownerDocument.defaultView;
 
 	if ( ! viewport ) {

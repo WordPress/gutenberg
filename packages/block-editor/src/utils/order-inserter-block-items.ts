@@ -1,13 +1,16 @@
-/** @typedef {import('../store/selectors').WPEditorInserterItem} WPEditorInserterItem */
+type EditorInserterItem = { id: string };
 
 /**
  * Helper function to order inserter block items according to a provided array of prioritized blocks.
  *
- * @param {WPEditorInserterItem[]} items    The array of editor inserter block items to be sorted.
- * @param {string[]}               priority The array of block names to be prioritized.
- * @return {WPEditorInserterItem[]} The sorted array of editor inserter block items.
+ * @param items    The array of editor inserter block items to be sorted.
+ * @param priority The array of block names to be prioritized.
+ * @return The sorted array of editor inserter block items.
  */
-export const orderInserterBlockItems = ( items, priority ) => {
+export const orderInserterBlockItems = (
+	items: EditorInserterItem[],
+	priority: string[] | undefined
+) => {
 	if ( ! priority ) {
 		return items;
 	}

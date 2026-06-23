@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { DataForm } from '@wordpress/dataviews';
-import { __experimentalVStack as VStack } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { useMemo } from '@wordpress/element';
 import { useViewConfig } from '@wordpress/views';
 
@@ -21,6 +21,7 @@ import { usePostTemplatePanelMode } from '../post-template/hooks';
 import revisionsField from '../../dataviews/fields/revisions';
 
 const EMPTY_FORM = { layout: { type: 'panel' }, fields: [] };
+const VIEW_CONFIG_FIELDS = [ 'form' ];
 
 // Some post types expose summary fields that edit entities other than the one
 // being edited. Keyed by the post type that needs them, the related records are
@@ -99,6 +100,7 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 	const { form: formConfig } = useViewConfig( {
 		kind: 'postType',
 		name: postType,
+		fields: VIEW_CONFIG_FIELDS,
 	} );
 	const form = formConfig ?? EMPTY_FORM;
 	const record = useSelect(
@@ -299,7 +301,7 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 	};
 	return (
 		<PostPanelSection className="editor-post-summary">
-			<VStack spacing={ 4 }>
+			<Stack direction="column" gap="lg">
 				<PostCardPanel
 					postType={ postType }
 					postId={ postId }
@@ -312,7 +314,7 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 					onChange={ onChange }
 				/>
 				<PostTrash onActionPerformed={ onActionPerformed } />
-			</VStack>
+			</Stack>
 		</PostPanelSection>
 	);
 }
