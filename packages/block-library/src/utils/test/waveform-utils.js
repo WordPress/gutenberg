@@ -399,19 +399,44 @@ describe( 'Waveform utilities', () => {
 			);
 		} );
 
-		it( 'redirects focus from the player wrapper to the slider', () => {
+		it( 'redirects focus from the player wrapper to the slider after waveform clicks', () => {
 			const { container, instance, seekControl } =
 				createSeekControlFixture();
 
+			container.addEventListener( 'click', () => {
+				container.setAttribute( 'tabindex', '0' );
+				container.focus();
+			} );
 			setupSeekControlAccessibility( container, instance );
 
-			// The library focuses the outer wrapper on click; focus must land
-			// on the accessible slider instead.
-			container.dispatchEvent(
-				new window.FocusEvent( 'focusin', { bubbles: true } )
+			seekControl.dispatchEvent(
+				new window.MouseEvent( 'click', {
+					bubbles: true,
+					clientX: 0,
+				} )
 			);
 
 			expect( seekControl ).toHaveFocus();
+		} );
+
+		it( 'does not redirect play button activation to the slider', () => {
+			const { container, instance, seekControl } =
+				createSeekControlFixture();
+			const playButton = document.createElement( 'button' );
+			container.prepend( playButton );
+
+			container.addEventListener( 'click', () => {
+				container.setAttribute( 'tabindex', '0' );
+				container.focus();
+			} );
+			setupSeekControlAccessibility( container, instance );
+
+			playButton.dispatchEvent(
+				new window.MouseEvent( 'click', { bubbles: true } )
+			);
+
+			expect( container ).toHaveFocus();
+			expect( seekControl ).not.toHaveFocus();
 		} );
 
 		it( 'renders the initial focus playhead at the beginning with a timestamp', () => {
