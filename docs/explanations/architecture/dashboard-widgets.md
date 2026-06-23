@@ -12,7 +12,9 @@ A widget travels through five stations, each owned by a different part of the co
 
 ![The widget pipeline: from the widgets folder, through the build and the server registry, to the client package and hosts](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/explanations/architecture/assets/dashboard-widgets-pipeline.svg)
 
-No station knows about the internals of the next one; each consumes a narrow artifact (a folder convention, a manifest, a registry, a REST record, a `WidgetType`). That separation is what lets each piece evolve independently and is the reason the client contract lives in its own package.
+No station knows the internals of the next. Each consumes a narrow artifact: a folder convention, a manifest, a registry, a REST record, a `WidgetType`.
+
+That separation lets each piece evolve independently. It is also why the client contract lives in its own package.
 
 ## Authoring: a widget is a folder
 
@@ -47,14 +49,18 @@ The output of the build is therefore two things: registered script modules (load
 
 ## The server registry
 
-`WP_Widget_Type_Registry` (`lib/experimental/dashboard-widgets/`) is a singleton hydrated at `init` from the manifest: each entry becomes a `WP_Widget_Type` with `name`, `render_module`, `widget_module`, and `presentation`. The hydration is a deterministic copy of the manifest, with no filters in between: the `widgets/` folder is the single source of widget authorship in this codebase.
+`WP_Widget_Type_Registry` (`lib/experimental/dashboard-widgets/`) is a singleton, hydrated at `init` from the manifest. Each entry becomes a `WP_Widget_Type` with `name`, `render_module`, `widget_module`, and `presentation`.
+
+The hydration is a deterministic copy, with no filters in between. The `widgets/` folder is the single source of widget authorship in this codebase.
 
 The registry is the server's runtime answer to "which widget types exist on this site", and two consumers read it:
 
 -   The REST controller (`WP_REST_Widget_Modules_Controller`) exposes it at `/wp/v2/widget-modules`, returning `{ name, render_module, widget_module, presentation }` per record.
 -   The dashboard page hooks the (otherwise generic) `{page-id}-wp-admin_boot_dependencies` filter to add every registered module to its import map as a `dynamic` dependency: reachable by `import()`, never eagerly executed.
 
-Registration makes the modules known to WordPress; loading them is a separate, per-host decision. Dynamic `import()` against the import map is how the dashboard loads widgets today, but a host can equally enqueue a module eagerly (`wp_enqueue_script_module()`), declare it as a `static` dependency of its own module, or, outside WordPress, skip the import map entirely and resolve modules through its own `ResolveWidgetModule`.
+Registration makes the modules known to WordPress. Loading them is a separate, per-host decision.
+
+Dynamic `import()` against the import map is how the dashboard loads widgets today. A host can load them another way: enqueue a module eagerly (`wp_enqueue_script_module()`), declare it as a `static` dependency of its own module, or, outside WordPress, skip the import map and resolve modules through its own `ResolveWidgetModule`.
 
 The registry exists as a class (rather than the manifest being read directly by REST) so that the _source_ of widget types stays an implementation detail. Today the only source is the build manifest; a plugin-facing registration API would target the registry without touching the pipeline behind it.
 
@@ -63,14 +69,22 @@ The registry exists as a class (rather than the manifest being read directly by 
 The package is the single source of truth for what a widget _is_ on the client, shared by widget authors and hosts. It exposes three kinds of resources and deliberately nothing else:
 
 -   **Contract types**: `WidgetType`, `WidgetName`, `WidgetIcon`, `WidgetRenderProps`, `ResolveWidgetModule`, `WidgetModuleRecord`. Authors type `widget.ts` / `render.tsx` against them; hosts consume the same shapes. Nothing re-exports them.
--   **Discovery**: `useWidgetTypes( records )` takes host-supplied widget-module records, dynamically imports each record's `widget_module` to retrieve the live metadata, and merges both halves into `WidgetType[]`. The record's `presentation` (originating in `widget.json`) wins over the module's value. The hook reaches for no store or endpoint: the host fetches the records however it wants (the dashboard reads its own `widgetModule` core-data entity, backed by `/wp/v2/widget-modules`) and passes them in.
+-   **Discovery**: `useWidgetTypes( records )` takes host-supplied widget-module records, imports each record's `widget_module` for the live metadata, and merges both halves into `WidgetType[]`. The record's `presentation` (from `widget.json`) wins over the module's value. The hook reaches for no store or endpoint: the host fetches the records however it wants and passes them in. The dashboard, for instance, reads its own `widgetModule` core-data entity, backed by `/wp/v2/widget-modules`.
 -   **Rendering**: `<WidgetRender>` resolves a `WidgetType.renderModule` through a host-provided `ResolveWidgetModule` and mounts the component with the `attributes` / `setAttributes` contract. On a WordPress page the resolver can be as simple as `( id ) => import( id )`, provided the hosting page exposed the module in its import map; hosts with other loading strategies supply their own resolver.
 
 Equally important is what the package does not do: no chrome, no layout, no persistence, no data store of its own, and no knowledge of any host. That is what makes it publishable and consumable outside the WordPress admin.
 
+For what a widget declares through that contract, layer by layer, see [Anatomy of a widget type](../../../packages/widget-primitives/src/stories/anatomy.md).
+
 ## Hosts
 
-A host is any context that renders widgets; the contract privileges none of them. The dashboard engine ([`@wordpress/widget-dashboard`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/widget-dashboard), mounted by `routes/dashboard/`) is the host this repository ships today, and it illustrates what a host owns: it registers the `widgetModule` core-data entity when its route module loads (before the dashboard renders), reads the entity's records and passes them to `useWidgetTypes( records )`, owns the layout array and its persistence, wraps every instance in its own chrome (header, toolbars, error boundary, Suspense fallback), and passes `resolveWidgetModule` down through its context (overridable for tests and Storybook).
+A host is any context that renders widgets; the contract privileges none of them. The dashboard engine ([`@wordpress/widget-dashboard`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/widget-dashboard), mounted by `routes/dashboard/`) is the host this repository ships today. It illustrates what a host owns:
+
+-   Registers the `widgetModule` core-data entity when its route module loads, before the dashboard renders.
+-   Reads the entity's records and passes them to `useWidgetTypes( records )`.
+-   Owns the layout array and its persistence.
+-   Wraps every instance in its own chrome: header, toolbars, error boundary, Suspense fallback.
+-   Passes `resolveWidgetModule` down through its context, overridable for tests and Storybook.
 
 The same `WidgetType` could equally be rendered by a sidebar, a plugin panel, or an application outside wp-admin; the choice of where and how to render belongs entirely to the host. Every host is a consumer of the package; not every consumer is a host: tests, Storybook, or a picker that only lists widget types consume the same contract without rendering anything.
 
