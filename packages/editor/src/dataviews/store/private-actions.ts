@@ -37,6 +37,8 @@ import {
 	templateTitleField,
 	pageTitleField,
 	patternTitleField,
+	patternDescriptionField,
+	patternSyncStatusField,
 	notesField,
 	scheduledDateField,
 	lastEditedDateField,
@@ -287,6 +289,9 @@ export const registerPostTypeSchema =
 				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
 					postTypeConfig.supports?.excerpt &&
 					excerptField,
+				postTypeConfig.slug === 'wp_block' &&
+					postTypeConfig.supports?.excerpt &&
+					patternDescriptionField,
 				postTypeConfig.supports?.[ 'page-attributes' ] && parentField,
 				postTypeConfig.supports?.comments && commentStatusField,
 				postTypeConfig.supports?.trackbacks && pingStatusField,
@@ -298,7 +303,8 @@ export const registerPostTypeSchema =
 				postTypeConfig.supports?.[ 'post-formats' ] &&
 					! disablePostFormats &&
 					formatField,
-				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
+				( ! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) ||
+					postTypeConfig.slug === 'wp_block' ) &&
 					postTypeConfig.supports?.editor &&
 					postContentInfoField,
 				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
@@ -318,6 +324,7 @@ export const registerPostTypeSchema =
 					postTypeConfig.viewable &&
 					postPreviewField,
 				hasEditorNotesSupport( postTypeConfig.supports ) && notesField,
+				postTypeConfig.slug === 'wp_block' && patternSyncStatusField,
 			].filter( Boolean );
 			if ( postTypeConfig.supports?.title ) {
 				let _titleField;
