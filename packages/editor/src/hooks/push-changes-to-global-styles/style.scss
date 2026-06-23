@@ -3,6 +3,9 @@
 	width: 100%;
 }
 
-.editor-push-changes-to-global-styles-notice {
-	margin: 0 0 16px;
+.editor-push-changes-to-global-styles-modal-actions {
+	display: flex;
+	gap: 8px;
+	justify-content: flex-end;
+	margin-top: 24px;
 }

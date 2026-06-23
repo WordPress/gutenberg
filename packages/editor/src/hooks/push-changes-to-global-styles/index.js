@@ -9,7 +9,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
-import { BaseControl, Button, Notice } from '@wordpress/components';
+import { BaseControl, Button, Modal } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	__EXPERIMENTAL_STYLE_PROPERTY,
@@ -246,25 +246,13 @@ function PushChangesToGlobalStylesControl( {
 	setAttributes,
 } ) {
 	const { user: userConfig, setUser: setUserConfig } = useGlobalStyles();
+	const [ isConfirmModalOpen, setIsConfirmModalOpen ] = useState( false );
 
 	const changes = useChangesToPush( name, attributes, userConfig );
 
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
-	const hasGlobalStylesEdits = useSelect( ( select ) => {
-		const {
-			__experimentalGetCurrentGlobalStylesId,
-			hasEditsForEntityRecord,
-		} = select( coreStore );
-		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
-
-		return globalStylesId
-			? hasEditsForEntityRecord( 'root', 'globalStyles', globalStylesId )
-			: false;
-	}, [] );
-
-	const [ hasAppliedGlobally, setHasAppliedGlobally ] = useState( false );
 
 	const pushChanges = useCallback( () => {
 		if ( changes.length === 0 ) {
@@ -303,7 +291,6 @@ function PushChangesToGlobalStylesControl( {
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( newBlockAttributes );
 			setUserConfig( newUserConfig, { undoIgnore: true } );
-			setHasAppliedGlobally( true );
 			createSuccessNotice(
 				sprintf(
 					// translators: %s: Title of the block e.g. 'Heading'.
@@ -321,7 +308,6 @@ function PushChangesToGlobalStylesControl( {
 								setUserConfig( userConfig, {
 									undoIgnore: true,
 								} );
-								setHasAppliedGlobally( false );
 							},
 						},
 					],
@@ -339,23 +325,25 @@ function PushChangesToGlobalStylesControl( {
 		userConfig,
 	] );
 
+	const openConfirmModal = useCallback( () => {
+		if ( changes.length === 0 ) {
+			return;
+		}
+
+		setIsConfirmModalOpen( true );
+	}, [ changes.length ] );
+
+	const closeConfirmModal = useCallback( () => {
+		setIsConfirmModalOpen( false );
+	}, [] );
+
+	const confirmApplyGlobally = useCallback( () => {
+		setIsConfirmModalOpen( false );
+		pushChanges();
+	}, [ pushChanges ] );
+
 	return (
 		<>
-			{ hasAppliedGlobally && hasGlobalStylesEdits && (
-				<Notice
-					className="editor-push-changes-to-global-styles-notice"
-					status="info"
-					isDismissible={ false }
-				>
-					{ sprintf(
-						// translators: %s: Title of the block e.g. 'Heading'.
-						__(
-							'These styles will apply to all %s blocks across the site when you save.'
-						),
-						getBlockType( name ).title
-					) }
-				</Notice>
-			) }
 			<BaseControl
 				className="editor-push-changes-to-global-styles-control"
 				help={ sprintf(
@@ -374,11 +362,44 @@ function PushChangesToGlobalStylesControl( {
 					variant="secondary"
 					accessibleWhenDisabled
 					disabled={ changes.length === 0 }
-					onClick={ pushChanges }
+					onClick={ openConfirmModal }
 				>
 					{ __( 'Apply globally' ) }
 				</Button>
 			</BaseControl>
+			{ isConfirmModalOpen && (
+				<Modal
+					title={ __( 'Apply styles globally' ) }
+					onRequestClose={ closeConfirmModal }
+					size="medium"
+				>
+					<p>
+						{ sprintf(
+							// translators: %s: Title of the block e.g. 'Paragraph'.
+							__(
+								'Applying these styles globally will affect every %s block across all content. Do you want to continue?'
+							),
+							getBlockType( name ).title
+						) }
+					</p>
+					<div className="editor-push-changes-to-global-styles-modal-actions">
+						<Button
+							__next40pxDefaultSize
+							variant="tertiary"
+							onClick={ closeConfirmModal }
+						>
+							{ __( 'Cancel' ) }
+						</Button>
+						<Button
+							__next40pxDefaultSize
+							variant="primary"
+							onClick={ confirmApplyGlobally }
+						>
+							{ __( 'Apply' ) }
+						</Button>
+					</div>
+				</Modal>
+			) }
 		</>
 	);
 }

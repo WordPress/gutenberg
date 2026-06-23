@@ -57,16 +57,11 @@ function GlobalStylesDescription( { record } ) {
 		}
 	);
 	return globalStylesChanges.length ? (
-		<>
-			<PanelRow>
-				{ __( 'This will update site-wide styles for:' ) }
-			</PanelRow>
-			<ul className="entities-saved-states__changes">
-				{ globalStylesChanges.map( ( change ) => (
-					<li key={ change }>{ change }</li>
-				) ) }
-			</ul>
-		</>
+		<ul className="entities-saved-states__changes">
+			{ globalStylesChanges.map( ( change ) => (
+				<li key={ change }>{ change }</li>
+			) ) }
+		</ul>
 	) : null;
 }
 
