@@ -569,6 +569,68 @@ test.describe( 'Cover', () => {
 		const overlay = coverBlock.locator( '.wp-block-cover__background' );
 		await expect( overlay ).toBeVisible();
 	} );
+
+	test.describe( 'Block Fields', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.setGutenbergExperiments( [
+				'gutenberg-content-only-inspector-fields',
+			] );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.setGutenbergExperiments( [] );
+		} );
+
+		// See https://github.com/WordPress/gutenberg/issues/74639.
+		test( "computes dimRatio and isDark when uploading an image via the inspector's Content tab", async ( {
+			editor,
+			page,
+			coverBlockUtils,
+		} ) => {
+			await editor.insertBlock( { name: 'core/cover' } );
+			const coverBlock = editor.canvas.getByRole( 'document', {
+				name: 'Block: Cover',
+			} );
+
+			// Select the Cover block (not the inner Paragraph).
+			await editor.selectBlocks( coverBlock );
+
+			// Open the Content tab in the inspector.
+			await editor.openDocumentSettingsSidebar();
+			const editorSettings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+
+			// Click "Choose a media item…" in the Content tab.
+			await editorSettings
+				.getByRole( 'button', { name: 'Choose a media item' } )
+				.click();
+
+			// Upload an image via the dropdown.
+			const fileName = await coverBlockUtils.upload(
+				page.getByTestId( 'form-file-upload-input' )
+			);
+			const fileBasename = path.basename( fileName );
+
+			// Wait for the img's src attribute to be prefixed with http.
+			// Otherwise, the URL for the img src attribute starts is a placeholder
+			// beginning with `blob`.
+			await expect( async () => {
+				const src = await coverBlock
+					.locator( 'img' )
+					.getAttribute( 'src' );
+				expect( src.includes( fileBasename ) ).toBe( true );
+			} ).toPass();
+
+			// The overlay should have dimRatio of 50 (opacity 0.5), not 100.
+			const overlay = coverBlock.locator( '.wp-block-cover__background' );
+			await expect( overlay ).toHaveCSS(
+				'background-color',
+				'rgb(179, 179, 179)'
+			);
+			await expect( overlay ).toHaveCSS( 'opacity', '0.5' );
+		} );
+	} );
 } );
 
 class CoverBlockUtils {
