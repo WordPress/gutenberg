@@ -671,28 +671,10 @@ export default dedupePlugins( [
 		},
 	},
 
-	// Override: Components src — allow ariakit and framer-motion imports.
+	// Override: Components src — allow ariakit/framer-motion imports and
+	// prevent new Emotion usage while existing styles are migrated.
 	{
 		files: [ 'packages/components/src/**' ],
-		rules: {
-			'no-restricted-imports': [
-				'error',
-				{
-					paths: restrictedImports.filter(
-						( { name } ) =>
-							! [ '@ariakit/react', 'framer-motion' ].includes(
-								name
-							)
-					),
-				},
-			],
-		},
-	},
-
-	// Override: Components src — prevent new Emotion usage while existing
-	// Emotion styles are migrated incrementally.
-	{
-		files: [ 'packages/components/src/**/*.[tj]s?(x)' ],
 		rules: {
 			'no-restricted-imports': [
 				'error',
