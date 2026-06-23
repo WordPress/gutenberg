@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useCallback } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { compose, createHigherOrderComponent } from '@wordpress/compose';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 
@@ -94,7 +94,7 @@ function createColorHOC( colorTypes, withColorPalette ) {
 		};
 	}, {} );
 
-	function computeDerivedColorState( attributes, colors, prevState = {} ) {
+	function computeDerivedColorState( attributes, colors ) {
 		return Object.entries( colorMap ).reduce(
 			( acc, [ colorAttributeName, colorContext ] ) => {
 				const customAttr = `custom${ upperFirst(
@@ -106,19 +106,10 @@ function createColorHOC( colorTypes, withColorPalette ) {
 					attributes[ customAttr ]
 				);
 
-				const prevColor = prevState[ colorAttributeName ]?.color;
-				const prevColorObject = prevState[ colorAttributeName ];
-
-				acc[ colorAttributeName ] =
-					prevColor === colorObject.color && prevColorObject
-						? prevColorObject
-						: {
-								...colorObject,
-								class: getColorClassName(
-									colorContext,
-									colorObject.slug
-								),
-						  };
+				acc[ colorAttributeName ] = {
+					...colorObject,
+					class: getColorClassName( colorContext, colorObject.slug ),
+				};
 
 				return acc;
 			},
@@ -137,17 +128,12 @@ function createColorHOC( colorTypes, withColorPalette ) {
 					[ attributes, colors ]
 				);
 
-				const getMostReadableColorFn = useCallback(
-					( colorValue ) =>
-						getMostReadableColor( colors, colorValue ),
-					[ colors ]
-				);
-
 				const colorUtils = useMemo(
 					() => ( {
-						getMostReadableColor: getMostReadableColorFn,
+						getMostReadableColor: ( colorValue ) =>
+							getMostReadableColor( colors, colorValue ),
 					} ),
-					[ getMostReadableColorFn ]
+					[ colors ]
 				);
 
 				const setters = useMemo( () => {
