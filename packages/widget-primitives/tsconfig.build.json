@@ -5,6 +5,7 @@
 		"types": [ "style-imports" ]
 	},
 	"references": [
+		{ "path": "../block-serialization-default-parser" },
 		{ "path": "../dataviews" },
 		{ "path": "../element/tsconfig.build.json" }
 	]

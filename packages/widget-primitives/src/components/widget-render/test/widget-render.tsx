@@ -12,9 +12,12 @@ import { Suspense } from '@wordpress/element';
  * Internal dependencies
  */
 import { WidgetRender } from '../widget-render';
+import { registerAdminBlock } from '../../admin-block-renderer/registry';
 import type { ResolveWidgetModule, WidgetType } from '../../../types';
 
-const PARAGRAPH = '<!-- wp:paragraph --><p>hello</p><!-- /wp:paragraph -->';
+function Echo( { label }: { label?: string } ) {
+	return <span>{ label }</span>;
+}
 
 function BuiltInDemo() {
 	return <span>built-in output</span>;
@@ -22,15 +25,20 @@ function BuiltInDemo() {
 
 describe( 'WidgetRender routing', () => {
 	it( 'routes a server-defined widget to the admin block renderer and skips the module resolver', () => {
+		registerAdminBlock( {
+			name: 'test/echo',
+			component: Echo,
+			attributes: { label: {} },
+		} );
 		const resolveWidgetModule = jest.fn();
 		const widgetType = {
 			name: 'plugin/code-def',
 			renderModule: '',
 			origin: 'code-registered',
-			content: PARAGRAPH,
+			content: '<!-- wp:test/echo {"label":"routed"} /-->',
 		} as WidgetType;
 
-		const { container } = render(
+		render(
 			<WidgetRender
 				widgetType={ widgetType }
 				resolveWidgetModule={
@@ -39,7 +47,7 @@ describe( 'WidgetRender routing', () => {
 			/>
 		);
 
-		expect( container ).toHaveTextContent( 'hello' );
+		expect( screen.getByText( 'routed' ) ).toBeVisible();
 		expect( resolveWidgetModule ).not.toHaveBeenCalled();
 	} );
 
