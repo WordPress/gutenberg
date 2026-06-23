@@ -468,8 +468,8 @@ function _gutenberg_get_entity_view_config_post_type_wp_block( $config ) {
 			array(
 				'id'     => 'excerpt',
 				'layout' => array(
-					'type'          => 'regular',
-					'labelPosition' => 'none',
+					'type'          => 'panel',
+					'labelPosition' => 'top',
 				),
 			),
 			array(
@@ -480,14 +480,13 @@ function _gutenberg_get_entity_view_config_post_type_wp_block( $config ) {
 				),
 			),
 			array(
-				'id'     => 'last_edited_date',
+				'id'     => 'sync-status',
 				'layout' => array(
-					'type'          => 'panel',
-					'labelPosition' => 'none',
+					'type'          => 'regular',
+					'labelPosition' => 'side',
 				),
 			),
 			'revisions',
-			'sync-status',
 		),
 	);
 

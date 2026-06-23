@@ -317,15 +317,36 @@ test.describe( 'Patterns', () => {
 			await expect( settingsSidebar ).toContainText(
 				'Pattern description for DataForm.'
 			);
+			await expect(
+				settingsSidebar.getByRole( 'textbox', {
+					name: 'Description',
+				} )
+			).toHaveCount( 0 );
+			await settingsSidebar
+				.getByRole( 'button', { name: 'Edit Description' } )
+				.click();
+			await expect(
+				page.getByRole( 'textbox', { name: 'Description' } )
+			).toBeVisible();
+			await page.keyboard.press( 'Escape' );
 			await expect( settingsSidebar ).toContainText(
 				'8 words, 1 minute read time.'
 			);
-			await expect( settingsSidebar ).toContainText( 'Last edited' );
+			await expect(
+				settingsSidebar.getByText( /Last edited/ )
+			).toHaveCount( 1 );
 			await expect(
 				settingsSidebar.getByText( 'Revisions', { exact: true } )
 			).toBeVisible();
 			await expect( settingsSidebar ).toContainText( 'Sync status' );
 			await expect( settingsSidebar ).toContainText( 'Not synced' );
+			await expect(
+				settingsSidebar
+					.locator(
+						'.dataforms-layouts-panel__field-trigger.is-disabled'
+					)
+					.filter( { hasText: 'Sync status' } )
+			).toHaveCount( 0 );
 			await expect(
 				settingsSidebar.getByRole( 'button', {
 					name: 'Pattern Categories',
