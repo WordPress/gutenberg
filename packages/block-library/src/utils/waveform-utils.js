@@ -222,6 +222,7 @@ export function setupSeekControlAccessibility(
 	const hover = createOverlay( 'waveform-seek-hover' );
 	let isPlaying = ! audio.paused;
 	let playheadTime = 0;
+	let shouldRedirectContainerFocus = false;
 
 	const positionOverlay = ( overlay, seconds, duration ) => {
 		const ratio = duration
@@ -309,10 +310,15 @@ export function setupSeekControlAccessibility(
 		actions[ event.key ]();
 	};
 
+	const onContainerClickCapture = ( event ) => {
+		shouldRedirectContainerFocus = seekControl.contains( event.target );
+	};
+
 	const onContainerClick = ( event ) => {
 		container.setAttribute( 'tabindex', '-1' );
 
 		if ( ! seekControl.contains( event.target ) ) {
+			shouldRedirectContainerFocus = false;
 			return;
 		}
 
@@ -325,14 +331,16 @@ export function setupSeekControlAccessibility(
 				currentTimeOverride: playheadTime,
 			} );
 		}
+		shouldRedirectContainerFocus = false;
 	};
 
 	// The library focuses the outer wrapper on click and can leave it in the
-	// tab order. Redirect any focus that lands on the wrapper itself onto the
-	// accessible slider so keyboard users always operate the seek control.
+	// tab order. Redirect focus onto the accessible slider only when the click
+	// that caused wrapper focus originated in the waveform seek control.
 	const onContainerFocusIn = ( event ) => {
-		if ( event.target === container ) {
+		if ( event.target === container && shouldRedirectContainerFocus ) {
 			seekControl.focus();
+			shouldRedirectContainerFocus = false;
 		}
 	};
 
@@ -380,6 +388,7 @@ export function setupSeekControlAccessibility(
 	};
 
 	seekControl.addEventListener( 'keydown', onKeyDown, true );
+	container.addEventListener( 'click', onContainerClickCapture, true );
 	container.addEventListener( 'click', onContainerClick );
 	container.addEventListener( 'focusin', onContainerFocusIn );
 	seekControl.addEventListener( 'pointermove', onPointerMove );
@@ -392,6 +401,7 @@ export function setupSeekControlAccessibility(
 
 	return () => {
 		seekControl.removeEventListener( 'keydown', onKeyDown, true );
+		container.removeEventListener( 'click', onContainerClickCapture, true );
 		container.removeEventListener( 'click', onContainerClick );
 		container.removeEventListener( 'focusin', onContainerFocusIn );
 		seekControl.removeEventListener( 'pointermove', onPointerMove );
