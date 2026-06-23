@@ -19,7 +19,7 @@ import {
 	formatOutdentRTL,
 } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
-import { useCallback, useEffect, Platform } from '@wordpress/element';
+import { useCallback, useEffect } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
 /**
@@ -33,7 +33,6 @@ const DEFAULT_BLOCK = {
 	name: 'core/list-item',
 };
 const TEMPLATE = [ [ 'core/list-item' ] ];
-const NATIVE_MARGIN_SPACING = 8;
 
 /**
  * At the moment, deprecations don't handle create blocks from attributes
@@ -118,11 +117,10 @@ function IndentUI( { clientId } ) {
 	);
 }
 
-export default function Edit( { attributes, setAttributes, clientId, style } ) {
+export default function Edit( { attributes, setAttributes, clientId } ) {
 	const { ordered, type, reversed, start } = attributes;
 	const blockProps = useBlockProps( {
 		style: {
-			...( Platform.isNative && style ),
 			listStyleType: ordered && type !== 'decimal' ? type : undefined,
 		},
 	} );
@@ -133,11 +131,6 @@ export default function Edit( { attributes, setAttributes, clientId, style } ) {
 		template: TEMPLATE,
 		templateLock: false,
 		templateInsertUpdatesSelection: true,
-		...( Platform.isNative && {
-			marginVertical: NATIVE_MARGIN_SPACING,
-			marginHorizontal: NATIVE_MARGIN_SPACING,
-			renderAppender: false,
-		} ),
 		__experimentalCaptureToolbars: true,
 	} );
 	useMigrateOnLoad( attributes, clientId );

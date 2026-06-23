@@ -38,15 +38,18 @@ export const ThemeProvider = ( {
 	children,
 	color = {},
 	cursor,
+	cornerRadius,
 	isRoot = false,
-	density,
 }: ThemeProviderProps ) => {
 	const instanceId = useId();
 
 	const { themeProviderStyles, resolvedSettings } = useThemeProviderStyles( {
 		color,
 		cursor,
+		cornerRadius,
 	} );
+
+	const cornerRadiusPreset = resolvedSettings.cornerRadius ?? 'subtle';
 
 	const contextValue = useMemo(
 		() => ( {
@@ -67,8 +70,8 @@ export const ThemeProvider = ( {
 			) : null }
 			<div
 				data-wpds-theme-provider-id={ instanceId }
-				data-wpds-root-provider={ isRoot }
-				data-wpds-density={ density }
+				data-wpds-root-provider={ isRoot || undefined }
+				data-wpds-corner-radius={ cornerRadiusPreset }
 				className={ styles.root }
 			>
 				<ThemeContext.Provider value={ contextValue }>

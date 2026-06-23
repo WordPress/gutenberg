@@ -26,25 +26,23 @@ function setupHook( visualSize = { width: 600, height: 400 } ) {
 
 describe( 'useMediaEditorState', () => {
 	describe( 'initial state', () => {
-		it( 'starts with default cropOptions (Free + freeform on)', () => {
+		it( 'starts with default cropOptions', () => {
 			const { result } = renderHook( () => useMediaEditorState() );
 
 			expect( result.current.cropOptions.aspectRatioValue ).toBe( '0' );
-			expect( result.current.cropOptions.freeformCrop ).toBe( true );
 		} );
 
 		it( 'merges initial cropper and cropOptions overrides', () => {
 			const { result } = renderHook( () =>
 				useMediaEditorState( {
 					cropper: { image: IMAGE },
-					cropOptions: { aspectRatioValue: '1', freeformCrop: false },
+					cropOptions: { aspectRatioValue: '1' },
 				} )
 			);
 
 			expect( result.current.state.image ).toEqual( IMAGE );
 			expect( result.current.cropOptions ).toEqual( {
 				aspectRatioValue: '1',
-				freeformCrop: false,
 			} );
 		} );
 
@@ -94,23 +92,10 @@ describe( 'useMediaEditorState', () => {
 			expect( result.current.hasRedo ).toBe( false );
 		} );
 
-		it( 'undo restores cropOptions changes (freeform toggle)', () => {
-			const { result } = setupHook();
-
-			act( () => result.current.setFreeformCrop( false ) );
-			expect( result.current.cropOptions.freeformCrop ).toBe( false );
-			expect( result.current.isDirty ).toBe( true );
-			expect( result.current.isCropperDirty ).toBe( false );
-
-			act( () => result.current.undo() );
-			expect( result.current.cropOptions.freeformCrop ).toBe( true );
-		} );
-
 		it( 'no-op actions do not record history entries', () => {
 			const { result } = setupHook();
 
-			// Setting freeformCrop to its current value should be a no-op.
-			act( () => result.current.setFreeformCrop( true ) );
+			act( () => result.current.setAspectRatioValue( '0' ) );
 
 			expect( result.current.hasUndo ).toBe( false );
 		} );
@@ -210,37 +195,6 @@ describe( 'useMediaEditorState', () => {
 			expect( result.current.state.rotation ).toBe( 0 );
 			expect( result.current.hasUndo ).toBe( false );
 		} );
-
-		it( 'groups a Free preset change and freeform re-enable in one undo step', () => {
-			const { result } = renderHook( () =>
-				useMediaEditorState( {
-					cropper: { image: IMAGE },
-					cropOptions: {
-						aspectRatioValue: '1',
-						freeformCrop: false,
-					},
-				} )
-			);
-
-			act( () => {
-				result.current.beginGesture();
-				result.current.setAspectRatioValue( '0' );
-				result.current.setFreeformCrop( true );
-				result.current.endGesture();
-			} );
-
-			expect( result.current.cropOptions ).toEqual( {
-				aspectRatioValue: '0',
-				freeformCrop: true,
-			} );
-
-			act( () => result.current.undo() );
-
-			expect( result.current.cropOptions ).toEqual( {
-				aspectRatioValue: '1',
-				freeformCrop: false,
-			} );
-		} );
 	} );
 
 	describe( 'SET_ASPECT_RATIO_VALUE atomicity', () => {
@@ -295,34 +249,10 @@ describe( 'useMediaEditorState', () => {
 			);
 		} );
 
-		it( 'records exactly ONE history entry for an aspect-ratio change followed by a freeform toggle', () => {
-			const { result } = setupHook();
-			const original = result.current.state.cropRect;
-			const originalPreset = result.current.cropOptions.aspectRatioValue;
-			const originalFreeform = result.current.cropOptions.freeformCrop;
-
-			act( () => result.current.setAspectRatioValue( '1' ) ); // Square
-			act( () => result.current.setFreeformCrop( false ) );
-
-			// Two discrete actions → two undo entries.
-			act( () => result.current.undo() );
-			expect( result.current.cropOptions.freeformCrop ).toBe(
-				originalFreeform
-			);
-			expect( result.current.cropOptions.aspectRatioValue ).toBe( '1' );
-
-			act( () => result.current.undo() );
-			expect( result.current.cropOptions.aspectRatioValue ).toBe(
-				originalPreset
-			);
-			expect( result.current.state.cropRect ).toEqual( original );
-		} );
-
 		it( 'groups cropper reset and cropOptions reset in one undo step', () => {
 			const { result } = setupHook();
 
 			act( () => result.current.setAspectRatioValue( '1' ) );
-			act( () => result.current.setFreeformCrop( false ) );
 			act( () => result.current.setRotation( 45 ) );
 
 			act( () => {
@@ -335,7 +265,6 @@ describe( 'useMediaEditorState', () => {
 			expect( result.current.state.rotation ).toBe( 0 );
 			expect( result.current.cropOptions ).toEqual( {
 				aspectRatioValue: '0',
-				freeformCrop: true,
 			} );
 
 			act( () => result.current.undo() );
@@ -343,7 +272,6 @@ describe( 'useMediaEditorState', () => {
 			expect( result.current.state.rotation ).toBe( 45 );
 			expect( result.current.cropOptions ).toEqual( {
 				aspectRatioValue: '1',
-				freeformCrop: false,
 			} );
 		} );
 	} );

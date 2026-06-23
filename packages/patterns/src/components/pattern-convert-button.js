@@ -186,7 +186,6 @@ export default function PatternConvertButton( {
 					} }
 					onClose={ () => {
 						setIsModalOpen( false );
-						closeBlockSettingsMenu();
 					} }
 				/>
 			) }

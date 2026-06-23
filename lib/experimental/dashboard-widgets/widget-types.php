@@ -80,8 +80,8 @@ add_action( 'rest_api_init', 'gutenberg_register_widget_modules_rest_controller'
  * dependencies.
  *
  * The wp-build page templates expose a generic
- * `{page-id}-wp-admin_boot_dependencies` filter. The dashboard surface
- * hooks it to make every registered widget render and metadata module
+ * `{page-id}-wp-admin_boot_dependencies` filter. The dashboard hooks
+ * it to make every registered widget render and metadata module
  * available in the page's import map for dynamic `import()` calls.
  *
  * Both the render module and the metadata module are added as

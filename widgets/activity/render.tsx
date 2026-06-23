@@ -336,31 +336,33 @@ export default function Activity( {
 	}
 
 	return (
-		<DataViews
-			data={ shownData }
-			fields={ FIELDS }
-			view={ resolvedView }
-			onChangeView={ setView }
-			paginationInfo={ paginationInfo }
-			getItemId={ ( item ) => item.id }
-			search={ false }
-			isLoading={ false }
-			defaultLayouts={ {
-				activity: {
-					sort: {
-						field: 'datetime',
-						direction: 'desc',
+		<Stack direction="column" className={ styles.list }>
+			<DataViews
+				data={ shownData }
+				fields={ FIELDS }
+				view={ resolvedView }
+				onChangeView={ setView }
+				paginationInfo={ paginationInfo }
+				getItemId={ ( item ) => item.id }
+				search={ false }
+				isLoading={ false }
+				defaultLayouts={ {
+					activity: {
+						sort: {
+							field: 'datetime',
+							direction: 'desc',
+						},
 					},
-				},
-			} }
-			renderItemLink={ ( { item, children, ...aProps } ) => (
-				<Link href={ item.link } { ...aProps }>
-					{ children }
-				</Link>
-			) }
-			isItemClickable={ ( item ) => !! item.link }
-		>
-			<DataViews.Layout />
-		</DataViews>
+				} }
+				renderItemLink={ ( { item, children, ...aProps } ) => (
+					<Link href={ item.link } { ...aProps }>
+						{ children }
+					</Link>
+				) }
+				isItemClickable={ ( item ) => !! item.link }
+			>
+				<DataViews.Layout />
+			</DataViews>
+		</Stack>
 	);
 }

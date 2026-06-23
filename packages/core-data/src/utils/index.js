@@ -1,3 +1,4 @@
+export { default as clearUnchangedEdits } from './clear-unchanged-edits';
 export { default as conservativeMapItem } from './conservative-map-item';
 export { default as getNormalizedCommaSeparable } from './get-normalized-comma-separable';
 export { default as ifMatchingAction } from './if-matching-action';
@@ -14,3 +15,4 @@ export {
 } from './user-permissions';
 export { RECEIVE_INTERMEDIATE_RESULTS } from './receive-intermediate-results';
 export { default as normalizeQueryForResolution } from './normalize-query-for-resolution';
+export { saveCRDTDoc } from './save-crdt-doc';

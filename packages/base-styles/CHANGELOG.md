@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add `outset-ring__focus` mixin for outline-based focus rings using `--wpds-*` design tokens ([#78698](https://github.com/WordPress/gutenberg/pull/78698)).
+
+## 10.0.1 (2026-06-16)
+
+## 10.0.0 (2026-06-10)
+
+### Breaking Changes
+
+-   Remove the following entries from the `z-index()` helper ([#77773](https://github.com/WordPress/gutenberg/pull/77773)):
+   -   `.nux-dot-tip`
+
+## 9.0.0 (2026-05-27)
+
 ### Breaking Changes
 
 -   Remove the following entries from the `z-index()` helper ([#78315](https://github.com/WordPress/gutenberg/pull/78315), [#78362](https://github.com/WordPress/gutenberg/pull/78362)):
@@ -9,10 +24,6 @@
     -   `.dataviews-footer`
     -   `.dataviews-view-grid__card .dataviews-selection-checkbox`
     -   `.dataviews-view-table thead`
-
-### Enhancements
-
--   Add `outset-ring__rest` and `outset-ring__focus` mixins for outline-based focus rings using `--wpds-*` design tokens ([#78646](https://github.com/WordPress/gutenberg/pull/78646)).
 
 ## 8.0.0 (2026-05-14)
 

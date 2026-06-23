@@ -36,7 +36,6 @@ interface NormalizedBlock {
 
 interface NormalizedCollaborativeState {
 	blocks: NormalizedBlock[];
-	crdtDocument: string | null;
 	title: string;
 }
 
@@ -441,78 +440,58 @@ export default class CollaborationUtils {
 	 * Returns a normalized view of the current collaborative editor state for
 	 * equality checks across participants.
 	 *
-	 * @param page                          The page to inspect.
-	 * @param [options]                     Optional settings.
-	 * @param [options.includeCrdtDocument] Whether to include the persisted
-	 *                                      _crdt_document in the returned state.
+	 * @param page The page to inspect.
 	 */
 	async getNormalizedPostState(
-		page: Page,
-		{ includeCrdtDocument = false }: { includeCrdtDocument?: boolean } = {}
+		page: Page
 	): Promise< NormalizedCollaborativeState > {
-		return page.evaluate(
-			( { includePersistedDoc } ) => {
-				const normalizeBlocks = (
-					blockTree: Array< {
-						attributes?: Record< string, unknown >;
-						innerBlocks?: Array< unknown >;
-						name: string;
-					} >
-				): NormalizedBlock[] =>
-					blockTree.map( ( block ) => ( {
-						name: block.name,
-						attributes: JSON.parse(
-							JSON.stringify( block.attributes ?? {} )
-						),
-						innerBlocks: normalizeBlocks(
-							( block.innerBlocks ?? [] ) as Array< {
-								attributes?: Record< string, unknown >;
-								innerBlocks?: Array< unknown >;
-								name: string;
-							} >
-						),
-					} ) );
+		return page.evaluate( () => {
+			const normalizeBlocks = (
+				blockTree: Array< {
+					attributes?: Record< string, unknown >;
+					innerBlocks?: Array< unknown >;
+					name: string;
+				} >
+			): NormalizedBlock[] =>
+				blockTree.map( ( block ) => ( {
+					name: block.name,
+					attributes: JSON.parse(
+						JSON.stringify( block.attributes ?? {} )
+					),
+					innerBlocks: normalizeBlocks(
+						( block.innerBlocks ?? [] ) as Array< {
+							attributes?: Record< string, unknown >;
+							innerBlocks?: Array< unknown >;
+							name: string;
+						} >
+					),
+				} ) );
 
-				const postId = ( window as any ).wp.data
-					.select( 'core/editor' )
-					.getCurrentPostId();
-				const record = ( window as any ).wp.data
-					.select( 'core' )
-					.getEntityRecord( 'postType', 'post', postId );
-				const blocks = ( window as any ).wp.data
-					.select( 'core/block-editor' )
-					.getBlocks();
+			const blocks = ( window as any ).wp.data
+				.select( 'core/block-editor' )
+				.getBlocks();
 
-				return {
-					title:
-						( window as any ).wp.data
-							.select( 'core/editor' )
-							.getEditedPostAttribute( 'title' ) ?? '',
-					blocks: normalizeBlocks( blocks ),
-					crdtDocument: includePersistedDoc
-						? record?.meta?._crdt_document ?? null
-						: null,
-				};
-			},
-			{ includePersistedDoc: includeCrdtDocument }
-		);
+			return {
+				title:
+					( window as any ).wp.data
+						.select( 'core/editor' )
+						.getEditedPostAttribute( 'title' ) ?? '',
+				blocks: normalizeBlocks( blocks ),
+			};
+		} );
 	}
 
 	/**
 	 * Wait until all tracked pages converge on the same normalized editor state.
 	 *
-	 * @param [options]                     Optional settings.
-	 * @param [options.includeCrdtDocument] Whether convergence should also
-	 *                                      include the persisted CRDT document.
-	 * @param [options.pages]               Specific pages to compare.
-	 * @param [options.timeout]             Maximum wait time in ms.
+	 * @param [options]         Optional settings.
+	 * @param [options.pages]   Specific pages to compare.
+	 * @param [options.timeout] Maximum wait time in ms.
 	 */
 	async waitForConvergence( {
-		includeCrdtDocument = false,
 		pages = this.allPages,
 		timeout = 15000,
 	}: {
-		includeCrdtDocument?: boolean;
 		pages?: Page[];
 		timeout?: number;
 	} = {} ): Promise< NormalizedCollaborativeState > {
@@ -521,18 +500,12 @@ export default class CollaborationUtils {
 
 		while ( Date.now() < deadline ) {
 			lastStates = await Promise.all(
-				pages.map( ( page ) =>
-					this.getNormalizedPostState( page, {
-						includeCrdtDocument,
-					} )
-				)
+				pages.map( ( page ) => this.getNormalizedPostState( page ) )
 			);
 
 			const serializedFirstState = JSON.stringify( lastStates[ 0 ] );
 			const isSettled = lastStates.every(
-				( state ) =>
-					JSON.stringify( state ) === serializedFirstState &&
-					( ! includeCrdtDocument || !! state.crdtDocument )
+				( state ) => JSON.stringify( state ) === serializedFirstState
 			);
 
 			if ( isSettled ) {

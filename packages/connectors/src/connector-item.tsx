@@ -197,7 +197,6 @@ export function DefaultConnectorSettings( {
 			}
 		>
 			<TextControl
-				__next40pxDefaultSize
 				label={ __( 'API Key' ) }
 				value={ apiKey }
 				onChange={ ( value ) => {
@@ -208,6 +207,7 @@ export function DefaultConnectorSettings( {
 				} }
 				placeholder={ __( 'Enter your API key' ) }
 				disabled={ readOnly || isSaving }
+				autoComplete="off"
 				help={ getHelp() }
 			/>
 			{ readOnly ? (

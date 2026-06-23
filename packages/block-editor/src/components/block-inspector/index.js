@@ -5,7 +5,6 @@ import { __ } from '@wordpress/i18n';
 import {
 	getBlockType,
 	getUnregisteredTypeHandlerName,
-	hasBlockSupport,
 	store as blocksStore,
 } from '@wordpress/blocks';
 import {
@@ -41,7 +40,11 @@ import { BlockStateBadges, BlockStatesControl } from '../../hooks/states';
 import ContentTab from '../inspector-controls-tabs/content-tab';
 import ViewportVisibilityInfo from '../block-visibility/viewport-visibility-info';
 import { unlock } from '../../lock-unlock';
-import { isDefaultBlockStyleState } from '../../hooks/block-style-state';
+import {
+	hasPseudoBlockStyleState,
+	hasViewportBlockStyleState,
+	isDefaultBlockStyleState,
+} from '../../hooks/block-style-state';
 import { onViewportStateChangeKey } from '../../store/private-keys';
 
 function StyleInspectorSlots( {
@@ -88,8 +91,11 @@ function StyleInspectorSlots( {
 	);
 }
 
-function StyleStateInspectorSlots( { blockName } ) {
+function StyleStateInspectorSlots( { blockName, selectedBlockStyleState } ) {
 	const borderPanelLabel = useBorderPanelLabel( { blockName } );
+	const showLayoutControls =
+		hasViewportBlockStyleState( selectedBlockStyleState ) &&
+		! hasPseudoBlockStyleState( selectedBlockStyleState );
 	return (
 		<>
 			<InspectorControls.Slot
@@ -106,6 +112,12 @@ function StyleStateInspectorSlots( { blockName } ) {
 				group="typography"
 				label={ __( 'Typography' ) }
 			/>
+			{ showLayoutControls && (
+				<InspectorControls.Slot
+					group="layout"
+					label={ __( 'Layout' ) }
+				/>
+			) }
 			<InspectorControls.Slot
 				group="dimensions"
 				label={ __( 'Dimensions' ) }
@@ -195,8 +207,8 @@ function BlockInspector() {
 
 			const {
 				getClientIdsOfDescendants,
-				getBlockName,
 				getBlockEditingMode,
+				shouldRenderBlockListView,
 			} = unlock( select( blockEditorStore ) );
 
 			const descendants = getClientIdsOfDescendants(
@@ -207,14 +219,7 @@ function BlockInspector() {
 			// List View tab.
 			const listViewDescendants = new Set();
 			descendants.forEach( ( clientId ) => {
-				const blockName = getBlockName( clientId );
-				// Navigation block doesn't have List View block support, but
-				// it does have a custom implementation that is shown within
-				// patterns, so it's included in this condition.
-				if (
-					blockName === 'core/navigation' ||
-					hasBlockSupport( blockName, 'listView' )
-				) {
+				if ( shouldRenderBlockListView( clientId ) ) {
 					const listViewChildren =
 						getClientIdsOfDescendants( clientId );
 					listViewChildren.forEach( ( childId ) =>
@@ -470,10 +475,17 @@ const BlockInspectorSingleBlock = ( {
 			) }
 			<ViewportVisibilityInfo clientId={ renderedBlockClientId } />
 			<EditContents clientId={ renderedBlockClientId } />
-			<BlockVariationTransforms blockClientId={ renderedBlockClientId } />
+			{ ! isBlockStyleStateSelected && (
+				<BlockVariationTransforms
+					blockClientId={ renderedBlockClientId }
+				/>
+			) }
 			<BlockInspectorPreTabsSlot />
 			{ isBlockStyleStateSelected && ! isSectionBlock && (
-				<StyleStateInspectorSlots blockName={ blockName } />
+				<StyleStateInspectorSlots
+					blockName={ blockName }
+					selectedBlockStyleState={ selectedBlockStyleState }
+				/>
 			) }
 			{ ! isBlockStyleStateSelected && hasMultipleTabs && (
 				<>

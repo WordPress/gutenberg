@@ -25,6 +25,7 @@
 		{ "path": "../private-apis" },
 		{ "path": "../route" },
 		{ "path": "../theme" },
+		{ "path": "../ui" },
 		{ "path": "../url" }
 	]
 }

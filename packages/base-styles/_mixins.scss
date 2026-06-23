@@ -4,6 +4,7 @@
 
 @use "sass:color";
 @use "sass:math";
+@use "@wordpress/theme/src/prebuilt/scss/design-token-fallbacks" as wpds;
 @use "./variables";
 @use "./colors";
 @use "./breakpoints";
@@ -179,27 +180,17 @@
 	outline-offset: 2px;
 }
 
+
 /**
- * Outset focus ring.
- *
  * Standard focus rings for the WordPress Design System.
- * Apply `outset-ring__rest` on the element and `outset-ring__focus` inside the
- * relevant pseudo-class at the call site, e.g. `&:focus { @include outset-ring__focus(); }`.
+
+ * Apply `outset-ring__focus` inside the relevant pseudo-class at the call site,
+ * e.g. `&:focus { @include outset-ring__focus(); }`.
  */
 
-@mixin outset-ring__rest() {
-	@media not (prefers-reduced-motion) {
-		transition: outline 0.1s ease-out;
-	}
-
-	// Outline width must be kept at 0 even with a transparent color,
-	// or else the outline will be visible in forced-colors mode.
-	outline: 0 solid transparent;
-	outline-offset: 1px;
-}
-
 @mixin outset-ring__focus() {
-	outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus-brand);
+	outline: wpds.wpds-var("--wpds-border-width-focus") solid wpds.wpds-var("--wpds-color-stroke-focus");
+	outline-offset: wpds.wpds-var("--wpds-border-width-focus");
 }
 
 
@@ -557,7 +548,7 @@
 
 @mixin wordpress-admin-schemes() {
 	body.admin-color-light {
-		@include admin-scheme(#0085ba);
+		@include admin-scheme(#007cba);
 	}
 
 	body.admin-color-modern {
@@ -565,27 +556,27 @@
 	}
 
 	body.admin-color-blue {
-		@include admin-scheme(#096484);
+		@include admin-scheme(#437aa8);
 	}
 
 	body.admin-color-coffee {
-		@include admin-scheme(#46403c);
+		@include admin-scheme(#916745);
 	}
 
 	body.admin-color-ectoplasm {
-		@include admin-scheme(#523f6d);
+		@include admin-scheme(#646c3e);
 	}
 
 	body.admin-color-midnight {
-		@include admin-scheme(#e14d43);
+		@include admin-scheme(#cf4339);
 	}
 
 	body.admin-color-ocean {
-		@include admin-scheme(#627c83);
+		@include admin-scheme(#567958);
 	}
 
 	body.admin-color-sunrise {
-		@include admin-scheme(#dd823b);
+		@include admin-scheme(#ad631e);
 	}
 }
 
@@ -704,6 +695,18 @@
 	&:hover {
 		color: colors.$white;
 		background: var(--wp-admin-theme-color);
+	}
+
+	svg {
+		@media not (prefers-reduced-motion) {
+			transition: transform cubic-bezier(0.165, 0.84, 0.44, 1) 0.2s;
+		}
+	}
+
+	&.is-pressed {
+		svg {
+			transform: rotate(45deg);
+		}
 	}
 }
 

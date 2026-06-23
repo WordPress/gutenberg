@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/style-engine",
-	"version": "2.46.0",
+	"version": "2.48.1",
 	"description": "A suite of parsers and compilers for WordPress styles.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -41,7 +41,6 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"wpCopyFiles": {
 		"files": [
@@ -66,6 +65,14 @@
 	"sideEffects": false,
 	"dependencies": {
 		"change-case": "^4.1.2"
+	},
+	"peerDependencies": {
+		"@types/react": "^18.3.27"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"
