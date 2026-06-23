@@ -19,6 +19,7 @@
 -   `Popover`: Disable popup transitions when Base UI marks animations as instant ([#79432](https://github.com/WordPress/gutenberg/pull/79432)).
 -   `Button`: Fix `loading` state in forced colors mode ([#78820](https://github.com/WordPress/gutenberg/pull/78820)).
 -   `Button`: Fix `loading` prop affecting `unstyled` variant ([#78820](https://github.com/WordPress/gutenberg/pull/78820)).
+-   Remove usage of private APIs, which previously caused conflicts for some consumers ([#78958](https://github.com/WordPress/gutenberg/pull/78958)).
 
 ### Internal
 

@@ -29,6 +29,7 @@
 		"@wordpress/jest-preset-default": "file:../../packages/jest-preset-default",
 		"@wordpress/scripts": "file:../../packages/scripts",
 		"babel-jest": "^29.7.0",
+		"babel-plugin-transform-import-meta": "^2.3.3",
 		"glob": "^7.1.2",
 		"jest": "^29.6.2",
 		"jest-environment-jsdom": "^30.2.0",

@@ -34,6 +34,11 @@ function generateCSSSelector( {
 	return selectors.join( ',' );
 }
 
+/**
+ * Context provider that generates a theme from a set of seed color values and
+ * configuration, producing a set of design token overrides as CSS custom
+ * properties.
+ */
 export const ThemeProvider = ( {
 	children,
 	color = {},
