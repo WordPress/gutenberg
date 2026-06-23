@@ -86,7 +86,7 @@ The new reference commit hash that is chosen needs to meet the following require
 
 ### Update `wordpress-develop`
 
-When releasing a plugin update that changes the minimum required version of WordPress, the end-to-end test GitHub Action workflow in Core SVN will need to be updated in any branch losing support. Otherwise, the first run of that workflow on that branch following the release will fail.
+When releasing a plugin update that changes the minimum required version of WordPress, the end-to-end test GitHub Actions workflow in Core SVN will need to be updated for any branch losing support. Otherwise, the first run of that workflow on that branch following the release will fail.
 
 A plugin version can be pinned in the workflow by adding the `gutenberg-version` input to the test matrix. [Core-59221](https://core.trac.wordpress.org/changeset/59221) is an example of this change for the 6.4 branch.
 
