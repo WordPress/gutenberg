@@ -23,6 +23,8 @@ import type { ThemeProviderProps } from './types';
 
 type Entry = [ string, string ];
 
+// `buildAccentRamp` caches by both arguments, so `getCachedBgRamp` must keep
+// equivalent background seeds on the same ramp reference for accent cache hits.
 const getCachedBgRamp = memoize( buildBgRamp, { maxSize: 10 } );
 const getCachedAccentRamp = memoize( buildAccentRamp, { maxSize: 10 } );
 
