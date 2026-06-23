@@ -368,7 +368,7 @@ jobs:
         runs-on: 'ubuntu-24.04'
         permissions: {}
         needs: [test-php, phpcs]
-        if: ${{ always() }}
+        if: ${{ always() && (github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request') }}
         steps:
             - name: Fail the job if the PHPUnit tests fail
               if: ${{ needs.test-php.result != 'success' }}
