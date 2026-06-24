@@ -76,7 +76,6 @@ function getSidesToModify(
 }
 
 export default function BoxInputControl( {
-	__next40pxDefaultSize,
 	onChange = noop,
 	onFocus = noop,
 	values,
@@ -87,6 +86,7 @@ export default function BoxInputControl( {
 	min = 0,
 	presets,
 	presetKey,
+	placeholder: placeholderProp,
 	...props
 }: BoxControlInputControlProps ) {
 	const defaultValuesToModify = getSidesToModify( side, sides );
@@ -207,7 +207,7 @@ export default function BoxInputControl( {
 							{ ...props }
 							min={ min }
 							__shouldNotWarnDeprecated36pxSize
-							__next40pxDefaultSize={ __next40pxDefaultSize }
+							__next40pxDefaultSize
 							className="component-box-control__unit-control"
 							id={ inputId }
 							isPressEnterToChange
@@ -217,13 +217,13 @@ export default function BoxInputControl( {
 							onUnitChange={ handleOnUnitChange }
 							onFocus={ handleOnFocus }
 							label={ LABELS[ side ] }
-							placeholder={ mixedPlaceholder }
+							placeholder={ mixedPlaceholder ?? placeholderProp }
 							hideLabelFromVision
 						/>
 					</Tooltip>
 
 					<FlexedRangeControl
-						__next40pxDefaultSize={ __next40pxDefaultSize }
+						__next40pxDefaultSize
 						__shouldNotWarnDeprecated36pxSize
 						aria-controls={ inputId }
 						label={ LABELS[ side ] }

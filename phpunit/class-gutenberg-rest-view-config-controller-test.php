@@ -14,7 +14,14 @@ class Tests_REST_View_Config_Controller extends WP_Test_REST_TestCase {
 	const ROUTE = '/wp/v2/view-config';
 
 	/**
-	 * Editor user id (has `edit_posts`).
+	 * Administrator user id (has `edit_theme_options` and `manage_options`).
+	 *
+	 * @var int
+	 */
+	protected static $admin_id;
+
+	/**
+	 * Editor user id (has `edit_posts` and `manage_categories`, lacks `manage_options`).
 	 *
 	 * @var int
 	 */
@@ -33,6 +40,7 @@ class Tests_REST_View_Config_Controller extends WP_Test_REST_TestCase {
 	 * @param WP_UnitTest_Factory $factory Factory instance.
 	 */
 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
+		self::$admin_id      = $factory->user->create( array( 'role' => 'administrator' ) );
 		self::$editor_id     = $factory->user->create( array( 'role' => 'editor' ) );
 		self::$subscriber_id = $factory->user->create( array( 'role' => 'subscriber' ) );
 	}
@@ -41,6 +49,7 @@ class Tests_REST_View_Config_Controller extends WP_Test_REST_TestCase {
 	 * Deletes shared users.
 	 */
 	public static function wpTearDownAfterClass() {
+		self::delete_user( self::$admin_id );
 		self::delete_user( self::$editor_id );
 		self::delete_user( self::$subscriber_id );
 	}
@@ -114,6 +123,126 @@ class Tests_REST_View_Config_Controller extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Post type config is gated by that post type's own `edit_posts` capability,
+	 * honoring custom capability registrations.
+	 *
+	 * `wp_template_part` maps `edit_posts` to `edit_theme_options`, which editors
+	 * lack but administrators have.
+	 *
+	 * @covers ::get_items_permissions_check
+	 * @covers ::get_required_capability
+	 */
+	public function test_get_items_uses_post_type_specific_capability() {
+		wp_set_current_user( self::$editor_id );
+		$this->assertErrorResponse(
+			'rest_cannot_read',
+			$this->dispatch_request( 'postType', 'wp_template_part' ),
+			403
+		);
+
+		wp_set_current_user( self::$admin_id );
+		$this->assertSame(
+			200,
+			$this->dispatch_request( 'postType', 'wp_template_part' )->get_status()
+		);
+	}
+
+	/**
+	 * An unregistered post type is treated as an unknown entity (404).
+	 *
+	 * @covers ::get_items_permissions_check
+	 * @covers ::get_required_capability
+	 */
+	public function test_get_items_unknown_post_type_is_not_found() {
+		wp_set_current_user( self::$admin_id );
+
+		$response = $this->dispatch_request( 'postType', 'does_not_exist' );
+
+		$this->assertErrorResponse( 'rest_view_config_invalid_entity', $response, 404 );
+	}
+
+	/**
+	 * Taxonomy config is gated by the taxonomy's `manage_terms` capability.
+	 *
+	 * @covers ::get_items_permissions_check
+	 * @covers ::get_required_capability
+	 */
+	public function test_get_items_uses_taxonomy_capability() {
+		// Editors have `manage_categories` (the `manage_terms` cap for `category`).
+		wp_set_current_user( self::$editor_id );
+		$this->assertSame(
+			200,
+			$this->dispatch_request( 'taxonomy', 'category' )->get_status()
+		);
+
+		// Subscribers do not.
+		wp_set_current_user( self::$subscriber_id );
+		$this->assertErrorResponse(
+			'rest_cannot_read',
+			$this->dispatch_request( 'taxonomy', 'category' ),
+			403
+		);
+	}
+
+	/**
+	 * An unregistered taxonomy is treated as an unknown entity (404).
+	 *
+	 * @covers ::get_items_permissions_check
+	 * @covers ::get_required_capability
+	 */
+	public function test_get_items_unknown_taxonomy_is_not_found() {
+		wp_set_current_user( self::$admin_id );
+
+		$response = $this->dispatch_request( 'taxonomy', 'does_not_exist' );
+
+		$this->assertErrorResponse( 'rest_view_config_invalid_entity', $response, 404 );
+	}
+
+	/**
+	 * Root-level config requires `manage_options`.
+	 *
+	 * @covers ::get_items_permissions_check
+	 * @covers ::get_required_capability
+	 */
+	public function test_get_items_root_requires_manage_options() {
+		// Editors lack `manage_options`.
+		wp_set_current_user( self::$editor_id );
+		$this->assertErrorResponse(
+			'rest_cannot_read',
+			$this->dispatch_request( 'root', 'site' ),
+			403
+		);
+
+		wp_set_current_user( self::$admin_id );
+		$this->assertSame(
+			200,
+			$this->dispatch_request( 'root', 'site' )->get_status()
+		);
+	}
+
+	/**
+	 * Unknown kinds fall back to the baseline `edit_posts` capability so that
+	 * entities registered through the view config filter remain readable.
+	 *
+	 * @covers ::get_items_permissions_check
+	 * @covers ::get_required_capability
+	 */
+	public function test_get_items_unknown_kind_falls_back_to_edit_posts() {
+		wp_set_current_user( self::$editor_id );
+		$this->assertSame(
+			200,
+			$this->dispatch_request( 'custom_kind', 'custom_name' )->get_status()
+		);
+
+		wp_set_current_user( self::$subscriber_id );
+		$this->assertErrorResponse(
+			'rest_cannot_read',
+			$this->dispatch_request( 'custom_kind', 'custom_name' ),
+			403
+		);
+	}
+
+	/**
 	 * Both `kind` and `name` are required.
 	 *
 	 * @covers ::register_routes
@@ -174,7 +303,8 @@ class Tests_REST_View_Config_Controller extends WP_Test_REST_TestCase {
 	 * @covers ::get_items
 	 */
 	public function test_empty_object_fields_serialize_as_json_objects() {
-		wp_set_current_user( self::$editor_id );
+		// Admin: reading wp_template_part config requires `edit_theme_options`.
+		wp_set_current_user( self::$admin_id );
 
 		// An entity with no provider yields empty default_layouts entries and form.
 		$decoded = json_decode( wp_json_encode( $this->dispatch_request( 'custom_kind', 'custom_name' )->get_data() ) );
@@ -189,6 +319,44 @@ class Tests_REST_View_Config_Controller extends WP_Test_REST_TestCase {
 
 		$this->assertIsObject( $decoded->default_view->layout );
 		$this->assertIsObject( $decoded->default_layouts->grid->layout );
+	}
+
+	/**
+	 * Empty object-typed values nested inside a `view_list` item's `view`
+	 * override serialize as JSON objects ({}), not arrays ([]).
+	 *
+	 * The `view.layout` (and its `styles` map) are typed as objects by the
+	 * schema but are not produced by core data, so this exercises the
+	 * schema-driven cast against a value supplied through the documented
+	 * `get_entity_view_config_{$kind}_{$name}` filter.
+	 *
+	 * @covers ::get_items
+	 */
+	public function test_empty_objects_inside_view_list_view_serialize_as_json_objects() {
+		wp_set_current_user( self::$editor_id );
+
+		$filter = static function ( $config ) {
+			$config['view_list'][] = array(
+				'title' => 'Custom',
+				'slug'  => 'custom',
+				'view'  => array(
+					'type'   => 'table',
+					'layout' => array(
+						'styles' => array(),
+					),
+				),
+			);
+			return $config;
+		};
+		add_filter( 'get_entity_view_config_custom_kind_custom_name', $filter );
+
+		$decoded = json_decode( wp_json_encode( $this->dispatch_request( 'custom_kind', 'custom_name' )->get_data() ) );
+
+		remove_filter( 'get_entity_view_config_custom_kind_custom_name', $filter );
+
+		$view = end( $decoded->view_list );
+		$this->assertIsObject( $view->view->layout );
+		$this->assertIsObject( $view->view->layout->styles );
 	}
 
 	/**

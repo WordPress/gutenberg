@@ -25,6 +25,10 @@
 				will-change: transform, opacity;
 			}
 
+			&[data-instant] {
+				transition: none;
+			}
+
 			opacity: 1;
 			transform: translate(0);
 
