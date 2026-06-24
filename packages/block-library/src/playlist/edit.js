@@ -185,9 +185,12 @@ const PlaylistEdit = ( {
 	// Handle track end - advance to next track, respecting shuffle.
 	const onTrackEnded = useCallback(
 		( playerInstance ) => {
+			if ( isRepeating ) {
+				playerInstance?.play()?.catch( logPlayError );
+				return;
+			}
 			if ( isShuffled ) {
 				if (
-					! isRepeating &&
 					isShuffleCycleComplete(
 						tracks.map( ( track ) => track.clientId ),
 						currentTrackClientId,
@@ -196,24 +199,14 @@ const PlaylistEdit = ( {
 				) {
 					return;
 				}
-				if ( isRepeating && tracks.length <= 1 ) {
-					playerInstance?.play()?.catch( logPlayError );
-					return;
-				}
 				advanceShuffled();
 				return;
 			}
 			const currentIndex = tracks.findIndex(
 				( track ) => track.clientId === currentTrackClientId
 			);
-			const nextTrack =
-				tracks[ currentIndex + 1 ] ||
-				( isRepeating ? tracks[ 0 ] : undefined );
+			const nextTrack = tracks[ currentIndex + 1 ];
 			if ( nextTrack?.clientId ) {
-				if ( nextTrack.clientId === currentTrackClientId ) {
-					playerInstance?.play()?.catch( logPlayError );
-					return;
-				}
 				setCurrentTrackClientId( nextTrack.clientId );
 			}
 		},

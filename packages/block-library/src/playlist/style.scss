@@ -98,6 +98,10 @@ $playlist-control-size: 24px;
 		// Span the play button width and separate action/toggle groups.
 		flex: 0 0 $waveform-player-height;
 		justify-content: space-between;
+		margin-block-start: max(
+			0px,
+			calc((1.5em - $playlist-control-size) / 2 + 2px)
+		);
 	}
 
 	.wp-block-playlist__controls-group {
@@ -173,6 +177,7 @@ $playlist-control-size: 24px;
 			overflow: hidden;
 			color: currentColor !important;
 			font-family: inherit !important;
+			line-height: 1.5;
 			text-overflow: ellipsis;
 			white-space: nowrap;
 		}
