@@ -2,9 +2,13 @@
 
 ## Unreleased
 
+## 15.22.0 (2026-06-24)
+
 ### Internal
 
 - Replace `showdown` with `marked` for Markdown paste handling. Smaller bundle, modern maintenance, native types.
+
+## 15.21.1 (2026-06-16)
 
 ## 15.21.0 (2026-06-10)
 

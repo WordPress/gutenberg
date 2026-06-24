@@ -1,0 +1,23 @@
+import { Meta, Markdown } from '@storybook/addon-docs/blocks';
+import AnatomyDoc from './anatomy.md?raw';
+import threeLayers from './assets/three-layers.svg';
+import presentationFramed from './assets/presentation-framed.svg';
+import presentationContentBleed from './assets/presentation-content-bleed.svg';
+import presentationFullBleed from './assets/presentation-full-bleed.svg';
+import representation from './assets/representation.svg';
+
+<Meta title="Widget Primitives/Anatomy" />
+
+<Markdown>
+	{ AnatomyDoc.replace( './assets/three-layers.svg', threeLayers )
+		.replace( './assets/presentation-framed.svg', presentationFramed )
+		.replace(
+			'./assets/presentation-content-bleed.svg',
+			presentationContentBleed
+		)
+		.replace(
+			'./assets/presentation-full-bleed.svg',
+			presentationFullBleed
+		)
+		.replace( './assets/representation.svg', representation ) }
+</Markdown>

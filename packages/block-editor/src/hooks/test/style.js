@@ -402,7 +402,7 @@ describe( 'getResponsiveStateCSSRules', () => {
 		expect(
 			getResponsiveStateCSSRules(
 				{
-					mobile: {
+					'@mobile': {
 						color: { text: 'red' },
 					},
 				},
@@ -418,7 +418,7 @@ describe( 'getResponsiveStateCSSRules', () => {
 		expect(
 			getResponsiveStateCSSRules(
 				{
-					mobile: {
+					'@mobile': {
 						color: { background: '#ff00d0' },
 						dimensions: { width: '50%' },
 					},
@@ -435,7 +435,7 @@ describe( 'getResponsiveStateCSSRules', () => {
 		expect(
 			getResponsiveStateCSSRules(
 				{
-					mobile: {
+					'@mobile': {
 						dimensions: { objectFit: 'fill' },
 					},
 				},
@@ -451,7 +451,7 @@ describe( 'getResponsiveStateCSSRules', () => {
 		expect(
 			getResponsiveStateCSSRules(
 				{
-					mobile: {
+					'@mobile': {
 						':hover': {
 							color: { background: 'black' },
 						},
@@ -469,7 +469,7 @@ describe( 'getResponsiveStateCSSRules', () => {
 		expect(
 			getResponsiveStateCSSRules(
 				{
-					mobile: {
+					'@mobile': {
 						elements: {
 							link: {
 								color: { text: 'blue' },
@@ -510,7 +510,7 @@ describe( 'getCanvasStateStyleValue', () => {
 						color: { text: 'red' },
 					},
 				},
-				{ viewport: 'mobile', pseudo: ':hover' }
+				{ viewport: '@mobile', pseudo: ':hover' }
 			)
 		).toEqual( {
 			color: { text: 'red' },
@@ -524,13 +524,13 @@ describe( 'getCanvasStateStyleValue', () => {
 					':hover': {
 						color: { background: 'blue', text: 'red' },
 					},
-					mobile: {
+					'@mobile': {
 						':hover': {
 							color: { text: 'yellow' },
 						},
 					},
 				},
-				{ viewport: 'mobile', pseudo: ':hover' }
+				{ viewport: '@mobile', pseudo: ':hover' }
 			)
 		).toEqual( {
 			color: { background: 'blue', text: 'yellow' },
