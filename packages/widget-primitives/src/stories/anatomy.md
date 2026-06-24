@@ -20,7 +20,9 @@ The host shows this almost verbatim, in pickers, headers, and help. It decides _
 
 How the widget asks to sit in the host's frame. Today this layer holds one property, `presentation`.
 
-`presentation` suggests how much chrome the widget wants around it. The widget speaks in its own vocabulary ("render me without a frame"); the host decides how to materialize it. Its three values are one axis, from the most chrome to none.
+`presentation` suggests how much chrome the widget wants around it.
+The widget speaks in its own vocabulary ("render me without a frame"); the host decides how to materialize it, including whether to show the identity at all and which parts of it.
+Painting the icon and title into a header is the conventional choice, not the only one: a host could just as well render the title in a footer. Its three values are one axis, from the most chrome to none.
 
 `framed` (the default): the host paints the header from identity and pads the content. Site Health renders inside that frame.
 
@@ -30,7 +32,8 @@ How the widget asks to sit in the host's frame. Today this layer holds one prope
 
 ![In content-bleed, the host still paints the identity header while the widget's content fills its area with no padding. Shown with Quick Draft.](./assets/presentation-content-bleed.svg)
 
-`full-bleed`: no visible header; the widget owns the whole tile. Welcome uses it. A host that hides the header still keeps the identity available, so assistive technology can name the tile.
+`full-bleed`: no visible header; the widget owns the whole tile. Welcome uses it.
+A host that hides the header still keeps the identity available, so assistive technology can name the tile.
 
 ![In full-bleed, the widget owns the tile edge to edge while the host keeps the identity header in a VisuallyHidden node for accessibility. Shown with Welcome.](./assets/presentation-full-bleed.svg)
 
