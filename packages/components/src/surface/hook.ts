@@ -53,7 +53,6 @@ export function useSurface(
 				[ styles.borderRight ]: borderRight,
 				[ styles.borderTop ]: borderTop,
 				[ styles.secondary ]: variant === 'secondary',
-				[ styles.tertiary ]: variant === 'tertiary',
 				[ styles.dotted ]: variant === 'dotted',
 				[ styles.grid ]: variant === 'grid',
 			},

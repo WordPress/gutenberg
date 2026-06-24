@@ -1,8 +1,8 @@
 $surface-background-color: var(--wpds-color-background-surface-neutral-strong);
-$surface-background-tint-color: #f5f5f5;
-$surface-border-color: rgba(0, 0, 0, 0.1);
-$surface-border-bold-color: rgba(0, 0, 0, 0.15);
-$surface-border-subtle-color: rgba(0, 0, 0, 0.05);
+$surface-background-tint-color: var(--wpds-color-background-surface-neutral-weak);
+$surface-border-color: var(--wpds-color-stroke-surface-neutral);
+$surface-border-bold-color: var(--wpds-color-stroke-surface-neutral-strong);
+$surface-border-subtle-color: var(--wpds-color-stroke-surface-neutral-weak);
 $surface-color: var(--wpds-color-foreground-content-neutral);
 
 .surface {
@@ -29,10 +29,6 @@ $surface-color: var(--wpds-color-foreground-content-neutral);
 
 .secondary {
 	background: $surface-background-tint-color;
-}
-
-.tertiary {
-	background: $surface-background-color;
 }
 
 .dotted {
