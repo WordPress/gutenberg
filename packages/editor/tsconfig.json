@@ -7,7 +7,6 @@
 	},
 	"references": [
 		{ "path": "../a11y" },
-		{ "path": "../annotations" },
 		{ "path": "../api-fetch" },
 		{ "path": "../blob" },
 		{ "path": "../block-editor" },
