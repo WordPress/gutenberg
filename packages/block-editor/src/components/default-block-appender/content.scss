@@ -30,6 +30,9 @@
 		// Set the opacity of the initial block appender to the same as placeholder text in an empty Paragraph block.
 		opacity: 0.62;
 
+		// Reset the text shadow from the global styles.
+		text-shadow: none;
+
 		// The following prevents user agent styles from applying margins to the appender's inner paragraph.
 		// This in turn prevents layout shift due to layout styles removing margins from first and last children.
 		margin-block-start: 0;

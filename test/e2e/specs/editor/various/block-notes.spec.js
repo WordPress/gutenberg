@@ -1168,6 +1168,56 @@ test.describe( 'Block Notes', () => {
 			expect( alpha ).toBeGreaterThan( 0.2 );
 			expect( alpha ).toBeLessThan( 0.35 );
 		} );
+
+		test( 'keeps the inline marker highlighted after a code-editor round-trip', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Round-trip me for a note.' },
+			} );
+
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await paragraph.click();
+			await page.keyboard.press( 'ControlOrMeta+a' );
+
+			await page
+				.getByRole( 'button', { name: 'More', exact: true } )
+				.click();
+			await page.getByRole( 'menuitem', { name: 'Add note' } ).click();
+			await page
+				.getByRole( 'textbox', { name: 'New note', exact: true } )
+				.fill( 'Survive the toggle' );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
+
+			// The annotations API renders the highlight as a `<mark>`; confirm it
+			// is present before the round-trip.
+			await expect(
+				editor.canvas
+					.locator( 'mark.annotation-text-core-note' )
+					.first()
+			).toBeVisible();
+
+			// Switch to the code editor and back. The visual editor unmounts and
+			// remounts, dropping then restoring the inline-note annotations: the
+			// highlight must reappear rather than silently vanish until the next
+			// block edit or reload. https://github.com/WordPress/gutenberg/pull/78218
+			await pageUtils.pressKeys( 'secondary+M' );
+			await pageUtils.pressKeys( 'secondary+M' );
+
+			await expect(
+				editor.canvas
+					.locator( 'mark.annotation-text-core-note' )
+					.first()
+			).toBeVisible();
+		} );
 	} );
 } );
 
