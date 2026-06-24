@@ -178,7 +178,6 @@ export function Controls( {
 				isShownByDefault
 			>
 				<TextControl
-					__next40pxDefaultSize
 					label={ __( 'Text' ) }
 					value={ label ? stripHTML( label ) : '' }
 					onChange={ ( labelValue ) => {
@@ -292,7 +291,6 @@ export function Controls( {
 				isShownByDefault={ ! isContentOnly }
 			>
 				<TextControl
-					__next40pxDefaultSize
 					label={ __( 'Rel attribute' ) }
 					value={ rel || '' }
 					onChange={ ( relValue ) => {

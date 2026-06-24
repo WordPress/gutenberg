@@ -181,7 +181,7 @@ describe( 'WidgetDashboard', () => {
 		).toBeInTheDocument();
 		expect( screen.getByText( 'does/not-exist' ) ).toBeInTheDocument();
 		expect(
-			screen.queryByRole( 'heading', { level: 3 } )
+			screen.queryByRole( 'heading', { level: 2 } )
 		).not.toBeInTheDocument();
 	} );
 

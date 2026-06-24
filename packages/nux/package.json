@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/nux",
-	"version": "10.0.1",
+	"version": "10.1.0",
 	"description": "Deprecated no-op NUX (New User eXperience) compatibility module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

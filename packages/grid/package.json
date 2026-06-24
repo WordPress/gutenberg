@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/grid",
-	"version": "0.1.0-prerelease",
+	"version": "0.1.0",
 	"description": "Grid layout components for arranging tiles in dashboard-style surfaces, with drag-to-reorder and tile resizing.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

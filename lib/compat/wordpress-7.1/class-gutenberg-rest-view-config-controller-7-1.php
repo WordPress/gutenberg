@@ -58,11 +58,21 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
-	public function get_items_permissions_check(
-		// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-		$request
-	) {
-		if ( ! current_user_can( 'edit_posts' ) ) {
+	public function get_items_permissions_check( $request ) {
+		$kind = $request->get_param( 'kind' );
+		$name = $request->get_param( 'name' );
+
+		$capability = $this->get_required_capability( $kind, $name );
+
+		if ( null === $capability ) {
+			return new WP_Error(
+				'rest_view_config_invalid_entity',
+				__( 'Invalid entity kind or name.', 'gutenberg' ),
+				array( 'status' => 404 )
+			);
+		}
+
+		if ( ! current_user_can( $capability ) ) {
 			return new WP_Error(
 				'rest_cannot_read',
 				__( 'Sorry, you are not allowed to read view config.', 'gutenberg' ),
@@ -71,6 +81,48 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Resolves the capability required to read the view config for an entity.
+	 *
+	 * Known kinds map to the capability that gates managing that entity's list:
+	 * post types use their own `edit_posts` capability (which honors custom
+	 * `capability_type` registrations), taxonomies use `manage_terms`, and
+	 * root-level entities use `manage_options`. A post type or taxonomy that is
+	 * not registered, or not exposed to the REST API, resolves to `null` so the
+	 * request is treated as referencing an unknown entity.
+	 *
+	 * Any other kind falls back to `edit_posts`. This keeps entities registered
+	 * through the `get_entity_view_config_{$kind}_{$name}` filter readable behind
+	 * a baseline capability.
+	 *
+	 * @param string $kind The entity kind (e.g. `postType`).
+	 * @param string $name The entity name (e.g. `page`).
+	 * @return string|null Capability required to read the config, or null if the
+	 *                     entity is not registered.
+	 */
+	protected function get_required_capability( $kind, $name ) {
+		switch ( $kind ) {
+			case 'postType':
+				$post_type = get_post_type_object( $name );
+				if ( $post_type && $post_type->show_in_rest ) {
+					return $post_type->cap->edit_posts;
+				}
+				return null;
+
+			case 'taxonomy':
+				$taxonomy = get_taxonomy( $name );
+				if ( $taxonomy && $taxonomy->show_in_rest ) {
+					return $taxonomy->cap->manage_terms;
+				}
+				return null;
+
+			case 'root':
+				return 'manage_options';
+		}
+
+		return 'edit_posts';
 	}
 
 	/**
@@ -84,35 +136,91 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 		$name = $request->get_param( 'name' );
 
 		$config = gutenberg_get_entity_view_config( $kind, $name );
-
-		/*
-		 * The schema types these as objects, but PHP encodes empty arrays as
-		 * JSON arrays ([]). Cast the object-typed values that may be empty so
-		 * they serialize as JSON objects ({}) and match the schema.
-		 */
-		$default_view = $config['default_view'];
-		if ( isset( $default_view['layout'] ) ) {
-			$default_view['layout'] = (object) $default_view['layout'];
-		}
-
-		$default_layouts = $config['default_layouts'];
-		foreach ( $default_layouts as $view_type => $layout ) {
-			if ( isset( $layout['layout'] ) ) {
-				$layout['layout'] = (object) $layout['layout'];
-			}
-			$default_layouts[ $view_type ] = (object) $layout;
-		}
+		$schema = $this->get_item_schema();
 
 		$response = array(
 			'kind'            => $kind,
 			'name'            => $name,
-			'default_view'    => $default_view,
-			'default_layouts' => $default_layouts,
-			'view_list'       => $config['view_list'],
-			'form'            => (object) $config['form'],
+			'default_view'    => $this->cast_empty_objects( $config['default_view'], $schema['properties']['default_view'] ),
+			'default_layouts' => $this->cast_empty_objects( $config['default_layouts'], $schema['properties']['default_layouts'] ),
+			'view_list'       => $this->cast_empty_objects( $config['view_list'], $schema['properties']['view_list'] ),
+			'form'            => $this->cast_empty_objects( $config['form'], $schema['properties']['form'] ),
 		);
 
 		return rest_ensure_response( $response );
+	}
+
+	/**
+	 * Recursively casts empty arrays to objects where the schema types them as
+	 * objects.
+	 *
+	 * PHP cannot distinguish an empty associative array from an empty list, so
+	 * `json_encode()` always serializes `array()` as a JSON array (`[]`). The
+	 * REST schema, however, types several values as objects, which must encode
+	 * as `{}`. This walks the value against its schema and casts any empty,
+	 * object-typed array to an object. Non-empty associative arrays already
+	 * encode as objects, so they are left as arrays and only recursed into to
+	 * fix any nested empty objects.
+	 *
+	 * Union schemas (`oneOf`/`anyOf`) are handled only for the empty-array case:
+	 * an empty value is cast to an object when any branch allows an object. Such
+	 * values are not recursed into, which is sufficient for the form schema
+	 * where they never contain empty nested objects.
+	 *
+	 * @param mixed $value  The value to normalize.
+	 * @param array $schema The schema node describing the value.
+	 * @return mixed The normalized value, with empty object-typed arrays cast to objects.
+	 */
+	protected function cast_empty_objects( $value, $schema ) {
+		if ( ! is_array( $value ) || ! is_array( $schema ) ) {
+			return $value;
+		}
+
+		if ( isset( $schema['oneOf'] ) || isset( $schema['anyOf'] ) ) {
+			$branches = isset( $schema['oneOf'] ) ? $schema['oneOf'] : $schema['anyOf'];
+			if ( array() === $value ) {
+				foreach ( $branches as $branch ) {
+					if ( is_array( $branch ) && in_array( 'object', (array) ( isset( $branch['type'] ) ? $branch['type'] : array() ), true ) ) {
+						return (object) array();
+					}
+				}
+			}
+			return $value;
+		}
+
+		$types = (array) ( isset( $schema['type'] ) ? $schema['type'] : array() );
+
+		if ( in_array( 'array', $types, true ) && isset( $schema['items'] ) ) {
+			foreach ( $value as $index => $item ) {
+				$value[ $index ] = $this->cast_empty_objects( $item, $schema['items'] );
+			}
+			return $value;
+		}
+
+		if ( in_array( 'object', $types, true ) ) {
+			if ( isset( $schema['properties'] ) ) {
+				foreach ( $schema['properties'] as $property => $property_schema ) {
+					if ( array_key_exists( $property, $value ) ) {
+						$value[ $property ] = $this->cast_empty_objects( $value[ $property ], $property_schema );
+					}
+				}
+			}
+			if ( isset( $schema['additionalProperties'] ) && is_array( $schema['additionalProperties'] ) ) {
+				foreach ( $value as $key => $item ) {
+					if ( isset( $schema['properties'][ $key ] ) ) {
+						continue;
+					}
+					$value[ $key ] = $this->cast_empty_objects( $item, $schema['additionalProperties'] );
+				}
+			}
+
+			// Empty object-typed arrays must serialize as {} to match the schema.
+			if ( array() === $value ) {
+				return (object) array();
+			}
+		}
+
+		return $value;
 	}
 
 	/**
@@ -262,7 +370,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 	 *
 	 * @return array Schema properties for the base view configuration.
 	 */
-	private function get_view_base_schema() {
+	protected function get_view_base_schema() {
 		return array(
 			'search'                => array(
 				'type' => 'string',
@@ -371,7 +479,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 	 *
 	 * @return array Schema for a column style object.
 	 */
-	private function get_column_style_schema() {
+	protected function get_column_style_schema() {
 		return array(
 			'type'       => 'object',
 			'properties' => array(
@@ -397,7 +505,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 	 *
 	 * @return array Schema for a table layout object.
 	 */
-	private function get_table_layout_schema() {
+	protected function get_table_layout_schema() {
 		return array(
 			'type'       => 'object',
 			'properties' => array(
@@ -421,7 +529,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 	 *
 	 * @return array Schema for a list layout object.
 	 */
-	private function get_list_layout_schema() {
+	protected function get_list_layout_schema() {
 		return array(
 			'type'       => 'object',
 			'properties' => array(
@@ -442,7 +550,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 	 *
 	 * @return array Schema for a combined layout object.
 	 */
-	private function get_combined_layout_schema() {
+	protected function get_combined_layout_schema() {
 		return array(
 			'type'       => 'object',
 			'properties' => array_merge(
@@ -458,7 +566,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 	 *
 	 * @return array Schema for a grid layout object.
 	 */
-	private function get_grid_layout_schema() {
+	protected function get_grid_layout_schema() {
 		return array(
 			'type'       => 'object',
 			'properties' => array(
@@ -487,7 +595,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 	 *
 	 * @return array Schema for a form layout object.
 	 */
-	private function get_form_layout_schema() {
+	protected function get_form_layout_schema() {
 		return array(
 			'oneOf' => array(
 				// RegularLayout.
@@ -647,7 +755,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 	 *
 	 * @return array Schema for a form field.
 	 */
-	private function get_form_field_schema() {
+	protected function get_form_field_schema() {
 		return array(
 			'oneOf' => array(
 				array( 'type' => 'string' ),
@@ -688,7 +796,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 	 *
 	 * @return array Schema properties for the form configuration.
 	 */
-	private function get_form_schema() {
+	protected function get_form_schema() {
 		return array(
 			'layout' => $this->get_form_layout_schema(),
 			'fields' => array(

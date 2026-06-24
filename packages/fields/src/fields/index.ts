@@ -16,6 +16,10 @@ export { default as dateField } from './date';
 export { default as scheduledDateField } from './scheduled-date';
 export { default as lastEditedDateField } from './last-edited';
 export { default as authorField } from './author';
+export {
+	templateAuthorField,
+	templatePartAuthorField,
+} from './template-author';
 export { default as notesField } from './notes';
 export { default as excerptField } from './excerpt';
 export {
