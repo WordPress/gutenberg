@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { render } from '@ariakit/test/react';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import FontSizePicker from '../';
 import type { FontSize } from '../types';
 
