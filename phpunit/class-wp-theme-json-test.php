@@ -102,6 +102,26 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		}
 	}
 
+	/**
+	 * Resets the block metadata cache for WP_Theme_JSON_Gutenberg.
+	 */
+	private function reset_blocks_metadata() {
+		$property = new ReflectionProperty( WP_Theme_JSON_Gutenberg::class, 'blocks_metadata' );
+		$property->setAccessible( true );
+		$property->setValue( null, array() );
+	}
+
+	/**
+	 * Returns the block metadata cache for WP_Theme_JSON_Gutenberg.
+	 *
+	 * @return array Block metadata.
+	 */
+	private function get_blocks_metadata() {
+		$property = new ReflectionProperty( WP_Theme_JSON_Gutenberg::class, 'blocks_metadata' );
+		$property->setAccessible( true );
+		return $property->getValue();
+	}
+
 	public function test_get_settings() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
@@ -626,6 +646,60 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSameCSS( $styles, $theme_json->get_stylesheet( array( 'styles' ) ) );
 		$this->assertSameCSS( $presets, $theme_json->get_stylesheet( array( 'presets' ) ) );
 		$this->assertSameCSS( $all, $theme_json->get_stylesheet() );
+	}
+
+	public function test_get_stylesheet_generates_block_element_selectors_lazily() {
+		$this->reset_blocks_metadata();
+
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/group' => array(
+							'color' => array(
+								'text' => 'black',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+
+		$blocks_metadata = $this->get_blocks_metadata();
+
+		$this->assertArrayHasKey( 'core/group', $blocks_metadata );
+		$this->assertArrayNotHasKey( 'elements', $blocks_metadata['core/group'] );
+
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/group' => array(
+							'elements' => array(
+								'link' => array(
+									'color' => array(
+										'text' => 'red',
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$actual = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+
+		$this->assertSameCSS( ':root :where(.wp-block-group a:where(:not(.wp-element-button))){color: red;}', $actual );
+
+		$blocks_metadata = $this->get_blocks_metadata();
+
+		$this->assertArrayHasKey( 'elements', $blocks_metadata['core/group'] );
+		$this->assertArrayHasKey( 'link', $blocks_metadata['core/group']['elements'] );
 	}
 
 	public function test_get_styles_for_block_support_for_shorthand_and_longhand_values() {
