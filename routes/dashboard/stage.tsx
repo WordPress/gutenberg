@@ -5,7 +5,7 @@ import { Page } from '@wordpress/admin-ui';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as viewportStore } from '@wordpress/viewport';
 import {
@@ -48,6 +48,27 @@ function Dashboard() {
 		[]
 	);
 
+	const greetingName = useSelect( ( select ) => {
+		const user = select( coreStore ).getCurrentUser();
+		if ( ! user ) {
+			return undefined;
+		}
+
+		const displayName = user.name?.trim();
+		if ( displayName ) {
+			return displayName;
+		}
+
+		if ( 'username' in user && typeof user.username === 'string' ) {
+			const username = user.username.trim();
+			if ( username ) {
+				return username;
+			}
+		}
+
+		return user.slug;
+	}, [] );
+
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	const handleLayoutChange = ( next: DashboardWidget[] ) => {
@@ -75,6 +96,14 @@ function Dashboard() {
 		>
 			<Page
 				title={ editMode && isMobileViewport ? undefined : pageTitle }
+				subTitle={
+					greetingName &&
+					sprintf(
+						/* translators: %s: current user's display name. */
+						__( 'Howdy, %s' ),
+						greetingName
+					)
+				}
 				ariaLabel={ pageTitle }
 				actions={ <WidgetDashboard.Actions /> }
 				hasPadding
