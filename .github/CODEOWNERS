@@ -53,14 +53,13 @@
 /packages/interactivity                         @luisherranz @darerodz
 
 # Tooling
-/bin                                            @ntwb @nerrad @ajitbohra
-/bin/api-docs                                   @ntwb @nerrad @ajitbohra
-/docs/tool                                      @ajitbohra
+/bin                                            @ntwb @nerrad @ajitbohra @manzoorwanijk
+/tools                                          @manzoorwanijk
 /packages/babel-plugin-import-jsx-pragma        @ntwb @nerrad @ajitbohra
 /packages/babel-plugin-makepot                  @ntwb @nerrad @ajitbohra
 /packages/babel-preset-default                  @ntwb @nerrad @ajitbohra
 /packages/browserslist-config                   @ntwb @nerrad @ajitbohra
-/packages/create-block                          @gziolo @ryanwelcher
+/packages/create-block                          @ryanwelcher
 /packages/create-block-tutorial-template        @ryanwelcher
 /packages/dependency-extraction-webpack-plugin
 /packages/docgen
@@ -73,7 +72,7 @@
 /packages/npm-package-json-lint-config          @ntwb @nerrad @ajitbohra
 /packages/postcss-themes                        @ntwb @nerrad @ajitbohra
 /packages/prettier-config                       @ntwb
-/packages/scripts                               @gziolo @ntwb @nerrad @ajitbohra @ryanwelcher
+/packages/scripts                               @ntwb @nerrad @ajitbohra @ryanwelcher
 /packages/stylelint-config                      @ntwb
 /test/php/gutenberg-coding-standards            @anton-vlasenko
 
@@ -127,7 +126,7 @@
 /packages/report-flaky-tests                    @kevin940726
 
 # wp-env
-/packages/env                                   @ObliviousHarmony @t-hamano
+/packages/env                                   @t-hamano
 
 # PHP
 /lib                                            @spacedmonkey
@@ -137,11 +136,3 @@
 /lib/experimental/rest-api.php                  @timothybjacobs
 /lib/experimental/class-wp-rest-*               @timothybjacobs
 /lib/experimental/class-wp-rest-block-editor-settings-controller.php @timothybjacobs @spacedmonkey
-
-# Native (Unowned)
-*.native.js
-*.android.js
-*.ios.js
-*.native.scss
-*.android.scss
-*.ios.scss
