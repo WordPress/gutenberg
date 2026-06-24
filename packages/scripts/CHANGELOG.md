@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `lint-style`: Use stylelint's `resolveConfig` for config detection instead of a static extension list, supporting all current and future config file formats without manual maintenance overhead ([#79226](https://github.com/WordPress/gutenberg/pull/79226)).
+-   `lint-style`: Use stylelint's `resolveConfig` for config detection instead of a static extension list, supporting all current and future config file formats without manual maintenance overhead ([#79280](https://github.com/WordPress/gutenberg/pull/79280)).
 
 ## 32.4.1 (2026-06-16)
 

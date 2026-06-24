@@ -3,7 +3,7 @@
  */
 const { sync: spawn } = require( 'cross-spawn' );
 const { sync: resolveBin } = require( 'resolve-bin' );
-const stylelint = require( 'stylelint' );
+// const stylelint = require( 'stylelint' );
 
 // Stylelint's exit code for config-not-found errors
 const CONFIG_NOT_FOUND_CODE = 78;
@@ -26,7 +26,12 @@ const {
  * @return {Promise<boolean>} Whether a config was found.
  */
 async function hasResolvableConfig() {
+	const { default: stylelint } = await import( 'stylelint' );
 	try {
+		// index.css is a dummy anchor — it doesn't need to exist.
+		// resolveConfig walks up from cwd, so ancestor configs
+		// (monorepo root, $HOME) are found too, unlike the old
+		// hasProjectFile check which only looked at the project dir.
 		const config = await stylelint.resolveConfig( 'index.css', {
 			cwd: process.cwd(),
 		} );
