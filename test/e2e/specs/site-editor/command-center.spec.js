@@ -65,11 +65,24 @@ test.describe( 'Site editor command palette', () => {
 	test( 'Open the command palette and navigate to Customize CSS', async ( {
 		page,
 	} ) => {
+		// User types "Additional CSS" (command label).
+		await page
+			.getByRole( 'button', { name: 'Open command palette' } )
+			.click();
+		await page.keyboard.type( 'Additional CSS' );
+		await page
+			.getByRole( 'option', { name: 'Open Additional CSS' } )
+			.click();
+		await expect( page.getByLabel( 'Additional CSS' ) ).toBeVisible();
+
+		// User types "custom CSS" (keyword).
 		await page
 			.getByRole( 'button', { name: 'Open command palette' } )
 			.click();
 		await page.keyboard.type( 'custom CSS' );
-		await page.getByRole( 'option', { name: 'Open custom CSS' } ).click();
+		await page
+			.getByRole( 'option', { name: 'Open Additional CSS' } )
+			.click();
 		await expect( page.getByLabel( 'Additional CSS' ) ).toBeVisible();
 	} );
 
