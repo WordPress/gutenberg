@@ -236,6 +236,25 @@ const resolve = ( path: string, namespace: string ) => {
 	}
 };
 
+/**
+ * Splits a ;-delimited expression into individual statements, respecting
+ * string literals, template literals, regex literals, and IIFEs so
+ * semicolons inside them are not treated as statement boundaries.
+ * Returns null when the string contains no semicolon.
+ *
+ * The IIFE support is intentionally limited, matching Datastar's genRx():
+ * only function(){} and ()=>{} syntax with no arguments and no nested
+ * IIFEs are recognised.
+ */
+export const splitStatements = ( expr: string ): string[] | null => {
+	if ( typeof expr !== 'string' || ! expr.includes( ';' ) ) {
+		return null;
+	}
+	const re =
+		/(\/(?:\\\/|[^/])*\/|"(?:\\"|[^"])*"|'(?:\\'|[^'])*'|`(?:\\`|[^`])*`|\(\s*((?:function)\s*\(\s*\)|(?:\(\s*\))\s*=>)\s*(?:\{[\s\S]*?\}|[^;){]*)\s*\)\s*\(\s*\)|[^;])+/gm;
+	return expr.trim().match( re );
+};
+
 // Generate the evaluate function.
 export const getEvaluate: GetEvaluate =
 	( { scope } ) =>
@@ -249,40 +268,99 @@ export const getEvaluate: GetEvaluate =
 		const hasNegationOperator =
 			path[ 0 ] === '!' && !! ( path = path.slice( 1 ) );
 		setScope( scope );
-		const value = resolve( path, namespace );
-		// Functions are returned without invoking them.
-		if ( typeof value === 'function' ) {
-			// Except if they have a negation operator present, for backward compatibility.
-			// This pattern is strongly discouraged and deprecated, and it will be removed in a near future release.
-			// TODO: Remove this condition to effectively ignore negation operator when provided with a function.
-			if ( hasNegationOperator ) {
-				warn(
-					'Using a function with a negation operator is deprecated and will stop working in WordPress 6.9. Please use derived state instead.'
-				);
-				const functionResult = ! value( ...args );
+
+		// Fast path: simple dotted path — use resolve() which handles
+		// function wrapping for scope management (required for
+		// data-wp-on--click="actions.toggleOptionsMenu" etc.).
+		// Complex expressions (operators, comparisons, semicolons)
+		// fall through to the full-expression path below.
+		if ( /^[a-zA-Z_$][\w.]*$/.test( path ) ) {
+			const value = resolve( path, namespace );
+			// Functions are returned without invoking them.
+			if ( typeof value === 'function' ) {
+				// Except if they have a negation operator present, for backward compatibility.
+				// This pattern is strongly discouraged and deprecated, and it will be removed in a near future release.
+				// TODO: Remove this condition to effectively ignore negation operator when provided with a function.
+				if ( hasNegationOperator ) {
+					warn(
+						'Using a function with a negation operator is deprecated and will stop working in WordPress 6.9. Please use derived state instead.'
+					);
+					const functionResult = ! value( ...args );
+					resetScope();
+					return functionResult;
+				}
+				// Reset scope before return and wrap the function so it will still run within the correct scope.
 				resetScope();
-				return functionResult;
+				const wrappedFunction: Function = ( ...functionArgs: any[] ) => {
+					setScope( scope );
+					const functionResult = value( ...functionArgs );
+					resetScope();
+					return functionResult;
+				};
+				// Preserve the sync property from the original function
+				if ( value.sync ) {
+					const syncAwareFunction = wrappedFunction as SyncAwareFunction;
+					syncAwareFunction.sync = true;
+				}
+				return wrappedFunction;
 			}
-			// Reset scope before return and wrap the function so it will still run within the correct scope.
+			const result = value;
 			resetScope();
-			const wrappedFunction: Function = ( ...functionArgs: any[] ) => {
-				setScope( scope );
-				const functionResult = value( ...functionArgs );
-				resetScope();
-				return functionResult;
-			};
-			// Preserve the sync property from the original function
-			if ( value.sync ) {
-				const syncAwareFunction = wrappedFunction as SyncAwareFunction;
-				syncAwareFunction.sync = true;
-			}
-			return wrappedFunction;
+			return hasNegationOperator && value !== PENDING_GETTER
+				? ! result
+				: result;
 		}
-		const result = value;
-		resetScope();
-		return hasNegationOperator && value !== PENDING_GETTER
-			? ! result
-			: result;
+
+		// Full-expression path — inspired by DataStar's genRx().
+		// Compiles arbitrary JavaScript expressions via new Function(),
+		// passing state, context, actions, and callbacks as named
+		// parameters. Supports ;-delimited multiple statements: the
+		// last statement's value is what the directive receives
+		// (DataStar's "last statement wins" convention).
+		try {
+			let resolvedStore = stores.get( namespace );
+			if ( typeof resolvedStore === 'undefined' ) {
+				resolvedStore = store(
+					namespace,
+					{},
+					{
+						lock: universalUnlock,
+					}
+				);
+			}
+			const state = resolvedStore ? resolvedStore.state : undefined;
+			const ctx = getScope().context[ namespace ];
+			const actions = resolvedStore ? resolvedStore.actions : undefined;
+			const callbacks = resolvedStore ? resolvedStore.callbacks : undefined;
+			const statements = splitStatements( path );
+			let expression: string;
+			if ( statements ) {
+				const lastIdx = statements.length - 1;
+				const last = statements[ lastIdx ].trim();
+				if ( ! last.startsWith( 'return ' ) ) {
+					statements[ lastIdx ] = `return (${ last });`;
+				}
+				expression = statements.join( ';\n' );
+			} else {
+				expression = `return (${ path });`;
+			}
+			const fn = new Function(
+				'state',
+				'context',
+				'actions',
+				'callbacks',
+				expression
+			);
+			const result = fn( state, ctx, actions, callbacks );
+			resetScope();
+			return hasNegationOperator ? ! result : result;
+		} catch ( e ) {
+			resetScope();
+			if ( e === PENDING_GETTER ) {
+				return PENDING_GETTER;
+			}
+			return undefined;
+		}
 	};
 
 // Separate directives by priority. The resulting array contains objects
