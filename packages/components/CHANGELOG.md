@@ -38,6 +38,7 @@
 -   Enforce CSS Module class selector naming for component-library packages ([#79504](https://github.com/WordPress/gutenberg/pull/79504)).
 -   `Surface`: Migrate styles from Emotion to SCSS Modules and use WPDS tokens for migrated visual values ([#79445](https://github.com/WordPress/gutenberg/pull/79445)).
 -   `Truncate`: Migrate styles from Emotion to SCSS Modules ([#79446](https://github.com/WordPress/gutenberg/pull/79446)).
+-   `View`: Migrate away from Emotion while preserving polymorphic `as` behavior ([#79443](https://github.com/WordPress/gutenberg/pull/79443)).
 
 ## 36.0.0 (2026-06-24)
 
@@ -62,7 +63,6 @@
 -   `ResizableBox`: Make the `children` prop optional ([#79370](https://github.com/WordPress/gutenberg/pull/79370)).
 -   Add documentation and lint guardrails for the ongoing Emotion migration ([#79442](https://github.com/WordPress/gutenberg/pull/79442)).
 -   `Divider`: Migrate styles from Emotion to SCSS Modules ([#79444](https://github.com/WordPress/gutenberg/pull/79444)).
--   `View`: Migrate away from Emotion while preserving polymorphic `as` behavior ([#79443](https://github.com/WordPress/gutenberg/pull/79443)).
 -   Adopt `--wpds-dimension-size-*` design tokens [#79093](https://github.com/WordPress/gutenberg/pull/79093).
 -   Point the legacy `--wp-components-*` color fallbacks at the design system tokens (`--wpds-*` / `--wp-admin-theme-color*`), so component styles get sensible defaults from the prebuilt token stylesheet without a runtime `<ThemeProvider>` ([#78664](https://github.com/WordPress/gutenberg/pull/78664)).
 -   `withFallbackStyles`: Refactor from a class component to a function component with hooks ([#78837](https://github.com/WordPress/gutenberg/pull/78837)).
