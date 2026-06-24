@@ -65,6 +65,8 @@ const NON_CONTEXTUAL_POST_TYPES = [
 	'wp_template_part',
 ];
 
+const ISOLATED_POST_TYPES = NON_CONTEXTUAL_POST_TYPES;
+
 /**
  * Depending on the post, template and template mode,
  * returns the appropriate blocks and change handlers for the block editor provider.
@@ -209,11 +211,17 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					select( coreStore );
 
 				const _mode = getRenderingMode();
-				const _defaultMode =
+				let _defaultMode;
+				if ( ISOLATED_POST_TYPES.includes( post.type ) ) {
+					_defaultMode = 'post-only';
+				} else if (
 					settings.__experimentalForceTemplateVisibleOnMount &&
 					settings.__experimentalUniversalCanvas
-						? 'template-locked'
-						: getDefaultRenderingMode( post.type );
+				) {
+					_defaultMode = 'template-locked';
+				} else {
+					_defaultMode = getDefaultRenderingMode( post.type );
+				}
 				/**
 				 * To avoid content "flash", wait until rendering mode has been resolved.
 				 * This is important for the initial render of the editor.

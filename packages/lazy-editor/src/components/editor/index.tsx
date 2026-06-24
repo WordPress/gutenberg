@@ -22,6 +22,8 @@ import { unlock } from '../../lock-unlock';
 
 const { Editor: PrivateEditor, BackButton } = unlock( editorPrivateApis );
 
+const ISOLATED_POST_TYPES = [ 'wp_template_part', 'wp_block', 'wp_navigation' ];
+
 interface EditorProps {
 	postType?: string;
 	postId?: string;
@@ -70,6 +72,9 @@ export function Editor( {
 			}
 			if ( resolvedPostType === 'wp_template' ) {
 				return resolvedPostId;
+			}
+			if ( ISOLATED_POST_TYPES.includes( resolvedPostType ) ) {
+				return undefined;
 			}
 			// Use private API to get template ID for this post
 			return unlock( select( coreDataStore ) ).getTemplateId(
