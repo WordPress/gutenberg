@@ -207,25 +207,14 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 
 	const templatePanelMode = usePostTemplatePanelMode();
 
-	// Assemble every piece of supplementary data merged into the form `data`
-	// alongside the post record: read-only editor data that the post's own
-	// fields consume (e.g. the `template` field's `available_templates` in
-	// classic themes), and the records of other entities targeted by namespaced
-	// fields (keyed by `${ kind }_${ name }`).
-	const { entityData, availableTemplates } = useSelect(
+	const entityRecords = useSelect(
 		( select ) => {
-			const { getEditedEntityRecord, canUser, getCurrentTheme } =
-				select( coreDataStore );
+			const { getEditedEntityRecord, canUser } = select( coreDataStore );
 
-			const _availableTemplates = getCurrentTheme()?.is_block_theme
-				? null
-				: select( editorStore ).getEditorSettings()
-						.availableTemplates ?? {};
-
-			const extra = {};
+			const records = {};
 
 			// Other entities the current post type needs merged into its form.
-			for ( const [ key, entity ] of Object.entries(
+			for ( const [ namespace, entity ] of Object.entries(
 				ENTITIES[ postType ] ?? {}
 			) ) {
 				if (
@@ -241,35 +230,37 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 				if ( entity.getId && ! id ) {
 					continue;
 				}
-				extra[ key ] = getEditedEntityRecord(
+				records[ namespace ] = getEditedEntityRecord(
 					entity.kind,
 					entity.name,
 					id
 				);
 			}
 
-			return {
-				entityData: extra,
-				availableTemplates: _availableTemplates,
-			};
+			return records;
 		},
 		[ postType ]
 	);
 
-	// Merge the supplementary data onto the record only when there is any.
+	const availableTemplates = useSelect( ( select ) => {
+		if ( select( coreDataStore ).getCurrentTheme()?.is_block_theme ) {
+			return null;
+		}
+		const settings = select( editorStore ).getEditorSettings();
+		return settings.availableTemplates ?? null;
+	}, [] );
+
+	// Merge the supplementary data onto the record.
 	const data = useMemo( () => {
 		if ( ! record ) {
 			return record;
 		}
-		const extra = { ...entityData };
+		const extra = { ...entityRecords };
 		if ( availableTemplates && Object.keys( availableTemplates ).length ) {
 			extra.available_templates = availableTemplates;
 		}
-		if ( ! Object.keys( extra ).length ) {
-			return record;
-		}
 		return { ...record, ...extra };
-	}, [ record, entityData, availableTemplates ] );
+	}, [ record, entityRecords, availableTemplates ] );
 
 	const { editEntityRecord } = useDispatch( coreDataStore );
 	const registry = useRegistry();
