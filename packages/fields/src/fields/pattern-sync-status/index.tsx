@@ -12,9 +12,12 @@ import { privateApis as patternPrivateApis } from '@wordpress/patterns';
 import type { Pattern } from '../../types';
 import { unlock } from '../../lock-unlock';
 
-const { PATTERN_SYNC_TYPES } = unlock( patternPrivateApis );
+const { PATTERN_SYNC_TYPES, PATTERN_TYPES } = unlock( patternPrivateApis );
 
 function getPatternSyncStatus( item: Pattern ) {
+	if ( item.type && item.type !== PATTERN_TYPES.user ) {
+		return PATTERN_SYNC_TYPES.unsynced;
+	}
 	// When the post is first created, the top-level sync status is not set yet,
 	// so fall back to the meta value.
 	if ( item.meta?.wp_pattern_sync_status === PATTERN_SYNC_TYPES.unsynced ) {
@@ -37,6 +40,7 @@ const patternSyncStatusField: Field< Pattern > = {
 	enableSorting: false,
 	enableHiding: false,
 	filterBy: false,
+	getValue: ( { item } ) => getPatternSyncStatus( item ),
 	render: ( { item } ) => (
 		<span>
 			{ getPatternSyncStatusLabel( getPatternSyncStatus( item ) ) }

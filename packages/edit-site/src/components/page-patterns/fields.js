@@ -6,6 +6,7 @@ import { useMemo, useId } from '@wordpress/element';
 import { BlockPreview } from '@wordpress/block-editor';
 import { parse } from '@wordpress/blocks';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { patternSyncStatusField } from '@wordpress/fields';
 
 /**
  * Internal dependencies
@@ -82,23 +83,18 @@ const SYNC_FILTERS = [
 ];
 
 export const patternStatusField = {
-	label: __( 'Sync status' ),
-	id: 'sync-status',
-	render: ( { item } ) => {
-		const syncStatus =
-			'wp_pattern_sync_status' in item
-				? item.wp_pattern_sync_status || PATTERN_SYNC_TYPES.full
-				: PATTERN_SYNC_TYPES.unsynced;
-		// User patterns can have their sync statuses checked directly.
-		// Non-user patterns are all unsynced for the time being.
+	...patternSyncStatusField,
+	render: ( { item, field } ) => {
+		const SyncStatus = patternSyncStatusField.render;
+		const syncStatus = patternSyncStatusField.getValue( {
+			item,
+			field,
+		} );
 		return (
 			<span
 				className={ `edit-site-patterns__field-sync-status-${ syncStatus }` }
 			>
-				{
-					SYNC_FILTERS.find( ( { value } ) => value === syncStatus )
-						.label
-				}
+				<SyncStatus item={ item } field={ field } />
 			</span>
 		);
 	},
@@ -107,5 +103,6 @@ export const patternStatusField = {
 		operators: [ OPERATOR_IS ],
 		isPrimary: true,
 	},
+	enableHiding: true,
 	enableSorting: false,
 };
