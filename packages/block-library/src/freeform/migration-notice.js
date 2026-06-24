@@ -7,9 +7,7 @@ import { createBlock, rawHandler } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
 /**
- * Block-level deprecation warning rendered when the
- * `gutenberg-classic-block-deprecation` experiment is enabled.
- *
+ * Block-level deprecation warning for the Classic block.
  * Uses the same `Warning` primitive as `core/missing` so the experience is
  * visually consistent with how the editor already surfaces deprecated blocks,
  * and offers two migration actions - a primary "Convert to blocks", and a
