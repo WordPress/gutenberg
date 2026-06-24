@@ -166,10 +166,9 @@ class Gutenberg_Knowledge_Post_Type {
 		add_action( 'save_post_' . self::POST_TYPE, 'wp_knowledge_ensure_default_type_term' );
 		add_filter( 'wp_insert_term_data', 'wp_knowledge_maybe_map_term_label', 10, 2 );
 
-		// Guideline-row reservation guard: keep `guideline-` slugs verbatim
-		// (no `-2` suffix) and enforce uniqueness, type, title, and content
-		// sanitization on the insert path (see knowledge.php).
-		add_filter( 'wp_unique_post_slug', 'wp_knowledge_preserve_guideline_slug', 10, 6 );
+		// Sanitize guideline content and re-stamp registry scope titles on the
+		// REST insert path. Slug uniqueness is left to WordPress: the published
+		// row keeps its exact slug and duplicates are suffixed (see knowledge.php).
 		add_filter( 'rest_pre_insert_' . self::POST_TYPE, 'wp_knowledge_guard_guideline_row', 10, 2 );
 	}
 }

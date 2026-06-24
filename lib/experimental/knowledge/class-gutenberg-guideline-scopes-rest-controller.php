@@ -57,7 +57,7 @@ class Gutenberg_Guideline_Scopes_REST_Controller extends WP_REST_Controller {
 	public function get_items_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		if ( ! current_user_can( 'read_knowledge_items' ) ) {
 			return new WP_Error(
-				'rest_forbidden',
+				'rest_cannot_read',
 				__( 'Sorry, you are not allowed to view guideline scopes.', 'gutenberg' ),
 				array( 'status' => rest_authorization_required_code() )
 			);

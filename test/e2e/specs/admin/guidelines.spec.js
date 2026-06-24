@@ -203,6 +203,50 @@ test.describe( 'Guidelines', () => {
 		).toHaveValue( 'Second version.' );
 	} );
 
+	test( 'reclaims an existing non-public row on save instead of duplicating', async ( {
+		page,
+		admin,
+		requestUtils,
+	} ) => {
+		// Seed a private row that already owns the canonical slug. The page
+		// reads only published rows, so the Copy section starts empty.
+		await requestUtils.rest( {
+			path: KNOWLEDGE_REST_BASE,
+			method: 'POST',
+			data: {
+				slug: 'guideline-copy',
+				content: 'Old private guidance.',
+				status: 'private',
+			},
+		} );
+
+		await admin.visitAdminPage( SETTINGS_PAGE_PATH, GUIDELINES_PAGE_QUERY );
+		const copyCard = getSectionCard( page, 'Copy' );
+		await copyCard
+			.getByRole( 'button', { name: 'Copy', exact: true } )
+			.click();
+		await expect(
+			copyCard.getByRole( 'textbox', { name: 'Copy guidelines' } )
+		).toHaveValue( '' );
+
+		// Saving reclaims the private row (republish + overwrite) rather than
+		// creating a second row.
+		await saveSectionGuidelines( page, 'Copy', 'New guidance.' );
+
+		const rows = await requestUtils.rest( {
+			path: KNOWLEDGE_REST_BASE,
+			params: {
+				slug: 'guideline-copy',
+				status: [ 'publish', 'private', 'draft' ],
+				context: 'edit',
+				per_page: 100,
+			},
+		} );
+		expect( rows ).toHaveLength( 1 );
+		expect( rows[ 0 ].status ).toBe( 'publish' );
+		expect( rows[ 0 ].content.raw ).toBe( 'New guidance.' );
+	} );
+
 	test( 'clears a scope guideline', async ( { page, admin } ) => {
 		await admin.visitAdminPage( SETTINGS_PAGE_PATH, GUIDELINES_PAGE_QUERY );
 		await expect( getSectionCard( page, 'Copy' ) ).toBeVisible();

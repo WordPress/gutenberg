@@ -348,51 +348,29 @@ if ( ! function_exists( 'wp_guideline_scope_from_slug' ) ) {
 	}
 }
 
-if ( ! function_exists( 'wp_knowledge_preserve_guideline_slug' ) ) {
-	/**
-	 * Hook callback for `wp_unique_post_slug` that keeps `guideline-` slugs
-	 * verbatim.
-	 *
-	 * Slug is identity for guideline rows, so we never want WordPress to append
-	 * a `-2` suffix. Uniqueness is enforced separately on the insert path by
-	 * `wp_knowledge_guard_guideline_row()`.
-	 *
-	 * @access private
-	 *
-	 * @param string $slug          The computed (possibly suffixed) slug.
-	 * @param int    $post_id       Post ID.
-	 * @param string $post_status   Post status.
-	 * @param string $post_type     Post type.
-	 * @param int    $post_parent   Post parent ID.
-	 * @param string $original_slug The desired slug before uniqueness checks.
-	 * @return string The slug to use.
-	 */
-	function wp_knowledge_preserve_guideline_slug( $slug, $post_id, $post_status, $post_type, $post_parent, $original_slug ) {
-		if ( 'wp_knowledge' === $post_type && 0 === strpos( (string) $original_slug, 'guideline-' ) ) {
-			return $original_slug;
-		}
-
-		return $slug;
-	}
-}
-
 if ( ! function_exists( 'wp_knowledge_guard_guideline_row' ) ) {
 	/**
-	 * Hook callback for `rest_pre_insert_wp_knowledge` that enforces the
-	 * guideline-row reservation rule and sanitization on the REST insert path.
+	 * Hook callback for `rest_pre_insert_wp_knowledge` that sanitizes and
+	 * normalizes guideline rows on the REST insert path.
 	 *
 	 * For rows whose slug begins with `guideline-`:
-	 * - Rejects a slug already owned by a different row (one row per slug), on
-	 *   create and update alike.
 	 * - Sanitizes `post_content` to plain text capped at the guideline length.
 	 * - Re-stamps the title of registry scopes from `wp_guideline_scopes()` in
 	 *   the site locale. Block rows keep the client-provided canonical block name.
+	 *
+	 * Slug uniqueness is intentionally left to WordPress: the published row keeps
+	 * its exact slug because the first save has no conflict and later saves reuse
+	 * that row by ID, while any other row with the same desired slug is suffixed
+	 * (`guideline-copy-2`) by `wp_unique_post_slug()`. The Settings page reads
+	 * only the published row by its exact slug, so suffixed rows are ignored. The
+	 * client save flow reclaims an existing same-slug row instead of creating a
+	 * duplicate (see routes/guidelines/data.ts).
 	 *
 	 * @access private
 	 *
 	 * @param stdClass        $prepared_post Prepared post object.
 	 * @param WP_REST_Request $request       Request object.
-	 * @return stdClass|WP_Error Prepared post, or WP_Error on a slug conflict.
+	 * @return stdClass Prepared post.
 	 */
 	function wp_knowledge_guard_guideline_row( $prepared_post, $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		$slug = '';
@@ -407,30 +385,6 @@ if ( ! function_exists( 'wp_knowledge_guard_guideline_row' ) ) {
 
 		if ( 0 !== strpos( (string) $slug, 'guideline-' ) ) {
 			return $prepared_post;
-		}
-
-		// Enforce one row per slug (the reservation rule). This runs on create
-		// and update alike: on update the row itself is excluded, so a
-		// content-only save passes, but repointing a row's slug onto a
-		// `guideline-` slug already owned by a different row is rejected.
-		$existing_ids = get_posts(
-			array(
-				'post_type'      => Gutenberg_Knowledge_Post_Type::POST_TYPE,
-				'name'           => $slug,
-				'post_status'    => 'any',
-				'posts_per_page' => 1,
-				'fields'         => 'ids',
-				'no_found_rows'  => true,
-				'post__not_in'   => empty( $prepared_post->ID ) ? array() : array( (int) $prepared_post->ID ),
-			)
-		);
-
-		if ( ! empty( $existing_ids ) ) {
-			return new WP_Error(
-				'rest_knowledge_slug_exists',
-				__( 'A guideline with this slug already exists.', 'gutenberg' ),
-				array( 'status' => 409 )
-			);
 		}
 
 		// Sanitize content: plain text, capped at the guideline length.

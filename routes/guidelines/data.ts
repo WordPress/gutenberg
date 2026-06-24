@@ -2,12 +2,14 @@
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
-import { useSelect, dispatch } from '@wordpress/data';
+import { useSelect, dispatch, resolveSelect } from '@wordpress/data';
 import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
 import {
 	store as blocksStore,
 	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
+import apiFetch from '@wordpress/api-fetch';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -113,7 +115,10 @@ export function useGuidelineData(): GuidelineData {
 	const query: GuidelineQuery = useMemo(
 		() => ( {
 			slug: slugs,
-			status: [ 'publish', 'draft' ],
+			// The published row is the canonical one. Private/draft/suffixed
+			// rows with the same slug are placeholders the page ignores; a save
+			// reclaims them (see saveGuidelineRow) rather than showing them.
+			status: [ 'publish' ],
 			per_page: -1,
 		} ),
 		[ slugs ]
@@ -148,17 +153,54 @@ export function useGuidelineData(): GuidelineData {
 	};
 }
 
+interface ReclaimableRow {
+	id: number;
+	author: number;
+}
+
 /**
- * Creates (or updates) a guideline row for the given slug.
+ * Finds an existing row that already owns this exact slug so a save can reuse
+ * it instead of creating a duplicate.
+ *
+ * Searches non-trash statuses only: WordPress renames a trashed post's slug to
+ * `…__trashed`, so a trashed row no longer holds the exact slug and is left
+ * alone (a fresh row simply reclaims the now-free slug). At most one row can own
+ * an exact slug, so this returns the first match or undefined.
+ *
+ * @param slug Row slug.
+ */
+async function findReclaimableRow(
+	slug: string
+): Promise< ReclaimableRow | undefined > {
+	const rows = ( await apiFetch( {
+		path: addQueryArgs( '/wp/v2/knowledge', {
+			slug,
+			status: [ 'publish', 'private', 'draft', 'pending', 'future' ],
+			per_page: 1,
+			context: 'edit',
+		} ),
+	} ) ) as ReclaimableRow[];
+
+	return rows?.[ 0 ];
+}
+
+/**
+ * Creates, updates, or reclaims the guideline row for the given slug.
  *
  * The server forces the `guideline` term and, for registry scopes, re-stamps
  * the title; block rows keep the canonical block name passed as the title.
  *
+ * When the page already knows the published row (`existingId`), it is updated
+ * by ID. Otherwise, if a same-slug row already exists in another status (e.g. a
+ * private placeholder), it is reclaimed — republished and overwritten — rather
+ * than creating a duplicate, since the published row is the canonical one. The
+ * author is reassigned only when taking over another user's row.
+ *
  * @param slug       Row slug.
  * @param title      Title to send (registry title for scopes, exact block name for blocks).
  * @param content    Guideline text.
- * @param existingId Existing row id, or undefined to create.
- * @param query      The collection query to invalidate after a create.
+ * @param existingId Existing published row id, or undefined.
+ * @param query      The collection query to invalidate after a create/reclaim.
  */
 export async function saveGuidelineRow(
 	slug: string,
@@ -187,20 +229,51 @@ export async function saveGuidelineRow(
 		return;
 	}
 
-	await saveEntityRecord(
-		KNOWLEDGE_KIND,
-		KNOWLEDGE_NAME,
-		{ slug, title, content, status: 'publish' },
-		{ throwOnError: true }
-	);
+	const reclaimable = await findReclaimableRow( slug );
 
-	// A freshly created row's id isn't in the slug-filtered query's resolved id
-	// list yet; re-resolve so it shows up.
+	if ( reclaimable ) {
+		// Reclaim the existing row: republish and overwrite it. Reassign the
+		// author only when taking over another user's row (admin-only, gated by
+		// `edit_others_knowledge_items` + `publish_knowledge_items`).
+		const data: Record< string, unknown > = {
+			title,
+			content,
+			status: 'publish',
+		};
+		const currentUser = await resolveSelect( coreStore ).getCurrentUser();
+		const currentUserId = currentUser?.id;
+		if ( currentUserId && reclaimable.author !== currentUserId ) {
+			data.author = currentUserId;
+		}
+
+		await apiFetch( {
+			path: `/wp/v2/knowledge/${ reclaimable.id }`,
+			method: 'POST',
+			data,
+		} );
+	} else {
+		await saveEntityRecord(
+			KNOWLEDGE_KIND,
+			KNOWLEDGE_NAME,
+			{ slug, title, content, status: 'publish' },
+			{ throwOnError: true }
+		);
+	}
+
+	// The created/reclaimed row isn't in the slug-filtered query's resolved id
+	// list yet. Invalidate and await the re-resolution so the fresh row is in
+	// the store before this resolves — callers like export read straight from
+	// the resolved records and must not race the re-fetch.
 	invalidateResolution( 'getEntityRecords', [
 		KNOWLEDGE_KIND,
 		KNOWLEDGE_NAME,
 		query,
 	] );
+	await resolveSelect( coreStore ).getEntityRecords(
+		KNOWLEDGE_KIND,
+		KNOWLEDGE_NAME,
+		query
+	);
 }
 
 /**
