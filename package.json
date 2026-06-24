@@ -32,6 +32,9 @@
 			},
 			{
 				"id": "dashboard",
+				"init": [
+					"@wordpress/dashboard-init"
+				],
 				"experimental": true
 			},
 			{

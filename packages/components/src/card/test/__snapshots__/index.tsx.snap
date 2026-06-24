@@ -281,14 +281,12 @@ exports[`Card Card component should render correctly 1`] = `
 }
 
 .emotion-10 {
-  border: 0;
-  margin: 0;
-  border-bottom: 1px solid currentColor;
-  height: 0;
-  width: auto;
   box-sizing: border-box;
   display: block;
   width: 100%;
+}
+
+.emotion-11 {
   border-color: rgba(0, 0, 0, 0.1);
 }
 
@@ -412,7 +410,7 @@ exports[`Card Card component should render correctly 1`] = `
       </div>
       <hr
         aria-orientation="horizontal"
-        class="components-divider components-card__divider components-card-divider emotion-10 emotion-11"
+        class="components-divider emotion-10 emotion-11 components-card__divider components-card-divider"
         data-wp-c16t="true"
         data-wp-component="CardDivider"
         role="separator"
