@@ -176,12 +176,39 @@ function getEnabledClientIdsTreeUnmemoized( state, rootClientId ) {
 			state,
 			clientId
 		);
+		if ( getBlockEditingMode( state, clientId ) !== 'disabled' ) {
+			result.push( { clientId, innerBlocks } );
+		} else {
+			result.push( ...innerBlocks );
+		}
+	}
+
+	return result;
+}
+
+function getListViewClientIdsTreeUnmemoized(
+	state,
+	rootClientId,
+	hasNamedDisabledParent = false
+) {
+	const blockOrder = getBlockOrder( state, rootClientId );
+	const result = [];
+
+	for ( const clientId of blockOrder ) {
 		const isDisabled =
 			getBlockEditingMode( state, clientId ) === 'disabled';
+		const hasName = !! getBlockAttributes( state, clientId )?.metadata
+			?.name;
+		const innerBlocks = getListViewClientIdsTreeUnmemoized(
+			state,
+			clientId,
+			hasNamedDisabledParent || ( isDisabled && hasName )
+		);
 		const isNamedDisabledParent =
+			! hasNamedDisabledParent &&
 			isDisabled &&
 			innerBlocks.length > 0 &&
-			!! getBlockAttributes( state, clientId )?.metadata?.name &&
+			hasName &&
 			hasContentOnlyChild( state, innerBlocks );
 
 		if ( ! isDisabled || isNamedDisabledParent ) {
@@ -205,6 +232,24 @@ function getEnabledClientIdsTreeUnmemoized( state, rootClientId ) {
  */
 export const getEnabledClientIdsTree = createRegistrySelector( () =>
 	createSelector( getEnabledClientIdsTreeUnmemoized, ( state ) => [
+		state.blocks.order,
+		state.derivedBlockEditingModes,
+		state.blocks.blockEditingModes,
+	] )
+);
+
+/**
+ * Returns a tree of block objects for List View. Blocks with a 'disabled'
+ * editing mode are excluded, except named disabled parent blocks with visible
+ * content-only children, which are retained as grouping rows.
+ *
+ * @param {Object}  state        Global application state.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {Object[]} Tree of block objects with only clientID and innerBlocks set.
+ */
+export const getListViewClientIdsTree = createRegistrySelector( () =>
+	createSelector( getListViewClientIdsTreeUnmemoized, ( state ) => [
 		state.blocks.order,
 		state.blocks.byClientId,
 		state.blocks.attributes,
