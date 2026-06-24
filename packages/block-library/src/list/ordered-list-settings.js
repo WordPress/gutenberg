@@ -86,7 +86,6 @@ const OrderedListSettings = ( { setAttributes, reversed, start, type } ) => {
 					}
 				>
 					<TextControl
-						__next40pxDefaultSize
 						label={ __( 'Start value' ) }
 						type="number"
 						onChange={ ( value ) => {

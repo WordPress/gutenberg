@@ -52,7 +52,7 @@ describe( 'layout', () => {
 				getResponsiveLayoutStyles( {
 					attributes: {
 						style: {
-							mobile: {
+							'@mobile': {
 								spacing: {
 									blockGap: '12px',
 								},
@@ -74,7 +74,7 @@ describe( 'layout', () => {
 				getResponsiveLayoutStyles( {
 					attributes: {
 						style: {
-							mobile: {
+							'@mobile': {
 								spacing: {
 									blockGap: '12px',
 								},
@@ -96,7 +96,7 @@ describe( 'layout', () => {
 				getResponsiveLayoutStyles( {
 					attributes: {
 						style: {
-							mobile: {
+							'@mobile': {
 								layout: {
 									minimumColumnWidth: '8rem',
 								},
@@ -118,7 +118,7 @@ describe( 'layout', () => {
 				getResponsiveLayoutStyles( {
 					attributes: {
 						style: {
-							mobile: {
+							'@mobile': {
 								layout: {
 									columnCount: 3,
 								},
@@ -140,7 +140,7 @@ describe( 'layout', () => {
 				getResponsiveLayoutStyles( {
 					attributes: {
 						style: {
-							mobile: {
+							'@mobile': {
 								layout: {
 									columnCount: 3,
 								},
@@ -165,7 +165,7 @@ describe( 'layout', () => {
 				getResponsiveLayoutStyles( {
 					attributes: {
 						style: {
-							tablet: {
+							'@tablet': {
 								spacing: {
 									blockGap: '12px',
 								},
