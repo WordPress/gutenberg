@@ -22,9 +22,9 @@
   <text x="578" y="110" font-family="-apple-system, system-ui, sans-serif" font-size="10.5" fill="#94a3b8">decides where, not what</text>
 
   <!-- Row 2: Framing -->
-  <rect x="44" y="144" width="304" height="74" rx="9" fill="#d7f0ea" stroke="#2b8d79" stroke-width="1.5"/>
+  <rect x="44" y="144" width="304" height="74" rx="9" fill="#d7f0ea" stroke="#1d6b5a" stroke-width="1.5"/>
   <text x="64" y="174" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="700" fill="#1d6b5a">Framing</text>
-  <text x="64" y="197" font-family="ui-monospace, SFMono-Regular, monospace" font-size="10.5" fill="#2b8d79">presentation</text>
+  <text x="64" y="197" font-family="ui-monospace, SFMono-Regular, monospace" font-size="10.5" fill="#1d6b5a">presentation</text>
   <line x1="352" y1="181" x2="556" y2="181" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
   <text x="454" y="172" text-anchor="middle" font-family="ui-monospace, monospace" font-size="12.5" font-weight="700" fill="#1d6b5a">translated</text>
   <rect x="560" y="144" width="256" height="74" rx="9" fill="#fafbfc" stroke="#cbd5e1" stroke-width="1.4"/>
