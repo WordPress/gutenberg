@@ -40,7 +40,7 @@ export function useSpacer(
 
 	const cx = useCx();
 
-	const classes = cx(
+	const spacerStyles = css(
 		isDefined( margin ) &&
 			css`
 				margin: ${ space( margin ) };
@@ -100,9 +100,10 @@ export function useSpacer(
 		isDefined( paddingRight ) &&
 			rtl( {
 				paddingRight: space( paddingRight ),
-			} )(),
-		className
+			} )()
 	);
+
+	const classes = cx( spacerStyles, className );
 
 	return { ...otherProps, className: classes };
 }

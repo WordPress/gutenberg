@@ -7,17 +7,10 @@ Snapshot Diff:
 
   Array [
     Object {
--     "margin-right": "calc(4px * 5)",
--   },
--   Object {
 -     "margin": "calc(4px * 10)",
--   },
--   Object {
--     "margin-left": "calc(4px * 3)",
--     "margin-right": "calc(4px * 3)",
--   },
--   Object {
 -     "margin-bottom": "calc(4px * 1)",
+-     "margin-left": "calc(4px * 3)",
+-     "margin-right": "calc(4px * 5)",
 +     "margin-bottom": "calc(4px * 2)",
     },
   ]
@@ -31,20 +24,11 @@ Snapshot Diff:
   Array [
     Object {
       "margin-bottom": "calc(4px * 2)",
-    },
--   Object {
--     "padding-top": "calc(4px * 5)",
--   },
--   Object {
 -     "padding": "calc(4px * 10)",
--   },
--   Object {
 -     "padding-bottom": "calc(4px * 2)",
--     "padding-top": "calc(4px * 2)",
--   },
--   Object {
 -     "padding-left": "calc(4px * 3)",
--   },
+-     "padding-top": "calc(4px * 5)",
+    },
   ]
 `;
 
@@ -68,11 +52,9 @@ Snapshot Diff:
 
   Array [
     Object {
+-     "margin": "calc(4px * 5)",
       "margin-bottom": "calc(4px * 2)",
     },
--   Object {
--     "margin": "calc(4px * 5)",
--   },
   ]
 `;
 
@@ -97,10 +79,8 @@ Snapshot Diff:
   Array [
     Object {
       "margin-bottom": "calc(4px * 2)",
-    },
--   Object {
 -     "margin-left": "calc(4px * 5)",
--   },
+    },
   ]
 `;
 
@@ -112,10 +92,8 @@ Snapshot Diff:
   Array [
     Object {
       "margin-bottom": "calc(4px * 2)",
-    },
--   Object {
 -     "margin-right": "calc(4px * 5)",
--   },
+    },
   ]
 `;
 
@@ -127,10 +105,8 @@ Snapshot Diff:
   Array [
     Object {
       "margin-bottom": "calc(4px * 2)",
-    },
--   Object {
 -     "margin-top": "calc(4px * 5)",
--   },
+    },
   ]
 `;
 
@@ -142,11 +118,9 @@ Snapshot Diff:
   Array [
     Object {
       "margin-bottom": "calc(4px * 2)",
-    },
--   Object {
 -     "margin-left": "calc(4px * 5)",
 -     "margin-right": "calc(4px * 5)",
--   },
+    },
   ]
 `;
 
@@ -158,11 +132,8 @@ Snapshot Diff:
   Array [
     Object {
       "margin-bottom": "calc(4px * 2)",
-    },
--   Object {
--     "margin-bottom": "calc(4px * 5)",
 -     "margin-top": "calc(4px * 5)",
--   },
+    },
   ]
 `;
 
@@ -174,10 +145,8 @@ Snapshot Diff:
   Array [
     Object {
       "margin-bottom": "calc(4px * 2)",
-    },
--   Object {
 -     "padding": "calc(4px * 5)",
--   },
+    },
   ]
 `;
 
@@ -189,10 +158,8 @@ Snapshot Diff:
   Array [
     Object {
       "margin-bottom": "calc(4px * 2)",
-    },
--   Object {
 -     "padding-bottom": "calc(4px * 5)",
--   },
+    },
   ]
 `;
 
@@ -204,10 +171,8 @@ Snapshot Diff:
   Array [
     Object {
       "margin-bottom": "calc(4px * 2)",
-    },
--   Object {
 -     "padding-left": "calc(4px * 5)",
--   },
+    },
   ]
 `;
 
@@ -219,10 +184,8 @@ Snapshot Diff:
   Array [
     Object {
       "margin-bottom": "calc(4px * 2)",
-    },
--   Object {
 -     "padding-right": "calc(4px * 5)",
--   },
+    },
   ]
 `;
 
@@ -234,10 +197,8 @@ Snapshot Diff:
   Array [
     Object {
       "margin-bottom": "calc(4px * 2)",
-    },
--   Object {
 -     "padding-top": "calc(4px * 5)",
--   },
+    },
   ]
 `;
 
@@ -249,11 +210,9 @@ Snapshot Diff:
   Array [
     Object {
       "margin-bottom": "calc(4px * 2)",
-    },
--   Object {
 -     "padding-left": "calc(4px * 5)",
 -     "padding-right": "calc(4px * 5)",
--   },
+    },
   ]
 `;
 
@@ -265,10 +224,8 @@ Snapshot Diff:
   Array [
     Object {
       "margin-bottom": "calc(4px * 2)",
-    },
--   Object {
 -     "padding-bottom": "calc(4px * 5)",
 -     "padding-top": "calc(4px * 5)",
--   },
+    },
   ]
 `;
