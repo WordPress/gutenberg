@@ -3,6 +3,7 @@
  * External dependencies
  */
 import type { ComponentType } from 'react';
+import { isValidElementType } from 'react-is';
 
 /**
  * WordPress dependencies
@@ -153,9 +154,9 @@ export function registerPlugin(
 
 	const { render, scope } = settings;
 
-	if ( typeof render !== 'function' ) {
+	if ( ! isValidElementType( render ) ) {
 		console.error(
-			'The "render" property must be specified and must be a valid function.'
+			'The "render" property must be specified and must be a valid component.'
 		);
 		return null;
 	}

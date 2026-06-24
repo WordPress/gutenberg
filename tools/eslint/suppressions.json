@@ -132,7 +132,7 @@
 			"count": 2
 		}
 	},
-	"packages/block-editor/src/components/global-styles/color-panel.js": {
+	"packages/block-editor/src/components/global-styles/color-gradient-dropdown-item.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
 		}
@@ -627,6 +627,71 @@
 			"count": 1
 		}
 	},
+	"packages/components/src/base-control/styles/base-control-styles.ts": {
+		"no-restricted-imports": {
+			"count": 2
+		}
+	},
+	"packages/components/src/border-box-control/styles.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/components/src/border-control/styles.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/components/src/box-control/styles/box-control-icon-styles.ts": {
+		"no-restricted-imports": {
+			"count": 2
+		}
+	},
+	"packages/components/src/box-control/styles/box-control-styles.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/components/src/card/card/component.tsx": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/components/src/card/get-padding-by-size.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/components/src/card/styles.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/components/src/color-palette/styles.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/components/src/color-picker/styles.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/components/src/combobox-control/styles.ts": {
+		"no-restricted-imports": {
+			"count": 2
+		}
+	},
+	"packages/components/src/confirm-dialog/styles.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/components/src/context/test/context-system-provider.js": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
 	"packages/components/src/custom-gradient-picker/gradient-bar/control-points.tsx": {
 		"react-hooks/refs": {
 			"count": 1
@@ -637,8 +702,83 @@
 			"count": 1
 		}
 	},
+	"packages/components/src/custom-gradient-picker/styles/custom-gradient-picker-styles.tsx": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/components/src/custom-select-control-v2/styles.ts": {
+		"no-restricted-imports": {
+			"count": 2
+		}
+	},
+	"packages/components/src/date-time/date-picker/styles.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/components/src/date-time/date-time/styles.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/components/src/date-time/time-picker/styles.ts": {
+		"no-restricted-imports": {
+			"count": 2
+		}
+	},
+	"packages/components/src/disabled/styles/disabled-styles.tsx": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
 	"packages/components/src/draggable/index.tsx": {
 		"react-hooks/refs": {
+			"count": 1
+		}
+	},
+	"packages/components/src/dropdown/styles.ts": {
+		"no-restricted-imports": {
+			"count": 2
+		}
+	},
+	"packages/components/src/elevation/hook.ts": {
+		"no-restricted-imports": {
+			"count": 2
+		}
+	},
+	"packages/components/src/elevation/styles.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/components/src/flex/flex-item/hook.ts": {
+		"no-restricted-imports": {
+			"count": 2
+		}
+	},
+	"packages/components/src/flex/flex/hook.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/components/src/flex/styles.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/components/src/focal-point-picker/styles/focal-point-picker-style.ts": {
+		"no-restricted-imports": {
+			"count": 2
+		}
+	},
+	"packages/components/src/focal-point-picker/styles/focal-point-style.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/components/src/font-size-picker/styles.ts": {
+		"no-restricted-imports": {
 			"count": 1
 		}
 	},
@@ -647,14 +787,59 @@
 			"count": 1
 		}
 	},
+	"packages/components/src/form-token-field/styles.ts": {
+		"no-restricted-imports": {
+			"count": 2
+		}
+	},
+	"packages/components/src/grid/hook.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
 	"packages/components/src/input-control/input-field.tsx": {
 		"react-hooks/immutability": {
 			"count": 2
 		}
 	},
+	"packages/components/src/input-control/styles/input-control-styles.tsx": {
+		"no-restricted-imports": {
+			"count": 3
+		}
+	},
+	"packages/components/src/item-group/styles.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/components/src/menu/stories/index.story.tsx": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/components/src/menu/styles.ts": {
+		"no-restricted-imports": {
+			"count": 2
+		}
+	},
+	"packages/components/src/navigator/styles.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
 	"packages/components/src/number-control/index.tsx": {
 		"react-hooks/refs": {
 			"count": 2
+		}
+	},
+	"packages/components/src/number-control/styles/number-control-styles.ts": {
+		"no-restricted-imports": {
+			"count": 2
+		}
+	},
+	"packages/components/src/palette-edit/styles.ts": {
+		"no-restricted-imports": {
+			"count": 1
 		}
 	},
 	"packages/components/src/panel/body.tsx": {
@@ -667,6 +852,11 @@
 			"count": 1
 		}
 	},
+	"packages/components/src/progress-bar/styles.ts": {
+		"no-restricted-imports": {
+			"count": 2
+		}
+	},
 	"packages/components/src/range-control/index.tsx": {
 		"react-hooks/immutability": {
 			"count": 3
@@ -675,8 +865,88 @@
 			"count": 4
 		}
 	},
+	"packages/components/src/range-control/styles/range-control-styles.ts": {
+		"no-restricted-imports": {
+			"count": 2
+		}
+	},
+	"packages/components/src/resizable-box/resize-tooltip/styles/resize-tooltip.styles.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/components/src/scrollable/styles.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/components/src/search-control/styles.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/components/src/select-control/styles/select-control-styles.ts": {
+		"no-restricted-imports": {
+			"count": 2
+		}
+	},
 	"packages/components/src/slot-fill/slot.tsx": {
 		"react-hooks/refs": {
+			"count": 1
+		}
+	},
+	"packages/components/src/spacer/hook.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/components/src/spinner/styles.ts": {
+		"no-restricted-imports": {
+			"count": 2
+		}
+	},
+	"packages/components/src/style-provider/index.tsx": {
+		"no-restricted-imports": {
+			"count": 2
+		}
+	},
+	"packages/components/src/surface/styles.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/components/src/tabs/styles.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/components/src/text/hook.ts": {
+		"no-restricted-imports": {
+			"count": 2
+		}
+	},
+	"packages/components/src/text/styles.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/components/src/textarea-control/styles/textarea-control-styles.ts": {
+		"no-restricted-imports": {
+			"count": 2
+		}
+	},
+	"packages/components/src/theme/styles.ts": {
+		"no-restricted-imports": {
+			"count": 2
+		}
+	},
+	"packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts": {
+		"no-restricted-imports": {
+			"count": 2
+		}
+	},
+	"packages/components/src/toggle-group-control/toggle-group-control/styles.ts": {
+		"no-restricted-imports": {
 			"count": 1
 		}
 	},
@@ -690,6 +960,16 @@
 			"count": 1
 		}
 	},
+	"packages/components/src/tools-panel/stories/index.story.tsx": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/components/src/tools-panel/styles.ts": {
+		"no-restricted-imports": {
+			"count": 2
+		}
+	},
 	"packages/components/src/tools-panel/tools-panel/hook.ts": {
 		"react-hooks/refs": {
 			"count": 2
@@ -698,6 +978,61 @@
 	"packages/components/src/tree-grid/cell.tsx": {
 		"react-hooks/refs": {
 			"count": 1
+		}
+	},
+	"packages/components/src/truncate/hook.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/components/src/truncate/styles.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/components/src/unit-control/styles/unit-control-styles.ts": {
+		"no-restricted-imports": {
+			"count": 2
+		}
+	},
+	"packages/components/src/utils/base-label.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/components/src/utils/box-sizing.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/components/src/utils/hooks/emotion.d.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/components/src/utils/hooks/test/use-cx.js": {
+		"no-restricted-imports": {
+			"count": 3
+		}
+	},
+	"packages/components/src/utils/hooks/use-cx.ts": {
+		"no-restricted-imports": {
+			"count": 4
+		}
+	},
+	"packages/components/src/utils/rtl.js": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/components/src/view/component.tsx": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/components/src/z-stack/styles.ts": {
+		"no-restricted-imports": {
+			"count": 2
 		}
 	},
 	"packages/compose/src/hooks/use-dialog/index.ts": {
@@ -815,11 +1150,6 @@
 			"count": 2
 		}
 	},
-	"packages/edit-post/src/components/init-pattern-modal/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
 	"packages/edit-post/src/components/welcome-guide/default.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -875,11 +1205,6 @@
 			"count": 3
 		}
 	},
-	"packages/edit-site/src/components/page-patterns/fields.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/edit-site/src/components/page-templates/fields.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -900,17 +1225,7 @@
 			"count": 4
 		}
 	},
-	"packages/edit-site/src/components/save-hub/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/edit-site/src/components/sidebar-global-styles/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/edit-site/src/components/sidebar-navigation-item/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		}
@@ -1073,11 +1388,6 @@
 			"count": 1
 		}
 	},
-	"packages/editor/src/components/post-taxonomies/flat-term-selector.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/editor/src/components/post-template/create-new-template-modal.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
@@ -1098,16 +1408,6 @@
 			"count": 1
 		}
 	},
-	"packages/editor/src/components/revision-created-panel/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/editor/src/components/sidebar/dataform-post-summary.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/editor/src/components/sidebar/header.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -1121,11 +1421,6 @@
 	"packages/editor/src/components/sidebar/post-revision-summary.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
-		}
-	},
-	"packages/editor/src/components/sidebar/post-summary.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
 		}
 	},
 	"packages/editor/src/components/site-discussion/index.js": {
@@ -1552,26 +1847,6 @@
 			"count": 1
 		}
 	},
-	"packages/patterns/src/components/allow-overrides-modal.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		}
-	},
-	"packages/patterns/src/components/create-pattern-modal.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
-	"packages/patterns/src/components/rename-pattern-category-modal.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
-	"packages/patterns/src/components/rename-pattern-modal.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
 	"packages/preferences/src/components/preferences-modal-tabs/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 6
@@ -1585,16 +1860,6 @@
 	"packages/rich-text/src/hook/index.js": {
 		"react-hooks/refs": {
 			"count": 12
-		}
-	},
-	"packages/server-side-render/src/server-side-render.js": {
-		"react-hooks/refs": {
-			"count": 3
-		}
-	},
-	"packages/theme/src/stories/index.story.tsx": {
-		"react-hooks/refs": {
-			"count": 5
 		}
 	},
 	"packages/ui/src/alert-dialog/root.tsx": {
@@ -1636,11 +1901,6 @@
 		},
 		"@wordpress/use-recommended-components": {
 			"count": 3
-		}
-	},
-	"routes/dashboard/widget-dashboard/components/dashboard-widget-chrome/dashboard-widget-chrome.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
 		}
 	},
 	"routes/experiments-home/stage.tsx": {

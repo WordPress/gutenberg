@@ -11,7 +11,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import SandBox from '..';
+import SandBox, { VIEWPORT_UNIT_VALUE_REGEX } from '..';
 
 describe( 'SandBox', () => {
 	const TestWrapper = () => {
@@ -108,5 +108,48 @@ describe( 'SandBox', () => {
 			'srcdoc',
 			expect.stringContaining( 'https://another.super.embed' )
 		);
+	} );
+
+	describe( 'VIEWPORT_UNIT_VALUE_REGEX', () => {
+		it.each( [
+			'100vh',
+			'50vw',
+			'0vh',
+			'50.5vh',
+			'.5vh',
+			'100dvh',
+			'50svw',
+			'1lvi',
+			'100vmin',
+			'100vmax',
+		] )( 'matches viewport unit value %s', ( value ) => {
+			expect( VIEWPORT_UNIT_VALUE_REGEX.test( value ) ).toBe( true );
+		} );
+
+		it.each( [
+			'100px',
+			'50%',
+			'100',
+			'vh',
+			'.vh',
+			'calc(100vh - 10px)',
+			'100 vh',
+			'',
+		] )( 'does not match %s', ( value ) => {
+			expect( VIEWPORT_UNIT_VALUE_REGEX.test( value ) ).toBe( false );
+		} );
+
+		it( 'is embedded in the sandbox iframe srcdoc', () => {
+			// Guards against drift between the exported constant and
+			// the copy inlined into `observeAndResizeJS`, which is
+			// serialized via `.toString()` into the iframe srcdoc and
+			// cannot reference module-scope values at runtime.
+			render( <SandBox html="<p>x</p>" title="Regex Sync Test" /> );
+			const iframe =
+				screen.getByTitle< HTMLIFrameElement >( 'Regex Sync Test' );
+			const srcDoc = iframe.getAttribute( 'srcdoc' ) ?? '';
+
+			expect( srcDoc ).toContain( VIEWPORT_UNIT_VALUE_REGEX.source );
+		} );
 	} );
 } );

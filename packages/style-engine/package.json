@@ -64,8 +64,15 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@types/react": "^18.3.27",
 		"change-case": "^4.1.2"
+	},
+	"peerDependencies": {
+		"@types/react": "^18.3.27"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

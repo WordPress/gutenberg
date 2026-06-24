@@ -10,23 +10,22 @@
 
 		.button {
 			/* Internal variables */
-			--wp-ui-button-font-weight: 499;
+			--wp-ui-button-font-weight: var(--wpds-typography-font-weight-medium);
 
-			--wp-ui-button-background-color: var(--wpds-color-bg-interactive-brand-strong);
-			--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-brand-strong-active);
-			--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-neutral-strong-disabled);
-			--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-brand-strong);
-			--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-brand-strong-active);
-			--wp-ui-button-foreground-color-disabled: var(--wpds-color-fg-interactive-neutral-strong-disabled);
+			--wp-ui-button-background-color: var(--wpds-color-background-interactive-brand-strong);
+			--wp-ui-button-background-color-active: var(--wpds-color-background-interactive-brand-strong-active);
+			--wp-ui-button-background-color-disabled: var(--wpds-color-background-interactive-brand-strong-disabled);
+			--wp-ui-button-foreground-color: var(--wpds-color-foreground-interactive-brand-strong);
+			--wp-ui-button-foreground-color-active: var(--wpds-color-foreground-interactive-brand-strong-active);
+			--wp-ui-button-foreground-color-disabled: var(--wpds-color-foreground-interactive-brand-strong-disabled);
 			--wp-ui-button-padding-block: var(--wpds-dimension-padding-xs);
 			--wp-ui-button-padding-inline: var(--wpds-dimension-padding-md);
-			--wp-ui-button-height: 40px;
+			--wp-ui-button-height: var(--wpds-dimension-size-lg);
 			--wp-ui-button-aspect-ratio: auto; /* Useful for overrides such as icon buttons */
 			--wp-ui-button-font-size: var(--wpds-typography-font-size-md);
 			--wp-ui-button-min-width: calc(4ch + 2 * var(--wp-ui-button-padding-inline));
 			/* Icons are rendered as 24px but need to occupy a 16px footprint */
-			/* TODO: replace hardcoded values with DS size tokens once available */
-			--wp-ui-button-icon-margin: calc((16px - 24px) / 2);
+			--wp-ui-button-icon-margin: calc((var(--wpds-dimension-size-2xs) - var(--wpds-dimension-size-sm)) / 2);
 
 			/* by default, borders have the same color as the background */
 			--wp-ui-button-border-color: var(--wp-ui-button-background-color);
@@ -137,13 +136,19 @@
 				@media not ( prefers-reduced-motion ) {
 					transition: opacity 0.1s ease-out;
 				}
+
+				@media ( forced-colors: active ) {
+					border-color: ButtonText;
+					border-block-end-style: none;
+					border-inline-start-style: none;
+				}
 			}
 		}
 
 		.is-small {
 			--wp-ui-button-padding-block: 0;
 			--wp-ui-button-padding-inline: var(--wpds-dimension-padding-sm);
-			--wp-ui-button-height: 24px;
+			--wp-ui-button-height: var(--wpds-dimension-size-sm);
 		}
 
 		.icon {
@@ -159,24 +164,24 @@
 			/* Outline and minimal buttons use the same foreground color */
 			&.is-outline,
 			&.is-minimal {
-				--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-brand);
-				--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-brand-active);
-				--wp-ui-button-foreground-color-disabled: var(--wpds-color-fg-interactive-neutral-disabled);
+				--wp-ui-button-foreground-color: var(--wpds-color-foreground-interactive-brand);
+				--wp-ui-button-foreground-color-active: var(--wpds-color-foreground-interactive-brand-active);
+				--wp-ui-button-foreground-color-disabled: var(--wpds-color-foreground-interactive-brand-disabled);
 			}
 
 			&.is-outline {
-				--wp-ui-button-background-color: var(--wpds-color-bg-interactive-brand-weak);
-				--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-brand-weak-active);
-				--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-neutral-weak-disabled);
+				--wp-ui-button-background-color: var(--wpds-color-background-interactive-brand-weak);
+				--wp-ui-button-background-color-active: var(--wpds-color-background-interactive-brand-weak-active);
+				--wp-ui-button-background-color-disabled: var(--wpds-color-background-interactive-brand-weak-disabled);
 				--wp-ui-button-border-color: var(--wpds-color-stroke-interactive-brand);
 				--wp-ui-button-border-color-active: var(--wpds-color-stroke-interactive-brand-active);
-				--wp-ui-button-border-color-disabled: var(--wpds-color-stroke-interactive-neutral-disabled);
+				--wp-ui-button-border-color-disabled: var(--wpds-color-stroke-interactive-brand-disabled);
 			}
 
 			&.is-minimal {
-				--wp-ui-button-background-color: var(--wpds-color-bg-interactive-brand-weak);
-				--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-brand-weak-active);
-				--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-neutral-weak-disabled);
+				--wp-ui-button-background-color: var(--wpds-color-background-interactive-brand-weak);
+				--wp-ui-button-background-color-active: var(--wpds-color-background-interactive-brand-weak-active);
+				--wp-ui-button-background-color-disabled: var(--wpds-color-background-interactive-brand-weak-disabled);
 			}
 		}
 
@@ -184,35 +189,35 @@
 			/* Solid and pressed minimal share the strong appearance */
 			&.is-solid,
 			&.is-minimal[aria-pressed="true"] {
-				--wp-ui-button-background-color: var(--wpds-color-bg-interactive-neutral-strong);
-				--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-neutral-strong-active);
-				--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-neutral-strong-disabled);
-				--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-neutral-strong);
-				--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-neutral-strong-active);
-				--wp-ui-button-foreground-color-disabled: var(--wpds-color-fg-interactive-neutral-strong-disabled);
+				--wp-ui-button-background-color: var(--wpds-color-background-interactive-neutral-strong);
+				--wp-ui-button-background-color-active: var(--wpds-color-background-interactive-neutral-strong-active);
+				--wp-ui-button-background-color-disabled: var(--wpds-color-background-interactive-neutral-strong-disabled);
+				--wp-ui-button-foreground-color: var(--wpds-color-foreground-interactive-neutral-strong);
+				--wp-ui-button-foreground-color-active: var(--wpds-color-foreground-interactive-neutral-strong-active);
+				--wp-ui-button-foreground-color-disabled: var(--wpds-color-foreground-interactive-neutral-strong-disabled);
 			}
 
 			/* Outline and unpressed minimal buttons use the same foreground color */
 			&.is-outline,
 			&.is-minimal:not([aria-pressed="true"]) {
-				--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-neutral);
-				--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-neutral-active);
-				--wp-ui-button-foreground-color-disabled: var(--wpds-color-fg-interactive-neutral-disabled);
+				--wp-ui-button-foreground-color: var(--wpds-color-foreground-interactive-neutral);
+				--wp-ui-button-foreground-color-active: var(--wpds-color-foreground-interactive-neutral-active);
+				--wp-ui-button-foreground-color-disabled: var(--wpds-color-foreground-interactive-neutral-disabled);
 			}
 
 			&.is-outline {
-				--wp-ui-button-background-color: var(--wpds-color-bg-interactive-neutral-weak);
-				--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-neutral-weak-active);
-				--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-neutral-weak-disabled);
+				--wp-ui-button-background-color: var(--wpds-color-background-interactive-neutral-weak);
+				--wp-ui-button-background-color-active: var(--wpds-color-background-interactive-neutral-weak-active);
+				--wp-ui-button-background-color-disabled: var(--wpds-color-background-interactive-neutral-weak-disabled);
 				--wp-ui-button-border-color: var(--wpds-color-stroke-interactive-neutral);
 				--wp-ui-button-border-color-active: var(--wpds-color-stroke-interactive-neutral-active);
 				--wp-ui-button-border-color-disabled: var(--wpds-color-stroke-interactive-neutral-disabled);
 			}
 
 			&.is-minimal:not([aria-pressed="true"]) {
-				--wp-ui-button-background-color: var(--wpds-color-bg-interactive-neutral-weak);
-				--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-neutral-weak-active);
-				--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-neutral-weak-disabled);
+				--wp-ui-button-background-color: var(--wpds-color-background-interactive-neutral-weak);
+				--wp-ui-button-background-color-active: var(--wpds-color-background-interactive-neutral-weak-active);
+				--wp-ui-button-background-color-disabled: var(--wpds-color-background-interactive-neutral-weak-disabled);
 			}
 		}
 
@@ -223,16 +228,20 @@
 		}
 
 		.is-compact {
-			--wp-ui-button-height: 32px;
+			--wp-ui-button-height: var(--wpds-dimension-size-md);
 		}
 
-		.is-loading {
+		.is-loading:not(.is-unstyled) {
 			color: transparent;
 
 			/* Keep text transparent when a loading button is hovered — needed because
 			 the hover state now sets `color` as a property declaration. */
 			&:not([data-disabled]):is(:hover, :active, :focus) {
 				color: transparent;
+			}
+
+			@media ( forced-colors: active ) {
+				color: ButtonFace;
 			}
 
 			* {

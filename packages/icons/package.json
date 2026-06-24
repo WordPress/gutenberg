@@ -43,13 +43,18 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@types/react": "^18.3.27",
 		"@wordpress/element": "file:../element",
 		"@wordpress/primitives": "file:../primitives",
 		"change-case": "^4.1.2"
 	},
 	"peerDependencies": {
+		"@types/react": "^18.3.27",
 		"react": "^18.0.0"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

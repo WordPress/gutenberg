@@ -181,7 +181,7 @@ Configure your root `package.json` with a `wpPlugin` object to control global na
 
 ### `wpPlugin.name`
 
-Name used to prefix genereated PHP functions. Must follow function name rules in PHP, i.e. valid name starts with a letter or underscore, followed by any number of letters, numbers, or underscores.
+Name used to prefix generated PHP functions. Must follow function name rules in PHP, i.e. valid name starts with a letter or underscore, followed by any number of letters, numbers, or underscores.
 
 ```json
 {
@@ -336,7 +336,7 @@ add_menu_page( 'Title', 'Menu', 'capability', 'my-admin-page', 'my_plugin_my_adm
 ```
 
 **Init Modules:**
-Init modules are JavaScript packages that execute during page initialization, before routes are registered and the app renders. They're ideal for:
+Init modules are JavaScript packages that execute during page initialization, after menu items and routes are registered and before the app renders. They're ideal for:
 - Adding icons to menu items (icons can't be passed from PHP)
 - Registering command palette entries
 
@@ -372,7 +372,7 @@ export async function init() {
 }
 ```
 
-The `init()` function is **mandatory** - all init modules must export this named function. Init modules are loaded as static dependencies and executed sequentially before the boot system registers menu items and routes.
+The `init()` function is **mandatory** - all init modules must export this named function. Init modules are loaded as static dependencies and executed sequentially after the boot system registers menu items and routes, before the app renders.
 
 ### Example: WordPress Core (Gutenberg)
 

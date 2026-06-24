@@ -159,6 +159,10 @@ const restrictedSyntax = [
 		selector: 'JSXAttribute[name.name="__nextHasNoMarginBottom"]',
 		message: 'The `__nextHasNoMarginBottom` prop is no longer needed.',
 	},
+	...[ 'BoxControl', 'TextControl' ].map( ( componentName ) => ( {
+		selector: `JSXElement[openingElement.name.name="${ componentName }"] JSXAttribute[name.name="__next40pxDefaultSize"]`,
+		message: `The \`__next40pxDefaultSize\` prop is no longer needed on \`${ componentName }\`.`,
+	} ) ),
 	{
 		selector:
 			'CallExpression[callee.name="withDispatch"] > :function > BlockStatement > :not(VariableDeclaration,ReturnStatement)',
@@ -547,11 +551,14 @@ export default dedupePlugins( [
 		},
 	},
 
-	// Override: Storybook + components + ui — relax jsdoc require-param.
+	// Override: Relax JSDoc parameter rules for TypeScript components. A
+	// component always receives props and returns a React element, and its
+	// props should be documented through its TypeScript props types.
 	{
 		files: [
 			'**/@(storybook|stories)/**',
 			'packages/components/src/**/*.tsx',
+			'packages/theme/src/**/*.tsx',
 			'packages/ui/src/**/*.tsx',
 		],
 		rules: {
@@ -648,7 +655,8 @@ export default dedupePlugins( [
 		},
 	},
 
-	// Override: Components src — allow ariakit and framer-motion imports.
+	// Override: Components src — allow ariakit/framer-motion imports and
+	// prevent new Emotion usage while existing styles are migrated.
 	{
 		files: [ 'packages/components/src/**' ],
 		rules: {
@@ -659,8 +667,9 @@ export default dedupePlugins( [
 						( { name } ) =>
 							! [ '@ariakit/react', 'framer-motion' ].includes(
 								name
-							)
+							) && ! name.startsWith( '@emotion/' )
 					),
+					patterns: [ '@emotion/**' ],
 				},
 			],
 		},

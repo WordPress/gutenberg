@@ -27,12 +27,11 @@ import {
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { privateApis as themePrivateApis } from '@wordpress/theme';
+import { ThemeProvider } from '@wordpress/theme';
 import { PluginArea } from '@wordpress/plugins';
 import { SnackbarNotices, store as noticesStore } from '@wordpress/notices';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
 import { Tooltip } from '@wordpress/ui';
 
 /**
@@ -50,7 +49,6 @@ import SavePanel from '../save-panel';
 
 const { useLocation } = unlock( routerPrivateApis );
 const { useStyle, UploadProgressSnackbar } = unlock( editorPrivateApis );
-const { ThemeProvider } = unlock( themePrivateApis );
 
 const ANIMATION_DURATION = 0.3;
 const CONTENT_COLOR = { background: '#ffffff' };
@@ -184,10 +182,18 @@ function Layout() {
 												}
 											/>
 										) }
-										<SidebarContent routeKey={ routeKey }>
-											{ areas.mobileContent ? (
-												<ThemeProvider
-													color={ CONTENT_COLOR }
+										{ areas.mobileContent ? (
+											/*
+											 * ThemeProvider wraps SidebarContent (rather than
+											 * just the content) so the scroll wrapper it renders
+											 * inherits the content background tokens. See
+											 * `.edit-site-sidebar__screen-wrapper` in style.scss.
+											 */
+											<ThemeProvider
+												color={ CONTENT_COLOR }
+											>
+												<SidebarContent
+													routeKey={ routeKey }
 												>
 													<div className="edit-site-layout__mobile-content">
 														<ErrorBoundary>
@@ -196,13 +202,17 @@ function Layout() {
 															}
 														</ErrorBoundary>
 													</div>
-												</ThemeProvider>
-											) : (
+												</SidebarContent>
+											</ThemeProvider>
+										) : (
+											<SidebarContent
+												routeKey={ routeKey }
+											>
 												<ErrorBoundary>
 													{ areas.mobileSidebar }
 												</ErrorBoundary>
-											) }
-										</SidebarContent>
+											</SidebarContent>
+										) }
 										<SaveHub />
 										<SavePanel />
 									</>

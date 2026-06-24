@@ -46,7 +46,6 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@types/mousetrap": "^1.6.8",
-		"@types/react": "^18.3.27",
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
@@ -67,7 +66,13 @@
 		"react-dom": "^18.3.1"
 	},
 	"peerDependencies": {
+		"@types/react": "^18.3.27",
 		"react": "^18.0.0"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

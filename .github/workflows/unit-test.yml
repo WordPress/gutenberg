@@ -29,6 +29,7 @@ jobs:
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
+            id-token: write
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
@@ -64,6 +65,10 @@ jobs:
             - name: Running the tests
               env:
                   SHARD: ${{ matrix.shard }}
+                  # Record the Node.js major as a custom flakiness environment
+                  # dimension so flakiness.io keeps a separate history per Node
+                  # version in the matrix.
+                  FK_ENV_NODEJS: ${{ matrix.node }}
               run: |
                   npm run test:unit -- \
                     --ci \
@@ -76,6 +81,7 @@ jobs:
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
+            id-token: write
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
@@ -108,6 +114,11 @@ jobs:
               run: npx lerna run build
 
             - name: Run the date tests
+              env:
+                  # Record the Node.js major as a custom flakiness environment
+                  # dimension so flakiness.io keeps a separate history per Node
+                  # version in the matrix.
+                  FK_ENV_NODEJS: ${{ matrix.node }}
               run: npm run test:unit:date -- --ci --maxWorkers="$(nproc)" --cacheDirectory="$HOME/.jest-cache"
 
     compute-previous-wordpress-version:
@@ -173,17 +184,21 @@ jobs:
             fail-fast: true
             matrix:
                 event: ['${{ github.event_name }}']
-                php: ['7.4', '8.0', '8.1', '8.2', '8.3']
+                php: ['7.4', '8.0', '8.1', '8.2', '8.3', '8.4', '8.5']
                 multisite: [false, true]
                 wordpress: ['', 'previous major version']
                 exclude:
-                    # On PRs: Only test PHP 7.4 and 8.3, single-site, latest WP
+                    # On PRs: Only test PHP 7.4 and 8.5, single-site, latest WP
                     - event: 'pull_request'
                       php: '8.0'
                     - event: 'pull_request'
                       php: '8.1'
                     - event: 'pull_request'
                       php: '8.2'
+                    - event: 'pull_request'
+                      php: '8.3'
+                    - event: 'pull_request'
+                      php: '8.4'
                     - event: 'pull_request'
                       multisite: true
                     - event: 'pull_request'
@@ -194,6 +209,10 @@ jobs:
                     - php: '8.1'
                       wordpress: 'previous major version'
                     - php: '8.2'
+                      wordpress: 'previous major version'
+                    - php: '8.3'
+                      wordpress: 'previous major version'
+                    - php: '8.4'
                       wordpress: 'previous major version'
 
         env:
@@ -218,7 +237,7 @@ jobs:
             # dependency versions are installed and cached.
             ##
             - name: Set up PHP
-              uses: shivammathur/setup-php@7c071dfe9dc99bdf297fa79cb49ea005b9fcadbc # v2.37.1
+              uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
               with:
                   php-version: '${{ matrix.php }}'
                   ini-file: development
@@ -313,7 +332,7 @@ jobs:
                   persist-credentials: false
 
             - name: Set up PHP
-              uses: shivammathur/setup-php@7c071dfe9dc99bdf297fa79cb49ea005b9fcadbc # v2.37.1
+              uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
               with:
                   php-version: '7.4'
                   coverage: none
