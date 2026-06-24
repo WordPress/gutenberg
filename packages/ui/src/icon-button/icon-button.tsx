@@ -30,7 +30,7 @@ export const IconButton = forwardRef< HTMLButtonElement, IconButtonProps >(
 		const classes = clsx( styles[ 'icon-button' ], className );
 
 		return (
-			<Tooltip.Provider delay={ 0 }>
+			<Tooltip.Provider>
 				<Tooltip.Root>
 					<Tooltip.Trigger
 						ref={ ref }

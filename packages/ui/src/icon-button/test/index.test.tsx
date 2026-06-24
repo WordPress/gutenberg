@@ -1,4 +1,4 @@
-import { render, waitFor, screen } from '@testing-library/react';
+import { act, render, waitFor, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
 import { IconButton } from '../index';
@@ -34,6 +34,48 @@ describe( 'IconButton', () => {
 	} );
 
 	describe( 'tooltip with disabled state', () => {
+		it( 'uses the default tooltip delay on hover', async () => {
+			jest.useFakeTimers();
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
+			try {
+				render( <IconButton label="Save" icon={ <svg /> } /> );
+
+				const button = screen.getByRole( 'button', { name: 'Save' } );
+				await user.hover( button );
+
+				expect( screen.queryByText( 'Save' ) ).not.toBeInTheDocument();
+
+				act( () => {
+					jest.advanceTimersByTime( 600 );
+				} );
+
+				await waitFor( () => {
+					expect( screen.getByText( 'Save' ) ).toBeVisible();
+				} );
+			} finally {
+				jest.useRealTimers();
+			}
+		} );
+
+		it( 'shows tooltip immediately on keyboard focus', async () => {
+			const user = userEvent.setup();
+
+			render( <IconButton label="Save" icon={ <svg /> } /> );
+
+			await user.tab();
+
+			await waitFor( () => {
+				expect( screen.getByText( 'Save' ) ).toBeVisible();
+			} );
+			expect( screen.getByText( 'Save' ) ).toHaveAttribute(
+				'data-instant',
+				'focus'
+			);
+		} );
+
 		it( 'does not show tooltip when truly disabled', async () => {
 			const user = userEvent.setup();
 
