@@ -4,7 +4,7 @@
  *
  * Generates scoped CSS for per-instance state styles declared in block attributes,
  * including pseudo-states (e.g., `style[':hover']`) and responsive states
- * (e.g., `style['mobile']` and `style['mobile'][':hover']`).
+ * (e.g., `style['@mobile']` and `style['@mobile'][':hover']`).
  *
  * @package WordPress
  */
@@ -513,7 +513,10 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 	}
 
 	$supported_pseudo_states = WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ] ?? array();
-	$style                   = $block['attrs']['style'] ?? array();
+	$style                   = gutenberg_resolve_style_state_aliases(
+		$block['attrs']['style'] ?? array(),
+		$block_name
+	);
 	$css_rules               = array();
 
 	foreach ( $supported_pseudo_states as $pseudo_state ) {

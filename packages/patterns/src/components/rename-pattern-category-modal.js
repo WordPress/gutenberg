@@ -132,7 +132,6 @@ export default function RenamePatternCategoryModal( {
 					<Stack direction="column" gap="sm">
 						<TextControl
 							ref={ textControlRef }
-							__next40pxDefaultSize
 							label={ __( 'Name' ) }
 							value={ name }
 							onChange={ onChange }

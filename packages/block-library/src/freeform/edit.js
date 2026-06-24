@@ -21,7 +21,6 @@ import { classic } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import ConvertToBlocksButton from './convert-to-blocks-button';
 import MigrationNotice from './migration-notice';
 import ModalEdit from './modal';
 
@@ -41,22 +40,8 @@ export default function FreeformEdit( {
 	);
 	const { removeBlock } = useDispatch( blockEditorStore );
 
-	// Gated by an experiment so authors can opt into a stronger nudge to
-	// migrate Classic block content ahead of its planned deprecation.
-	const isDeprecationMode = window.__experimentalClassicBlockDeprecation;
-
 	return (
 		<>
-			{ canRemove && ! isDeprecationMode && (
-				<BlockControls>
-					<ToolbarGroup>
-						<ConvertToBlocksButton
-							content={ content }
-							onReplace={ onReplace }
-						/>
-					</ToolbarGroup>
-				</BlockControls>
-			) }
 			<BlockControls>
 				<ToolbarGroup>
 					<ToolbarButton
@@ -68,7 +53,7 @@ export default function FreeformEdit( {
 				</ToolbarGroup>
 			</BlockControls>
 			<div { ...useBlockProps() }>
-				{ isDeprecationMode && canRemove && content && (
+				{ canRemove && content && (
 					<MigrationNotice
 						content={ content }
 						onReplace={ onReplace }
@@ -80,15 +65,11 @@ export default function FreeformEdit( {
 					<Placeholder
 						icon={ <BlockIcon icon={ classic } /> }
 						label={ __( 'Classic' ) }
-						instructions={
-							isDeprecationMode
-								? __(
-										'The Classic block is being phased out. It’s recommended to use other blocks for the best editing experience.'
-								  )
-								: __( 'Use the classic editor to add content.' )
-						}
+						instructions={ __(
+							'The Classic block is being phased out. It’s recommended to use other blocks for the best editing experience.'
+						) }
 					>
-						{ isDeprecationMode && canRemove && (
+						{ canRemove && (
 							<Button
 								__next40pxDefaultSize
 								variant="primary"
@@ -99,11 +80,7 @@ export default function FreeformEdit( {
 						) }
 						<Button
 							__next40pxDefaultSize
-							variant={
-								isDeprecationMode && canRemove
-									? 'secondary'
-									: 'primary'
-							}
+							variant={ canRemove ? 'secondary' : 'primary' }
 							onClick={ () => setOpen( true ) }
 						>
 							{ __( 'Edit contents' ) }
