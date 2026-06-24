@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 15.22.0 (2026-06-24)
+
 ### Enhancements
 
 -   List View: a block that supports `listView` is now excluded from the List View when it has no inner blocks and disallows insertion (`allowedBlocks` is `[]` or `false`), since there is nothing to show, rearrange, or add. ([#78932](https://github.com/WordPress/gutenberg/pull/78932))
