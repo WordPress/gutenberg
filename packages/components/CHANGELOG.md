@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
--   The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed ([#79386](https://github.com/WordPress/gutenberg/pull/79386), [#79419](https://github.com/WordPress/gutenberg/pull/79419)):
+-   The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed ([#79386](https://github.com/WordPress/gutenberg/pull/79386), [#79419](https://github.com/WordPress/gutenberg/pull/79419), [#79481](https://github.com/WordPress/gutenberg/pull/79481)):
     -   `BoxControl`
     -   `FontSizePicker`
     -   `TextControl`
