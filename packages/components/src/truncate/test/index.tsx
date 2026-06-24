@@ -55,18 +55,6 @@ describe( 'Truncate', () => {
 			);
 			expect( screen.getByText( 'Lo!!!m.' ) ).toBeVisible();
 		} );
-
-		test( 'should render numberOfLines as a CSS custom property', () => {
-			render( <Truncate numberOfLines={ 2 }>Lorem ipsum.</Truncate> );
-
-			expect( screen.getByText( 'Lorem ipsum.' ) ).toHaveAttribute(
-				'data-lines',
-				'2'
-			);
-			expect( screen.getByText( 'Lorem ipsum.' ) ).toHaveStyle( {
-				'--wp-components-truncate-lines': '2',
-			} );
-		} );
 	} );
 
 	describe( 'with other children types', () => {

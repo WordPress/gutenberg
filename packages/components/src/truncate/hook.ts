@@ -2,7 +2,6 @@
  * External dependencies
  */
 import clsx from 'clsx';
-import type { CSSProperties } from 'react';
 
 /**
  * Internal dependencies
@@ -12,10 +11,6 @@ import { useContextSystem } from '../context';
 import { TRUNCATE_ELLIPSIS, TRUNCATE_TYPE, truncateContent } from './utils';
 import type { TruncateProps } from './types';
 import styles from './style.module.scss';
-
-type TruncateStyle = CSSProperties & {
-	'--wp-components-truncate-lines'?: number;
-};
 
 export default function useTruncate(
 	props: WordPressComponentProps< TruncateProps, 'span' >
@@ -50,14 +45,16 @@ export default function useTruncate(
 	const shouldTruncate =
 		!! childrenAsText && ellipsizeMode === TRUNCATE_TYPE.auto;
 	const shouldClampLines = shouldTruncate && !! numberOfLines;
+	const shouldClampSingleLine = shouldClampLines && numberOfLines === 1;
 
 	const classes = clsx(
 		shouldTruncate && ! numberOfLines && styles.truncate,
 		shouldClampLines && styles.lineClamp,
+		shouldClampSingleLine && styles.singleLineClamp,
 		className
 	);
 
-	const truncateStyle: TruncateStyle | undefined = shouldClampLines
+	const truncateStyle = shouldClampLines
 		? {
 				...style,
 				'--wp-components-truncate-lines': numberOfLines,
@@ -67,7 +64,6 @@ export default function useTruncate(
 	return {
 		...otherProps,
 		className: classes,
-		'data-lines': shouldClampLines ? numberOfLines : undefined,
 		style: truncateStyle,
 		children: truncatedContent,
 	};

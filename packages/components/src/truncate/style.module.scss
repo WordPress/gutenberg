@@ -14,7 +14,7 @@
 	// The `word-break: break-all` property first makes sure a text line
 	// breaks even when it contains 'unbreakable' content such as long URLs.
 	// See https://github.com/WordPress/gutenberg/issues/60860.
-	&[data-lines="1"] {
+	&.singleLineClamp {
 		word-break: break-all;
 	}
 }
