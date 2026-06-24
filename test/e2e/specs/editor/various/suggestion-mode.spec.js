@@ -276,4 +276,38 @@ test.describe( 'Suggestion mode', () => {
 		await waitForSuggestionSaved( page );
 		await expect( heading ).toHaveClass( /is-suggestion-pending/ );
 	} );
+
+	test( 'does not suggest an empty inserted block until it has content', async ( {
+		editor,
+		page,
+	} ) => {
+		// Clicking the default block appender (the empty canvas space below
+		// the last block) inserts an unmodified default paragraph via
+		// `insertDefaultBlock`. In Suggest mode that empty block must NOT
+		// become an "Insert block" suggestion on its own — the suggestion
+		// should only appear once the user types content into it. See the
+		// store interceptor's new-block branch.
+		await switchIntent( page, 'Suggest' );
+
+		// Click the default block appender to insert an empty paragraph —
+		// the same path as clicking the empty space below the last block.
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
+
+		const block = editor.canvas
+			.locator( '[data-type="core/paragraph"]' )
+			.first();
+		await expect( block ).toBeVisible();
+
+		// The empty inserted block must not carry the insertion-suggestion
+		// treatment. The interceptor tags `pending-insert` synchronously on
+		// the same store update that inserts the block, so with the bug the
+		// class is already present by the time the block renders.
+		await expect( block ).not.toHaveClass( /is-suggestion-pending-insert/ );
+
+		// Once the user types into the new block, it becomes a suggestion.
+		await page.keyboard.type( 'Newly added text' );
+		await expect( block ).toHaveClass( /is-suggestion-pending-insert/ );
+	} );
 } );
