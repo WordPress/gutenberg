@@ -202,7 +202,7 @@ add_action( 'admin_menu', 'gutenberg_experiments_legacy_menu', 9 );
  * `?page=experiments-wp-admin` URL.
  */
 function gutenberg_redirect_legacy_experiments_page() {
-	wp_safe_redirect( admin_url( 'admin.php?page=experiments-wp-admin' ) );
+	wp_safe_redirect( admin_url( 'options-general.php?page=experiments-wp-admin' ) );
 	exit;
 }
 add_action( 'load-admin_page_gutenberg-experiments', 'gutenberg_redirect_legacy_experiments_page' );

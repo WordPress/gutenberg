@@ -8,22 +8,21 @@
 /**
  * Gutenberg's Menu.
  *
- * Adds a top-level "Gutenberg" wp-admin menu that links directly to the
- * Experiments screen. The Experiments page is rendered by the auto-generated
- * `gutenberg_experiments_wp_admin_render_page()` callback (see
- * `lib/experimental/experiments/load.php`), and the menu uses its
- * `experiments-wp-admin` slug so no separate submenu is needed.
+ * Surfaces the Experiments screen as a "Gutenberg Experiments" submenu under
+ * the core Settings menu, rather than as a dedicated top-level menu. The page
+ * is rendered by the auto-generated `gutenberg_experiments_wp_admin_render_page()`
+ * callback (see `lib/experimental/experiments/load.php`).
  *
  * @since 0.1.0
  */
 function gutenberg_menu() {
-	add_menu_page(
-		__( 'Gutenberg', 'gutenberg' ),
-		__( 'Gutenberg', 'gutenberg' ),
+	add_submenu_page(
+		'options-general.php',
+		__( 'Gutenberg Experiments', 'gutenberg' ),
+		__( 'Gutenberg Experiments', 'gutenberg' ),
 		'manage_options',
 		'experiments-wp-admin',
-		'gutenberg_experiments_wp_admin_render_page',
-		'dashicons-edit'
+		'gutenberg_experiments_wp_admin_render_page'
 	);
 }
 add_action( 'admin_menu', 'gutenberg_menu', 9 );
