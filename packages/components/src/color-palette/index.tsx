@@ -13,6 +13,7 @@ import clsx from 'clsx';
 import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useMemo, useState, forwardRef } from '@wordpress/element';
+import { Icon, pencil } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -304,32 +305,39 @@ function UnforwardedColorPalette(
 								} }
 								type="button"
 							/>
-							<VStack
-								className="components-color-palette__custom-color-text-wrapper"
-								spacing={ 0.5 }
-							>
-								<Truncate className="components-color-palette__custom-color-name">
-									{ value
-										? buttonLabelName
-										: __( 'No color selected' ) }
-								</Truncate>
-								{ /*
-								This `Truncate` is always rendered, even if
-								there is no `displayValue`, to ensure the layout
-								does not shift
-								*/ }
-								<Truncate
-									className={ clsx(
-										'components-color-palette__custom-color-value',
-										{
-											'components-color-palette__custom-color-value--is-hex':
-												isHex,
-										}
-									) }
+							<div className="components-color-palette__custom-color-text-wrapper">
+								<VStack spacing={ 0.5 }>
+									<Truncate className="components-color-palette__custom-color-name">
+										{ value
+											? buttonLabelName
+											: __( 'No color selected' ) }
+									</Truncate>
+									{ /*
+									This `Truncate` is always rendered, even if
+									there is no `displayValue`, to ensure the layout
+									does not shift
+									*/ }
+									<Truncate
+										className={ clsx(
+											'components-color-palette__custom-color-value',
+											{
+												'components-color-palette__custom-color-value--is-hex':
+													isHex,
+											}
+										) }
+									>
+										{ displayValue }
+									</Truncate>
+								</VStack>
+								<button
+									className="components-color-palette__custom-color-edit-button"
+									aria-label={ __( 'Edit custom color' ) }
+									onClick={ onToggle }
+									type="button"
 								>
-									{ displayValue }
-								</Truncate>
-							</VStack>
+									<Icon icon={ pencil } size={ 20 } />
+								</button>
+							</div>
 						</VStack>
 					) }
 				/>
