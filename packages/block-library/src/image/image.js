@@ -236,7 +236,6 @@ function ContentOnlyControls( {
 				>
 					<div className="wp-block-image__toolbar_content_textarea__container">
 						<TextControl
-							__next40pxDefaultSize
 							className="wp-block-image__toolbar_content_textarea"
 							label={ __( 'Title attribute' ) }
 							value={ attributes.title || '' }
@@ -1143,7 +1142,6 @@ export default function Image( {
 			) }
 			<InspectorControls group="advanced">
 				<TextControl
-					__next40pxDefaultSize
 					label={ __( 'Title attribute' ) }
 					value={ title || '' }
 					onChange={ onSetTitle }

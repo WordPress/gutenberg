@@ -75,6 +75,7 @@ export default function MediaAttachedToEdit( {
 			post: 0,
 			_embedded: { ...data?._embedded, 'wp:attached-to': undefined },
 		} );
+		setValue( null );
 		setOptions( [] );
 	};
 
@@ -90,13 +91,16 @@ export default function MediaAttachedToEdit( {
 			{}
 		);
 		setSearchResults( results );
-		const mappedSuggestions = results.map( ( result ) => {
+		const suggestions = results.map( ( result ) => {
 			return {
 				label: result.title,
 				value: result.id.toString(),
 			};
 		} );
-		setOptions( mappedSuggestions );
+		const includeCurrent =
+			! filterValue &&
+			suggestions.findIndex( ( s ) => s.value === value ) === -1;
+		setOptions( suggestions.concat( includeCurrent ? defaultPost : [] ) );
 		setIsLoading( false );
 	};
 
@@ -146,23 +150,22 @@ export default function MediaAttachedToEdit( {
 		}
 	};
 
-	const help = !! data.post
-		? createInterpolateElement(
-				__(
-					'Search for a post or page to attach this media to or <button>detach current</button>.'
-				),
-				{
-					button: (
-						<Button
-							__next40pxDefaultSize
-							onClick={ handleDetach }
-							variant="link"
-							accessibleWhenDisabled
-						/>
-					),
-				}
-		  )
-		: __( 'Search for a post or page to attach this media to.' );
+	const help = createInterpolateElement(
+		__(
+			'Search for a post or page to attach this media to or <button>detach current</button>.'
+		),
+		{
+			button: (
+				<Button
+					__next40pxDefaultSize
+					onClick={ handleDetach }
+					variant="link"
+					accessibleWhenDisabled
+					disabled={ ! value }
+				/>
+			),
+		}
+	);
 
 	return (
 		<ComboboxControl

@@ -12,6 +12,8 @@
 -   Suggestions: surface Apply / Reject actions in the collaboration sidebar via a shared `useSuggestionDecision` hook. Note headers expose icon-only Apply / Reject buttons, the note body renders the suggestion summary plus the staleness confirmation dialog, and the e2e coverage for block notes and the intent switcher is extended to the new UI.
 -   Suggestions: replace the manual commit-bar with a background auto-save subsystem. Pending overlay edits flush as a `_wp_suggestion` note after a short idle window, and subsequent edits on the same block update the existing note rather than creating a new one — keeping the live block tree free of pending suggestion state.
 
+## 14.49.0 (2026-06-24)
+
 ## 14.48.1 (2026-06-16)
 
 ## 14.48.0 (2026-06-10)

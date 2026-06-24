@@ -9,7 +9,7 @@
 	"description": "Playlist track.",
 	"keywords": [ "music", "sound" ],
 	"textdomain": "default",
-	"usesContext": [ "showArtists", "currentTrack" ],
+	"usesContext": [ "showArtists" ],
 	"attributes": {
 		"blob": {
 			"type": "string",
@@ -17,9 +17,6 @@
 		},
 		"id": {
 			"type": "number"
-		},
-		"uniqueId": {
-			"type": "string"
 		},
 		"src": {
 			"type": "string"

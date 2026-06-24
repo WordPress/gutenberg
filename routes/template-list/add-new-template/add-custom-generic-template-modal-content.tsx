@@ -63,7 +63,6 @@ function AddCustomGenericTemplateModalContent( {
 		<form onSubmit={ onCreateTemplate }>
 			<VStack spacing={ 6 }>
 				<TextControl
-					__next40pxDefaultSize
 					label={ __( 'Name' ) }
 					value={ title }
 					onChange={ setTitle }

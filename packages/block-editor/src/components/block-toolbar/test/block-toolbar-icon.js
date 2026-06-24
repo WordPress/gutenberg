@@ -13,10 +13,32 @@ import { paragraph } from '@wordpress/icons';
  * Internal dependencies
  */
 import BlockToolbarIcon from '../block-toolbar-icon';
+import { isIsolatedEditorKey } from '../../../store/private-keys';
 
+jest.mock( '@wordpress/blocks', () => {
+	const actualImplementation = jest.requireActual( '@wordpress/blocks' );
+	return {
+		...actualImplementation,
+		getBlockType: ( name ) => ( {
+			name,
+			title: name === 'core/template-part' ? 'Template Part' : 'Group',
+			icon: `${ name }-icon`,
+		} ),
+	};
+} );
 jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
+jest.mock( '../../../lock-unlock', () => ( {
+	unlock: ( value ) => ( {
+		registerPrivateActions: jest.fn(),
+		registerPrivateSelectors: jest.fn(),
+		...value,
+	} ),
+} ) );
 jest.mock( '../../block-title/use-block-display-title', () =>
 	jest.fn().mockReturnValue( 'Block Name' )
+);
+jest.mock( '../../block-icon', () =>
+	jest.fn( ( { icon } ) => <span data-testid="block-icon">{ icon }</span> )
 );
 jest.mock( '../../block-switcher', () =>
 	jest.fn( ( { children } ) => (
@@ -37,6 +59,34 @@ describe( 'BlockToolbarIcon', () => {
 	const defaultProps = {
 		clientIds: [ 'test-client-id' ],
 		isSynced: false,
+	};
+	const setupToolbarSelectors = ( {
+		attributes = {
+			metadata: {
+				patternName: 'theme/hero',
+			},
+		},
+		blockName = 'core/group',
+		getActiveBlockVariation = () => null,
+		settings = {},
+		isWithinEditedSection = false,
+	} = {} ) => {
+		useSelect.mockImplementation( ( mapSelect ) =>
+			mapSelect( () => ( {
+				get: () => false,
+				getBlockName: () => blockName,
+				getBlockAttributes: () => attributes,
+				getSettings: () => settings,
+				getBlockParentsByBlockName: () => [],
+				canRemoveBlocks: () => true,
+				getTemplateLock: () => undefined,
+				getBlockEditingMode: () => 'default',
+				canEditBlock: () => true,
+				getBlockStyles: () => [ {} ],
+				getActiveBlockVariation,
+				isWithinEditedContentOnlySection: () => isWithinEditedSection,
+			} ) )
+		);
 	};
 
 	beforeEach( () => {
@@ -140,6 +190,55 @@ describe( 'BlockToolbarIcon', () => {
 			expect( button ).toHaveAttribute(
 				'aria-label',
 				'Multiple blocks selected'
+			);
+		} );
+	} );
+
+	describe( 'pattern sections', () => {
+		it( 'should not show the block switcher before the section is being edited', () => {
+			setupToolbarSelectors();
+
+			render( <BlockToolbarIcon { ...defaultProps } /> );
+
+			expect(
+				screen.queryByTestId( 'block-switcher' )
+			).not.toBeInTheDocument();
+			expect( screen.getByRole( 'button' ) ).toHaveAttribute(
+				'aria-disabled',
+				'true'
+			);
+		} );
+
+		it( 'should show the block switcher when the section is being edited', () => {
+			setupToolbarSelectors( { isWithinEditedSection: true } );
+
+			render( <BlockToolbarIcon { ...defaultProps } /> );
+
+			expect(
+				screen.getByTestId( 'block-switcher' )
+			).toBeInTheDocument();
+		} );
+
+		it( 'should show the block icon for pattern wrappers in isolated editors', () => {
+			setupToolbarSelectors( {
+				attributes: {
+					metadata: {
+						name: 'Header',
+						patternName: 'theme/header-wrapper',
+					},
+				},
+				settings: {
+					[ isIsolatedEditorKey ]: true,
+				},
+			} );
+
+			render( <BlockToolbarIcon { ...defaultProps } /> );
+
+			expect(
+				screen.getByTestId( 'block-switcher' )
+			).toBeInTheDocument();
+			expect( screen.getByTestId( 'block-icon' ) ).toHaveTextContent(
+				'core/group-icon'
 			);
 		} );
 	} );
