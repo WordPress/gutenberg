@@ -136,14 +136,6 @@ The space between the popover and the control wrapper.
 
 -   Required: No
 
-### `size`: `string`
-
-Size of the control.
-
--   Required: No
--   Default: `default`
--   Allowed values: `default`, `__unstable-large`
-
 ### `value`: `Object`
 
 An object representing the current border configuration.

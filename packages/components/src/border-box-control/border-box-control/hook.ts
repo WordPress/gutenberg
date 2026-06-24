@@ -32,13 +32,10 @@ export function useBorderBoxControl(
 		onChange,
 		enableAlpha = false,
 		enableStyle = true,
-		size = 'default',
 		value,
 		__experimentalIsRenderedInSidebar = false,
 		...otherProps
 	} = useContextSystem( props, 'BorderBoxControl' );
-
-	const computedSize = size === 'default' ? '__unstable-large' : size;
 
 	const mixedBorders = hasMixedBorders( value );
 	const splitBorders = hasSplitBorders( value );
@@ -135,7 +132,6 @@ export function useBorderBoxControl(
 		onSplitChange,
 		toggleLinked,
 		linkedValue,
-		size: computedSize,
 		splitValue,
 		wrapperClassName,
 		__experimentalIsRenderedInSidebar,

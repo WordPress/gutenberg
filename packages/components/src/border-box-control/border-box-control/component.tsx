@@ -59,7 +59,6 @@ const UnconnectedBorderBoxControl = (
 		onSplitChange,
 		popoverPlacement,
 		popoverOffset,
-		size,
 		splitValue,
 		toggleLinked,
 		wrapperClassName,
@@ -112,15 +111,11 @@ const UnconnectedBorderBoxControl = (
 						shouldSanitizeBorder={ false } // This component will handle that.
 						value={ linkedValue }
 						withSlider
-						width={
-							size === '__unstable-large' ? '116px' : '110px'
-						}
+						width="116px"
+						size="__unstable-large"
 						__experimentalIsRenderedInSidebar={
 							__experimentalIsRenderedInSidebar
 						}
-						__next40pxDefaultSize
-						__shouldNotWarnDeprecated36pxSize
-						size={ size }
 					/>
 				) : (
 					<BorderBoxControlSplitControls
@@ -135,13 +130,11 @@ const UnconnectedBorderBoxControl = (
 						__experimentalIsRenderedInSidebar={
 							__experimentalIsRenderedInSidebar
 						}
-						size={ size }
 					/>
 				) }
 				<BorderBoxControlLinkedButton
 					onClick={ toggleLinked }
 					isLinked={ isLinked }
-					size={ size }
 				/>
 			</View>
 		</View>
