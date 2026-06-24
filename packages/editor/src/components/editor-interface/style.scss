@@ -23,6 +23,10 @@
 		color: var(--wp-block-synced-color);
 	}
 
+	.editor-document-tools__inserter-toggle.components-button.has-icon.is-primary {
+		color: #fff;
+	}
+
 	.editor-document-tools__inserter-toggle.components-button.has-icon.is-pressed,
 	.editor-document-tools__inserter-toggle.components-button.has-icon[aria-pressed="true"] {
 		color: #fff;

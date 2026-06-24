@@ -343,7 +343,7 @@ function VisualEditor( {
 
 	const centerContentCSS = `display:flex;align-items:center;justify-content:center;`;
 	const globalEditorColorSchemeCSS = isGlobalEditorColorScheme
-		? `:where(.editor-styles-wrapper){
+		? `:where(.block-editor-iframe__html, .block-editor-iframe__body, .editor-styles-wrapper, .block-editor-block-list__layout, .is-root-container){
 			--wp-admin-theme-color: var(--wp-block-synced-color, #7a00df);
 			--wp-admin-theme-color--rgb: var(--wp-block-synced-color--rgb, 122, 0, 223);
 			--wp-admin-theme-color-darker-10: #6700bd;
@@ -351,6 +351,9 @@ function VisualEditor( {
 			--wp-components-color-accent: var(--wp-block-synced-color, #7a00df);
 			--wp-components-color-accent-darker-10: #6700bd;
 			--wp-components-color-accent-darker-20: #540099;
+		}
+		:where(.block-editor-block-list__block.is-hovered, .block-editor-block-list__block.is-selected, .block-editor-block-list__block.is-highlighted)::after{
+			outline-color: var(--wp-block-synced-color, #7a00df);
 		}`
 		: '';
 
