@@ -5,18 +5,28 @@ import {
 	getVisibleBounds,
 	createExportCamera,
 	getImageFit,
+	getRotatedBBox,
+	getViewScale,
 } from '../camera';
 import {
 	restrictPanZoom,
 	restrictCropRect,
 	getImageCropBounds,
+	getMinZoom,
 } from '../containment';
-import { getSourceRegion, getSourceRegionPercent } from '../source-region';
-import { DEFAULT_STATE } from '../constants';
+import {
+	getSourceRegion,
+	getSourceRegionPercent,
+	snapCropRectToSourcePixelGrid,
+	snapCropRectToSourcePixels,
+} from '../source-region';
+import { computeTransformStyle } from '../transform-style';
+import { DEFAULT_STATE, MAX_ZOOM, MIN_ZOOM } from '../constants';
 import type { CropperState, Size } from '../types';
 
 const CONTAINER: Size = { width: 800, height: 600 };
 const IMAGE: Size = { width: 1600, height: 900 };
+const PORTRAIT_IMAGE: Size = { width: 900, height: 1600 };
 
 function makeState( overrides: Partial< CropperState > = {} ): CropperState {
 	return {
@@ -28,6 +38,47 @@ function makeState( overrides: Partial< CropperState > = {} ): CropperState {
 		},
 		...overrides,
 	};
+}
+
+function expectImageCoversCrop( state: CropperState, imageSize: Size ): void {
+	const container: Size = { width: 1000, height: 1000 };
+	const camera = createCamera( state, container, imageSize );
+	const snapRotation = Math.round( state.rotation / 90 ) * 90;
+	const baseCamera = createCamera(
+		{
+			...state,
+			pan: { x: 0, y: 0 },
+			zoom: 1,
+			rotation: snapRotation,
+		},
+		container,
+		imageSize
+	);
+	const vb = getVisibleBounds( baseCamera );
+	const cr = state.cropRect;
+	const stencilCorners: [ number, number ][] = [
+		[ vb.left + cr.x * vb.width, vb.top + cr.y * vb.height ],
+		[ vb.left + ( cr.x + cr.width ) * vb.width, vb.top + cr.y * vb.height ],
+		[
+			vb.left + ( cr.x + cr.width ) * vb.width,
+			vb.top + ( cr.y + cr.height ) * vb.height,
+		],
+		[
+			vb.left + cr.x * vb.width,
+			vb.top + ( cr.y + cr.height ) * vb.height,
+		],
+	];
+
+	for ( const corner of stencilCorners ) {
+		const w = screenToWorld( camera, {
+			x: corner[ 0 ],
+			y: corner[ 1 ],
+		} );
+		expect( w.x ).toBeGreaterThanOrEqual( -0.001 );
+		expect( w.x ).toBeLessThanOrEqual( 1.001 );
+		expect( w.y ).toBeGreaterThanOrEqual( -0.001 );
+		expect( w.y ).toBeLessThanOrEqual( 1.001 );
+	}
 }
 
 describe( 'createCamera', () => {
@@ -120,6 +171,35 @@ describe( 'restrictPanZoom', () => {
 		const result = restrictPanZoom( state, IMAGE, state.cropRect );
 		expect( result.zoom ).toBeGreaterThanOrEqual( 1 );
 	} );
+	it( 'caps zoom at MAX_ZOOM', () => {
+		const state = makeState( { zoom: MAX_ZOOM * 2 } );
+		const result = restrictPanZoom( state, IMAGE, state.cropRect );
+		expect( result.zoom ).toBe( MAX_ZOOM );
+	} );
+	it( 'allows zoom below 1 when a fine-rotated portrait crop remains covered', () => {
+		const cropRect = { x: 0.46, y: 0, width: 0.08, height: 1 };
+		const state = makeState( {
+			image: {
+				src: 'portrait.jpg',
+				naturalWidth: PORTRAIT_IMAGE.width,
+				naturalHeight: PORTRAIT_IMAGE.height,
+			},
+			rotation: 19,
+			zoom: 0.9,
+			cropRect,
+		} );
+		const result = restrictPanZoom( state, PORTRAIT_IMAGE, cropRect );
+
+		expect( result.zoom ).toBeGreaterThan( 0.9 );
+		expect( result.zoom ).toBeLessThan( 1 );
+
+		const restrictedState = makeState( {
+			...state,
+			pan: result.pan,
+			zoom: result.zoom,
+		} );
+		expectImageCoversCrop( restrictedState, PORTRAIT_IMAGE );
+	} );
 	it( 'at 90° with zoom=1, allows zero pan on landscape image', () => {
 		// At zoom=1, 90° rotation, the image exactly covers the visual area.
 		// No pan should be possible in either direction.
@@ -170,6 +250,36 @@ describe( 'restrictPanZoom', () => {
 		const result = restrictPanZoom( state, IMAGE, state.cropRect );
 		expect( result.pan.x ).toBeCloseTo( 0, 5 );
 		expect( result.pan.y ).toBeCloseTo( 0, 5 );
+	} );
+} );
+
+describe( 'getMinZoom', () => {
+	it( 'falls back to MIN_ZOOM for invalid image dimensions', () => {
+		const state = makeState( {
+			image: {
+				src: 'invalid.jpg',
+				naturalWidth: 1000,
+				naturalHeight: 0,
+			},
+		} );
+
+		expect( getMinZoom( state ) ).toBe( MIN_ZOOM );
+	} );
+
+	it( 'returns a finite value for non-finite rotation and crop fields', () => {
+		const state = makeState( {
+			rotation: Number.NaN,
+			cropRect: {
+				x: 0,
+				y: 0,
+				width: Number.NaN,
+				height: 1,
+			},
+		} );
+
+		const minZoom = getMinZoom( state );
+		expect( Number.isFinite( minZoom ) ).toBe( true );
+		expect( minZoom ).toBeGreaterThan( 0 );
 	} );
 } );
 
@@ -472,6 +582,114 @@ describe( 'getSourceRegion', () => {
 	} );
 } );
 
+describe( 'snapCropRectToSourcePixels', () => {
+	const getSourceEdges = ( state: CropperState ) => {
+		const region = getSourceRegion( state, IMAGE );
+		return {
+			left: region.x,
+			top: region.y,
+			right: region.x + region.width,
+			bottom: region.y + region.height,
+		};
+	};
+
+	it( 'snaps the selected source-region edges to whole pixels under pan and zoom', () => {
+		const state = makeState( {
+			zoom: 2.25,
+			pan: { x: 0.013, y: -0.017 },
+			cropRect: { x: 0.12, y: 0.18, width: 0.33, height: 0.41 },
+		} );
+		const candidate = { x: 0.123, y: 0.187, width: 0.337, height: 0.419 };
+
+		const unsnapped = getSourceRegion(
+			{ ...state, cropRect: candidate },
+			IMAGE
+		);
+		expect(
+			Math.abs(
+				unsnapped.x +
+					unsnapped.width -
+					Math.round( unsnapped.x + unsnapped.width )
+			)
+		).toBeGreaterThan( 0.01 );
+		expect(
+			Math.abs(
+				unsnapped.y +
+					unsnapped.height -
+					Math.round( unsnapped.y + unsnapped.height )
+			)
+		).toBeGreaterThan( 0.01 );
+
+		const snappedCropRect = snapCropRectToSourcePixels(
+			state,
+			IMAGE,
+			candidate,
+			'se'
+		);
+
+		const snapped = getSourceEdges( {
+			...state,
+			cropRect: snappedCropRect,
+		} );
+		expect( snapped.left ).toBeCloseTo( unsnapped.x, 3 );
+		expect( snapped.top ).toBeCloseTo( unsnapped.y, 3 );
+		expect( snapped.right ).toBeCloseTo( Math.round( snapped.right ), 3 );
+		expect( snapped.bottom ).toBeCloseTo( Math.round( snapped.bottom ), 3 );
+	} );
+
+	it( 'snaps all source-region edges to whole pixels', () => {
+		const state = makeState( {
+			rotation: 30,
+			zoom: 2.25,
+			pan: { x: 0.013, y: -0.017 },
+			cropRect: { x: 0.12, y: 0.18, width: 0.33, height: 0.41 },
+		} );
+		const candidate = { x: 0.123, y: 0.187, width: 0.337, height: 0.419 };
+
+		const snappedCropRect = snapCropRectToSourcePixelGrid(
+			state,
+			IMAGE,
+			candidate
+		);
+		const snapped = getSourceEdges( {
+			...state,
+			cropRect: snappedCropRect,
+		} );
+
+		expect( snapped.left ).toBeCloseTo( Math.round( snapped.left ), 3 );
+		expect( snapped.top ).toBeCloseTo( Math.round( snapped.top ), 3 );
+		expect( snapped.right ).toBeCloseTo( Math.round( snapped.right ), 3 );
+		expect( snapped.bottom ).toBeCloseTo( Math.round( snapped.bottom ), 3 );
+	} );
+
+	it( 'does not snap selected edges while fine rotation couples source axes', () => {
+		const state = makeState( {
+			rotation: 30,
+			zoom: 2.25,
+			pan: { x: 0.013, y: -0.017 },
+			cropRect: { x: 0.12, y: 0.18, width: 0.33, height: 0.41 },
+		} );
+		const candidate = { x: 0.123, y: 0.187, width: 0.337, height: 0.419 };
+
+		expect(
+			snapCropRectToSourcePixels( state, IMAGE, candidate, 'e' )
+		).toBe( candidate );
+	} );
+
+	it( 'returns the input crop rect when the image dimensions are invalid', () => {
+		const cropRect = { x: 0.1, y: 0.2, width: 0.3, height: 0.4 };
+
+		expect(
+			snapCropRectToSourcePixels(
+				makeState(),
+				{ width: 0, height: 0 },
+				cropRect,
+				'se'
+			)
+		).toBe( cropRect );
+	} );
+} );
+
 describe( 'getSourceRegionPercent', () => {
 	it( 'at default state, returns 0/0/100/100', () => {
 		const state = makeState();
@@ -578,5 +796,424 @@ describe( 'getImageCropBounds', () => {
 		expect( bounds.maxX ).toBeGreaterThan( 1.3 );
 		expect( bounds.minY ).toBeLessThan( -0.3 );
 		expect( bounds.maxY ).toBeGreaterThan( 1.3 );
+	} );
+} );
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Non-finite input regressions.
+//
+// The reducer normalizes rotation/zoom/pan on every action, so these paths
+// aren't user-reachable today. But programmatic callers and deserialized
+// state could still feed corrupted values, which used to silently propagate
+// NaN/Infinity into the crop rect, camera matrix, or REST /edit payload.
+// These tests pin the defense-in-depth guards in place.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const HOSTILE_STATE: CropperState = makeState( {
+	pan: { x: Number.NaN, y: Number.NEGATIVE_INFINITY },
+	zoom: Number.POSITIVE_INFINITY,
+	rotation: Number.NaN,
+} );
+
+describe( 'getRotatedBBox — non-finite input regression', () => {
+	it.each( [
+		[ 'NaN width', Number.NaN, 100, 30 ],
+		[ '±Infinity height', 100, Number.POSITIVE_INFINITY, 30 ],
+		[ 'NaN rotation', 100, 100, Number.NaN ],
+		[ '-Infinity rotation', 100, 100, Number.NEGATIVE_INFINITY ],
+		// MAX_VALUE is finite but degreesToRadians( MAX_VALUE ) overflows
+		// to Infinity, then Math.cos/sin return NaN. The magnitude bound
+		// in `isSafeNumber` catches this before the trig.
+		[ 'MAX_VALUE rotation', 100, 100, Number.MAX_VALUE ],
+	] )( 'returns {0, 0} for %s', ( _label, w, h, rot ) => {
+		expect( getRotatedBBox( w, h, rot ) ).toEqual( {
+			width: 0,
+			height: 0,
+		} );
+	} );
+
+	it( 'still returns correct dimensions for normal inputs', () => {
+		// Sanity check that the guard doesn't break the happy path.
+		const out = getRotatedBBox( 200, 100, 90 );
+		expect( out.width ).toBeCloseTo( 100, 5 );
+		expect( out.height ).toBeCloseTo( 200, 5 );
+	} );
+} );
+
+describe( 'getImageFit — non-finite input regression', () => {
+	it( 'returns finite sizes when rotation is NaN (treated as 0)', () => {
+		const out = getImageFit( CONTAINER, IMAGE, Number.NaN );
+		expect( Number.isFinite( out.elementSize.width ) ).toBe( true );
+		expect( Number.isFinite( out.elementSize.height ) ).toBe( true );
+		expect( Number.isFinite( out.visualSize.width ) ).toBe( true );
+		expect( Number.isFinite( out.visualSize.height ) ).toBe( true );
+	} );
+
+	it( 'returns zero sizes when containerSize has a non-finite dimension', () => {
+		const out = getImageFit( { width: Number.NaN, height: 600 }, IMAGE, 0 );
+		expect( out.elementSize ).toEqual( { width: 0, height: 0 } );
+		expect( out.visualSize ).toEqual( { width: 0, height: 0 } );
+	} );
+
+	it( 'returns zero sizes when imageSize has a non-finite dimension', () => {
+		const out = getImageFit(
+			CONTAINER,
+			{ width: Number.POSITIVE_INFINITY, height: 900 },
+			0
+		);
+		expect( out.elementSize ).toEqual( { width: 0, height: 0 } );
+		expect( out.visualSize ).toEqual( { width: 0, height: 0 } );
+	} );
+} );
+
+describe( 'createCamera — non-finite input regression', () => {
+	it( 'returns a matrix with all finite entries even for hostile state', () => {
+		const m = createCamera( HOSTILE_STATE, CONTAINER, IMAGE );
+		expect( m ).toHaveLength( 6 );
+		for ( let i = 0; i < 6; i++ ) {
+			expect( Number.isFinite( m[ i ] ) ).toBe( true );
+		}
+	} );
+
+	it( 'returns identity matrix when imageSize has non-finite dimensions', () => {
+		const m = createCamera( makeState(), CONTAINER, {
+			width: Number.NaN,
+			height: 900,
+		} );
+		// mat2d.create() returns [1, 0, 0, 1, 0, 0] (identity).
+		expect( Array.from( m ) ).toEqual( [ 1, 0, 0, 1, 0, 0 ] );
+	} );
+} );
+
+describe( 'createExportCamera — non-finite input regression', () => {
+	it( 'returns a matrix with all finite entries even for hostile state', () => {
+		// This is the matrix passed to ctx.setTransform → ctx.drawImage at
+		// export time, so NaN here would corrupt the saved file.
+		const m = createExportCamera( HOSTILE_STATE, IMAGE, {
+			width: 600,
+			height: 400,
+		} );
+		for ( let i = 0; i < 6; i++ ) {
+			expect( Number.isFinite( m[ i ] ) ).toBe( true );
+		}
+	} );
+
+	it( 'returns identity matrix when outputSize has non-finite dimensions', () => {
+		const m = createExportCamera( makeState(), IMAGE, {
+			width: Number.POSITIVE_INFINITY,
+			height: 400,
+		} );
+		expect( Array.from( m ) ).toEqual( [ 1, 0, 0, 1, 0, 0 ] );
+	} );
+} );
+
+describe( 'restrictCropRect — non-finite input regression', () => {
+	const cropRect = { x: 0.1, y: 0.1, width: 0.5, height: 0.5 };
+
+	it.each( [
+		[ 'NaN zoom', cropRect, Number.NaN, 0, 16 / 9 ],
+		[ '-Infinity rotation', cropRect, 1, Number.NEGATIVE_INFINITY, 16 / 9 ],
+		[ 'NaN aspectRatio', cropRect, 1, 0, Number.NaN ],
+		[
+			'MAX_VALUE zoom (overflow guard)',
+			cropRect,
+			Number.MAX_VALUE,
+			0,
+			16 / 9,
+		],
+	] )( 'returns a finite rect for %s', ( _label, rect, z, r, a ) => {
+		const out = restrictCropRect( rect, z, r, a );
+		expect( Number.isFinite( out.x ) ).toBe( true );
+		expect( Number.isFinite( out.y ) ).toBe( true );
+		expect( Number.isFinite( out.width ) ).toBe( true );
+		expect( Number.isFinite( out.height ) ).toBe( true );
+	} );
+
+	it( 'sanitizes cropRect fields on the no-resize (fit-through) path', () => {
+		// When the crop already fits (t >= 1 - EPSILON) the function used to
+		// return the raw cropRect, letting non-finite fields slip through.
+		const hostileRect = {
+			x: Number.NaN,
+			y: 0.1,
+			width: 0.3,
+			height: 0.3,
+		};
+		const out = restrictCropRect( hostileRect, 10, 0, 16 / 9 );
+		expect( Number.isFinite( out.x ) ).toBe( true );
+		expect( out.x ).toBe( 0 );
+	} );
+} );
+
+describe( 'restrictPanZoom — non-finite input regression', () => {
+	const cropRect = { x: 0.1, y: 0.1, width: 0.5, height: 0.5 };
+
+	it( 'returns finite pan and zoom for hostile state', () => {
+		const out = restrictPanZoom( HOSTILE_STATE, IMAGE, cropRect );
+		expect( Number.isFinite( out.zoom ) ).toBe( true );
+		expect( Number.isFinite( out.pan.x ) ).toBe( true );
+		expect( Number.isFinite( out.pan.y ) ).toBe( true );
+	} );
+
+	it( 'returns finite pan and zoom when only state.zoom is corrupted', () => {
+		const state = makeState( { zoom: Number.NaN } );
+		const out = restrictPanZoom( state, IMAGE, cropRect );
+		expect( Number.isFinite( out.zoom ) ).toBe( true );
+		expect( out.zoom ).toBeGreaterThanOrEqual( 1 );
+	} );
+
+	it( 'sanitizes the cropRect argument before feeding it into the math', () => {
+		// A NaN cropRect.width would drive getMinZoomForCover to NaN via
+		// Math.max(1, NaN, NaN), and that NaN would be returned as zoom.
+		const hostileRect = {
+			x: 0.1,
+			y: 0.1,
+			width: Number.NaN,
+			height: 0.5,
+		};
+		const out = restrictPanZoom( makeState(), IMAGE, hostileRect );
+		expect( Number.isFinite( out.zoom ) ).toBe( true );
+		expect( Number.isFinite( out.pan.x ) ).toBe( true );
+		expect( Number.isFinite( out.pan.y ) ).toBe( true );
+	} );
+
+	it( 'returns finite zoom when imageSize is Infinity (aspectRatio NaN guard)', () => {
+		// Infinity / Infinity = NaN, which used to leak as `zoom: NaN`
+		// through the no-correction early return.
+		const rect = { x: 0.1, y: 0.1, width: 0.5, height: 0.5 };
+		const out = restrictPanZoom(
+			makeState(),
+			{ width: Infinity, height: Infinity },
+			rect
+		);
+		expect( Number.isFinite( out.zoom ) ).toBe( true );
+		expect( Number.isFinite( out.pan.x ) ).toBe( true );
+		expect( Number.isFinite( out.pan.y ) ).toBe( true );
+	} );
+} );
+
+describe( 'computeTransformStyle — non-finite input regression', () => {
+	it( 'produces a finite matrix string for hostile state', () => {
+		// CSS preview path must agree with createCamera under hostile state
+		// (both should produce safe output, not divergent NaN vs finite).
+		const out = computeTransformStyle( HOSTILE_STATE, IMAGE );
+		expect( out ).toMatch( /^matrix\(/ );
+		expect( out ).not.toMatch( /NaN/ );
+		expect( out ).not.toMatch( /Infinity/ );
+	} );
+
+	it( 'returns the identity matrix when imageSize is hostile', () => {
+		// State sanitization only covers state fields; imageSize NaN/Infinity
+		// would still emit `matrix(..., NaN, NaN)` in the translate components
+		// without this explicit guard.
+		expect(
+			computeTransformStyle( makeState(), {
+				width: Number.NaN,
+				height: 900,
+			} )
+		).toBe( 'matrix(1, 0, 0, 1, 0, 0)' );
+		expect(
+			computeTransformStyle( makeState(), {
+				width: Infinity,
+				height: Infinity,
+			} )
+		).toBe( 'matrix(1, 0, 0, 1, 0, 0)' );
+	} );
+} );
+
+describe( 'getImageCropBounds — non-finite input regression', () => {
+	it( 'returns finite bounds for hostile state', () => {
+		const out = getImageCropBounds(
+			HOSTILE_STATE,
+			{ width: 800, height: 450 },
+			{ width: 800, height: 450 }
+		);
+		expect( Number.isFinite( out.minX ) ).toBe( true );
+		expect( Number.isFinite( out.minY ) ).toBe( true );
+		expect( Number.isFinite( out.maxX ) ).toBe( true );
+		expect( Number.isFinite( out.maxY ) ).toBe( true );
+		expect( out.minX ).toBeLessThanOrEqual( out.maxX );
+		expect( out.minY ).toBeLessThanOrEqual( out.maxY );
+	} );
+} );
+
+describe( 'getSourceRegion — non-finite input regression', () => {
+	it( 'returns a finite source region for hostile state', () => {
+		// getSourceRegion feeds the REST /edit endpoint, so NaN here would
+		// reach the server.
+		const out = getSourceRegion( HOSTILE_STATE, IMAGE );
+		expect( Number.isFinite( out.x ) ).toBe( true );
+		expect( Number.isFinite( out.y ) ).toBe( true );
+		expect( Number.isFinite( out.width ) ).toBe( true );
+		expect( Number.isFinite( out.height ) ).toBe( true );
+	} );
+
+	it( 'returns finite metadata on the zero-size early-return path', () => {
+		// When imageSize is zero/invalid, the function returns a zero region
+		// plus rotation/flip/zoom metadata. Hostile state must not leak NaN
+		// out through those metadata fields.
+		const out = getSourceRegion( HOSTILE_STATE, {
+			width: 0,
+			height: 0,
+		} );
+		expect( Number.isFinite( out.rotation ) ).toBe( true );
+		expect( Number.isFinite( out.zoom ) ).toBe( true );
+		expect( out.zoom ).toBeGreaterThanOrEqual( 1 );
+	} );
+} );
+
+describe( 'getViewScale — presentational magnification to fill the canvas', () => {
+	// A tall image (1400x2500) fit into a short, wide canvas (1000x500):
+	// contain fit = min(1000/1400, 500/2500) = 0.2, so the rendered footprint
+	// is 280x500 — it fills the canvas height but only 280 of 1000 px wide.
+	const CANVAS: Size = { width: 1000, height: 500 };
+	const FOOTPRINT: Size = { width: 280, height: 500 };
+	const TARGET = 0.8;
+	const MAX = 8;
+
+	it( 'returns 1 when the crop already fills at least the target on its binding axis', () => {
+		// Full-footprint crop is 280x500 on screen: 500 == canvas height, well
+		// above 0.8 of it. No magnification needed.
+		const full = { x: 0, y: 0, width: 1, height: 1 };
+		expect( getViewScale( full, CANVAS, FOOTPRINT, TARGET, MAX ) ).toBe(
+			1
+		);
+	} );
+
+	it( 'magnifies an under-filling crop so its binding axis reaches target * canvas', () => {
+		// A square crop in the 280x500 footprint: width fills (cropRect.width=1
+		// -> 280px), height is 280/500 = 0.56 (-> 280px). On-screen 280x280.
+		// kW = 0.8*1000/280 = 2.857, kH = 0.8*500/280 = 1.4286, k = min = 1.4286.
+		const square = { x: 0, y: 0.22, width: 1, height: 280 / 500 };
+		const scale = getViewScale( square, CANVAS, FOOTPRINT, TARGET, MAX );
+		expect( scale ).toBeCloseTo( ( TARGET * 500 ) / 280, 5 );
+		// After magnification the binding (height) axis reaches 0.8 * canvas.
+		expect( square.height * FOOTPRINT.height * scale ).toBeCloseTo(
+			TARGET * CANVAS.height,
+			5
+		);
+	} );
+
+	it( 'clamps magnification at maxScale for a near-degenerate crop', () => {
+		// Tiny crop would need an enormous scale to fill; cap it.
+		const tiny = { x: 0.5, y: 0.5, width: 0.02, height: 0.02 };
+		expect( getViewScale( tiny, CANVAS, FOOTPRINT, TARGET, MAX ) ).toBe(
+			MAX
+		);
+	} );
+
+	it( 'never shrinks below 1 even when the crop overfills the target', () => {
+		const full = { x: 0, y: 0, width: 1, height: 1 };
+		expect( getViewScale( full, CANVAS, FOOTPRINT, 0.5, MAX ) ).toBe( 1 );
+	} );
+
+	it( 'returns 1 for zero or degenerate inputs', () => {
+		const full = { x: 0, y: 0, width: 1, height: 1 };
+		const zeroRect = { x: 0, y: 0, width: 0, height: 0 };
+		expect( getViewScale( zeroRect, CANVAS, FOOTPRINT, TARGET, MAX ) ).toBe(
+			1
+		);
+		expect(
+			getViewScale(
+				full,
+				{ width: 0, height: 0 },
+				FOOTPRINT,
+				TARGET,
+				MAX
+			)
+		).toBe( 1 );
+		expect(
+			getViewScale( full, CANVAS, { width: 0, height: 0 }, TARGET, MAX )
+		).toBe( 1 );
+	} );
+
+	it( 'returns 1 (never NaN) for non-finite inputs', () => {
+		const full = { x: 0, y: 0, width: 1, height: 1 };
+		const nanRect = { x: 0, y: 0, width: NaN, height: 1 };
+		expect( getViewScale( nanRect, CANVAS, FOOTPRINT, TARGET, MAX ) ).toBe(
+			1
+		);
+		expect(
+			getViewScale(
+				full,
+				{ width: NaN, height: 500 },
+				FOOTPRINT,
+				TARGET,
+				MAX
+			)
+		).toBe( 1 );
+		expect(
+			getViewScale(
+				full,
+				CANVAS,
+				{ width: Infinity, height: 500 },
+				TARGET,
+				MAX
+			)
+		).toBe( 1 );
+		expect( getViewScale( full, CANVAS, FOOTPRINT, NaN, MAX ) ).toBe( 1 );
+		expect( getViewScale( full, CANVAS, FOOTPRINT, TARGET, NaN ) ).toBe(
+			1
+		);
+	} );
+} );
+
+describe( 'getViewScale — property invariants', () => {
+	const ITERATIONS = 100;
+
+	it( `holds across ${ ITERATIONS } random valid inputs`, () => {
+		for ( let i = 0; i < ITERATIONS; i++ ) {
+			const canvasW = 200 + ( ( i * 37 ) % 1800 );
+			const canvasH = 200 + ( ( i * 53 ) % 1200 );
+			const footprintW = 50 + ( ( i * 19 ) % 800 );
+			const footprintH = 50 + ( ( i * 29 ) % 1000 );
+			const cropW = 0.05 + ( ( i * 3 ) % 95 ) / 100;
+			const cropH = 0.05 + ( ( i * 5 ) % 95 ) / 100;
+			const cropX = Math.min( ( ( i * 11 ) % 100 ) / 100, 1 - cropW );
+			const cropY = Math.min( ( ( i * 17 ) % 100 ) / 100, 1 - cropH );
+			const targetFill = 0.1 + ( ( i * 7 ) % 90 ) / 100;
+			const maxScale = 1 + ( ( i * 13 ) % 20 );
+
+			const canvas: Size = { width: canvasW, height: canvasH };
+			const footprint: Size = { width: footprintW, height: footprintH };
+			const cropRect = {
+				x: cropX,
+				y: cropY,
+				width: cropW,
+				height: cropH,
+			};
+
+			const scale = getViewScale(
+				cropRect,
+				canvas,
+				footprint,
+				targetFill,
+				maxScale
+			);
+
+			expect( Number.isFinite( scale ) ).toBe( true );
+			expect( scale ).toBeGreaterThanOrEqual( 1 );
+			expect( scale ).toBeLessThanOrEqual( maxScale );
+
+			const cropScreenW = cropRect.width * footprintW;
+			const cropScreenH = cropRect.height * footprintH;
+			const kW = ( targetFill * canvasW ) / cropScreenW;
+			const kH = ( targetFill * canvasH ) / cropScreenH;
+			const k = Math.min( kW, kH );
+			const unclamped = Math.max( 1, k );
+
+			expect( scale ).toBeCloseTo( Math.min( maxScale, unclamped ), 10 );
+
+			const shouldCheckFill = scale > 1 && scale < maxScale - 1e-10;
+			const bindingIsWidth = kW <= kH + 1e-10;
+			const magnifiedBinding = bindingIsWidth
+				? cropScreenW * scale
+				: cropScreenH * scale;
+			const targetBinding = bindingIsWidth
+				? targetFill * canvasW
+				: targetFill * canvasH;
+			expect(
+				shouldCheckFill ? magnifiedBinding / targetBinding : 1
+			).toBeCloseTo( 1, shouldCheckFill ? 4 : 10 );
+		}
 	} );
 } );

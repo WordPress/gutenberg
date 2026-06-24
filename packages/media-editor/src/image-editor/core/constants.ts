@@ -8,8 +8,60 @@ import { __ } from '@wordpress/i18n';
  */
 import type { NormalizedRect, Flip, CropperState } from './types';
 
+/**
+ * Default/resting zoom. A full, unrotated crop needs at least 1x to cover the
+ * crop area, but smaller/fine-rotated crops can be valid below 1x — the true
+ * floor for those comes from `getMinZoom`.
+ */
 export const MIN_ZOOM = 1;
+/**
+ * Safety floor for coverage-aware zoom. Degenerate crops can have a geometric
+ * coverage minimum of 0, but camera and inverse-matrix math need a stable,
+ * positive scale.
+ */
+export const ABSOLUTE_MIN_ZOOM = 0.1;
 export const MAX_ZOOM = 10;
+
+/**
+ * Minimum crop rect dimension in source-image pixels, enforced per axis
+ * during resize. Prevents accidental sub-pixel crops while staying small
+ * enough to allow tight crops (favicons, icons). Adjust here to tune the
+ * floor globally.
+ */
+export const MIN_CROP_PIXELS = 16;
+
+/**
+ * Minimum on-screen crop rect dimension in CSS pixels. The source-pixel
+ * floor (`MIN_CROP_PIXELS`) keeps crops from going sub-pixel, but on a large
+ * image fit into a small canvas it can render only a few CSS pixels wide —
+ * too small to grab the resize handles. This floor keeps the crop operable
+ * regardless of display scale; it binds when zoomed out and yields to the
+ * source-pixel floor once the image is shown large enough. Sized to one
+ * handle touch target (`$handle-touch-target-size` in `cropper.scss`).
+ */
+export const MIN_CROP_SCREEN_PX = 44;
+
+/**
+ * Fraction of the constraining canvas axis the settled crop should occupy on
+ * screen. When a crop is shown smaller than this (e.g. a square crop in a tall
+ * image, capped by the contain-fit footprint's narrow axis), the view magnifies
+ * to fill the canvas. `1` = always fill the canvas; lower = rescue only the
+ * under-filled cases. See `getViewScale`.
+ */
+export const SETTLE_TARGET_CANVAS_FILL = 0.8;
+
+/**
+ * Upper bound on the presentational view magnification (`getViewScale`).
+ * Prevents a near-degenerate crop from magnifying the scene without limit.
+ */
+export const MAX_VIEW_SCALE = 8;
+
+/**
+ * CSS pixels per source pixel required before resize handles snap the selected
+ * source region to whole-pixel edges. Below 1:1, a source pixel is sub-pixel on
+ * screen, so snapping would feel notchy without a visible pixel boundary.
+ */
+export const PIXEL_SNAP_DISPLAY_SCALE = 1;
 
 /**
  * Wheel zoom sensitivity. A deltaY of 100 changes zoom by 0.25.

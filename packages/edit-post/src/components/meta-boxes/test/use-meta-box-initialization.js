@@ -35,6 +35,10 @@ const initializeMetaBoxes = jest.fn( () => ( {
 	type: 'META_BOXES_INITIALIZED',
 } ) );
 
+const updateEditorSettings = jest.fn( () => ( {
+	type: 'UPDATE_EDITOR_SETTINGS',
+} ) );
+
 function createMockStores( {
 	isEditorReady = true,
 	isCollaborationEnabled = true,
@@ -43,6 +47,10 @@ function createMockStores( {
 	return {
 		'core/editor': {
 			...storeConfig,
+			actions: {
+				...storeConfig.actions,
+				updateEditorSettings,
+			},
 			selectors: {
 				__unstableIsEditorReady: jest.fn( () => isEditorReady ),
 				isCollaborationEnabledForCurrentPost: jest.fn(
@@ -91,6 +99,7 @@ describe( 'useMetaBoxInitialization', () => {
 	afterEach( () => {
 		setCollaborationSupported.mockClear();
 		initializeMetaBoxes.mockClear();
+		updateEditorSettings.mockClear();
 	} );
 
 	it( 'disables collaboration when metaboxes are present', () => {
@@ -187,5 +196,27 @@ describe( 'useMetaBoxInitialization', () => {
 		renderHook( registry );
 
 		expect( setCollaborationSupported ).not.toHaveBeenCalled();
+	} );
+
+	it( 'disables visual revisions when metaboxes are present', () => {
+		const mockStores = createMockStores( {
+			metaBoxes: [ { id: 'my-metabox', title: 'My Meta Box' } ],
+		} );
+		const registry = createRegistry( mockStores );
+
+		renderHook( registry );
+
+		expect( updateEditorSettings ).toHaveBeenCalledWith( {
+			disableVisualRevisions: true,
+		} );
+	} );
+
+	it( 'does not disable visual revisions when there are no metaboxes', () => {
+		const mockStores = createMockStores( { metaBoxes: [] } );
+		const registry = createRegistry( mockStores );
+
+		renderHook( registry );
+
+		expect( updateEditorSettings ).not.toHaveBeenCalled();
 	} );
 } );

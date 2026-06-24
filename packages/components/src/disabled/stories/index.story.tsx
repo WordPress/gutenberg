@@ -32,7 +32,7 @@ const meta: Meta< typeof Disabled > = {
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},
@@ -46,7 +46,6 @@ const Form = () => {
 	return (
 		<VStack>
 			<TextControl
-				__next40pxDefaultSize
 				label="Text Control"
 				value={ textControlValue }
 				onChange={ setTextControlValue }

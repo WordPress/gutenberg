@@ -9,6 +9,7 @@ import {
 	Spinner,
 	TextareaControl,
 	TextControl,
+	CheckboxControl,
 	ToolbarButton,
 	ToolbarGroup,
 	__experimentalToolsPanel as ToolsPanel,
@@ -44,6 +45,7 @@ import {
 	useCallback,
 	useEffect,
 	useMemo,
+	useRef,
 	useState,
 } from '@wordpress/element';
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
@@ -63,6 +65,13 @@ import { Caption } from '../utils/caption';
 import { MediaControl } from '../utils/media-control';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import {
+	getActiveDimensionValue,
+	getDimensionResetAttributes,
+	getDimensionUpdateAttributes,
+	getStyleStateKey,
+} from '../utils/style-state';
+import { useOpenImageMediaEditorModal } from './use-open-image-media-editor-modal';
+import {
 	MIN_SIZE,
 	ALLOWED_MEDIA_TYPES,
 	SIZED_LAYOUTS,
@@ -72,9 +81,9 @@ import { evalAspectRatio, mediaPosition } from './utils';
 
 const {
 	DimensionsTool,
+	isDefaultBlockStyleState,
 	ResolutionTool,
 	mediaEditKey,
-	openMediaEditorModalKey,
 } = unlock( blockEditorPrivateApis );
 
 const scaleOptions = [
@@ -227,7 +236,6 @@ function ContentOnlyControls( {
 				>
 					<div className="wp-block-image__toolbar_content_textarea__container">
 						<TextControl
-							__next40pxDefaultSize
 							className="wp-block-image__toolbar_content_textarea"
 							label={ __( 'Title attribute' ) }
 							value={ attributes.title || '' }
@@ -297,6 +305,7 @@ export default function Image( {
 		sizeSlug,
 		lightbox,
 		metadata,
+		isDecorative,
 	} = attributes;
 	const [ imageElement, setImageElement ] = useState();
 	const [ resizeDelta, setResizeDelta ] = useState( null );
@@ -381,20 +390,16 @@ export default function Image( {
 		[ clientId ]
 	);
 	const { getBlock, getSettings } = useSelect( blockEditorStore );
-	const settings = getSettings();
-	const openMediaEditorModal = settings[ openMediaEditorModalKey ];
-
-	const handleMediaUpdate = useCallback(
-		( { id: newId, url: newUrl } ) => {
-			if ( typeof newId === 'number' && newId !== id ) {
-				setAttributes( {
-					id: newId,
-					url: newUrl ?? url,
-				} );
-			}
-		},
-		[ id, url, setAttributes ]
+	const cropButtonRef = useRef();
+	const handleMediaEditorModalClose = useCallback(
+		() => cropButtonRef.current?.focus(),
+		[]
 	);
+	const openImageMediaEditorModal = useOpenImageMediaEditorModal( {
+		attributes,
+		setAttributes,
+		onClose: handleMediaEditorModalClose,
+	} );
 
 	const {
 		replaceBlocks,
@@ -525,6 +530,7 @@ export default function Image( {
 		if ( enable && ! lightboxSetting?.enabled ) {
 			setAttributes( {
 				lightbox: { enabled: true },
+				isDecorative: false,
 			} );
 		} else if ( ! enable && lightboxSetting?.enabled ) {
 			setAttributes( {
@@ -561,6 +567,20 @@ export default function Image( {
 
 	function updateAlt( newAlt ) {
 		setAttributes( { alt: newAlt } );
+	}
+
+	function updateIsDecorative( value ) {
+		setAttributes( {
+			isDecorative: value || undefined,
+			...( value && {
+				alt: '',
+				caption: undefined,
+				href: undefined,
+				linkDestination: undefined,
+				linkTarget: undefined,
+				rel: undefined,
+			} ),
+		} );
 	}
 
 	const imperativeFocalPointPreview = ( value ) => {
@@ -632,7 +652,8 @@ export default function Image( {
 		isSingleSelected &&
 		canEditImage &&
 		! isEditingImage &&
-		! isContentOnlyMode;
+		! isContentOnlyMode &&
+		! isUploading;
 
 	function switchToCover() {
 		replaceBlocks(
@@ -661,14 +682,67 @@ export default function Image( {
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
+	const selectedStyleState = useSelect(
+		( select ) => {
+			if ( ! isSingleSelected ) {
+				return undefined;
+			}
+			const { getSelectedBlockStyleState } = unlock(
+				select( blockEditorStore )
+			);
+			return getSelectedBlockStyleState( clientId );
+		},
+		[ clientId, isSingleSelected ]
+	);
+	const hasSelectedStyleState =
+		! isDefaultBlockStyleState( selectedStyleState );
+	const selectedStyleStateKey = getStyleStateKey( selectedStyleState );
+	const activeWidth = getActiveDimensionValue( {
+		attributes,
+		selectedState: selectedStyleState,
+		hasSelectedStyleState,
+		attributeKey: 'width',
+	} );
+	const activeHeight = getActiveDimensionValue( {
+		attributes,
+		selectedState: selectedStyleState,
+		hasSelectedStyleState,
+		attributeKey: 'height',
+	} );
+	const activeAspectRatio = getActiveDimensionValue( {
+		attributes,
+		selectedState: selectedStyleState,
+		hasSelectedStyleState,
+		attributeKey: 'aspectRatio',
+	} );
+	const activeScale = getActiveDimensionValue( {
+		attributes,
+		selectedState: selectedStyleState,
+		hasSelectedStyleState,
+		attributeKey: 'scale',
+		styleKey: 'objectFit',
+	} );
+	const setDimensionAttributes = ( nextDimensions ) => {
+		setAttributes(
+			getDimensionUpdateAttributes( {
+				style: attributes.style,
+				selectedState: selectedStyleState,
+				hasSelectedStyleState,
+				nextDimensions,
+				dimensionKeyMap: { scale: 'objectFit' },
+			} )
+		);
+	};
+
 	const dimensionsControl =
 		showDimensionsControls &&
 		( SIZED_LAYOUTS.includes( parentLayoutType ) ? (
 			<DimensionsTool
+				key={ selectedStyleStateKey }
 				panelId={ clientId }
-				value={ { aspectRatio } }
+				value={ { aspectRatio: activeAspectRatio, scale: activeScale } }
 				onChange={ ( { aspectRatio: newAspectRatio } ) => {
-					setAttributes( {
+					setDimensionAttributes( {
 						aspectRatio: newAspectRatio,
 						scale: 'cover',
 					} );
@@ -678,26 +752,29 @@ export default function Image( {
 			/>
 		) : (
 			<DimensionsTool
+				key={ selectedStyleStateKey }
 				panelId={ clientId }
-				value={ { width, height, scale, aspectRatio } }
+				value={ {
+					width: activeWidth,
+					height: activeHeight,
+					scale: activeScale,
+					aspectRatio: activeAspectRatio,
+				} }
 				onChange={ ( {
 					width: newWidth,
 					height: newHeight,
 					scale: newScale,
 					aspectRatio: newAspectRatio,
 				} ) => {
-					// Rebuilding the object forces setting `undefined`
-					// for values that are removed since setAttributes
-					// doesn't do anything with keys that aren't set.
-					setAttributes( {
+					setDimensionAttributes( {
 						// CSS includes `height: auto`, but we need
 						// `width: auto` to fix the aspect ratio when
 						// only height is set due to the width and
 						// height attributes set via the server.
 						width: ! newWidth && newHeight ? 'auto' : newWidth,
 						height: newHeight,
-						scale: newScale,
 						aspectRatio: newAspectRatio,
+						scale: newScale,
 					} );
 				} }
 				defaultScale="cover"
@@ -806,7 +883,8 @@ export default function Image( {
 		isSingleSelected &&
 		! isEditingImage &&
 		! lockHrefControls &&
-		! lockUrlControls;
+		! lockUrlControls &&
+		! isDecorative;
 
 	const showCoverControls =
 		isSingleSelected && canInsertCover && ! isContentOnlyMode;
@@ -857,19 +935,14 @@ export default function Image( {
 					) }
 					{ allowCrop && (
 						<ToolbarButton
+							ref={ cropButtonRef }
 							onClick={
-								openMediaEditorModal && id
-									? () =>
-											openMediaEditorModal( {
-												id,
-												onUpdate: handleMediaUpdate,
-											} )
+								openImageMediaEditorModal
+									? openImageMediaEditorModal
 									: () => setIsEditingImage( true )
 							}
 							aria-haspopup={
-								openMediaEditorModal && id
-									? 'dialog'
-									: undefined
+								openImageMediaEditorModal ? 'dialog' : undefined
 							}
 							icon={ crop }
 							label={ __( 'Crop' ) }
@@ -914,7 +987,10 @@ export default function Image( {
 				<InspectorControls group="content">
 					<ToolsPanel
 						label={ __( 'Media' ) }
-						resetAll={ () => onSelectImage( undefined ) }
+						resetAll={ () => {
+							onSelectImage( undefined );
+							setAttributes( { isDecorative: false } );
+						} }
 						dropdownMenuProps={ dropdownMenuProps }
 					>
 						{ ! lockUrlControls && (
@@ -944,24 +1020,24 @@ export default function Image( {
 								/>
 							</ToolsPanelItem>
 						) }
-						<ToolsPanelItem
-							label={ __( 'Alternative text' ) }
-							isShownByDefault
-							hasValue={ () => !! alt }
-							onDeselect={ () =>
-								setAttributes( { alt: undefined } )
-							}
-						>
-							<TextareaControl
+						{ ! isDecorative && (
+							<ToolsPanelItem
 								label={ __( 'Alternative text' ) }
-								value={ alt || '' }
-								onChange={ updateAlt }
-								readOnly={ lockAltControls }
-								help={
-									lockAltControls ? (
-										<>{ lockAltControlsMessage }</>
-									) : (
-										<>
+								isShownByDefault
+								hasValue={ () => !! alt }
+								onDeselect={ () =>
+									setAttributes( { alt: undefined } )
+								}
+							>
+								<TextareaControl
+									label={ __( 'Alternative text' ) }
+									value={ alt || '' }
+									onChange={ updateAlt }
+									readOnly={ lockAltControls }
+									help={
+										lockAltControls ? (
+											<>{ lockAltControlsMessage }</>
+										) : (
 											<ExternalLink
 												href={
 													// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
@@ -974,31 +1050,54 @@ export default function Image( {
 													'Describe the purpose of the image.'
 												) }
 											</ExternalLink>
-											<br />
-											{ __(
-												'Leave empty if decorative.'
-											) }
-										</>
-									)
+										)
+									}
+								/>
+							</ToolsPanelItem>
+						) }
+
+						{ ! lockAltControls && ! lightboxChecked && (
+							<ToolsPanelItem
+								label={ __( 'Mark as decorative' ) }
+								isShownByDefault
+								hasValue={ () => !! isDecorative }
+								onDeselect={ () =>
+									setAttributes( { isDecorative: false } )
 								}
-							/>
-						</ToolsPanelItem>
+							>
+								<CheckboxControl
+									label={ __( 'Mark as decorative' ) }
+									checked={ !! isDecorative }
+									onChange={ updateIsDecorative }
+									help={ __(
+										'Hidden from assistive technologies.'
+									) }
+								/>
+							</ToolsPanelItem>
+						) }
 					</ToolsPanel>
 				</InspectorControls>
 			) }
 			<InspectorControls
 				group="dimensions"
-				resetAllFilter={ ( attrs ) => ( {
-					...attrs,
-					aspectRatio: undefined,
-					width: undefined,
-					height: undefined,
-					scale: undefined,
-					focalPoint: undefined,
-				} ) }
+				resetAllFilter={ ( attrs ) => {
+					return getDimensionResetAttributes( {
+						attributes: attrs,
+						selectedState: selectedStyleState,
+						hasSelectedStyleState,
+						keys: [ 'aspectRatio', 'height', 'objectFit', 'width' ],
+						defaultAttributes: {
+							aspectRatio: undefined,
+							width: undefined,
+							height: undefined,
+							scale: undefined,
+							focalPoint: undefined,
+						},
+					} );
+				} }
 			>
 				{ dimensionsControl }
-				{ url && scale && (
+				{ ! hasSelectedStyleState && url && scale && (
 					<ToolsPanelItem
 						label={ __( 'Focal point' ) }
 						isShownByDefault
@@ -1043,7 +1142,6 @@ export default function Image( {
 			) }
 			<InspectorControls group="advanced">
 				<TextControl
-					__next40pxDefaultSize
 					label={ __( 'Title attribute' ) }
 					value={ title || '' }
 					onChange={ onSetTitle }
@@ -1072,7 +1170,17 @@ export default function Image( {
 	const filename = getFilename( url );
 	let defaultedAlt;
 
-	if ( alt ) {
+	if ( isDecorative ) {
+		defaultedAlt = filename
+			? sprintf(
+					/* translators: %s: file name */
+					__(
+						'This image has been marked as decorative; its file name is %s'
+					),
+					filename
+			  )
+			: __( 'This image has been marked as decorative.' );
+	} else if ( alt ) {
 		defaultedAlt = alt;
 	} else if ( filename ) {
 		defaultedAlt = sprintf(
@@ -1120,7 +1228,33 @@ export default function Image( {
 									height:
 										pixelSize.height + resizeDelta.height,
 							  }
-							: { width, height } ),
+							: ( () => {
+									const style = {};
+									if ( width === 'auto' ) {
+										style.width = 'auto';
+									} else if (
+										width !== undefined &&
+										width !== null
+									) {
+										style.width =
+											typeof width === 'number'
+												? `${ width }px`
+												: width;
+									}
+									if (
+										height === 'auto' ||
+										height === undefined ||
+										height === null
+									) {
+										style.height = 'auto';
+									} else {
+										style.height =
+											typeof height === 'number'
+												? `${ height }px`
+												: height;
+									}
+									return style;
+							  } )() ),
 						objectFit: scale,
 						objectPosition:
 							focalPoint && scale
@@ -1327,18 +1461,20 @@ export default function Image( {
 			{ img }
 			{ resizableBox }
 
-			<Caption
-				attributes={ attributes }
-				setAttributes={ setAttributes }
-				isSelected={ isSingleSelected }
-				insertBlocksAfter={ insertBlocksAfter }
-				label={ __( 'Image caption text' ) }
-				showToolbarButton={
-					isSingleSelected &&
-					( hasNonContentControls || isContentOnlyMode ) &&
-					! hideCaptionControls
-				}
-			/>
+			{ ! isDecorative && (
+				<Caption
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					isSelected={ isSingleSelected }
+					insertBlocksAfter={ insertBlocksAfter }
+					label={ __( 'Image caption text' ) }
+					showToolbarButton={
+						isSingleSelected &&
+						( hasNonContentControls || isContentOnlyMode ) &&
+						! hideCaptionControls
+					}
+				/>
+			) }
 		</>
 	);
 }

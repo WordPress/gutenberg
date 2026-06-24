@@ -1,8 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Tooltip } from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+import { Stack, Tooltip } from '@wordpress/ui';
 import { __, _x } from '@wordpress/i18n';
 import {
 	dateI18n,
@@ -95,14 +94,19 @@ export function NoteByline( { avatar, name, date, userId } ) {
 					{ name ?? currentUserName }
 				</span>
 				{ date && (
-					<Tooltip text={ tooltipText }>
-						<time
-							dateTime={ commentDateTime }
-							className="editor-collab-sidebar-panel__user-time"
-						>
-							{ commentDateText }
-						</time>
-					</Tooltip>
+					<Tooltip.Root>
+						<Tooltip.Trigger
+							render={
+								<time
+									dateTime={ commentDateTime }
+									className="editor-collab-sidebar-panel__user-time"
+								>
+									{ commentDateText }
+								</time>
+							}
+						/>
+						<Tooltip.Popup>{ tooltipText }</Tooltip.Popup>
+					</Tooltip.Root>
 				) }
 			</Stack>
 		</>

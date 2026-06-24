@@ -6,8 +6,9 @@ import { resolveSelect, useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import type { Field, Form } from '@wordpress/dataviews';
+import { addQueryArgs } from '@wordpress/url';
 // eslint-disable-next-line @wordpress/use-recommended-components -- Used here because it supports rendering as a `span` via the `render` prop to avoid invalid HTML.
-import { Notice, Stack } from '@wordpress/ui';
+import { Link, Notice, Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -18,6 +19,7 @@ import {
 	createDescriptionField,
 	SlugEdit,
 } from '../../utils/fields';
+import { OverflowingBadges } from '../../utils/overflowing-badges';
 import { SUPPORT_FEATURES, usePublicTaxonomies } from '../utils';
 import type { PostTypeFormData, SupportFeature } from '../types';
 
@@ -77,6 +79,30 @@ export const showInRestField = createBooleanField(
 	}
 );
 
+export const countField: Field< PostTypeFormData > = {
+	id: 'count',
+	label: __( 'Posts' ),
+	type: 'integer',
+	readOnly: true,
+	render: ( { item } ) => {
+		const count = item.count;
+		if ( item.status !== 'publish' || ! count ) {
+			return <span aria-hidden="true">—</span>;
+		}
+		return (
+			<Link
+				href={ addQueryArgs( 'edit.php', {
+					post_type: item.slug,
+				} ) }
+			>
+				{ count }
+			</Link>
+		);
+	},
+	enableSorting: false,
+	filterBy: false,
+};
+
 export const supportsField: Field< PostTypeFormData > = {
 	id: 'supports',
 	label: __( 'Supports' ),
@@ -106,11 +132,12 @@ export const supportsField: Field< PostTypeFormData > = {
 			return <span aria-hidden="true">—</span>;
 		}
 		return (
-			<>
-				{ features
-					.map( ( f ) => SUPPORT_LABELS[ f ] ?? f )
-					.join( ', ' ) }
-			</>
+			<OverflowingBadges
+				items={ features.map( ( f ) => ( {
+					key: f,
+					label: SUPPORT_LABELS[ f ] ?? f,
+				} ) ) }
+			/>
 		);
 	},
 	filterBy: false,
@@ -222,11 +249,12 @@ export function useTaxonomiesField(): Field< PostTypeFormData > {
 					return <span aria-hidden="true">—</span>;
 				}
 				return (
-					<>
-						{ slugs
-							.map( ( s ) => labelMap[ s ] ?? s )
-							.join( ', ' ) }
-					</>
+					<OverflowingBadges
+						items={ slugs.map( ( s ) => ( {
+							key: s,
+							label: labelMap[ s ] ?? s,
+						} ) ) }
+					/>
 				);
 			},
 			filterBy: false,

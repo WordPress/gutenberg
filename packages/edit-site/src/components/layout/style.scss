@@ -1,18 +1,17 @@
-@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/z-index" as *;
 
 .edit-site-layout {
 	height: 100%;
-	background: $gray-900;
-	color: $gray-400;
+	background: var(--wpds-color-background-surface-neutral-weak);
+	color: var(--wpds-color-foreground-content-neutral);
 	display: flex;
 	flex-direction: column;
 
 	// Show a dark background in "frame" mode to avoid edge artifacts.
 	&:not(.is-full-canvas) .editor-visual-editor {
-		background: $gray-900;
+		background: var(--wpds-color-background-surface-neutral-weak);
 	}
 }
 
@@ -81,6 +80,20 @@
 	}
 }
 
+.edit-site-layout__mobile-content {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+}
+
+// On mobile, the content surface lives on the scroll wrapper
+// (not the inner content element) so it also covers the wrapper's
+// reserved scrollbar gutter, preventing the theme background color from
+// bleeding through.
+.edit-site-sidebar__screen-wrapper:has(.edit-site-layout__mobile-content) {
+	background: var(--wpds-color-background-surface-neutral);
+}
+
 .edit-site-layout__canvas-container {
 	position: relative;
 	flex-grow: 1;
@@ -104,7 +117,7 @@
 	}
 
 	.edit-site-resizable-frame__inner {
-		color: $gray-900;
+		color: var(--wpds-color-foreground-content-neutral);
 	}
 
 	@include break-medium {
@@ -122,7 +135,7 @@
 			}
 
 			.edit-site-layout:not(.is-full-canvas) & {
-				border-radius: $radius-large;
+				border-radius: var(--wpds-border-radius-xl);
 			}
 
 			&:hover {
@@ -173,7 +186,7 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	view-transition-name: toggle;
 	/* stylelint-enable  */
 	position: relative;
-	color: $white;
+	color: var(--wpds-color-foreground-interactive-neutral);
 	height: $header-height;
 	width: $header-height;
 	overflow: hidden;
@@ -181,12 +194,12 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background: $gray-900;
+	background: var(--wpds-color-background-surface-neutral-weak);
 	border-radius: 0;
 
 	&:hover,
 	&:active {
-		color: $white;
+		color: var(--wpds-color-foreground-interactive-neutral-active);
 	}
 
 	&:focus-visible,
@@ -229,8 +242,8 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	left: auto;
 	right: 0;
 	width: $sidebar-width;
-	color: $gray-900;
-	background: $white;
+	color: var(--wpds-color-foreground-content-neutral);
+	background: var(--wpds-color-background-surface-neutral-strong);
 
 	&:focus,
 	&:focus-within {
@@ -246,7 +259,9 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	}
 
 	@include break-medium {
-		border-left: $border-width solid $gray-300;
+		border-left:
+			$border-width solid
+			var(--wpds-color-stroke-surface-neutral);
 	}
 }
 
@@ -256,7 +271,7 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	overflow: hidden;
 	box-shadow: $elevation-x-small;
 	@include break-medium() {
-		border-radius: 8px;
+		border-radius: var(--wpds-border-radius-xl);
 		margin: $canvas-padding $canvas-padding $canvas-padding 0;
 	}
 }

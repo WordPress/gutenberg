@@ -19,7 +19,9 @@ import { cleanForSlug } from '@wordpress/url';
 import { unlock } from '../lock-unlock';
 import type { ContentType } from '../types';
 
-const { ValidatedInputControl } = unlock( componentsPrivateApis );
+const { ValidatedInputControl, ValidatedToggleControl } = unlock(
+	componentsPrivateApis
+);
 
 // Surface field-level validity messages in priority order: structural rules
 // (required, pattern, maxLength) first, async/custom last. `required` only
@@ -168,6 +170,37 @@ export const statusField: Field< ContentType > = {
 	id: 'status',
 	label: __( 'Status' ),
 	description: __( 'Enabled and registered with WordPress when active.' ),
+	// The field keeps `label: 'Status'` so the filter chip and column header
+	// read naturally ("Status: Active"); the form toggle uses its own "Active"
+	// label — the on/off semantic is clearer next to a switch.
+	Edit: ( {
+		data,
+		field,
+		onChange,
+		hideLabelFromVision,
+		markWhenOptional,
+		validity,
+	} ) => {
+		const isActive = field.getValue( { item: data } ) === 'publish';
+		return (
+			<ValidatedToggleControl
+				label={ __( 'Active' ) }
+				hidden={ hideLabelFromVision }
+				help={ field.description }
+				markWhenOptional={ markWhenOptional }
+				customValidity={ getCustomValidity( validity ) }
+				checked={ isActive }
+				onChange={ ( next: boolean ) =>
+					onChange(
+						field.setValue( {
+							item: data,
+							value: next ? 'publish' : 'draft',
+						} )
+					)
+				}
+			/>
+		);
+	},
 	elements: [
 		{ value: 'publish', label: __( 'Active' ) },
 		{ value: 'draft', label: __( 'Inactive' ) },

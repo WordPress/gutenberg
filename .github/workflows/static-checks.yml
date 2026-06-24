@@ -47,13 +47,16 @@ jobs:
                       os: 'macos-15'
 
         steps:
-            - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+            - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
               with:
+                  # Need full history on the annotation run so the root-deps
+                  # check can compute the merge-base against the PR base.
+                  fetch-depth: ${{ case(github.event_name == 'pull_request' && matrix.annotations == true, '0', '1') }}
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
 
             - name: Use desired version of Node.js
-              uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+              uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
               with:
                   node-version: ${{ matrix.node }}
                   cache: npm
@@ -73,6 +76,15 @@ jobs:
             - name: Lint package.json files
               run: npm run lint:pkg-json
 
+            - name: Lint dependency versions across workspaces
+              run: npm run lint:deps
+
+            - name: Check root dependencies
+              if: ${{ matrix.annotations && github.event_name == 'pull_request' }}
+              env:
+                  BASE_SHA: ${{ github.event.pull_request.base.sha }}
+              run: npm run --workspace @wordpress/validation-tools check-root-dependencies -- --base "$BASE_SHA"
+
             - name: Lint package-lock.json file
               run: npm run lint:lockfile
 
@@ -81,7 +93,8 @@ jobs:
 
             - name: Lint JavaScript
               if: ${{ matrix.annotations }}
-              run: npm run lint:js -- --format compact
+              # `--quiet` reports only errors so they aren't buried under warnings in the CI log.
+              run: npm run lint:js -- --format compact --quiet
 
             - name: Lint Styles
               if: ${{ matrix.annotations }}
@@ -89,6 +102,10 @@ jobs:
 
             - name: Type checking
               run: npm run build
+
+            - name: Audit published dependencies
+              if: ${{ matrix.annotations }}
+              run: npm run lint:published-deps -- --fail-unused-ignores
 
             - name: Check local changes
               run: npm run other:check-local-changes

@@ -3,7 +3,6 @@
  */
 import type { Action } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
-import { external } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -13,9 +12,11 @@ import type { PostTypeFormData } from '../types';
 
 const viewPostsAction: Action< PostTypeFormData > = {
 	id: 'view-posts',
-	label: __( 'View posts' ),
-	icon: external,
-	isPrimary: true,
+	label: ( items ) =>
+		items[ 0 ]?.config.labels.view_items ||
+		( items[ 0 ]?.config.hierarchical
+			? __( 'View pages' )
+			: __( 'View posts' ) ),
 	// Drafts are not registered with WordPress, so `edit.php?post_type=…`
 	// would 404. Only surface the link for active post types.
 	isEligible: ( item ) => item.status === 'publish',

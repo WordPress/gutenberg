@@ -14,14 +14,37 @@ export type PaddingSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
 export type GapSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
 
 /**
+ * Size scale for element sizing tokens.
+ */
+export type ElementSize =
+	| '5xs'
+	| '4xs'
+	| '3xs'
+	| '2xs'
+	| 'xs'
+	| 'sm'
+	| 'md'
+	| 'lg';
+
+/**
  * Size scale for surface width tokens.
  */
 export type SurfaceWidthSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 
 /**
+ * Size scale for duration tokens.
+ */
+export type DurationSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+
+/**
+ * Easing curve variants.
+ */
+export type Easing = 'subtle' | 'balanced' | 'expressive';
+
+/**
  * Size scale for border radius tokens.
  */
-export type BorderRadiusSize = 'xs' | 'sm' | 'md' | 'lg';
+export type BorderRadiusSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 /**
  * Size scale for border width tokens.
@@ -31,13 +54,7 @@ export type BorderWidthSize = 'xs' | 'sm' | 'md' | 'lg' | 'focus';
 /**
  * Target elements that tokens can be applied to.
  */
-export type Target =
-	| 'surface'
-	| 'interactive'
-	| 'track'
-	| 'thumb'
-	| 'content'
-	| 'focus';
+export type Target = 'surface' | 'interactive' | 'track' | 'thumb' | 'content';
 
 /**
  * Background color variants for surface elements.
@@ -114,6 +131,8 @@ export type SurfaceStrokeColor =
 	| 'info-strong'
 	| 'warning'
 	| 'warning-strong'
+	| 'caution'
+	| 'caution-strong'
 	| 'error'
 	| 'error-strong';
 
@@ -151,11 +170,15 @@ export type ForegroundColor =
 	| 'neutral-weak-disabled'
 	| 'brand'
 	| 'brand-active'
+	| 'brand-disabled'
 	| 'brand-strong'
 	| 'brand-strong-active'
+	| 'brand-strong-disabled'
 	| 'error-active'
+	| 'error-disabled'
 	| 'error-strong'
-	| 'error-strong-active';
+	| 'error-strong-active'
+	| 'error-strong-disabled';
 
 /**
  * Font family variants.

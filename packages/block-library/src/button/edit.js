@@ -39,7 +39,11 @@ import {
 	getDefaultBlockName,
 	getBlockBindingsSource,
 } from '@wordpress/blocks';
-import { useMergeRefs, useRefEffect } from '@wordpress/compose';
+import {
+	useMergeRefs,
+	useRefEffect,
+	privateApis as composePrivateApis,
+} from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
 import { getUpdatedLinkAttributes } from './get-updated-link-attributes';
@@ -49,6 +53,7 @@ import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 import { getWidthClasses, isPercentageWidth } from './utils';
 
 const { HTMLElementControl } = unlock( blockEditorPrivateApis );
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 const LINK_SETTINGS = [
 	...LinkControl.DEFAULT_LINK_SETTINGS,
@@ -107,10 +112,14 @@ function useEnter( props ) {
 			selectionChange( middle.clientId );
 		}
 
-		element.addEventListener( 'keydown', onKeyDown );
-		return () => {
-			element.removeEventListener( 'keydown', onKeyDown );
-		};
+		// Capture phase so we run before writing-flow's ancestor-bubble
+		// keydown handlers that gate on `event.defaultPrevented`.
+		return subscribeDelegatedListener(
+			element,
+			'keydown',
+			onKeyDown,
+			true
+		);
 	}, [] );
 }
 
@@ -440,7 +449,6 @@ function ButtonEdit( props ) {
 				/>
 				{ isLinkTag && (
 					<TextControl
-						__next40pxDefaultSize
 						label={ __( 'Link relation' ) }
 						help={ createInterpolateElement(
 							__(

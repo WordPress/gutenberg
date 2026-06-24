@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { createSelector, createRegistrySelector } from '@wordpress/data';
+import type { ConnectionStatus } from '@wordpress/sync';
 
 /**
  * Internal dependencies
@@ -19,18 +20,6 @@ const EMPTY_OBJECT = {};
 /**
  * Returns the previous edit from the current undo offset
  * for the entity records edits history, if any.
- *
- * Known Issue: Every-time state.undoManager changes, the getUndoManager
- * private selector is called (if used within useSelect and things like that)
- * which ensures the UI is always properly reactive. But, it's not the case with
- * the custom "sync" undo manager.
- *
- * Assumption: When an undo/redo is created, other parts of the core-data state
- * are likely changing simultaneously, which will trigger the selectors again.
- *
- * This issue is acceptable based on the assumption above.
- *
- * @see https://github.com/WordPress/gutenberg/pull/72407/files#r2580214235 for more details.
  *
  * @param state State tree.
  *
@@ -327,6 +316,12 @@ export function isCollaborationSupported( state: State ): boolean {
 /**
  * Returns the view configuration for the given entity type.
  *
+ * An optional fourth argument (e.g. `{ fields }`) may be passed when selecting;
+ * it is consumed by the `getViewConfig` resolver to request a subset of the
+ * config via the REST API `_fields` parameter and does not affect what is read
+ * here. Partial responses are merged in the reducer, so the returned object may
+ * accumulate properties across requests for the same entity.
+ *
  * @param state Data state.
  * @param kind  Entity kind.
  * @param name  Entity name.
@@ -346,4 +341,36 @@ export function getViewConfig(
 			form: undefined,
 		}
 	);
+}
+
+/**
+ * Returns the current sync connection status across all entities. Prioritizes
+ * disconnected states, then connecting, then connected.
+ *
+ * @param state Data state.
+ *
+ * @return The current sync connection state, prioritized by importance.
+ */
+export function getSyncConnectionStatus(
+	state: State
+): ConnectionStatus | undefined {
+	if ( ! state.syncConnectionStatuses ) {
+		return undefined;
+	}
+
+	const PRIORITIZED_STATUSES = [ 'disconnected', 'connecting', 'connected' ];
+
+	let coalesced: ConnectionStatus | undefined;
+
+	for ( const status of Object.values( state.syncConnectionStatuses ) ) {
+		if (
+			! coalesced ||
+			PRIORITIZED_STATUSES.indexOf( status.status ) <
+				PRIORITIZED_STATUSES.indexOf( coalesced.status )
+		) {
+			coalesced = status;
+		}
+	}
+
+	return coalesced;
 }

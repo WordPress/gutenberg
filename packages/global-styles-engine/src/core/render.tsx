@@ -23,6 +23,7 @@ import {
 	scopeFeatureSelectors,
 	appendToSelector,
 	getBlockStyleVariationSelector,
+	getBlockStyleVariationFeatureSelector,
 	getResolvedValue,
 } from '../utils/common';
 import { getBlockSelector } from './selectors';
@@ -35,6 +36,7 @@ import { LAYOUT_DEFINITIONS } from '../utils/layout';
 import { getValueFromObjectPath, setImmutably } from '../utils/object';
 import { getSetting } from '../settings/get-setting';
 import type { GlobalStylesConfig, GlobalStylesStyles } from '../types';
+import { normalizeStyleStateAliases } from '../style-state-back-compat';
 
 // =============================================================================
 // LOCAL TYPE DEFINITIONS
@@ -152,6 +154,7 @@ export type BlockSelectors = Record<
  * - `fallbackGapValue`: fallback block gap value used by layout rules.
  * - `hasLayoutSupport`: whether layout styles can be generated for the node.
  * - `isStyleVariation`: whether this node is a block style variation.
+ * - `variationName`: block style variation name used for feature selectors.
  * - `layoutSelector`: optional selector override for layout styles.
  * - `layoutHasBlockGapSupport`: optional block gap support override for layout styles.
  * - `name`: block name used by block-specific declaration adjustments.
@@ -170,6 +173,7 @@ interface StylesNode {
 	fallbackGapValue?: string;
 	hasLayoutSupport?: boolean;
 	isStyleVariation?: boolean;
+	variationName?: string;
 	layoutSelector?: string;
 	layoutHasBlockGapSupport?: boolean;
 	name?: string;
@@ -229,8 +233,8 @@ const VALID_ELEMENT_PSEUDO_SELECTORS: Record< string, string[] > = {
  * Keep in sync with WP_Theme_JSON_Gutenberg::RESPONSIVE_BREAKPOINTS.
  */
 const RESPONSIVE_BREAKPOINTS: Record< string, string > = {
-	mobile: '@media (width <= 480px)',
-	tablet: '@media (480px < width <= 782px)',
+	'@mobile': '@media (width <= 480px)',
+	'@tablet': '@media (480px < width <= 782px)',
 };
 
 /**
@@ -337,27 +341,6 @@ function flattenTree(
 		}
 	} );
 	return result;
-}
-
-/**
- * Gets variation selector string from feature selector.
- *
- * @param featureSelector        The feature selector
- * @param styleVariationSelector The style variation selector
- * @return Combined selector string
- */
-function concatFeatureVariationSelectorString(
-	featureSelector: string,
-	styleVariationSelector: string
-): string {
-	const featureSelectors = featureSelector.split( ',' );
-	const combinedSelectors: string[] = [];
-	featureSelectors.forEach( ( selector ) => {
-		combinedSelectors.push(
-			`${ styleVariationSelector.trim() }${ selector.trim() }`
-		);
-	} );
-	return combinedSelectors.join( ', ' );
 }
 
 /**
@@ -978,6 +961,7 @@ function getPseudoStyleNodes( node: StylesNode ): StylesNode[] {
 		name,
 		elementName,
 		mediaQuery,
+		variationName,
 	} = node;
 	const pseudoSelectors = name
 		? VALID_BLOCK_PSEUDO_SELECTORS[ name ] ?? []
@@ -1005,6 +989,7 @@ function getPseudoStyleNodes( node: StylesNode ): StylesNode[] {
 						: undefined,
 				name,
 				elementName,
+				variationName,
 			},
 		];
 	} );
@@ -1027,6 +1012,7 @@ function getResponsiveStyleNodes( node: StylesNode ): StylesNode[] {
 		name,
 		elementName,
 		isStyleVariation,
+		variationName,
 	} = node;
 
 	if ( ! name && ! elementName ) {
@@ -1052,57 +1038,10 @@ function getResponsiveStyleNodes( node: StylesNode ): StylesNode[] {
 					name,
 					elementName,
 					isStyleVariation,
+					variationName,
 				},
 			];
 		}
-	);
-}
-
-/**
- * Scopes feature selectors to a style variation selector.
- *
- * Variation feature selectors are compound selectors rather than suffixes. For
- * example, `.wp-image-spacing` becomes `.is-style-foo.wp-image.wp-image-spacing`.
- *
- * @param featureSelectors       Feature-level selectors from a style node.
- * @param styleVariationSelector Selector for the style variation.
- * @return Feature-level selectors scoped to the style variation.
- */
-function getVariationFeatureSelectors(
-	featureSelectors: StylesNode[ 'featureSelectors' ],
-	styleVariationSelector: string
-): StylesNode[ 'featureSelectors' ] {
-	if ( ! featureSelectors || typeof featureSelectors === 'string' ) {
-		return undefined;
-	}
-
-	return Object.fromEntries(
-		Object.entries( featureSelectors ).map( ( [ feature, selector ] ) => {
-			if ( typeof selector === 'string' ) {
-				return [
-					feature,
-					concatFeatureVariationSelectorString(
-						selector,
-						styleVariationSelector
-					),
-				];
-			}
-
-			return [
-				feature,
-				Object.fromEntries(
-					Object.entries( selector ).map(
-						( [ subfeature, subfeatureSelector ] ) => [
-							subfeature,
-							concatFeatureVariationSelectorString(
-								subfeatureSelector,
-								styleVariationSelector
-							),
-						]
-					)
-				),
-			];
-		} )
 	);
 }
 
@@ -1179,15 +1118,14 @@ export const getNodesWithStyles = (
 							variationStyleNodesToAdd.push( {
 								styles: variationStyles,
 								selector: variationSelector,
-								featureSelectors: getVariationFeatureSelectors(
+								featureSelectors:
 									blockSelector?.featureSelectors,
-									variationSelector
-								),
 								fallbackGapValue:
 									blockSelector?.fallbackGapValue,
 								hasLayoutSupport:
 									blockSelector?.hasLayoutSupport,
 								isStyleVariation: true,
+								variationName,
 								layoutSelector:
 									variationSelector + blockSelector.selector,
 								layoutHasBlockGapSupport: true,
@@ -1635,6 +1573,7 @@ function renderStylesNode(
 		layoutHasBlockGapSupport,
 		skipSelectorWrapper,
 		name,
+		variationName,
 	} = node;
 	let ruleset = '';
 	const effectiveSelector = selectorSuffix
@@ -1665,9 +1604,15 @@ function renderStylesNode(
 		Object.entries( featureDeclarations ).forEach(
 			( [ featureSelector, declarations ] ) => {
 				if ( declarations.length ) {
-					const selectorForRule = selectorSuffix
-						? appendToSelector( featureSelector, selectorSuffix )
+					let selectorForRule = variationName
+						? getBlockStyleVariationFeatureSelector(
+								variationName,
+								featureSelector
+						  )
 						: featureSelector;
+					selectorForRule = selectorSuffix
+						? appendToSelector( selectorForRule, selectorSuffix )
+						: selectorForRule;
 					const rules = declarations.join( ';' );
 					ruleset += `:root :where(${ selectorForRule }){${ rules };}`;
 				}
@@ -1755,10 +1700,18 @@ export const transformToStyles = (
 		variationStyles: false,
 		...styleOptions,
 	};
-	const nodesWithStyles = getNodesWithStyles( tree, blockSelectors );
-	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
-	const useRootPaddingAlign = tree?.settings?.useRootPaddingAwareAlignments;
-	const { contentSize, wideSize } = tree?.settings?.layout || {};
+	const normalizedTree = normalizeStyleStateAliases( tree );
+	const nodesWithStyles = getNodesWithStyles(
+		normalizedTree,
+		blockSelectors
+	);
+	const nodesWithSettings = getNodesWithSettings(
+		normalizedTree,
+		blockSelectors
+	);
+	const useRootPaddingAlign =
+		normalizedTree?.settings?.useRootPaddingAwareAlignments;
+	const { contentSize, wideSize } = normalizedTree?.settings?.layout || {};
 	const hasBodyStyles =
 		options.marginReset || options.rootPadding || options.layoutStyles;
 
@@ -1818,7 +1771,7 @@ export const transformToStyles = (
 				...responsiveNodes.flatMap( getPseudoStyleNodes ),
 			].forEach( ( expandedNode ) => {
 				ruleset += renderStylesNode( expandedNode, {
-					tree,
+					tree: normalizedTree,
 					useRootPaddingAlign,
 					disableLayoutStyles,
 					hasBlockGapSupport,
@@ -1845,7 +1798,8 @@ export const transformToStyles = (
 	if ( options.blockGap && hasBlockGapSupport ) {
 		// Use fallback of `0.5em` just in case, however if there is blockGap support, there should nearly always be a real value.
 		const gapValue =
-			getGapCSSValue( tree?.styles?.spacing?.blockGap ) || '0.5em';
+			getGapCSSValue( normalizedTree?.styles?.spacing?.blockGap ) ||
+			'0.5em';
 		ruleset =
 			ruleset +
 			`:root :where(.wp-site-blocks) > * { margin-block-start: ${ gapValue }; margin-block-end: 0; }`;

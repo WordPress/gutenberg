@@ -3,7 +3,6 @@
  */
 import type { Action } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
-import { external } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -14,8 +13,6 @@ import type { TaxonomyFormData } from '../types';
 const viewTermsAction: Action< TaxonomyFormData > = {
 	id: 'view-terms',
 	label: __( 'View terms' ),
-	icon: external,
-	isPrimary: true,
 	// Drafts aren't registered, and `edit-tags.php` requires a `post_type`
 	// query arg to render the term list, so the taxonomy must also be
 	// attached to at least one post type.

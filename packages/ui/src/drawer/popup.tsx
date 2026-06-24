@@ -2,21 +2,14 @@ import { Drawer as _Drawer } from '@base-ui/react/drawer';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-import {
-	type ThemeProvider as ThemeProviderType,
-	privateApis as themePrivateApis,
-} from '@wordpress/theme';
-import { unlock } from '../lock-unlock';
+import { ThemeProvider } from '@wordpress/theme';
 import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
 import { SCROLL_CONTAINER_ATTR } from '../utils/use-overlay-scroll-state-attributes';
-import { renderPortalWithChildren } from '../utils/render-portal-with-children';
+import { renderSlotWithChildren } from '../utils/render-slot-with-children';
 import { DrawerValidationProvider, useDrawerModal } from './context';
 import { Portal } from './portal';
 import styles from './style.module.css';
 import type { PopupProps } from './types';
-
-const ThemeProvider: typeof ThemeProviderType =
-	unlock( themePrivateApis ).ThemeProvider;
 
 const CLOSE_ICON_ATTR = 'data-wp-ui-drawer-close-icon';
 
@@ -24,8 +17,7 @@ const CLOSE_ICON_ATTR = 'data-wp-ui-drawer-close-icon';
  * Renders the drawer popup element that contains the drawer content.
  * Uses a portal to render outside the DOM hierarchy.
  *
- * When `portal` is omitted, defaults to `Drawer.Portal`. Portal merging is
- * handled by `renderPortalWithChildren` (shared with other overlay `Popup`s).
+ * When `portal` is omitted, defaults to `Drawer.Portal`.
  *
  * The popup is a flex column; scroll ownership lives on `Drawer.Content`,
  * which children are expected to render. Without it, long body content will
@@ -94,7 +86,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DrawerPopup(
 		</>
 	);
 
-	return renderPortalWithChildren( portal, <Portal />, portalChildren );
+	return renderSlotWithChildren( portal, <Portal />, portalChildren );
 } );
 
 export { Popup };

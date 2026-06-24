@@ -275,7 +275,7 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 		// If there are settings changes, we need to update both styles and
 		// settings atomically to avoid race conditions.
 		if ( newSettings?.typography ) {
-			// Build the state-aware path so that viewport styles (e.g. mobile)
+			// Build the state-aware path so that viewport styles (e.g. @mobile)
 			// are written to the correct sub-path and do not overwrite the default.
 			const stylePathForState = [ prefix, stateParam ]
 				.filter( Boolean )
@@ -352,8 +352,9 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 			<BlockPreviewPanel
 				name={ name }
 				variation={ variation }
+				selectedViewport={ selectedViewport }
 				selectedState={ hasSelectedState ? stateParam : 'default' }
-				stateStyles={ hasSelectedState ? style : undefined }
+				stateStyles={ hasSelectedState ? inheritedStyle : undefined }
 			/>
 			{ hasVariationsPanel && (
 				<div className="global-styles-ui-screen-variations">
@@ -362,14 +363,6 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 						<VariationsPanel name={ name } />
 					</VStack>
 				</div>
-			) }
-			{ hasColorPanel && (
-				<StylesColorPanel
-					inheritedValue={ inheritedStyle }
-					value={ style }
-					onChange={ setStyle }
-					settings={ settings }
-				/>
 			) }
 			{ hasBackgroundPanel && (
 				<StylesBackgroundPanel
@@ -416,6 +409,14 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 					onChange={ setStyle }
 					settings={ settings }
 					includeLayoutControls
+				/>
+			) }
+			{ hasColorPanel && (
+				<StylesColorPanel
+					inheritedValue={ inheritedStyle }
+					value={ style }
+					onChange={ setStyle }
+					settings={ settings }
 				/>
 			) }
 			{ hasImageSettingsPanel && ! hasSelectedState && (
