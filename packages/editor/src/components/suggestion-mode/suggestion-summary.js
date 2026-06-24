@@ -193,6 +193,22 @@ function ellipsize( text ) {
 }
 
 /**
+ * Cap a string to `SUMMARY_MAX_CHARS` without collapsing or trimming its
+ * whitespace. Unlike `ellipsize`, this preserves the text verbatim — an
+ * inline suggestion that adds or removes literal spaces (e.g. a single typed
+ * space) is shown as-is rather than reduced to an empty quote.
+ *
+ * @param {string} text Literal marker text.
+ * @return {string} The text, truncated with an ellipsis when too long.
+ */
+function clampText( text ) {
+	if ( text.length <= SUMMARY_MAX_CHARS ) {
+		return text;
+	}
+	return `${ text.slice( 0, SUMMARY_MAX_CHARS - 1 ) }…`;
+}
+
+/**
  * Derive the inserted and deleted text spans from a pair of before/after
  * strings by running the shared word-level diff and concatenating matching
  * segments. Whitespace-only runs are excluded from the counts so a pure
@@ -270,11 +286,13 @@ export function summarizeOperations( operations ) {
 		// Add:/Delete: line. With no resolvable text (marker edited away) fall
 		// through to the generic attribute label rather than an empty quote.
 		if ( op.type === 'inline-suggestion' ) {
-			const text =
-				isTextLike( op.text ) && op.text.trim()
-					? ellipsize( op.text )
-					: '';
-			if ( ! text ) {
+			// The marker stores the proposed text verbatim, so render it as-is
+			// — including pure-whitespace edits such as a typed space — instead
+			// of collapsing it the way the word-diff path does. Only fall back
+			// to the attribute label when no text resolved (marker edited away),
+			// signalled by a non-string or empty `op.text`.
+			const text = isTextLike( op.text ) ? clampText( op.text ) : '';
+			if ( text === '' ) {
 				attributeLabels.push( op.attribute );
 				continue;
 			}

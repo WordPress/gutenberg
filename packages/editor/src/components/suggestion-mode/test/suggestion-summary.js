@@ -229,6 +229,22 @@ describe( 'summarizeOperations', () => {
 		] );
 	} );
 
+	it( 'quotes a whitespace-only inline-suggestion add verbatim', () => {
+		// Regression: typing only whitespace in Suggest mode resolves to a
+		// marker whose text is all spaces. The summary used to require
+		// `text.trim()` to be truthy and then collapse whitespace, so the line
+		// fell back to "Format: content" instead of showing the added spaces.
+		const lines = summarizeOperations( [
+			{
+				type: 'inline-suggestion',
+				attribute: 'content',
+				suggestionType: 'add',
+				text: '   ',
+			},
+		] );
+		expect( lines ).toEqual( [ { label: 'Add:', value: '“   ”' } ] );
+	} );
+
 	it( 'falls back to a format line for an inline-suggestion with no resolved text', () => {
 		// The marker can no longer be found in content (e.g. the block was
 		// edited away): degrade to the generic attribute label rather than an

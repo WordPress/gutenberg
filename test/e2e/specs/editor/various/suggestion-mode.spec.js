@@ -208,6 +208,61 @@ test.describe( 'Suggestion mode', () => {
 		await expect( summary ).not.toContainText( 'Format:' );
 	} );
 
+	test( 'add — a whitespace-only addition summarizes as "Add: …", not "Format: content"', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Regression: inserting only whitespace in Suggest mode resolves to a
+		// marker whose text is all spaces. The summary required the resolved
+		// text to survive a `trim()` (and then collapsed its whitespace), so a
+		// pure-whitespace edit fell back to "Format: content" instead of
+		// quoting the added spaces.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Wordone.' },
+		} );
+
+		await switchIntent( page, 'Suggest' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		// Place the caret between "Word" and "one." and type only spaces.
+		await page.keyboard.press( 'Home' );
+		await pageUtils.pressKeys( 'ArrowRight', { times: 4 } );
+		await page.keyboard.type( '   ' );
+
+		// The spaces are wrapped in an in-content add marker whose
+		// `data-suggestion-id` is minted by the note comment created during
+		// typing — its presence proves the suggestion already saved.
+		await expect(
+			paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="add"]'
+			)
+		).toHaveAttribute( 'data-suggestion-id', /\d/ );
+
+		// Open the notes sidebar and read the suggestion's summary line.
+		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
+		const allNotesToggle = topBar.getByRole( 'button', {
+			name: 'All notes',
+			exact: true,
+		} );
+		if (
+			( await allNotesToggle.getAttribute( 'aria-expanded' ) ) === 'false'
+		) {
+			await allNotesToggle.click();
+		}
+
+		const summary = page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.locator( '.editor-collab-sidebar-panel__suggestion-summary' );
+		await expect( summary ).toBeVisible();
+		await expect( summary ).toContainText( 'Add:' );
+		await expect( summary ).not.toContainText( 'Format:' );
+	} );
+
 	test( 'delete — golden path: deleting a selection becomes an in-content del marker', async ( {
 		editor,
 		page,
