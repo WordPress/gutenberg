@@ -122,7 +122,7 @@ function Header( { titleId, widgetType }: HeaderProps ) {
 						<Icon icon={ widgetType.icon } />
 					</span>
 				) }
-				<Card.Title id={ titleId } render={ <h3 /> }>
+				<Card.Title id={ titleId } render={ <h2 /> }>
 					{ widgetType.title }
 				</Card.Title>
 			</Stack>

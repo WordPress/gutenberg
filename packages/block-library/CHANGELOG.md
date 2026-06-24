@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   Search: Expose an HTML element selector in the Advanced inspector panel that can render the block in the semantic HTML `<search>` landmark element instead of `<form role="search">`. Defers to `add_theme_support( 'html5', array( 'search-element' ) )` when the per-block value is left at "Default".
 -   Icon Block: Insert with a default icon instead of an empty placeholder ([#79111](https://github.com/WordPress/gutenberg/pull/79111)).
 
 ## 9.48.1 (2026-06-16)

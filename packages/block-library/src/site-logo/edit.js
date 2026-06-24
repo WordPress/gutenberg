@@ -75,7 +75,8 @@ const SiteLogo = ( {
 	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const cropButtonRef = useRef();
-	const { toggleSelection } = useDispatch( blockEditorStore );
+	const { toggleSelection, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	// Check if we're in contentOnly mode
@@ -108,6 +109,7 @@ const SiteLogo = ( {
 		// fallen out of sync. This can happen if the toggle is saved in the `on` position,
 		// but changes are later made to the site icon in the Customizer.
 		if ( shouldSyncIcon && logoId !== iconId ) {
+			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( { shouldSyncIcon: false } );
 		}
 	}, [] );

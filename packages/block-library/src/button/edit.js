@@ -449,7 +449,6 @@ function ButtonEdit( props ) {
 				/>
 				{ isLinkTag && (
 					<TextControl
-						__next40pxDefaultSize
 						label={ __( 'Link relation' ) }
 						help={ createInterpolateElement(
 							__(
