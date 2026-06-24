@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.1.0 (2026-06-24)
+
 ### New Features
 
 -   Initial experimental release. Depends on WordPress core-private APIs and is

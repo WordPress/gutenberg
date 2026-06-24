@@ -97,6 +97,7 @@ require_once __DIR__ . '/experimental/rest-api-overrides.php';
 // Gutenberg plugin compat.
 require __DIR__ . '/compat/plugin/edit-site-routes-backwards-compat.php';
 require __DIR__ . '/compat/plugin/fonts.php';
+require __DIR__ . '/compat/plugin/style-state-aliases.php';
 
 
 // WordPress 7.0 compat.

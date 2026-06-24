@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 1.49.0 (2026-06-24)
+
+### Enhancements
+
+-   Added `RequestUtils.resetThemeGlobalStyles()` to reset the current theme's user global styles to an empty config for test isolation.
+
+### Bug Fixes
+
+-   Resolve root-relative `page.goto()` URLs against the full `baseURL`, including any subdirectory path, so tests work against WordPress installs served from a subdirectory.
+
 ## 1.48.1 (2026-06-16)
 
 ## 1.48.0 (2026-06-10)

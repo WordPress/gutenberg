@@ -19,7 +19,8 @@ import { getCSSRules, compileCSS } from '@wordpress/style-engine';
  */
 import { BACKGROUND_SUPPORT_KEY, BackgroundImagePanel } from './background';
 import { BORDER_SUPPORT_KEY, BorderPanel, SHADOW_SUPPORT_KEY } from './border';
-import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
+import { COLOR_SUPPORT_KEY } from './color';
+import { ElementsEdit } from './elements';
 import {
 	TypographyPanel,
 	TYPOGRAPHY_SUPPORT_KEY,
@@ -57,8 +58,8 @@ const BORDER_SIDES = [ 'Top', 'Right', 'Bottom', 'Left' ];
 // Keep in sync with WP_Theme_JSON_Gutenberg::RESPONSIVE_BREAKPOINTS and
 // packages/global-styles-engine/src/core/render.tsx.
 const RESPONSIVE_BREAKPOINTS = {
-	mobile: '@media (width <= 480px)',
-	tablet: '@media (480px < width <= 782px)',
+	'@mobile': '@media (width <= 480px)',
+	'@tablet': '@media (480px < width <= 782px)',
 };
 
 const styleSupportKeys = [
@@ -419,7 +420,10 @@ export function getResponsiveStateCSSRules( style, name, baseSelector ) {
 
 	Object.entries( RESPONSIVE_BREAKPOINTS ).forEach(
 		( [ viewport, mediaQuery ] ) => {
-			const viewportStyles = style?.[ viewport ];
+			const viewportStyles = getStyleForState( style, {
+				viewport,
+				pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
+			} );
 			if ( ! viewportStyles ) {
 				return;
 			}
@@ -464,8 +468,8 @@ export function getResponsiveStateCSSRules( style, name, baseSelector ) {
  * Returns the style value used to force-preview a selected state on canvas.
  *
  * Responsive pseudo states inherit from their default-viewport pseudo state.
- * For example, selecting `mobile + :hover` should preview styles from
- * `:hover`, with `mobile.:hover` values layered on top when present.
+ * For example, selecting `@mobile + :hover` should preview styles from
+ * `:hover`, with `@mobile.:hover` values layered on top when present.
  *
  * @param {Object} style         Block style object.
  * @param {Object} selectedState Selected block style state.
@@ -848,7 +852,7 @@ function BlockStyleControls( {
 
 	return (
 		<BlockStyleStateProvider value={ selectedState }>
-			<ColorEdit { ...passedProps } />
+			<ElementsEdit { ...passedProps } />
 			<BackgroundImagePanel { ...passedProps } />
 			<TypographyPanel { ...passedProps } />
 			<BorderPanel { ...passedProps } />
