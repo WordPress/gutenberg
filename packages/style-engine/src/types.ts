@@ -74,6 +74,7 @@ export interface Style {
 		lineHeight?: CSSProperties[ 'lineHeight' ];
 		textColumns?: CSSProperties[ 'columnCount' ];
 		textDecoration?: CSSProperties[ 'textDecoration' ];
+		textShadow?: CSSProperties[ 'textShadow' ];
 		textTransform?: CSSProperties[ 'textTransform' ];
 		writingMode?: CSSProperties[ 'writingMode' ];
 	};
