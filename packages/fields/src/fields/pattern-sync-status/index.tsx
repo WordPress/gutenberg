@@ -33,8 +33,9 @@ function getPatternSyncStatus( item: Pattern ) {
 	if ( item.type && item.type !== PATTERN_TYPES.user ) {
 		return PATTERN_SYNC_TYPES.unsynced;
 	}
-	// When the post is first created, the top-level sync status is not set yet,
-	// so fall back to the meta value.
+	// When a pattern is first created directly from the post editor
+	// (`post-new.php?post_type=wp_block`), the top-level sync status is not
+	// set yet, so fall back to the meta value.
 	if ( item.meta?.wp_pattern_sync_status === PATTERN_SYNC_TYPES.unsynced ) {
 		return PATTERN_SYNC_TYPES.unsynced;
 	}
