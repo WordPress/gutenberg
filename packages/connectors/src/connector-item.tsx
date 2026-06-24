@@ -197,7 +197,6 @@ export function DefaultConnectorSettings( {
 			}
 		>
 			<TextControl
-				__next40pxDefaultSize
 				label={ __( 'API Key' ) }
 				value={ apiKey }
 				onChange={ ( value ) => {

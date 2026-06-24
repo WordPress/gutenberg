@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.49.0 (2026-06-24)
+
 ### Enhancements
 
 -   Export the `Style`, `StyleOptions`, and `GeneratedCSSRule` TypeScript types so that consumers of the public API can type their usage of `compileCSS` and `getCSSRules`.

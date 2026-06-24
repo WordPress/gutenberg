@@ -1731,7 +1731,7 @@ describe( 'Selecting links', () => {
 					);
 				};
 
-				const { container } = render( <LinkControlConsumer /> );
+				render( <LinkControlConsumer /> );
 
 				// Search Input UI.
 				const searchInput = screen.getByRole( 'combobox', {
@@ -1804,8 +1804,7 @@ describe( 'Selecting links', () => {
 				} );
 
 				// Make sure focus is retained after submission.
-				// eslint-disable-next-line testing-library/no-node-access
-				expect( container.firstChild ).toHaveFocus();
+				expect( currentLinkAnchor ).toHaveFocus();
 
 				expect( currentLink ).toBeVisible();
 				expect(

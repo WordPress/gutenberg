@@ -15,6 +15,8 @@ import { symbol } from '@wordpress/icons';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+import { isIsolatedEditorKey } from '../../store/private-keys';
 
 /** @typedef {import('@wordpress/blocks').WPIcon} WPIcon */
 
@@ -72,11 +74,13 @@ export default function useBlockDisplayInformation( clientId ) {
 			if ( ! clientId ) {
 				return null;
 			}
+			const blockEditorSelect = select( blockEditorStore );
 			const {
 				getBlockName,
 				getBlockAttributes,
 				__experimentalGetParsedPattern,
-			} = select( blockEditorStore );
+				getSettings,
+			} = blockEditorSelect;
 			const { getBlockType, getActiveBlockVariation } =
 				select( blocksStore );
 			const blockName = getBlockName( clientId );
@@ -85,11 +89,20 @@ export default function useBlockDisplayInformation( clientId ) {
 				return null;
 			}
 			const attributes = getBlockAttributes( clientId );
+			const { isWithinEditedContentOnlySection } =
+				unlock( blockEditorSelect );
+			const isIsolatedEditor = !! getSettings()?.[ isIsolatedEditorKey ];
 
 			// Check if this block is a pattern
 			const patternName = attributes?.metadata?.patternName;
+			const isEditedContentOnlySection =
+				isWithinEditedContentOnlySection( clientId );
 
-			if ( patternName ) {
+			if (
+				patternName &&
+				! isEditedContentOnlySection &&
+				! isIsolatedEditor
+			) {
 				const pattern = __experimentalGetParsedPattern( patternName );
 				const positionLabel = getPositionTypeLabel( attributes );
 				return {

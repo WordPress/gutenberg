@@ -8,12 +8,12 @@
 /**
  * Extract tabs list from tab-panel innerblocks.
  *
- * @since 7.0.0
+ * @since 7.1.0
  *
  * @param array  $innerblocks Parsed inner blocks of tabs block.
  * @param string $tabs_id     Unique ID for the tabs instance, used to generate tab IDs.
  *
- * @return array List of tabs with id, label, index.
+ * @return array List of tab IDs.
  */
 function block_core_tabs_generate_tabs_list( array $innerblocks = array(), string $tabs_id = '' ): array {
 	$tabs_list = array();
@@ -24,8 +24,7 @@ function block_core_tabs_generate_tabs_list( array $innerblocks = array(), strin
 			$tab_index = 0;
 			foreach ( $inner_block['innerBlocks'] ?? array() as $tab_block ) {
 				if ( 'core/tab-panel' === ( $tab_block['blockName'] ?? '' ) ) {
-					$attrs     = $tab_block['attrs'] ?? array();
-					$tab_label = $attrs['label'] ?? '';
+					$attrs = $tab_block['attrs'] ?? array();
 
 					$tab_id = ! empty( $attrs['anchor'] )
 						? $attrs['anchor']
@@ -33,11 +32,7 @@ function block_core_tabs_generate_tabs_list( array $innerblocks = array(), strin
 							? $tabs_id . '-tab-' . $tab_index
 							: 'tab-' . $tab_index );
 
-					$tabs_list[] = array(
-						'id'    => esc_attr( $tab_id ),
-						'label' => $tab_label,
-						'index' => $tab_index,
-					);
+					$tabs_list[] = esc_attr( $tab_id );
 					++$tab_index;
 				}
 			}
@@ -53,7 +48,7 @@ function block_core_tabs_generate_tabs_list( array $innerblocks = array(), strin
  * It is more performant to do this here, once, rather than in the tabs render and tabs context filters.
  * In this way core/tabs is both a provider and a consumer of the core/tabs-list context.
  *
- * @since 7.0.0
+ * @since 7.1.0
  *
  * @param array $context      Default block context.
  * @param array $parsed_block The block being rendered.
@@ -63,8 +58,7 @@ function block_core_tabs_generate_tabs_list( array $innerblocks = array(), strin
 function block_core_tabs_provide_context( array $context, array $parsed_block ): array {
 	if ( 'core/tabs' === $parsed_block['blockName'] ) {
 		// Generate a unique ID for the tabs instance first, so it can be used
-		// to derive stable tab IDs. Used for 3rd party extensibility to identify
-		// the tabs instance.
+		// to derive stable tab IDs.
 		$tabs_id                   = $parsed_block['attrs']['anchor'] ?? wp_unique_id( 'tabs_' );
 		$tabs_list                 = block_core_tabs_generate_tabs_list( $parsed_block['innerBlocks'] ?? array(), $tabs_id );
 		$context['core/tabs-list'] = $tabs_list;
@@ -78,7 +72,7 @@ add_filter( 'render_block_context', 'block_core_tabs_provide_context', 10, 2 );
 /**
  * Render callback for core/tabs.
  *
- * @since 7.0.0
+ * @since 7.1.0
  *
  * @param array     $attributes Block attributes.
  * @param string    $content    Block content.
@@ -99,7 +93,7 @@ function block_core_tabs_render_block_callback( array $attributes, string $conte
 	$tag_processor = new WP_HTML_Tag_Processor( $content );
 
 	$tag_processor->next_tag( array( 'class_name' => 'wp-block-tabs' ) );
-	$tag_processor->set_attribute( 'data-wp-interactive', 'core/tabs/private' );
+	$tag_processor->set_attribute( 'data-wp-interactive', 'core/tabs' );
 
 	$tag_processor->set_attribute(
 		'data-wp-context',
@@ -116,12 +110,11 @@ function block_core_tabs_render_block_callback( array $attributes, string $conte
 	$output = $tag_processor->get_updated_html();
 
 	/**
-	 * Builds a client side state for just this tabs instance.
-	 * This allows 3rd party extensibility of tabs while retaining
-	 * client side state management per core/tabs instance, like context.
+	 * Builds a client side state for just this tabs instance, so each
+	 * core/tabs block manages its own state, like context.
 	 */
 	wp_interactivity_state(
-		'core/tabs/private',
+		'core/tabs',
 		array(
 			$tabs_id => $tabs_list,
 		)
@@ -133,7 +126,7 @@ function block_core_tabs_render_block_callback( array $attributes, string $conte
 /**
  * Registers the `core/tabs` block on the server.
  *
- * @since 7.0.0
+ * @since 7.1.0
  */
 function register_block_core_tabs() {
 	register_block_type_from_metadata(

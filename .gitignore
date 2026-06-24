@@ -19,6 +19,7 @@ coverage
 yarn.lock
 /artifacts
 /test/e2e/artifacts
+/test/e2e/flakiness-report
 /perf-envs
 /composer.lock
 

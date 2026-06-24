@@ -89,7 +89,13 @@ export interface BasePostWithEmbeddedFeaturedMedia extends BasePost {
 	_embedded: EmbeddedFeaturedMedia;
 }
 
-export interface Template extends CommonPost {
+interface TemplateAuthorFields {
+	author?: number;
+	author_text: string;
+	original_source?: 'theme' | 'plugin' | 'site' | 'user';
+}
+
+export interface Template extends CommonPost, TemplateAuthorFields {
 	type: 'wp_template';
 	is_custom: boolean;
 	source: string;
@@ -100,7 +106,7 @@ export interface Template extends CommonPost {
 	description?: string;
 }
 
-export interface TemplatePart extends CommonPost {
+export interface TemplatePart extends CommonPost, TemplateAuthorFields {
 	type: 'wp_template_part';
 	source: string;
 	origin: string;
