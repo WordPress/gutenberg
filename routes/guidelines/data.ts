@@ -8,8 +8,6 @@ import {
 	store as blocksStore,
 	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
-import apiFetch from '@wordpress/api-fetch';
-import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -162,6 +160,12 @@ interface ReclaimableRow {
  * Finds an existing row that already owns this exact slug so a save can reuse
  * it instead of creating a duplicate.
  *
+ * Resolves through core-data (not a raw fetch) so the row lands in the store and
+ * the save right after can update it by ID. The query omits `context` on
+ * purpose: the entity already fetches in edit context via its `baseURLParams`,
+ * so we still get raw fields, but the record stores under the `default` cache
+ * bucket where `editEntityRecord`/`getRawEntityRecord` read it.
+ *
  * Searches non-trash statuses only: WordPress renames a trashed post's slug to
  * `…__trashed`, so a trashed row no longer holds the exact slug and is left
  * alone (a fresh row simply reclaims the now-free slug). At most one row can own
@@ -172,14 +176,15 @@ interface ReclaimableRow {
 async function findReclaimableRow(
 	slug: string
 ): Promise< ReclaimableRow | undefined > {
-	const rows = ( await apiFetch( {
-		path: addQueryArgs( '/wp/v2/knowledge', {
+	const rows = ( await resolveSelect( coreStore ).getEntityRecords(
+		KNOWLEDGE_KIND,
+		KNOWLEDGE_NAME,
+		{
 			slug,
 			status: [ 'publish', 'private', 'draft', 'pending', 'future' ],
 			per_page: 1,
-			context: 'edit',
-		} ),
-	} ) ) as ReclaimableRow[];
+		}
+	) ) as ReclaimableRow[] | null;
 
 	return rows?.[ 0 ];
 }
@@ -216,41 +221,46 @@ export async function saveGuidelineRow(
 		invalidateResolution,
 	} = dispatch( coreStore );
 
-	if ( existingId ) {
-		await editEntityRecord( KNOWLEDGE_KIND, KNOWLEDGE_NAME, existingId, {
-			content,
-		} );
-		await saveEditedEntityRecord(
-			KNOWLEDGE_KIND,
-			KNOWLEDGE_NAME,
-			existingId,
-			{ throwOnError: true }
-		);
-		return;
-	}
+	// The known published row and an existing same-slug row (e.g. a private
+	// placeholder) are both in the store, so they share one update path; only a
+	// brand-new scope is created.
+	const reclaimable = existingId
+		? undefined
+		: await findReclaimableRow( slug );
+	const targetId = existingId ?? reclaimable?.id;
 
-	const reclaimable = await findReclaimableRow( slug );
-
-	if ( reclaimable ) {
-		// Reclaim the existing row: republish and overwrite it. Reassign the
-		// author only when taking over another user's row (admin-only, gated by
-		// `edit_others_knowledge_items` + `publish_knowledge_items`).
-		const data: Record< string, unknown > = {
+	if ( targetId ) {
+		const edits: Record< string, unknown > = {
 			title,
 			content,
 			status: 'publish',
 		};
-		const currentUser = await resolveSelect( coreStore ).getCurrentUser();
-		const currentUserId = currentUser?.id;
-		if ( currentUserId && reclaimable.author !== currentUserId ) {
-			data.author = currentUserId;
+		// Reassign the author only when taking over another user's row
+		// (admin-only, gated by `edit_others_knowledge_items` +
+		// `publish_knowledge_items`). `saveEditedEntityRecord` sends only changed
+		// fields, so re-stamping `title`/`status` on the published row is a no-op.
+		if ( reclaimable ) {
+			const currentUser =
+				await resolveSelect( coreStore ).getCurrentUser();
+			if ( currentUser?.id && reclaimable.author !== currentUser.id ) {
+				edits.author = currentUser.id;
+			}
 		}
 
-		await apiFetch( {
-			path: `/wp/v2/knowledge/${ reclaimable.id }`,
-			method: 'POST',
-			data,
-		} );
+		await editEntityRecord(
+			KNOWLEDGE_KIND,
+			KNOWLEDGE_NAME,
+			targetId,
+			edits
+		);
+		await saveEditedEntityRecord(
+			KNOWLEDGE_KIND,
+			KNOWLEDGE_NAME,
+			targetId,
+			{
+				throwOnError: true,
+			}
+		);
 	} else {
 		await saveEntityRecord(
 			KNOWLEDGE_KIND,
@@ -260,20 +270,23 @@ export async function saveGuidelineRow(
 		);
 	}
 
-	// The created/reclaimed row isn't in the slug-filtered query's resolved id
-	// list yet. Invalidate and await the re-resolution so the fresh row is in
-	// the store before this resolves — callers like export read straight from
-	// the resolved records and must not race the re-fetch.
-	invalidateResolution( 'getEntityRecords', [
-		KNOWLEDGE_KIND,
-		KNOWLEDGE_NAME,
-		query,
-	] );
-	await resolveSelect( coreStore ).getEntityRecords(
-		KNOWLEDGE_KIND,
-		KNOWLEDGE_NAME,
-		query
-	);
+	// A created or reclaimed row isn't in the page's slug+publish query yet, so
+	// invalidate and await the re-resolution: the fresh row must be in the store
+	// before this resolves (callers like export read the resolved records and
+	// must not race the re-fetch). A content-only update of the known published
+	// row is already in the query, so it needs none of this.
+	if ( ! existingId ) {
+		invalidateResolution( 'getEntityRecords', [
+			KNOWLEDGE_KIND,
+			KNOWLEDGE_NAME,
+			query,
+		] );
+		await resolveSelect( coreStore ).getEntityRecords(
+			KNOWLEDGE_KIND,
+			KNOWLEDGE_NAME,
+			query
+		);
+	}
 }
 
 /**
