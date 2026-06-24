@@ -119,7 +119,7 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
               with:
                   ref: ${{ matrix.branch }}
                   token: ${{ secrets.GUTENBERG_TOKEN }}
@@ -238,7 +238,8 @@ jobs:
                     echo "exists=true" >> "$GITHUB_OUTPUT"
                   else
                     svn_status=$?
-                    if grep -q 'E160013' "$svn_error_file"; then
+                    # WP.org SVN may report a missing tag as W160013 followed by E200009.
+                    if grep -Eq 'E160013|W160013|E200009|non-existent' "$svn_error_file"; then
                       echo "exists=false" >> "$GITHUB_OUTPUT"
                     else
                       cat "$svn_error_file" >&2
@@ -312,7 +313,8 @@ jobs:
                     echo "exists=true" >> "$GITHUB_OUTPUT"
                   else
                     svn_status=$?
-                    if grep -q 'E160013' "$svn_error_file"; then
+                    # WP.org SVN may report a missing tag as W160013 followed by E200009.
+                    if grep -Eq 'E160013|W160013|E200009|non-existent' "$svn_error_file"; then
                       echo "exists=false" >> "$GITHUB_OUTPUT"
                     else
                       cat "$svn_error_file" >&2

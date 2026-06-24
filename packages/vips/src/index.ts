@@ -3,10 +3,10 @@
  */
 import Vips from 'wasm-vips';
 
-// @ts-expect-error - WASM files are inlined as base64 data URLs at build time
+// @ts-expect-error - WASM files are inlined as Uint8Array at build time.
 import VipsModule from 'wasm-vips/vips.wasm';
 
-// @ts-expect-error - WASM files are inlined as base64 data URLs at build time
+// @ts-expect-error - WASM files are inlined as Uint8Array at build time.
 import VipsHeifModule from 'wasm-vips/vips-heif.wasm';
 
 /**
@@ -31,6 +31,32 @@ let cleanup: () => void;
 let vipsPromise: Promise< typeof Vips > | undefined;
 
 /**
+ * Caches Blob URLs created for inlined WASM binaries.
+ *
+ * The WASM binaries are inlined as `Uint8Array` values at build time. wasm-vips
+ * loads them (including the HEIF dynamic library) by fetching a URL, so the
+ * bytes are wrapped in a Blob URL the first time each is requested.
+ */
+const wasmUrls = new WeakMap< Uint8Array< ArrayBuffer >, string >();
+
+/**
+ * Returns a Blob URL for an inlined WASM binary, creating it on first use.
+ *
+ * @param bytes The inlined WASM binary.
+ * @return A Blob URL pointing at the binary.
+ */
+function getWasmUrl( bytes: Uint8Array< ArrayBuffer > ): string {
+	let url = wasmUrls.get( bytes );
+	if ( ! url ) {
+		url = URL.createObjectURL(
+			new Blob( [ bytes ], { type: 'application/wasm' } )
+		);
+		wasmUrls.set( bytes, url );
+	}
+	return url;
+}
+
+/**
  * Instantiates and returns a new vips instance.
  *
  * Reuses any existing instance.
@@ -46,13 +72,15 @@ async function getVips(): Promise< typeof Vips > {
 		// It can be re-added when Core adds JXL support.
 		dynamicLibraries: [ 'vips-heif.wasm' ],
 		locateFile: ( fileName: string ) => {
-			// WASM files are inlined as base64 data URLs at build time,
-			// eliminating the need for separate file downloads and avoiding
-			// issues with hosts not serving WASM files with correct MIME types.
+			// WASM files are inlined as a Uint8Array at build time and exposed
+			// here as Blob URLs. This eliminates the need for separate file
+			// downloads and avoids issues with hosts not serving WASM files
+			// with correct MIME types, while keeping the inlined bytes
+			// compressible (see the build-time binary encoding).
 			if ( fileName.endsWith( 'vips.wasm' ) ) {
-				return VipsModule;
+				return getWasmUrl( VipsModule );
 			} else if ( fileName.endsWith( 'vips-heif.wasm' ) ) {
-				return VipsHeifModule;
+				return getWasmUrl( VipsHeifModule );
 			}
 			return fileName;
 		},
@@ -221,6 +249,11 @@ function applyResizeAndCrop<
 		width: number;
 		height: number;
 		crop: ( ...args: number[] ) => T;
+		// Optional UltraHDR support: present on Vips.Image instances when the
+		// source has an embedded gain map.
+		gainmap?: T;
+		copy?: () => T;
+		setImage?: ( name: string, value: T ) => void;
 	},
 >(
 	resize: ImageSizeCrop,
@@ -298,7 +331,46 @@ function applyResizeAndCrop<
 	const cropWidth = Math.min( image.width, target.width );
 	const cropHeight = Math.min( image.height, target.height );
 
-	return image.crop( left, top, cropWidth, cropHeight );
+	const cropped = image.crop( left, top, cropWidth, cropHeight );
+
+	// For UltraHDR sources, also crop the attached gain map. The gain map
+	// can be smaller than the main image, so we scale the crop coordinates
+	// to its resolution. See:
+	// https://www.libvips.org/API/current/uhdr.html#a-la-carte-processing
+	const gainmap = image.gainmap;
+	const copy = cropped.copy;
+	const setImage = cropped.setImage;
+	if ( ! gainmap || ! copy || ! setImage ) {
+		return cropped;
+	}
+
+	// Scale the crop rect to the gain map's resolution. `crop` expects integer
+	// pixel coordinates, so round here rather than relying on an implicit
+	// float-to-int conversion, and clamp to the gain map bounds so the rect
+	// never extends past its edges.
+	const hscale = gainmap.width / image.width;
+	const vscale = gainmap.height / image.height;
+	const gainmapLeft = Math.round( left * hscale );
+	const gainmapTop = Math.round( top * vscale );
+	const gainmapWidth = Math.min(
+		Math.round( cropWidth * hscale ),
+		gainmap.width - gainmapLeft
+	);
+	const gainmapHeight = Math.min(
+		Math.round( cropHeight * vscale ),
+		gainmap.height - gainmapTop
+	);
+	const newGainmap = gainmap.crop(
+		gainmapLeft,
+		gainmapTop,
+		gainmapWidth,
+		gainmapHeight
+	);
+
+	// setImage mutates, so produce a unique copy first.
+	const result = copy.call( cropped );
+	setImage.call( result, 'gainmap', newGainmap );
+	return result;
 }
 
 /**
@@ -313,9 +385,9 @@ function buildSaveOptions(
 	quality: number
 ): SaveOptions< typeof type > {
 	const saveOptions: SaveOptions< typeof type > = {
-		// Strip metadata except ICC color profiles,
+		// Strip metadata except ICC color profiles or gainmaps,
 		// matching WordPress core's behavior.
-		keep: 'icc',
+		keep: 'icc|gainmap',
 	};
 
 	if ( supportsQuality( type ) ) {
@@ -332,6 +404,11 @@ function buildSaveOptions(
 
 /**
  * Resizes an image using vips.
+ *
+ * UltraHDR JPEGs are auto-detected and preserved: libvips's `uhdrload*`
+ * has higher priority than `jpegload*`, so `newFromBuffer`/`thumbnailBuffer`
+ * decode the gain map alongside the base image, and `jpegsave*` delegates
+ * to `uhdrsave*` on output when a gain map is attached.
  *
  * @param id        Item ID.
  * @param buffer    Original file buffer.
@@ -421,6 +498,66 @@ export async function resizeImage(
 		return result;
 	} finally {
 		inProgressOperations.delete( id );
+	}
+}
+
+/**
+ * Information returned by getUltraHdrInfo() for a successfully probed
+ * UltraHDR JPEG.
+ */
+interface UltraHdrInfo {
+	width: number;
+	height: number;
+	/** HDR headroom in stops (log2 of the linear capacity). */
+	hdrCapacity: number;
+}
+
+/**
+ * Probes a JPEG to determine whether it is an UltraHDR image with an embedded
+ * gain map.
+ *
+ * Returns dimensions and HDR headroom on success, or `null` if the buffer is
+ * not a valid UltraHDR JPEG (no gain map, decode failure, or unsupported
+ * format).
+ *
+ * @param buffer Image buffer.
+ * @return UltraHDR info, or null when the buffer is not UltraHDR.
+ */
+export async function getUltraHdrInfo(
+	buffer: ArrayBuffer
+): Promise< UltraHdrInfo | null > {
+	try {
+		const vips = await getVips();
+		const image = vips.Image.uhdrloadBuffer( buffer );
+		if ( ! image.gainmap ) {
+			cleanup?.();
+			return null;
+		}
+
+		// `gainmap-hdr-capacity-max` is libultrahdr's linear-scale max capacity.
+		// Convert to log2 stops so the value stored in attachment metadata
+		// represents HDR headroom in stops.
+		let hdrCapacityLinear = 1;
+		try {
+			hdrCapacityLinear = image.getDouble( 'gainmap-hdr-capacity-max' );
+		} catch {
+			// Field may be missing; fall back to no headroom.
+		}
+		const hdrCapacity =
+			hdrCapacityLinear > 0 ? Math.log2( hdrCapacityLinear ) : 0;
+
+		const info: UltraHdrInfo = {
+			width: image.width,
+			height: image.pageHeight,
+			hdrCapacity,
+		};
+
+		cleanup?.();
+		return info;
+	} catch {
+		// Not an UltraHDR image (or libultrahdr decoder unavailable).
+		cleanup?.();
+		return null;
 	}
 }
 
@@ -555,5 +692,6 @@ export {
 	resizeImage as vipsResizeImage,
 	rotateImage as vipsRotateImage,
 	hasTransparency as vipsHasTransparency,
+	getUltraHdrInfo as vipsGetUltraHdrInfo,
 	cancelOperations as vipsCancelOperations,
 };

@@ -25,7 +25,6 @@ The following components are checked by this rule:
 -   NumberControl
 -   RangeControl
 -   SelectControl
--   TextControl
 -   ToggleGroupControl
 -   UnitControl
 

@@ -1,11 +1,18 @@
+/**
+ * @jest-environment node
+ */
+import plugin from '../no-unknown-ds-tokens.mjs';
 import { getStylelintResult } from './utils';
 
-const CONFIG = './.stylelintrc.no-unknown-ds-tokens.json';
+const CONFIG = {
+	plugins: [ plugin ],
+	rules: { 'plugin-wpds/no-unknown-ds-tokens': true },
+};
 
 describe( 'flags no warnings with valid wpds tokens css', () => {
 	let result: ReturnType< typeof getStylelintResult >;
 
-	beforeEach( () => {
+	beforeAll( () => {
 		result = getStylelintResult(
 			'./fixtures/no-unknown-ds-tokens-valid.css',
 			CONFIG
@@ -26,7 +33,7 @@ describe( 'flags no warnings with valid wpds tokens css', () => {
 describe( 'flags warnings with invalid wpds tokens css', () => {
 	let result: ReturnType< typeof getStylelintResult >;
 
-	beforeEach( () => {
+	beforeAll( () => {
 		result = getStylelintResult(
 			'./fixtures/no-unknown-ds-tokens-invalid.css',
 			CONFIG

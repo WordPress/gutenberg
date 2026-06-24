@@ -56,8 +56,8 @@ export const VALID_BLOCK_STATES: Record< string, StateDefinition[] > = {
  * These map to CSS media queries wrapping the block's styles.
  */
 export const RESPONSIVE_STATES: StateDefinition[] = [
-	{ value: 'tablet', label: __( 'Tablet' ) },
-	{ value: 'mobile', label: __( 'Mobile' ) },
+	{ value: '@tablet', label: __( 'Tablet' ) },
+	{ value: '@mobile', label: __( 'Mobile' ) },
 ];
 
 /**
