@@ -2,7 +2,6 @@
  * External dependencies
  */
 import clsx from 'clsx';
-import type { CSSProperties } from 'react';
 
 /**
  * Internal dependencies
@@ -11,11 +10,6 @@ import { useContextSystem } from '../context';
 import type { SurfaceProps } from './types';
 import type { WordPressComponentProps } from '../context';
 import styles from './style.module.scss';
-
-type SurfaceStyle = CSSProperties & {
-	'--wp-components-surface-background-size'?: string;
-	'--wp-components-surface-background-size-dotted'?: string;
-};
 
 export function useSurface(
 	props: WordPressComponentProps< SurfaceProps, 'div' >
@@ -33,7 +27,7 @@ export function useSurface(
 	} = useContextSystem( props, 'Surface' );
 
 	const hasPatternBackground = variant === 'dotted' || variant === 'grid';
-	const surfaceStyle: SurfaceStyle | undefined = hasPatternBackground
+	const surfaceStyle = hasPatternBackground
 		? {
 				...style,
 				'--wp-components-surface-background-size': `${ backgroundSize }px`,
