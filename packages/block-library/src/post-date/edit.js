@@ -210,7 +210,7 @@ export default function PostDateEdit( props ) {
 					<ToolsPanelItem
 						hasValue={ () => isLink !== false }
 						label={
-							postType?.labels.singular_name
+							postType?.labels?.singular_name
 								? sprintf(
 										// translators: %s: Name of the post type e.g: "post".
 										__( 'Link to %s' ),
@@ -223,7 +223,7 @@ export default function PostDateEdit( props ) {
 					>
 						<ToggleControl
 							label={
-								postType?.labels.singular_name
+								postType?.labels?.singular_name
 									? sprintf(
 											// translators: %s: Name of the post type e.g: "post".
 											__( 'Link to %s' ),

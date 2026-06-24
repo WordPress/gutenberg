@@ -2,6 +2,57 @@
 
 ## Unreleased
 
+## 0.16.0 (2026-06-24)
+
+### Breaking Changes
+
+-   Rename the `bg` and `fg` design token groups to `background` and `foreground`. All `--wpds-color-bg-*` custom properties are now `--wpds-color-background-*`, and all `--wpds-color-fg-*` custom properties are now `--wpds-color-foreground-*` ([#79098](https://github.com/WordPress/gutenberg/pull/79098)).
+-   Remove the `--wpds-dimension-base` design token. It was a primitive (the `4px` base unit) and is no longer exposed publicly ([#79254](https://github.com/WordPress/gutenberg/pull/79254)).
+-   Remove `privateApis` from the package exports due to API stabilization described in "New Features" ([#78958](https://github.com/WordPress/gutenberg/pull/78958)).
+
+### New Features
+
+-   Add `ThemeProvider` as a public package export ([#78958](https://github.com/WordPress/gutenberg/pull/78958)).
+-   Add `--wpds-color-stroke-surface-caution` and `--wpds-color-stroke-surface-caution-strong` so the `caution` tone has the same stroke-surface coverage as the other status tones ([#79198](https://github.com/WordPress/gutenberg/pull/79198)).
+-   Add `--wpds-border-radius-xl` for page and app shell surfaces so nested cards and notices can stay on `--wpds-border-radius-lg` without matching the parent radius ([#78913](https://github.com/WordPress/gutenberg/pull/78913)).
+-   Add `cornerRadius` prop to `ThemeProvider` for configuring the border-radius preset (`none`, `subtle`, `moderate`, `pronounced`) via prebuilt design token modes. [#78816](https://github.com/WordPress/gutenberg/pull/78816).
+-   Add disabled variants for the `brand` and `error` tones of the interactive `background`, `foreground`, and `stroke` color tokens (e.g. `--wpds-color-stroke-interactive-brand-disabled`, `--wpds-color-background-interactive-brand-strong-disabled`), for parity with the existing `neutral` disabled tokens ([#79124](https://github.com/WordPress/gutenberg/pull/79124)).
+
+### Enhancements
+
+-   `ThemeProvider`: forward the `cornerRadius` preset to the document element when `isRoot` is set, matching `color` and `cursor`. [#79153](https://github.com/WordPress/gutenberg/pull/79153).
+
+### Documentation
+
+-   Rename the `bg` and `fg` design token groups to `background` and `foreground`. All `--wpds-color-bg-*` custom properties are now `--wpds-color-background-*`, and all `--wpds-color-fg-*` custom properties are now `--wpds-color-foreground-*` ([#79098](https://github.com/WordPress/gutenberg/pull/79098)).
+-   Rename the `--wpds-color-stroke-focus-brand` design token to `--wpds-color-stroke-focus` ([#79125](https://github.com/WordPress/gutenberg/pull/79125)).
+-   Added [Design Tokens Maintainer's Guide](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/tokens/README.md) and trimmed maintainer-facing content from package README ([#79157](https://github.com/WordPress/gutenberg/pull/79157)).
+
+### Enhancements
+
+-   Tweak `--wpds-color-foreground-interactive-brand-active` and `--wpds-color-foreground-interactive-error-active` to differentiate them from the non-`active` counterparts ([#79151](https://github.com/WordPress/gutenberg/pull/79151)).
+
+### Bug Fixes
+
+-   `ThemeProvider`: Strictly enforce the documented seed-color input contract for `color.primary` / `color.background`. Inputs outside sRGB (e.g. `oklch()`), previously accepted incidentally, now throw a clear error ([#79148](https://github.com/WordPress/gutenberg/pull/79148)).
+
+### Internal
+
+-   Add unit tests for `ThemeProvider` and `useThemeProviderStyles` ([#79126](https://github.com/WordPress/gutenberg/pull/79126)).
+-   Run the stylelint plugin tests through the stylelint Node API instead of spawning the CLI via `child_process` ([#79199](https://github.com/WordPress/gutenberg/pull/79199)).
+
+### Documentation
+
+-   Document the static-stylesheet + `<ThemeProvider>` delivery model, the `isRoot` prop, and the canonical pattern for using `<ThemeProvider>` across documents (iframes and other portals) ([#78664](https://github.com/WordPress/gutenberg/pull/78664)).
+
+### Code Quality
+
+-   `ThemeProvider`: Apply scoped custom properties via inline `style` (mirrored onto the wrapper's own document element when `isRoot`) instead of a per-instance `<style>` element ([#78678](https://github.com/WordPress/gutenberg/pull/78678)).
+-   `ThemeProvider`: Stop serializing `data-wpds-root-provider="false"` on non-root providers by only setting the attribute when `isRoot` is `true` ([#79253](https://github.com/WordPress/gutenberg/pull/79253)).
+-   Declare `postcss`, `esbuild`, and `vite` as optional peer dependencies for the bundler plugins, and move `@types/react` from `dependencies` to an optional peer dependency ([#79095](https://github.com/WordPress/gutenberg/pull/79095)).
+
+## 0.15.1 (2026-06-16)
+
 ## 0.15.0 (2026-06-10)
 
 ### New Features
@@ -13,7 +64,8 @@
 -   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
 
 ### Breaking Changes
-- Revert React back to v18 [#78940](https://github.com/WordPress/gutenberg/pull/78940).
+
+-   Revert React back to v18 [#78940](https://github.com/WordPress/gutenberg/pull/78940).
 -   Drop the experimental `density` support from `ThemeProvider`. The `density` prop has been removed, along with the related `data-wpds-density` attribute and the per-density overrides on `--wpds-dimension-padding-*` / `--wpds-dimension-gap-*` tokens ([#78741](https://github.com/WordPress/gutenberg/pull/78741)).
 -   Rename the `color.bg` prop on `ThemeProvider` to `color.background` ([#79007](https://github.com/WordPress/gutenberg/pull/79007)).
 

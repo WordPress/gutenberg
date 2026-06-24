@@ -2,14 +2,16 @@
 /**
  * REST API comment controller with reaction support for WordPress 7.1 compatibility.
  *
- * Extends the 6.9 comment controller to add support for the 'reaction'
- * comment type, enabling emoji reactions on notes.
+ * Extends the core comments controller to add support for the 'reaction'
+ * comment type, enabling emoji reactions on notes. The notes functionality
+ * this builds on ships in WordPress 6.9 core, which is the plugin's minimum
+ * supported version.
  *
  * @package gutenberg
  * @since   7.1.0
  */
 
-class Gutenberg_REST_Comment_Controller_7_1 extends Gutenberg_REST_Comment_Controller_6_9 {
+class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller {
 
 	/**
 	 * Retrieves the comment schema, adding reaction_emojis.
@@ -834,17 +836,44 @@ class Gutenberg_REST_Comment_Controller_7_1 extends Gutenberg_REST_Comment_Contr
 
 		return parent::check_is_comment_content_allowed( $prepared_comment );
 	}
+
+	/**
+	 * Checks if a post type supports notes.
+	 *
+	 * Core's WP_REST_Comments_Controller declares this helper as private, so it
+	 * is reimplemented here to keep it available to this subclass.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param string $post_type Post type name.
+	 * @return bool True if post type supports notes, false otherwise.
+	 */
+	protected function check_post_type_supports_notes( $post_type ) {
+		$supports = get_all_post_type_supports( $post_type );
+		if ( ! isset( $supports['editor'] ) ) {
+			return false;
+		}
+		if ( ! is_array( $supports['editor'] ) ) {
+			return false;
+		}
+		foreach ( $supports['editor'] as $item ) {
+			if ( ! empty( $item['notes'] ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
 }
 
 /**
  * Registers the Gutenberg REST comment controller for WordPress 7.1 compatibility.
  *
- * Replaces the 6.9 controller registration to use the 7.1 controller
- * which adds reaction support.
+ * Registers on rest_api_init at the default priority so it takes precedence over
+ * core's comments controller (registered at priority 99), adding reaction support
+ * on top of the notes functionality that ships in WordPress 6.9 core.
  */
 function gutenberg_register_comment_controller_7_1() {
 	$controller = new Gutenberg_REST_Comment_Controller_7_1();
 	$controller->register_routes();
 }
-remove_action( 'rest_api_init', 'gutenberg_register_comment_controller_6_9' );
 add_action( 'rest_api_init', 'gutenberg_register_comment_controller_7_1' );

@@ -7,6 +7,7 @@ exports[`BlockIcon renders a Icon 1`] = `
   >
     <svg
       aria-hidden="true"
+      fill="currentColor"
       focusable="false"
       height="24"
       viewBox="0 0 24 24"
