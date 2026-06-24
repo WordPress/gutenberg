@@ -1,6 +1,15 @@
 name: Publish npm packages
 
 on:
+    workflow_call:
+        inputs:
+            release_type:
+                description: 'Release type'
+                required: true
+                type: string
+            wp_version:
+                description: 'WordPress major version (`wp` only)'
+                type: string
     workflow_dispatch:
         inputs:
             release_type:
@@ -30,14 +39,39 @@ permissions: {}
 
 jobs:
     release:
-        name: Release - ${{ github.event.inputs.release_type }}
+        name: Release - ${{ inputs.release_type }}
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
+            packages: read
         environment: WordPress packages
         steps:
+            - name: Resolve release context
+              id: release_context
+              run: |
+                  if [ "$RELEASE_TYPE" = "wp" ] && [ -z "$WP_VERSION" ]; then
+                    echo "::error::The wp_version input is required when release_type is wp."
+                    exit 1
+                  fi
+
+                  if [ "$RELEASE_TYPE" = "wp" ]; then
+                    WP_VERSION="${WP_VERSION#wp/}"
+
+                    if [[ ! "$WP_VERSION" =~ ^[0-9]+\.[0-9]+$ ]]; then
+                      echo "::error::Expected wp_version to be X.Y or wp/X.Y, received ${INPUT_WP_VERSION}."
+                      exit 1
+                    fi
+
+                    echo "wp_branch=wp/$WP_VERSION" >> "$GITHUB_OUTPUT"
+                    echo "wp_version=$WP_VERSION" >> "$GITHUB_OUTPUT"
+                  fi
+              env:
+                  RELEASE_TYPE: ${{ inputs.release_type }}
+                  INPUT_WP_VERSION: ${{ inputs.wp_version }}
+                  WP_VERSION: ${{ inputs.wp_version }}
+
             - name: Checkout (for CLI)
-              if: ${{ github.event.inputs.release_type != 'wp' }}
+              if: ${{ inputs.release_type != 'wp' }}
               uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
               with:
                   path: cli
@@ -46,7 +80,7 @@ jobs:
                   persist-credentials: false
 
             - name: Checkout (for publishing)
-              if: ${{ github.event.inputs.release_type != 'wp' }}
+              if: ${{ inputs.release_type != 'wp' }}
               uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
               with:
                   path: publish
@@ -57,11 +91,11 @@ jobs:
                   persist-credentials: true
 
             - name: Checkout (for publishing WP major version)
-              if: ${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version }}
+              if: ${{ inputs.release_type == 'wp' && inputs.wp_version }}
               uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
               with:
                   path: publish
-                  ref: wp/${{ github.event.inputs.wp_version }}
+                  ref: ${{ steps.release_context.outputs.wp_branch }}
                   # We need to ensure that Lerna can read the commit created during the previous npm publishing.
                   # Lerna assumes that all packages need publishing if it can't access the necessary information.
                   fetch-depth: 999
@@ -76,7 +110,7 @@ jobs:
                   git config user.email gutenberg@wordpress.org
 
             - name: Setup Node.js
-              if: ${{ github.event.inputs.release_type != 'wp' }}
+              if: ${{ inputs.release_type != 'wp' }}
               uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
               with:
                   node-version-file: 'cli/.nvmrc'
@@ -84,15 +118,75 @@ jobs:
                   check-latest: true
 
             - name: Setup Node.js (for WP major version)
-              if: ${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version }}
+              if: ${{ inputs.release_type == 'wp' && inputs.wp_version }}
               uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
               with:
                   node-version-file: 'publish/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'
                   check-latest: true
 
+            - name: Login to GitHub Container Registry
+              if: ${{ inputs.release_type == 'wp' && inputs.wp_version }}
+              uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
+              with:
+                  registry: ghcr.io
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Setup ORAS
+              if: ${{ inputs.release_type == 'wp' && inputs.wp_version }}
+              uses: oras-project/setup-oras@38de303aac69abb66f3e6255b7198bff35f323e3 # v2.0.0
+
+            - name: Resolve Gutenberg SHA from GHCR build
+              id: ghcr_build
+              if: ${{ inputs.release_type == 'wp' && inputs.wp_version }}
+              run: |
+                  BUILD_DIRECTORY="$RUNNER_TEMP/gutenberg-build"
+                  mkdir -p "$BUILD_DIRECTORY"
+                  cd "$BUILD_DIRECTORY"
+
+                  oras pull "ghcr.io/wordpress/gutenberg/gutenberg-wp-develop-build:wp-$WP_VERSION"
+
+                  if [ ! -f gutenberg.tar.gz ]; then
+                    echo "::error::The GHCR build did not contain gutenberg.tar.gz."
+                    exit 1
+                  fi
+
+                  tar -xzf gutenberg.tar.gz ./.gutenberg-hash
+
+                  if [ ! -f .gutenberg-hash ]; then
+                    echo "::error::The GHCR build did not contain .gutenberg-hash."
+                    exit 1
+                  fi
+
+                  SOURCE_SHA="$(tr -d '[:space:]' < .gutenberg-hash)"
+                  if [[ ! "$SOURCE_SHA" =~ ^[0-9a-fA-F]{40}$ ]]; then
+                    echo "::error::.gutenberg-hash must contain a full 40-character commit SHA."
+                    exit 1
+                  fi
+
+                  echo "sha=$SOURCE_SHA" >> "$GITHUB_OUTPUT"
+                  echo "Resolved Gutenberg SHA from ghcr.io/wordpress/gutenberg/gutenberg-wp-develop-build:wp-$WP_VERSION: $SOURCE_SHA"
+              env:
+                  WP_VERSION: ${{ steps.release_context.outputs.wp_version }}
+
+            - name: Verify publish checkout matches GHCR build
+              if: ${{ inputs.release_type == 'wp' && inputs.wp_version }}
+              run: |
+                  cd publish
+                  CHECKOUT_SHA="$(git rev-parse HEAD)"
+                  if [ "$CHECKOUT_SHA" != "$SOURCE_SHA" ]; then
+                    echo "::error::The wp/$WP_VERSION branch checkout ($CHECKOUT_SHA) does not match the GHCR wp-$WP_VERSION build ($SOURCE_SHA)."
+                    exit 1
+                  fi
+
+                  echo "The wp/$WP_VERSION checkout matches the GHCR build SHA: $SOURCE_SHA"
+              env:
+                  SOURCE_SHA: ${{ steps.ghcr_build.outputs.sha }}
+                  WP_VERSION: ${{ steps.release_context.outputs.wp_version }}
+
             - name: Publish development packages to npm ("next" dist-tag)
-              if: ${{ github.event.inputs.release_type == 'development' }}
+              if: ${{ inputs.release_type == 'development' }}
               run: |
                   cd cli
                   npm ci
@@ -101,7 +195,7 @@ jobs:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
             - name: Publish packages based on the latest Gutenberg plugin to npm ("latest" dist-tag)
-              if: ${{ github.event.inputs.release_type == 'latest' }}
+              if: ${{ inputs.release_type == 'latest' }}
               run: |
                   cd cli
                   npm ci
@@ -110,7 +204,7 @@ jobs:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
             - name: Publish packages to npm with bug fixes ("latest" dist-tag)
-              if: ${{ github.event.inputs.release_type == 'bugfix' }}
+              if: ${{ inputs.release_type == 'bugfix' }}
               run: |
                   cd cli
                   npm ci
@@ -118,12 +212,12 @@ jobs:
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-            - name: Publish packages to npm for WP major version ("wp/${{ github.event.inputs.wp_version || 'X.Y' }}" dist-tag)
-              if: ${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version }}
+            - name: Publish packages to npm for WP major version
+              if: ${{ inputs.release_type == 'wp' && inputs.wp_version }}
               run: |
                   cd publish
                   npm ci
                   npx lerna publish patch --dist-tag "wp-$WP_VERSION" --no-private --yes --no-verify-access
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-                  WP_VERSION: ${{ github.event.inputs.wp_version }}
+                  WP_VERSION: ${{ steps.release_context.outputs.wp_version }}

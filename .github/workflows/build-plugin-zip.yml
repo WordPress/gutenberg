@@ -341,6 +341,18 @@ jobs:
               run: |
                   oras tag "ghcr.io/wordpress/gutenberg/gutenberg-wp-develop-build:${SOURCE_SHA}" "${MUTABLE_TAG}"
 
+    trigger-wp-npm-publish:
+        name: Trigger WP npm package publishing
+        needs: publish-to-container-registry
+        if: |
+            github.ref_type == 'branch' &&
+            startsWith( github.ref_name, 'wp/' )
+        uses: ./.github/workflows/publish-npm-packages.yml
+        with:
+            release_type: wp
+            wp_version: ${{ github.ref_name }}
+        secrets: inherit
+
     revert-version-bump:
         name: Revert version bump if build failed
         needs: [bump-version, build]
