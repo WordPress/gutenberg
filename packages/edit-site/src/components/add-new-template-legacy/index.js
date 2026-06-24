@@ -16,13 +16,7 @@ import {
 	Icon as WCIcon,
 } from '@wordpress/components';
 import { decodeEntities } from '@wordpress/html-entities';
-import {
-	useState,
-	memo,
-	useRef,
-	useEffect,
-	useCallback,
-} from '@wordpress/element';
+import { useState, memo, useRef, useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useViewportMatch } from '@wordpress/compose';
@@ -165,12 +159,10 @@ function NewTemplateModal( { onClose } ) {
 		modalContentMap.templatesList
 	);
 	const [ entityForSuggestions, setEntityForSuggestions ] = useState( {} );
-	const [ postFormats, setPostFormats ] = useState( [] );
 	const [ isSubmitting, setIsSubmitting ] = useState( false );
 	const missingTemplates = useMissingTemplates(
 		setEntityForSuggestions,
 		() => setModalContent( modalContentMap.customTemplate ),
-		setPostFormats,
 		() => setModalContent( modalContentMap.postFormats )
 	);
 	const history = useHistory();
@@ -370,7 +362,6 @@ function NewTemplateModal( { onClose } ) {
 			) }
 			{ modalContent === modalContentMap.postFormats && (
 				<AddPostFormatTemplateModalContent
-					postFormats={ postFormats }
 					onSelect={ createTemplate }
 					onBack={ () =>
 						setModalContent( modalContentMap.templatesList )
@@ -418,7 +409,6 @@ function NewTemplate() {
 function useMissingTemplates(
 	setEntityForSuggestions,
 	onClickCustomTemplate,
-	setPostFormats,
 	onClickPostFormats
 ) {
 	const existingTemplates = useExistingTemplates();
@@ -476,16 +466,8 @@ function useMissingTemplates(
 		);
 	} );
 
-	const onClickPostFormatMenuItem = useCallback(
-		( { postFormats } ) => {
-			setPostFormats( postFormats );
-			onClickPostFormats?.();
-		},
-		[ setPostFormats, onClickPostFormats ]
-	);
-	const { entryPoint: postFormatEntryPoint } = usePostFormatMenuItems(
-		onClickPostFormatMenuItem
-	);
+	const { entryPoint: postFormatEntryPoint } =
+		usePostFormatMenuItems( onClickPostFormats );
 
 	const missingTemplates = [
 		...enhancedMissingDefaultTemplateTypes,
