@@ -9,6 +9,7 @@ import { render, act } from '@testing-library/react';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
@@ -25,6 +26,14 @@ const mockCreateSuggestion = jest.fn();
 const mockUpdateSuggestion = jest.fn();
 const mockDeleteSuggestion = jest.fn();
 
+// The auto-saver forces a fresh read of a linked comment before updating it
+// (so a peer's accept/reject is seen even if this tab's cache is stale). That
+// re-read goes through `resolveSelect( ... ).getEntityRecord`, which hits
+// `apiFetch`. Serve those reads from an in-test "server" map so we can model a
+// cache that disagrees with the server.
+jest.mock( '@wordpress/api-fetch' );
+const mockServerComments = new Map();
+
 jest.mock( '../provider', () => {
 	const actual = jest.requireActual( '../provider' );
 	return {
@@ -37,6 +46,21 @@ jest.mock( '../provider', () => {
 	};
 } );
 
+// Make `useSuggestionOverlay` mockable so one test can simulate the overlay
+// state NOT reflecting the new comment id (the exact "editor has not picked up
+// the new comment ID yet" window). The real hook and provider are used by
+// default.
+jest.mock( '../overlay-context', () => {
+	const actual = jest.requireActual( '../overlay-context' );
+	return {
+		__esModule: true,
+		...actual,
+		useSuggestionOverlay: jest.fn(),
+	};
+} );
+const { useSuggestionOverlay: actualUseSuggestionOverlay } =
+	jest.requireActual( '../overlay-context' );
+
 const createSuggestion = mockCreateSuggestion;
 const updateSuggestion = mockUpdateSuggestion;
 const deleteSuggestion = mockDeleteSuggestion;
@@ -45,6 +69,24 @@ beforeEach( () => {
 	createSuggestion.mockReset();
 	updateSuggestion.mockReset();
 	deleteSuggestion.mockReset();
+	mockServerComments.clear();
+	// Default: the real overlay hook (full provider behavior).
+	useSuggestionOverlay.mockImplementation( ( ...callArgs ) =>
+		actualUseSuggestionOverlay( ...callArgs )
+	);
+	apiFetch.mockReset();
+	// The fresh-read queries the note collection filtered to one id
+	// (`/wp/v2/comments?...&include[0]=<id>`). Resolve that from the in-test
+	// server map, returning an array; an unknown id yields an empty array (the
+	// note was deleted).
+	apiFetch.mockImplementation( ( { path } = {} ) => {
+		const match = String( path ?? '' ).match( /include[^=]*=(\d+)/ );
+		if ( match ) {
+			const record = mockServerComments.get( Number( match[ 1 ] ) );
+			return Promise.resolve( record ? [ record ] : [] );
+		}
+		return Promise.resolve( [] );
+	} );
 	jest.useFakeTimers();
 } );
 
@@ -58,6 +100,8 @@ function renderInSuggestMode( ui ) {
 	registry.register( coreStore );
 	registry.register( editorStore );
 	registry.dispatch( editorStore ).setEditorIntent( 'suggest' );
+	// A current post id is required for the fresh-read note query.
+	registry.dispatch( editorStore ).setEditedPost( 'post', 100 );
 
 	const wrapper = ( { children } ) => (
 		<RegistryProvider value={ registry }>
@@ -68,13 +112,22 @@ function renderInSuggestMode( ui ) {
 	return { registry, ...render( ui, { wrapper } ) };
 }
 
-// Seed a comment record so `getEntityRecord( 'root', 'comment', id )` resolves
-// without an HTTP fetch — mirrors what `useNoteThreads`'s entity query would
-// have populated by the time a suggestion is in flight.
+// Seed a comment record into both this tab's cache and the in-test "server",
+// modelling the common case where the two agree — mirrors what
+// `useNoteThreads`'s entity query would have populated by the time a
+// suggestion is in flight.
 function seedComment( registry, comment ) {
 	registry
 		.dispatch( coreStore )
 		.receiveEntityRecords( 'root', 'comment', [ comment ] );
+	mockServerComments.set( comment.id, comment );
+}
+
+// Seed only the server copy — the tab's cache stays stale (or empty). Used to
+// prove the forced fresh read picks up a peer's resolution this tab hasn't
+// synced yet.
+function seedServerComment( comment ) {
+	mockServerComments.set( comment.id, comment );
 }
 
 // Test harness exposes the overlay API via a render-prop ref so tests can
@@ -292,6 +345,76 @@ describe( 'SuggestionAutoSave', () => {
 		);
 	} );
 
+	it( 'updates the first note (not a duplicate) when the new id has not yet propagated to overlay state', async () => {
+		// Simulate the exact window the reviewer asked about: the create has
+		// resolved with a comment id, but the editor has NOT yet picked it up
+		// via React state (`setCommentId` is a no-op here). A save chained
+		// behind the in-flight create must still find the id and update the
+		// same note rather than POSTing a second one — the auto-saver tracks
+		// the id in a synchronous ref that does not depend on a re-render.
+		useSuggestionOverlay.mockImplementation( ( ...callArgs ) => {
+			const real = actualUseSuggestionOverlay( ...callArgs );
+			return { ...real, setCommentId: () => {} };
+		} );
+
+		let resolveCreate;
+		createSuggestion.mockImplementation(
+			() =>
+				new Promise( ( resolve ) => {
+					resolveCreate = resolve;
+				} )
+		);
+		updateSuggestion.mockResolvedValue( { id: 42 } );
+
+		renderInSuggestMode(
+			<>
+				<CaptureOverlay />
+				<SuggestionAutoSave />
+			</>
+		);
+
+		act( () => {
+			overlayHandle.captureBaseline( 'a', 'core/paragraph', {
+				content: 'Hi',
+			} );
+			overlayHandle.setOverlayAttributes( 'a', { content: 'Hello' } );
+		} );
+
+		await act( async () => {
+			jest.advanceTimersByTime( 1500 );
+		} );
+		await flushPromises();
+
+		// Create is in flight. Keep typing so a second save queues behind it.
+		act( () => {
+			overlayHandle.setOverlayAttributes( 'a', {
+				content: 'Hello world',
+			} );
+		} );
+
+		await act( async () => {
+			jest.advanceTimersByTime( 1500 );
+		} );
+		await flushPromises();
+
+		// Let the create resolve. The queued save runs immediately after, in a
+		// microtask, before React could ever have committed the new id.
+		await act( async () => {
+			resolveCreate( { id: 42 } );
+		} );
+		await flushPromises();
+		await flushPromises();
+		await flushPromises();
+
+		// No duplicate POST — the queued save updated note 42 despite overlay
+		// state never receiving the id.
+		expect( createSuggestion ).toHaveBeenCalledTimes( 1 );
+		expect( updateSuggestion ).toHaveBeenCalledTimes( 1 );
+		expect( updateSuggestion ).toHaveBeenCalledWith(
+			expect.objectContaining( { commentId: 42 } )
+		);
+	} );
+
 	it( 'creates a fresh suggestion when the linked note has been resolved', async () => {
 		// First create resolves; second create resolves with a different id so
 		// we can assert the overlay's commentId rotated.
@@ -403,6 +526,67 @@ describe( 'SuggestionAutoSave', () => {
 		expect( updateSuggestion ).toHaveBeenCalledWith(
 			expect.objectContaining( { commentId: 42 } )
 		);
+	} );
+
+	it( 'forces a fresh read and orphans a note resolved by a peer even when this tab’s cache is stale', async () => {
+		createSuggestion
+			.mockResolvedValueOnce( { id: 42 } )
+			.mockResolvedValueOnce( { id: 43 } );
+		updateSuggestion.mockResolvedValue( { id: 42 } );
+
+		const { registry } = renderInSuggestMode(
+			<>
+				<CaptureOverlay />
+				<SuggestionAutoSave />
+			</>
+		);
+
+		act( () => {
+			overlayHandle.captureBaseline( 'a', 'core/paragraph', {
+				content: 'Hi',
+			} );
+			overlayHandle.setOverlayAttributes( 'a', { content: 'Hello' } );
+		} );
+
+		await act( async () => {
+			jest.advanceTimersByTime( 1500 );
+		} );
+		await flushPromises();
+		await flushPromises();
+
+		expect( createSuggestion ).toHaveBeenCalledTimes( 1 );
+
+		// A peer accepts note 42 on the server, but THIS tab never refreshed
+		// the comment — its cache still shows the note as pending ('hold').
+		// The stale cache must not be trusted.
+		registry
+			.dispatch( coreStore )
+			.receiveEntityRecords( 'root', 'comment', [
+				{ id: 42, status: 'hold' },
+			] );
+		seedServerComment( { id: 42, status: 'approved' } );
+
+		act( () => {
+			overlayHandle.setOverlayAttributes( 'a', {
+				content: 'Hello world',
+			} );
+		} );
+
+		await act( async () => {
+			jest.advanceTimersByTime( 1500 );
+		} );
+		await flushPromises();
+		await flushPromises();
+
+		// The forced fresh read sees the resolved status and orphans the link,
+		// so the new edit spawns a fresh note rather than clobbering note 42.
+		expect( apiFetch ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				path: expect.stringMatching( /comments\?.*include[^=]*=42/ ),
+			} )
+		);
+		expect( updateSuggestion ).not.toHaveBeenCalled();
+		expect( createSuggestion ).toHaveBeenCalledTimes( 2 );
 	} );
 
 	it( 'does nothing when the editor is not in Suggest intent', async () => {

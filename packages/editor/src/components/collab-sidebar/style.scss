@@ -218,3 +218,12 @@
 		}
 	}
 }
+
+// Inline-note highlight applied via @wordpress/annotations under the
+// `core-note` source. Each marker is tinted by `<NoteHighlightStyles>` using
+// the note author's color from `AVATAR_BORDER_COLORS`; this base rule only
+// provides shared layout/transition properties.
+.annotation-text-core-note {
+	border-radius: 1px;
+	transition: background-color 0.1s ease-in-out;
+}

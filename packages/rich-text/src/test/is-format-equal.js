@@ -62,6 +62,47 @@ describe( 'isFormatEqual', () => {
 			description:
 				'should return true both have same attributes but different order',
 		},
+		{
+			format1: { type: 'bold', attributes: { 'data-test': '1' } },
+			format2: {
+				type: 'bold',
+				unregisteredAttributes: { 'data-test': '1' },
+			},
+			isEqual: true,
+			description:
+				'should return true if one has the same attributes but unregistered',
+		},
+		{
+			format1: { type: 'bold', attributes: { 'data-test': '1' } },
+			format2: {
+				type: 'bold',
+				unregisteredAttributes: { 'data-test': '2' },
+			},
+			isEqual: false,
+			description:
+				'should return false if an unregistered attribute has a different value',
+		},
+		{
+			format1: {
+				type: 'bold',
+				attributes: { a: '1' },
+				unregisteredAttributes: { 'data-test': '1' },
+			},
+			format2: {
+				type: 'bold',
+				attributes: { a: '1', 'data-test': '1' },
+			},
+			isEqual: true,
+			description:
+				'should return true if attributes are split between registered and unregistered',
+		},
+		{
+			format1: { type: 'bold' },
+			format2: { type: 'bold', unregisteredAttributes: { a: '1' } },
+			isEqual: false,
+			description:
+				'should return false if only one has unregistered attributes',
+		},
 	];
 
 	spec.forEach( ( { format1, format2, isEqual, description } ) => {
