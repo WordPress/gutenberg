@@ -191,7 +191,6 @@ const UnforwardedFontSizePicker = (
 						<FlexItem isBlock>
 							<UnitControl
 								__next40pxDefaultSize
-								__shouldNotWarnDeprecated36pxSize
 								label={ __( 'Font size' ) }
 								labelPosition="top"
 								hideLabelFromVision
@@ -228,7 +227,6 @@ const UnforwardedFontSizePicker = (
 								<Spacer marginX={ 2 } marginBottom={ 0 }>
 									<RangeControl
 										__next40pxDefaultSize
-										__shouldNotWarnDeprecated36pxSize
 										className="components-font-size-picker__custom-input"
 										label={ __( 'Font size' ) }
 										hideLabelFromVision
