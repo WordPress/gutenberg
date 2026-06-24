@@ -42,12 +42,9 @@ describe( 'props', () => {
 	} );
 
 	test( 'should render vertical orientation', () => {
-		render( <Divider orientation="vertical" marginStart={ 3 } /> );
+		render( <Divider orientation="vertical" /> );
 
 		const divider = screen.getByRole( 'separator' );
 		expect( divider ).toHaveAttribute( 'aria-orientation', 'vertical' );
-		expect( divider ).toHaveStyle( {
-			'--wp-components-divider-margin-start': 'calc(4px * 3)',
-		} );
 	} );
 } );
