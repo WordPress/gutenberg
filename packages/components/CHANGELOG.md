@@ -14,6 +14,7 @@
 ### Bug Fixes
 
 -   `SandBox`: Fix the viewport-unit (`vh`, `vw`, etc.) stripping so user-supplied HTML using these units in `width`/`height` no longer triggers a runaway resize loop in the preview ([#78677](https://github.com/WordPress/gutenberg/pull/78677)).
+-   `BoxControl`: Respect a consumer-supplied `placeholder` passed via `inputProps`, falling back to it when there is no mixed-value placeholder ([#79466](https://github.com/WordPress/gutenberg/pull/79466)).
 
 ### Internal
 
