@@ -43,12 +43,8 @@ function UnconnectedDivider(
 
 	return (
 		<Ariakit.Separator
-			render={
-				<hr
-					className={ clsx( styles.divider, className ) }
-					style={ dividerStyle }
-				/>
-			}
+			className={ clsx( styles.divider, className ) }
+			style={ dividerStyle }
 			{ ...contextProps }
 			ref={ forwardedRef }
 		/>

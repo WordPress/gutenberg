@@ -9,6 +9,13 @@ import { render, screen } from '@testing-library/react';
 import { Divider } from '..';
 
 describe( 'props', () => {
+	test( 'should render a horizontal separator by default', () => {
+		render( <Divider /> );
+
+		const divider = screen.getByRole( 'separator' );
+		expect( divider ).toHaveAttribute( 'aria-orientation', 'horizontal' );
+	} );
+
 	test( 'should render marginStart', () => {
 		render( <Divider marginStart={ 5 } /> );
 
