@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Documentation
+
+-   Document the safe `clsx` pattern for conditional CSS Module classes ([#79490](https://github.com/WordPress/gutenberg/pull/79490)).
+
 ## 36.0.0 (2026-06-24)
 
 ### Breaking Changes
