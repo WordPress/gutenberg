@@ -433,6 +433,9 @@ import deprecated from '@wordpress/deprecated';
 import styles from './style.module.scss';
 
 function MyComponent( { __nextHasNoOuterMargins = false, className } ) {
+	const deprecatedOuterMarginsClassName =
+		! __nextHasNoOuterMargins && styles.deprecatedOuterMargins;
+
 	if ( ! __nextHasNoOuterMargins ) {
 		deprecated( 'Outer margin styles for wp.components.MyComponent', {
 			since: '6.0',
@@ -445,8 +448,7 @@ function MyComponent( { __nextHasNoOuterMargins = false, className } ) {
 			className={ clsx(
 				'components-my-component',
 				styles.root,
-				! __nextHasNoOuterMargins &&
-					styles.deprecatedOuterMargins,
+				deprecatedOuterMarginsClassName,
 				className
 			) }
 		/>
