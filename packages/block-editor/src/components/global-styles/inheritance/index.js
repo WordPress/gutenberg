@@ -22,7 +22,12 @@ import {
 	useState,
 } from '@wordpress/element';
 import { getBlockType } from '@wordpress/blocks';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import { usePushDestination } from '../inherited-value-context';
 
 const GENERIC_INHERITANCE_TOOLTIP_TEXT = __( 'Default inherited from:' );
 const INHERITANCE_TOOLTIP_LINE_SEPARATOR = '\n';
@@ -64,6 +69,42 @@ function getTranslatedBreadcrumb( source, blockStyles ) {
 		} )
 		.filter( Boolean );
 	return parts.join( ' > ' );
+}
+
+/**
+ * Builds the help text shown under the "Make default" action, naming the Global
+ * Styles location the override will be written to.
+ *
+ * The breadcrumb mirrors the push destination (block, plus the active variation
+ * when one is being edited) so the copy stays in lockstep with where the value
+ * actually lands. Returns undefined when there is no block context to describe.
+ *
+ * @param {Object}  destination              Push destination context.
+ * @param {?string} destination.blockName    Block name (e.g. `core/heading`).
+ * @param {?string} destination.ownVariation Active block style variation slug.
+ * @param {Array}   destination.blockStyles  Registered styles for the block.
+ * @return {string|undefined} Help text, or undefined when no block context exists.
+ */
+function getPushDestinationHelpText( {
+	blockName,
+	ownVariation,
+	blockStyles,
+} ) {
+	if ( ! blockName ) {
+		return undefined;
+	}
+	const breadcrumb = ownVariation
+		? [ 'styles', 'blocks', 'blockName', 'variations', 'variationName' ]
+		: [ 'styles', 'blocks', 'blockName' ];
+	const path = getTranslatedBreadcrumb(
+		{ breadcrumb, blockName, variation: ownVariation },
+		blockStyles
+	);
+	return sprintf(
+		/* translators: %s: Global Styles location the default is updated, e.g. "Styles > Blocks > Heading". */
+		__( 'Update default for %s' ),
+		path
+	);
 }
 
 /**
@@ -199,9 +240,11 @@ export function getInheritanceProps(
  * @param {Object}    props
  * @param {Function}  props.onResetToInherited     Reset handler.
  * @param {?Function} [props.onPushToGlobalStyles] Push-to-Global-Styles handler.
- *                                                 When provided, a "Push to
- *                                                 global styles" action is added
- *                                                 to the menu.
+ *                                                 When provided, a "Make default"
+ *                                                 action is added to the menu.
+ * @param {string}    [props.pushHelpText]         Secondary text describing the
+ *                                                 Global Styles location the
+ *                                                 "Make default" action updates.
  * @param {string}    [props.className]            Optional className for the
  *                                                 dropdown wrapper.
  *
@@ -210,6 +253,7 @@ export function getInheritanceProps(
 export function InheritanceActionsDropdown( {
 	onResetToInherited,
 	onPushToGlobalStyles,
+	pushHelpText,
 	className,
 } ) {
 	return (
@@ -248,16 +292,6 @@ export function InheritanceActionsDropdown( {
 			renderContent={ ( { onClose } ) => (
 				<NavigableMenu role="menu">
 					<MenuGroup>
-						{ onPushToGlobalStyles && (
-							<MenuItem
-								onClick={ () => {
-									onClose();
-									onPushToGlobalStyles();
-								} }
-							>
-								{ __( 'Push to global styles' ) }
-							</MenuItem>
-						) }
 						<MenuItem
 							onClick={ () => {
 								onClose();
@@ -266,6 +300,17 @@ export function InheritanceActionsDropdown( {
 						>
 							{ __( 'Reset to inherited value' ) }
 						</MenuItem>
+						{ onPushToGlobalStyles && (
+							<MenuItem
+								info={ pushHelpText }
+								onClick={ () => {
+									onClose();
+									onPushToGlobalStyles();
+								} }
+							>
+								{ __( 'Make default' ) }
+							</MenuItem>
+						) }
 					</MenuGroup>
 				</NavigableMenu>
 			) }
@@ -307,6 +352,10 @@ function PortaledInheritanceControls( {
 } ) {
 	const sentinelRef = useRef( null );
 	const [ labelEl, setLabelEl ] = useState( null );
+	const pushDestination = usePushDestination();
+	const pushHelpText = onPushToGlobalStyles
+		? getPushDestinationHelpText( pushDestination )
+		: undefined;
 
 	useLayoutEffect( () => {
 		const sentinel = sentinelRef.current;
@@ -373,6 +422,7 @@ function PortaledInheritanceControls( {
 							<InheritanceActionsDropdown
 								onResetToInherited={ onResetToInherited }
 								onPushToGlobalStyles={ onPushToGlobalStyles }
+								pushHelpText={ pushHelpText }
 							/>
 						) }
 					</>,

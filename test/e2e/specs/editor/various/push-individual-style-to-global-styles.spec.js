@@ -33,6 +33,13 @@ test.describe( 'Push individual style to Global Styles (post editor)', () => {
 		await setUserGlobalStyles( requestUtils, {
 			blocks: {
 				'core/heading': { typography: { fontSize: '11px' } },
+				// Seed an inherited value on the Quote block's "plain" style
+				// variation so a variation-scoped override surfaces the dot menu.
+				'core/quote': {
+					variations: {
+						plain: { typography: { fontSize: '11px' } },
+					},
+				},
 			},
 		} );
 		await admin.createNewPost();
@@ -66,7 +73,7 @@ test.describe( 'Push individual style to Global Styles (post editor)', () => {
 			.getByRole( 'button', { name: 'Local override options' } )
 			.click();
 		await page
-			.getByRole( 'menuitem', { name: 'Push to global styles' } )
+			.getByRole( 'menuitem', { name: 'Make default', exact: false } )
 			.click();
 
 		// Persist through the multi-entity save panel, the flow that includes
@@ -79,5 +86,54 @@ test.describe( 'Push individual style to Global Styles (post editor)', () => {
 		expect( styles?.blocks?.[ 'core/heading' ]?.typography?.fontSize ).toBe(
 			'99px'
 		);
+	} );
+
+	test( 'pushes a variation-scoped override to the variation default, not the block base', async ( {
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		// A Quote using its "plain" style variation, whose local font size
+		// overrides the inherited variation value seeded above.
+		await editor.insertBlock( {
+			name: 'core/quote',
+			attributes: {
+				className: 'is-style-plain',
+				style: { typography: { fontSize: '99px' } },
+			},
+		} );
+
+		// Inserting a Quote can leave selection on its inner paragraph; select
+		// the Quote itself so the inspector targets the variation-bearing block.
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Quote' } )
+		);
+
+		await editor.openDocumentSettingsSidebar();
+		const settings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+
+		await settings
+			.getByRole( 'button', { name: 'Local override options' } )
+			.click();
+		await page
+			.getByRole( 'menuitem', { name: 'Make default', exact: false } )
+			.click();
+
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty: false,
+		} );
+
+		// The value must land on the variation's Global Styles location, and
+		// the block's base default must remain untouched.
+		const styles = await getUserGlobalStyles( requestUtils );
+		expect(
+			styles?.blocks?.[ 'core/quote' ]?.variations?.plain?.typography
+				?.fontSize
+		).toBe( '99px' );
+		expect(
+			styles?.blocks?.[ 'core/quote' ]?.typography?.fontSize
+		).toBeUndefined();
 	} );
 } );

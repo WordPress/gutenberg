@@ -25,7 +25,7 @@ describe( 'InheritanceActionsDropdown', () => {
 			screen.getByRole( 'menuitem', { name: 'Reset to inherited value' } )
 		).toBeVisible();
 		expect(
-			screen.queryByRole( 'menuitem', { name: 'Push to global styles' } )
+			screen.queryByRole( 'menuitem', { name: /Make default/ } )
 		).not.toBeInTheDocument();
 	} );
 
@@ -39,11 +39,38 @@ describe( 'InheritanceActionsDropdown', () => {
 			/>
 		);
 		await openMenu();
-		await click(
-			screen.getByRole( 'menuitem', { name: 'Push to global styles' } )
-		);
+		await click( screen.getByRole( 'menuitem', { name: 'Make default' } ) );
 		expect( onPushToGlobalStyles ).toHaveBeenCalledTimes( 1 );
 		expect( onResetToInherited ).not.toHaveBeenCalled();
+	} );
+
+	test( 'lists reset before the make-default action', async () => {
+		render(
+			<InheritanceActionsDropdown
+				onResetToInherited={ () => {} }
+				onPushToGlobalStyles={ () => {} }
+			/>
+		);
+		await openMenu();
+		const items = screen.getAllByRole( 'menuitem' );
+		expect( items[ 0 ] ).toHaveTextContent( 'Reset to inherited value' );
+		expect( items[ 1 ] ).toHaveTextContent( 'Make default' );
+	} );
+
+	test( 'renders the push help text as the make-default action info', async () => {
+		render(
+			<InheritanceActionsDropdown
+				onResetToInherited={ () => {} }
+				onPushToGlobalStyles={ () => {} }
+				pushHelpText="Update default for Styles > Blocks > Heading"
+			/>
+		);
+		await openMenu();
+		expect(
+			screen.getByRole( 'menuitem', {
+				name: /Update default for Styles > Blocks > Heading/,
+			} )
+		).toBeVisible();
 	} );
 } );
 

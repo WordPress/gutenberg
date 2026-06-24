@@ -95,7 +95,7 @@ test.describe( 'Push individual style to Global Styles', () => {
 			.getByRole( 'button', { name: 'Local override options' } )
 			.click();
 		await page
-			.getByRole( 'menuitem', { name: 'Push to global styles' } )
+			.getByRole( 'menuitem', { name: 'Make default', exact: false } )
 			.click();
 
 		// Persist all dirty entities (template + global styles).

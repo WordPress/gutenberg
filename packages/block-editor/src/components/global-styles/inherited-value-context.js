@@ -44,6 +44,26 @@ function isDefaultStyleState( selectedState ) {
 }
 
 /**
+ * Builds the Global Styles destination path for an individual pushed override.
+ *
+ * Overrides made while a block style variation is active are written to that
+ * variation's Global Styles location, so "Make default" updates the default the
+ * user is actually editing rather than the block's base default.
+ *
+ * @param {string}   blockName    Block name (e.g. `core/heading`).
+ * @param {?string}  ownVariation Active block style variation slug, if any.
+ * @param {string[]} stylePath    Path relative to the block's style object
+ *                                (e.g. `[ 'typography', 'fontSize' ]`).
+ * @return {string[]} Path relative to the Global Styles `styles` object.
+ */
+export function getPushDestinationPath( blockName, ownVariation, stylePath ) {
+	const blockPath = ownVariation
+		? [ 'blocks', blockName, 'variations', ownVariation ]
+		: [ 'blocks', blockName ];
+	return [ ...blockPath, ...stylePath ];
+}
+
+/**
  * React context carrying the block-level inputs required to build a
  * panel-scoped `inheritedValue` payload. The Provider collapses the
  * `useSelect` subscription to one per mount, so individual panels do not
@@ -110,7 +130,9 @@ export function InheritedValueProvider( {
 		isDefaultStyleState( selectedState );
 
 	/**
-	 * Promotes a single local style override to the block's Global Styles.
+	 * Promotes a single local style override to the block's Global Styles,
+	 * or to the active variation's Global Styles when a variation is being
+	 * edited (see {@link getPushDestinationPath}).
 	 *
 	 * @param {string[]} stylePath Path relative to the block's style object
 	 *                             (e.g. `[ 'typography', 'fontSize' ]` or
@@ -123,11 +145,11 @@ export function InheritedValueProvider( {
 				return;
 			}
 			pushStylesToGlobalStyles(
-				[ 'blocks', blockName, ...stylePath ],
+				getPushDestinationPath( blockName, ownVariation, stylePath ),
 				value
 			);
 		},
-		[ pushStylesToGlobalStyles, blockName ]
+		[ pushStylesToGlobalStyles, blockName, ownVariation ]
 	);
 
 	const contextValue = useMemo(
@@ -214,7 +236,29 @@ export function usePushIndividualStyleToGlobalStyles() {
 }
 
 /**
- * Hook: returns a factory that builds per-control "Push to global styles"
+ * Hook: exposes the block context that determines where "Make default" writes,
+ * so the local-override dropdown can describe the destination to the user.
+ *
+ * The destination mirrors {@link getPushDestinationPath}: the current block,
+ * plus the active variation when one is being edited. Returns empty/null values
+ * when no Provider is mounted.
+ *
+ * @return {{ blockName: ?string, ownVariation: ?string, blockStyles: Array }} Destination context.
+ */
+export function usePushDestination() {
+	const ctx = useContext( InheritedValueContext );
+	return useMemo(
+		() => ( {
+			blockName: ctx?.blockName ?? null,
+			ownVariation: ctx?.ownVariation ?? null,
+			blockStyles: ctx?.blockStyles ?? [],
+		} ),
+		[ ctx ]
+	);
+}
+
+/**
+ * Hook: returns a factory that builds per-control "Make default"
  * handlers for a panel. Call once per panel, passing the panel's local
  * `value` object, then call the returned factory per control.
  *

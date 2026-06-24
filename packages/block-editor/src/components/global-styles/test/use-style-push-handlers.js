@@ -8,6 +8,7 @@ import { renderHook } from '@testing-library/react';
  */
 import {
 	InheritedValueContext,
+	getPushDestinationPath,
 	useStylePushHandlers,
 } from '../inherited-value-context';
 
@@ -101,5 +102,49 @@ describe( 'useStylePushHandlers', () => {
 		expect(
 			getPushHandler( [ [ 'typography', 'lineHeight' ] ] )
 		).toBeUndefined();
+	} );
+} );
+
+describe( 'getPushDestinationPath', () => {
+	test( 'targets the block base default when no variation is active', () => {
+		expect(
+			getPushDestinationPath( 'core/heading', null, [
+				'typography',
+				'fontSize',
+			] )
+		).toEqual( [ 'blocks', 'core/heading', 'typography', 'fontSize' ] );
+	} );
+
+	test( "targets the active variation's default when one is being edited", () => {
+		expect(
+			getPushDestinationPath( 'core/quote', 'plain', [ 'color', 'text' ] )
+		).toEqual( [
+			'blocks',
+			'core/quote',
+			'variations',
+			'plain',
+			'color',
+			'text',
+		] );
+	} );
+
+	test( 'preserves element-scoped sub-paths', () => {
+		expect(
+			getPushDestinationPath( 'core/heading', 'fancy', [
+				'elements',
+				'link',
+				'color',
+				'text',
+			] )
+		).toEqual( [
+			'blocks',
+			'core/heading',
+			'variations',
+			'fancy',
+			'elements',
+			'link',
+			'color',
+			'text',
+		] );
 	} );
 } );

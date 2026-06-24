@@ -248,7 +248,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	/**
 	 * Writes a single style value to the user's Global Styles config at the
 	 * supplied styles-relative path. Used by the block inspector's
-	 * "Push to global styles" action to promote an individual local override
+	 * "Make default" action to promote an individual local override
 	 * to Global Styles.
 	 *
 	 * @param {string[]} path  Path relative to `styles` (e.g.
