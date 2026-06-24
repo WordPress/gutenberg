@@ -5,6 +5,7 @@ import { DataViewsPicker, filterSortAndPaginate } from '@wordpress/dataviews';
 import type { Field, View } from '@wordpress/dataviews';
 import { useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { Stack } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
 
 /**
@@ -13,6 +14,7 @@ import type { WidgetType } from '@wordpress/widget-primitives';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { createDashboardWidget } from '../../utils/create-dashboard-widget';
 import { WidgetPreviewChrome } from '../widget-preview-chrome';
+import { PreviewSizeControl } from './preview-size-control';
 
 const DEFAULT_VIEW: View = {
 	type: 'pickerGrid',
@@ -20,6 +22,8 @@ const DEFAULT_VIEW: View = {
 	search: '',
 	mediaField: 'preview',
 	titleField: 'title',
+	// Larger tile than the 230 default; scale is 120/170/230/290/350/430.
+	layout: { previewSize: 290 },
 };
 
 const getItemId = ( item: WidgetType ) => item.name;
@@ -88,6 +92,8 @@ export function WidgetPicker( {
 	const { widgetTypes: registeredTypes } = useDashboardInternalContext();
 	const [ selection, setSelection ] = useState< string[] >( [] );
 	const [ view, setView ] = useState< View >( DEFAULT_VIEW );
+	const layout = view.layout as { previewSize?: number } | undefined;
+	const previewSize = layout?.previewSize ?? 290;
 
 	const { data: widgetTypes } = filterSortAndPaginate(
 		registeredTypes,
@@ -125,6 +131,47 @@ export function WidgetPicker( {
 			onChangeSelection={ setSelection }
 			getItemId={ getItemId }
 			itemListLabel={ itemListLabel }
-		/>
+		>
+			{ /* Custom toolbar: search left, size right (no view-config cog). */ }
+			<Stack
+				direction="row"
+				align="top"
+				justify="space-between"
+				className="dataviews__view-actions"
+				gap="xs"
+			>
+				<Stack
+					direction="row"
+					gap="sm"
+					justify="start"
+					className="dataviews__search"
+				>
+					<DataViewsPicker.Search />
+				</Stack>
+				<Stack
+					direction="row"
+					align="center"
+					style={ { flexShrink: 0 } }
+				>
+					<PreviewSizeControl
+						value={ previewSize }
+						onChange={ ( next ) =>
+							setView(
+								( current ) =>
+									( {
+										...current,
+										layout: {
+											...current.layout,
+											previewSize: next,
+										},
+									} ) as View
+							)
+						}
+					/>
+				</Stack>
+			</Stack>
+			<DataViewsPicker.Layout />
+			<DataViewsPicker.Footer />
+		</DataViewsPicker>
 	);
 }
