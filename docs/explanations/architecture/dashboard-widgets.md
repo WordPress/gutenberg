@@ -74,7 +74,7 @@ The package is the single source of truth for what a widget _is_ on the client, 
 
 Equally important is what the package does not do: no chrome, no layout, no persistence, no data store of its own, and no knowledge of any host. That is what makes it publishable and consumable outside the WordPress admin.
 
-For what a widget declares through that contract, layer by layer, see [Anatomy of a widget type](../../../packages/widget-primitives/src/stories/anatomy.md).
+For what a widget declares through that contract, layer by layer, see [Anatomy of a widget type](https://github.com/WordPress/gutenberg/blob/HEAD/packages/widget-primitives/src/stories/anatomy.md).
 
 ## Hosts
 
