@@ -358,7 +358,7 @@ export const getTopMostNamedContentGroupForBlock = createSelector(
  *
  * @return {?string} Client ID of the grouping block, or null.
  */
-export const getBlockFieldsGroupHeaderClientId = createSelector(
+export const getContentGroupHeaderClientId = createSelector(
 	( state, clientId ) => {
 		const groupClientId = getTopMostNamedContentGroupForBlock(
 			state,

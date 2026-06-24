@@ -75,7 +75,7 @@ function BlockFields( {
 
 			return unlock(
 				select( blockEditorStore )
-			).getBlockFieldsGroupHeaderClientId( clientId );
+			).getContentGroupHeaderClientId( clientId );
 		},
 		[ clientId, isMultiBlock ]
 	);

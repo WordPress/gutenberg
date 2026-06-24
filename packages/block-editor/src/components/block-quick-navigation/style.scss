@@ -1,5 +1,12 @@
 @use "@wordpress/base-styles/variables";
 
+.block-editor-block-quick-navigation__group-heading {
+	padding: variables.$grid-unit-30 0 variables.$grid-unit-05;
+	margin: 0 !important;
+	font-size: 13px;
+	font-weight: 500;
+}
+
 .block-editor-block-quick-navigation__item {
 	font-weight: variables.$font-weight-regular;
 }

@@ -14,7 +14,7 @@ import {
 	getListViewClientIdsTree,
 	getContentClientIdsForSection,
 	getTopMostNamedContentGroupForBlock,
-	getBlockFieldsGroupHeaderClientId,
+	getContentGroupHeaderClientId,
 	getEnabledBlockParents,
 	getExpandedBlock,
 	isDragging,
@@ -1081,10 +1081,10 @@ describe( 'private selectors', () => {
 
 		it( 'returns a group heading for only the first content row in a group', () => {
 			expect(
-				getBlockFieldsGroupHeaderClientId( baseState, 'first-content' )
+				getContentGroupHeaderClientId( baseState, 'first-content' )
 			).toBe( 'group' );
 			expect(
-				getBlockFieldsGroupHeaderClientId( baseState, 'second-content' )
+				getContentGroupHeaderClientId( baseState, 'second-content' )
 			).toBe( null );
 		} );
 
@@ -1133,7 +1133,7 @@ describe( 'private selectors', () => {
 				getTopMostNamedContentGroupForBlock( state, 'first-content' )
 			).toBe( 'group' );
 			expect(
-				getBlockFieldsGroupHeaderClientId( state, 'first-content' )
+				getContentGroupHeaderClientId( state, 'first-content' )
 			).toBe( 'group' );
 		} );
 	} );
