@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { Button, Modal, Spinner } from '@wordpress/components';
@@ -24,10 +29,14 @@ function useAttachedMedia( category, query ) {
 	const [ isLoading, setIsLoading ] = useState( false );
 	const [ hasError, setHasError ] = useState( false );
 	const [ refreshCount, setRefreshCount ] = useState( 0 );
-	const refresh = useCallback(
-		() => setRefreshCount( ( count ) => count + 1 ),
-		[]
-	);
+	const refresh = useCallback( () => {
+		// Enter the loading state synchronously so it stays continuous with the
+		// caller's other updates (e.g. clearing per-item busy state). Otherwise
+		// there's a one-render gap before the effect below sets it, which
+		// unmounts and remounts the loading spinner.
+		setIsLoading( true );
+		setRefreshCount( ( count ) => count + 1 );
+	}, [] );
 
 	useEffect( () => {
 		let isMounted = true;
@@ -134,6 +143,10 @@ export default function AttachedMediaPanel( { onInsert, category } ) {
 		0,
 		( totalItems ?? mediaList.length ) - mediaList.length
 	);
+	// A single busy flag covering the whole attach/detach/refetch lifecycle, so
+	// the grid shows one consistent loading state rather than a per-item spinner
+	// followed by a separate area-wide one.
+	const isBusy = isLoading || isAttaching || updatingMediaIds.length > 0;
 
 	const refreshAttachedMedia = useCallback( () => {
 		category.invalidate?.( query );
@@ -225,7 +238,7 @@ export default function AttachedMediaPanel( { onInsert, category } ) {
 			<h3 className="block-editor-inserter__attached-media-panel-heading">
 				{ __( 'Attached images' ) }
 			</h3>
-			{ isLoading && (
+			{ isLoading && ! mediaList.length && (
 				<div className="block-editor-inserter__attached-media-panel-spinner">
 					<Spinner />
 				</div>
@@ -240,14 +253,18 @@ export default function AttachedMediaPanel( { onInsert, category } ) {
 					{ __( 'No images attached to this post.' ) }
 				</p>
 			) }
-			{ ! isLoading && ! hasError && !! mediaList.length && (
-				<>
-					<div className="block-editor-inserter__attached-media-panel-grid">
+			{ !! mediaList.length && (
+				<div className="block-editor-inserter__attached-media-panel-results">
+					{ /* Keep the existing items visible (dimmed) while busy attaching,
+					     detaching or refetching, so the area doesn't flicker. */ }
+					<div
+						className={ clsx(
+							'block-editor-inserter__attached-media-panel-grid',
+							{ 'is-loading': isBusy }
+						) }
+					>
 						<MediaList
 							category={ category }
-							isItemBusy={ ( media ) =>
-								updatingMediaIds.includes( media.id )
-							}
 							label={ __( 'Attached images' ) }
 							mediaList={ mediaList }
 							onClick={ onInsert }
@@ -275,7 +292,12 @@ export default function AttachedMediaPanel( { onInsert, category } ) {
 							</MediaLibraryButton>
 						) }
 					</div>
-				</>
+					{ isBusy && (
+						<div className="block-editor-inserter__attached-media-panel-overlay">
+							<Spinner />
+						</div>
+					) }
+				</div>
 			) }
 			<div className="block-editor-inserter__attached-media-panel-actions">
 				<MediaLibraryButton

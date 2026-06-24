@@ -546,10 +546,32 @@ $block-inserter-tabs-height: 44px;
 	margin: 0;
 }
 
+.block-editor-inserter__attached-media-panel-results {
+	position: relative;
+}
+
 .block-editor-inserter__attached-media-panel-grid {
 	display: grid;
 	grid-template-columns: repeat(3, minmax(0, 1fr));
 	gap: $grid-unit-10;
+
+	// While refetching, dim the existing items and float a spinner over them
+	// (see `&-overlay`) instead of clearing the grid, to avoid flicker.
+	&.is-loading {
+		opacity: 0.5;
+		pointer-events: none;
+
+		// Keep the per-item detach buttons hidden in this state; they would
+		// otherwise reappear over the dimmed grid via their focus/touch reveal.
+		.block-editor-inserter__media-list__item-detach-button.components-button.has-icon {
+			opacity: 0;
+			pointer-events: none;
+		}
+	}
+
+	@media not ( prefers-reduced-motion ) {
+		transition: opacity 0.1s linear;
+	}
 
 	.block-editor-inserter__media-list {
 		display: grid;
@@ -560,6 +582,14 @@ $block-inserter-tabs-height: 44px;
 		overflow: visible;
 		width: 100%;
 	}
+}
+
+.block-editor-inserter__attached-media-panel-overlay {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .block-editor-inserter__attached-media-panel-more.components-button {
