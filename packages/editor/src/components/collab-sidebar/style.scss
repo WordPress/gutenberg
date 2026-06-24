@@ -75,9 +75,29 @@
 	color: $gray-700;
 }
 
+.editor-collab-sidebar-panel__show-more-button {
+	width: fit-content;
+	color: var(--wpds-color-foreground-interactive-brand);
+	cursor: var(--wpds-cursor-control);
+
+	&:hover,
+	&:focus,
+	&:active {
+		color: var(--wpds-color-foreground-interactive-brand-active);
+	}
+}
+
 .editor-collab-sidebar-panel__note-content {
 	p:last-child {
 		margin-bottom: 0;
+	}
+
+	&.is-collapsed {
+		-webkit-line-clamp: 3;
+		line-clamp: 3;
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
 	}
 }
 

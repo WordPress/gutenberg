@@ -688,7 +688,9 @@ test.describe( 'Image', () => {
 			.getByRole( 'button', { name: 'Upload', exact: true } )
 			.click();
 
-		await expect( page.locator( '.components-spinner' ) ).toHaveCount( 0 );
+		await expect(
+			page.locator( '.editor-post-publish-panel .components-spinner' )
+		).toHaveCount( 0 );
 		await expect(
 			editor.canvas
 				.locator( 'role=document[name="Block: Image"i]' )
