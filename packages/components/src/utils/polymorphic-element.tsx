@@ -18,6 +18,8 @@ type PolymorphicElementProps< T extends React.ElementType > = Omit<
 type PolymorphicElementRef< T extends React.ElementType > =
 	React.ComponentPropsWithRef< T >[ 'ref' ];
 
+const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
+
 const knownIntrinsicElementProps = new Set( [
 	'children',
 	'className',
@@ -53,7 +55,10 @@ function isValidIntrinsicElementProp( prop: string, element: string ) {
 
 	const ownerDocument = globalThis.document;
 	if ( ownerDocument ) {
-		return prop in ownerDocument.createElement( element );
+		return (
+			prop in ownerDocument.createElement( element ) ||
+			prop in ownerDocument.createElementNS( SVG_NAMESPACE, element )
+		);
 	}
 
 	return prop === prop.toLowerCase();

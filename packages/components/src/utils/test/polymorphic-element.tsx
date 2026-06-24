@@ -52,6 +52,41 @@ describe( 'PolymorphicElement', () => {
 		expect( element ).toHaveStyle( { color: 'rgb(255, 0, 0)' } );
 	} );
 
+	it( 'preserves SVG props for SVG intrinsic elements', () => {
+		render(
+			<PolymorphicElement
+				as="svg"
+				data-testid="svg"
+				preserveAspectRatio="xMidYMid meet"
+				viewBox="0 0 24 24"
+			/>
+		);
+
+		const svg = screen.getByTestId( 'svg' );
+
+		expect( svg ).toHaveAttribute( 'preserveAspectRatio', 'xMidYMid meet' );
+		expect( svg ).toHaveAttribute( 'viewBox', '0 0 24 24' );
+	} );
+
+	it( 'filters invalid props from SVG intrinsic elements', () => {
+		render(
+			createElement( PolymorphicElement, {
+				as: 'svg',
+				'data-testid': 'svg',
+				labelPosition: 'top',
+				viewBox: '0 0 24 24',
+			} as Parameters< typeof PolymorphicElement >[ 0 ] & {
+				labelPosition: string;
+			} )
+		);
+
+		const svg = screen.getByTestId( 'svg' );
+
+		expect( svg ).toHaveAttribute( 'viewBox', '0 0 24 24' );
+		expect( svg ).not.toHaveAttribute( 'labelPosition' );
+		expect( svg ).not.toHaveAttribute( 'labelposition' );
+	} );
+
 	it( 'passes custom props through to custom components', () => {
 		function CustomComponent( {
 			variant,
