@@ -206,5 +206,3 @@ function gutenberg_redirect_legacy_experiments_page() {
 	exit;
 }
 add_action( 'load-admin_page_gutenberg-experiments', 'gutenberg_redirect_legacy_experiments_page' );
-add_action( 'load-toplevel_page_gutenberg-experiments', 'gutenberg_redirect_legacy_experiments_page' );
-add_action( 'load-gutenberg_page_gutenberg-experiments', 'gutenberg_redirect_legacy_experiments_page' );
