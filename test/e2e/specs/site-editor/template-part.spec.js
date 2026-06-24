@@ -254,16 +254,12 @@ test.describe( 'Template Part', () => {
 		const editorSettings = page.getByRole( 'region', {
 			name: 'Editor settings',
 		} );
-		const blockCard = editorSettings
-			.locator( '.block-editor-block-card' )
+		const blockHeading = editorSettings
+			.getByRole( 'tabpanel', { name: 'Block' } )
+			.getByRole( 'heading' )
 			.first();
 
-		await expect(
-			blockCard.locator( '.block-editor-block-card__name' )
-		).toHaveText( 'Header' );
-		await expect(
-			blockCard.locator( '.components-badge__content' )
-		).toHaveText( 'Group' );
+		await expect( blockHeading ).toHaveAccessibleName( 'Header Group' );
 	} );
 
 	test( 'shows changes in a template when a template part it contains is modified', async ( {

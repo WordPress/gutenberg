@@ -486,25 +486,18 @@ test.describe( 'Unsynced pattern', () => {
 		const editorSettings = page.getByRole( 'region', {
 			name: 'Editor settings',
 		} );
-		const blockCard = editorSettings
-			.locator( '.block-editor-block-card' )
+		const blockHeading = editorSettings
+			.getByRole( 'tabpanel', { name: 'Block' } )
+			.getByRole( 'heading' )
 			.first();
-		const blockCardName = blockCard.locator(
-			'.block-editor-block-card__name'
-		);
-		const blockCardBadge = blockCard.locator(
-			'.components-badge__content'
-		);
 
-		await expect( blockCardName ).toHaveText( 'Header' );
-		await expect( blockCardBadge ).toHaveText( 'Pattern' );
+		await expect( blockHeading ).toHaveAccessibleName( 'Header Pattern' );
 
 		await editorSettings
 			.getByRole( 'button', { name: 'Edit pattern' } )
 			.click();
 
-		await expect( blockCardName ).toHaveText( 'Header' );
-		await expect( blockCardBadge ).toHaveText( 'Group' );
+		await expect( blockHeading ).toHaveAccessibleName( 'Header Group' );
 	} );
 
 	test( 'detaches an unsynced pattern via the block options menu', async ( {
