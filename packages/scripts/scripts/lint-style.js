@@ -5,8 +5,11 @@ const { sync: spawn } = require( 'cross-spawn' );
 const { sync: resolveBin } = require( 'resolve-bin' );
 // const stylelint = require( 'stylelint' );
 
-// Stylelint's exit code for config-not-found errors
-const CONFIG_NOT_FOUND_CODE = 78;
+function isNoConfigFoundError( err ) {
+	return (
+		err.code === 78 && err.message.startsWith( 'No configuration provided' )
+	);
+}
 
 /**
  * Internal dependencies
@@ -37,11 +40,7 @@ async function hasResolvableConfig() {
 		} );
 		return config !== undefined;
 	} catch ( err ) {
-		// Stylelint throws with code 78 when no config is found;
-		// inject the bundled default.
-		// Other errors mean the config exists but is broken;
-		// let stylelint report them during linting.
-		if ( err.code === CONFIG_NOT_FOUND_CODE ) {
+		if ( isNoConfigFoundError( err ) ) {
 			return false;
 		}
 		return true;
