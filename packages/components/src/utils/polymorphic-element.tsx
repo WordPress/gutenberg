@@ -18,13 +18,69 @@ type PolymorphicElementProps< T extends React.ElementType > = Omit<
 type PolymorphicElementRef< T extends React.ElementType > =
 	React.ComponentPropsWithRef< T >[ 'ref' ];
 
-function UnforwardedPolymorphicElement< T extends React.ElementType = 'div' >(
-	{ as, ...props }: PolymorphicElementProps< T >,
-	ref: PolymorphicElementRef< T >
+const knownIntrinsicElementProps = new Set( [
+	'children',
+	'className',
+	'dangerouslySetInnerHTML',
+	'defaultChecked',
+	'defaultValue',
+	'htmlFor',
+	'id',
+	'readOnly',
+	'ref',
+	'role',
+	'style',
+	'suppressContentEditableWarning',
+	'suppressHydrationWarning',
+	'tabIndex',
+	'title',
+] );
+
+function isValidIntrinsicElementProp( prop: string, element: string ) {
+	if (
+		prop.startsWith( 'data-' ) ||
+		prop.startsWith( 'aria-' ) ||
+		( prop.charCodeAt( 0 ) === 111 &&
+			prop.charCodeAt( 1 ) === 110 &&
+			prop.charCodeAt( 2 ) < 91 )
+	) {
+		return true;
+	}
+
+	if ( knownIntrinsicElementProps.has( prop ) ) {
+		return true;
+	}
+
+	const ownerDocument = globalThis.document;
+	if ( ownerDocument ) {
+		return prop in ownerDocument.createElement( element );
+	}
+
+	return prop === prop.toLowerCase();
+}
+
+function filterIntrinsicElementProps(
+	props: PolymorphicElementProps< React.ElementType >,
+	element: string
+) {
+	return Object.fromEntries(
+		Object.entries( props ).filter( ( [ prop ] ) =>
+			isValidIntrinsicElementProp( prop, element )
+		)
+	);
+}
+
+function UnforwardedPolymorphicElement(
+	{ as, ...props }: PolymorphicElementProps< React.ElementType >,
+	ref: React.ForwardedRef< unknown >
 ) {
 	const Element = as || 'div';
+	const forwardedProps =
+		typeof Element === 'string'
+			? filterIntrinsicElementProps( props, Element )
+			: props;
 
-	return <Element ref={ ref } { ...props } />;
+	return <Element ref={ ref } { ...forwardedProps } />;
 }
 
 /**

@@ -5,14 +5,13 @@ Snapshot Diff:
 - Received styles
 + Base styles
 
-@@ -3,8 +3,9 @@
-      "color": "var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e))",
+@@ -6,7 +6,8 @@
+      "text-wrap": "pretty",
+    },
+    Object {
       "font-size": "calc((13 / 13) * 13px)",
       "font-weight": "normal",
-      "line-height": "1.4",
-      "margin": "0",
 +     "text-align": "center",
-      "text-wrap": "pretty",
     },
   ]
 `;
@@ -23,11 +22,14 @@ exports[`Text should render highlighted words with highlightCaseSensitive 1`] = 
   line-height: 1.4;
   margin: 0;
   text-wrap: pretty;
+}
+
+.emotion-1 {
   font-size: calc((13 / 13) * 13px);
   font-weight: normal;
 }
 
-.emotion-0 mark {
+.emotion-2 mark {
   background: #f0b849;
   border-radius: 2px;
   box-shadow: 0 0 0 1px rgba( 0, 0, 0, 0.05 ) inset,0 -1px 0 rgba( 0, 0, 0, 0.1 ) inset;
@@ -35,7 +37,7 @@ exports[`Text should render highlighted words with highlightCaseSensitive 1`] = 
 
 <div>
   <span
-    class="components-truncate components-text emotion-0 emotion-1"
+    class="components-truncate emotion-0 emotion-1 emotion-2 components-text"
     data-wp-c16t="true"
     data-wp-component="Text"
     role="heading"
@@ -55,13 +57,16 @@ exports[`Text snapshot tests should render correctly 1`] = `
   line-height: 1.4;
   margin: 0;
   text-wrap: pretty;
+}
+
+.emotion-1 {
   font-size: calc((13 / 13) * 13px);
   font-weight: normal;
 }
 
 <div>
   <span
-    class="components-truncate components-text emotion-0 emotion-1"
+    class="components-truncate emotion-0 emotion-1 components-text"
     data-wp-c16t="true"
     data-wp-component="Text"
   >
