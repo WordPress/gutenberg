@@ -277,7 +277,8 @@ function UnforwardedNumberControl(
 }
 
 /**
- * `NumberControl` lets users enter and adjust a numeric value.
+ * `NumberControl` is a text input control that lets users enter and adjust a
+ * numeric value.
  */
 export const NumberControl = forwardRef( UnforwardedNumberControl );
 NumberControl.displayName = 'NumberControl';
