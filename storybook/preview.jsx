@@ -9,7 +9,10 @@ import {
 import { WithGlobalCSS } from './decorators/with-global-css';
 import { WithMaxWidthWrapper } from './decorators/with-max-width-wrapper';
 import { WithRTL } from './decorators/with-rtl';
-import { WithDesignSystemTheme } from './decorators/with-design-system-theme';
+import {
+	DesignSystemThemeDocsContainer,
+	WithDesignSystemTheme,
+} from './decorators/with-design-system-theme';
 import { ComponentStatusIndicator } from './components/component-status-indicator';
 import theme from './theme';
 
@@ -78,6 +81,7 @@ export const parameters = {
 	},
 	docs: {
 		theme,
+		container: DesignSystemThemeDocsContainer,
 		controls: {
 			sort: 'requiredFirst',
 		},

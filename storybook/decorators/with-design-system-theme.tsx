@@ -1,7 +1,100 @@
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import type { CornerRadiusPreset } from '@wordpress/theme';
 import { ThemeProvider } from '@wordpress/theme';
-import type { StoryContext } from 'storybook/internal/types';
+import {
+	DocsContainer,
+	type DocsContainerProps,
+} from '@storybook/addon-docs/blocks';
+import type {
+	GlobalsUpdatedPayload,
+	PreparedStory,
+	StoryContext,
+} from 'storybook/internal/types';
 import { storyIdMatchesDesignSystemTheme } from './utils/design-system-theme-story-matchers';
+
+const GLOBALS_UPDATED = 'globalsUpdated';
+
+type DesignSystemThemeGlobals = StoryContext[ 'globals' ];
+
+function getDesignSystemThemeSettings( globals: DesignSystemThemeGlobals ) {
+	const colorTheme = globals.dsColorTheme;
+	const cursorControl = globals.dsCursorControl || undefined;
+	const cornerRadiusPreset =
+		( globals.dsCornerRadius as CornerRadiusPreset ) || undefined;
+
+	let color;
+	if ( colorTheme === 'dark' ) {
+		color = { background: '#1e1e1e', primary: '#3858e9' };
+	}
+
+	return {
+		color,
+		cursor: cursorControl ? { control: cursorControl } : undefined,
+		cornerRadius: cornerRadiusPreset,
+	};
+}
+
+function useDesignSystemDocsGlobals(
+	context: DocsContainerProps[ 'context' ]
+) {
+	const story = useMemo< PreparedStory | undefined >(
+		() =>
+			context
+				.componentStories()
+				.find( ( candidate ) =>
+					storyIdMatchesDesignSystemTheme( candidate.id )
+				),
+		[ context ]
+	);
+	const [ globals, setGlobals ] = useState< DesignSystemThemeGlobals >( () =>
+		story ? context.getStoryContext( story ).globals : {}
+	);
+
+	useEffect( () => {
+		if ( ! story ) {
+			return;
+		}
+
+		const onGlobalsUpdated = ( changed: GlobalsUpdatedPayload ) => {
+			setGlobals( changed.globals );
+		};
+
+		context.channel.on( GLOBALS_UPDATED, onGlobalsUpdated );
+		return () => {
+			context.channel.off( GLOBALS_UPDATED, onGlobalsUpdated );
+		};
+	}, [ context.channel, story ] );
+
+	return {
+		globals,
+		shouldApplyDesignSystemTheme: !! story,
+	};
+}
+
+export function DesignSystemThemeDocsContainer( {
+	children,
+	context,
+	...props
+}: React.PropsWithChildren< DocsContainerProps > ) {
+	const { globals, shouldApplyDesignSystemTheme } =
+		useDesignSystemDocsGlobals( context );
+
+	const docs = (
+		<DocsContainer context={ context } { ...props }>
+			{ children }
+		</DocsContainer>
+	);
+
+	if ( ! shouldApplyDesignSystemTheme ) {
+		return docs;
+	}
+
+	return (
+		<ThemeProvider { ...getDesignSystemThemeSettings( globals ) } isRoot>
+			{ docs }
+		</ThemeProvider>
+	);
+}
 
 /**
  * Decorator that applies Design System theme based on toolbar selections.
@@ -21,22 +114,16 @@ export function WithDesignSystemTheme(
 		return <Story { ...context } />;
 	}
 
-	const colorTheme = context.globals.dsColorTheme;
-	const cursorControl = context.globals.dsCursorControl || undefined;
-	const cornerRadiusPreset =
-		( context.globals.dsCornerRadius as CornerRadiusPreset ) || undefined;
-
-	let color;
-	if ( colorTheme === 'dark' ) {
-		color = { background: '#1e1e1e', primary: '#3858e9' };
-	}
+	const { color, cursor, cornerRadius } = getDesignSystemThemeSettings(
+		context.globals
+	);
 
 	return (
 		<ThemeProvider
 			color={ color }
-			cursor={ cursorControl ? { control: cursorControl } : undefined }
-			cornerRadius={ cornerRadiusPreset }
-			isRoot
+			cursor={ cursor }
+			cornerRadius={ cornerRadius }
+			isRoot={ context.viewMode !== 'docs' }
 		>
 			<div
 				style={
