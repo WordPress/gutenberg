@@ -63,6 +63,12 @@ function gutenberg_enable_block_experiments() {
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-block-experiments' ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableBlockExperiments = true', 'before' );
 	}
+
+	// Use the Custom HTML block (instead of the Classic block) to handle
+	// non-block (freeform) content.
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-html-freeform-handler' ) ) {
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableHtmlFreeformHandler = true', 'before' );
+	}
 }
 
 add_action( 'admin_init', 'gutenberg_enable_block_experiments' );

@@ -34,6 +34,11 @@ function gutenberg_initialize_experiments_settings() {
 					'label'       => __( 'Grid interactivity', 'gutenberg' ),
 					'description' => __( 'Enables enhancements to the Grid block that let you move and resize items in the editor canvas.', 'gutenberg' ),
 				),
+				array(
+					'id'          => 'gutenberg-html-freeform-handler',
+					'label'       => __( 'Custom HTML for freeform content', 'gutenberg' ),
+					'description' => __( 'Handles non-block (freeform) content with the Custom HTML block instead of the Classic block.', 'gutenberg' ),
+				),
 			),
 		),
 		array(

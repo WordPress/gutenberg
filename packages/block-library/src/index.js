@@ -385,7 +385,11 @@ export const registerCoreBlocks = (
 	}
 
 	setDefaultBlockName( paragraph.name );
-	if (
+	if ( window?.__experimentalEnableHtmlFreeformHandler ) {
+		// Experiment: handle non-block (freeform) content with the Custom HTML
+		// block instead of the Classic block.
+		setFreeformContentHandlerName( html.name );
+	} else if (
 		window.wp &&
 		window.wp.oldEditor &&
 		blocks.some( ( { name } ) => name === classic.name )
