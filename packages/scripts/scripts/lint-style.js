@@ -3,7 +3,6 @@
  */
 const { sync: spawn } = require( 'cross-spawn' );
 const { sync: resolveBin } = require( 'resolve-bin' );
-// const stylelint = require( 'stylelint' );
 
 function isNoConfigFoundError( err ) {
 	return (
