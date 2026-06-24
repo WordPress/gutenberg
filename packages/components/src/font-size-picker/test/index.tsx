@@ -6,18 +6,15 @@ import userEvent from '@testing-library/user-event';
 import { render } from '@ariakit/test/react';
 
 /**
- * Internal dependencies
- */
-import _FontSizePicker from '../';
-import type { FontSize } from '../types';
-/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
 
-const FontSizePicker = (
-	props: React.ComponentProps< typeof _FontSizePicker >
-) => <_FontSizePicker __next40pxDefaultSize { ...props } />;
+/**
+ * Internal dependencies
+ */
+import FontSizePicker from '../';
+import type { FontSize } from '../types';
 
 const ControlledFontSizePicker = ( {
 	onChange,

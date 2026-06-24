@@ -27,7 +27,6 @@ import { Container, Header, HeaderLabel, HeaderToggle } from './styles';
 import { Spacer } from '../spacer';
 import FontSizePickerSelect from './font-size-picker-select';
 import FontSizePickerToggleGroup from './font-size-picker-toggle-group';
-import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
 
 const DEFAULT_UNITS = [ 'px', 'em', 'rem', 'vw', 'vh' ];
 
@@ -38,18 +37,22 @@ const UnforwardedFontSizePicker = (
 	ref: ForwardedRef< any >
 ) => {
 	const {
-		__next40pxDefaultSize = false,
 		fallbackFontSize,
 		fontSizes = [],
 		disableCustomFontSizes = false,
 		onChange,
-		size = 'default',
 		units: unitsProp = DEFAULT_UNITS,
 		value,
 		valueMode = 'literal',
 		withSlider = false,
 		withReset = true,
+		// Deprecated props, no longer used.
+		size: _size,
+		__next40pxDefaultSize: _next40pxDefaultSize,
 	} = props;
+
+	void _size;
+	void _next40pxDefaultSize;
 
 	const labelId = useInstanceId(
 		UnforwardedFontSizePicker,
@@ -117,12 +120,6 @@ const UnforwardedFontSizePicker = (
 		!! valueUnit && [ 'em', 'rem', 'vw', 'vh' ].includes( valueUnit );
 	const isDisabled = value === undefined;
 
-	maybeWarnDeprecated36pxSize( {
-		componentName: 'FontSizePicker',
-		__next40pxDefaultSize,
-		size,
-	} );
-
 	return (
 		<Container
 			ref={ ref }
@@ -155,12 +152,10 @@ const UnforwardedFontSizePicker = (
 			<div>
 				{ currentPickerType === 'select' && (
 					<FontSizePickerSelect
-						__next40pxDefaultSize={ __next40pxDefaultSize }
 						fontSizes={ fontSizes }
 						value={ value }
 						valueMode={ valueMode }
 						disableCustomFontSizes={ disableCustomFontSizes }
-						size={ size }
 						onChange={ ( newValue, selectedItem ) => {
 							if ( newValue === undefined ) {
 								onChange?.( undefined, selectedItem );
@@ -179,8 +174,6 @@ const UnforwardedFontSizePicker = (
 						fontSizes={ fontSizes }
 						value={ value }
 						valueMode={ valueMode }
-						__next40pxDefaultSize={ __next40pxDefaultSize }
-						size={ size }
 						onChange={ ( newValue, selectedItem ) => {
 							if ( newValue === undefined ) {
 								onChange?.( undefined, selectedItem );
@@ -197,7 +190,7 @@ const UnforwardedFontSizePicker = (
 					<Flex className="components-font-size-picker__custom-size-control">
 						<FlexItem isBlock>
 							<UnitControl
-								__next40pxDefaultSize={ __next40pxDefaultSize }
+								__next40pxDefaultSize
 								__shouldNotWarnDeprecated36pxSize
 								label={ __( 'Font size' ) }
 								labelPosition="top"
@@ -226,7 +219,6 @@ const UnforwardedFontSizePicker = (
 										);
 									}
 								} }
-								size={ size }
 								units={ hasUnits ? units : [] }
 								min={ 0 }
 							/>
@@ -235,9 +227,7 @@ const UnforwardedFontSizePicker = (
 							<FlexItem isBlock>
 								<Spacer marginX={ 2 } marginBottom={ 0 }>
 									<RangeControl
-										__next40pxDefaultSize={
-											__next40pxDefaultSize
-										}
+										__next40pxDefaultSize
 										__shouldNotWarnDeprecated36pxSize
 										className="components-font-size-picker__custom-input"
 										label={ __( 'Font size' ) }
@@ -276,12 +266,7 @@ const UnforwardedFontSizePicker = (
 									} }
 									variant="secondary"
 									__next40pxDefaultSize
-									size={
-										size === '__unstable-large' ||
-										props.__next40pxDefaultSize
-											? 'default'
-											: 'small'
-									}
+									size="default"
 								>
 									{ __( 'Reset' ) }
 								</Button>
