@@ -25,6 +25,7 @@ export {
 	suggestionFormat,
 	registerSuggestionFormat,
 	findSuggestionRange,
+	findSuggestionText,
 } from './format';
 export { useAnnotateSuggestions } from './use-annotate-suggestions';
 export {

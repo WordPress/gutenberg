@@ -22,6 +22,7 @@ import {
 	useSuggestionsProvider,
 } from '../suggestion-mode';
 import SuggestionSummary from '../suggestion-mode/suggestion-summary';
+import { findSuggestionText } from '../inline-suggestions';
 
 /**
  * Read-only status constants — keep in sync with `_wp_suggestion_status`
@@ -216,6 +217,53 @@ export function SuggestionActionButtons( { thread } ) {
 }
 
 /**
+ * Render a suggestion's summary, resolving inline-suggestion marker text from
+ * the linked block's live content first.
+ *
+ * An inline suggestion (Option B) stores no before/after text in its payload —
+ * the proposed words live in the in-content `<mark>` marker, so its text is
+ * derived on read (`findSuggestionText`) the same way the canvas decoration
+ * derives the marker's range. Resolution happens inside `useSelect` so the
+ * summary tracks the marker as contiguous typing grows it, then the enriched
+ * operations feed the pure `summarizeOperations`. Threads with no inline op
+ * (structural or whole-attribute suggestions) pass through untouched.
+ *
+ * @param {{ thread: Object, operations: Array }} props
+ */
+function ResolvedSuggestionSummary( { thread, operations } ) {
+	const resolvedOperations = useSelect(
+		( select ) => {
+			if ( ! thread?.blockClientId ) {
+				return operations;
+			}
+			const attributes = select( blockEditorStore ).getBlockAttributes(
+				thread.blockClientId
+			);
+			if ( ! attributes ) {
+				return operations;
+			}
+			return operations.map( ( op ) => {
+				if (
+					op.type !== 'inline-suggestion' ||
+					! op.attribute ||
+					op.text
+				) {
+					return op;
+				}
+				const text = findSuggestionText(
+					attributes[ op.attribute ],
+					thread.id
+				);
+				return text ? { ...op, text } : op;
+			} );
+		},
+		[ operations, thread?.blockClientId, thread?.id ]
+	);
+
+	return <SuggestionSummary operations={ resolvedOperations } />;
+}
+
+/**
  * Body for a note that carries a suggestion payload: the compact
  * Add/Delete/Formatting summary and a resolved-state label if applicable.
  * Accept/Reject and the staleness dialog live in the header slot via
@@ -238,7 +286,10 @@ export default function SuggestionActions( { thread } ) {
 			gap="sm"
 			className="editor-collab-sidebar-panel__suggestion"
 		>
-			<SuggestionSummary operations={ payload.operations } />
+			<ResolvedSuggestionSummary
+				thread={ thread }
+				operations={ payload.operations }
+			/>
 			{ isResolved && (
 				<WCText variant="muted" size="12px">
 					{ suggestionStatus === APPLIED

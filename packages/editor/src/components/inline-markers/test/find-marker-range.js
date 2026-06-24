@@ -12,7 +12,7 @@ import { select } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { findMarkerRange } from '../find-marker-range';
+import { findMarkerRange, findMarkerText } from '../find-marker-range';
 
 const FORMAT_NAME = 'test/marker';
 
@@ -143,5 +143,59 @@ describe( 'findMarkerRange', () => {
 			start: 7,
 			end: 13,
 		} );
+	} );
+} );
+
+describe( 'findMarkerText', () => {
+	beforeAll( () => {
+		if ( ! isRegistered() ) {
+			registerFormatType( FORMAT_NAME, {
+				title: 'Marker',
+				tagName: 'mark',
+				className: 'wp-marker',
+				attributes: {
+					'data-id': 'data-id',
+					'data-suggestion-id': 'data-suggestion-id',
+				},
+				edit: () => null,
+			} );
+		}
+	} );
+
+	afterAll( () => {
+		if ( isRegistered() ) {
+			unregisterFormatType( FORMAT_NAME );
+		}
+	} );
+
+	it( 'returns the marked text for a matching id', () => {
+		const value = RichTextData.fromHTMLString(
+			'hello <mark class="wp-marker" data-id="7">new text</mark> world'
+		);
+		expect( findMarkerText( value, { ...options, id: 7 } ) ).toBe(
+			'new text'
+		);
+	} );
+
+	it( 'returns the marked text from a plain HTML string', () => {
+		const html = 'a <mark class="wp-marker" data-id="7">marked</mark> b';
+		expect( findMarkerText( html, { ...options, id: 7 } ) ).toBe(
+			'marked'
+		);
+	} );
+
+	it( 'returns an empty string when no marker matches', () => {
+		const value = RichTextData.fromHTMLString(
+			'<mark class="wp-marker" data-id="3">x</mark>'
+		);
+		expect( findMarkerText( value, { ...options, id: 7 } ) ).toBe( '' );
+	} );
+
+	it( 'returns an empty string for null input or a missing id', () => {
+		expect( findMarkerText( null, { ...options, id: 7 } ) ).toBe( '' );
+		const value = RichTextData.fromHTMLString(
+			'<mark class="wp-marker" data-id="7">x</mark>'
+		);
+		expect( findMarkerText( value, { ...options, id: null } ) ).toBe( '' );
 	} );
 } );

@@ -264,6 +264,29 @@ export function summarizeOperations( operations ) {
 			} );
 			continue;
 		}
+		// An inline suggestion (Option B) stores no before/after text — the
+		// proposed words live in the in-content marker. The sidebar resolves
+		// that text into `op.text` before summarizing, so report it as a plain
+		// Add:/Delete: line. With no resolvable text (marker edited away) fall
+		// through to the generic attribute label rather than an empty quote.
+		if ( op.type === 'inline-suggestion' ) {
+			const text =
+				isTextLike( op.text ) && op.text.trim()
+					? ellipsize( op.text )
+					: '';
+			if ( ! text ) {
+				attributeLabels.push( op.attribute );
+				continue;
+			}
+			lines.push( {
+				label:
+					op.suggestionType === 'del'
+						? __( 'Delete:' )
+						: __( 'Add:' ),
+				value: `“${ text }”`,
+			} );
+			continue;
+		}
 		if ( op.type !== 'attribute-set' ) {
 			attributeLabels.push( op.attribute );
 			continue;

@@ -12,7 +12,7 @@
  * coexist on one block without colliding.
  */
 
-export { findMarkerRange } from './find-marker-range';
+export { findMarkerRange, findMarkerText } from './find-marker-range';
 export { wrapInlineMarker } from './wrap-inline-marker';
 export { readInlineSelection } from './read-inline-selection';
 export { readInlineCaret } from './read-inline-caret';

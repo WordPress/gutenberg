@@ -200,6 +200,49 @@ describe( 'summarizeOperations', () => {
 		expect( lines ).toEqual( [ { label: 'Formatting:', value: 'bold' } ] );
 	} );
 
+	it( 'summarizes an inline-suggestion add op as "Add: <text>"', () => {
+		// An inline addition carries no before/after in the payload — the
+		// proposed words live in the in-content marker and are resolved into
+		// `text` by the sidebar before summarizing.
+		const lines = summarizeOperations( [
+			{
+				type: 'inline-suggestion',
+				attribute: 'content',
+				suggestionType: 'add',
+				text: 'new text',
+			},
+		] );
+		expect( lines ).toEqual( [ { label: 'Add:', value: '“new text”' } ] );
+	} );
+
+	it( 'summarizes an inline-suggestion del op as "Delete: <text>"', () => {
+		const lines = summarizeOperations( [
+			{
+				type: 'inline-suggestion',
+				attribute: 'content',
+				suggestionType: 'del',
+				text: 'old text',
+			},
+		] );
+		expect( lines ).toEqual( [
+			{ label: 'Delete:', value: '“old text”' },
+		] );
+	} );
+
+	it( 'falls back to a format line for an inline-suggestion with no resolved text', () => {
+		// The marker can no longer be found in content (e.g. the block was
+		// edited away): degrade to the generic attribute label rather than an
+		// empty "Add:" quote.
+		const lines = summarizeOperations( [
+			{
+				type: 'inline-suggestion',
+				attribute: 'content',
+				suggestionType: 'add',
+			},
+		] );
+		expect( lines ).toEqual( [ { label: 'Format:', value: 'content' } ] );
+	} );
+
 	it( 'summarizes a block-remove op as "Remove block: <name>"', () => {
 		const lines = summarizeOperations( [
 			{

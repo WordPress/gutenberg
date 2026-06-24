@@ -141,6 +141,62 @@ test.describe( 'Suggestion mode', () => {
 		expect( serialized ).toContain( 'Hello' );
 	} );
 
+	test( 'add — the note summarizes the addition as "Add: …", not "Format: content"', async ( {
+		editor,
+		page,
+	} ) => {
+		// Regression: an inline addition created by typing produces an
+		// `inline-suggestion` operation that carries no before/after text (the
+		// proposed words live in the in-content marker, not the payload). The
+		// sidebar summary used to fall through to the generic attribute branch
+		// and label the note "Format: content"; it should read like a Google
+		// Docs review note — Add: "new text".
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'This is your first post.' },
+		} );
+
+		await switchIntent( page, 'Suggest' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		// Place the caret before "This" and type the suggested addition.
+		await page.keyboard.press( 'Home' );
+		await page.keyboard.type( 'new text' );
+
+		// The addition is wrapped in an in-content add marker. Its
+		// `data-suggestion-id` is minted by the note comment created during
+		// typing, so reaching this point means the suggestion already exists —
+		// no separate auto-save wait is needed for the inline path.
+		await expect(
+			paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="add"]'
+			)
+		).toContainText( 'new text' );
+
+		// Open the notes sidebar and read the suggestion's summary line.
+		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
+		const allNotesToggle = topBar.getByRole( 'button', {
+			name: 'All notes',
+			exact: true,
+		} );
+		if (
+			( await allNotesToggle.getAttribute( 'aria-expanded' ) ) === 'false'
+		) {
+			await allNotesToggle.click();
+		}
+
+		const summary = page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.locator( '.editor-collab-sidebar-panel__suggestion-summary' );
+		await expect( summary ).toBeVisible();
+		await expect( summary ).toContainText( 'Add:' );
+		await expect( summary ).toContainText( 'new text' );
+		await expect( summary ).not.toContainText( 'Format:' );
+	} );
+
 	test( 'delete — golden path: deleting a selection becomes an in-content del marker', async ( {
 		editor,
 		page,

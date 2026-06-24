@@ -11,7 +11,7 @@ import {
 /**
  * Internal dependencies
  */
-import { findMarkerRange } from '../inline-markers';
+import { findMarkerRange, findMarkerText } from '../inline-markers';
 
 export const SUGGESTION_FORMAT_NAME = 'core/suggestion';
 
@@ -98,6 +98,25 @@ export function registerSuggestionFormat( edit ) {
  */
 export function findSuggestionRange( value, id ) {
 	return findMarkerRange( value, {
+		formatType: SUGGESTION_FORMAT_NAME,
+		idAttribute: SUGGESTION_ID_ATTRIBUTE,
+		id,
+		quickReject: SUGGESTION_CLASS,
+	} );
+}
+
+/**
+ * Resolve the visible text wrapped by a suggestion marker, by id, deriving it
+ * from the in-content marker on every read. Used to summarize what an inline
+ * suggestion proposes to add or remove (e.g. `Add: "new text"` in the sidebar)
+ * without storing the text in the suggestion payload.
+ *
+ * @param {*}             value Block attribute value (RichTextData, string, or other).
+ * @param {number|string} id    Suggestion id to search for.
+ * @return {string} The marked text, or '' when no marker is found.
+ */
+export function findSuggestionText( value, id ) {
+	return findMarkerText( value, {
 		formatType: SUGGESTION_FORMAT_NAME,
 		idAttribute: SUGGESTION_ID_ATTRIBUTE,
 		id,
