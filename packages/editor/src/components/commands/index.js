@@ -55,6 +55,7 @@ const getEditorCommandLoader = () =>
 			isRichEditingEnabled,
 			isPublishSidebarEnabled,
 			disableContentOnlyForUnsyncedPatterns,
+			disableContentOnlyForTemplateParts,
 		} = useSelect( ( select ) => {
 			const { get } = select( preferencesStore );
 			const { isListViewOpened, getCurrentPostType, getEditorSettings } =
@@ -78,6 +79,8 @@ const getEditorCommandLoader = () =>
 				disableContentOnlyForUnsyncedPatterns:
 					!! getEditorSettings()
 						.disableContentOnlyForUnsyncedPatterns,
+				disableContentOnlyForTemplateParts:
+					!! getEditorSettings().disableContentOnlyForTemplateParts,
 			};
 		}, [] );
 		const { getActiveComplementaryArea } = useSelect( interfaceStore );
@@ -103,6 +106,9 @@ const getEditorCommandLoader = () =>
 		}
 
 		const commands = [];
+		const disableContentOnlyForPatternsAndTemplateParts =
+			disableContentOnlyForUnsyncedPatterns &&
+			disableContentOnlyForTemplateParts;
 
 		commands.push( {
 			name: 'core/open-shortcut-help',
@@ -183,15 +189,21 @@ const getEditorCommandLoader = () =>
 
 		commands.push( {
 			name: 'core/toggle-pattern-editing',
-			label: disableContentOnlyForUnsyncedPatterns
-				? __( 'Enable content-only editing for patterns' )
-				: __( 'Disable content-only editing for patterns' ),
+			label: disableContentOnlyForPatternsAndTemplateParts
+				? __(
+						'Enable content-only editing for patterns and template parts'
+				  )
+				: __(
+						'Disable content-only editing for patterns and template parts'
+				  ),
 			icon: symbol,
 			category: 'command',
 			callback: ( { close } ) => {
+				const disableContentOnly =
+					! disableContentOnlyForPatternsAndTemplateParts;
 				updateEditorSettings( {
-					disableContentOnlyForUnsyncedPatterns:
-						! disableContentOnlyForUnsyncedPatterns,
+					disableContentOnlyForUnsyncedPatterns: disableContentOnly,
+					disableContentOnlyForTemplateParts: disableContentOnly,
 				} );
 				close();
 			},
