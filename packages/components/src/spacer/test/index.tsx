@@ -9,6 +9,48 @@ import { render, screen } from '@testing-library/react';
 import { Spacer } from '../index';
 
 describe( 'props', () => {
+	test( 'should apply margin shorthand props with the expected cascade', () => {
+		render(
+			<Spacer
+				margin={ 10 }
+				marginX={ 3 }
+				marginRight={ 5 }
+				marginBottom={ 1 }
+				data-testid="customized-spacer"
+			/>
+		);
+
+		const styles = window.getComputedStyle(
+			screen.getByTestId( 'customized-spacer' )
+		);
+
+		expect( styles.marginTop ).toBe( 'calc(40px)' );
+		expect( styles.marginRight ).toBe( 'calc(20px)' );
+		expect( styles.marginBottom ).toBe( 'calc(4px)' );
+		expect( styles.marginLeft ).toBe( 'calc(12px)' );
+	} );
+
+	test( 'should apply padding shorthand props with the expected cascade', () => {
+		render(
+			<Spacer
+				padding={ 10 }
+				paddingY={ 2 }
+				paddingTop={ 5 }
+				paddingLeft={ 3 }
+				data-testid="customized-spacer"
+			/>
+		);
+
+		const styles = window.getComputedStyle(
+			screen.getByTestId( 'customized-spacer' )
+		);
+
+		expect( styles.paddingTop ).toBe( 'calc(20px)' );
+		expect( styles.paddingRight ).toBe( 'calc(40px)' );
+		expect( styles.paddingBottom ).toBe( 'calc(8px)' );
+		expect( styles.paddingLeft ).toBe( 'calc(12px)' );
+	} );
+
 	test( 'should render correctly', () => {
 		render( <Spacer data-testid="spacer" /> );
 

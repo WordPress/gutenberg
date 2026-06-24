@@ -49,6 +49,17 @@ describe( 'Text', () => {
 		} );
 	} );
 
+	test( 'should apply base typography styles', () => {
+		render( <Text role="note">Lorem ipsum.</Text> );
+
+		const styles = window.getComputedStyle( screen.getByRole( 'note' ) );
+
+		expect( styles.color ).toBe( COLORS.theme.foreground );
+		expect( styles.lineHeight ).toBe( '1.4' );
+		expect( styles.margin ).toBe( '0px' );
+		expect( styles.textWrap ).toBe( 'pretty' );
+	} );
+
 	test( 'should render custom size', () => {
 		render(
 			<Text role="heading" size={ 15 }>

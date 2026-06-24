@@ -14,6 +14,15 @@ describe( 'props', () => {
 		expect( screen.getByRole( 'heading' ) ).toMatchSnapshot();
 	} );
 
+	test( 'should apply default heading text styles', () => {
+		render( <Heading>Code is Poetry</Heading> );
+
+		const styles = window.getComputedStyle( screen.getByRole( 'heading' ) );
+
+		expect( styles.display ).toBe( 'block' );
+		expect( styles.fontWeight ).toBe( '600' );
+	} );
+
 	test( 'should render level as a number', () => {
 		render( <Heading>Code is Poetry</Heading> );
 		render( <Heading level={ 4 }>Code is Poetry</Heading> );

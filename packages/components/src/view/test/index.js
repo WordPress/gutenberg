@@ -54,6 +54,23 @@ describe( 'props', () => {
 		expect( ref ).toHaveBeenCalledWith( customView );
 	} );
 
+	test( 'should preserve SVG attributes', () => {
+		render(
+			<View
+				as="svg"
+				data-testid="svg-view"
+				fill="currentColor"
+				strokeWidth={ 2 }
+				viewBox="0 0 24 24"
+			/>
+		);
+
+		const svgView = screen.getByTestId( 'svg-view' );
+		expect( svgView ).toHaveAttribute( 'fill', 'currentColor' );
+		expect( svgView ).toHaveAttribute( 'stroke-width', '2' );
+		expect( svgView ).toHaveAttribute( 'viewBox', '0 0 24 24' );
+	} );
+
 	test( 'should render with custom styles (string)', () => {
 		const { container } = render(
 			<View

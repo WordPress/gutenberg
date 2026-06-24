@@ -73,15 +73,41 @@ describe.each( components )( '$name', ( { Component: RawComponent } ) => {
 			<Component
 				as="svg"
 				data-testid="svg"
+				fill="currentColor"
 				preserveAspectRatio="xMidYMid meet"
+				stroke="none"
+				strokeWidth={ 2 }
 				viewBox="0 0 24 24"
 			/>
 		);
 
 		const svg = screen.getByTestId( 'svg' );
 
+		expect( svg ).toHaveAttribute( 'fill', 'currentColor' );
 		expect( svg ).toHaveAttribute( 'preserveAspectRatio', 'xMidYMid meet' );
+		expect( svg ).toHaveAttribute( 'stroke', 'none' );
+		expect( svg ).toHaveAttribute( 'stroke-width', '2' );
 		expect( svg ).toHaveAttribute( 'viewBox', '0 0 24 24' );
+	} );
+
+	it( 'preserves SVG props for non-SVG-root intrinsic elements', () => {
+		render(
+			<svg>
+				<Component
+					as="path"
+					d="M0 0h24v24H0z"
+					data-testid="path"
+					fillRule="evenodd"
+					clipPath="url(#clip)"
+				/>
+			</svg>
+		);
+
+		const path = screen.getByTestId( 'path' );
+
+		expect( path ).toHaveAttribute( 'clip-path', 'url(#clip)' );
+		expect( path ).toHaveAttribute( 'd', 'M0 0h24v24H0z' );
+		expect( path ).toHaveAttribute( 'fill-rule', 'evenodd' );
 	} );
 
 	it( 'filters invalid props from SVG intrinsic elements', () => {

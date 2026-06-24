@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -10,6 +10,25 @@ import { View } from '../../view';
 import { VStack } from '..';
 
 describe( 'props', () => {
+	test( 'should apply default vertical stack styles', () => {
+		render(
+			<VStack data-testid="v-stack">
+				<View />
+				<View />
+			</VStack>
+		);
+
+		const styles = window.getComputedStyle(
+			screen.getByTestId( 'v-stack' )
+		);
+
+		expect( styles.alignItems ).toBe( 'stretch' );
+		expect( styles.display ).toBe( 'flex' );
+		expect( styles.flexDirection ).toBe( 'column' );
+		expect( styles.gap ).toBe( 'calc(4px * 2)' );
+		expect( styles.justifyContent ).toBe( 'center' );
+	} );
+
 	test( 'should render correctly', () => {
 		const { container } = render(
 			<VStack>

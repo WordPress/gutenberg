@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -10,6 +10,24 @@ import { View } from '../../view';
 import { HStack } from '..';
 
 describe( 'props', () => {
+	test( 'should apply default horizontal stack styles', () => {
+		render(
+			<HStack data-testid="h-stack">
+				<View />
+				<View />
+			</HStack>
+		);
+
+		const styles = window.getComputedStyle(
+			screen.getByTestId( 'h-stack' )
+		);
+
+		expect( styles.alignItems ).toBe( 'center' );
+		expect( styles.display ).toBe( 'flex' );
+		expect( styles.gap ).toBe( 'calc(4px * 2)' );
+		expect( styles.justifyContent ).toBe( 'space-between' );
+	} );
+
 	test( 'should render correctly', () => {
 		const { container } = render(
 			<HStack>

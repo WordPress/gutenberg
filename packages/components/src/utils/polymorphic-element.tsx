@@ -23,6 +23,39 @@ let cachedOwnerDocument: Document | undefined;
 const htmlElementCache = new Map< string, HTMLElement >();
 const svgElementCache = new Map< string, SVGElement >();
 
+const knownSvgElementProps = new Set( [
+	'clipPath',
+	'clipRule',
+	'cx',
+	'cy',
+	'd',
+	'fill',
+	'fillRule',
+	'focusable',
+	'height',
+	'pathLength',
+	'points',
+	'preserveAspectRatio',
+	'r',
+	'rx',
+	'ry',
+	'stroke',
+	'strokeLinecap',
+	'strokeLinejoin',
+	'strokeWidth',
+	'transform',
+	'viewBox',
+	'width',
+	'x',
+	'x1',
+	'x2',
+	'xlinkHref',
+	'xmlSpace',
+	'y',
+	'y1',
+	'y2',
+] );
+
 const knownIntrinsicElementProps = new Set( [
 	'children',
 	'className',
@@ -83,6 +116,10 @@ function isValidIntrinsicElementProp( prop: string, element: string ) {
 	}
 
 	if ( knownIntrinsicElementProps.has( prop ) ) {
+		return true;
+	}
+
+	if ( knownSvgElementProps.has( prop ) ) {
 		return true;
 	}
 
