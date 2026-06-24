@@ -8,9 +8,8 @@ import { join } from 'path';
 import { render, screen } from '@testing-library/react';
 import { ThemeProvider } from '../theme-provider';
 
-// Mock the CSS module so the provider's scoping class is a real, stable class
-// name. Without this the global Jest CSS mock leaves the class `undefined`, and
-// jsdom cannot match the generated rules to compute the custom properties.
+// Give the wrapper a stable class so tests can locate it and read its
+// computed custom properties.
 jest.mock( '../style.module.css', () => ( {
 	root: 'theme-provider-root',
 } ) );
@@ -34,7 +33,7 @@ function readProp( element: Element, property: string ) {
 
 // The `ThemeProvider` wrapper element that scopes the given descendant.
 function getScopingProvider( element: Element ) {
-	return element.closest< HTMLElement >( '[data-wpds-theme-provider-id]' )!;
+	return element.closest< HTMLElement >( '.theme-provider-root' )!;
 }
 
 describe( 'ThemeProvider', () => {
@@ -131,22 +130,101 @@ describe( 'ThemeProvider', () => {
 			expect( readProp( document.documentElement, BRAND_BG ) ).toBe( '' );
 		} );
 
-		// Unlike color/cursor (emitted at runtime in the provider's own
-		// `<style>`), the `cornerRadius` preset resolves to
-		// `--wpds-border-radius-*` values through the prebuilt design-token CSS
-		// (the modes authored in `terrazzo.config.ts`). A root provider relies
-		// on that stylesheet's `:root:has( [data-wpds-root-provider='true']… )`
-		// rule to forward the preset to the document element, so these tests
-		// load the prebuilt CSS to exercise it. It is injected only for this
-		// block (it also defines base tokens on `:root`) to avoid interfering
-		// with the color assertions above.
+		it( 'removes the forwarded properties from the document root on unmount', () => {
+			const { unmount } = render(
+				<ThemeProvider isRoot color={ { primary: PRIMARY } }>
+					<div>x</div>
+				</ThemeProvider>
+			);
+
+			expect( readProp( document.documentElement, BRAND_BG ) ).toBe(
+				PRIMARY
+			);
+
+			unmount();
+
+			// No prior value, so cleanup removes the property entirely.
+			expect( readProp( document.documentElement, BRAND_BG ) ).toBe( '' );
+		} );
+
+		it( "forwards tokens to the wrapper's own document, not the top document", () => {
+			const iframe = document.createElement( 'iframe' );
+			document.body.appendChild( iframe );
+			const iframeDoc = iframe.contentDocument!;
+			// Mount into a child element (not the iframe `body` directly, which
+			// React warns against) so the wrapper's `ownerDocument` is the iframe.
+			const mount = iframeDoc.createElement( 'div' );
+			iframeDoc.body.appendChild( mount );
+
+			const { unmount } = render(
+				<ThemeProvider isRoot color={ { primary: PRIMARY } }>
+					<div>x</div>
+				</ThemeProvider>,
+				{ container: mount }
+			);
+
+			expect( readProp( iframeDoc.documentElement, BRAND_BG ) ).toBe(
+				PRIMARY
+			);
+			expect( readProp( document.documentElement, BRAND_BG ) ).toBe( '' );
+
+			unmount();
+			iframe.remove();
+		} );
+
+		it( 'warns when multiple root providers share a document', () => {
+			const warn = jest
+				.spyOn( console, 'warn' )
+				.mockImplementation( () => {} );
+
+			render(
+				<>
+					<ThemeProvider isRoot color={ { primary: PRIMARY } }>
+						<div>a</div>
+					</ThemeProvider>
+					<ThemeProvider isRoot color={ { primary: OTHER_PRIMARY } }>
+						<div>b</div>
+					</ThemeProvider>
+				</>
+			);
+
+			expect( warn ).toHaveBeenCalledWith(
+				expect.stringContaining( 'More than one root provider' )
+			);
+
+			warn.mockRestore();
+		} );
+
+		it( 'does not warn for a single root provider', () => {
+			const warn = jest
+				.spyOn( console, 'warn' )
+				.mockImplementation( () => {} );
+
+			render(
+				<ThemeProvider isRoot color={ { primary: PRIMARY } }>
+					<div>x</div>
+				</ThemeProvider>
+			);
+
+			expect( warn ).not.toHaveBeenCalled();
+
+			warn.mockRestore();
+		} );
+
+		// `cornerRadius` forwards to `:root` through the prebuilt CSS's
+		// `:root:has( [data-wpds-root-provider='true']… )` rule (not the JS
+		// mirror used for color/cursor), so load that stylesheet to exercise
+		// it. Scoped to this block since it also defines base `:root` tokens.
 		describe( 'cornerRadius forwarding', () => {
 			let prebuiltStyle: HTMLStyleElement;
 
 			beforeAll( () => {
 				prebuiltStyle = document.createElement( 'style' );
 				prebuiltStyle.textContent = readFileSync(
-					join( __dirname, '../prebuilt/css/design-tokens.css' ),
+					join(
+						import.meta.dirname,
+						'../prebuilt/css/design-tokens.css'
+					),
 					'utf8'
 				);
 				document.head.appendChild( prebuiltStyle );

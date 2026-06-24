@@ -1,19 +1,12 @@
 import clsx from 'clsx';
 import { Tooltip as _Tooltip } from '@base-ui/react/tooltip';
 import { forwardRef } from '@wordpress/element';
-import {
-	type ThemeProvider as ThemeProviderType,
-	privateApis as themePrivateApis,
-} from '@wordpress/theme';
+import { ThemeProvider } from '@wordpress/theme';
 import type { PopupProps } from './types';
-import { unlock } from '../lock-unlock';
 import { Portal } from './portal';
 import { Positioner } from './positioner';
 import { renderSlotWithChildren } from '../utils/render-slot-with-children';
 import styles from './style.module.css';
-
-const ThemeProvider: typeof ThemeProviderType =
-	unlock( themePrivateApis ).ThemeProvider;
 
 /*
  * This should ideally use whatever dark color makes sense, and not be

@@ -76,6 +76,16 @@ jobs:
             - name: Lint dependency versions across workspaces
               run: npm run lint:deps
 
+            - name: Check root dependencies
+              if: ${{ matrix.annotations && github.event_name == 'pull_request' }}
+              env:
+                  BASE_SHA: ${{ github.event.pull_request.base.sha }}
+              # Fetch just the base commit so the check can read its
+              # package.json without a costly full-history checkout.
+              run: |
+                  git fetch --no-tags --depth=1 origin "$BASE_SHA"
+                  npm run --workspace @wordpress/validation-tools check-root-dependencies -- --base "$BASE_SHA"
+
             - name: Lint package-lock.json file
               run: npm run lint:lockfile
 

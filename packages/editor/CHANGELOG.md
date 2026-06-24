@@ -7,6 +7,8 @@
 -   Added an `editorIntent` preference (`edit`, `suggest`, `view`) with a matching `setEditorIntent` action and `getEditorIntent` selector. Surfaced as an Edit / Suggest / View menu in the editor options for post types that support notes. The `view` intent puts the block editor into a read-only preview. Keyboard shortcuts follow the Google Docs convention: Ctrl+Alt+Shift+Z (Edit), +X (Suggest), +C (View) on Windows / ⌘⌥⇧Z/X/C on macOS.
 -   Added a suggestion-overlay subsystem that powers the `suggest` intent. When active, an `editor.BlockEdit` filter diverts `setAttributes` into an in-memory overlay keyed by `clientId`; the block renders with the pending change merged on top of its real attributes, but the block-editor store stays at the baseline. A toolbar button on the selected block submits the overlay as a note comment with a `_wp_suggestion` meta payload (`schemaVersion`, `blockName`, `baseRevision`, `operations`) or discards it. Phase 2: capture only; Apply/Reject and diff rendering follow.
 
+## 14.49.0 (2026-06-24)
+
 ## 14.48.1 (2026-06-16)
 
 ## 14.48.0 (2026-06-10)
