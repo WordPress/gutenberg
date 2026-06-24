@@ -174,15 +174,26 @@ function bindFieldToNamespace( field, namespace, isVisible = () => true ) {
 }
 
 export default function DataFormPostSummary( { onActionPerformed } ) {
-	const { postType, postId, isPostStatusRemoved } = useSelect( ( select ) => {
-		const { getCurrentPostType, getCurrentPostId, isEditorPanelRemoved } =
-			select( editorStore );
-		return {
-			postType: getCurrentPostType(),
-			postId: getCurrentPostId(),
-			isPostStatusRemoved: isEditorPanelRemoved( 'post-status' ),
-		};
-	}, [] );
+	const { postType, postId, isPostStatusRemoved, availableTemplates } =
+		useSelect( ( select ) => {
+			const {
+				getCurrentPostType,
+				getCurrentPostId,
+				isEditorPanelRemoved,
+				getEditorSettings,
+			} = select( editorStore );
+			const _availableTemplates = select(
+				coreDataStore
+			).getCurrentTheme()?.is_block_theme
+				? null
+				: getEditorSettings().availableTemplates ?? null;
+			return {
+				postType: getCurrentPostType(),
+				postId: getCurrentPostId(),
+				isPostStatusRemoved: isEditorPanelRemoved( 'post-status' ),
+				availableTemplates: _availableTemplates,
+			};
+		}, [] );
 	const { form: formConfig } = useViewConfig( {
 		kind: 'postType',
 		name: postType,
@@ -241,14 +252,6 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 		},
 		[ postType ]
 	);
-
-	const availableTemplates = useSelect( ( select ) => {
-		if ( select( coreDataStore ).getCurrentTheme()?.is_block_theme ) {
-			return null;
-		}
-		const settings = select( editorStore ).getEditorSettings();
-		return settings.availableTemplates ?? null;
-	}, [] );
 
 	// Merge the supplementary data onto the record.
 	const data = useMemo( () => {
