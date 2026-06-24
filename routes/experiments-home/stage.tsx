@@ -161,29 +161,23 @@ function ExperimentsPage() {
 	}
 
 	return (
-		<Page title={ __( 'Gutenberg Experiments' ) }>
-			<div className="experiments-page__intro">
-				<p>
-					{ __(
-						'The Gutenberg plugin adds editing, customization, and site building to WordPress, and gives early adopters access to the latest block and full site editing features before they ship in a WordPress release. The experiments below are in active development, so expect rough edges and changes over time.'
-					) }
-				</p>
-				<p>
-					{ createInterpolateElement(
-						__(
-							'To learn more about the project and how to build with blocks, see the <a>Block Editor Handbook</a>.'
-						),
-						{
-							a: (
-								<Link
-									href="https://developer.wordpress.org/block-editor/"
-									openInNewTab
-								/>
-							),
-						}
-					) }
-				</p>
-			</div>
+		<Page
+			title={ __( 'Gutenberg Experiments' ) }
+			subTitle={ createInterpolateElement(
+				__(
+					'The Gutenberg plugin adds editing, customization, and site building to WordPress, and gives early adopters access to the latest block and full site editing features before they ship in a WordPress release. <br />The experiments below are in active development, so expect rough edges and changes over time. <br />To learn more about the project and how to build with blocks, see the <a>Block Editor Handbook</a>.'
+				),
+				{
+					a: (
+						<Link
+							href="https://developer.wordpress.org/block-editor/"
+							openInNewTab
+						/>
+					),
+					br: <br />,
+				}
+			) }
+		>
 			<div className="experiments-page__form">
 				<DataForm
 					data={ settings }
