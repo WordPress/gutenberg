@@ -212,7 +212,11 @@ function UploadFonts() {
 	return (
 		<div className="font-library__tabpanel-layout">
 			<DropZone onFilesDrop={ handleDropZone } />
-			<Stack className="font-library__local-fonts" direction="column">
+			<Stack
+				className="font-library__local-fonts"
+				direction="column"
+				gap="sm"
+			>
 				{ notice && (
 					<Notice
 						status={ notice.type }
@@ -254,15 +258,9 @@ function UploadFonts() {
 									align="center"
 									gap="sm"
 								>
-									<WCIcon
-										icon={ upload }
-										size={ 32 }
-										className="font-library__upload-area__icon"
-									/>
-									<Text className="font-library__upload-area__title">
-										{ __( 'Upload Fonts' ) }
-									</Text>
-									<Text className="font-library__upload-area__subtitle">
+									<WCIcon icon={ upload } size={ 32 } />
+									<Text>{ __( 'Upload Fonts' ) }</Text>
+									<Text>
 										{ __(
 											'Drop files or click to select'
 										) }
