@@ -22,7 +22,9 @@ const ITEM_PADDING_INLINE = space( 3 );
 // - border color and divider color are different from COLORS.theme variables
 // - lighter text color is not defined in COLORS.theme, should it be?
 // - lighter background color is not defined in COLORS.theme, should it be?
+// TODO: should use the `stroke-surface-neutral` WPDS token when refactored to SCSS modules
 const DEFAULT_BORDER_COLOR = COLORS.theme.gray[ 300 ];
+// TODO: should use the `stroke-surface-neutral-weak` WPDS token when refactored to SCSS modules
 const DIVIDER_COLOR = COLORS.theme.gray[ 200 ];
 const LIGHTER_TEXT_COLOR = COLORS.theme.gray[ 700 ];
 const LIGHT_BACKGROUND_COLOR = COLORS.theme.gray[ 100 ];

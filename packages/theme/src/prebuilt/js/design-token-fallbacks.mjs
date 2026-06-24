@@ -77,13 +77,13 @@ export default {
 	'--wpds-color-foreground-interactive-brand':
 		'var(--wp-admin-theme-color, #3858e9)',
 	'--wpds-color-foreground-interactive-brand-active':
-		'var(--wp-admin-theme-color, #3858e9)',
+		'color-mix(in oklch, var(--wp-admin-theme-color, #3858e9) 52%, black)',
 	'--wpds-color-foreground-interactive-brand-disabled': '#8d8d8d',
 	'--wpds-color-foreground-interactive-brand-strong': '#fff',
 	'--wpds-color-foreground-interactive-brand-strong-active': '#fff',
 	'--wpds-color-foreground-interactive-brand-strong-disabled': '#8d8d8d',
 	'--wpds-color-foreground-interactive-error': '#cc1818',
-	'--wpds-color-foreground-interactive-error-active': '#cc1818',
+	'--wpds-color-foreground-interactive-error-active': '#470000',
 	'--wpds-color-foreground-interactive-error-disabled': '#8d8d8d',
 	'--wpds-color-foreground-interactive-error-strong': '#f2efef',
 	'--wpds-color-foreground-interactive-error-strong-active': '#f2efef',
@@ -114,6 +114,8 @@ export default {
 		'color-mix(in oklch, var(--wp-admin-theme-color, #3858e9) 40%, white)',
 	'--wpds-color-stroke-surface-brand-strong':
 		'var(--wp-admin-theme-color, #3858e9)',
+	'--wpds-color-stroke-surface-caution': '#cfc28d',
+	'--wpds-color-stroke-surface-caution-strong': '#826a00',
 	'--wpds-color-stroke-surface-error': '#dab1aa',
 	'--wpds-color-stroke-surface-error-strong': '#cc1818',
 	'--wpds-color-stroke-surface-info': '#a9c6e7',
@@ -126,7 +128,6 @@ export default {
 	'--wpds-color-stroke-surface-warning': '#e1bc7c',
 	'--wpds-color-stroke-surface-warning-strong': '#926300',
 	'--wpds-cursor-control': 'pointer',
-	'--wpds-dimension-base': '4px',
 	'--wpds-dimension-gap-2xl': '32px',
 	'--wpds-dimension-gap-3xl': '40px',
 	'--wpds-dimension-gap-lg': '16px',

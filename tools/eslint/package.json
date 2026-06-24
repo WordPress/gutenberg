@@ -38,7 +38,7 @@
 		"eslint-plugin-jest-dom": "^5.5.0",
 		"eslint-plugin-prettier": "^5.5.5",
 		"eslint-plugin-react-hooks": "^7.1.1",
-		"eslint-plugin-storybook": "^10.2.19",
+		"eslint-plugin-storybook": "^10.4.3",
 		"eslint-plugin-testing-library": "^7.16.0",
 		"glob": "^7.1.2",
 		"globals": "^16.0.0",

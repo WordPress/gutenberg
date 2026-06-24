@@ -16,7 +16,7 @@ import {
 	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useMemo, useCallback, useEffect, useRef } from '@wordpress/element';
+import { useCallback, useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -26,7 +26,12 @@ import RemoveTabToolbarControl from '../tab-panel/remove-tab-toolbar-control';
 
 const EMPTY_ARRAY = [];
 
-function Edit( { attributes, clientId, context } ) {
+function Edit( {
+	attributes,
+	clientId,
+	context,
+	__unstableLayoutClassNames: layoutClassNames,
+} ) {
 	const tabsList = context[ 'core/tabs-list' ] || EMPTY_ARRAY;
 
 	const colorProps = useColorProps( attributes );
@@ -52,9 +57,7 @@ function Edit( { attributes, clientId, context } ) {
 		[ clientId ]
 	);
 
-	const effectiveActiveIndex = useMemo( () => {
-		return editorActiveTabIndex ?? activeTabIndex;
-	}, [ editorActiveTabIndex, activeTabIndex ] );
+	const effectiveActiveIndex = editorActiveTabIndex ?? activeTabIndex;
 
 	const { __unstableMarkNextChangeAsNotPersistent, updateBlockAttributes } =
 		useDispatch( blockEditorStore );
@@ -126,6 +129,9 @@ function Edit( { attributes, clientId, context } ) {
 	const blockProps = useBlockProps( {
 		role: 'tablist',
 		ref: menuRef,
+		// Applied manually since this block has no inner blocks for the layout
+		// support to add its container classes to.
+		className: layoutClassNames,
 	} );
 
 	const buttonClassName = clsx( colorProps.className, borderProps.className );
@@ -147,9 +153,9 @@ function Edit( { attributes, clientId, context } ) {
 						<button
 							key={ tab.clientId || index }
 							type="button"
-							className={ clsx( buttonClassName, {
-								'is-active': isActive,
-							} ) }
+							role="tab"
+							aria-selected={ isActive }
+							className={ buttonClassName || undefined }
 							style={ buttonStyle }
 							tabIndex={ -1 }
 							onClick={ ( event ) => {
