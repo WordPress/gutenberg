@@ -997,11 +997,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/view/component.tsx": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/z-stack/styles.ts": {
 		"no-restricted-imports": {
 			"count": 2
