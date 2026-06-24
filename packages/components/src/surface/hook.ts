@@ -42,10 +42,10 @@ export function useSurface(
 		className: clsx(
 			styles.surface,
 			{
-				[ styles.borderBottom ]: borderBottom,
-				[ styles.borderLeft ]: borderLeft,
-				[ styles.borderRight ]: borderRight,
-				[ styles.borderTop ]: borderTop,
+				[ styles[ 'border-bottom' ] ]: borderBottom,
+				[ styles[ 'border-left' ] ]: borderLeft,
+				[ styles[ 'border-right' ] ]: borderRight,
+				[ styles[ 'border-top' ] ]: borderTop,
 				[ styles.secondary ]: variant === 'secondary',
 				[ styles.dotted ]: variant === 'dotted',
 				[ styles.grid ]: variant === 'grid',
