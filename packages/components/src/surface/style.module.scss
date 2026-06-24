@@ -1,55 +1,52 @@
-$surface-background-color: var(--wpds-color-background-surface-neutral-strong);
-$surface-background-tint-color: var(--wpds-color-background-surface-neutral-weak);
-$surface-border-color: var(--wpds-color-stroke-surface-neutral);
-$surface-border-bold-color: var(--wpds-color-stroke-surface-neutral-strong);
-$surface-border-subtle-color: var(--wpds-color-stroke-surface-neutral-weak);
-$surface-color: var(--wpds-color-foreground-content-neutral);
-
 .surface {
-	background-color: $surface-background-color;
-	color: $surface-color;
+	background-color: var(--wpds-color-background-surface-neutral-strong);
+	color: var(--wpds-color-foreground-content-neutral);
 	position: relative;
 }
 
 .borderBottom {
-	border-block-end: var(--wpds-border-width-xs) solid $surface-border-color;
+	border-bottom: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 }
 
 .borderLeft {
-	border-inline-start: var(--wpds-border-width-xs) solid $surface-border-color;
+	/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Preserve physical `borderLeft` behavior from the previous Emotion styles. */
+	border-left: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 }
 
 .borderRight {
-	border-inline-end: var(--wpds-border-width-xs) solid $surface-border-color;
+	/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Preserve physical `borderRight` behavior from the previous Emotion styles. */
+	border-right: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 }
 
 .borderTop {
-	border-block-start: var(--wpds-border-width-xs) solid $surface-border-color;
+	border-top: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 }
 
 .secondary {
-	background: $surface-background-tint-color;
+	background: var(--wpds-color-background-surface-neutral-weak);
 }
 
 .dotted {
 	background:
-		linear-gradient(90deg, $surface-background-color
+		linear-gradient(90deg, var(--wpds-color-background-surface-neutral-strong)
 		var(--wp-components-surface-background-size-dotted), transparent 1%)
 		center,
-		linear-gradient($surface-background-color
+		linear-gradient(var(--wpds-color-background-surface-neutral-strong)
 		var(--wp-components-surface-background-size-dotted), transparent 1%)
 		center,
-		$surface-border-bold-color;
+		var(--wpds-color-stroke-surface-neutral-strong);
 	background-size:
 		var(--wp-components-surface-background-size)
 		var(--wp-components-surface-background-size);
 }
 
 .grid {
-	background: $surface-background-color;
+	background: var(--wpds-color-background-surface-neutral-strong);
 	background-image:
-		linear-gradient($surface-border-subtle-color 1px, transparent 1px),
-		linear-gradient(90deg, $surface-border-subtle-color 1px, transparent 1px);
+		linear-gradient(var(--wpds-color-stroke-surface-neutral-weak)
+		var(--wpds-border-width-xs), transparent var(--wpds-border-width-xs)),
+		linear-gradient(90deg, var(--wpds-color-stroke-surface-neutral-weak)
+		var(--wpds-border-width-xs), transparent var(--wpds-border-width-xs));
 	background-size:
 		var(--wp-components-surface-background-size)
 		var(--wp-components-surface-background-size);
