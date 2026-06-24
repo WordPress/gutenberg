@@ -618,6 +618,14 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			// eslint-disable-next-line testing-library/no-node-access
 			aspectSelect.closest( '.is-inherited-from-global-styles' )
 		).toBeNull();
+		// A local override now gets the same local-override flag as every
+		// other control, so the inline override menu (Reset / Make default)
+		// can attach. The menu itself is portaled and covered by the
+		// InheritanceActionsDropdown unit tests.
+		expect(
+			// eslint-disable-next-line testing-library/no-node-access
+			aspectSelect.closest( '.has-local-override-from-global-styles' )
+		).not.toBeNull();
 	} );
 
 	it( 'does not call `onChange` on mount of an at-rest aspectRatio', () => {

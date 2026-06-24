@@ -1,15 +1,13 @@
 /**
  * WordPress dependencies
  */
-import {
-	SelectControl,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-} from '@wordpress/components';
+import { SelectControl } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
 import { useSettings } from '../use-settings';
+import { InheritanceToolsPanelItem } from '../global-styles/inheritance';
 
 /**
  * @typedef {import('@wordpress/components/build-types/select-control/types').SelectControlProps} SelectControlProps
@@ -23,14 +21,17 @@ import { useSettings } from '../use-settings';
 
 /**
  * @typedef {Object} AspectRatioToolProps
- * @property {string}                       [panelId]          ID of the panel this tool is associated with.
- * @property {string}                       [value]            Current aspect ratio value.
- * @property {AspectRatioToolPropsOnChange} [onChange]         Callback to update the aspect ratio value.
- * @property {SelectControlProps[]}         [options]          Aspect ratio options.
- * @property {string}                       [defaultValue]     Default aspect ratio value.
- * @property {boolean}                      [isShownByDefault] Whether the tool is shown by default.
- * @property {string}                       [className]        Additional CSS class on the wrapping ToolsPanelItem.
- * @property {string}                       [title]            Native browser tooltip applied to the wrapping ToolsPanelItem (e.g. "Inherited from Global Styles").
+ * @property {string}                       [panelId]                ID of the panel this tool is associated with.
+ * @property {string}                       [value]                  Current aspect ratio value.
+ * @property {AspectRatioToolPropsOnChange} [onChange]               Callback to update the aspect ratio value.
+ * @property {SelectControlProps[]}         [options]                Aspect ratio options.
+ * @property {string}                       [defaultValue]           Default aspect ratio value.
+ * @property {boolean}                      [isShownByDefault]       Whether the tool is shown by default.
+ * @property {string}                       [className]              Additional CSS class on the wrapping panel item.
+ * @property {boolean}                      [isInherited]            Whether the control is displaying an inherited Global Styles value.
+ * @property {boolean}                      [hasLocalOverride]       Whether a local value is overriding an inherited Global Styles value.
+ * @property {string}                       [inheritanceTooltipText] Tooltip text describing the inherited Global Styles source.
+ * @property {Function}                     [onPushToGlobalStyles]   Handler that promotes the local override to Global Styles ("Make default").
  */
 
 export default function AspectRatioTool( {
@@ -42,7 +43,10 @@ export default function AspectRatioTool( {
 	hasValue,
 	isShownByDefault = true,
 	className,
-	title,
+	isInherited,
+	hasLocalOverride,
+	inheritanceTooltipText,
+	onPushToGlobalStyles,
 } ) {
 	// Match the CSS default so if the value is used directly in CSS it will look correct in the control.
 	const displayValue = value ?? 'auto';
@@ -82,9 +86,12 @@ export default function AspectRatioTool( {
 	];
 
 	return (
-		<ToolsPanelItem
+		<InheritanceToolsPanelItem
 			className={ className }
-			title={ title }
+			isInherited={ isInherited }
+			hasLocalOverride={ hasLocalOverride }
+			inheritanceTooltipText={ inheritanceTooltipText }
+			onPushToGlobalStyles={ onPushToGlobalStyles }
 			hasValue={
 				hasValue ? hasValue : () => displayValue !== defaultValue
 			}
@@ -100,6 +107,6 @@ export default function AspectRatioTool( {
 				onChange={ onChange }
 				size="__unstable-large"
 			/>
-		</ToolsPanelItem>
+		</InheritanceToolsPanelItem>
 	);
 }

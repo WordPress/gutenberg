@@ -1196,6 +1196,10 @@ export default function DimensionsPanel( {
 					inheritanceTooltipText={ tooltipText(
 						'dimensions.aspectRatio'
 					) }
+					onPushToGlobalStyles={ getPushHandler(
+						[ [ 'dimensions', 'aspectRatio' ] ],
+						() => setAspectRatioValue( undefined )
+					) }
 					isShownByDefault={
 						defaultControls.aspectRatio ??
 						DEFAULT_CONTROLS.aspectRatio
