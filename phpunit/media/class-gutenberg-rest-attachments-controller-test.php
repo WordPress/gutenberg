@@ -1788,7 +1788,9 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 
 		$controller = new Gutenberg_REST_Attachments_Controller( 'attachment' );
 		$method     = new ReflectionMethod( $controller, 'create_item_from_url' );
-		$method->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
 		$result = $method->invoke( $controller, $request );
 
 		remove_filter( 'pre_http_request', $track );
