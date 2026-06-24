@@ -6,7 +6,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 const INITIAL_DESCRIPTION = 'Pattern description for DataForm.';
 const UPDATED_DESCRIPTION = 'Updated pattern description from DataForm.';
 const FINAL_CONTENT = `<!-- wp:paragraph -->\n<p>Pattern summary content with eight words here again.</p>\n<!-- /wp:paragraph -->`;
-const EDITOR_CONTEXTS = [
+const WP_BLOCK_EDITOR_CONTEXTS = [
 	{
 		name: 'post editor',
 		openPattern: async ( { admin, pattern } ) => {
@@ -41,11 +41,6 @@ const EDITOR_CONTEXTS = [
 ];
 
 test.describe( 'Post Summary', () => {
-	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'emptytheme' );
-		await requestUtils.deleteAllBlocks();
-	} );
-
 	test.beforeEach( async ( { requestUtils } ) => {
 		await requestUtils.setGutenbergExperiments( [
 			'gutenberg-dataform-inspector',
@@ -54,15 +49,27 @@ test.describe( 'Post Summary', () => {
 
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.setGutenbergExperiments( [] );
-		await requestUtils.deleteAllBlocks();
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
-	} );
+	test.describe( 'wp_block summary', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activateTheme( 'emptytheme' );
+			await requestUtils.deleteAllBlocks();
+		} );
 
-	test.describe( 'wp_block', () => {
-		for ( const { name, openPattern, savePattern } of EDITOR_CONTEXTS ) {
+		test.afterEach( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllBlocks();
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.activateTheme( 'twentytwentyone' );
+		} );
+
+		for ( const {
+			name,
+			openPattern,
+			savePattern,
+		} of WP_BLOCK_EDITOR_CONTEXTS ) {
 			test( `shows pattern summary fields in the ${ name }`, async ( {
 				admin,
 				editor,
