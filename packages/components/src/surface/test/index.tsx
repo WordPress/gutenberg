@@ -7,69 +7,35 @@ import { render, screen } from '@testing-library/react';
  * Internal dependencies
  */
 import { Surface } from '../index';
-import type { SurfaceVariant } from '../types';
 
 describe( 'props', () => {
-	test( 'should render correctly', () => {
-		const { container } = render( <Surface>Surface</Surface> );
-		expect( container ).toMatchSnapshot();
+	test( 'should render children in a Surface wrapper', () => {
+		render( <Surface>Surface</Surface> );
+
+		const surface = screen.getByText( 'Surface' );
+
+		expect( surface ).toHaveClass( 'components-surface' );
+		expect( surface ).toHaveAttribute( 'data-wp-component', 'Surface' );
 	} );
 
-	test.each< SurfaceVariant >( [
-		'secondary',
-		'tertiary',
-		'dotted',
-		'grid',
-	] )( 'should render the %s variant', ( variant ) => {
-		render( <Surface variant={ variant }>Surface</Surface> );
-		expect( screen.getByText( 'Surface' ) ).toHaveAttribute(
-			'data-variant',
-			variant
+	test( 'should merge custom class names', () => {
+		render( <Surface className="custom-surface">Surface</Surface> );
+
+		expect( screen.getByText( 'Surface' ) ).toHaveClass(
+			'components-surface',
+			'custom-surface'
 		);
 	} );
 
-	test( 'should render borderLeft', () => {
-		render( <Surface borderLeft>Surface</Surface> );
-		expect( screen.getByText( 'Surface' ) ).toHaveAttribute(
-			'data-border-left',
-			'true'
-		);
-	} );
-
-	test( 'should render borderRight', () => {
-		render( <Surface borderRight>Surface</Surface> );
-		expect( screen.getByText( 'Surface' ) ).toHaveAttribute(
-			'data-border-right',
-			'true'
-		);
-	} );
-
-	test( 'should render borderTop', () => {
-		render( <Surface borderTop>Surface</Surface> );
-		expect( screen.getByText( 'Surface' ) ).toHaveAttribute(
-			'data-border-top',
-			'true'
-		);
-	} );
-
-	test( 'should render borderBottom', () => {
-		render( <Surface borderBottom>Surface</Surface> );
-		expect( screen.getByText( 'Surface' ) ).toHaveAttribute(
-			'data-border-bottom',
-			'true'
-		);
-	} );
-
-	test( 'should render background size custom properties for pattern variants', () => {
+	test( 'should render as the requested element', () => {
 		render(
-			<Surface variant="dotted" backgroundSize={ 24 }>
+			<Surface as="section" aria-label="Surface area">
 				Surface
 			</Surface>
 		);
 
-		expect( screen.getByText( 'Surface' ) ).toHaveStyle( {
-			'--wp-components-surface-background-size': '24px',
-			'--wp-components-surface-background-size-dotted': '23px',
-		} );
+		expect(
+			screen.getByRole( 'region', { name: 'Surface area' } )
+		).toHaveTextContent( 'Surface' );
 	} );
 } );

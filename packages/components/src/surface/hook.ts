@@ -45,12 +45,20 @@ export function useSurface(
 
 	return {
 		...otherProps,
-		className: clsx( styles.surface, className ),
-		'data-border-bottom': borderBottom ? true : undefined,
-		'data-border-left': borderLeft ? true : undefined,
-		'data-border-right': borderRight ? true : undefined,
-		'data-border-top': borderTop ? true : undefined,
-		'data-variant': variant === 'primary' ? undefined : variant,
+		className: clsx(
+			styles.surface,
+			{
+				[ styles.borderBottom ]: borderBottom,
+				[ styles.borderLeft ]: borderLeft,
+				[ styles.borderRight ]: borderRight,
+				[ styles.borderTop ]: borderTop,
+				[ styles.secondary ]: variant === 'secondary',
+				[ styles.tertiary ]: variant === 'tertiary',
+				[ styles.dotted ]: variant === 'dotted',
+				[ styles.grid ]: variant === 'grid',
+			},
+			className
+		),
 		style: surfaceStyle,
 	};
 }
