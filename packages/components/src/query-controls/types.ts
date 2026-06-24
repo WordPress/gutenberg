@@ -31,7 +31,6 @@ export type CategorySelectProps = Pick<
 	categoriesList: Category[];
 	onChange: ( newCategory: string ) => void;
 	selectedCategoryId?: Category[ 'id' ];
-	__next40pxDefaultSize: boolean;
 };
 
 export type AuthorSelectProps = Pick<
@@ -41,7 +40,6 @@ export type AuthorSelectProps = Pick<
 	authorList?: Author[];
 	onChange: ( newAuthor: string ) => void;
 	selectedAuthorId?: Author[ 'id' ];
-	__next40pxDefaultSize: boolean;
 };
 
 type Order = 'asc' | 'desc';
@@ -122,7 +120,7 @@ type BaseQueryControlsProps = {
 	 * Start opting into the larger default height that will become the
 	 * default size in a future version.
 	 *
-	 * @deprecated Default behavior since WP 6.7. Prop can be safely removed.
+	 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
 	 * @ignore
 	 */
 	__next40pxDefaultSize?: boolean;
