@@ -299,6 +299,18 @@ function isGlobalPreview( canvas: CanvasData ) {
 	);
 }
 
+function shouldUseUniversalCanvas( canvas: CanvasData ) {
+	return (
+		! canvas.isPreview &&
+		! [
+			'wp_template',
+			'wp_template_part',
+			'wp_navigation',
+			'wp_block',
+		].includes( canvas.postType )
+	);
+}
+
 function PreviewEditButton( {
 	editLink,
 	isResolving,
@@ -1237,6 +1249,19 @@ export default function Canvas( { canvas }: CanvasProps ) {
 					postId={ canvas.postId }
 					settings={ {
 						isPreviewMode: canvas.isPreview,
+						...( shouldUseUniversalCanvas( canvas )
+							? {
+									// Prototype-only universal canvas mode: content
+									// entities should open with their full template
+									// visible so the user can edit content in
+									// context, while direct design entity routes
+									// continue to use their normal dedicated canvas.
+									defaultRenderingMode: 'template-locked',
+									__experimentalUniversalCanvas: true,
+									__experimentalForceTemplateVisibleOnMount:
+										true,
+							  }
+							: {} ),
 						// The Extensible Site Editor has its own "Choose a
 						// layout" page-creation flow. Core's existing
 						// "Choose a pattern" starter modal is a separate

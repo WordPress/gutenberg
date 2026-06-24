@@ -3188,6 +3188,33 @@ export const __unstableGetVisibleBlocks = createSelector(
 );
 
 export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
+	const blockName = getBlockName( state, clientId );
+	const attributes = getBlockAttributes( state, clientId );
+	const isNavigationOverlayTemplatePart =
+		attributes?.area === 'navigation-overlay' ||
+		attributes?.slug === 'overlay' ||
+		attributes?.slug?.includes( 'overlay' );
+	const isUniversalCanvasTemplateSection =
+		state.settings.__experimentalUniversalCanvas &&
+		getBlockListSettings( state, clientId )?.templateLock === 'contentOnly';
+	const isUniversalCanvasTemplatePart =
+		state.settings.__experimentalUniversalCanvas &&
+		blockName === 'core/template-part' &&
+		! isNavigationOverlayTemplatePart;
+	const isUniversalCanvasGlobalSection =
+		( isUniversalCanvasTemplateSection || isUniversalCanvasTemplatePart ) &&
+		blockName !== 'core/post-content';
+
+	// Universal canvas global sections use the existing block overlay as the
+	// first-click affordance. Keep their inner blocks inert until the section
+	// has explicitly entered content-only editing mode.
+	if (
+		isUniversalCanvasGlobalSection &&
+		getEditedContentOnlySection( state ) !== clientId
+	) {
+		return true;
+	}
+
 	// Prevent overlay on blocks with a non-default editing mode. If the mode is
 	// 'disabled' then the overlay is redundant since the block can't be
 	// selected. If the mode is 'contentOnly' then the overlay is redundant

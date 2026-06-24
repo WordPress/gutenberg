@@ -36,7 +36,9 @@ const BLOCK_INSPECTOR_AREA = 'edit-post/block';
 function TemplatePartNavigationEditButton( { clientId } ) {
 	const registry = useRegistry();
 	const { selectBlock, flashBlock } = useDispatch( blockEditorStore );
-	const { requestInspectorTab } = unlock( useDispatch( blockEditorStore ) );
+	const { editContentOnlySection, requestInspectorTab } = unlock(
+		useDispatch( blockEditorStore )
+	);
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
 	const {
@@ -81,6 +83,7 @@ function TemplatePartNavigationEditButton( { clientId } ) {
 			// InspectorControlsTabs mounts. Without this, the Content tab flashes
 			// before animating to List View.
 			registry.batch( () => {
+				editContentOnlySection( clientId );
 				selectBlock( firstNavigationBlockId );
 				flashBlock( firstNavigationBlockId, 500 );
 				enableComplementaryArea( 'core', BLOCK_INSPECTOR_AREA );
@@ -91,7 +94,9 @@ function TemplatePartNavigationEditButton( { clientId } ) {
 		}
 	}, [
 		firstNavigationBlockId,
+		clientId,
 		registry,
+		editContentOnlySection,
 		selectBlock,
 		flashBlock,
 		enableComplementaryArea,

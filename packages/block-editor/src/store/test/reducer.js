@@ -5114,6 +5114,137 @@ describe( 'state', () => {
 					)
 				);
 			} );
+
+			it( 'keeps nested template parts protected while editing a universal canvas template section, but unlocks them when edited directly', () => {
+				const universalCanvasState = dispatchActions(
+					[
+						{
+							type: 'UPDATE_SETTINGS',
+							settings: {
+								__experimentalUniversalCanvas: true,
+							},
+						},
+						{
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									name: 'core/group',
+									clientId: 'template-section',
+									attributes: {},
+									innerBlocks: [
+										{
+											name: 'core/paragraph',
+											clientId: 'section-paragraph',
+											attributes: {},
+											innerBlocks: [],
+										},
+										{
+											name: 'core/template-part',
+											clientId: 'template-part',
+											attributes: {},
+											innerBlocks: [],
+										},
+									],
+								},
+							],
+						},
+						{
+							type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+							clientId: 'template-part',
+							hasControlledInnerBlocks: true,
+						},
+						{
+							type: 'REPLACE_INNER_BLOCKS',
+							rootClientId: 'template-part',
+							blocks: [
+								{
+									name: 'core/paragraph',
+									clientId: 'template-part-paragraph',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						},
+						{
+							type: 'UPDATE_BLOCK_LIST_SETTINGS',
+							clientId: 'template-section',
+							settings: {
+								templateLock: 'contentOnly',
+							},
+						},
+						{
+							type: 'SET_BLOCK_EDITING_MODE',
+							clientId: '',
+							mode: 'disabled',
+						},
+						{
+							type: 'SET_BLOCK_EDITING_MODE',
+							clientId: 'template-section',
+							mode: 'contentOnly',
+						},
+						{
+							type: 'SET_BLOCK_EDITING_MODE',
+							clientId: 'template-part',
+							mode: 'contentOnly',
+						},
+					],
+					testReducer
+				);
+
+				expect( universalCanvasState.derivedBlockEditingModes ).toEqual(
+					new Map(
+						Object.entries( {
+							'section-paragraph': 'contentOnly',
+							'template-part-paragraph': 'disabled',
+						} )
+					)
+				);
+
+				const editingTemplateSection = dispatchActions(
+					[
+						{
+							type: 'EDIT_CONTENT_ONLY_SECTION',
+							clientId: 'template-section',
+						},
+					],
+					testReducer,
+					universalCanvasState
+				);
+
+				expect(
+					editingTemplateSection.derivedBlockEditingModes
+				).toEqual(
+					new Map(
+						Object.entries( {
+							'': 'disabled',
+							'section-paragraph': 'default',
+							'template-part-paragraph': 'disabled',
+						} )
+					)
+				);
+
+				const editingTemplatePart = dispatchActions(
+					[
+						{
+							type: 'EDIT_CONTENT_ONLY_SECTION',
+							clientId: 'template-part',
+						},
+					],
+					testReducer,
+					universalCanvasState
+				);
+
+				expect( editingTemplatePart.derivedBlockEditingModes ).toEqual(
+					new Map(
+						Object.entries( {
+							'': 'disabled',
+							'template-section': 'disabled',
+							'section-paragraph': 'disabled',
+							'template-part-paragraph': 'default',
+						} )
+					)
+				);
+			} );
 		} );
 
 		describe( 'zoom out mode', () => {

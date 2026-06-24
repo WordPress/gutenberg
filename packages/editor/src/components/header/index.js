@@ -44,6 +44,7 @@ function Header( {
 		hasBlockSelection,
 		hasSectionRootClientId,
 		isStylesCanvasActive,
+		isEditingGlobalSection,
 	} = useSelect( ( select ) => {
 		const { get: getPreference } = select( preferencesStore );
 		const {
@@ -55,9 +56,32 @@ function Header( {
 		const { getStylesPath, getShowStylebook } = unlock(
 			select( editorStore )
 		);
-		const { getBlockSelectionStart, getSectionRootClientId } = unlock(
-			select( blockEditorStore )
-		);
+		const blockEditor = select( blockEditorStore );
+		const {
+			getBlockSelectionStart,
+			getSectionRootClientId,
+			getEditedContentOnlySection,
+		} = unlock( blockEditor );
+		const editedSectionId = getEditedContentOnlySection();
+		const editedSectionName = editedSectionId
+			? blockEditor.getBlockName( editedSectionId )
+			: null;
+		const editedSectionAttributes = editedSectionId
+			? blockEditor.getBlockAttributes( editedSectionId )
+			: null;
+		const isNavigationOverlayTemplatePart =
+			editedSectionAttributes?.area === 'navigation-overlay' ||
+			editedSectionAttributes?.slug === 'overlay' ||
+			editedSectionAttributes?.slug?.includes( 'overlay' );
+		const blockEditorSettings = blockEditor.getSettings();
+		const isUniversalCanvasTemplatePart =
+			blockEditorSettings.__experimentalUniversalCanvas &&
+			editedSectionName === 'core/template-part' &&
+			! isNavigationOverlayTemplatePart;
+		const isUniversalCanvasTemplateSection =
+			blockEditorSettings.__experimentalUniversalCanvas &&
+			blockEditor.getBlockListSettings( editedSectionId )
+				?.templateLock === 'contentOnly';
 
 		return {
 			postId: getCurrentPostId(),
@@ -68,6 +92,11 @@ function Header( {
 			hasFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
 			hasBlockSelection: !! getBlockSelectionStart(),
 			hasSectionRootClientId: !! getSectionRootClientId(),
+			isEditingGlobalSection:
+				!! editedSectionId &&
+				editedSectionName !== 'core/post-content' &&
+				( isUniversalCanvasTemplatePart ||
+					isUniversalCanvasTemplateSection ),
 			isStylesCanvasActive:
 				!! getStylesPath()?.startsWith( '/revisions' ) ||
 				getShowStylebook(),
@@ -89,6 +118,9 @@ function Header( {
 
 	return (
 		<HeaderSkeleton
+			className={
+				isEditingGlobalSection ? 'is-editing-global-section' : null
+			}
 			toolbar={
 				<>
 					<DocumentTools

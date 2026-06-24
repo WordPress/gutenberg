@@ -2764,11 +2764,52 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 			}
 		}
 
+		const parentTemplatePartClientId = findParentInClientIdsList(
+			state,
+			clientId,
+			templatePartClientIds
+		);
+
 		// Set the edited section and all blocks within it to 'default', so that all changes can be made.
 		if ( hasEditedContentOnlySection && isWithinEditedContentOnlySection ) {
+			const editedSectionBlock = state.blocks.byClientId?.get(
+				state.editedContentOnlySection
+			);
+			const isEditingTemplatePart =
+				editedSectionBlock?.name === 'core/template-part';
+			// Prototype universal canvas rule: template parts remain separate
+			// global elements. Editing a wider template section should not unlock
+			// a nested template part; the user must select and edit that shared
+			// element explicitly.
+			if (
+				state.settings?.__experimentalUniversalCanvas &&
+				! isEditingTemplatePart &&
+				( templatePartClientIds.includes( clientId ) ||
+					parentTemplatePartClientId )
+			) {
+				derivedBlockEditingModes.set(
+					clientId,
+					templatePartClientIds.includes( clientId )
+						? 'contentOnly'
+						: 'disabled'
+				);
+				return;
+			}
+
 			derivedBlockEditingModes.set( clientId, 'default' );
 			// When there's an editedContentOnlySection, it overrides any modes that are usually
 			// set for `contentOnlyParents`, return early to prevent continuing to code below.
+			return;
+		}
+
+		// Universal canvas template parts are selected and edited as a whole.
+		// Their descendants should not be selectable until the template part
+		// itself has been explicitly opened for editing.
+		if (
+			state.settings?.__experimentalUniversalCanvas &&
+			parentTemplatePartClientId
+		) {
+			derivedBlockEditingModes.set( clientId, 'disabled' );
 			return;
 		}
 

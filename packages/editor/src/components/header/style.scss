@@ -29,6 +29,19 @@
 	@include break-zoomed-in {
 		flex-wrap: nowrap;
 	}
+
+	&.is-editing-global-section {
+		--wp-admin-theme-color: var(--wp-block-synced-color);
+		--wp-admin-theme-color--rgb: var(--wp-block-synced-color--rgb);
+
+		.editor-document-bar {
+			background: rgba(var(--wp-block-synced-color--rgb), 0.08);
+
+			&:hover {
+				background: rgba(var(--wp-block-synced-color--rgb), 0.12);
+			}
+		}
+	}
 }
 
 .editor-header__back-button {
