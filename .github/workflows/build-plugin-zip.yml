@@ -344,6 +344,9 @@ jobs:
     trigger-wp-npm-publish:
         name: Trigger WP npm package publishing
         needs: publish-to-container-registry
+        permissions:
+            contents: read
+            packages: read
         if: |
             github.ref_type == 'branch' &&
             startsWith( github.ref_name, 'wp/' )
