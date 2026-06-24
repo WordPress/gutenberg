@@ -21,10 +21,8 @@ export default {
 	],
 	'primary-bgFill2': [ 'background-interactive-brand-strong-active' ],
 	'primary-surface4': [ 'background-interactive-brand-weak-active' ],
-	'primary-fgSurface3': [
-		'foreground-interactive-brand',
-		'foreground-interactive-brand-active',
-	],
+	'primary-fgSurface4': [ 'foreground-interactive-brand-active' ],
+	'primary-fgSurface3': [ 'foreground-interactive-brand' ],
 	'primary-stroke3': [
 		'background-thumb-brand',
 		'background-thumb-brand-active',
@@ -67,11 +65,13 @@ export default {
 		'background-interactive-error-weak-active',
 		'background-surface-error',
 	],
-	'error-fgSurface4': [ 'foreground-content-error' ],
+	'error-fgSurface4': [
+		'foreground-content-error',
+		'foreground-interactive-error-active',
+	],
 	'error-fgSurface3': [
 		'foreground-content-error-weak',
 		'foreground-interactive-error',
-		'foreground-interactive-error-active',
 	],
 	'error-stroke3': [
 		'stroke-interactive-error',
@@ -139,4 +139,6 @@ export default {
 	'caution-surface4': [ 'background-surface-caution' ],
 	'caution-fgSurface4': [ 'foreground-content-caution' ],
 	'caution-fgSurface3': [ 'foreground-content-caution-weak' ],
+	'caution-stroke3': [ 'stroke-surface-caution-strong' ],
+	'caution-stroke1': [ 'stroke-surface-caution' ],
 } as Record< string, string[] >;
