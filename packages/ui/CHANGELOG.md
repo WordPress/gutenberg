@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.16.0 (2026-06-24)
+
 ### Breaking Changes
 
 -   `Icon`: The component no longer sets `fill="currentColor"` by default. Icons from `@wordpress/icons` now define how they inherit `currentColor` internally, such as through `fill` or `stroke`. Consumers should tint icons with the CSS `color` property rather than relying on inherited `fill` styles. ([#79320](https://github.com/WordPress/gutenberg/pull/79320))

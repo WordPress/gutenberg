@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 36.0.0 (2026-06-24)
+
 ### Breaking Changes
 
 -   The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed ([#79386](https://github.com/WordPress/gutenberg/pull/79386), [#79419](https://github.com/WordPress/gutenberg/pull/79419)):
