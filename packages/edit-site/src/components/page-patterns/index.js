@@ -12,6 +12,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useView, useViewConfig } from '@wordpress/views';
 import { useSelect } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
+import { patternSyncStatusField } from '@wordpress/fields';
 
 /**
  * Internal dependencies
@@ -26,7 +27,7 @@ import { unlock } from '../../lock-unlock';
 import usePatterns, { useAugmentPatternsWithPermissions } from './use-patterns';
 import PatternsActions from './actions';
 import { useEditPostAction } from '../dataviews-actions';
-import { patternStatusField, previewField } from './fields';
+import { previewField } from './fields';
 import usePatternCategories from '../sidebar-navigation-screen-patterns/use-pattern-categories';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
@@ -115,7 +116,7 @@ export default function DataviewsPatterns() {
 		const _fields = [ previewField, patternTitleField ];
 
 		if ( postType === PATTERN_TYPES.user ) {
-			_fields.push( patternStatusField );
+			_fields.push( patternSyncStatusField );
 		} else if (
 			postType === TEMPLATE_PART_POST_TYPE &&
 			templatePartAuthorField
