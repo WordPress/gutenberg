@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/widget-primitives",
-	"version": "0.1.0-prerelease",
+	"version": "0.1.0",
 	"description": "Host-agnostic toolkit for dashboard widgets: the widget contract types, the discovery hook, and the render entry point.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

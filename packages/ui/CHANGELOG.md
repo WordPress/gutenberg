@@ -2,8 +2,15 @@
 
 ## Unreleased
 
+## 0.16.0 (2026-06-24)
+
+### Breaking Changes
+
+-   `Icon`: The component no longer sets `fill="currentColor"` by default. Icons from `@wordpress/icons` now define how they inherit `currentColor` internally, such as through `fill` or `stroke`. Consumers should tint icons with the CSS `color` property rather than relying on inherited `fill` styles. ([#79320](https://github.com/WordPress/gutenberg/pull/79320))
+
 ### Enhancements
 
+-   Focus ring utilities: Remove the shared outline transition so focus ring styles are not accidentally overridden by component transitions ([#78823](https://github.com/WordPress/gutenberg/pull/78823)).
 -   `Field.Description`: Apply `text-wrap: pretty` to description text to avoid typographic widows ([#79143](https://github.com/WordPress/gutenberg/pull/79143)).
 -   `Autocomplete`: Add `Autocomplete.Group` and `Autocomplete.GroupLabel` subcomponents ([#78901](https://github.com/WordPress/gutenberg/pull/78901)).
 
@@ -15,8 +22,11 @@
 
 ### Bug Fixes
 
+-   Avoid React SSR warnings from layout effects in `@wordpress/ui` hooks and stories ([#79458](https://github.com/WordPress/gutenberg/pull/79458)).
+-   `Popover`: Disable popup transitions when Base UI marks animations as instant ([#79432](https://github.com/WordPress/gutenberg/pull/79432)).
 -   `Button`: Fix `loading` state in forced colors mode ([#78820](https://github.com/WordPress/gutenberg/pull/78820)).
 -   `Button`: Fix `loading` prop affecting `unstyled` variant ([#78820](https://github.com/WordPress/gutenberg/pull/78820)).
+-   Remove usage of private APIs, which previously caused conflicts for some consumers ([#78958](https://github.com/WordPress/gutenberg/pull/78958)).
 
 ### Internal
 

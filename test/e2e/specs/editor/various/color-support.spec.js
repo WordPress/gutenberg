@@ -22,7 +22,7 @@ test.describe( 'Link color in themes', () => {
 
 		await editor.openDocumentSettingsSidebar();
 
-		await page.getByRole( 'button', { name: 'Color options' } ).click();
+		await page.getByRole( 'button', { name: 'Elements options' } ).click();
 
 		await page
 			.getByRole( 'menuitemcheckbox', { name: 'Show Link' } )
