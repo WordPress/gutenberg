@@ -186,9 +186,9 @@ test.describe( 'Unsynced pattern', () => {
 			'aria-disabled',
 			'true'
 		);
-		await expect( namedGroup.locator( 'a' ) ).not.toHaveAttribute(
+		await expect( namedGroup.locator( 'a' ) ).toHaveAttribute(
 			'href',
-			/.+/
+			/#block-/
 		);
 
 		// Assert that content blocks are present in List View.

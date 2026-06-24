@@ -42,13 +42,8 @@
 			color: inherit;
 		}
 
-		&[aria-disabled="true"] {
-			color: $gray-700;
-			cursor: default;
-		}
-
 		// Ensure that on hover, the admin color is still used.
-		&:hover:not([aria-disabled="true"]) {
+		&:hover {
 			color: var(--wp-admin-theme-color);
 		}
 

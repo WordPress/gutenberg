@@ -92,9 +92,6 @@ function ListViewBlockSelectButton(
 	}
 
 	return (
-		// Disabled grouping rows intentionally omit `href` while remaining
-		// focusable via TreeGrid's roving `tabIndex`.
-		// eslint-disable-next-line jsx-a11y/anchor-is-valid
 		<a
 			className={ clsx(
 				'block-editor-list-view-block-select-button',
@@ -110,7 +107,7 @@ function ListViewBlockSelectButton(
 			onDragStart={ onDragStartHandler }
 			onDragEnd={ onDragEnd }
 			draggable={ draggable }
-			href={ isDisabled ? undefined : `#block-${ clientId }` }
+			href={ `#block-${ clientId }` }
 			aria-disabled={ isDisabled ? true : undefined }
 			aria-describedby={ ariaDescribedBy }
 			aria-expanded={ isExpanded }
