@@ -48,7 +48,6 @@ export type BorderBoxControlProps = ColorProps &
 		/**
 		 * Size of the control.
 		 *
-		 * @default 'default'
 		 * @deprecated This prop no longer has any effect.
 		 * @ignore
 		 */
