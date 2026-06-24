@@ -1066,4 +1066,93 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 
 		$this->assertSame( '.first{color: red;color: blue;margin: 0;}.second{display: flex;}@media (min-width: 600px){.third{display: grid;}}', $compiled_css );
 	}
+
+	/**
+	 * Tests that CSS variable declarations can be generated from nested values.
+	 *
+	 * @covers WP_Style_Engine_CSS_Variables_Gutenberg::get_declarations_from_values
+	 */
+	public function test_css_variables_generates_declarations_from_nested_values() {
+		$declarations = WP_Style_Engine_CSS_Variables_Gutenberg::get_declarations_from_values(
+			array(
+				'lineHeight'   => array(
+					'small' => '1.2',
+				),
+				'spacing/unit' => 'rem',
+			),
+			array( 'prefix' => '--wp--custom--' )
+		);
+
+		$this->assertSame(
+			array(
+				array(
+					'name'  => '--wp--custom--line-height--small',
+					'value' => '1.2',
+				),
+				array(
+					'name'  => '--wp--custom--spacing-unit',
+					'value' => 'rem',
+				),
+			),
+			$declarations
+		);
+	}
+
+	/**
+	 * Tests that CSS variable rules preserve selector and declaration order.
+	 *
+	 * @covers WP_Style_Engine_CSS_Variables_Gutenberg
+	 */
+	public function test_css_variables_builds_selector_scoped_rules() {
+		$css_variables = new WP_Style_Engine_CSS_Variables_Gutenberg();
+
+		$css_variables
+			->add_declaration( ':root', '--wp--preset--color--primary', '#ffffff' )
+			->add_declarations_from_values(
+				':root',
+				array(
+					'lineHeight' => array(
+						'small' => '1.2',
+					),
+				),
+				array( 'prefix' => '--wp--custom--' )
+			)
+			->add_declarations(
+				'.wp-block-test',
+				array(
+					array(
+						'name'  => '--wp--preset--dimension--25',
+						'value' => '25%',
+					),
+				)
+			);
+
+		$this->assertSame(
+			array(
+				array(
+					'selector'     => ':root',
+					'declarations' => array(
+						array(
+							'name'  => '--wp--preset--color--primary',
+							'value' => '#ffffff',
+						),
+						array(
+							'name'  => '--wp--custom--line-height--small',
+							'value' => '1.2',
+						),
+					),
+				),
+				array(
+					'selector'     => '.wp-block-test',
+					'declarations' => array(
+						array(
+							'name'  => '--wp--preset--dimension--25',
+							'value' => '25%',
+						),
+					),
+				),
+			),
+			$css_variables->get_rules()
+		);
+	}
 }
