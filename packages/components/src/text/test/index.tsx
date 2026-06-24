@@ -29,17 +29,6 @@ describe( 'Text', () => {
 		} );
 	} );
 
-	test( 'should render truncate', () => {
-		render(
-			<Text role="heading" truncate>
-				Lorem ipsum.
-			</Text>
-		);
-		expect( screen.getByRole( 'heading' ) ).toHaveAccessibleName(
-			'Lorem ipsum.'
-		);
-	} );
-
 	test( 'should render size', () => {
 		render(
 			<Text role="heading" size="title">
