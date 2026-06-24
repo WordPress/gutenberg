@@ -162,9 +162,7 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 		// Pullquote: click into quote text, select all, type.
 		await clearAndType(
 			page2,
-			editor2.canvas.locator(
-				'[data-type="core/pullquote"] blockquote p'
-			),
+			editor2.canvas.locator( '[data-type="core/pullquote"] aside p' ),
 			'Edited quote'
 		);
 

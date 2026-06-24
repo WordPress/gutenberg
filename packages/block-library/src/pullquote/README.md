@@ -49,9 +49,9 @@ This is a [**static block**](https://developer.wordpress.org/block-editor/gettin
 ```html
 <!-- wp:core/pullquote -->
 <figure class="wp-block-pullquote">
-    <blockquote>
+    <aside>
     <p>Testing pullquote block...</p><cite>...with a caption</cite>
-    </blockquote>
+    </aside>
 </figure>
 <!-- /wp:core/pullquote -->
 ```

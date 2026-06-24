@@ -277,7 +277,7 @@ test.describe( 'Quote', () => {
 		await editor.transformBlockTo( 'core/pullquote' );
 		expect( await editor.getEditedPostContent() ).toBe(
 			`<!-- wp:pullquote -->
-<figure class="wp-block-pullquote"><blockquote><p>one<br>two</p><cite>cite</cite></blockquote></figure>
+<figure class="wp-block-pullquote"><aside><p>one<br>two</p><cite>cite</cite></aside></figure>
 <!-- /wp:pullquote -->`
 		);
 	} );

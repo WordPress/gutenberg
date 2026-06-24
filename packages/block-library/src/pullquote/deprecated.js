@@ -69,6 +69,104 @@ function multilineToInline( value ) {
 	return values.join( '<br>' );
 }
 
+// Pull quotes are paratextual, not quotations, so the wrapper element changed
+// from <blockquote> to <aside>. Content saved with the old <blockquote> markup
+// validates through this deprecation and migrates on the next edit. Attributes
+// are unchanged (value/citation still source from <p>/<cite>).
+const v7 = {
+	attributes: {
+		value: {
+			type: 'rich-text',
+			source: 'rich-text',
+			selector: 'p',
+			role: 'content',
+		},
+		citation: {
+			type: 'rich-text',
+			source: 'rich-text',
+			selector: 'cite',
+			role: 'content',
+		},
+	},
+	supports: {
+		anchor: true,
+		align: [ 'left', 'right', 'wide', 'full' ],
+		background: {
+			backgroundImage: true,
+			backgroundSize: true,
+			__experimentalDefaultControls: {
+				backgroundImage: true,
+			},
+		},
+		color: {
+			gradients: true,
+			background: true,
+			link: true,
+			__experimentalDefaultControls: {
+				background: true,
+				text: true,
+			},
+		},
+		dimensions: {
+			minHeight: true,
+		},
+		spacing: {
+			margin: true,
+			padding: true,
+		},
+		typography: {
+			fontSize: true,
+			lineHeight: true,
+			textAlign: true,
+			__experimentalFontFamily: true,
+			__experimentalFontWeight: true,
+			__experimentalFontStyle: true,
+			__experimentalTextTransform: true,
+			__experimentalTextDecoration: true,
+			__experimentalLetterSpacing: true,
+			__experimentalDefaultControls: {
+				fontSize: true,
+			},
+		},
+		__experimentalBorder: {
+			color: true,
+			radius: true,
+			style: true,
+			width: true,
+			__experimentalDefaultControls: {
+				color: true,
+				radius: true,
+				style: true,
+				width: true,
+			},
+		},
+		__experimentalStyle: {
+			typography: {
+				fontSize: '1.5em',
+				lineHeight: '1.6',
+			},
+		},
+		interactivity: {
+			clientNavigation: true,
+		},
+	},
+	save( { attributes } ) {
+		const { citation, value } = attributes;
+		const shouldShowCitation = ! RichText.isEmpty( citation );
+
+		return (
+			<figure { ...useBlockProps.save() }>
+				<blockquote>
+					<RichText.Content tagName="p" value={ value } />
+					{ shouldShowCitation && (
+						<RichText.Content tagName="cite" value={ citation } />
+					) }
+				</blockquote>
+			</figure>
+		);
+	},
+};
+
 const v6 = {
 	attributes: {
 		value: {
@@ -755,4 +853,4 @@ const v0 = {
  *
  * See block-deprecation.md
  */
-export default [ v6, v5, v4, v3, v2, v1, v0 ];
+export default [ v7, v6, v5, v4, v3, v2, v1, v0 ];

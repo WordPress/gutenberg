@@ -9,12 +9,12 @@ export default function save( { attributes } ) {
 
 	return (
 		<figure { ...useBlockProps.save() }>
-			<blockquote>
+			<aside>
 				<RichText.Content tagName="p" value={ value } />
 				{ shouldShowCitation && (
 					<RichText.Content tagName="cite" value={ citation } />
 				) }
-			</blockquote>
+			</aside>
 		</figure>
 	);
 }
