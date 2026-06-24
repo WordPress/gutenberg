@@ -159,7 +159,7 @@ const restrictedSyntax = [
 		selector: 'JSXAttribute[name.name="__nextHasNoMarginBottom"]',
 		message: 'The `__nextHasNoMarginBottom` prop is no longer needed.',
 	},
-	...[ 'BoxControl', 'TextControl' ].map( ( componentName ) => ( {
+	...[ 'BoxControl', 'TextControl', 'FocalPointPicker' ].map( ( componentName ) => ( {
 		selector: `JSXElement[openingElement.name.name="${ componentName }"] JSXAttribute[name.name="__next40pxDefaultSize"]`,
 		message: `The \`__next40pxDefaultSize\` prop is no longer needed on \`${ componentName }\`.`,
 	} ) ),
