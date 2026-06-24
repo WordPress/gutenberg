@@ -22,6 +22,8 @@ import PostSavedState from '../post-saved-state';
 import PostViewLink from '../post-view-link';
 import PreviewDropdown from '../preview-dropdown';
 import ZoomOutToggle from '../zoom-out-toggle';
+import InlineGlobalEntitySaveButton from './inline-global-entity-save-button';
+import useActiveEditorEntity from '../use-active-editor-entity';
 import { store as editorStore } from '../../store';
 import { CollaboratorsPresence } from '../collaborators-presence/index';
 import { unlock } from '../../lock-unlock';
@@ -34,9 +36,9 @@ function Header( {
 	const isWideViewport = useViewportMatch( 'large' );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isTooNarrowForDocumentBar = useMediaQuery( '(max-width: 403px)' );
+	const activeEntity = useActiveEditorEntity();
+	const { postId, postType, isInlineGlobalEntity } = activeEntity;
 	const {
-		postId,
-		postType,
 		isTextEditor,
 		isPublishSidebarOpened,
 		showIconLabels,
@@ -49,8 +51,6 @@ function Header( {
 		const { get: getPreference } = select( preferencesStore );
 		const {
 			getEditorMode,
-			getCurrentPostType,
-			getCurrentPostId,
 			isPublishSidebarOpened: _isPublishSidebarOpened,
 		} = select( editorStore );
 		const { getStylesPath, getShowStylebook } = unlock(
@@ -84,8 +84,6 @@ function Header( {
 				?.templateLock === 'contentOnly';
 
 		return {
-			postId: getCurrentPostId(),
-			postType: getCurrentPostType(),
 			isTextEditor: getEditorMode() === 'text',
 			isPublishSidebarOpened: _isPublishSidebarOpened(),
 			showIconLabels: getPreference( 'core', 'showIconLabels' ),
@@ -156,27 +154,37 @@ function Header( {
 						/>
 					) }
 					{ ! customSaveButton && ! isPublishSidebarOpened && (
-						/*
-						 * This button isn't completely hidden by the publish sidebar.
-						 * We can't hide the whole toolbar when the publish sidebar is open because
-						 * we want to prevent mounting/unmounting the PostPublishButtonOrToggle DOM node.
-						 * We track that DOM node to return focus to the PostPublishButtonOrToggle
-						 * when the publish sidebar has been closed.
-						 */
-						<PostSavedState forceIsDirty={ forceIsDirty } />
+						<>
+							{ isInlineGlobalEntity ? (
+								<InlineGlobalEntitySaveButton
+									activeEntity={ activeEntity }
+								/>
+							) : (
+								/*
+								 * This button isn't completely hidden by the publish sidebar.
+								 * We can't hide the whole toolbar when the publish sidebar is open because
+								 * we want to prevent mounting/unmounting the PostPublishButtonOrToggle DOM node.
+								 * We track that DOM node to return focus to the PostPublishButtonOrToggle
+								 * when the publish sidebar has been closed.
+								 */
+								<PostSavedState forceIsDirty={ forceIsDirty } />
+							) }
+						</>
 					) }
 
-					<PostViewLink />
+					{ ! isInlineGlobalEntity && <PostViewLink /> }
 
 					<PreviewDropdown
 						forceIsAutosaveable={ forceIsDirty }
 						disabled={ isStylesCanvasActive }
 					/>
 
-					<PostPreviewButton
-						className="editor-header__post-preview-button"
-						forceIsAutosaveable={ forceIsDirty }
-					/>
+					{ ! isInlineGlobalEntity && (
+						<PostPreviewButton
+							className="editor-header__post-preview-button"
+							forceIsAutosaveable={ forceIsDirty }
+						/>
+					) }
 
 					{ isWideViewport && canBeZoomedOut && (
 						<ZoomOutToggle disabled={ isStylesCanvasActive } />
@@ -186,7 +194,7 @@ function Header( {
 						<PinnedItems.Slot scope="core" />
 					) }
 
-					{ ! customSaveButton && (
+					{ ! customSaveButton && ! isInlineGlobalEntity && (
 						<PostPublishButtonOrToggle
 							forceIsDirty={ forceIsDirty }
 							setEntitiesSavedStatesCallback={

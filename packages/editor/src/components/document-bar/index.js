@@ -16,7 +16,7 @@ import {
 } from '@wordpress/components';
 import { BlockIcon, store as blockEditorStore } from '@wordpress/block-editor';
 import { chevronLeftSmall, chevronRightSmall, layout } from '@wordpress/icons';
-import { store as coreStore } from '@wordpress/core-data';
+import { displayShortcut } from '@wordpress/keycodes';
 import { store as commandsStore } from '@wordpress/commands';
 import { useRef, useEffect } from '@wordpress/element';
 import { useReducedMotion } from '@wordpress/compose';
@@ -29,10 +29,10 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { TEMPLATE_POST_TYPES } from '../../store/constants';
 import { store as editorStore } from '../../store';
 import usePageTypeBadge from '../../utils/pageTypeBadge';
-import { getTemplateInfo } from '../../utils/get-template-info';
 import { getStylesCanvasTitle } from '../styles-canvas';
 import { unlock } from '../../lock-unlock';
 import useEditedSectionDetails from './useEditedSectionDetails';
+import useActiveEditorEntity from '../use-active-editor-entity';
 
 /** @typedef {import("@wordpress/components").IconType} IconType */
 
@@ -63,47 +63,23 @@ export default function DocumentBar( props ) {
 
 	// Get details about the currently edited content-only section
 	const unlockedPatternInfo = useEditedSectionDetails();
-
+	const activeEntity = useActiveEditorEntity();
 	const {
 		postId,
 		postType,
 		postTypeLabel,
-		documentTitle,
+		record,
 		isNotFound,
 		templateTitle,
+		isInlineGlobalEntity,
+	} = activeEntity;
+
+	const {
 		onNavigateToPreviousEntityRecord,
 		isTemplatePreview,
 		stylesCanvasTitle,
 	} = useSelect( ( select ) => {
-		const {
-			getCurrentPostType,
-			getCurrentPostId,
-			getEditorSettings,
-			getRenderingMode,
-		} = select( editorStore );
-
-		const {
-			getEditedEntityRecord,
-			getPostType,
-			getCurrentTheme,
-			isResolving: isResolvingSelector,
-		} = select( coreStore );
-		const _postType = getCurrentPostType();
-		const _postId = getCurrentPostId();
-		const _document = getEditedEntityRecord(
-			'postType',
-			_postType,
-			_postId
-		);
-
-		const { default_template_types: templateTypes = [] } =
-			getCurrentTheme() ?? {};
-
-		const _templateInfo = getTemplateInfo( {
-			templateTypes,
-			template: _document,
-		} );
-		const _postTypeLabel = getPostType( _postType )?.labels?.singular_name;
+		const { getEditorSettings, getRenderingMode } = select( editorStore );
 
 		// Check if styles canvas is active and get its title
 		const { getStylesPath, getShowStylebook } = unlock(
@@ -117,19 +93,6 @@ export default function DocumentBar( props ) {
 		);
 
 		return {
-			postId: _postId,
-			postType: _postType,
-			postTypeLabel: _postTypeLabel,
-			documentTitle: _document.title,
-			isNotFound:
-				! _document &&
-				! isResolvingSelector(
-					'getEditedEntityRecord',
-					'postType',
-					_postType,
-					_postId
-				),
-			templateTitle: _templateInfo.title,
 			onNavigateToPreviousEntityRecord:
 				getEditorSettings().onNavigateToPreviousEntityRecord,
 			isTemplatePreview: getRenderingMode() === 'template-locked',
@@ -143,7 +106,7 @@ export default function DocumentBar( props ) {
 	const isTemplate = TEMPLATE_POST_TYPES.includes( postType );
 	const hasBackButton =
 		!! onNavigateToPreviousEntityRecord || !! unlockedPatternInfo;
-	const entityTitle = isTemplate ? templateTitle : documentTitle;
+	const entityTitle = isTemplate ? templateTitle : record?.title;
 
 	// Use pattern info if a pattern block is unlocked, otherwise use document/entity info
 	const title =
@@ -163,7 +126,9 @@ export default function DocumentBar( props ) {
 		}
 	};
 
-	const pageTypeBadge = usePageTypeBadge( postId );
+	const pageTypeBadge = usePageTypeBadge(
+		isInlineGlobalEntity ? undefined : postId
+	);
 
 	const mountedRef = useRef( false );
 	useEffect( () => {

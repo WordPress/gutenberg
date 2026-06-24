@@ -21,6 +21,7 @@ import PluginDocumentSettingPanel from '../plugin-document-setting-panel';
 import PluginSidebar from '../plugin-sidebar';
 import PostSummary from './post-summary';
 import PostRevisionSummary from './post-revision-summary';
+import InlineTemplatePartSummary from './inline-template-part-summary';
 import PostTaxonomiesPanel from '../post-taxonomies/panel';
 import PostTransformPanel from '../post-transform-panel';
 import SidebarHeader from './header';
@@ -32,6 +33,7 @@ import useAutoSwitchEditorSidebars from '../provider/use-auto-switch-editor-side
 import { sidebars } from './constants';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
+import useActiveEditorEntity from '../use-active-editor-entity';
 import {
 	NAVIGATION_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
@@ -48,6 +50,7 @@ const SidebarContent = ( {
 	onActionPerformed,
 	extraPanels,
 	postType,
+	activeEntity,
 } ) => {
 	const tabListRef = useRef( null );
 	// Because `PluginSidebar` renders a `ComplementaryArea`, we
@@ -88,6 +91,16 @@ const SidebarContent = ( {
 	let tabContent;
 	if ( isRevisionsMode ) {
 		tabContent = <PostRevisionSummary />;
+	} else if ( activeEntity.isInlineTemplatePart ) {
+		tabContent = (
+			<>
+				<InlineTemplatePartSummary
+					activeEntity={ activeEntity }
+					onActionPerformed={ onActionPerformed }
+				/>
+				<TemplatePartContentPanel postType={ activeEntity.postType } />
+			</>
+		);
 	} else {
 		tabContent = (
 			<>
@@ -112,7 +125,10 @@ const SidebarContent = ( {
 			identifier={ tabName }
 			header={
 				<Tabs.Context.Provider value={ tabsContextValue }>
-					<SidebarHeader ref={ tabListRef } />
+					<SidebarHeader
+						ref={ tabListRef }
+						documentLabel={ activeEntity.postTypeLabel }
+					/>
 				</Tabs.Context.Provider>
 			}
 			closeLabel={ __( 'Close Settings' ) }
@@ -144,6 +160,7 @@ const SidebarContent = ( {
 
 const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 	useAutoSwitchEditorSidebars();
+	const activeEntity = useActiveEditorEntity();
 	const { tabName, keyboardShortcut, showSummary, postType } = useSelect(
 		( select ) => {
 			const shortcut = select(
@@ -165,8 +182,6 @@ const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 					: sidebars.document;
 			}
 
-			const _postType = select( editorStore ).getCurrentPostType();
-
 			return {
 				tabName: _tabName,
 				keyboardShortcut: shortcut,
@@ -174,11 +189,11 @@ const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 					TEMPLATE_POST_TYPE,
 					TEMPLATE_PART_POST_TYPE,
 					NAVIGATION_POST_TYPE,
-				].includes( _postType ),
-				postType: _postType,
+				].includes( activeEntity.postType ),
+				postType: activeEntity.postType,
 			};
 		},
-		[]
+		[ activeEntity.postType ]
 	);
 
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
@@ -205,6 +220,7 @@ const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 				onActionPerformed={ onActionPerformed }
 				extraPanels={ extraPanels }
 				postType={ postType }
+				activeEntity={ activeEntity }
 			/>
 		</Tabs>
 	);

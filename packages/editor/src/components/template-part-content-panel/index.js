@@ -49,11 +49,14 @@ function TemplatePartContentPanelInner() {
 	);
 }
 
-export default function TemplatePartContentPanel() {
-	const postType = useSelect( ( select ) => {
+export default function TemplatePartContentPanel( {
+	postType: postTypeOverride,
+} = {} ) {
+	const currentPostType = useSelect( ( select ) => {
 		const { getCurrentPostType } = select( editorStore );
 		return getCurrentPostType();
 	}, [] );
+	const postType = postTypeOverride || currentPostType;
 	if ( postType !== TEMPLATE_PART_POST_TYPE ) {
 		return null;
 	}
