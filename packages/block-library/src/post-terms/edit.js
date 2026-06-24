@@ -65,7 +65,6 @@ export default function PostTermsEdit( {
 		<>
 			<InspectorControls group="advanced">
 				<TextControl
-					__next40pxDefaultSize
 					autoComplete="off"
 					label={ __( 'Separator' ) }
 					value={ separator || '' }

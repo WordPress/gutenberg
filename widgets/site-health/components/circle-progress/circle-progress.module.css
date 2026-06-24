@@ -1,7 +1,8 @@
 .root {
 	flex-shrink: 0;
-	width: calc(var(--wpds-dimension-base) * 17);
-	height: calc(var(--wpds-dimension-base) * 17);
+	/* TODO: Replace with a --wpds-dimension-size-* token if 64px is added to the WPDS element size scale. */
+	width: 64px;
+	height: 64px;
 }
 
 .root.success {

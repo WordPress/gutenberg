@@ -1,16 +1,9 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
-import { __experimentalHStack as HStack } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
-import { useState, useMemo, useId } from '@wordpress/element';
+import { useMemo, useId } from '@wordpress/element';
 import { BlockPreview } from '@wordpress/block-editor';
-import { Icon } from '@wordpress/icons';
 import { parse } from '@wordpress/blocks';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
@@ -22,7 +15,6 @@ import {
 	PATTERN_SYNC_TYPES,
 	OPERATOR_IS,
 } from '../../utils/constants';
-import { useAddedBy } from '../page-templates/hooks';
 import { unlock } from '../../lock-unlock';
 
 const { useStyle } = unlock( editorPrivateApis );
@@ -116,43 +108,4 @@ export const patternStatusField = {
 		isPrimary: true,
 	},
 	enableSorting: false,
-};
-
-function AuthorField( { item } ) {
-	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
-	const { text, icon, imageUrl } = useAddedBy( item.type, item.id );
-
-	return (
-		<HStack alignment="left" spacing={ 0 }>
-			{ imageUrl && (
-				<div
-					className={ clsx( 'fields-controls__author-avatar', {
-						'is-loaded': isImageLoaded,
-					} ) }
-				>
-					<img
-						onLoad={ () => setIsImageLoaded( true ) }
-						alt=""
-						src={ imageUrl }
-					/>
-				</div>
-			) }
-			{ ! imageUrl && (
-				<div className="fields-controls__author-icon">
-					<Icon icon={ icon } />
-				</div>
-			) }
-			<span className="fields-controls__author-name">{ text }</span>
-		</HStack>
-	);
-}
-
-export const templatePartAuthorField = {
-	label: __( 'Author' ),
-	id: 'author',
-	getValue: ( { item } ) => item.author_text,
-	render: AuthorField,
-	filterBy: {
-		isPrimary: true,
-	},
 };
