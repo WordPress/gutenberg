@@ -48,7 +48,7 @@ Either way the host never interprets the values. It mounts the form from the dec
 
 ![The attributes are a contract both sides write: the render module reads them to produce the output, the widget asks for changes through setAttributes, and the host edits them through a settings form. The meaning stays the widget's.](./assets/representation.svg)
 
-The `WidgetRender` stories show both: Default, where the widget asks, and With Settings, where the host edits.
+The `WidgetRender` stories show these in motion: Default, where the widget asks; With Settings, where the host edits; and With Host Chrome, where the host frames it.
 
 ## Why the split matters
 
