@@ -10,8 +10,8 @@ import {
 	type VNode,
 	type RefObject,
 } from 'preact';
-import { useContext, useLayoutEffect, useMemo, useRef } from 'preact/hooks';
-import { signal, type Signal } from '@preact/signals';
+import { useContext, useMemo, useRef } from 'preact/hooks';
+import { signal, useSignal, type Signal } from '@preact/signals';
 
 /**
  * Internal dependencies
@@ -33,7 +33,7 @@ import {
 	type DirectiveCallback,
 	type DirectiveEntry,
 } from './hooks';
-import { getScope, navigationContextSignal } from './scopes';
+import { getScope } from './scopes';
 import { proxifyState, proxifyContext, deepMerge } from './proxies';
 import { PENDING_GETTER } from './proxies/state';
 
@@ -370,9 +370,10 @@ export default () => {
 				useContext( inheritedContext );
 			const client = useRef( {} );
 			const server = {};
+			const serverSignal = useSignal( {} );
 			const result = {
 				client: { ...inheritedClient },
-				server: { ...inheritedServer },
+				server: { ...inheritedServer.peek() },
 			};
 			const namespaces = new Set< string >();
 
@@ -417,11 +418,17 @@ export default () => {
 				);
 				result.server[ namespace ] = proxifyContext(
 					server[ namespace ],
-					inheritedServer[ namespace ]
+					inheritedServer.peek()[ namespace ]
 				);
 			} );
 
-			return createElement( Provider, { value: result }, children );
+			serverSignal.value = result.server;
+
+			return createElement(
+				Provider,
+				{ value: { client: result.client, server: serverSignal } },
+				children
+			);
 		},
 		{ priority: 5 }
 	);
@@ -1026,20 +1033,12 @@ export default () => {
 			// Get the content of this router region.
 			const vdom = routerRegions.get( regionId )!.value;
 
-			// Triggers an invalidation after the directive data-wp-context has
-			// been evaluated and the value of the server context has changed.
-			useLayoutEffect( () => {
-				if ( vdom && typeof vdom.type !== 'string' ) {
-					navigationContextSignal.value =
-						navigationContextSignal.peek() + 1;
-				}
-			}, [ vdom ] );
-
 			if ( vdom && typeof vdom.type !== 'string' ) {
 				// The scope needs to be injected.
 				const previousScope = getScope();
 				return cloneElement( vdom, { previousScope } );
 			}
+
 			return vdom;
 		},
 		{ priority: 1 }

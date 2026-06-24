@@ -2,7 +2,6 @@
  * External dependencies
  */
 import type { h as createElement, RefObject } from 'preact';
-import { signal } from '@preact/signals';
 
 /**
  * Internal dependencies
@@ -83,8 +82,6 @@ export const getElement = () => {
 	} );
 };
 
-export const navigationContextSignal = signal( 0 );
-
 /**
  * Gets the context defined and updated from the server.
  *
@@ -126,10 +123,7 @@ export function getServerContext< T extends object >( namespace?: string ): T {
 		}
 	}
 
-	// Accesses the signal to make this reactive. It assigns it to `subscribe`
-	// to prevent the JavaScript minifier from removing this line.
-	getServerContext.subscribe = navigationContextSignal.value;
-
-	return deepClone( scope.serverContext[ namespace || getNamespace() ] );
+	return deepClone(
+		( scope.serverContext as any ).value[ namespace || getNamespace() ]
+	);
 }
-getServerContext.subscribe = 0;
