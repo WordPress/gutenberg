@@ -132,7 +132,7 @@
 			"count": 2
 		}
 	},
-	"packages/block-editor/src/components/global-styles/color-panel.js": {
+	"packages/block-editor/src/components/global-styles/color-gradient-dropdown-item.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
 		}
