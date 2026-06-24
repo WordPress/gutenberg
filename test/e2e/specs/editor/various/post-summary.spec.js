@@ -76,26 +76,25 @@ test.describe( 'Post Summary', () => {
 				const summary = await openPatternSummary( { editor, page } );
 				const fields = getPatternSummaryFields( { page, summary } );
 
-				await expect( fields.description ).toContainText(
+				await expect( fields.description.control ).toHaveText(
 					INITIAL_DESCRIPTION
 				);
 				await expect( fields.descriptionTextbox ).toHaveCount( 0 );
 
-				await fields.editDescriptionButton.click();
+				await fields.description.editButton.click();
 				await expect( fields.descriptionTextbox ).toBeVisible();
 				await fields.descriptionTextbox.fill( UPDATED_DESCRIPTION );
 				await page.keyboard.press( 'Escape' );
-				await expect( fields.description ).toContainText(
+				await expect( fields.description.control ).toHaveText(
 					UPDATED_DESCRIPTION
 				);
 
-				await expect( fields.contentInfo ).toContainText(
-					/Last edited/
+				await expect( fields.revisions.root ).toBeVisible();
+				await expect( fields.syncStatus.control ).toHaveText(
+					'Not synced'
 				);
-				await expect( fields.revisions ).toBeVisible();
-				await expect( fields.syncStatus ).toContainText( 'Not synced' );
 				await expect(
-					fields.syncStatus.getByRole( 'button' )
+					fields.syncStatus.root.getByRole( 'button' )
 				).toHaveCount( 0 );
 
 				await savePattern( { editor, page } );
@@ -109,8 +108,8 @@ test.describe( 'Post Summary', () => {
 					getPatternSummaryFields( {
 						page,
 						summary: reloadedSummary,
-					} ).description
-				).toContainText( UPDATED_DESCRIPTION );
+					} ).description.control
+				).toHaveText( UPDATED_DESCRIPTION );
 			} );
 		}
 
@@ -136,8 +135,8 @@ test.describe( 'Post Summary', () => {
 			const summary = await openPatternSummary( { editor, page } );
 			const fields = getPatternSummaryFields( { page, summary } );
 
-			await expect( fields.title ).toContainText( title );
-			await expect( fields.syncStatus ).toContainText( 'Synced' );
+			await expect( fields.title ).toHaveText( title );
+			await expect( fields.syncStatus.control ).toHaveText( 'Synced' );
 		} );
 
 		test( 'shows title and sync status while creating a new unsynced pattern in the post editor', async ( {
@@ -166,8 +165,10 @@ test.describe( 'Post Summary', () => {
 			const summary = await openPatternSummary( { editor, page } );
 			const fields = getPatternSummaryFields( { page, summary } );
 
-			await expect( fields.title ).toContainText( title );
-			await expect( fields.syncStatus ).toContainText( 'Not synced' );
+			await expect( fields.title ).toHaveText( title );
+			await expect( fields.syncStatus.control ).toHaveText(
+				'Not synced'
+			);
 		} );
 	} );
 } );
@@ -206,21 +207,17 @@ async function openPatternSummary( { editor, page } ) {
 	} );
 	await settingsSidebar.getByRole( 'tab', { name: 'Pattern' } ).click();
 
-	const summary = settingsSidebar.locator( '.editor-post-summary' );
+	const summary = page.locator( '.editor-post-summary' );
 	await expect( summary ).toBeVisible();
 
 	return summary;
 }
 
 function getPatternSummaryFields( { page, summary } ) {
-	const panelFields = summary.locator(
-		'.dataforms-layouts-panel__field-trigger'
-	);
-	const regularFields = summary.locator(
-		'.dataforms-layouts-regular__field'
-	);
-	const description = panelFields.filter( {
-		has: page.getByRole( 'button', { name: 'Edit Description' } ),
+	const description = getPanelSummaryField( {
+		page,
+		summary,
+		label: 'Description',
 	} );
 
 	return {
@@ -229,13 +226,50 @@ function getPatternSummaryFields( { page, summary } ) {
 		descriptionTextbox: page.getByRole( 'textbox', {
 			name: 'Description',
 		} ),
-		editDescriptionButton: description.getByRole( 'button', {
-			name: 'Edit Description',
+		revisions: getPanelSummaryField( {
+			page,
+			summary,
+			label: 'Revisions',
 		} ),
-		contentInfo: regularFields.filter( {
-			hasText: '8 words, 1 minute read time.',
+		syncStatus: getRegularSummaryField( {
+			page,
+			summary,
+			label: 'Sync status',
 		} ),
-		revisions: panelFields.filter( { hasText: 'Revisions' } ),
-		syncStatus: regularFields.filter( { hasText: 'Sync status' } ),
 	};
+}
+
+function getPanelSummaryField( { page, summary, label } ) {
+	const root = summary
+		.locator( '.dataforms-layouts-panel__field-trigger' )
+		.filter( {
+			has: page
+				.locator( '.dataforms-layouts-panel__field-label' )
+				.filter( { hasText: exactText( label ) } ),
+		} );
+
+	return {
+		root,
+		control: root.locator( '.dataforms-layouts-panel__field-control' ),
+		editButton: root.getByRole( 'button', { name: `Edit ${ label }` } ),
+	};
+}
+
+function getRegularSummaryField( { page, summary, label } ) {
+	const root = summary
+		.locator( '.dataforms-layouts-regular__field' )
+		.filter( {
+			has: page
+				.locator( '.dataforms-layouts-regular__field-label' )
+				.filter( { hasText: exactText( label ) } ),
+		} );
+
+	return {
+		root,
+		control: root.locator( '.dataforms-layouts-regular__field-control' ),
+	};
+}
+
+function exactText( text ) {
+	return new RegExp( `^${ text.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' ) }$` );
 }
