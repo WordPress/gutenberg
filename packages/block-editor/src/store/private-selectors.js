@@ -19,6 +19,7 @@ import {
 	canInsertBlockType,
 	getBlockName,
 	getTemplateLock,
+	getClientIdsOfDescendants,
 	getClientIdsWithDescendants,
 	getBlockRootClientId,
 	getBlockAttributes,
@@ -256,6 +257,144 @@ export const getListViewClientIdsTree = createRegistrySelector( () =>
 		state.derivedBlockEditingModes,
 		state.blocks.blockEditingModes,
 	] )
+);
+
+function getTopMostNamedContentGroupForBlockUnmemoized( state, clientId ) {
+	const sectionClientId = getParentSectionBlock( state, clientId );
+	if ( ! sectionClientId ) {
+		return null;
+	}
+
+	const parents = getBlockParents( state, clientId );
+	const sectionIndex = parents.indexOf( sectionClientId );
+	if ( sectionIndex === -1 ) {
+		return null;
+	}
+
+	for ( const parent of parents.slice( sectionIndex + 1 ) ) {
+		const isNamedDisabledParent =
+			getBlockEditingMode( state, parent ) === 'disabled' &&
+			!! getBlockAttributes( state, parent )?.metadata?.name;
+		if ( isNamedDisabledParent ) {
+			return parent;
+		}
+	}
+
+	return null;
+}
+
+/**
+ * Returns content-only descendants for a content-only section.
+ * Descendants that are already represented inside a nested List View support
+ * block are excluded from the flat content panel list.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Client ID of the section block.
+ *
+ * @return {string[]} Content-only client IDs for the section.
+ */
+export const getContentClientIdsForSection = createSelector(
+	( state, clientId ) => {
+		const descendants = getClientIdsOfDescendants( state, clientId );
+
+		const listViewDescendants = new Set();
+		descendants.forEach( ( descendant ) => {
+			if ( shouldRenderBlockListView( state, descendant ) ) {
+				const listViewChildren = getClientIdsOfDescendants(
+					state,
+					descendant
+				);
+				listViewChildren.forEach( ( childId ) =>
+					listViewDescendants.add( childId )
+				);
+			}
+		} );
+
+		return descendants.filter( ( current ) => {
+			return (
+				! listViewDescendants.has( current ) &&
+				getBlockEditingMode( state, current ) === 'contentOnly'
+			);
+		} );
+	},
+	( state ) => [
+		state.blocks.order,
+		state.blocks.byClientId,
+		state.blocks.attributes,
+		state.derivedBlockEditingModes,
+		state.blocks.blockEditingModes,
+		state.blockListSettings,
+	]
+);
+
+/**
+ * Returns the top-most named disabled grouping block for a content block.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Client ID of the content block.
+ *
+ * @return {?string} Client ID of the grouping block, or null.
+ */
+export const getTopMostNamedContentGroupForBlock = createSelector(
+	getTopMostNamedContentGroupForBlockUnmemoized,
+	( state ) => [
+		state.blocks.parents,
+		state.blocks.byClientId,
+		state.blocks.attributes,
+		state.derivedBlockEditingModes,
+		state.blocks.blockEditingModes,
+		state.blockListSettings,
+		state.editedContentOnlySection,
+		state.settings,
+	]
+);
+
+/**
+ * Returns a group heading client ID for the first content row in a named group.
+ * Later content rows in the same group return null.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Client ID of the content block.
+ *
+ * @return {?string} Client ID of the grouping block, or null.
+ */
+export const getBlockFieldsGroupHeaderClientId = createSelector(
+	( state, clientId ) => {
+		const groupClientId = getTopMostNamedContentGroupForBlock(
+			state,
+			clientId
+		);
+		if ( ! groupClientId ) {
+			return null;
+		}
+
+		const sectionClientId = getParentSectionBlock( state, clientId );
+		if ( ! sectionClientId ) {
+			return null;
+		}
+
+		const firstClientIdInGroup = getContentClientIdsForSection(
+			state,
+			sectionClientId
+		).find(
+			( current ) =>
+				getTopMostNamedContentGroupForBlock( state, current ) ===
+				groupClientId
+		);
+
+		return firstClientIdInGroup === clientId ? groupClientId : null;
+	},
+	( state ) => [
+		state.blocks.order,
+		state.blocks.parents,
+		state.blocks.byClientId,
+		state.blocks.attributes,
+		state.derivedBlockEditingModes,
+		state.blocks.blockEditingModes,
+		state.blockListSettings,
+		state.editedContentOnlySection,
+		state.settings,
+	]
 );
 
 /**

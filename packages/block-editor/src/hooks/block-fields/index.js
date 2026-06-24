@@ -67,6 +67,22 @@ function BlockFields( {
 		clientId,
 		context: 'list-view',
 	} );
+	const groupHeaderClientId = useSelect(
+		( select ) => {
+			if ( ! isMultiBlock ) {
+				return null;
+			}
+
+			return unlock(
+				select( blockEditorStore )
+			).getBlockFieldsGroupHeaderClientId( clientId );
+		},
+		[ clientId, isMultiBlock ]
+	);
+	const groupHeaderTitle = useBlockDisplayTitle( {
+		clientId: groupHeaderClientId,
+		context: 'list-view',
+	} );
 	const blockInformation = useBlockDisplayInformation( clientId );
 
 	const blockTypeFields = blockType?.[ fieldsKey ];
@@ -210,63 +226,70 @@ function BlockFields( {
 	};
 
 	return (
-		<div
-			className="block-editor-block-fields__container"
-			onMouseEnter={
-				isMultiBlock
-					? () => debouncedToggleBlockHighlight( clientId, true )
-					: undefined
-			}
-			onMouseLeave={ () =>
-				isMultiBlock
-					? debouncedToggleBlockHighlight( clientId, false )
-					: undefined
-			}
-			onFocus={
-				isMultiBlock
-					? () => {
-							selectBlock(
-								clientId,
-								null /* null to avoid focus on the block in the canvas */
-							);
-					  }
-					: undefined
-			}
-		>
-			<div className="block-editor-block-fields__header">
-				<HStack spacing={ 1 }>
-					{ isMultiBlock && (
-						<>
-							<BlockIcon
-								className="block-editor-block-fields__header-icon"
-								icon={ blockInformation?.icon }
-							/>
+		<>
+			{ groupHeaderTitle && (
+				<h2 className="block-editor-block-fields__group-heading">
+					{ groupHeaderTitle }
+				</h2>
+			) }
+			<div
+				className="block-editor-block-fields__container"
+				onMouseEnter={
+					isMultiBlock
+						? () => debouncedToggleBlockHighlight( clientId, true )
+						: undefined
+				}
+				onMouseLeave={ () =>
+					isMultiBlock
+						? debouncedToggleBlockHighlight( clientId, false )
+						: undefined
+				}
+				onFocus={
+					isMultiBlock
+						? () => {
+								selectBlock(
+									clientId,
+									null /* null to avoid focus on the block in the canvas */
+								);
+						  }
+						: undefined
+				}
+			>
+				<div className="block-editor-block-fields__header">
+					<HStack spacing={ 1 }>
+						{ isMultiBlock && (
+							<>
+								<BlockIcon
+									className="block-editor-block-fields__header-icon"
+									icon={ blockInformation?.icon }
+								/>
+								<h2 className="block-editor-block-fields__header-title">
+									<Truncate numberOfLines={ 1 }>
+										{ blockTitle }
+									</Truncate>
+								</h2>
+								<FieldsDropdownMenu
+									fields={ dataFormFields }
+									visibleFields={ form.fields }
+									onToggleField={ handleToggleField }
+								/>
+							</>
+						) }
+						{ ! isMultiBlock && (
 							<h2 className="block-editor-block-fields__header-title">
-								<Truncate numberOfLines={ 1 }>
-									{ blockTitle }
-								</Truncate>
+								{ __( 'Content' ) }
 							</h2>
-							<FieldsDropdownMenu
-								fields={ dataFormFields }
-								visibleFields={ form.fields }
-								onToggleField={ handleToggleField }
-							/>
-						</>
-					) }
-					{ ! isMultiBlock && (
-						<h2 className="block-editor-block-fields__header-title">
-							{ __( 'Content' ) }
-						</h2>
-					) }
-				</HStack>
+						) }
+					</HStack>
+				</div>
+				<DataForm
+					data={ attributes }
+					fields={ dataFormFields }
+					form={ form }
+					onChange={ setAttributes }
+				/>
 			</div>
-			<DataForm
-				data={ attributes }
-				fields={ dataFormFields }
-				form={ form }
-				onChange={ setAttributes }
-			/>
-		</div>
+		</>
 	);
 }
 

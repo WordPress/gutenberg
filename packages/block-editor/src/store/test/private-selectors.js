@@ -12,6 +12,9 @@ import {
 	isBlockSubtreeDisabled,
 	getEnabledClientIdsTree,
 	getListViewClientIdsTree,
+	getContentClientIdsForSection,
+	getTopMostNamedContentGroupForBlock,
+	getBlockFieldsGroupHeaderClientId,
 	getEnabledBlockParents,
 	getExpandedBlock,
 	isDragging,
@@ -1004,6 +1007,134 @@ describe( 'private selectors', () => {
 			};
 
 			expect( getListViewClientIdsTree( state ) ).toEqual( [] );
+		} );
+	} );
+
+	describe( 'content panel grouping selectors', () => {
+		const baseState = {
+			settings: {},
+			blocks: {
+				byClientId: new Map( [
+					[ 'section', {} ],
+					[ 'ungrouped', {} ],
+					[ 'group', {} ],
+					[ 'first-content', {} ],
+					[ 'second-content', {} ],
+				] ),
+				attributes: new Map( [
+					[
+						'section',
+						{ metadata: { patternName: 'test/pattern' } },
+					],
+					[ 'ungrouped', {} ],
+					[ 'group', { metadata: { name: 'Group' } } ],
+					[ 'first-content', {} ],
+					[ 'second-content', {} ],
+				] ),
+				order: new Map( [
+					[ '', [ 'section' ] ],
+					[ 'section', [ 'ungrouped', 'group' ] ],
+					[ 'ungrouped', [] ],
+					[ 'group', [ 'first-content', 'second-content' ] ],
+					[ 'first-content', [] ],
+					[ 'second-content', [] ],
+				] ),
+				parents: new Map( [
+					[ 'section', '' ],
+					[ 'ungrouped', 'section' ],
+					[ 'group', 'section' ],
+					[ 'first-content', 'group' ],
+					[ 'second-content', 'group' ],
+				] ),
+				blockEditingModes: new Map(),
+			},
+			blockListSettings: new Map( [
+				[ 'section', {} ],
+				[ 'group', {} ],
+			] ),
+			derivedBlockEditingModes: new Map( [
+				[ 'section', 'disabled' ],
+				[ 'ungrouped', 'contentOnly' ],
+				[ 'group', 'disabled' ],
+				[ 'first-content', 'contentOnly' ],
+				[ 'second-content', 'contentOnly' ],
+			] ),
+		};
+
+		it( 'returns content-only descendants for a section', () => {
+			expect(
+				getContentClientIdsForSection( baseState, 'section' )
+			).toEqual( [ 'ungrouped', 'first-content', 'second-content' ] );
+		} );
+
+		it( 'returns the top-most named content group for a block', () => {
+			expect(
+				getTopMostNamedContentGroupForBlock(
+					baseState,
+					'first-content'
+				)
+			).toBe( 'group' );
+			expect(
+				getTopMostNamedContentGroupForBlock( baseState, 'ungrouped' )
+			).toBe( null );
+		} );
+
+		it( 'returns a group heading for only the first content row in a group', () => {
+			expect(
+				getBlockFieldsGroupHeaderClientId( baseState, 'first-content' )
+			).toBe( 'group' );
+			expect(
+				getBlockFieldsGroupHeaderClientId( baseState, 'second-content' )
+			).toBe( null );
+		} );
+
+		it( 'uses the top-most named group when named groups are nested', () => {
+			const state = {
+				...baseState,
+				blocks: {
+					...baseState.blocks,
+					byClientId: new Map( [
+						...baseState.blocks.byClientId,
+						[ 'nested-group', {} ],
+					] ),
+					attributes: new Map( [
+						...baseState.blocks.attributes,
+						[
+							'nested-group',
+							{ metadata: { name: 'Nested group' } },
+						],
+					] ),
+					order: new Map( [
+						...baseState.blocks.order,
+						[ 'group', [ 'nested-group' ] ],
+						[
+							'nested-group',
+							[ 'first-content', 'second-content' ],
+						],
+					] ),
+					parents: new Map( [
+						...baseState.blocks.parents,
+						[ 'nested-group', 'group' ],
+						[ 'first-content', 'nested-group' ],
+						[ 'second-content', 'nested-group' ],
+					] ),
+				},
+				blockListSettings: new Map( [
+					...baseState.blockListSettings,
+					[ 'nested-group', {} ],
+				] ),
+				derivedBlockEditingModes: new Map( [
+					...baseState.derivedBlockEditingModes,
+					[ 'nested-group', 'disabled' ],
+				] ),
+			};
+
+			expect(
+				getTopMostNamedContentGroupForBlock( state, 'first-content' )
+			).toBe( 'group' );
+			expect(
+				getBlockFieldsGroupHeaderClientId( state, 'first-content' )
+			).toBe( 'group' );
 		} );
 	} );
 
