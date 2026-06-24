@@ -46,9 +46,7 @@
 	// consistent across variants, matching `@wordpress/ui` Notice (`.title` /
 	// `.description` always use `--text-vertical-padding` whether or not `CloseIcon`
 	// is rendered).
-	// TODO: Replace `$button-size-small` with a WPDS size token once size tokens
-	// land in `@wordpress/theme`.
-	padding-block: calc((#{$button-size-small} - 1lh) / 2);
+	padding-block: calc((var(--wpds-dimension-size-sm) - 1lh) / 2);
 }
 
 .components-notice__actions {

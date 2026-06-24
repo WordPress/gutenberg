@@ -391,4 +391,423 @@ HTML;
 			'The block content should show the filtered value.'
 		);
 	}
+
+	/**
+	 * Renders a list item with a source value bound to its content attribute.
+	 *
+	 * @param mixed  $source_value  The source value.
+	 * @param string $block_content The block content.
+	 * @return string Rendered block content.
+	 */
+	private function render_list_item_with_source_value( $source_value, $block_content ) {
+		register_block_bindings_source(
+			self::SOURCE_NAME,
+			array(
+				'label'              => self::SOURCE_LABEL,
+				'get_value_callback' => function () use ( $source_value ) {
+					return $source_value;
+				},
+			)
+		);
+
+		$parsed_blocks = parse_blocks( $block_content );
+		$block         = new WP_Block( $parsed_blocks[0] );
+		return trim( $block->render() );
+	}
+
+	/**
+	 * Tests if list item content is updated with a plain text value returned by the source.
+	 *
+	 * @covers WP_Block::render
+	 */
+	public function test_update_list_item_with_plain_text_value_from_source() {
+		$block_content = <<<HTML
+<!-- wp:list-item {"metadata":{"bindings":{"content":{"source":"test/source"}}}} -->
+<li>This should not appear</li>
+<!-- /wp:list-item -->
+HTML;
+		$result        = $this->render_list_item_with_source_value( 'test source value', $block_content );
+
+		$this->assertSame(
+			'<li>test source value</li>',
+			$result,
+			'The list item content should be replaced by the source text.'
+		);
+	}
+	/**
+	 * Tests if raw nested list markup is replaced when it is not a list inner block.
+	 *
+	 * @covers WP_Block::render
+	 */
+	public function test_update_list_item_with_raw_nested_list_markup_without_inner_block_replaces_markup() {
+		$block_content = <<<HTML
+<!-- wp:list-item {"metadata":{"bindings":{"content":{"source":"test/source"}}}} -->
+<li>Default content<ul><li>Raw nested list should be replaced</li></ul></li>
+<!-- /wp:list-item -->
+HTML;
+		$result        = $this->render_list_item_with_source_value( 'Bound text', $block_content );
+
+		$this->assertSame(
+			'<li>Bound text</li>',
+			$result,
+			'Raw nested list markup should be replaced with the rest of the list item content.'
+		);
+	}
+
+	/**
+	 * Tests if source image markup renders after post KSES sanitization.
+	 *
+	 * @covers WP_Block::render
+	 */
+	public function test_update_list_item_source_image_renders_after_kses() {
+		$block_content = <<<HTML
+<!-- wp:list-item {"metadata":{"bindings":{"content":{"source":"test/source"}}}} -->
+<li>This should not appear</li>
+<!-- /wp:list-item -->
+HTML;
+		$result        = $this->render_list_item_with_source_value(
+			'Bound <img class="wp-image-42" src="https://example.com/inline-image.jpg" alt="Inline image" />',
+			$block_content
+		);
+
+		$this->assertMatchesRegularExpression(
+			'#<li>Bound <img[^>]*class="wp-image-42"[^>]*src="https://example\.com/inline-image\.jpg"[^>]*alt="Inline image"[^>]*/?></li>#',
+			$result,
+			'The source image should render in the list item content after sanitization.'
+		);
+	}
+
+	/**
+	 * Tests if unsafe source markup is sanitized from list item content.
+	 *
+	 * @covers WP_Block::render
+	 */
+	public function test_update_list_item_unsafe_source_markup_is_sanitized() {
+		$block_content = <<<HTML
+<!-- wp:list-item {"metadata":{"bindings":{"content":{"source":"test/source"}}}} -->
+<li>This should not appear</li>
+<!-- /wp:list-item -->
+HTML;
+		$result        = $this->render_list_item_with_source_value(
+			'Bound <img src="https://example.com/inline-image.jpg" alt="Inline image" onerror="alert(1)" /> <script>alert("Unsafe HTML")</script>',
+			$block_content
+		);
+
+		$this->assertStringNotContainsString(
+			'<script',
+			$result,
+			'Script tags should be stripped from list item source content.'
+		);
+		$this->assertStringNotContainsString(
+			'onerror',
+			$result,
+			'Event handler attributes should be stripped from list item source content.'
+		);
+		$this->assertMatchesRegularExpression(
+			'#<img[^>]*src="https://example\.com/inline-image\.jpg"[^>]*alt="Inline image"[^>]*/?>#',
+			$result,
+			'Safe image markup should remain after sanitization.'
+		);
+	}
+
+	/**
+	 * Tests if original inline images are replaced by bound list item text.
+	 *
+	 * @covers WP_Block::render
+	 */
+	public function test_update_list_item_original_inline_image_is_replaced_by_source_text() {
+		$block_content = <<<HTML
+<!-- wp:list-item {"metadata":{"bindings":{"content":{"source":"test/source"}}}} -->
+<li>Original <img src="https://example.com/original-image.jpg" alt="Original inline image" /> content</li>
+<!-- /wp:list-item -->
+HTML;
+		$result        = $this->render_list_item_with_source_value( 'Bound text', $block_content );
+
+		$this->assertSame(
+			'<li>Bound text</li>',
+			$result,
+			'The original inline image should be replaced with the rest of the list item content.'
+		);
+		$this->assertStringNotContainsString(
+			'original-image.jpg',
+			$result,
+			'The original inline image source should not remain after binding replacement.'
+		);
+		$this->assertStringNotContainsString(
+			'Original inline image',
+			$result,
+			'The original inline image alt text should not remain after binding replacement.'
+		);
+	}
+
+	/**
+	 * Tests if list item content updates preserve nested list inner blocks.
+	 *
+	 * @covers WP_Block::render
+	 */
+	public function test_update_list_item_with_nested_list_preserves_nested_list() {
+		$block_content = <<<HTML
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item {"metadata":{"bindings":{"content":{"source":"test/source"}}}} -->
+<li>Default content<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Nested child</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+HTML;
+		$result        = $this->render_list_item_with_source_value( 'Bound list item', $block_content );
+		$normalized    = preg_replace( '/>\s+</', '><', trim( $result ) );
+
+		$this->assertStringNotContainsString(
+			'Default content',
+			$result,
+			'The original list item content should be replaced by the source value.'
+		);
+		$this->assertMatchesRegularExpression(
+			'#<li>Bound list item\s*<ul class="wp-block-list"><li>Nested child</li></ul></li>#',
+			$normalized,
+			'The list item should render the source text and preserve nested list inner blocks.'
+		);
+	}
+
+	/**
+	 * Tests if raw list markup before a nested list inner block is replaced with the original content.
+	 *
+	 * @covers WP_Block::render
+	 */
+	public function test_update_list_item_with_raw_list_markup_before_nested_list_replaces_raw_markup() {
+		$block_content = <<<HTML
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item {"metadata":{"bindings":{"content":{"source":"test/source"}}}} -->
+<li>Default content<ul><li>Raw list markup should be replaced</li></ul><!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Nested child should remain</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+HTML;
+		$result        = $this->render_list_item_with_source_value( 'Bound list item', $block_content );
+		$normalized    = preg_replace( '/>\s+</', '><', trim( $result ) );
+
+		$this->assertStringNotContainsString(
+			'Raw list markup should be replaced',
+			$result,
+			'Raw list markup before the nested block should be replaced by the source value.'
+		);
+		$this->assertMatchesRegularExpression(
+			'#<li>Bound list item\s*<ul class="wp-block-list"><li>Nested child should remain</li></ul></li>#',
+			$normalized,
+			'The list item should preserve only the delimiter-backed nested list inner block.'
+		);
+	}
+
+	/**
+	 * Tests if an empty source value clears the content but preserves nested list inner blocks.
+	 *
+	 * @covers WP_Block::render
+	 */
+	public function test_update_list_item_with_empty_value_preserves_nested_list() {
+		$block_content = <<<HTML
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item {"metadata":{"bindings":{"content":{"source":"test/source"}}}} -->
+<li>Default content<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Nested child</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+HTML;
+		$result        = $this->render_list_item_with_source_value( '', $block_content );
+		$normalized    = preg_replace( '/>\s+</', '><', trim( $result ) );
+
+		$this->assertStringNotContainsString(
+			'Default content',
+			$result,
+			'An empty source value should clear the original list item content.'
+		);
+		$this->assertMatchesRegularExpression(
+			'#<li>\s*<ul class="wp-block-list"><li>Nested child</li></ul></li>#',
+			$normalized,
+			'An empty source value should still preserve nested list inner blocks.'
+		);
+	}
+
+	/**
+	 * Tests if content updates preserve a nested ordered list inner block.
+	 *
+	 * @covers WP_Block::render
+	 */
+	public function test_update_list_item_with_nested_ordered_list_preserves_nested_list() {
+		$block_content = <<<HTML
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item {"metadata":{"bindings":{"content":{"source":"test/source"}}}} -->
+<li>Default content<!-- wp:list {"ordered":true} -->
+<ol class="wp-block-list"><!-- wp:list-item -->
+<li>Nested ordered child</li>
+<!-- /wp:list-item --></ol>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+HTML;
+		$result        = $this->render_list_item_with_source_value( 'Bound list item', $block_content );
+		$normalized    = preg_replace( '/>\s+</', '><', trim( $result ) );
+
+		$this->assertStringNotContainsString(
+			'Default content',
+			$result,
+			'The original list item content should be replaced by the source value.'
+		);
+		$this->assertMatchesRegularExpression(
+			'#<li>Bound list item\s*<ol class="wp-block-list"><li>Nested ordered child</li></ol></li>#',
+			$normalized,
+			'The list item should render the source text and preserve the nested ordered list.'
+		);
+	}
+
+	/**
+	 * Tests if content updates preserve multiple levels of nested list inner blocks.
+	 *
+	 * @covers WP_Block::render
+	 */
+	public function test_update_list_item_with_deeply_nested_list_preserves_all_levels() {
+		$block_content = <<<HTML
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item {"metadata":{"bindings":{"content":{"source":"test/source"}}}} -->
+<li>Level one default<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Level two<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Level three</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+HTML;
+		$result        = $this->render_list_item_with_source_value( 'Bound list item', $block_content );
+
+		$this->assertStringNotContainsString(
+			'Level one default',
+			$result,
+			'Only the bound list item content should be replaced.'
+		);
+		$this->assertStringContainsString(
+			'Level two',
+			$result,
+			'The first nested level should be preserved.'
+		);
+		$this->assertStringContainsString(
+			'Level three',
+			$result,
+			'The second nested level should be preserved.'
+		);
+	}
+
+	/**
+	 * Tests that a non-list inner block is preserved when the content is bound.
+	 *
+	 * The list item block only permits `core/list` children through the editor,
+	 * but block markup can be authored or pasted with other inner blocks. The
+	 * render path detects the first inner block by structure (not by tag name),
+	 * so any block type before which the rich text ends must be preserved.
+	 *
+	 * @covers WP_Block::render
+	 */
+	public function test_update_list_item_preserves_non_list_inner_block() {
+		$block_content = <<<HTML
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item {"metadata":{"bindings":{"content":{"source":"test/source"}}}} -->
+<li>Default content<!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button">Keep this button</a></div>
+<!-- /wp:button --></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+HTML;
+		$result        = $this->render_list_item_with_source_value( 'Bound list item', $block_content );
+
+		$this->assertStringNotContainsString(
+			'Default content',
+			$result,
+			'The original list item content should be replaced by the source value.'
+		);
+		$this->assertStringContainsString(
+			'Bound list item',
+			$result,
+			'The source value should be rendered as the list item content.'
+		);
+		$this->assertStringContainsString(
+			'wp-block-button',
+			$result,
+			'The nested button inner block should be preserved.'
+		);
+		$this->assertStringContainsString(
+			'Keep this button',
+			$result,
+			'The nested button inner block content should be preserved.'
+		);
+	}
+
+	/**
+	 * Tests if pattern overrides update list item content without removing nested lists.
+	 *
+	 * @covers WP_Block::process_block_bindings
+	 */
+	public function test_default_binding_for_list_item_pattern_overrides() {
+		$list_item_name = 'Editable List Item';
+		$block_content  = <<<HTML
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item {"metadata":{"bindings":{"__default":{"source":"core/pattern-overrides"}},"name":"$list_item_name"}} -->
+<li>Default content<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Nested child</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+HTML;
+
+		$expected_content = 'Pattern <em>override</em>';
+		$parsed_blocks    = parse_blocks( $block_content );
+		$block            = new WP_Block(
+			$parsed_blocks[0],
+			array(
+				'pattern/overrides' => array(
+					$list_item_name => array( 'content' => $expected_content ),
+				),
+			)
+		);
+
+		$result     = $block->render();
+		$normalized = preg_replace( '/>\s+</', '><', trim( $result ) );
+
+		$this->assertStringNotContainsString(
+			'Default content',
+			$result,
+			'The original list item content should be replaced by the pattern override.'
+		);
+		$this->assertStringContainsString(
+			'<li>Nested child</li>',
+			$normalized,
+			'Nested list inner blocks should remain in the rendered output.'
+		);
+		$this->assertMatchesRegularExpression(
+			'#<li>Pattern <em>override</em><ul class="wp-block-list"><li>Nested child</li></ul></li>#',
+			$normalized,
+			'The list item should render the pattern override before its nested list.'
+		);
+
+		$expected_bindings_metadata = array(
+			'content' => array( 'source' => 'core/pattern-overrides' ),
+		);
+		$this->assertSame(
+			$expected_bindings_metadata,
+			$block->inner_blocks[0]->attributes['metadata']['bindings'],
+			'The __default binding should be updated with the list item content binding metadata.'
+		);
+	}
 }

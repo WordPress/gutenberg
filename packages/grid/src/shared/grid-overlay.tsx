@@ -15,32 +15,17 @@ import type { GridOverlayRenderProps } from './types';
 import styles from './grid-overlay.module.css';
 
 /**
- * Default edit-mode overlay. Renders one column per track; when
- * `rowHeight` and `rows` are supplied, each column holds that many
- * row-marker tiles sized to the uniform row height.
- *
- * Used by both `DashboardGrid` and `DashboardLanes`. Replaced wholesale
- * by passing a `renderGridOverlay` to either surface; themed in place
- * via the CSS custom properties documented in the package README.
- *
- * Reveals with a diagonal alpha wave from the top-left corner when
- * `isActive` becomes true (motion design tokens for duration and
- * easing). Fades out on deactivate; while inactive, `visibility:
- * hidden` releases paint cost.
- *
- * The overlay inherits its gap from the same design-system gap token
- * the surfaces use, so columns and row markers stay pixel-aligned
- * without the surface having to forward a `spacing` value.
+ * Default edit-mode overlay: one column per track, each holding `rows`
+ * row-marker tiles when `rowHeight` is uniform. Used by both surfaces
+ * and replaceable via `renderGridOverlay`. Reveals with a diagonal
+ * wave on activate and releases paint cost while inactive.
  *
  * @param props           Render props supplied by the surface.
- * @param props.columns   Number of column tracks to mirror.
- * @param props.rowHeight Row height in pixels for surfaces with uniform
- *                        rows. Omitted on lane surfaces or auto-sized
- *                        grids; in that case row markers are skipped.
- * @param props.rows      Number of row tracks to mirror in each column.
- *                        Omitted when row height is unknown.
- * @param props.isActive  When `false`, the overlay fades out and stops
- *                        consuming paint cost.
+ * @param props.columns   Column tracks to mirror.
+ * @param props.rowHeight Uniform row height in pixels; omitted for
+ *                        content-sized rows, which skip row markers.
+ * @param props.rows      Row tracks per column; omitted when unknown.
+ * @param props.isActive  When `false`, the overlay fades out.
  */
 export function GridOverlay( {
 	columns,

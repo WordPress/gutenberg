@@ -101,12 +101,13 @@ The Suggest-mode subsystem lives in `packages/editor/src/components/suggestion-m
 | `suggestion-summary.js`     | Compact sidebar summary ("Add: …", "Delete: …", "Format: …") used in collapsed thread lists. |
 | `auto-save.js`              | Debounced background persistence of pending overlays as note comments (replaces the explicit "Submit" affordance from earlier phases). |
 
-REST/PHP surface lives in `lib/compat/wordpress-6.9/`:
+REST/PHP surface lives in `lib/compat/wordpress-7.1/`:
 
 | File | Role |
 |------|------|
-| `block-comments.php`                              | Registers the `_wp_note_status`, `_wp_suggestion`, and `_wp_suggestion_status` comment meta and adds `editor.notes` post-type support. |
-| `class-gutenberg-rest-comment-controller-6-9.php` | REST controller subclass remapping permissions for `note`-type comments (post editors get `edit_post`-based access; updates are gated by an allowlist of suggestion-lifecycle fields). |
+| `block-comments.php`                                      | Registers the `_wp_note_status`, `_wp_suggestion`, and `_wp_suggestion_status` comment meta and adds `editor.notes` post-type support. |
+| `class-gutenberg-rest-comment-suggestions-controller.php` | REST controller that layers suggestion behavior onto core's comments controller: permits empty content for suggestion-only notes, grants `edit_post`-capable users an allowlisted apply/reject path (`status` and `_wp_suggestion_status` only), and caps the `_wp_suggestion` payload size. Note permissions themselves are handled natively by core. |
+| `block-comment-suggestions.php`                           | Registers the suggestions REST controller on `rest_api_init`. |
 
 ## Suggestion Payload (v2)
 
