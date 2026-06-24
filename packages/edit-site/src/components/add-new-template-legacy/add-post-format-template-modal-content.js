@@ -13,13 +13,18 @@ import {
 import { useViewportMatch } from '@wordpress/compose';
 import { focus } from '@wordpress/dom';
 
+/**
+ * Internal dependencies
+ */
+import { usePostFormatMenuItems } from './utils';
+
 function AddPostFormatTemplateModalContent( {
-	postFormats,
 	onSelect,
 	onBack,
 	containerRef,
 } ) {
 	const isMobile = useViewportMatch( 'medium', '<' );
+	const { availableFormats: postFormats } = usePostFormatMenuItems();
 
 	// Focus the first focusable element when the component mounts.
 	useEffect( () => {
