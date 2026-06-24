@@ -87,6 +87,7 @@ export default function BoxInputControl( {
 	min = 0,
 	presets,
 	presetKey,
+	placeholder: placeholderProp,
 	...props
 }: BoxControlInputControlProps ) {
 	const defaultValuesToModify = getSidesToModify( side, sides );
@@ -217,7 +218,7 @@ export default function BoxInputControl( {
 							onUnitChange={ handleOnUnitChange }
 							onFocus={ handleOnFocus }
 							label={ LABELS[ side ] }
-							placeholder={ mixedPlaceholder }
+							placeholder={ mixedPlaceholder ?? placeholderProp }
 							hideLabelFromVision
 						/>
 					</Tooltip>

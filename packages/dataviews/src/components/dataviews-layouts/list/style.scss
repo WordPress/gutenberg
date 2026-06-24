@@ -1,5 +1,14 @@
 @use "../../../dataviews/style" as *;
 
+// Square media (thumbnail) size per density. The compact density uses the
+// `--wpds-dimension-size-md` token; these larger densities have no matching
+// token, so they're kept as local constants. The field wrapper reuses the
+// same value as its `min-height` to keep the title centered against the media.
+// TODO: Replace with `--wpds-dimension-size-*` tokens if 48px and 64px are
+// added to the WPDS element size scale.
+$media-size: 48px;
+$media-size-comfortable: 64px;
+
 div.dataviews-view-list {
 	list-style-type: none;
 }
@@ -135,8 +144,8 @@ div.dataviews-view-list {
 	}
 
 	.dataviews-view-list__media-wrapper {
-		width: calc(var(--wpds-dimension-base) * 13);
-		height: calc(var(--wpds-dimension-base) * 13);
+		width: $media-size;
+		height: $media-size;
 		overflow: hidden;
 		position: relative;
 		flex-shrink: 0;
@@ -162,7 +171,7 @@ div.dataviews-view-list {
 	}
 
 	.dataviews-view-list__field-wrapper {
-		min-height: calc(var(--wpds-dimension-base) * 13); // Ensures title is centrally aligned when all fields are hidden
+		min-height: $media-size; // Ensures title is centrally aligned when all fields are hidden
 		flex-grow: 1;
 		min-width: 0;
 	}
@@ -245,12 +254,12 @@ div.dataviews-view-list {
 			}
 
 			.dataviews-view-list__media-wrapper {
-				width: calc(var(--wpds-dimension-base) * 16);
-				height: calc(var(--wpds-dimension-base) * 16);
+				width: $media-size-comfortable;
+				height: $media-size-comfortable;
 			}
 
 			.dataviews-view-list__field-wrapper {
-				min-height: calc(var(--wpds-dimension-base) * 16);
+				min-height: $media-size-comfortable;
 			}
 
 			.dataviews-view-list__fields {
