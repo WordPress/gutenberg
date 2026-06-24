@@ -1,4 +1,5 @@
 import { __ } from '@wordpress/i18n';
+import type { RichTextValue } from '@wordpress/rich-text';
 import { toggleFormat } from '@wordpress/rich-text';
 import {
 	RichTextToolbarButton,
@@ -6,17 +7,26 @@ import {
 } from '@wordpress/block-editor';
 import { formatStrikethrough } from '@wordpress/icons';
 
+interface StrikethroughEditProps {
+	value: RichTextValue;
+	onChange: ( value: RichTextValue ) => void;
+	isActive: boolean;
+	onFocus: () => void;
+}
+
 const name = 'core/strikethrough';
 const title = __( 'Strikethrough' );
+const RichTextToolbarButtonUnsafe =
+	RichTextToolbarButton as React.ComponentType< any >;
 
 export const strikethrough = {
 	name,
 	title,
 	tagName: 's',
 	className: null,
-	edit( { isActive, value, onChange, onFocus } ) {
+	edit( { isActive, value, onChange, onFocus }: StrikethroughEditProps ) {
 		function onClick() {
-			onChange( toggleFormat( value, { type: name, title } ) );
+			onChange( toggleFormat( value, { type: name } ) );
 			onFocus();
 		}
 
@@ -27,7 +37,7 @@ export const strikethrough = {
 					character="d"
 					onUse={ onClick }
 				/>
-				<RichTextToolbarButton
+				<RichTextToolbarButtonUnsafe
 					icon={ formatStrikethrough }
 					title={ title }
 					onClick={ onClick }
