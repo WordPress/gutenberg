@@ -22,6 +22,7 @@
 
 ### Internal
 
+-   `Surface`: Migrate styles from Emotion to SCSS Modules ([#79445](https://github.com/WordPress/gutenberg/pull/79445)).
 -   `ResizableBox`: Make the `children` prop optional ([#79370](https://github.com/WordPress/gutenberg/pull/79370)).
 -   Add documentation and lint guardrails for the ongoing Emotion migration ([#79442](https://github.com/WordPress/gutenberg/pull/79442)).
 -   `Divider`: Migrate styles from Emotion to SCSS Modules ([#79444](https://github.com/WordPress/gutenberg/pull/79444)).
