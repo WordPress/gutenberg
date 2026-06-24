@@ -41,20 +41,3 @@ export const Default: Story = {
 		icon: wordpress,
 	},
 };
-
-/**
- * Explicit `fill` colors in the icon will be preserved.
- */
-export const WithIntrinsicFillColor: Story = {
-	args: {
-		icon: (
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				viewBox="0 0 24 24"
-				fill="blue"
-			>
-				<rect x="0" y="0" width="24" height="24" />
-			</svg>
-		),
-	},
-};
