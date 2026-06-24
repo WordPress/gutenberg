@@ -6,12 +6,21 @@ import { subscript as subscriptIcon } from '@wordpress/icons';
 const name = 'core/subscript';
 const title = __( 'Subscript' );
 
+const RichTextToolbarButtonUnsafe =
+	RichTextToolbarButton as React.ComponentType< any >;
+
+interface SubscriptEditProps {
+	isActive: boolean;
+	value: any;
+	onChange: ( value: any ) => void;
+	onFocus: () => void;
+}
 export const subscript = {
 	name,
 	title,
 	tagName: 'sub',
 	className: null,
-	edit( { isActive, value, onChange, onFocus } ) {
+	edit( { isActive, value, onChange, onFocus }: SubscriptEditProps ) {
 		function onToggle() {
 			onChange( toggleFormat( value, { type: name, title } ) );
 		}
@@ -22,7 +31,7 @@ export const subscript = {
 		}
 
 		return (
-			<RichTextToolbarButton
+			<RichTextToolbarButtonUnsafe
 				icon={ subscriptIcon }
 				title={ title }
 				onClick={ onClick }

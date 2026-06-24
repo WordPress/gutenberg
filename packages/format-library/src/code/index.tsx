@@ -53,7 +53,12 @@ export const code = {
 
 		value = remove( value, startIndex, startIndex + 1 );
 		value = remove( value, endIndex, endIndex + 1 );
-		value = applyFormat( value, { type: name }, startIndex, endIndex );
+		value = applyFormat(
+			value,
+			{ type: name, title },
+			startIndex,
+			endIndex
+		);
 
 		return value;
 	},
@@ -64,7 +69,7 @@ export const code = {
 		isActive,
 	}: CodeEditProps ): ReactElement {
 		function onClick() {
-			onChange( toggleFormat( value, { type: name } ) );
+			onChange( toggleFormat( value, { type: name, title } ) );
 			onFocus();
 		}
 

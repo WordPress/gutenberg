@@ -29,11 +29,11 @@ export const bold = {
 		isVisible = true,
 	}: BoldEditProps ): JSX.Element {
 		function onToggle() {
-			onChange( toggleFormat( value, { type: name } ) );
+			onChange( toggleFormat( value, { type: name, title } ) );
 		}
 
 		function onClick() {
-			onChange( toggleFormat( value, { type: name } ) );
+			onChange( toggleFormat( value, { type: name, title } ) );
 			onFocus();
 		}
 
