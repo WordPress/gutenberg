@@ -32,7 +32,7 @@ export const Link = forwardRef< HTMLAnchorElement, LinkProps >( function Link(
 			className: clsx(
 				defenseStyles.a,
 				resetStyles[ 'box-sizing' ],
-				focusStyles[ 'outset-ring--focus' ],
+				focusStyles[ 'outset-ring-focus' ],
 				variant !== 'unstyled' && styles.link,
 				variant !== 'unstyled' && styles[ `is-${ tone }` ],
 				variant === 'unstyled' && styles[ 'is-unstyled' ],

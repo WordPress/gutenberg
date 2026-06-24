@@ -24,7 +24,7 @@ export const Trigger = forwardRef< HTMLButtonElement, SelectTriggerProps >(
 		return (
 			<InputLayout
 				className={ clsx(
-					focusStyles[ 'outset-ring--focus-within-except-active' ],
+					focusStyles[ 'outset-ring-focus-within-except-active' ],
 					selectTriggerStyles[ 'trigger-wrapper' ],
 					variant === 'minimal' &&
 						selectTriggerStyles[ 'is-minimal' ],

@@ -144,7 +144,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 							ref={ scrollStateRef }
 							className={ clsx(
 								overlayChromeStyles.content,
-								focusStyles[ 'outset-ring--focus-visible' ]
+								focusStyles[ 'outset-ring-focus-visible' ]
 							) }
 							onScroll={ onScroll }
 						>

@@ -23,7 +23,7 @@ export const Trigger = forwardRef< HTMLButtonElement, ComboboxTriggerProps >(
 		return (
 			<InputLayout
 				className={ clsx(
-					focusStyles[ 'outset-ring--focus-within-except-active' ],
+					focusStyles[ 'outset-ring-focus-within-except-active' ],
 					selectTriggerStyles[ 'trigger-wrapper' ],
 					className
 				) }
