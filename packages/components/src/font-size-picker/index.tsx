@@ -46,13 +46,7 @@ const UnforwardedFontSizePicker = (
 		valueMode = 'literal',
 		withSlider = false,
 		withReset = true,
-		// Deprecated props, no longer used.
-		size: _size,
-		__next40pxDefaultSize: _next40pxDefaultSize,
 	} = props;
-
-	void _size;
-	void _next40pxDefaultSize;
 
 	const labelId = useInstanceId(
 		UnforwardedFontSizePicker,
