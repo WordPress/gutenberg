@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+- Give each pasted data-URI image a unique filename so concurrent uploads no longer collide server-side and overwrite each other (e.g. pasting multiple images from Google Docs).
+
 ### Internal
 
 - Replace `showdown` with `marked` for Markdown paste handling. Smaller bundle, modern maintenance, native types.
