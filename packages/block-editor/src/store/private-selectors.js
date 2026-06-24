@@ -130,6 +130,14 @@ function getClientIdsTreeUnmemoized( state, rootClientId = '' ) {
 	);
 }
 
+function hasContentOnlyChild( state, blocks ) {
+	return blocks.some(
+		( block ) =>
+			getBlockEditingMode( state, block.clientId ) === 'contentOnly' ||
+			hasContentOnlyChild( state, block.innerBlocks )
+	);
+}
+
 /**
  * Returns a stripped down block object containing only its client ID,
  * and its inner blocks' client IDs.
@@ -168,7 +176,15 @@ function getEnabledClientIdsTreeUnmemoized( state, rootClientId ) {
 			state,
 			clientId
 		);
-		if ( getBlockEditingMode( state, clientId ) !== 'disabled' ) {
+		const isDisabled =
+			getBlockEditingMode( state, clientId ) === 'disabled';
+		const isNamedDisabledParent =
+			isDisabled &&
+			innerBlocks.length > 0 &&
+			!! getBlockAttributes( state, clientId )?.metadata?.name &&
+			hasContentOnlyChild( state, innerBlocks );
+
+		if ( ! isDisabled || isNamedDisabledParent ) {
 			result.push( { clientId, innerBlocks } );
 		} else {
 			result.push( ...innerBlocks );
@@ -190,6 +206,8 @@ function getEnabledClientIdsTreeUnmemoized( state, rootClientId ) {
 export const getEnabledClientIdsTree = createRegistrySelector( () =>
 	createSelector( getEnabledClientIdsTreeUnmemoized, ( state ) => [
 		state.blocks.order,
+		state.blocks.byClientId,
+		state.blocks.attributes,
 		state.derivedBlockEditingModes,
 		state.blocks.blockEditingModes,
 	] )

@@ -22,6 +22,7 @@ const ListViewBlockContents = forwardRef(
 			level,
 			isExpanded,
 			selectedClientIds,
+			isDisabled,
 			...props
 		},
 		ref
@@ -38,39 +39,49 @@ const ListViewBlockContents = forwardRef(
 			? selectedClientIds
 			: [ clientId ];
 
+		const blockSelectButton = ( draggableProps = {} ) => (
+			<ListViewBlockSelectButton
+				ref={ ref }
+				className="block-editor-list-view-block-contents"
+				block={ block }
+				onClick={ onClick }
+				onToggleExpanded={ onToggleExpanded }
+				isSelected={ isSelected }
+				position={ position }
+				siblingBlockCount={ siblingBlockCount }
+				level={ level }
+				isExpanded={ isExpanded }
+				isDisabled={ isDisabled }
+				{ ...draggableProps }
+				{ ...props }
+			/>
+		);
+
 		return (
 			<>
-				{ AdditionalBlockContent && (
+				{ AdditionalBlockContent && ! isDisabled && (
 					<AdditionalBlockContent
 						block={ block }
 						insertedBlock={ insertedBlock }
 						setInsertedBlock={ setInsertedBlock }
 					/>
 				) }
-				<BlockDraggable
-					appendToOwnerDocument
-					clientIds={ draggableClientIds }
-					cloneClassname="block-editor-list-view-draggable-chip"
-				>
-					{ ( { draggable, onDragStart, onDragEnd } ) => (
-						<ListViewBlockSelectButton
-							ref={ ref }
-							className="block-editor-list-view-block-contents"
-							block={ block }
-							onClick={ onClick }
-							onToggleExpanded={ onToggleExpanded }
-							isSelected={ isSelected }
-							position={ position }
-							siblingBlockCount={ siblingBlockCount }
-							level={ level }
-							draggable={ draggable }
-							onDragStart={ onDragStart }
-							onDragEnd={ onDragEnd }
-							isExpanded={ isExpanded }
-							{ ...props }
-						/>
-					) }
-				</BlockDraggable>
+				{ isDisabled && blockSelectButton() }
+				{ ! isDisabled && (
+					<BlockDraggable
+						appendToOwnerDocument
+						clientIds={ draggableClientIds }
+						cloneClassname="block-editor-list-view-draggable-chip"
+					>
+						{ ( { draggable, onDragStart, onDragEnd } ) =>
+							blockSelectButton( {
+								draggable,
+								onDragStart,
+								onDragEnd,
+							} )
+						}
+					</BlockDraggable>
+				) }
 			</>
 		);
 	}

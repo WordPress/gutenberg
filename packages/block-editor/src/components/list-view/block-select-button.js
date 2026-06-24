@@ -46,6 +46,7 @@ function ListViewBlockSelectButton(
 		isExpanded,
 		ariaDescribedBy,
 		visibilityLabel,
+		isDisabled,
 	},
 	ref
 ) {
@@ -74,17 +75,32 @@ function ListViewBlockSelectButton(
 	 */
 	function onKeyDown( event ) {
 		if ( event.keyCode === ENTER || event.keyCode === SPACE ) {
+			if ( isDisabled ) {
+				event.preventDefault();
+				return;
+			}
 			onClick( event );
 		}
 	}
 
+	function onClickHandler( event ) {
+		if ( isDisabled ) {
+			event.preventDefault();
+			return;
+		}
+		onClick( event );
+	}
+
 	return (
+		// Disabled grouping rows intentionally omit `href` while remaining
+		// focusable via TreeGrid's roving `tabIndex`.
+		// eslint-disable-next-line jsx-a11y/anchor-is-valid
 		<a
 			className={ clsx(
 				'block-editor-list-view-block-select-button',
 				className
 			) }
-			onClick={ onClick }
+			onClick={ onClickHandler }
 			onContextMenu={ onContextMenu }
 			onKeyDown={ onKeyDown }
 			onMouseDown={ onMouseDown }
@@ -94,7 +110,8 @@ function ListViewBlockSelectButton(
 			onDragStart={ onDragStartHandler }
 			onDragEnd={ onDragEnd }
 			draggable={ draggable }
-			href={ `#block-${ clientId }` }
+			href={ isDisabled ? undefined : `#block-${ clientId }` }
+			aria-disabled={ isDisabled ? true : undefined }
 			aria-describedby={ ariaDescribedBy }
 			aria-expanded={ isExpanded }
 		>

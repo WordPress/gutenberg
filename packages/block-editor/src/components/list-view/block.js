@@ -141,8 +141,11 @@ function ListViewBlock( {
 		[ clientId ]
 	);
 	const { canRename } = useBlockRename( blockName );
+	const isDisabledListViewGroup =
+		getBlockEditingMode( clientId ) === 'disabled';
 
 	const showBlockActions =
+		! isDisabledListViewGroup &&
 		// When a block hides its toolbar it also hides the block settings menu,
 		// since that menu is part of the toolbar in the editor canvas.
 		// List View respects this by also hiding the block settings menu.
@@ -199,6 +202,10 @@ function ListViewBlock( {
 		// Do not handle events if it comes from modals;
 		// retain the default behavior for these keys.
 		if ( event.target.closest( '[role=dialog]' ) ) {
+			return;
+		}
+
+		if ( isDisabledListViewGroup ) {
 			return;
 		}
 
@@ -415,6 +422,11 @@ function ListViewBlock( {
 
 	const selectEditorBlock = useCallback(
 		( event ) => {
+			if ( isDisabledListViewGroup ) {
+				event.preventDefault();
+				return;
+			}
+
 			// For keyboard activation (Enter/Space on a link), transfer focus
 			// to the canvas with the caret at the end of the block.
 			// For mouse clicks, keep focus in the list view so that subsequent
@@ -423,7 +435,7 @@ function ListViewBlock( {
 			selectBlock( event, clientId, isKeyboardActivation ? -1 : null );
 			event.preventDefault();
 		},
-		[ clientId, selectBlock ]
+		[ clientId, isDisabledListViewGroup, selectBlock ]
 	);
 
 	const updateFocusAndSelection = useCallback(
@@ -539,7 +551,8 @@ function ListViewBlock( {
 	);
 
 	const hasSiblings = siblingBlockCount > 0;
-	const hasRenderedMovers = showBlockMovers && hasSiblings;
+	const hasRenderedMovers =
+		showBlockMovers && hasSiblings && ! isDisabledListViewGroup;
 	const moverCellClassName = clsx(
 		'block-editor-list-view-block__mover-cell',
 		{ 'is-visible': isHovered || isSelected }
@@ -558,15 +571,16 @@ function ListViewBlock( {
 	}
 
 	const classes = clsx( {
-		'is-selected': isSelected,
-		'is-first-selected': isFirstSelectedBlock,
-		'is-last-selected': isLastSelectedBlock,
+		'is-selected': isSelected && ! isDisabledListViewGroup,
+		'is-first-selected': isFirstSelectedBlock && ! isDisabledListViewGroup,
+		'is-last-selected': isLastSelectedBlock && ! isDisabledListViewGroup,
 		'is-branch-selected': isBranchSelected,
 		'is-synced-branch': isSyncedBranch,
 		'is-dragging': isDragged,
 		'has-single-cell': ! showBlockActions,
 		'is-synced': blockInformation?.isSynced,
-		'is-draggable': canMoveBlock,
+		'is-draggable': canMoveBlock && ! isDisabledListViewGroup,
+		'is-disabled-list-view-group': isDisabledListViewGroup,
 		'is-displacement-normal': displacement === 'normal',
 		'is-displacement-up': displacement === 'up',
 		'is-displacement-down': displacement === 'down',
@@ -584,7 +598,9 @@ function ListViewBlock( {
 
 	// Detect if there is a block in the canvas currently being edited and multi-selection is not happening.
 	const currentlyEditingBlockInCanvas =
-		isSelected && selectedClientIds.length === 1;
+		isSelected &&
+		selectedClientIds.length === 1 &&
+		! isDisabledListViewGroup;
 
 	return (
 		<ListViewLeaf
@@ -601,14 +617,16 @@ function ListViewBlock( {
 			path={ path }
 			id={ `list-view-${ listViewInstanceId }-block-${ clientId }` }
 			data-block={ clientId }
-			data-expanded={ canEditBlock ? isExpanded : undefined }
+			data-expanded={
+				canEditBlock || isDisabledListViewGroup ? isExpanded : undefined
+			}
 			ref={ rowRef }
 		>
 			<TreeGridCell
 				className="block-editor-list-view-block__contents-cell"
 				colSpan={ colSpan }
 				ref={ cellRef }
-				aria-selected={ !! isSelected }
+				aria-selected={ !! isSelected && ! isDisabledListViewGroup }
 			>
 				{ ( { ref, tabIndex, onFocus } ) => (
 					<div className="block-editor-list-view-block__contents-container">
@@ -627,7 +645,12 @@ function ListViewBlock( {
 								currentlyEditingBlockInCanvas ? 0 : tabIndex
 							}
 							onFocus={ onFocus }
-							isExpanded={ canEditBlock ? isExpanded : undefined }
+							isExpanded={
+								canEditBlock || isDisabledListViewGroup
+									? isExpanded
+									: undefined
+							}
+							isDisabled={ isDisabledListViewGroup }
 							selectedClientIds={ selectedClientIds }
 							ariaDescribedBy={ descriptionId }
 							visibilityLabel={ blockVisibilityDescription }
@@ -679,7 +702,7 @@ function ListViewBlock( {
 			{ showBlockActions && BlockSettingsMenu && (
 				<TreeGridCell
 					className={ listViewBlockSettingsClassName }
-					aria-selected={ !! isSelected }
+					aria-selected={ !! isSelected && ! isDisabledListViewGroup }
 					ref={ settingsRef }
 				>
 					{ ( { ref, tabIndex, onFocus } ) => (
