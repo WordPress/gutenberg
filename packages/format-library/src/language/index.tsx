@@ -11,6 +11,14 @@ import { useState } from '@wordpress/element';
 import { applyFormat, removeFormat, useAnchor } from '@wordpress/rich-text';
 import { language as languageIcon } from '@wordpress/icons';
 
+/**
+ * Internal dependencies
+ */
+import type { LanguageEditProps, InlineLanguageUIProps } from '../types';
+
+const RichTextToolbarButtonUnsafe =
+	RichTextToolbarButton as React.ComponentType< any >;
+
 const name = 'core/language';
 const title = __( 'Language' );
 
@@ -26,7 +34,7 @@ export const language = {
 	edit: Edit,
 };
 
-function Edit( { isActive, value, onChange, contentRef } ) {
+function Edit( { isActive, value, onChange, contentRef }: LanguageEditProps ) {
 	const [ isPopoverVisible, setIsPopoverVisible ] = useState( false );
 	const togglePopover = () => {
 		setIsPopoverVisible( ( state ) => ! state );
@@ -34,7 +42,7 @@ function Edit( { isActive, value, onChange, contentRef } ) {
 
 	return (
 		<>
-			<RichTextToolbarButton
+			<RichTextToolbarButtonUnsafe
 				icon={ languageIcon }
 				label={ title }
 				title={ title }
@@ -60,14 +68,21 @@ function Edit( { isActive, value, onChange, contentRef } ) {
 	);
 }
 
-function InlineLanguageUI( { value, contentRef, onChange, onClose } ) {
+function InlineLanguageUI( {
+	value,
+	contentRef,
+	onChange,
+	onClose,
+}: InlineLanguageUIProps ) {
 	const popoverAnchor = useAnchor( {
-		editableContentElement: contentRef.current,
-		settings: language,
+		editableContentElement:
+			// eslint-disable-next-line react-hooks/refs
+			contentRef.current as HTMLElement | null,
+		settings: language as any,
 	} );
 
 	const [ lang, setLang ] = useState( '' );
-	const [ dir, setDir ] = useState( 'ltr' );
+	const [ dir, setDir ] = useState< 'ltr' | 'rtl' >( 'ltr' );
 
 	return (
 		<Popover
@@ -89,7 +104,7 @@ function InlineLanguageUI( { value, contentRef, onChange, onClose } ) {
 								lang,
 								dir,
 							},
-						} )
+						} as any )
 					);
 					onClose();
 				} }
