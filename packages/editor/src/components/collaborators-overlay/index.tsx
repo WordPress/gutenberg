@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-// @ts-expect-error No exported types
+// @ts-ignore No exported types.
 import { privateApis } from '@wordpress/block-editor';
 
 /**

@@ -7,12 +7,9 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { __experimentalGrid as Grid } from '@wordpress/components';
-import {
-	getColorClassName,
-	__experimentalGetGradientClass,
-	// @wordpress/block-editor imports are not typed.
-	// @ts-expect-error
-} from '@wordpress/block-editor';
+// @ts-ignore No exported types.
+// prettier-ignore
+import { getColorClassName, __experimentalGetGradientClass } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies

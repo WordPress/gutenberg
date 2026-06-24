@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { BlockPreview } from '@wordpress/block-editor';
+import { Preview as LazyEditorPreview } from '@wordpress/lazy-editor';
 import { __unstableSerializeAndClean, parse } from '@wordpress/blocks';
 import {
 	Button,
@@ -613,21 +613,19 @@ function PageLayoutPreview( {
 			<div className="apm-layout-preview-page">
 				{ ! previewBlocks && <PageLayoutPreviewPlaceholder /> }
 				{ !! previewBlocks && (
-					<BlockPreview.Async
+					<LazyEditorPreview
+						blocks={ previewBlocks as any }
+						description={ pattern.title }
 						placeholder={ <PageLayoutPreviewPlaceholder /> }
-					>
-						<BlockPreview
-							blocks={ previewBlocks as any }
-							viewportWidth={
-								pattern.viewportWidth
-									? Math.min(
-											pattern.viewportWidth,
-											PAGE_LAYOUT_PREVIEW_VIEWPORT_WIDTH
-									  )
-									: PAGE_LAYOUT_PREVIEW_VIEWPORT_WIDTH
-							}
-						/>
-					</BlockPreview.Async>
+						viewportWidth={
+							pattern.viewportWidth
+								? Math.min(
+										pattern.viewportWidth,
+										PAGE_LAYOUT_PREVIEW_VIEWPORT_WIDTH
+								  )
+								: PAGE_LAYOUT_PREVIEW_VIEWPORT_WIDTH
+						}
+					/>
 				) }
 			</div>
 		</div>

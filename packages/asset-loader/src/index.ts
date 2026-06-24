@@ -175,6 +175,97 @@ function injectInlineScript(
 	return script;
 }
 
+function getVersionedSrc( src: string, version?: string ) {
+	if ( ! version ) {
+		return src;
+	}
+
+	return src + '?ver=' + version;
+}
+
+function getInlineContent( inlineAsset?: InlineStyle | InlineScript ) {
+	if ( Array.isArray( inlineAsset ) ) {
+		return inlineAsset.join( '\n' );
+	}
+
+	return inlineAsset ?? '';
+}
+
+function getStyleHtml(
+	handle: string,
+	styleData: Style,
+	inlineStyles: Record< 'before' | 'after', Record< string, InlineStyle > >
+) {
+	const beforeInline = getInlineContent( inlineStyles.before?.[ handle ] );
+	const afterInline = getInlineContent( inlineStyles.after?.[ handle ] );
+
+	return [
+		beforeInline
+			? `<style id="${ handle }-before-inline-css">${ beforeInline }</style>`
+			: '',
+		styleData.src
+			? `<link rel="stylesheet" href="${ getVersionedSrc(
+					styleData.src,
+					styleData.version
+			  ) }" id="${ handle }-css" media="${ styleData.media || 'all' }">`
+			: '',
+		afterInline
+			? `<style id="${ handle }-after-inline-css">${ afterInline }</style>`
+			: '',
+	]
+		.filter( Boolean )
+		.join( '\n' );
+}
+
+function getScriptHtml(
+	handle: string,
+	scriptData: Script,
+	inlineScripts: Record< 'before' | 'after', Record< string, InlineScript > >
+) {
+	const beforeInline = getInlineContent( inlineScripts.before?.[ handle ] );
+	const afterInline = getInlineContent( inlineScripts.after?.[ handle ] );
+
+	return [
+		beforeInline
+			? `<script id="${ handle }-before-js">${ beforeInline }</script>`
+			: '',
+		scriptData.src
+			? `<script src="${ getVersionedSrc(
+					scriptData.src,
+					scriptData.version
+			  ) }" id="${ handle }-js"></script>`
+			: `<script id="${ handle }-js"></script>`,
+		afterInline
+			? `<script id="${ handle }-after-js">${ afterInline }</script>`
+			: '',
+	]
+		.filter( Boolean )
+		.join( '\n' );
+}
+
+export function getResolvedAssetsHtml(
+	scriptsData: Record< string, Script >,
+	inlineScripts: Record< 'before' | 'after', Record< string, InlineScript > >,
+	stylesData: Record< string, Style >,
+	inlineStyles: Record< 'before' | 'after', Record< string, InlineStyle > >
+) {
+	const orderedStyles = buildDependencyOrderedList( stylesData );
+	const orderedScripts = buildDependencyOrderedList( scriptsData );
+
+	return {
+		styles: orderedStyles
+			.map( ( handle ) =>
+				getStyleHtml( handle, stylesData[ handle ], inlineStyles )
+			)
+			.join( '\n' ),
+		scripts: orderedScripts
+			.map( ( handle ) =>
+				getScriptHtml( handle, scriptsData[ handle ], inlineScripts )
+			)
+			.join( '\n' ),
+	};
+}
+
 // Function to create dependency-ordered list respecting WordPress dependency graph
 function buildDependencyOrderedList< T extends Style | Script >(
 	assetsData: Record< string, T >
