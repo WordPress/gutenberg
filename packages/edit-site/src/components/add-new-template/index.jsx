@@ -3,8 +3,6 @@ import {
 	Button,
 	Modal,
 	__experimentalGrid as Grid,
-	__experimentalText as WCText,
-	__experimentalVStack as VStack,
 	Flex,
 	Icon as WCIcon,
 } from '@wordpress/components';
@@ -35,6 +33,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { focus } from '@wordpress/dom';
+import { Stack, Text } from '@wordpress/ui';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import AddCustomTemplateModalContent from './add-custom-template-modal-content';
 import {
@@ -113,20 +112,19 @@ function TemplateListItem( {
 				<div className="edit-site-add-new-template__template-icon">
 					<WCIcon icon={ icon } />
 				</div>
-				<VStack
+				<Stack
 					className="edit-site-add-new-template__template-name"
-					alignment="center"
-					spacing={ 0 }
+					direction="column"
+					align="center"
 				>
-					<WCText
-						align="center"
-						weight="var(--wpds-typography-font-weight-emphasis)"
-						lineHeight={ 1.53846153846 } // 20px
+					<Text
+						variant="heading-md"
+						style={ { textAlign: 'center' } }
 					>
 						{ title }
-					</WCText>
+					</Text>
 					{ children }
-				</VStack>
+				</Stack>
 			</Flex>
 		</Button>
 	);
@@ -319,13 +317,11 @@ function NewTemplateModal( { onClose } ) {
 							)
 						}
 					>
-						<WCText
-							lineHeight={ 1.53846153846 } // 20px
-						>
+						<Text variant="body-md">
 							{ __(
 								'A custom template can be manually applied to any post or page.'
 							) }
-						</WCText>
+						</Text>
 					</TemplateListItem>
 				</Grid>
 			) }
