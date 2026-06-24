@@ -9,17 +9,24 @@ import { useState, useEffect } from '@wordpress/element';
  */
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
-import { getComputedCSS, getGridTracks, getClosestTrack } from './utils';
+import {
+	getGridContentClientRect,
+	getGridItemAreaClientRect,
+	getGridOffsetRect,
+	getGridRect,
+} from './utils';
 
 export function GridItemResizer( {
 	clientId,
 	bounds,
+	layout,
 	onChange,
 	parentLayout,
 } ) {
 	const blockElement = useBlockElement( clientId );
 	const rootBlockElement = blockElement?.parentElement;
-	const { isManualPlacement } = parentLayout;
+	const { isManualPlacement, justifyContent, verticalAlignment } =
+		parentLayout;
 
 	if ( ! blockElement || ! rootBlockElement ) {
 		return null;
@@ -31,11 +38,14 @@ export function GridItemResizer( {
 			bounds={ bounds }
 			blockElement={ blockElement }
 			rootBlockElement={ rootBlockElement }
+			layout={ layout }
 			onChange={ onChange }
 			isManualGrid={
 				isManualPlacement &&
 				window.__experimentalEnableGridInteractivity
 			}
+			justifyContent={ justifyContent }
+			verticalAlignment={ verticalAlignment }
 		/>
 	);
 }
@@ -45,8 +55,11 @@ function GridItemResizerInner( {
 	bounds,
 	blockElement,
 	rootBlockElement,
+	layout,
 	onChange,
 	isManualGrid,
+	justifyContent,
+	verticalAlignment,
 } ) {
 	const [ resizeDirection, setResizeDirection ] = useState( null );
 	const [ enableSide, setEnableSide ] = useState( {
@@ -55,20 +68,32 @@ function GridItemResizerInner( {
 		left: false,
 		right: false,
 	} );
+	const [ gridAreaStyles, setGridAreaStyles ] = useState( {} );
 
 	useEffect( () => {
-		const observer = new window.ResizeObserver( () => {
+		const updateGridArea = () => {
+			const gridItemAreaClientRect =
+				getGridItemAreaClientRect( blockElement );
 			const blockClientRect = blockElement.getBoundingClientRect();
-			const rootBlockClientRect =
-				rootBlockElement.getBoundingClientRect();
+			const gridContentClientRect =
+				getGridContentClientRect( rootBlockElement );
 
-			const topAvailable = blockClientRect.top > rootBlockClientRect.top;
+			setGridAreaStyles( {
+				width: gridItemAreaClientRect.width,
+				height: gridItemAreaClientRect.height,
+				transform: `translate(${
+					gridItemAreaClientRect.left - blockClientRect.left
+				}px, ${ gridItemAreaClientRect.top - blockClientRect.top }px)`,
+			} );
+
+			const topAvailable =
+				gridItemAreaClientRect.top > gridContentClientRect.top;
 			const bottomAvailable =
-				blockClientRect.bottom < rootBlockClientRect.bottom;
+				gridItemAreaClientRect.bottom < gridContentClientRect.bottom;
 			const leftAvailable =
-				blockClientRect.left > rootBlockClientRect.left;
+				gridItemAreaClientRect.left > gridContentClientRect.left;
 			const rightAvailable =
-				blockClientRect.right < rootBlockClientRect.right;
+				gridItemAreaClientRect.right < gridContentClientRect.right;
 
 			setEnableSide( {
 				top: !! isManualGrid
@@ -80,10 +105,27 @@ function GridItemResizerInner( {
 					: ! rightAvailable && leftAvailable,
 				right: rightAvailable,
 			} );
+		};
+
+		updateGridArea();
+
+		const observer = new window.ResizeObserver( () => {
+			updateGridArea();
 		} );
-		observer.observe( blockElement );
+		observer.observe( blockElement, { box: 'border-box' } );
+		observer.observe( rootBlockElement, { box: 'border-box' } );
 		return () => observer.disconnect();
-	}, [ blockElement, rootBlockElement, isManualGrid ] );
+	}, [
+		blockElement,
+		rootBlockElement,
+		isManualGrid,
+		justifyContent,
+		verticalAlignment,
+		layout?.columnStart,
+		layout?.rowStart,
+		layout?.columnSpan,
+		layout?.rowSpan,
+	] );
 
 	const justification = {
 		right: 'left',
@@ -96,6 +138,7 @@ function GridItemResizerInner( {
 	};
 
 	const styles = {
+		...gridAreaStyles,
 		display: 'flex',
 		justifyContent: 'center',
 		alignItems: 'center',
@@ -150,47 +193,19 @@ function GridItemResizerInner( {
 					setResizeDirection( direction );
 				} }
 				onResizeStop={ ( event, direction, boxElement ) => {
-					const columnGap = parseFloat(
-						getComputedCSS( rootBlockElement, 'column-gap' )
+					const rect = getGridOffsetRect(
+						rootBlockElement,
+						boxElement.getBoundingClientRect()
 					);
-					const rowGap = parseFloat(
-						getComputedCSS( rootBlockElement, 'row-gap' )
-					);
-					const gridColumnTracks = getGridTracks(
-						getComputedCSS(
-							rootBlockElement,
-							'grid-template-columns'
-						),
-						columnGap
-					);
-					const gridRowTracks = getGridTracks(
-						getComputedCSS(
-							rootBlockElement,
-							'grid-template-rows'
-						),
-						rowGap
-					);
-					const rect = new window.DOMRect(
-						blockElement.offsetLeft + boxElement.offsetLeft,
-						blockElement.offsetTop + boxElement.offsetTop,
-						boxElement.offsetWidth,
-						boxElement.offsetHeight
-					);
-					const columnStart =
-						getClosestTrack( gridColumnTracks, rect.left ) + 1;
-					const rowStart =
-						getClosestTrack( gridRowTracks, rect.top ) + 1;
-					const columnEnd =
-						getClosestTrack( gridColumnTracks, rect.right, 'end' ) +
-						1;
-					const rowEnd =
-						getClosestTrack( gridRowTracks, rect.bottom, 'end' ) +
-						1;
+					const gridRect = getGridRect( rootBlockElement, rect );
+
 					onChange( {
-						columnSpan: columnEnd - columnStart + 1,
-						rowSpan: rowEnd - rowStart + 1,
-						columnStart: isManualGrid ? columnStart : undefined,
-						rowStart: isManualGrid ? rowStart : undefined,
+						columnSpan: gridRect.columnSpan,
+						rowSpan: gridRect.rowSpan,
+						columnStart: isManualGrid
+							? gridRect.columnStart
+							: undefined,
+						rowStart: isManualGrid ? gridRect.rowStart : undefined,
 					} );
 				} }
 			/>

@@ -762,6 +762,20 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			}
 		}
 	} elseif ( 'grid' === $layout_type ) {
+		$justify_items_options = array(
+			'left'    => 'start',
+			'center'  => 'center',
+			'right'   => 'end',
+			'stretch' => 'stretch',
+		);
+
+		$alignment_options = array(
+			'top'     => 'start',
+			'center'  => 'center',
+			'bottom'  => 'end',
+			'stretch' => 'stretch',
+		);
+
 		/*
 		 * If the gap value is an array, we use the "left" value because it represents the vertical gap, which
 		 * is the relevant one for computation of responsive grid columns.
@@ -809,8 +823,10 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$should_output_grid_columns = true;
 		}
 
-		$should_output_grid_rows = ( null === $viewport_overrides || $has_viewport_property_override( 'rowCount' ) ) && ! empty( $layout_for_styles['columnCount'] ) && ! empty( $layout_for_styles['rowCount'] );
-		$grid_declarations       = array();
+		$should_output_grid_rows          = ( null === $viewport_overrides || $has_viewport_property_override( 'rowCount' ) ) && ! empty( $layout_for_styles['columnCount'] ) && ! empty( $layout_for_styles['rowCount'] );
+		$should_output_grid_justification = null === $viewport_overrides || $has_viewport_property_override( 'justifyContent' );
+		$should_output_grid_alignment     = null === $viewport_overrides || $has_viewport_property_override( 'verticalAlignment' );
+		$grid_declarations                = array();
 
 		if ( $should_output_grid_columns && ! empty( $layout_for_styles['columnCount'] ) && ! empty( $layout_for_styles['minimumColumnWidth'] ) ) {
 			$max_value                                  = 'max(min(' . $layout_for_styles['minimumColumnWidth'] . ', 100%), (100% - (' . $responsive_gap_value . ' * (' . $layout_for_styles['columnCount'] . ' - 1))) /' . $layout_for_styles['columnCount'] . ')';
@@ -829,16 +845,24 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 					$grid_declarations['container-type'] = 'inline-size';
 				}
 			}
-			$layout_styles[] = array(
-				'selector'     => $selector,
-				'declarations' => $grid_declarations,
-			);
 		}
 
 		if ( $should_output_grid_rows ) {
+			$grid_declarations['grid-template-rows'] = 'repeat(' . $layout_for_styles['rowCount'] . ', minmax(1rem, auto))';
+		}
+
+		if ( $should_output_grid_justification && ! empty( $layout_for_styles['justifyContent'] ) && array_key_exists( $layout_for_styles['justifyContent'], $justify_items_options ) ) {
+			$grid_declarations['justify-items'] = $justify_items_options[ $layout_for_styles['justifyContent'] ];
+		}
+
+		if ( $should_output_grid_alignment && ! empty( $layout_for_styles['verticalAlignment'] ) && array_key_exists( $layout_for_styles['verticalAlignment'], $alignment_options ) ) {
+			$grid_declarations['align-items'] = $alignment_options[ $layout_for_styles['verticalAlignment'] ];
+		}
+
+		if ( ! empty( $grid_declarations ) ) {
 			$layout_styles[] = array(
 				'selector'     => $selector,
-				'declarations' => array( 'grid-template-rows' => 'repeat(' . $layout_for_styles['rowCount'] . ', minmax(1rem, auto))' ),
+				'declarations' => $grid_declarations,
 			);
 		}
 

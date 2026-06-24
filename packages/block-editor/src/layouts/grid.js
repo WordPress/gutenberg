@@ -1,8 +1,17 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-
+import { __, _x } from '@wordpress/i18n';
+import {
+	justifyLeft,
+	justifyCenter,
+	justifyRight,
+	justifyStretch,
+	justifyTop,
+	justifyCenterVertical,
+	justifyBottom,
+	justifyStretchVertical,
+} from '@wordpress/icons';
 import {
 	BaseControl,
 	Flex,
@@ -11,6 +20,7 @@ import {
 	__experimentalNumberControl as NumberControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 	__experimentalUnitControl as UnitControl,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -63,6 +73,68 @@ const units = [
 	{ value: 'em', label: 'em', default: 0 },
 ];
 
+const justifyItemsMap = {
+	left: 'start',
+	center: 'center',
+	right: 'end',
+	stretch: 'stretch',
+};
+
+const alignItemsMap = {
+	top: 'start',
+	center: 'center',
+	bottom: 'end',
+	stretch: 'stretch',
+};
+
+const defaultAlignment = 'stretch';
+
+const gridJustificationOptions = [
+	{
+		value: 'left',
+		icon: justifyLeft,
+		label: __( 'Justify items left' ),
+	},
+	{
+		value: 'center',
+		icon: justifyCenter,
+		label: __( 'Justify items center' ),
+	},
+	{
+		value: 'right',
+		icon: justifyRight,
+		label: __( 'Justify items right' ),
+	},
+	{
+		value: 'stretch',
+		icon: justifyStretch,
+		label: __( 'Stretch items' ),
+	},
+];
+
+const gridVerticalAlignmentOptions = [
+	{
+		value: 'top',
+		icon: justifyTop,
+		label: _x( 'Align top', 'Block vertical alignment setting' ),
+	},
+	{
+		value: 'center',
+		icon: justifyCenterVertical,
+		label: _x( 'Align middle', 'Block vertical alignment setting' ),
+	},
+	{
+		value: 'bottom',
+		icon: justifyBottom,
+		label: _x( 'Align bottom', 'Block vertical alignment setting' ),
+	},
+	{
+		value: 'stretch',
+		icon: justifyStretchVertical,
+		label: _x( 'Stretch to fill', 'Block vertical alignment setting' ),
+	},
+];
+
 export default {
 	name: 'grid',
 	label: __( 'Grid' ),
@@ -73,7 +145,11 @@ export default {
 		resetLayout = {},
 		clientId,
 	} ) {
-		const { allowSizingOnChildren = false } = layoutBlockSupport;
+		const {
+			allowJustification = true,
+			allowVerticalAlignment = true,
+			allowSizingOnChildren = false,
+		} = layoutBlockSupport;
 
 		// Always show both column and minimum width controls in Auto mode.
 		// Manual mode (with isManualPlacement) is only available behind the experiment flag.
@@ -92,6 +168,10 @@ export default {
 			hasLayoutValue( 'rowCount' );
 		const hasMinimumColumnWidthValue = () =>
 			hasLayoutValue( 'minimumColumnWidth' );
+		const hasJustificationValue = () =>
+			hasLayoutValue( 'justifyContent', defaultAlignment );
+		const hasVerticalAlignmentValue = () =>
+			hasLayoutValue( 'verticalAlignment', defaultAlignment );
 		const resetGridType = () =>
 			onChange(
 				cleanEmptyObject( {
@@ -114,6 +194,20 @@ export default {
 				cleanEmptyObject( {
 					...layout,
 					minimumColumnWidth: resetLayout?.minimumColumnWidth,
+				} )
+			);
+		const resetJustification = () =>
+			onChange(
+				cleanEmptyObject( {
+					...layout,
+					justifyContent: resetLayout?.justifyContent,
+				} )
+			);
+		const resetVerticalAlignment = () =>
+			onChange(
+				cleanEmptyObject( {
+					...layout,
+					verticalAlignment: resetLayout?.verticalAlignment,
 				} )
 			);
 
@@ -162,6 +256,32 @@ export default {
 						/>
 					</ToolsPanelItem>
 				) }
+				{ allowJustification && (
+					<ToolsPanelItem
+						label={ __( 'Justification' ) }
+						hasValue={ hasJustificationValue }
+						onDeselect={ resetJustification }
+						panelId={ clientId }
+					>
+						<GridLayoutJustifyItemsControl
+							layout={ layout }
+							onChange={ onChange }
+						/>
+					</ToolsPanelItem>
+				) }
+				{ allowVerticalAlignment && (
+					<ToolsPanelItem
+						label={ __( 'Alignment' ) }
+						hasValue={ hasVerticalAlignmentValue }
+						onDeselect={ resetVerticalAlignment }
+						panelId={ clientId }
+					>
+						<GridLayoutVerticalAlignmentControl
+							layout={ layout }
+							onChange={ onChange }
+						/>
+					</ToolsPanelItem>
+				) }
 			</>
 		);
 	},
@@ -189,6 +309,8 @@ export default {
 			columnCount = null,
 			rowCount = null,
 		} = effectiveLayout;
+		const justifyItems = justifyItemsMap[ effectiveLayout.justifyContent ];
+		const alignItems = alignItemsMap[ effectiveLayout.verticalAlignment ];
 
 		// Check that the grid layout attributes are of the correct type, so that we don't accidentally
 		// write code that stores a string attribute instead of a number.
@@ -241,6 +363,11 @@ export default {
 			( ! hasViewportOverrides || hasViewportOverride( 'rowCount' ) ) &&
 			columnCount &&
 			rowCount;
+		const shouldOutputGridJustification =
+			! hasViewportOverrides || hasViewportOverride( 'justifyContent' );
+		const shouldOutputGridAlignment =
+			! hasViewportOverrides ||
+			hasViewportOverride( 'verticalAlignment' );
 
 		if (
 			shouldOutputGridColumns &&
@@ -289,6 +416,14 @@ export default {
 			);
 		}
 
+		if ( shouldOutputGridJustification && justifyItems ) {
+			rules.push( `justify-items: ${ justifyItems }` );
+		}
+
+		if ( shouldOutputGridAlignment && alignItems ) {
+			rules.push( `align-items: ${ alignItems }` );
+		}
+
 		if ( rules.length ) {
 			output = `${ appendSelectors( selector ) } { ${ rules.join(
 				'; '
@@ -313,6 +448,68 @@ export default {
 		return [];
 	},
 };
+
+function GridLayoutJustifyItemsControl( { layout, onChange } ) {
+	const { justifyContent = defaultAlignment } = layout;
+	const onJustificationChange = ( value ) => {
+		onChange( {
+			...layout,
+			justifyContent: value,
+		} );
+	};
+
+	return (
+		<ToggleGroupControl
+			__next40pxDefaultSize
+			label={ __( 'Justification' ) }
+			onChange={ onJustificationChange }
+			value={ justifyContent }
+			className="block-editor-hooks__grid-layout-justification-controls"
+		>
+			{ gridJustificationOptions.map( ( { value, icon, label } ) => {
+				return (
+					<ToggleGroupControlOptionIcon
+						key={ value }
+						value={ value }
+						icon={ icon }
+						label={ label }
+					/>
+				);
+			} ) }
+		</ToggleGroupControl>
+	);
+}
+
+function GridLayoutVerticalAlignmentControl( { layout, onChange } ) {
+	const { verticalAlignment = defaultAlignment } = layout;
+	const onVerticalAlignmentChange = ( value ) => {
+		onChange( {
+			...layout,
+			verticalAlignment: value,
+		} );
+	};
+
+	return (
+		<ToggleGroupControl
+			__next40pxDefaultSize
+			label={ __( 'Alignment' ) }
+			onChange={ onVerticalAlignmentChange }
+			value={ verticalAlignment }
+			className="block-editor-hooks__grid-layout-vertical-alignment-controls"
+		>
+			{ gridVerticalAlignmentOptions.map( ( { value, icon, label } ) => {
+				return (
+					<ToggleGroupControlOptionIcon
+						key={ value }
+						value={ value }
+						icon={ icon }
+						label={ label }
+					/>
+				);
+			} ) }
+		</ToggleGroupControl>
+	);
+}
 
 // Enables setting minimum width of grid items.
 function GridLayoutMinimumWidthControl( { layout, onChange } ) {

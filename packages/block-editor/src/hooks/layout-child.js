@@ -495,6 +495,7 @@ function GridTools( {
 					clientId={ clientId }
 					// Don't allow resizing beyond the grid visualizer.
 					bounds={ resizerBounds }
+					layout={ style?.layout }
 					onChange={ updateLayout }
 					parentLayout={ parentLayout }
 				/>
