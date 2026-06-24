@@ -3,11 +3,12 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/z-index" as *;
 
-.block-editor-grid-visualizer {
+.components-popover.block-editor-block-popover.block-editor-grid-visualizer {
 	// Specificity to override the z-index and pointer-events set by .components-popover.
 	&.block-editor-grid-visualizer.block-editor-grid-visualizer {
 		z-index: z-index(".block-editor-grid-visualizer");
 
+		.components-popover__content,
 		.components-popover__content * {
 			pointer-events: none;
 		}
@@ -80,26 +81,27 @@
 	min-height: $grid-unit-10;
 }
 
-.block-editor-grid-item-resizer {
+.components-popover.block-editor-block-popover.block-editor-grid-item-resizer {
 	// Specificity to override the z-index and pointer-events set by .components-popover.
 	&.block-editor-grid-item-resizer.block-editor-grid-item-resizer {
 		z-index: z-index(".block-editor-grid-visualizer");
 
+		.components-popover__content,
 		.components-popover__content * {
 			pointer-events: none;
+		}
+
+		.block-editor-grid-item-resizer__box .components-resizable-box__handle {
+			// Specificity to override the pointer-events set by this popover.
+			&.components-resizable-box__handle.components-resizable-box__handle {
+				pointer-events: all;
+			}
 		}
 	}
 }
 
 .block-editor-grid-item-resizer__box {
 	border: $border-width solid var(--wp-admin-theme-color);
-
-	.components-resizable-box__handle {
-		// Specificity to override the pointer-events set by .components-popover.
-		&.components-resizable-box__handle.components-resizable-box__handle {
-			pointer-events: all;
-		}
-	}
 }
 
 .block-editor-grid-item-mover__move-button-container {
@@ -267,4 +269,3 @@
 		}
 	}
 }
-

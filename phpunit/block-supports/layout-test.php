@@ -404,6 +404,17 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 				),
 				'expected_output' => '.wp-layout{grid-template-columns:repeat(3, minmax(0, 1fr));}',
 			),
+			'grid layout with item alignment'              => array(
+				'args'            => array(
+					'selector' => '.wp-layout',
+					'layout'   => array(
+						'type'              => 'grid',
+						'justifyContent'    => 'center',
+						'verticalAlignment' => 'bottom',
+					),
+				),
+				'expected_output' => '.wp-layout{grid-template-columns:repeat(auto-fill, minmax(min(12rem, 100%), 1fr));container-type:inline-size;justify-items:center;align-items:end;}',
+			),
 			'default layout with blockGap to verify converting gap value into valid CSS' => array(
 				'args'            => array(
 					'selector'              => '.wp-block-group.wp-container-6',

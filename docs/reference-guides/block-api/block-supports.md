@@ -841,14 +841,14 @@ For the `flex` layout type only, determines display of sizing controls (Fit/Grow
 -   Type: `boolean`
 -   Default value: `true`
 
-For the `flex` layout type only, determines display of the vertical alignment control in the block toolbar.
+For the `flex` layout type, determines display of the vertical alignment control in the block toolbar and block sidebar. For the `grid` layout type, determines display of the vertical alignment control in the block sidebar.
 
 ### layout.allowJustification
 
 -   Type: `boolean`
 -   Default value: `true`
 
-For the `flex` layout type, determines display of the justification control in the block toolbar and block sidebar. For the `constrained` layout type, determines display of justification control in the block sidebar.
+For the `flex` layout type, determines display of the justification control in the block toolbar and block sidebar. For the `grid` and `constrained` layout types, determines display of the justification control in the block sidebar.
 
 ### layout.allowOrientation
 
