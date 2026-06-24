@@ -8,14 +8,15 @@
 /**
  * Render callback for core/tab-list.
  *
- * Re-renders each tab inner block with per-item context (index, id,
- * label) injected from the tabs-list, so the tab render callback
- * can add the correct IAPI directives for each button.
+ * Injects IAPI directives into the saved button HTML. The buttons already
+ * carry color/border/padding styles from save.js; this callback adds
+ * tab-specific attributes (id, aria-controls, context) and interactivity
+ * directives using data from the tabs-list context.
  *
  * @since 7.0.0
  *
  * @param array     $attributes Block attributes.
- * @param string    $content    Block content (rendered inner blocks from save.js).
+ * @param string    $content    Block content (rendered buttons from save.js).
  * @param \WP_Block $block      WP_Block instance.
  *
  * @return string Updated HTML.
@@ -27,41 +28,33 @@ function block_core_tab_list_render_callback( array $attributes, string $content
 		return $content;
 	}
 
-	// Re-render each tab with per-item context (index, id, label).
-	// Match by position so items align with their corresponding tabs.
-	$buttons_html = '';
-	$tab_position = 0;
+	$tag_processor = new WP_HTML_Tag_Processor( $content );
+	$tab_index     = 0;
 
-	foreach ( $block->parsed_block['innerBlocks'] ?? array() as $parsed_tab ) {
-		if ( 'core/tab' !== ( $parsed_tab['blockName'] ?? '' ) ) {
-			continue;
-		}
+	while ( $tag_processor->next_tag( 'button' ) ) {
+		$tab = $tabs_list[ $tab_index ] ?? null;
 
-		$tab       = $tabs_list[ $tab_position ] ?? null;
-		$tab_index = $tab_position;
-		++$tab_position;
-
-		// Skip tabs with no matching tab panel.
 		if ( null === $tab ) {
-			continue;
+			break;
 		}
 
-		$item_context = array_merge(
-			$block->context,
-			array(
-				'core/tab-index' => $tab_index,
-				'core/tab-id'    => $tab['id'] ?? '',
-				'core/tab-label' => $tab['label'] ?? '',
-			)
+		$tab_id = $tab['id'] ?? 'tab-' . $tab_index;
+
+		$tag_processor->set_attribute( 'id', 'tab__' . $tab_id );
+		$tag_processor->set_attribute( 'aria-controls', $tab_id );
+		$tag_processor->set_attribute( 'data-wp-on--click', 'actions.handleTabClick' );
+		$tag_processor->set_attribute( 'data-wp-on--keydown', 'actions.handleTabKeyDown' );
+		$tag_processor->set_attribute( 'data-wp-bind--aria-selected', 'state.isActiveTab' );
+		$tag_processor->set_attribute( 'data-wp-bind--tabindex', 'state.tabIndexAttribute' );
+		$tag_processor->set_attribute(
+			'data-wp-context',
+			wp_json_encode( array( 'tabIndex' => $tab_index ) )
 		);
 
-		$tab_block     = new WP_Block( $parsed_tab, $item_context );
-		$buttons_html .= $tab_block->render();
+		++$tab_index;
 	}
 
-	// Rebuild the wrapper using get_block_wrapper_attributes().
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'role' => 'tablist' ) );
-	return sprintf( '<div %s>%s</div>', $wrapper_attributes, $buttons_html );
+	return $tag_processor->get_updated_html();
 }
 
 /**

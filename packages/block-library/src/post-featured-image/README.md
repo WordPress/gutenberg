@@ -62,6 +62,7 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 
 _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
 
+- **dimensions**: `.wp-block-post-featured-image img`
 - **border**: `.wp-block-post-featured-image img, .wp-block-post-featured-image .block-editor-media-placeholder, .wp-block-post-featured-image .wp-block-post-featured-image__overlay`
 - **shadow**: `.wp-block-post-featured-image img, .wp-block-post-featured-image .components-placeholder`
 - **filter**:

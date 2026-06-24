@@ -203,7 +203,6 @@ export default function PostTitleEdit( {
 										}
 									>
 										<TextControl
-											__next40pxDefaultSize
 											label={ __( 'Link relation' ) }
 											help={ createInterpolateElement(
 												__(

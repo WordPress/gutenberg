@@ -474,4 +474,18 @@ describe( 'BoxControl', () => {
 			} );
 		} );
 	} );
+
+	describe( 'Placeholder', () => {
+		it( 'applies a consumer-supplied placeholder passed via inputProps', () => {
+			render(
+				<UncontrolledBoxControl
+					inputProps={ { placeholder: 'Inherited' } }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'textbox', { name: 'All sides' } )
+			).toHaveAttribute( 'placeholder', 'Inherited' );
+		} );
+	} );
 } );

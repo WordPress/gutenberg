@@ -38,23 +38,23 @@ const legacyWpComponentsOverridesCSS: Entry[] = [
 	],
 	[
 		'--wp-components-color-accent-inverted',
-		'var(--wpds-color-fg-interactive-brand-strong)',
+		'var(--wpds-color-foreground-interactive-brand-strong)',
 	],
 	[
 		'--wp-components-color-background',
-		'var(--wpds-color-bg-surface-neutral-strong)',
+		'var(--wpds-color-background-surface-neutral-strong)',
 	],
 	[
 		'--wp-components-color-foreground',
-		'var(--wpds-color-fg-content-neutral)',
+		'var(--wpds-color-foreground-content-neutral)',
 	],
 	[
 		'--wp-components-color-foreground-inverted',
-		'var(--wpds-color-bg-surface-neutral)',
+		'var(--wpds-color-background-surface-neutral)',
 	],
 	[
 		'--wp-components-color-gray-100',
-		'var(--wpds-color-bg-surface-neutral)',
+		'var(--wpds-color-background-surface-neutral)',
 	],
 	[
 		'--wp-components-color-gray-200',
@@ -74,11 +74,11 @@ const legacyWpComponentsOverridesCSS: Entry[] = [
 	],
 	[
 		'--wp-components-color-gray-700',
-		'var(--wpds-color-fg-content-neutral-weak)',
+		'var(--wpds-color-foreground-content-neutral-weak)',
 	],
 	[
 		'--wp-components-color-gray-800',
-		'var(--wpds-color-fg-content-neutral)',
+		'var(--wpds-color-foreground-content-neutral)',
 	],
 ];
 
@@ -161,9 +161,11 @@ function generateStyles( {
 export function useThemeProviderStyles( {
 	color = {},
 	cursor,
+	cornerRadius,
 }: {
 	color?: ThemeProviderProps[ 'color' ];
 	cursor?: ThemeProviderProps[ 'cursor' ];
+	cornerRadius?: ThemeProviderProps[ 'cornerRadius' ];
 } = {} ) {
 	const { resolvedSettings: inheritedSettings } = useContext( ThemeContext );
 
@@ -180,6 +182,8 @@ export function useThemeProviderStyles( {
 		inheritedSettings.color?.background ??
 		DEFAULT_SEED_COLORS.background;
 	const cursorControl = cursor?.control ?? inheritedSettings.cursor?.control;
+	const cornerRadiusPreset =
+		cornerRadius ?? inheritedSettings.cornerRadius ?? 'subtle';
 
 	const resolvedSettings = useMemo(
 		() => ( {
@@ -188,8 +192,9 @@ export function useThemeProviderStyles( {
 				background,
 			},
 			cursor: cursorControl ? { control: cursorControl } : undefined,
+			cornerRadius: cornerRadiusPreset,
 		} ),
-		[ primary, background, cursorControl ]
+		[ primary, background, cursorControl, cornerRadiusPreset ]
 	);
 
 	const colorStyles = useMemo( () => {
@@ -200,9 +205,10 @@ export function useThemeProviderStyles( {
 			primary,
 		};
 
-		// Generate ramps, keyed by their design token group name. The
-		// `background` seed maps to the `bg` token group: the design system
-		// token naming intentionally keeps the `bg` convention.
+		// Generate ramps, keyed by their primitive token group name. The
+		// `background` seed maps to the `bg` primitive ramp group, whose name
+		// is kept abbreviated even though the semantic tokens it feeds are
+		// exposed under the spelled-out `background` group.
 		const computedColorRamps = new Map< string, RampResult >();
 		const bgRamp = getCachedBgRamp( seeds.background );
 		Object.entries( seeds ).forEach( ( [ rampName, seed ] ) => {
