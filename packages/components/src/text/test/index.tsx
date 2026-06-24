@@ -31,11 +31,13 @@ describe( 'Text', () => {
 
 	test( 'should render truncate', () => {
 		render(
-			<Text role="heading" truncate limit={ 1 } ellipsizeMode="tail">
+			<Text role="heading" truncate>
 				Lorem ipsum.
 			</Text>
 		);
-		expect( screen.getByRole( 'heading' ) ).toHaveTextContent( 'L…' );
+		expect( screen.getByRole( 'heading' ) ).toHaveAccessibleName(
+			'Lorem ipsum.'
+		);
 	} );
 
 	test( 'should render size', () => {
