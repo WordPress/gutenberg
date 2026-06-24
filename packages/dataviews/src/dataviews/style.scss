@@ -16,7 +16,7 @@
 	flex-grow: 1;
 	min-height: 0;
 	box-sizing: border-box;
-	scroll-padding-bottom: calc(var(--wpds-dimension-base) * 16);
+	scroll-padding-bottom: 64px;
 	/* stylelint-disable-next-line property-no-unknown -- '@container' not globally permitted */
 	container: dataviews-wrapper / inline-size;
 	display: flex;

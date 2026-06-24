@@ -8,8 +8,8 @@
 	"exclude": [],
 	"files": [ "global.d.ts" ],
 	"references": [
+		{ "path": "../compose" },
 		{ "path": "../element" },
-		{ "path": "../private-apis" },
 		{ "path": "../style-runtime" }
 	]
 }
