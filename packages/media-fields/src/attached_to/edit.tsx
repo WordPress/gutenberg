@@ -90,13 +90,16 @@ export default function MediaAttachedToEdit( {
 			{}
 		);
 		setSearchResults( results );
-		const mappedSuggestions = results.map( ( result ) => {
+		const suggestions = results.map( ( result ) => {
 			return {
 				label: result.title,
 				value: result.id.toString(),
 			};
 		} );
-		setOptions( mappedSuggestions );
+		const includeCurrent =
+			! filterValue &&
+			suggestions.findIndex( ( s ) => s.value === value ) === -1;
+		setOptions( suggestions.concat( includeCurrent ? defaultPost : [] ) );
 		setIsLoading( false );
 	};
 
