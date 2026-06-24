@@ -1661,6 +1661,7 @@ describe( 'private selectors', () => {
 			blockName = 'core/group',
 			patternName,
 			disableContentOnlyForUnsyncedPatterns,
+			disableContentOnlyForTemplateParts,
 			templateLock,
 			rootTemplateLock,
 		} = {} ) => {
@@ -1685,10 +1686,14 @@ describe( 'private selectors', () => {
 							: {},
 					],
 				] ),
-				settings:
-					disableContentOnlyForUnsyncedPatterns !== undefined
+				settings: {
+					...( disableContentOnlyForUnsyncedPatterns !== undefined
 						? { disableContentOnlyForUnsyncedPatterns }
-						: {},
+						: {} ),
+					...( disableContentOnlyForTemplateParts !== undefined
+						? { disableContentOnlyForTemplateParts }
+						: {} ),
+				},
 				editedContentOnlySection: undefined,
 			};
 		};
@@ -1728,6 +1733,22 @@ describe( 'private selectors', () => {
 			const state = createState( {
 				patternName: 'my-pattern',
 				disableContentOnlyForUnsyncedPatterns: false,
+			} );
+			expect( isSectionBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'should return false for template parts when disableContentOnlyForTemplateParts is true', () => {
+			const state = createState( {
+				blockName: 'core/template-part',
+				disableContentOnlyForTemplateParts: true,
+			} );
+			expect( isSectionBlock( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'should return true for template parts when disableContentOnlyForTemplateParts is false', () => {
+			const state = createState( {
+				blockName: 'core/template-part',
+				disableContentOnlyForTemplateParts: false,
 			} );
 			expect( isSectionBlock( state, 'block-1' ) ).toBe( true );
 		} );
