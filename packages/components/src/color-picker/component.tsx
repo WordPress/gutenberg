@@ -249,7 +249,7 @@ const UnconnectedColorPicker = (
 
 /**
  * ColorPicker lets users select a color from a visual color surface, or by
- * by editing its hex, RGB, or HSL values.
+ * editing its hex, RGB, or HSL values.
  */
 export const ColorPicker = contextConnect(
 	UnconnectedColorPicker,
