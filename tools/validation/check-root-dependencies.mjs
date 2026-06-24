@@ -3,7 +3,8 @@
 /**
  * Fails when a PR adds new entries to `dependencies` or `devDependencies` in
  * the root package.json. New dependencies should be declared in the workspace
- * that uses them — under `tools/` or `test/` — not at the repo root.
+ * that uses them (e.g. under `packages/`, `tools/`, or `test/`), not at the
+ * repo root.
  *
  * See docs/contributors/code/workspace-development.md.
  *
@@ -19,12 +20,10 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import SimpleGit from 'simple-git';
 
-const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
-const ROOT = path.resolve( __dirname, '../..' );
+const ROOT = path.resolve( import.meta.dirname, '../..' );
 const ROOT_PACKAGE_JSON = path.join( ROOT, 'package.json' );
 const FIELDS = [ 'dependencies', 'devDependencies' ];
 const GUIDE_URL =
@@ -107,7 +106,7 @@ console.error( `
 
 ${ list }
 
-Please declare dependencies in the workspace that uses them, not at the repo root — add the dependency to an existing workspace under tools/ or test/, or create a new workspace if no existing one fits.
+Please declare dependencies in the workspace that uses them, not at the repo root. Add the dependency to an existing workspace (e.g. under packages/, tools/, or test/), or create a new one if no existing workspace fits.
 
 See: ${ GUIDE_URL }
 ` );
