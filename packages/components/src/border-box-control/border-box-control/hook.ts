@@ -34,6 +34,9 @@ export function useBorderBoxControl(
 		enableStyle = true,
 		value,
 		__experimentalIsRenderedInSidebar = false,
+		// Deprecated props, no longer used.
+		size: _size,
+		__next40pxDefaultSize: _next40pxDefaultSize,
 		...otherProps
 	} = useContextSystem( props, 'BorderBoxControl' );
 
