@@ -2,6 +2,48 @@
 
 ## Unreleased
 
+## 2.49.0 (2026-06-24)
+
+## 2.48.1 (2026-06-16)
+
+## 2.48.0 (2026-06-10)
+
+## 2.47.0 (2026-05-27)
+
+## 2.46.0 (2026-05-14)
+
+## 2.45.0 (2026-04-29)
+
+## 2.44.0 (2026-04-15)
+
+## 2.43.0 (2026-04-01)
+
+## 2.42.0 (2026-03-18)
+
+### Bug Fixes
+
+-   Fix race condition where router evaluates before `hydrateRegions()` completes on Safari and Firefox, causing interactive regions to be permanently non-functional (dead DOM). ([#76053](https://github.com/WordPress/gutenberg/pull/76053))
+## 2.41.0 (2026-03-04)
+
+## 2.40.0 (2026-02-18)
+
+### Deprecations
+
+-   Move `state.navigation.hasStarted` and `state.navigation.hasFinished` to a private store and deprecate direct access from the public `core/router` store. ([#70882](https://github.com/WordPress/gutenberg/pull/70882))
+
+### Bug Fixes
+
+-   Update cached styles for re-fetched pages. ([#75097](https://github.com/WordPress/gutenberg/pull/75097))
+
+## 2.39.0 (2026-01-29)
+
+### Bug Fixes
+
+-   Prevent router regions with data-wp-key from being recreated on navigation. ([#74750](https://github.com/WordPress/gutenberg/pull/74750))
+-   Fix initial router regions with `attachTo` being duplicated after `navigate()`. ([#74857](https://github.com/WordPress/gutenberg/pull/74857))
+
+## 2.38.0 (2026-01-16)
+
 ## 2.36.0 (2025-11-26)
 
 ## 2.35.0 (2025-11-12)
@@ -28,8 +70,7 @@
 
 -   Preserve `media` attribute on intial style sheets after client-side navigation. ([70668](https://github.com/WordPress/gutenberg/pull/70668))
 
--  Ignores `<noscript>` elements while preparing DOM. ([70905](https://github.com/WordPress/gutenberg/pull/70905))
-
+-   Ignores `<noscript>` elements while preparing DOM. ([70905](https://github.com/WordPress/gutenberg/pull/70905))
 
 ## 2.26.0 (2025-06-25)
 

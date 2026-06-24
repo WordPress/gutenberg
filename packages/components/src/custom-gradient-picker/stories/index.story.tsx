@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
-import { fn } from '@storybook/test';
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 /**
  * WordPress dependencies
  */
@@ -23,6 +23,11 @@ const meta: Meta< typeof CustomGradientPicker > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Mostly an internal component. Use `GradientPicker` instead.',
+		},
 	},
 };
 export default meta;

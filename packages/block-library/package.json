@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-library",
-	"version": "9.36.0",
+	"version": "10.0.0",
 	"description": "Block library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -28,33 +28,30 @@
 		"build-module",
 		"build-style",
 		"build-types",
-		"*.md",
-		"babel-plugin.cjs"
+		"*.md"
 	],
-	"type": "module",
 	"main": "build/index.cjs",
-	"module": "build-module/index.js",
+	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
-			"import": "./build-module/index.js",
+			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
-		"./babel-plugin": "./babel-plugin.cjs",
 		"./build-module/*": "./build-module/*",
 		"./build-style/*": "./build-style/*",
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"wpScriptModuleExports": {
-		"./accordion/view": "./build-module/accordion/view.js",
-		"./file/view": "./build-module/file/view.js",
-		"./form/view": "./build-module/form/view.js",
-		"./image/view": "./build-module/image/view.js",
-		"./navigation/view": "./build-module/navigation/view.js",
-		"./query/view": "./build-module/query/view.js",
-		"./search/view": "./build-module/search/view.js",
-		"./tabs/view": "./build-module/tabs/view.js"
+		"./accordion/view": "./build-module/accordion/view.mjs",
+		"./file/view": "./build-module/file/view.mjs",
+		"./form/view": "./build-module/form/view.mjs",
+		"./image/view": "./build-module/image/view.mjs",
+		"./navigation/view": "./build-module/navigation/view.mjs",
+		"./playlist/view": "./build-module/playlist/view.mjs",
+		"./query/view": "./build-module/query/view.mjs",
+		"./search/view": "./build-module/search/view.mjs",
+		"./tabs/view": "./build-module/tabs/view.mjs"
 	},
 	"wpStyleEntryPoints": [
 		"src/*.scss",
@@ -91,9 +88,10 @@
 		"src/**/*.scss",
 		"src/*/init.js",
 		"build/*/init.js",
-		"build-module/*/init.js"
+		"build-module/*/init.mjs"
 	],
 	"dependencies": {
+		"@arraypress/waveform-player": "^1.2.1",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/autop": "file:../autop",
@@ -126,26 +124,38 @@
 		"@wordpress/reusable-blocks": "file:../reusable-blocks",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/server-side-render": "file:../server-side-render",
+		"@wordpress/shortcode": "file:../shortcode",
+		"@wordpress/ui": "file:../ui",
+		"@wordpress/upload-media": "file:../upload-media",
 		"@wordpress/url": "file:../url",
 		"@wordpress/viewport": "file:../viewport",
 		"@wordpress/wordcount": "file:../wordcount",
 		"change-case": "^4.1.2",
 		"clsx": "^2.1.1",
-		"colord": "^2.7.0",
-		"escape-html": "^1.0.3",
+		"colord": "^2.9.3",
 		"fast-average-color": "^9.1.1",
 		"fast-deep-equal": "^3.1.3",
-		"html-react-parser": "5.2.11",
+		"html-react-parser": "^5.2.11",
 		"memize": "^2.1.0",
 		"remove-accents": "^0.5.0",
-		"uuid": "^9.0.1"
+		"uuid": "^14.0.0"
 	},
 	"devDependencies": {
-		"deep-freeze": "0.0.1"
+		"@testing-library/dom": "^10.4.1",
+		"@testing-library/react": "^16.3.2",
+		"@testing-library/user-event": "^14.6.1",
+		"@wordpress/stylelint-tools": "file:../../tools/stylelint",
+		"deep-freeze": "^0.0.1"
 	},
 	"peerDependencies": {
+		"@types/react": "^18.3.27",
 		"react": "^18.0.0",
 		"react-dom": "^18.0.0"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

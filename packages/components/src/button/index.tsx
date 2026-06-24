@@ -89,7 +89,22 @@ function useDeprecatedProps( {
 	};
 }
 
-export function UnforwardedButton(
+/**
+ * Lets users take actions and make choices with a single click or tap.
+ *
+ * ```jsx
+ * import { Button } from '@wordpress/components';
+ * const Mybutton = () => (
+ *   <Button
+ *     variant="primary"
+ *     onClick={ handleClick }
+ *   >
+ *     Click here
+ *   </Button>
+ * );
+ * ```
+ */
+export const Button = forwardRef( function UnforwardedButton(
 	props: ButtonProps & DeprecatedButtonProps,
 	ref: ForwardedRef< any >
 ) {
@@ -286,22 +301,6 @@ export function UnforwardedButton(
 			) }
 		</>
 	);
-}
+} );
 
-/**
- * Lets users take actions and make choices with a single click or tap.
- *
- * ```jsx
- * import { Button } from '@wordpress/components';
- * const Mybutton = () => (
- *   <Button
- *     variant="primary"
- *     onClick={ handleClick }
- *   >
- *     Click here
- *   </Button>
- * );
- * ```
- */
-export const Button = forwardRef( UnforwardedButton );
 export default Button;

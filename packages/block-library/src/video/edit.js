@@ -8,7 +8,6 @@ import clsx from 'clsx';
  */
 import { isBlobURL } from '@wordpress/blob';
 import {
-	Disabled,
 	Spinner,
 	Placeholder,
 	__experimentalToolsPanel as ToolsPanel,
@@ -27,6 +26,7 @@ import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { video as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
+import { prependHTTPS } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -110,9 +110,10 @@ function VideoEdit( {
 
 	function onSelectURL( newSrc ) {
 		if ( newSrc !== src ) {
+			const url = prependHTTPS( newSrc );
 			// Check if there's an embed block that handles this URL.
 			const embedBlock = createUpgradedEmbedBlock( {
-				attributes: { url: newSrc },
+				attributes: { url },
 			} );
 			if ( undefined !== embedBlock && onReplace ) {
 				onReplace( embedBlock );
@@ -120,7 +121,7 @@ function VideoEdit( {
 			}
 			setAttributes( {
 				blob: undefined,
-				src: newSrc,
+				src: url,
 				id: undefined,
 				poster: undefined,
 			} );
@@ -233,21 +234,15 @@ function VideoEdit( {
 				</ToolsPanel>
 			</InspectorControls>
 			<figure { ...blockProps }>
-				{ /*
-                Disable the video tag if the block is not selected
-                so the user clicking on it won't play the
-                video when the controls are enabled.
-            */ }
-				<Disabled isDisabled={ ! isSingleSelected }>
-					<video
-						controls={ controls }
-						poster={ poster }
-						src={ src || temporaryURL }
-						ref={ videoPlayer }
-					>
-						<Tracks tracks={ tracks } />
-					</video>
-				</Disabled>
+				<video
+					controls={ controls }
+					inert={ ! isSingleSelected ? 'true' : undefined }
+					poster={ poster }
+					src={ src || temporaryURL }
+					ref={ videoPlayer }
+				>
+					<Tracks tracks={ tracks } />
+				</video>
 				{ !! temporaryURL && <Spinner /> }
 				<Caption
 					attributes={ attributes }

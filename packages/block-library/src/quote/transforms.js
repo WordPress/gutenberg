@@ -105,6 +105,31 @@ const transforms = {
 	to: [
 		{
 			type: 'block',
+			blocks: [ 'core/pullquote' ],
+			isMatch: ( {}, block ) => {
+				return block.innerBlocks.every(
+					( { name } ) => name === 'core/paragraph'
+				);
+			},
+			transform: (
+				{ align, citation, anchor, fontSize, style },
+				innerBlocks
+			) => {
+				const value = innerBlocks
+					.map( ( { attributes } ) => `${ attributes.content }` )
+					.join( '<br>' );
+				return createBlock( 'core/pullquote', {
+					value,
+					align,
+					citation,
+					anchor,
+					fontSize,
+					style,
+				} );
+			},
+		},
+		{
+			type: 'block',
 			blocks: [ 'core/verse' ],
 			isMatch: ( {}, block ) => {
 				return block.innerBlocks.every( ( innerBlock ) => {
@@ -141,15 +166,41 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/paragraph' ],
-			transform: ( { citation }, innerBlocks ) =>
-				RichText.isEmpty( citation )
-					? innerBlocks
+			isMatch: ( { citation }, block ) => {
+				const innerBlocks = block.innerBlocks;
+				if ( ! innerBlocks.length ) {
+					return ! RichText.isEmpty( citation );
+				}
+
+				return innerBlocks.every( ( innerBlock ) => {
+					if ( innerBlock.name === 'core/paragraph' ) {
+						return true;
+					}
+					const converted = switchToBlockType(
+						innerBlock,
+						'core/paragraph'
+					);
+					return converted !== null;
+				} );
+			},
+			transform: ( { citation }, innerBlocks ) => {
+				const paragraphs = innerBlocks.flatMap( ( innerBlock ) => {
+					if ( innerBlock.name === 'core/paragraph' ) {
+						return innerBlock;
+					}
+					return (
+						switchToBlockType( innerBlock, 'core/paragraph' ) || []
+					);
+				} );
+				return RichText.isEmpty( citation )
+					? paragraphs
 					: [
-							...innerBlocks,
+							...paragraphs,
 							createBlock( 'core/paragraph', {
 								content: citation,
 							} ),
-					  ],
+					  ];
+			},
 		},
 		{
 			type: 'block',

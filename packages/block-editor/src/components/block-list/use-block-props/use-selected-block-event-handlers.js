@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
 import { isTextField } from '@wordpress/dom';
 import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -31,6 +32,7 @@ export function useEventHandlers( { clientId, isSelected } ) {
 		hasMultiSelection,
 		isSectionBlock,
 		editedContentOnlySection,
+		getBlock,
 	} = unlock( useSelect( blockEditorStore ) );
 	const {
 		insertAfterBlock,
@@ -128,15 +130,13 @@ export function useEventHandlers( { clientId, isSelected } ) {
 
 				const rect = node.getBoundingClientRect();
 
-				const clone = node.cloneNode( true );
-				clone.style.visibility = 'hidden';
-				// Maybe remove the clone now that it's relative?
-				clone.style.display = 'none';
-
-				// Remove the id and leave it on the clone so that drop target
-				// calculations are correct.
+				// Remove the id and leave it on a shallow clone so that drop
+				// target calculations are correct.
 				const id = node.id;
+				const clone = node.cloneNode();
+				clone.style.display = 'none';
 				node.id = null;
+				node.after( clone );
 
 				let _scale = 1;
 
@@ -153,8 +153,6 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				}
 
 				const inverted = 1 / _scale;
-
-				node.after( clone );
 
 				const originalNodeProperties = {};
 				for ( const property of [
@@ -225,32 +223,41 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				}
 
 				let hasStarted = false;
+				let lastClientX = originClientX;
+				let lastClientY = originClientY;
 
-				function over( e ) {
+				function dragOver( e ) {
+					// Only trigger `over` if the mouse has moved.
+					if (
+						e.clientX === lastClientX &&
+						e.clientY === lastClientY
+					) {
+						return;
+					}
+					lastClientX = e.clientX;
+					lastClientY = e.clientY;
+					over();
+				}
+
+				function over() {
 					if ( ! hasStarted ) {
 						hasStarted = true;
 						node.style.pointerEvents = 'none';
 					}
+					const pointerYDelta = lastClientY - originClientY;
+					const pointerXDelta = lastClientX - originClientX;
 					const scrollTop = defaultView.scrollY;
 					const scrollLeft = defaultView.scrollX;
-					node.style.top = `${
-						( e.clientY -
-							originClientY +
-							scrollTop -
-							originScrollTop ) *
-						inverted
-					}px`;
-					node.style.left = `${
-						( e.clientX -
-							originClientX +
-							scrollLeft -
-							originScrollLeft ) *
-						inverted
-					}px`;
+					const scrollTopDelta = scrollTop - originScrollTop;
+					const scrollLeftDelta = scrollLeft - originScrollLeft;
+					const topDelta = pointerYDelta + scrollTopDelta;
+					const leftDelta = pointerXDelta + scrollLeftDelta;
+					node.style.top = `${ topDelta * inverted }px`;
+					node.style.left = `${ leftDelta * inverted }px`;
 				}
 
 				function end() {
-					ownerDocument.removeEventListener( 'dragover', over );
+					ownerDocument.removeEventListener( 'dragover', dragOver );
 					ownerDocument.removeEventListener( 'dragend', end );
 					ownerDocument.removeEventListener( 'drop', end );
 					ownerDocument.removeEventListener( 'scroll', over );
@@ -271,7 +278,7 @@ export function useEventHandlers( { clientId, isSelected } ) {
 					);
 				}
 
-				ownerDocument.addEventListener( 'dragover', over );
+				ownerDocument.addEventListener( 'dragover', dragOver );
 				ownerDocument.addEventListener( 'dragend', end );
 				ownerDocument.addEventListener( 'drop', end );
 				ownerDocument.addEventListener( 'scroll', over );
@@ -294,31 +301,39 @@ export function useEventHandlers( { clientId, isSelected } ) {
 			 */
 			function onDoubleClick( event ) {
 				const isSection = isSectionBlock( clientId );
+				const block = getBlock( clientId );
+				const isSyncedPattern = isReusableBlock( block );
+				const isTemplatePartBlock = isTemplatePart( block );
 				const isAlreadyEditing = editedContentOnlySection === clientId;
 
-				if ( isSection && ! isAlreadyEditing ) {
-					event.preventDefault();
-					editContentOnlySection( clientId );
+				if (
+					! isSection ||
+					isAlreadyEditing ||
+					isSyncedPattern ||
+					isTemplatePartBlock
+				) {
+					return;
 				}
+
+				event.preventDefault();
+				editContentOnlySection( clientId );
 			}
 
-			// Only add double-click listener if experimental flag is enabled
-			if ( window?.__experimentalContentOnlyPatternInsertion ) {
-				node.addEventListener( 'dblclick', onDoubleClick );
-			}
+			node.addEventListener( 'dblclick', onDoubleClick );
 
 			return () => {
 				node.removeEventListener( 'keydown', onKeyDown );
 				node.removeEventListener( 'dragstart', onDragStart );
-				if ( window?.__experimentalContentOnlyPatternInsertion ) {
-					node.removeEventListener( 'dblclick', onDoubleClick );
-				}
+				node.removeEventListener( 'dblclick', onDoubleClick );
 			};
 		},
 		[
 			clientId,
 			isSelected,
 			getBlockRootClientId,
+			getBlock,
+			isReusableBlock,
+			isTemplatePart,
 			insertAfterBlock,
 			removeBlock,
 			isZoomOut,

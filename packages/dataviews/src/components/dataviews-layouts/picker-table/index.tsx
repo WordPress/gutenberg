@@ -33,6 +33,7 @@ import type { SetSelection } from '../../../types/private';
 import ColumnHeaderMenu from '../table/column-header-menu';
 import ColumnPrimary from '../table/column-primary';
 import getDataByGroup from '../utils/get-data-by-group';
+import { useIntersectionObserver } from '../utils/use-infinite-scroll';
 
 interface TableColumnFieldProps< Item > {
 	fields: NormalizedField< Item >[];
@@ -95,8 +96,13 @@ function TableRow< Item >( {
 	posinset,
 }: TableRowProps< Item > ) {
 	const { paginationInfo } = useContext( DataViewsContext );
+
 	const isSelected = selection.includes( id );
+
 	const [ isHovered, setIsHovered ] = useState( false );
+	const elementRef = useRef< HTMLButtonElement >( null );
+
+	useIntersectionObserver( elementRef, posinset );
 	const {
 		showTitle = true,
 		showMedia = true,
@@ -119,6 +125,7 @@ function TableRow< Item >( {
 	return (
 		<Composite.Item
 			key={ id }
+			ref={ elementRef }
 			render={ ( { children, ...props } ) => (
 				<tr
 					className={ clsx( 'dataviews-view-table__row', {
@@ -135,7 +142,23 @@ function TableRow< Item >( {
 			aria-setsize={ paginationInfo.totalItems || undefined }
 			aria-posinset={ posinset }
 			role={ infiniteScrollEnabled ? 'article' : 'option' }
+			onMouseDown={ ( event ) => {
+				if ( event.button !== 0 ) {
+					return;
+				}
+				// Pre-focus the Composite container (parent `tbody`) so that
+				// when the row is focused on click, Ariakit sees the focus
+				// coming from within the Composite and uses `focusSilently`
+				// (which passes `preventScroll: true`). Without this, the
+				// first focus into the Composite scrolls the active row
+				// under the sticky table header, which also causes the click
+				// to land on a different element than the original target.
+				event.currentTarget.parentElement?.focus( {
+					preventScroll: true,
+				} );
+			} }
 			onClick={ () => {
+				// Toggle in/out of selection array
 				if ( isSelected ) {
 					onChangeSelection(
 						selection.filter( ( itemId ) => id !== itemId )
@@ -150,6 +173,7 @@ function TableRow< Item >( {
 		>
 			<td
 				className="dataviews-view-table__checkbox-column"
+				// eslint-disable-next-line jsx-a11y/no-interactive-element-to-noninteractive-role
 				role="presentation"
 			>
 				<div className="dataviews-view-table__cell-content-wrapper">
@@ -167,7 +191,10 @@ function TableRow< Item >( {
 			</td>
 
 			{ hasPrimaryColumn && (
-				<td role="presentation">
+				<td
+					// eslint-disable-next-line jsx-a11y/no-interactive-element-to-noninteractive-role
+					role="presentation"
+				>
 					<ColumnPrimary
 						item={ item }
 						titleField={ showTitle ? titleField : undefined }
@@ -192,6 +219,7 @@ function TableRow< Item >( {
 							maxWidth,
 							minWidth,
 						} }
+						// eslint-disable-next-line jsx-a11y/no-interactive-element-to-noninteractive-role
 						role="presentation"
 					>
 						<TableColumnField
@@ -224,7 +252,7 @@ function ViewPickerTable< Item >( {
 	const headerMenuRefs = useRef<
 		Map< string, { node: HTMLButtonElement; fallback: string } >
 	>( new Map() );
-	const headerMenuToFocusRef = useRef< HTMLButtonElement >();
+	const headerMenuToFocusRef = useRef< HTMLButtonElement >( undefined );
 	const [ nextHeaderMenuToFocus, setNextHeaderMenuToFocus ] =
 		useState< HTMLButtonElement >();
 	const isMultiselect = useIsMultiselectPicker( actions ) ?? false;
@@ -235,6 +263,12 @@ function ViewPickerTable< Item >( {
 			headerMenuToFocusRef.current = undefined;
 		}
 	} );
+
+	const groupField = view.groupBy?.field
+		? fields.find( ( f ) => f.id === view.groupBy?.field )
+		: null;
+	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
+	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
 
 	const tableNoticeId = useId();
 
@@ -264,10 +298,6 @@ function ViewPickerTable< Item >( {
 		( field ) => field.id === view.descriptionField
 	);
 
-	const groupField = view.groupBy?.field
-		? fields.find( ( f ) => f.id === view.groupBy?.field )
-		: null;
-	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
 	const { showTitle = true, showMedia = true, showDescription = true } = view;
 	const hasPrimaryColumn =
 		( titleField && showTitle ) ||
@@ -285,7 +315,6 @@ function ViewPickerTable< Item >( {
 				headerMenuRefs.current.delete( column );
 			}
 		};
-	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
 
 	return (
 		<>
@@ -319,6 +348,7 @@ function ViewPickerTable< Item >( {
 									data={ data }
 									actions={ actions }
 									getItemId={ getItemId }
+									disableSelectAll={ isInfiniteScroll }
 								/>
 							) }
 						</th>
@@ -400,6 +430,7 @@ function ViewPickerTable< Item >( {
 											1
 										}
 										className="dataviews-view-table__group-header-cell"
+										// eslint-disable-next-line jsx-a11y/no-interactive-element-to-noninteractive-role
 										role="presentation"
 									>
 										{ view.groupBy?.showLabel === false
@@ -441,23 +472,29 @@ function ViewPickerTable< Item >( {
 						orientation="vertical"
 					>
 						{ hasData &&
-							data.map( ( item, index ) => (
-								<TableRow
-									key={ getItemId( item ) }
-									item={ item }
-									fields={ fields }
-									id={ getItemId( item ) || index.toString() }
-									view={ view }
-									titleField={ titleField }
-									mediaField={ mediaField }
-									descriptionField={ descriptionField }
-									selection={ selection }
-									getItemId={ getItemId }
-									onChangeSelection={ onChangeSelection }
-									multiselect={ isMultiselect }
-									posinset={ index + 1 }
-								/>
-							) ) }
+							data.map( ( item, index ) => {
+								const itemId = getItemId( item );
+								// Use position from item for accessibility in infinite scroll mode.
+								const posinset = ( item as any ).position;
+
+								return (
+									<TableRow
+										key={ itemId }
+										item={ item }
+										fields={ fields }
+										id={ itemId || index.toString() }
+										view={ view }
+										titleField={ titleField }
+										mediaField={ mediaField }
+										descriptionField={ descriptionField }
+										selection={ selection }
+										getItemId={ getItemId }
+										onChangeSelection={ onChangeSelection }
+										multiselect={ isMultiselect }
+										posinset={ posinset }
+									/>
+								);
+							} ) }
 					</Composite>
 				) }
 			</table>

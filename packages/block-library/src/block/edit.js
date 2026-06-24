@@ -40,7 +40,7 @@ import { getBlockBindingsSource } from '@wordpress/blocks';
 import { unlock } from '../lock-unlock';
 
 const { useLayoutClasses } = unlock( blockEditorPrivateApis );
-const { hasOverridableBlocks } = unlock( patternsPrivateApis );
+const { isOverridableBlock } = unlock( patternsPrivateApis );
 
 const fullAlignments = [ 'full', 'wide', 'left', 'right' ];
 
@@ -149,6 +149,8 @@ function ReusableBlockControl( {
 	);
 }
 
+const EMPTY_OBJECT = {};
+
 function ReusableBlockEdit( {
 	name,
 	attributes: { ref, content },
@@ -168,25 +170,38 @@ function ReusableBlockEdit( {
 	const { __unstableMarkLastChangeAsPersistent } =
 		useDispatch( blockEditorStore );
 
-	const { onNavigateToEntityRecord, hasPatternOverridesSource } = useSelect(
-		( select ) => {
-			const { getSettings } = select( blockEditorStore );
-			// For editing link to the site editor if the theme and user permissions support it.
-			return {
-				onNavigateToEntityRecord:
-					getSettings().onNavigateToEntityRecord,
-				hasPatternOverridesSource: !! getBlockBindingsSource(
-					'core/pattern-overrides'
-				),
-			};
-		},
-		[]
-	);
+	const {
+		onNavigateToEntityRecord,
+		hasPatternOverridesSource,
+		supportedBlockTypesRaw,
+	} = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		// For editing link to the site editor if the theme and user permissions support it.
+		return {
+			onNavigateToEntityRecord: getSettings().onNavigateToEntityRecord,
+			hasPatternOverridesSource: !! getBlockBindingsSource(
+				'core/pattern-overrides'
+			),
+			supportedBlockTypesRaw:
+				getSettings().__experimentalBlockBindingsSupportedAttributes ||
+				EMPTY_OBJECT,
+		};
+	}, [] );
 
-	const canOverrideBlocks = useMemo(
-		() => hasPatternOverridesSource && hasOverridableBlocks( blocks ),
-		[ hasPatternOverridesSource, blocks ]
-	);
+	const canOverrideBlocks = useMemo( () => {
+		const supportedBlockTypes = Object.keys( supportedBlockTypesRaw );
+		const hasOverridableBlocks = ( _blocks ) =>
+			_blocks.some( ( block ) => {
+				if (
+					supportedBlockTypes.includes( block.name ) &&
+					isOverridableBlock( block )
+				) {
+					return true;
+				}
+				return hasOverridableBlocks( block.innerBlocks );
+			} );
+		return hasPatternOverridesSource && hasOverridableBlocks( blocks );
+	}, [ hasPatternOverridesSource, blocks, supportedBlockTypesRaw ] );
 
 	const { alignment, layout } = useInferredLayout( blocks, parentLayout );
 	const layoutClasses = useLayoutClasses( { layout }, name );

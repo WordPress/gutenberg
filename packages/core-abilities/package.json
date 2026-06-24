@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/core-abilities",
-	"version": "0.1.0",
+	"version": "0.14.0",
 	"description": "WordPress core abilities integration for the Abilities API.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -30,24 +30,21 @@
 		"build-types",
 		"*.md"
 	],
-	"type": "module",
 	"main": "build/index.cjs",
-	"module": "build-module/index.js",
+	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
-			"import": "./build-module/index.js",
+			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json"
 	},
 	"wpScriptModuleExports": {
-		".": "./build-module/index.js"
+		".": "./build-module/index.mjs"
 	},
 	"types": "build-types",
-	"sideEffects": [
-		"{src,build,build-module}/index.js"
-	],
+	"sideEffects": true,
 	"dependencies": {
 		"@wordpress/abilities": "file:../abilities",
 		"@wordpress/api-fetch": "file:../api-fetch",

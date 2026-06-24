@@ -37,23 +37,30 @@ function ButtonBlockAppender(
 				isOpen,
 				blockTitle,
 				hasSingleBlockType,
+				appenderLabel,
 			} ) => {
 				const isToggleButton = ! hasSingleBlockType;
-				const label = hasSingleBlockType
-					? sprintf(
-							// translators: %s: the name of the block when there is only one
-							_x(
-								'Add %s',
-								'directly add the only allowed block'
-							),
-							blockTitle
-					  )
-					: _x(
-							'Add block',
-							'Generic label for block inserter button'
-					  );
+
+				let label;
+				if ( appenderLabel ) {
+					// Block returns the full label; use directly (consistent with getBlockLabel).
+					label = appenderLabel;
+				} else if ( hasSingleBlockType ) {
+					label = sprintf(
+						// translators: %s: the name of the block when there is only one
+						_x( 'Add %s', 'directly add the only allowed block' ),
+						blockTitle.toLowerCase()
+					);
+				} else {
+					label = _x(
+						'Add block',
+						'Generic label for block inserter button'
+					);
+				}
 
 				return (
+					// Disable reason: There shouldn't be a case where this button is disabled but not visually hidden.
+					// eslint-disable-next-line @wordpress/components-no-unsafe-button-disabled
 					<Button
 						__next40pxDefaultSize
 						ref={ ref }
@@ -66,8 +73,6 @@ function ButtonBlockAppender(
 						onClick={ onToggle }
 						aria-haspopup={ isToggleButton ? 'true' : undefined }
 						aria-expanded={ isToggleButton ? isOpen : undefined }
-						// Disable reason: There shouldn't be a case where this button is disabled but not visually hidden.
-						// eslint-disable-next-line no-restricted-syntax
 						disabled={ disabled }
 						label={ label }
 						showTooltip

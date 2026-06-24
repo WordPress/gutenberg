@@ -11,13 +11,11 @@
  * @param WP_Block_Type $block_type Block Type.
  */
 function gutenberg_register_anchor_support( $block_type ) {
-	$has_anchor_support = block_has_support( $block_type, array( 'anchor' ), false );
-
-	if ( ! $has_anchor_support ) {
+	if ( ! block_has_support( $block_type, array( 'anchor' ) ) ) {
 		return;
 	}
 
-	if ( ! $block_type->attributes ) {
+	if ( ! isset( $block_type->attributes ) ) {
 		$block_type->attributes = array();
 	}
 
@@ -31,28 +29,20 @@ function gutenberg_register_anchor_support( $block_type ) {
 /**
  * Add the anchor id to the output.
  *
- * @param WP_Block_Type $block_type Block Type.
- * @param array         $block_attributes Block attributes.
- *
- * @return array Block anchor id.
+ * @param WP_Block_Type        $block_type       Block Type.
+ * @param array<string, mixed> $block_attributes Block attributes.
+ * @return array<string, string> Attributes with block anchor id.
  */
 function gutenberg_apply_anchor_support( $block_type, $block_attributes ) {
-	if ( ! $block_attributes ) {
+	if ( empty( $block_attributes ) ) {
 		return array();
 	}
 
-	$has_anchor_support = block_has_support( $block_type, array( 'anchor' ), false );
-	if ( ! $has_anchor_support ) {
+	if ( ! block_has_support( $block_type, array( 'anchor' ) ) ) {
 		return array();
 	}
 
-	$has_anchor = array_key_exists( 'anchor', $block_attributes );
-	if ( ! $has_anchor ) {
-		return array();
-	}
-
-	$anchor_value = (string) $block_attributes['anchor'];
-	if ( '' === $anchor_value ) {
+	if ( ! isset( $block_attributes['anchor'] ) || ! is_string( $block_attributes['anchor'] ) || '' === $block_attributes['anchor'] ) {
 		return array();
 	}
 

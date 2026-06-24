@@ -2,15 +2,19 @@
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { DataForm, DataViews, type Form } from '@wordpress/dataviews';
-import type { Field, View } from '@wordpress/dataviews';
+import type { Field, View, Form } from '@wordpress/dataviews';
+import { DataForm, DataViews } from '@wordpress/dataviews';
 
 /**
  * Internal dependencies
  */
 import {
 	altTextField,
+	attachedToField,
+	authorField,
 	captionField,
+	dateAddedField,
+	dateModifiedField,
 	descriptionField,
 	filenameField,
 	filesizeField,
@@ -106,6 +110,19 @@ const sampleMediaItem: MediaItem = {
 		},
 	},
 	missing_image_sizes: [],
+	_embedded: {
+		author: [
+			{
+				id: 1,
+				name: 'John Doe',
+				avatar_urls: {
+					'24': 'https://gravatar.com/avatar/?s=24&d=mm&r=g',
+					'48': 'https://gravatar.com/avatar/?s=48&d=mm&r=g',
+					'96': 'https://gravatar.com/avatar/?s=96&d=mm&r=g',
+				},
+			},
+		],
+	},
 };
 
 // Sample data for a non-image file (ZIP)
@@ -148,7 +165,7 @@ const sampleMediaItemZip: MediaItem = {
 	},
 	mime_type: 'application/zip',
 	media_type: 'file',
-	post: 1,
+	post: 123,
 	source_url:
 		'http://localhost:8888/wp-content/uploads/2025/11/gutenberg-v22-0-0.zip',
 	media_details: {
@@ -173,6 +190,39 @@ const sampleMediaItemZip: MediaItem = {
 		sizes: {},
 	},
 	missing_image_sizes: [],
+	_embedded: {
+		'wp:attached-to': [
+			{
+				id: 123,
+				date: '2025-12-19T00:21:52',
+				slug: '',
+				type: 'post',
+				link: 'http://localhost:8888/?p=123',
+				title: {
+					raw: 'A post title',
+					rendered: 'A post title',
+				},
+				excerpt: {
+					raw: '',
+					rendered: '',
+					protected: false,
+				},
+				author: 1,
+				featured_media: 0,
+			},
+		],
+		author: [
+			{
+				id: 1,
+				name: 'Jane Smith',
+				avatar_urls: {
+					'24': 'https://gravatar.com/avatar/?s=24&d=mm&r=g',
+					'48': 'https://gravatar.com/avatar/?s=48&d=mm&r=g',
+					'96': 'https://gravatar.com/avatar/?s=96&d=mm&r=g',
+				},
+			},
+		],
+	},
 };
 
 // Sample data for a broken image (demonstrates error fallback)
@@ -224,6 +274,19 @@ const sampleMediaItemBrokenImage: MediaItem = {
 		sizes: {},
 	},
 	missing_image_sizes: [],
+	_embedded: {
+		author: [
+			{
+				id: 1,
+				name: 'Admin User',
+				avatar_urls: {
+					'24': 'https://gravatar.com/avatar/?s=24&d=mm&r=g',
+					'48': 'https://gravatar.com/avatar/?s=48&d=mm&r=g',
+					'96': 'https://gravatar.com/avatar/?s=96&d=mm&r=g',
+				},
+			},
+		],
+	},
 };
 
 // Create a showcase of all media fields.
@@ -231,7 +294,11 @@ const showcaseFields = [
 	mediaThumbnailField,
 	filenameField,
 	altTextField,
+	attachedToField,
+	authorField,
 	captionField,
+	dateAddedField,
+	dateModifiedField,
 	descriptionField,
 	mimeTypeField,
 	mediaDimensionsField,
@@ -259,6 +326,10 @@ const DataFormsComponent = ( { type }: { type: 'regular' | 'panel' } ) => {
 			'mime_type',
 			'media_dimensions',
 			'filesize',
+			'author',
+			'date',
+			'modified',
+			'attached_to',
 		],
 	};
 
@@ -315,12 +386,6 @@ export const DataViewsPreview = () => {
 		totalPages: 1,
 	};
 
-	const defaultLayouts = {
-		table: {},
-		list: {},
-		grid: {},
-	};
-
 	return (
 		<div style={ { padding: '20px' } }>
 			<h2>Media Fields DataViews Preview</h2>
@@ -335,7 +400,6 @@ export const DataViewsPreview = () => {
 				view={ view }
 				onChangeView={ ( nextView: View ) => setView( nextView ) }
 				paginationInfo={ paginationInfo }
-				defaultLayouts={ defaultLayouts }
 			/>
 		</div>
 	);

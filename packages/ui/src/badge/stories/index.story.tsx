@@ -1,23 +1,17 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryObj } from '@storybook/react';
-
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Fragment } from '@wordpress/element';
-import '@wordpress/theme/design-tokens.css';
-
-/**
- * Internal dependencies
- */
 import { Badge } from '../index';
 
 const meta: Meta< typeof Badge > = {
+	tags: [ 'manifest' ],
 	title: 'Design System/Components/Badge',
 	component: Badge,
-	tags: [ 'status-experimental' ],
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
+	},
 };
 export default meta;
 
@@ -93,8 +87,7 @@ export const AllIntents: Story = {
 				display: 'grid',
 				gridTemplateColumns: 'max-content min-content',
 				gap: '1rem',
-				color: 'var(--wpds-color-fg-content-neutral)',
-				backgroundColor: 'var(--wpds-color-bg-surface-neutral-strong)',
+				color: 'var(--wpds-color-foreground-content-neutral)',
 			} }
 		>
 			{ (

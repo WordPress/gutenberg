@@ -150,6 +150,7 @@ function KeyboardShortcutsRegister() {
 			description: __( 'Select text across multiple blocks.' ),
 			keyCombination: {
 				modifier: 'shift',
+				// Spotted during my own research — invalid character?
 				character: 'arrow',
 			},
 		} );
@@ -214,6 +215,16 @@ function KeyboardShortcutsRegister() {
 			keyCombination: {
 				modifier: 'primaryShift',
 				character: 'h',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/block-editor/rename',
+			category: 'block',
+			description: __( 'Rename the selected block.' ),
+			keyCombination: {
+				modifier: 'primaryAlt',
+				character: 'r',
 			},
 		} );
 	}, [ registerShortcut ] );

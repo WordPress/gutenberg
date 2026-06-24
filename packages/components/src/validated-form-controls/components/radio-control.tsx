@@ -44,3 +44,4 @@ const UnforwardedValidatedRadioControl = (
 export const ValidatedRadioControl = forwardRef(
 	UnforwardedValidatedRadioControl
 );
+ValidatedRadioControl.displayName = 'ValidatedRadioControl';

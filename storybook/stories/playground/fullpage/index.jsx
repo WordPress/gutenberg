@@ -13,7 +13,9 @@ import '@wordpress/format-library';
 /**
  * Internal dependencies
  */
-import styles from './style.lazy.scss';
+// Reason: Styles are injected dynamically.
+// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
+import styles from './style.lazy.scss?inline';
 import { editorStyles } from '../editor-styles';
 
 export default function EditorFullPage() {
@@ -26,10 +28,12 @@ export default function EditorFullPage() {
 	// Ensures that the CSS intended for the playground (especially the style resets)
 	// are only loaded for the playground and don't leak into other stories.
 	useEffect( () => {
-		styles.use();
+		const style = document.createElement( 'style' );
+		style.textContent = styles;
+		document.head.appendChild( style );
 
-		return styles.unuse;
-	} );
+		return () => document.head.removeChild( style );
+	}, [] );
 
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions

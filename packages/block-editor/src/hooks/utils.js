@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { getBlockSupport } from '@wordpress/blocks';
@@ -14,16 +19,13 @@ import {
 	useBlockEditContext,
 	mayDisplayControlsKey,
 	mayDisplayParentControlsKey,
+	mayDisplayPatternEditingControlsKey,
 } from '../components/block-edit/context';
 import { useSettings } from '../components';
 import { useSettingsForBlockElement } from '../components/global-styles/hooks';
 import { getValueFromObjectPath, setImmutably } from '../utils/object';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
-/**
- * External dependencies
- */
-import clsx from 'clsx';
 
 /**
  * Removed falsy values from nested object.
@@ -236,6 +238,7 @@ export function useBlockSettings( name, parentLayout ) {
 	const [
 		backgroundImage,
 		backgroundSize,
+		gradient,
 		customFontFamilies,
 		defaultFontFamilies,
 		themeFontFamilies,
@@ -266,6 +269,7 @@ export function useBlockSettings( name, parentLayout ) {
 		aspectRatio,
 		height,
 		minHeight,
+		minWidth,
 		width,
 		dimensionSizes,
 		layout,
@@ -298,6 +302,7 @@ export function useBlockSettings( name, parentLayout ) {
 	] = useSettings(
 		'background.backgroundImage',
 		'background.backgroundSize',
+		'background.gradient',
 		'typography.fontFamilies.custom',
 		'typography.fontFamilies.default',
 		'typography.fontFamilies.theme',
@@ -328,6 +333,7 @@ export function useBlockSettings( name, parentLayout ) {
 		'dimensions.aspectRatio',
 		'dimensions.height',
 		'dimensions.minHeight',
+		'dimensions.minWidth',
 		'dimensions.width',
 		'dimensions.dimensionSizes',
 		'layout',
@@ -364,6 +370,7 @@ export function useBlockSettings( name, parentLayout ) {
 			background: {
 				backgroundImage,
 				backgroundSize,
+				gradient,
 			},
 			color: {
 				palette: {
@@ -441,6 +448,7 @@ export function useBlockSettings( name, parentLayout ) {
 				aspectRatio,
 				height,
 				minHeight,
+				minWidth,
 				width,
 				dimensionSizes,
 			},
@@ -451,6 +459,7 @@ export function useBlockSettings( name, parentLayout ) {
 	}, [
 		backgroundImage,
 		backgroundSize,
+		gradient,
 		customFontFamilies,
 		defaultFontFamilies,
 		themeFontFamilies,
@@ -481,6 +490,7 @@ export function useBlockSettings( name, parentLayout ) {
 		aspectRatio,
 		height,
 		minHeight,
+		minWidth,
 		width,
 		dimensionSizes,
 		layout,
@@ -524,60 +534,66 @@ export function createBlockEditFilter( features ) {
 		return { ...settings, Edit: memo( settings.edit ) };
 	} );
 	const withBlockEditHooks = createHigherOrderComponent(
-		( OriginalBlockEdit ) => ( props ) => {
-			const context = useBlockEditContext();
-			// CAUTION: code added before this line will be executed for all
-			// blocks, not just those that support the feature! Code added
-			// above this line should be carefully evaluated for its impact on
-			// performance.
-			return [
-				...features.map( ( feature, i ) => {
-					const {
-						Edit,
-						hasSupport,
-						attributeKeys = [],
-						shareWithChildBlocks,
-					} = feature;
-					const shouldDisplayControls =
-						context[ mayDisplayControlsKey ] ||
-						( context[ mayDisplayParentControlsKey ] &&
-							shareWithChildBlocks );
+		( OriginalBlockEdit ) =>
+			function WithBlockEditHooks( props ) {
+				const context = useBlockEditContext();
+				// CAUTION: code added before this line will be executed for all
+				// blocks, not just those that support the feature! Code added
+				// above this line should be carefully evaluated for its impact on
+				// performance.
+				return [
+					...features.map( ( feature, i ) => {
+						const {
+							Edit,
+							hasSupport,
+							attributeKeys = [],
+							shareWithChildBlocks,
+							supportsPatternEditing,
+						} = feature;
+						const shouldDisplayControls =
+							( supportsPatternEditing &&
+								context[
+									mayDisplayPatternEditingControlsKey
+								] ) ||
+							context[ mayDisplayControlsKey ] ||
+							( context[ mayDisplayParentControlsKey ] &&
+								shareWithChildBlocks );
 
-					if (
-						! shouldDisplayControls ||
-						! hasSupport( props.name )
-					) {
-						return null;
-					}
-
-					const neededProps = {};
-					for ( const key of attributeKeys ) {
-						if ( props.attributes[ key ] ) {
-							neededProps[ key ] = props.attributes[ key ];
+						if (
+							! shouldDisplayControls ||
+							! hasSupport( props.name )
+						) {
+							return null;
 						}
-					}
 
-					return (
-						<Edit
-							// We can use the index because the array length
-							// is fixed per page load right now.
-							key={ i }
-							name={ props.name }
-							isSelected={ props.isSelected }
-							clientId={ props.clientId }
-							setAttributes={ props.setAttributes }
-							__unstableParentLayout={
-								props.__unstableParentLayout
+						const neededProps = {};
+						for ( const key of attributeKeys ) {
+							if ( props.attributes[ key ] ) {
+								neededProps[ key ] = props.attributes[ key ];
 							}
-							// This component is pure, so only pass needed
-							// props!!!
-							{ ...neededProps }
-						/>
-					);
-				} ),
-				<OriginalBlockEdit key="edit" { ...props } />,
-			];
-		},
+						}
+
+						return (
+							<Edit
+								// We can use the index because the array length
+								// is fixed per page load right now.
+								key={ i }
+								name={ props.name }
+								isSelected={ props.isSelected }
+								clientId={ props.clientId }
+								setAttributes={ props.setAttributes }
+								__unstableParentLayout={
+									props.__unstableParentLayout
+								}
+								// This component is pure, so only pass needed
+								// props!!!
+								{ ...neededProps }
+							/>
+						);
+					} ),
+					<OriginalBlockEdit key="edit" { ...props } />,
+				];
+			},
 		'withBlockEditHooks'
 	);
 	addFilter( 'editor.BlockEdit', 'core/editor/hooks', withBlockEditHooks );
@@ -613,76 +629,77 @@ const BlockPropsPure = memo( BlockProps );
 
 export function createBlockListBlockFilter( features ) {
 	const withBlockListBlockHooks = createHigherOrderComponent(
-		( BlockListBlock ) => ( props ) => {
-			const [ allWrapperProps, setAllWrapperProps ] = useState(
-				Array( features.length ).fill( undefined )
-			);
-			return [
-				...features.map( ( feature, i ) => {
-					const {
-						hasSupport,
-						attributeKeys = [],
-						useBlockProps,
-						isMatch,
-					} = feature;
+		( BlockListBlock ) =>
+			function WithBlockListBlockHooks( props ) {
+				const [ allWrapperProps, setAllWrapperProps ] = useState(
+					Array( features.length ).fill( undefined )
+				);
+				return [
+					...features.map( ( feature, i ) => {
+						const {
+							hasSupport,
+							attributeKeys = [],
+							useBlockProps,
+							isMatch,
+						} = feature;
 
-					const neededProps = {};
-					for ( const key of attributeKeys ) {
-						if ( props.attributes[ key ] ) {
-							neededProps[ key ] = props.attributes[ key ];
+						const neededProps = {};
+						for ( const key of attributeKeys ) {
+							if ( props.attributes[ key ] ) {
+								neededProps[ key ] = props.attributes[ key ];
+							}
 						}
-					}
 
-					if (
-						// Skip rendering if none of the needed attributes are
-						// set.
-						! Object.keys( neededProps ).length ||
-						! hasSupport( props.name ) ||
-						( isMatch && ! isMatch( neededProps ) )
-					) {
-						return null;
-					}
+						if (
+							// Skip rendering if none of the needed attributes are
+							// set.
+							! Object.keys( neededProps ).length ||
+							! hasSupport( props.name ) ||
+							( isMatch && ! isMatch( neededProps ) )
+						) {
+							return null;
+						}
 
-					return (
-						<BlockPropsPure
-							// We can use the index because the array length
-							// is fixed per page load right now.
-							key={ i }
-							index={ i }
-							useBlockProps={ useBlockProps }
-							// This component is pure, so we must pass a stable
-							// function reference.
-							setAllWrapperProps={ setAllWrapperProps }
-							name={ props.name }
-							clientId={ props.clientId }
-							// This component is pure, so only pass needed
-							// props!!!
-							{ ...neededProps }
-						/>
-					);
-				} ),
-				<BlockListBlock
-					key="edit"
-					{ ...props }
-					wrapperProps={ allWrapperProps
-						.filter( Boolean )
-						.reduce( ( acc, wrapperProps ) => {
-							return {
-								...acc,
-								...wrapperProps,
-								className: clsx(
-									acc.className,
-									wrapperProps.className
-								),
-								style: {
-									...acc.style,
-									...wrapperProps.style,
-								},
-							};
-						}, props.wrapperProps || {} ) }
-				/>,
-			];
-		},
+						return (
+							<BlockPropsPure
+								// We can use the index because the array length
+								// is fixed per page load right now.
+								key={ i }
+								index={ i }
+								useBlockProps={ useBlockProps }
+								// This component is pure, so we must pass a stable
+								// function reference.
+								setAllWrapperProps={ setAllWrapperProps }
+								name={ props.name }
+								clientId={ props.clientId }
+								// This component is pure, so only pass needed
+								// props!!!
+								{ ...neededProps }
+							/>
+						);
+					} ),
+					<BlockListBlock
+						key="edit"
+						{ ...props }
+						wrapperProps={ allWrapperProps
+							.filter( Boolean )
+							.reduce( ( acc, wrapperProps ) => {
+								return {
+									...acc,
+									...wrapperProps,
+									className: clsx(
+										acc.className,
+										wrapperProps.className
+									),
+									style: {
+										...acc.style,
+										...wrapperProps.style,
+									},
+								};
+							}, props.wrapperProps || {} ) }
+					/>,
+				];
+			},
 		'withBlockListBlockHooks'
 	);
 	addFilter(

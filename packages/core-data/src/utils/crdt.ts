@@ -1,65 +1,97 @@
 /**
  * External dependencies
  */
-import fastDeepEqual from 'fast-deep-equal/es6';
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 
 /**
  * WordPress dependencies
  */
-// @ts-expect-error No exported types.
-import { __unstableSerializeAndClean } from '@wordpress/blocks';
-import { type CRDTDoc, type ObjectData, Y } from '@wordpress/sync';
+import {
+	__unstableSerializeAndClean,
+	parse,
+	type Block as WPBlock,
+} from '@wordpress/blocks';
+import {
+	type CRDTDoc,
+	type ObjectData,
+	type ObjectID,
+	type ObjectType,
+	type SyncConfig,
+	Y,
+} from '@wordpress/sync';
 
 /**
  * Internal dependencies
  */
+import { BaseAwareness } from '../awareness/base-awareness';
 import {
-	mergeCrdtBlocks,
 	type Block,
+	deserializeBlockAttributes,
+	mergeCrdtBlocks,
+	type MergeCursorPosition,
+	mergeRichTextUpdate,
 	type YBlock,
 	type YBlocks,
 } from './crdt-blocks';
 import { type Post } from '../entity-types/post';
-import { type Type } from '../entity-types';
+import { CRDT_DOC_META_PERSISTENCE_KEY, CRDT_RECORD_MAP_KEY } from '../sync';
+import type { WPSelection } from '../types';
 import {
-	CRDT_DOC_META_PERSISTENCE_KEY,
-	CRDT_RECORD_MAP_KEY,
-	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
-} from '../sync';
-import type { WPBlockSelection, WPSelection } from '../types';
+	getSelectionHistory,
+	getShiftedSelection,
+	updateSelectionHistory,
+} from './crdt-selection';
+import {
+	asRichTextOffset,
+	createYMap,
+	getRootMap,
+	isYMap,
+	type YMapRecord,
+	type YMapWrap,
+} from './crdt-utils';
 
+// A function that derives content from blocks. Two callers produce this:
+// `useEntityBlockEditor` reads blocks from its argument (so the optional arg
+// lets it accept whatever caller is invoked with), and the receiver-side
+// injection in this file captures blocks in a closure and ignores the arg.
+type ContentFromBlocksFn = ( args?: { blocks: Block[] } ) => string;
+
+// Changes that can be applied to a post entity record.
 export type PostChanges = Partial< Post > & {
 	blocks?: Block[];
+	content?: Post[ 'content' ] | string | ContentFromBlocksFn;
 	excerpt?: Post[ 'excerpt' ] | string;
 	selection?: WPSelection;
 	title?: Post[ 'title' ] | string;
 };
 
-// Hold a reference to the last known selection to help compute Y.Text deltas.
-let lastSelection: WPBlockSelection | null = null;
+// A post record as represented in the CRDT document (Y.Map).
+export interface YPostRecord extends YMapRecord {
+	author: number;
+	// Blocks are undefined when they need to be re-parsed from content.
+	blocks: YBlocks | undefined;
+	content: Y.Text;
+	categories: number[];
+	comment_status: string;
+	date: string | null;
+	excerpt: Y.Text;
+	featured_media: number;
+	format: string;
+	meta: YMapWrap< YMapRecord >;
+	ping_status: string;
+	slug: string;
+	status: string;
+	sticky: boolean;
+	tags: number[];
+	template: string;
+	title: Y.Text;
+}
 
-// Properties that are allowed to be synced for a post.
-const allowedPostProperties = new Set< string >( [
-	'author',
-	'blocks',
-	'comment_status',
-	'date',
-	'excerpt',
-	'featured_media',
-	'format',
-	'ping_status',
-	'meta',
-	'slug',
-	'status',
-	'sticky',
-	'tags',
-	'template',
-	'title',
-] );
+export const POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE = '_crdt_document';
 
 // Post meta keys that should *not* be synced.
 const disallowedPostMetaKeys = new Set< string >( [
-	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
+	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 ] );
 
 /**
@@ -70,11 +102,11 @@ const disallowedPostMetaKeys = new Set< string >( [
  * @param {Partial< ObjectData >} changes
  * @return {void}
  */
-export function defaultApplyChangesToCRDTDoc(
+function defaultApplyChangesToCRDTDoc(
 	ydoc: CRDTDoc,
 	changes: ObjectData
 ): void {
-	const ymap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
+	const ymap = getRootMap( ydoc, CRDT_RECORD_MAP_KEY );
 
 	Object.entries( changes ).forEach( ( [ key, newValue ] ) => {
 		// Cannot serialize function values, so cannot sync them.
@@ -82,17 +114,12 @@ export function defaultApplyChangesToCRDTDoc(
 			return;
 		}
 
-		// Set the value in the root document.
-		function setValue< T = unknown >( updatedValue: T ): void {
-			ymap.set( key, updatedValue );
-		}
-
 		switch ( key ) {
 			// Add support for additional data types here.
 
 			default: {
 				const currentValue = ymap.get( key );
-				mergeValue( currentValue, newValue, setValue );
+				updateMapValue( ymap, key, currentValue, newValue );
 			}
 		}
 	} );
@@ -104,68 +131,110 @@ export function defaultApplyChangesToCRDTDoc(
  *
  * @param {CRDTDoc}     ydoc
  * @param {PostChanges} changes
- * @param {Type}        _postType
+ * @param {Set<string>} syncedProperties
  * @return {void}
  */
 export function applyPostChangesToCRDTDoc(
 	ydoc: CRDTDoc,
 	changes: PostChanges,
-	_postType: Type // eslint-disable-line @typescript-eslint/no-unused-vars
+	syncedProperties: Set< string >
 ): void {
-	const ymap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
+	const ymap = getRootMap< YPostRecord >( ydoc, CRDT_RECORD_MAP_KEY );
 
-	Object.entries( changes ).forEach( ( [ key, newValue ] ) => {
-		if ( ! allowedPostProperties.has( key ) ) {
+	Object.keys( changes ).forEach( ( key ) => {
+		if ( ! syncedProperties.has( key ) ) {
 			return;
 		}
 
-		// Cannot serialize function values, so cannot sync them.
+		const newValue = changes[ key ];
+
+		// Cannot serialize function values, so cannot sync them. `content` is
+		// often passed as a lazy serializer by `useEntityBlockEditor`; the
+		// receiver re-derives it from the synced blocks (see
+		// getPostChangesFromCRDTDoc), so dropping it here is intentional.
 		if ( 'function' === typeof newValue ) {
 			return;
 		}
 
-		// Set the value in the root document.
-		function setValue< T = unknown >( updatedValue: T ): void {
-			ymap.set( key, updatedValue );
-		}
-
 		switch ( key ) {
 			case 'blocks': {
-				let currentBlocks = ymap.get( 'blocks' ) as YBlocks;
+				// Block changes from typing are bundled with a 'selection' update.
+				// Use the resulting cursor position for block merging.
+				const newCursorPosition = parseCursorSelection(
+					changes.selection
+				);
+
+				// Blocks are undefined when they need to be re-parsed from content.
+				// When new content is also part of this change (e.g. the Code
+				// Editor dispatching `{ content, blocks: undefined }` on every
+				// keystroke), derive blocks from content so the merge keeps
+				// stable YBlock identities for unchanged blocks.
+
+				const rawContent = getRawValue( changes.content );
+				if ( ! newValue && typeof rawContent === 'string' ) {
+					// We have no blocks but an updated content string.
+					mergeContentWithoutBlocks(
+						ymap,
+						rawContent,
+						newCursorPosition
+					);
+					break;
+				} else if ( ! newValue ) {
+					// We have an update containing empty blocks and content.
+					// Set to undefined instead of deleting the key. This is important
+					// since we iterate over the Y.Map keys in getPostChangesFromCRDTDoc.
+					ymap.set( key, undefined );
+					break;
+				}
+
+				let currentBlocks = ymap.get( key );
 
 				// Initialize.
 				if ( ! ( currentBlocks instanceof Y.Array ) ) {
 					currentBlocks = new Y.Array< YBlock >();
-					setValue( currentBlocks );
+					ymap.set( key, currentBlocks );
 				}
-
-				// Block[] from local changes.
-				const newBlocks = ( newValue as PostChanges[ 'blocks' ] ) ?? [];
 
 				// Merge blocks does not need `setValue` because it is operating on a
 				// Yjs type that is already in the Y.Doc.
-				mergeCrdtBlocks( currentBlocks, newBlocks, lastSelection );
+				mergeCrdtBlocks( currentBlocks, newValue, newCursorPosition );
 				break;
 			}
 
-			case 'excerpt': {
-				const currentValue = ymap.get( 'excerpt' ) as
-					| string
-					| undefined;
-				const rawNewValue = getRawValue( newValue );
+			case 'content':
+			case 'excerpt':
+			case 'title': {
+				const currentValue = ymap.get( key );
+				let rawValue = getRawValue( newValue );
 
-				mergeValue( currentValue, rawNewValue, setValue );
+				// Copy logic from prePersistPostType to ensure that the "Auto
+				// Draft" template title is not synced.
+				if (
+					key === 'title' &&
+					! currentValue?.toString() &&
+					'Auto Draft' === rawValue
+				) {
+					rawValue = '';
+				}
+
+				if ( currentValue instanceof Y.Text ) {
+					mergeRichTextUpdate( currentValue, rawValue ?? '' );
+				} else {
+					const newYText = new Y.Text( rawValue ?? '' );
+					ymap.set( key, newYText );
+				}
+
 				break;
 			}
 
 			// "Meta" is overloaded term; here, it refers to post meta.
 			case 'meta': {
-				let metaMap = ymap.get( 'meta' ) as Y.Map< unknown >;
+				let metaMap = ymap.get( 'meta' );
 
 				// Initialize.
-				if ( ! ( metaMap instanceof Y.Map ) ) {
-					metaMap = new Y.Map();
-					setValue( metaMap );
+				if ( ! isYMap( metaMap ) ) {
+					metaMap = createYMap< YMapRecord >();
+					ymap.set( 'meta', metaMap );
 				}
 
 				// Iterate over each meta property in the new value and merge it if it
@@ -176,12 +245,11 @@ export function applyPostChangesToCRDTDoc(
 							return;
 						}
 
-						mergeValue(
+						updateMapValue(
+							metaMap,
+							metaKey,
 							metaMap.get( metaKey ), // current value in CRDT
-							metaValue, // new value from changes
-							( updatedMetaValue: unknown ): void => {
-								metaMap.set( metaKey, updatedMetaValue );
-							}
+							metaValue // new value from changes
 						);
 					}
 				);
@@ -195,42 +263,90 @@ export function applyPostChangesToCRDTDoc(
 					break;
 				}
 
-				const currentValue = ymap.get( 'slug' ) as string;
-				mergeValue( currentValue, newValue, setValue );
+				const currentValue = ymap.get( key );
+				updateMapValue( ymap, key, currentValue, newValue );
 				break;
 			}
 
-			case 'title': {
-				const currentValue = ymap.get( 'title' ) as string | undefined;
-
-				// Copy logic from prePersistPostType to ensure that the "Auto
-				// Draft" template title is not synced.
-				let rawNewValue = getRawValue( newValue );
-				if ( ! currentValue && 'Auto Draft' === rawNewValue ) {
-					rawNewValue = '';
-				}
-
-				mergeValue( currentValue, rawNewValue, setValue );
-				break;
-			}
-
-			// Add support for additional data types here.
+			// Add support for additional properties here.
 
 			default: {
 				const currentValue = ymap.get( key );
-				mergeValue( currentValue, newValue, setValue );
+				updateMapValue( ymap, key, currentValue, newValue );
 			}
 		}
 	} );
 
-	// Update the lastSelection for use in computing Y.Text deltas.
-	if ( 'selection' in changes ) {
-		lastSelection = changes.selection?.selectionStart ?? null;
+	// Process changes that we don't want to persist to the CRDT document.
+	if ( changes.selection ) {
+		const selection = changes.selection;
+		// Persist selection changes at the end of the current event loop.
+		// This allows undo meta to be saved with the current selection before
+		// it is overwritten by the new selection from Gutenberg.
+		// Without this, selection history will already contain the latest
+		// selection (after this change) when the undo stack is saved.
+		setTimeout( () => {
+			updateSelectionHistory( ydoc, selection );
+		}, 0 );
 	}
 }
 
-export function defaultGetChangesFromCRDTDoc( crdtDoc: CRDTDoc ): ObjectData {
-	return crdtDoc.getMap( CRDT_RECORD_MAP_KEY ).toJSON();
+/**
+ * Derive blocks from a raw content string and merge them into the post's
+ * blocks Y.Array. Used when a caller dispatches a change with `blocks:
+ * undefined` alongside new content,  most notably the Code Editor's
+ * per-keystroke dispatch.
+ *
+ * @param ymap           The post's root Y.Map.
+ * @param rawContent     The raw HTML content to parse.
+ * @param cursorPosition Cursor position derived from the change's selection,
+ *                       used by mergeCrdtBlocks for rich-text cursor hints.
+ */
+function mergeContentWithoutBlocks(
+	ymap: YMapWrap< YPostRecord >,
+	rawContent: string,
+	cursorPosition: MergeCursorPosition
+): void {
+	let currentBlocks = ymap.get( 'blocks' );
+
+	if ( ! ( currentBlocks instanceof Y.Array ) ) {
+		currentBlocks = new Y.Array< YBlock >();
+		ymap.set( 'blocks', currentBlocks );
+	}
+
+	mergeCrdtBlocks(
+		currentBlocks,
+		parse( rawContent ) as Block[],
+		cursorPosition,
+		{ preserveClientIds: true }
+	);
+}
+
+/**
+ * Only returns a selection object if it describes a selection within a block, with
+ * a cursor inside a RichText field associated with one of that block’s attributes.
+ *
+ * @param selection Selection object which might represent a selection within a block,
+ *                  within a RichText field associated with a particular attribute of
+ *                  that block, or none at all.
+ */
+function parseCursorSelection( selection?: WPSelection ): MergeCursorPosition {
+	const selectionStart = selection?.selectionStart;
+
+	return selectionStart?.clientId &&
+		selectionStart.attributeKey &&
+		'number' === typeof selectionStart.offset &&
+		Number.isInteger( selectionStart.offset )
+		? {
+				attributeKey: selectionStart.attributeKey,
+				clientId: selectionStart.clientId,
+				offset: asRichTextOffset( selectionStart.offset ),
+		  }
+		: null;
+}
+
+function defaultGetChangesFromCRDTDoc( crdtDoc: CRDTDoc ): ObjectData {
+	return getRootMap( crdtDoc, CRDT_RECORD_MAP_KEY ).toJSON();
 }
 
 /**
@@ -238,23 +354,23 @@ export function defaultGetChangesFromCRDTDoc( crdtDoc: CRDTDoc ): ObjectData {
  * against the local record and determine if there are changes (edits) we want
  * to dispatch.
  *
- * @param {CRDTDoc} ydoc
- * @param {Post}    editedRecord
- * @param {Type}    _postType
+ * @param {CRDTDoc}     ydoc
+ * @param {Post}        editedRecord
+ * @param {Set<string>} syncedProperties
  * @return {Partial<PostChanges>} The changes that should be applied to the local record.
  */
 export function getPostChangesFromCRDTDoc(
 	ydoc: CRDTDoc,
 	editedRecord: Post,
-	_postType: Type // eslint-disable-line @typescript-eslint/no-unused-vars
+	syncedProperties: Set< string >
 ): PostChanges {
-	const ymap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
+	const ymap = getRootMap< YPostRecord >( ydoc, CRDT_RECORD_MAP_KEY );
 
 	let allowedMetaChanges: Post[ 'meta' ] = {};
 
 	const changes = Object.fromEntries(
 		Object.entries( ymap.toJSON() ).filter( ( [ key, newValue ] ) => {
-			if ( ! allowedPostProperties.has( key ) ) {
+			if ( ! syncedProperties.has( key ) ) {
 				return false;
 			}
 
@@ -283,16 +399,14 @@ export function getPostChangesFromCRDTDoc(
 						ydoc.meta?.get( CRDT_DOC_META_PERSISTENCE_KEY ) &&
 						editedRecord.content
 					) {
-						const blocks = ymap.get( 'blocks' ) as YBlocks;
+						const blocksJson = ymap.get( 'blocks' )?.toJSON() ?? [];
+
 						return (
-							__unstableSerializeAndClean(
-								blocks.toJSON()
-							).trim() !== editedRecord.content.raw.trim()
+							__unstableSerializeAndClean( blocksJson ).trim() !==
+							getRawValue( editedRecord.content )
 						);
 					}
 
-					// The consumers of blocks have memoization that renders optimization
-					// here unnecessary.
 					return true;
 				}
 
@@ -300,11 +414,8 @@ export function getPostChangesFromCRDTDoc(
 					// Do not overwrite a "floating" date. Borrowing logic from the
 					// isEditedPostDateFloating selector.
 					const currentDateIsFloating =
-						[ 'draft', 'auto-draft', 'pending' ].includes(
-							ymap.get( 'status' ) as string
-						) &&
-						( null === currentValue ||
-							editedRecord.modified === currentValue );
+						null === currentValue ||
+						editedRecord.modified === currentValue;
 
 					if ( currentDateIsFloating ) {
 						return false;
@@ -314,17 +425,29 @@ export function getPostChangesFromCRDTDoc(
 				}
 
 				case 'meta': {
+					const currentMeta =
+						( currentValue as PostChanges[ 'meta' ] ) ?? {};
+
 					allowedMetaChanges = Object.fromEntries(
 						Object.entries( newValue ?? {} ).filter(
-							( [ metaKey ] ) =>
-								! disallowedPostMetaKeys.has( metaKey )
+							( [ metaKey ] ) => {
+								if ( disallowedPostMetaKeys.has( metaKey ) ) {
+									return false;
+								}
+
+								// Ignore meta keys that are no longer registered
+								// for this post (absent from the REST response).
+								// Without this, orphaned CRDT meta would mark
+								// the post permanently dirty.
+								return metaKey in currentMeta;
+							}
 						)
 					);
 
 					// Merge the allowed meta changes with the current meta values since
 					// not all meta properties are synced.
 					const mergedValue = {
-						...( currentValue as PostChanges[ 'meta' ] ),
+						...currentMeta,
 						...allowedMetaChanges,
 					};
 
@@ -340,6 +463,7 @@ export function getPostChangesFromCRDTDoc(
 					return haveValuesChanged( currentValue, newValue );
 				}
 
+				case 'content':
 				case 'excerpt':
 				case 'title': {
 					return haveValuesChanged(
@@ -357,6 +481,30 @@ export function getPostChangesFromCRDTDoc(
 		} )
 	);
 
+	// Blocks extracted from the CRDT document have rich-text attributes as
+	// plain strings (from Y.Text.toJSON()). Convert them back to RichTextData
+	// so block edit components receive the same types as locally-created blocks.
+	if ( changes.blocks ) {
+		changes.blocks = deserializeBlockAttributes(
+			changes.blocks as Block[]
+		);
+	}
+
+	// When blocks changed but content didn't (the sender internally used a lazy
+	// serializer function), inject a closure that captures the synced blocks
+	// and serializes them on demand. Mirrors what useEntityBlockEditor does
+	// locally. A fresh function on every persistent edit marks the entity
+	// dirty (so the save button reactivates for peers), while serialization
+	// stays lazy (only runs when getEditedPostContent reads it). The closure
+	// captures `capturedBlocks` so the right content is returned even if the
+	// caller later clears `record.blocks` (e.g. the Code Editor re-parsing
+	// from content).
+	if ( changes.blocks && ! changes.content ) {
+		const capturedBlocks = changes.blocks;
+		changes.content = () =>
+			__unstableSerializeAndClean( capturedBlocks as WPBlock[] );
+	}
+
 	// Meta changes must be merged with the edited record since not all meta
 	// properties are synced.
 	if ( 'object' === typeof changes.meta ) {
@@ -366,8 +514,45 @@ export function getPostChangesFromCRDTDoc(
 		};
 	}
 
+	// When remote content changes are detected, recalculate the local user's
+	// selection using Y.RelativePosition to account for text shifts. The ydoc
+	// has already been updated with remote content at this point, so converting
+	// relative positions to absolute gives corrected offsets. Including the
+	// selection in PostChanges ensures it dispatches atomically with content.
+	const selectionHistory = getSelectionHistory( ydoc );
+	const shiftedSelection = getShiftedSelection( ydoc, selectionHistory );
+	if ( shiftedSelection ) {
+		changes.selection = {
+			...shiftedSelection,
+			initialPosition: 0,
+		};
+	}
+
 	return changes;
 }
+
+/**
+ * This default sync config can be used for entities that are flat maps of
+ * primitive values and do not require custom logic to merge changes.
+ */
+export const defaultSyncConfig: SyncConfig = {
+	applyChangesToCRDTDoc: defaultApplyChangesToCRDTDoc,
+	createAwareness: ( ydoc: CRDTDoc ) => new BaseAwareness( ydoc ),
+	getChangesFromCRDTDoc: defaultGetChangesFromCRDTDoc,
+};
+
+/**
+ * This default collection sync config can be used to sync entity collections
+ * (e.g., block comments) where we are not interested in merging changes at the
+ * individual record level, but instead want to replace the entire collection
+ * when changes are detected.
+ */
+export const defaultCollectionSyncConfig: SyncConfig = {
+	applyChangesToCRDTDoc: () => {},
+	getChangesFromCRDTDoc: () => ( {} ),
+	shouldSync: ( _: ObjectType, objectId: ObjectID | null ) =>
+		null === objectId,
+};
 
 /**
  * Extract the raw string value from a property that may be a string or an object
@@ -394,19 +579,25 @@ function getRawValue( value?: unknown ): string | undefined {
 	return undefined;
 }
 
-function haveValuesChanged< ValueType = any >(
-	currentValue: ValueType,
-	newValue: ValueType
+function haveValuesChanged< ValueType >(
+	currentValue: ValueType | undefined,
+	newValue: ValueType | undefined
 ): boolean {
 	return ! fastDeepEqual( currentValue, newValue );
 }
 
-function mergeValue< ValueType = any >(
-	currentValue: ValueType,
-	newValue: ValueType,
-	setValue: ( value: ValueType ) => void
+function updateMapValue< T extends YMapRecord, K extends keyof T >(
+	map: YMapWrap< T >,
+	key: K,
+	currentValue: T[ K ] | undefined,
+	newValue: T[ K ] | undefined
 ): void {
-	if ( haveValuesChanged< ValueType >( currentValue, newValue ) ) {
-		setValue( newValue );
+	if ( undefined === newValue ) {
+		map.delete( key );
+		return;
+	}
+
+	if ( haveValuesChanged< T[ K ] >( currentValue, newValue ) ) {
+		map.set( key, newValue );
 	}
 }

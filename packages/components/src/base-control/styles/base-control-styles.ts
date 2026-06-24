@@ -45,6 +45,7 @@ export const StyledHelp = styled.p`
 	font-size: ${ font( 'helpText.fontSize' ) };
 	font-style: normal;
 	color: ${ COLORS.gray[ 700 ] };
+	text-wrap: pretty;
 `;
 
 export const StyledVisualLabel = styled.span`

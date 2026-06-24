@@ -1,0 +1,45 @@
+{
+	"name": "@wordpress/validation-tools",
+	"version": "0.0.0",
+	"description": "Validation scripts used across the Gutenberg monorepo.",
+	"private": true,
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"validation"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/tools/validation",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "tools/validation"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"type": "module",
+	"devDependencies": {
+		"@mawesome/dependency-audit": "^0.4.4",
+		"@wordpress/create-block": "file:../../packages/create-block",
+		"@wordpress/scripts": "file:../../packages/scripts",
+		"chalk": "^4.1.1",
+		"glob": "^7.1.2",
+		"jsonc-parser": "^3.3.1",
+		"simple-git": "^3.24.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"check-installed-deps": "node ./check-installed-deps.mjs",
+		"check-licenses": "node ./check-licenses.mjs",
+		"dependency-audit": "dependency-audit --collapse-root-cause \"../../packages/*\"",
+		"check-local-changes": "node ./check-local-changes.cjs",
+		"check-root-dependencies": "node ./check-root-dependencies.mjs",
+		"test-create-block": "node ./test-create-block.mjs",
+		"validate-package-lock": "node ./validate-package-lock.cjs",
+		"validate-tsconfig": "node ./validate-tsconfig.mjs"
+	}
+}

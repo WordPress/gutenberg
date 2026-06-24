@@ -32,25 +32,24 @@
 		"build-types",
 		"*.md"
 	],
-	"type": "module",
 	"main": "build/index.cjs",
-	"module": "build-module/index.js",
+	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
-			"import": "./build-module/index.js",
+			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json",
 		"./build-style/": "./build-style/"
 	},
-	"react-native": "src/index",
 	"wpScriptModuleExports": {
-		".": "./build-module/index.js"
+		".": "./build-module/index.mjs"
 	},
 	"dependencies": {
 		"@wordpress/abilities": "file:../abilities",
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/components": "file:../components",
+		"@wordpress/core-abilities": "file:../core-abilities",
 		"@wordpress/data": "file:../data",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",

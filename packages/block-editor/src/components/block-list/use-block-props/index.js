@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import { useContext } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
-import { useMergeRefs, useDisabled } from '@wordpress/compose';
+import { useMergeRefs, useDisabled, useRefEffect } from '@wordpress/compose';
 import warning from '@wordpress/warning';
 
 /**
@@ -30,6 +30,7 @@ import { useIntersectionObserver } from './use-intersection-observer';
 import { useScrollIntoView } from './use-scroll-into-view';
 import { useFlashEditableBlocks } from '../../use-flash-editable-blocks';
 import { useFirefoxDraggableCompatibility } from './use-firefox-draggable-compatibility';
+import { useBlockVisibility } from '../../block-visibility/';
 
 /**
  * This hook is used to lightly mark an element as a block element. The element
@@ -102,8 +103,17 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		isSectionBlock,
 		isWithinSectionBlock,
 		canMove,
-		isBlockHidden,
+		blockVisibility,
+		deviceType,
 	} = useContext( PrivateBlockContext );
+
+	const defaultViewRef = useRefEffect( ( element ) => {
+		if ( element ) {
+			const { ownerDocument } = element;
+			const { defaultView } = ownerDocument;
+			defaultViewRef.current = defaultView;
+		}
+	}, [] );
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
 	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
@@ -112,6 +122,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const isHoverEnabled = ! isWithinSectionBlock;
 	const mergedRefs = useMergeRefs( [
 		props.ref,
+		defaultViewRef,
 		useFocusFirstElement( { clientId, initialPosition } ),
 		useBlockRefProvider( clientId ),
 		useFocusHandler( clientId ),
@@ -137,6 +148,13 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 					'var(--wp-block-synced-color--rgb)',
 		  }
 		: {};
+
+	// Use block visibility hook with data from context to avoid extra subscription.
+	const { isBlockCurrentlyHidden } = useBlockVisibility( {
+		blockVisibility,
+		deviceType,
+		view: defaultViewRef.current,
+	} );
 
 	// Ensures it warns only inside the `edit` implementation for the block.
 	if ( blockApiVersion < 2 && clientId === blockEditContext.clientId ) {
@@ -185,7 +203,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				'has-editable-outline': hasEditableOutline,
 				'has-negative-margin': hasNegativeMargin,
 				'is-editing-content-only-section': isEditingContentOnlySection,
-				'is-block-hidden': isBlockHidden,
+				'is-block-hidden': isBlockCurrentlyHidden,
 			},
 			className,
 			props.className,

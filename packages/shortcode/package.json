@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/shortcode",
-	"version": "4.36.0",
+	"version": "4.49.0",
 	"description": "Shortcode module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -29,23 +29,21 @@
 		"build-types",
 		"*.md"
 	],
-	"type": "module",
 	"main": "build/index.cjs",
-	"module": "build-module/index.js",
+	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
-			"import": "./build-module/index.js",
+			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"wpScriptDefaultExport": true,
 	"types": "build-types",
 	"dependencies": {
-		"memize": "^2.0.1"
+		"memize": "^2.1.0"
 	},
 	"publishConfig": {
 		"access": "public"

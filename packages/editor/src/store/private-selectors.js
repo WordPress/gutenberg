@@ -21,13 +21,21 @@ import { store as preferencesStore } from '@wordpress/preferences';
 /**
  * Internal dependencies
  */
-import { getRenderingMode, getCurrentPost } from './selectors';
+import {
+	getRenderingMode,
+	getCurrentPost,
+	getCurrentPostType,
+	getCurrentPostId,
+	getEditorSettings,
+	getCurrentPostRevisionsCount,
+} from './selectors';
 import {
 	getEntityActions as _getEntityActions,
 	getEntityFields as _getEntityFields,
 	isEntityReady as _isEntityReady,
 } from '../dataviews/store/private-selectors';
 import { getTemplatePartIcon } from '../utils';
+import { unlock } from '../lock-unlock';
 
 const EMPTY_INSERTION_POINT = {
 	rootClientId: undefined,
@@ -55,14 +63,36 @@ export const getInserter = createRegistrySelector( ( select ) =>
 			}
 
 			if ( getRenderingMode( state ) === 'template-locked' ) {
+				const {
+					getBlocksByName,
+					getSelectedBlockClientId,
+					getBlockParents,
+					getBlockOrder,
+				} = select( blockEditorStore );
 				const [ postContentClientId ] =
-					select( blockEditorStore ).getBlocksByName(
-						'core/post-content'
-					);
+					getBlocksByName( 'core/post-content' );
 				if ( postContentClientId ) {
+					const selectedBlockClientId = getSelectedBlockClientId();
+
+					// If a block inside Post Content is selected,
+					// let the inserter use its default logic for determining the
+					// insertion position by returning an empty insertion point.
+					if (
+						selectedBlockClientId &&
+						selectedBlockClientId !== postContentClientId &&
+						getBlockParents( selectedBlockClientId ).includes(
+							postContentClientId
+						)
+					) {
+						return EMPTY_INSERTION_POINT;
+					}
+
+					// Otherwise (no selection, or Post Content itself
+					// is selected), insert at the end of Post Content.
 					return {
 						rootClientId: postContentClientId,
-						insertionIndex: undefined,
+						insertionIndex:
+							getBlockOrder( postContentClientId ).length,
 						filterValue: undefined,
 					};
 				}
@@ -71,14 +101,26 @@ export const getInserter = createRegistrySelector( ( select ) =>
 			return EMPTY_INSERTION_POINT;
 		},
 		( state ) => {
+			const {
+				getBlocksByName,
+				getSelectedBlockClientId,
+				getBlockParents,
+				getBlockOrder,
+			} = select( blockEditorStore );
 			const [ postContentClientId ] =
-				select( blockEditorStore ).getBlocksByName(
-					'core/post-content'
-				);
+				getBlocksByName( 'core/post-content' );
+			const selectedBlockClientId = getSelectedBlockClientId();
 			return [
 				state.blockInserterPanel,
 				getRenderingMode( state ),
 				postContentClientId,
+				selectedBlockClientId,
+				selectedBlockClientId
+					? getBlockParents( selectedBlockClientId )
+					: undefined,
+				postContentClientId
+					? getBlockOrder( postContentClientId ).length
+					: undefined,
 			];
 		}
 	)
@@ -216,7 +258,18 @@ export const getPostBlocksByName = createRegistrySelector( ( select ) =>
 				} )
 			);
 		},
-		() => [ select( blockEditorStore ).getBlocks() ]
+		( state, blockNames ) => {
+			blockNames = Array.isArray( blockNames )
+				? blockNames
+				: [ blockNames ];
+			const { getBlocksByName, getBlockParents } =
+				select( blockEditorStore );
+			const clientIds = getBlocksByName( blockNames );
+			const parentsOfClientIds = clientIds.map( ( id ) =>
+				getBlockParents( id )
+			);
+			return [ clientIds, ...parentsOfClientIds ];
+		}
 	)
 );
 
@@ -252,6 +305,11 @@ export const getDefaultRenderingMode = createRegistrySelector(
 			'core',
 			'renderingModes'
 		)?.[ theme ]?.[ postType ];
+
+		if ( RENDERING_MODES.includes( defaultModePreference ) ) {
+			return defaultModePreference;
+		}
+
 		const postTypeDefaultMode = Array.isArray(
 			postTypeEntity?.supports?.editor
 		)
@@ -260,14 +318,18 @@ export const getDefaultRenderingMode = createRegistrySelector(
 			  )?.[ 'default-mode' ]
 			: undefined;
 
-		const defaultMode = defaultModePreference || postTypeDefaultMode;
-
-		// Fallback gracefully to 'post-only' when rendering mode is not supported.
-		if ( ! RENDERING_MODES.includes( defaultMode ) ) {
-			return 'post-only';
+		if ( RENDERING_MODES.includes( postTypeDefaultMode ) ) {
+			return postTypeDefaultMode;
 		}
 
-		return defaultMode;
+		const settingsDefaultMode =
+			getEditorSettings( state ).defaultRenderingMode;
+
+		if ( RENDERING_MODES.includes( settingsDefaultMode ) ) {
+			return settingsDefaultMode;
+		}
+
+		return 'post-only';
 	}
 );
 
@@ -292,11 +354,267 @@ export function getShowStylebook( state ) {
 }
 
 /**
- * Get the canvas minimum height.
+ * Returns the current revisions page number.
  *
  * @param {Object} state Global application state.
- * @return {number} The canvas minimum height.
+ * @return {number} The page number.
  */
-export function getCanvasMinHeight( state ) {
-	return state.canvasMinHeight;
+export function getRevisionPage( state ) {
+	return state.revisionPage;
 }
+
+/**
+ * Builds the query object for fetching a page of revisions.
+ *
+ * @param {string} revisionKey The entity's revision key.
+ * @param {number} page        The 1-based page number (page 1 = newest).
+ * @return {Object} Query object for getRevisions.
+ */
+export function buildRevisionsPageQuery( revisionKey, page ) {
+	return {
+		per_page: REVISIONS_PER_PAGE,
+		page,
+		context: 'edit',
+		orderby: 'date',
+		order: 'desc',
+		_fields: [
+			...new Set( [
+				'id',
+				'date',
+				'modified',
+				'author',
+				'meta',
+				'title.raw',
+				'excerpt.raw',
+				'content.raw',
+				revisionKey,
+			] ),
+		].join(),
+	};
+}
+
+const REVISIONS_PER_PAGE = 100;
+
+export function getRevisionsPerPage() {
+	return REVISIONS_PER_PAGE;
+}
+
+/**
+ * Returns revisions for the given page number.
+ *
+ * @param {Object} state Global application state.
+ * @param {number} page  The 1-based page number (page 1 = newest).
+ * @return {Array|null} The revisions array, or null if not yet loaded.
+ */
+export const getPageRevisions = createRegistrySelector(
+	( select ) => ( state, page ) => {
+		if ( ! page ) {
+			return null;
+		}
+
+		const { type: postType, id: postId } = getCurrentPost( state );
+		if ( ! postType || ! postId ) {
+			return null;
+		}
+
+		const entityConfig = select( coreStore ).getEntityConfig(
+			'postType',
+			postType
+		);
+		const revisionKey = entityConfig?.revisionKey || 'id';
+
+		return select( coreStore ).getRevisions(
+			'postType',
+			postType,
+			postId,
+			buildRevisionsPageQuery( revisionKey, page )
+		);
+	}
+);
+
+/**
+ * Returns whether the editor is in revisions preview mode.
+ *
+ * @param {Object} state Global application state.
+ * @return {boolean} Whether revisions mode is active.
+ */
+export function isRevisionsMode( state ) {
+	return state.revisionId !== null;
+}
+
+/**
+ * Returns whether the revision diff highlighting is shown.
+ *
+ * @param {Object} state Global application state.
+ * @return {boolean} Whether revision diff is being shown.
+ */
+export function isShowingRevisionDiff( state ) {
+	return state.showRevisionDiff;
+}
+
+/**
+ * Returns the current revision ID in revisions mode.
+ *
+ * @param {Object} state Global application state.
+ * @return {number|null} The revision ID, or null if not in revisions mode.
+ */
+export function getCurrentRevisionId( state ) {
+	return state.revisionId;
+}
+
+/**
+ * Returns the current revision object in revisions mode.
+ *
+ * @param {Object} state Global application state.
+ * @return {Object|null|undefined} The revision object, null if loading, or undefined if not in revisions mode.
+ */
+export const getCurrentRevision = createRegistrySelector(
+	( select ) => ( state ) => {
+		const revisionId = getCurrentRevisionId( state );
+		if ( ! revisionId ) {
+			return undefined;
+		}
+
+		const page = getRevisionPage( state );
+		if ( ! page ) {
+			return null;
+		}
+
+		const { type: postType, id: postId } = getCurrentPost( state );
+		const entityConfig = select( coreStore ).getEntityConfig(
+			'postType',
+			postType
+		);
+		const revisionKey = entityConfig?.revisionKey || 'id';
+		const revisions = select( coreStore ).getRevisions(
+			'postType',
+			postType,
+			postId,
+			buildRevisionsPageQuery( revisionKey, page )
+		);
+		if ( ! revisions ) {
+			return null;
+		}
+		return (
+			revisions.find( ( r ) => r[ revisionKey ] === revisionId ) ?? null
+		);
+	}
+);
+
+/**
+ * Returns the currently selected note ID.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {undefined|number|'new'} The selected note ID, 'new' for the new note form, or undefined if none.
+ */
+export function getSelectedNote( state ) {
+	return state.selectedNote?.noteId;
+}
+
+/**
+ * Returns whether the selected note should be focused.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the selected note should be focused.
+ */
+export function isNoteFocused( state ) {
+	return !! state.selectedNote?.options?.focus;
+}
+
+/**
+ * Returns the previous revision (the one before the current revision).
+ * Used for diffing between revisions.
+ *
+ * @param {Object} state Global application state.
+ * @return {Object|null|undefined} The previous revision object, null if loading or no previous revision, or undefined if not in revisions mode.
+ */
+export const getPreviousRevision = createRegistrySelector(
+	( select ) => ( state ) => {
+		const currentRevisionId = getCurrentRevisionId( state );
+		if ( ! currentRevisionId ) {
+			return undefined;
+		}
+
+		const page = getRevisionPage( state );
+		if ( ! page ) {
+			return null;
+		}
+
+		const { type: postType, id: postId } = getCurrentPost( state );
+		const entityConfig = select( coreStore ).getEntityConfig(
+			'postType',
+			postType
+		);
+		const revisionKey = entityConfig?.revisionKey || 'id';
+		const query = buildRevisionsPageQuery( revisionKey, page );
+		const revisions = select( coreStore ).getRevisions(
+			'postType',
+			postType,
+			postId,
+			query
+		);
+		if ( ! revisions ) {
+			return null;
+		}
+
+		// Find current revision index.
+		const currentIndex = revisions.findIndex(
+			( r ) => r[ revisionKey ] === currentRevisionId
+		);
+
+		// Return the previous revision (older one) if it exists.
+		if ( currentIndex >= 0 && currentIndex < revisions.length - 1 ) {
+			return revisions[ currentIndex + 1 ];
+		}
+
+		// At page boundary: fetch the first revision from the next page.
+		const totalRevisions = getCurrentPostRevisionsCount( state );
+		const totalPages = Math.ceil( totalRevisions / query.per_page ) || 1;
+		if ( currentIndex === revisions.length - 1 && page < totalPages ) {
+			const nextPageRevisions = select( coreStore ).getRevisions(
+				'postType',
+				postType,
+				postId,
+				buildRevisionsPageQuery( revisionKey, page + 1 )
+			);
+			return nextPageRevisions?.[ 0 ] ?? null;
+		}
+
+		return null;
+	}
+);
+
+/**
+ * Returns whether the collaboration is enabled for the current post.
+ *
+ * @return {boolean} Whether collaboration is enabled.
+ */
+export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
+	( select ) => ( state ) => {
+		// Return early, if collaboration is not supported.
+		if ( ! unlock( select( coreStore ) ).isCollaborationSupported() ) {
+			return false;
+		}
+
+		const currentPostType = getCurrentPostType( state );
+		const currentPostId = getCurrentPostId( state );
+		const entityConfig = select( coreStore ).getEntityConfig(
+			'postType',
+			currentPostType
+		);
+		const syncConfig = entityConfig?.syncConfig;
+
+		return Boolean(
+			syncConfig &&
+				syncConfig.supportsPersistence &&
+				window._wpCollaborationEnabled &&
+				false !==
+					syncConfig.shouldSync?.(
+						`postType/${ currentPostType }`,
+						currentPostId
+					)
+		);
+	}
+);

@@ -1,5 +1,3 @@
-@use "@wordpress/base-styles/variables" as *;
-
 // Picker-specific table styles
 // The table picker mainly reuses the regular table styles from ../table/style.scss
 // Add any picker-specific overrides here if needed in the future.
@@ -9,7 +7,9 @@
 
 	// Constrain checkbox column to fixed width while other columns share remaining space.
 	.dataviews-view-table__checkbox-column {
-		width: $grid-unit-60;
+		// TODO: Replace with a `--wpds-dimension-size-*` token if 48px is added
+		// to the WPDS element size scale.
+		width: 48px;
 	}
 
 	tbody:focus-visible {
@@ -20,7 +20,7 @@
 		}
 
 		[data-active-item="true"] {
-			outline: 2px solid var(--wp-admin-theme-color);
+			outline: 2px solid var(--wpds-color-stroke-focus);
 		}
 	}
 
@@ -36,19 +36,18 @@
 
 	// When used in picker context, ensure row selection works as expected
 	.dataviews-view-table__row {
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 
 		&.is-selected {
-			// Ensure selected rows are visually distinct
-			background-color: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+			background-color: var(--wpds-color-background-interactive-brand-weak-active);
 		}
 
 		&.is-hovered {
-			background-color: rgba(var(--wp-admin-theme-color--rgb), 0.08);
+			background-color: var(--wpds-color-background-interactive-brand-weak-active);
 		}
 
 		&.is-selected.is-hovered {
-			background-color: rgba(var(--wp-admin-theme-color--rgb), 0.12);
+			background-color: var(--wpds-color-background-interactive-brand-weak-active);
 		}
 	}
 }

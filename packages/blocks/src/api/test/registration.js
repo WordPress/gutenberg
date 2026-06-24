@@ -48,6 +48,7 @@ const pick = ( obj, keys ) =>
 
 describe( 'blocks', () => {
 	const defaultBlockSettings = {
+		apiVersion: 3,
 		save: noop,
 		category: 'text',
 		title: 'block title',
@@ -139,7 +140,7 @@ describe( 'blocks', () => {
 			);
 			expect( console ).not.toHaveWarned();
 			expect( block ).toEqual( {
-				apiVersion: 1,
+				apiVersion: 3,
 				name: 'my-plugin/fancy-block-4',
 				icon: { src: BLOCK_ICON_DEFAULT },
 				attributes: {},
@@ -201,6 +202,7 @@ describe( 'blocks', () => {
 
 		it( 'should canonicalize legacy block category.', () => {
 			const blockType = {
+					apiVersion: 3,
 					save: noop,
 					category: 'common',
 					title: 'block title',
@@ -214,6 +216,7 @@ describe( 'blocks', () => {
 
 		it( 'should unset category of blocks with non registered category.', () => {
 			const blockType = {
+					apiVersion: 3,
 					save: noop,
 					category: 'custom-category-slug',
 					title: 'block title',
@@ -285,6 +288,10 @@ describe( 'blocks', () => {
 				category: 'text',
 			} );
 
+			// This warning is expected because the default apiVersion is 1 when not explicitly specified.
+			expect( console ).toHaveWarnedWith(
+				'Block with API version 2 or lower is deprecated since version 6.9. See: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/block-migration-for-iframe-editor-compatibility/ Note: The block "core/test-block-with-defaults" is registered with API version 1. This means that the post editor may work as a non-iframe editor. Since all editors are planned to work as iframes in the future, set the `apiVersion` field to 3 and test the block inside the iframe editor.'
+			);
 			expect( getBlockType( 'core/test-block-with-defaults' ) ).toEqual( {
 				apiVersion: 1,
 				name: 'core/test-block-with-defaults',
@@ -306,6 +313,7 @@ describe( 'blocks', () => {
 
 		it( 'should default to empty object when attributes is omitted and without warning', () => {
 			registerBlockType( 'core/test-block-omitted-attributes', {
+				apiVersion: 3,
 				title: 'block title',
 				category: 'text',
 				save: noop,
@@ -351,6 +359,7 @@ describe( 'blocks', () => {
 			} );
 
 			const blockType = {
+				apiVersion: 3,
 				settingName: 'settingValue',
 				save: noop,
 				category: 'text',
@@ -359,7 +368,7 @@ describe( 'blocks', () => {
 			registerBlockType( 'core/test-block-with-attributes', blockType );
 			expect( getBlockType( 'core/test-block-with-attributes' ) ).toEqual(
 				{
-					apiVersion: 1,
+					apiVersion: 3,
 					name: 'core/test-block-with-attributes',
 					settingName: 'settingValue',
 					save: noop,
@@ -396,11 +405,12 @@ describe( 'blocks', () => {
 			} );
 
 			const blockType = {
+				apiVersion: 3,
 				title: 'block title',
 			};
 			registerBlockType( blockName, blockType );
 			expect( getBlockType( blockName ) ).toEqual( {
-				apiVersion: 1,
+				apiVersion: 3,
 				name: blockName,
 				save: expect.any( Function ),
 				title: 'block title',
@@ -470,6 +480,7 @@ describe( 'blocks', () => {
 			} );
 
 			const blockType = {
+				apiVersion: 3,
 				title: 'block settings merge',
 				variations: [
 					{ name: 'bar', label: 'Bar' },
@@ -478,7 +489,7 @@ describe( 'blocks', () => {
 			};
 			registerBlockType( blockName, blockType );
 			expect( getBlockType( blockName ) ).toEqual( {
-				apiVersion: 1,
+				apiVersion: 3,
 				name: blockName,
 				save: expect.any( Function ),
 				title: 'block settings merge',
@@ -521,6 +532,7 @@ describe( 'blocks', () => {
 
 		it( 'should normalize the icon containing an element', () => {
 			const blockType = {
+				apiVersion: 3,
 				save: noop,
 				category: 'text',
 				title: 'block title',
@@ -544,7 +556,7 @@ describe( 'blocks', () => {
 			expect(
 				getBlockType( 'core/test-block-icon-normalize-element' )
 			).toEqual( {
-				apiVersion: 1,
+				apiVersion: 3,
 				name: 'core/test-block-icon-normalize-element',
 				save: noop,
 				category: 'text',
@@ -577,6 +589,7 @@ describe( 'blocks', () => {
 
 		it( 'should normalize the icon containing a string', () => {
 			const blockType = {
+				apiVersion: 3,
 				save: noop,
 				category: 'text',
 				title: 'block title',
@@ -589,7 +602,7 @@ describe( 'blocks', () => {
 			expect(
 				getBlockType( 'core/test-block-icon-normalize-string' )
 			).toEqual( {
-				apiVersion: 1,
+				apiVersion: 3,
 				name: 'core/test-block-icon-normalize-string',
 				save: noop,
 				category: 'text',
@@ -625,6 +638,7 @@ describe( 'blocks', () => {
 				);
 			};
 			const blockType = {
+				apiVersion: 3,
 				save: noop,
 				category: 'text',
 				title: 'block title',
@@ -637,7 +651,7 @@ describe( 'blocks', () => {
 			expect(
 				getBlockType( 'core/test-block-icon-normalize-function' )
 			).toEqual( {
-				apiVersion: 1,
+				apiVersion: 3,
 				name: 'core/test-block-icon-normalize-function',
 				save: noop,
 				category: 'text',
@@ -659,6 +673,7 @@ describe( 'blocks', () => {
 
 		it( 'should correctly register an icon with background and a custom svg', () => {
 			const blockType = {
+				apiVersion: 3,
 				save: noop,
 				category: 'text',
 				title: 'block title',
@@ -685,7 +700,7 @@ describe( 'blocks', () => {
 			expect(
 				getBlockType( 'core/test-block-icon-normalize-background' )
 			).toEqual( {
-				apiVersion: 1,
+				apiVersion: 3,
 				name: 'core/test-block-icon-normalize-background',
 				save: noop,
 				category: 'text',
@@ -721,6 +736,7 @@ describe( 'blocks', () => {
 
 		it( 'should store a copy of block type', () => {
 			const blockType = {
+				apiVersion: 3,
 				settingName: 'settingValue',
 				save: noop,
 				category: 'text',
@@ -729,7 +745,7 @@ describe( 'blocks', () => {
 			registerBlockType( 'core/test-block-with-settings', blockType );
 			blockType.mutated = true;
 			expect( getBlockType( 'core/test-block-with-settings' ) ).toEqual( {
-				apiVersion: 1,
+				apiVersion: 3,
 				name: 'core/test-block-with-settings',
 				settingName: 'settingValue',
 				save: noop,
@@ -750,6 +766,7 @@ describe( 'blocks', () => {
 
 		it( 'should transform parent string to array', () => {
 			const blockType = {
+				apiVersion: 3,
 				save: noop,
 				category: 'text',
 				title: 'block title',
@@ -763,7 +780,7 @@ describe( 'blocks', () => {
 				'Parent must be undefined or an array of strings (block types), but it is a string.'
 			);
 			expect( block ).toEqual( {
-				apiVersion: 1,
+				apiVersion: 3,
 				name: 'core/test-block-parent-string',
 				save: noop,
 				category: 'text',
@@ -1001,6 +1018,7 @@ describe( 'blocks', () => {
 			const Edit = () => 'test';
 			const block = registerBlockType(
 				{
+					apiVersion: 3,
 					name: 'test/block-from-metadata',
 					title: 'Block from metadata',
 					category: 'text',
@@ -1020,7 +1038,7 @@ describe( 'blocks', () => {
 				}
 			);
 			expect( block ).toEqual( {
-				apiVersion: 1,
+				apiVersion: 3,
 				name: 'test/block-from-metadata',
 				title: 'Block from metadata',
 				category: 'text',
@@ -1057,6 +1075,7 @@ describe( 'blocks', () => {
 			const Edit = () => 'test';
 			const block = registerBlockType(
 				{
+					apiVersion: 3,
 					name: 'test/block-from-metadata-i18n',
 					title: 'I18n title from metadata',
 					description: 'I18n description from metadata',
@@ -1089,7 +1108,7 @@ describe( 'blocks', () => {
 			);
 
 			expect( block ).toEqual( {
-				apiVersion: 1,
+				apiVersion: 3,
 				name: 'test/block-from-metadata-i18n',
 				title: 'I18n title from metadata (translated)',
 				description: 'I18n description from metadata (translated)',
@@ -1158,7 +1177,7 @@ describe( 'blocks', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 			expect( getBlockTypes() ).toEqual( [
 				{
-					apiVersion: 1,
+					apiVersion: 3,
 					name: 'core/test-block',
 					save: noop,
 					category: 'text',
@@ -1178,7 +1197,7 @@ describe( 'blocks', () => {
 			const oldBlock = unregisterBlockType( 'core/test-block' );
 			expect( console ).not.toHaveWarned();
 			expect( oldBlock ).toEqual( {
-				apiVersion: 1,
+				apiVersion: 3,
 				name: 'core/test-block',
 				save: noop,
 				category: 'text',
@@ -1260,7 +1279,7 @@ describe( 'blocks', () => {
 		it( 'should return { name, save } for blocks with minimum settings', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 			expect( getBlockType( 'core/test-block' ) ).toEqual( {
-				apiVersion: 1,
+				apiVersion: 3,
 				name: 'core/test-block',
 				save: noop,
 				category: 'text',
@@ -1280,6 +1299,7 @@ describe( 'blocks', () => {
 
 		it( 'should return all block type elements', () => {
 			const blockType = {
+				apiVersion: 3,
 				settingName: 'settingValue',
 				save: noop,
 				category: 'text',
@@ -1287,7 +1307,7 @@ describe( 'blocks', () => {
 			};
 			registerBlockType( 'core/test-block-with-settings', blockType );
 			expect( getBlockType( 'core/test-block-with-settings' ) ).toEqual( {
-				apiVersion: 1,
+				apiVersion: 3,
 				name: 'core/test-block-with-settings',
 				settingName: 'settingValue',
 				save: noop,
@@ -1315,6 +1335,7 @@ describe( 'blocks', () => {
 		it( 'should return all registered blocks', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 			const blockType = {
+				apiVersion: 3,
 				settingName: 'settingValue',
 				save: noop,
 				category: 'text',
@@ -1323,7 +1344,7 @@ describe( 'blocks', () => {
 			registerBlockType( 'core/test-block-with-settings', blockType );
 			expect( getBlockTypes() ).toEqual( [
 				{
-					apiVersion: 1,
+					apiVersion: 3,
 					name: 'core/test-block',
 					save: noop,
 					category: 'text',
@@ -1340,7 +1361,7 @@ describe( 'blocks', () => {
 					blockHooks: {},
 				},
 				{
-					apiVersion: 1,
+					apiVersion: 3,
 					name: 'core/test-block-with-settings',
 					settingName: 'settingValue',
 					save: noop,

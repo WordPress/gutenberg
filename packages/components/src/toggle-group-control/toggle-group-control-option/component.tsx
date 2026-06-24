@@ -64,5 +64,6 @@ function UnforwardedToggleGroupControlOption(
 export const ToggleGroupControlOption = forwardRef(
 	UnforwardedToggleGroupControlOption
 );
+ToggleGroupControlOption.displayName = 'ToggleGroupControlOption';
 
 export default ToggleGroupControlOption;

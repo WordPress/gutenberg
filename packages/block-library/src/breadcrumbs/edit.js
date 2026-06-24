@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
 	ToggleControl,
@@ -13,13 +13,15 @@ import {
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { useEffect, useState, RawHTML } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { useServerSideRender } from '@wordpress/server-side-render';
+import { useDisabled } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import HtmlRenderer from '../utils/html-renderer';
 
 const separatorDefaultValue = '/';
 
@@ -100,14 +102,34 @@ export default function BreadcrumbEdit( {
 		setInvalidationKey( ( c ) => c + 1 );
 	}, [ post ] );
 
-	const blockProps = useBlockProps();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-	const { content } = useServerSideRender( {
+	const { content, status, error } = useServerSideRender( {
 		attributes,
 		skipBlockSupportAttributes: true,
 		block: name,
 		urlQueryArgs: { post_id: postId, invalidationKey },
 	} );
+	const prevContentRef = useRef( '' );
+	useEffect( () => {
+		if ( status === 'success' ) {
+			prevContentRef.current = content;
+		}
+	}, [ content, status ] );
+	const [ showLoader, setShowLoader ] = useState( false );
+	useEffect( () => {
+		if ( status !== 'loading' ) {
+			return;
+		}
+		const timeout = setTimeout( () => {
+			setShowLoader( true );
+		}, 400 );
+		return () => {
+			clearTimeout( timeout );
+			setShowLoader( false );
+		};
+	}, [ status ] );
+	const disabledRef = useDisabled();
+	const blockProps = useBlockProps( { ref: disabledRef } );
 
 	if ( isLoading ) {
 		return (
@@ -156,10 +178,13 @@ export default function BreadcrumbEdit( {
 		}
 		placeholder = (
 			<nav
+				{ ...blockProps }
 				style={ {
-					'--separator': `'${ separator }'`,
+					'--separator': `"${ separator
+						.replace( /\\/g, '\\\\' )
+						.replace( /"/g, '\\"' ) }"`,
+					...blockProps.style,
 				} }
-				inert="true"
 			>
 				<ol>
 					{ placeholderItems.map( ( text, index ) => (
@@ -239,7 +264,6 @@ export default function BreadcrumbEdit( {
 						}
 					>
 						<TextControl
-							__next40pxDefaultSize
 							autoComplete="off"
 							label={ __( 'Separator' ) }
 							value={ separator }
@@ -265,7 +289,7 @@ export default function BreadcrumbEdit( {
 						setAttributes( { showOnHomePage: value } )
 					}
 					help={ __(
-						'If this breadcrumbs block appears in a template or template part that’s shown on the homepage, enable this option to display the breadcrumb trail. Otherwise, this setting has no effect.'
+						'If this Breadcrumbs block appears in a template or template part that’s shown on the homepage, enable this option to display the breadcrumb trail. Otherwise, this setting has no effect.'
 					) }
 				/>
 				<CheckboxControl
@@ -279,13 +303,39 @@ export default function BreadcrumbEdit( {
 					) }
 				/>
 			</InspectorControls>
-			<div { ...blockProps }>
-				{ showPlaceholder ? (
-					placeholder
+			{ status === 'loading' &&
+				! showPlaceholder &&
+				( prevContentRef.current ? (
+					<HtmlRenderer
+						wrapperProps={ {
+							...blockProps,
+							style: {
+								...blockProps.style,
+								opacity: showLoader ? 0.3 : 1,
+							},
+						} }
+						html={ prevContentRef.current }
+					/>
 				) : (
-					<RawHTML inert="true">{ content }</RawHTML>
-				) }
-			</div>
+					<div { ...blockProps }>
+						<Spinner />
+					</div>
+				) ) }
+			{ status === 'error' && (
+				<div { ...blockProps }>
+					<p>
+						{ sprintf(
+							/* translators: %s: error message returned when rendering the block. */
+							__( 'Error: %s' ),
+							error
+						) }
+					</p>
+				</div>
+			) }
+			{ showPlaceholder && placeholder }
+			{ ! showPlaceholder && status === 'success' && (
+				<HtmlRenderer wrapperProps={ blockProps } html={ content } />
+			) }
 		</>
 	);
 }

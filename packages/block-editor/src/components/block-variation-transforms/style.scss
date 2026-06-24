@@ -3,7 +3,7 @@
 
 .block-editor-block-variation-transforms {
 	box-sizing: border-box;
-	padding: 0 $grid-unit-20 $grid-unit-20 52px;
+	padding: 0 $grid-unit-20 $grid-unit-20;
 
 	&:where(fieldset) {
 		// Reset `fieldset` browser defaults, keeping intentional padding.

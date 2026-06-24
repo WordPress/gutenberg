@@ -15,8 +15,12 @@ import { __ } from '@wordpress/i18n';
  */
 import { isValidVideoEmbedUrl } from '../embed-video-utils';
 
-export default function EmbedVideoUrlInput( { onSubmit, onClose } ) {
-	const [ url, setUrl ] = useState( '' );
+export default function EmbedVideoUrlInput( {
+	onSubmit,
+	onClose,
+	initialUrl = '',
+} ) {
+	const [ url, setUrl ] = useState( initialUrl );
 	const [ error, setError ] = useState( '' );
 
 	const handleConfirm = () => {
@@ -53,7 +57,7 @@ export default function EmbedVideoUrlInput( { onSubmit, onClose } ) {
 					</Notice>
 				) }
 				<TextControl
-					__next40pxDefaultSize
+					type="url"
 					label={ __( 'Video URL' ) }
 					value={ url }
 					onChange={ ( value ) => {

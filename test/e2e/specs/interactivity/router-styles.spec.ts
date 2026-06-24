@@ -446,6 +446,54 @@ test.describe( 'Router styles', () => {
 		await expect( hideOnPrint ).toBeVisible();
 	} );
 
+	test( 'should update styles when navigating to a cached page with force', async ( {
+		page,
+		request,
+		interactivityUtils: utils,
+	} ) => {
+		const csn = page.getByTestId( 'client-side navigation' );
+		const red = page.getByTestId( 'red' );
+		const green = page.getByTestId( 'green' );
+
+		// Navigate to "red" to cache the page and populate the
+		// internal style cache for the red page URL.
+		await page.getByTestId( 'link red' ).click();
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+		await expect( red ).toHaveCSS( 'color', COLOR_RED );
+		await expect( green ).toHaveCSS( 'color', COLOR_WRAPPER );
+
+		// Navigate to "green" so red styles are removed.
+		await page.getByTestId( 'link green' ).click();
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+
+		// Intercept the next fetch to the red page URL and respond
+		// with the "all" page HTML instead.
+		const redLink = utils.getLink( 'red' );
+		const allLink = utils.getLink( 'all' );
+		await page.route( redLink, async ( route ) => {
+			// Fetch the "all" page HTML to simulate server-side content
+			// changes (e.g., new blocks appearing on the page).
+			const allPage = await request.fetch( allLink );
+			const body = await allPage.body();
+			return route.fulfill( { body, contentType: 'text/html' } );
+		} );
+
+		// Force-navigate to "red". The response now contains all
+		// three color blocks with their styles.
+		await page.getByTestId( 'force link red' ).click();
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+
+		// Red and green styles should be present.
+		await expect( red ).toHaveCSS( 'color', COLOR_RED );
+		await expect( green ).toHaveCSS( 'color', COLOR_GREEN );
+
+		// Unroute previous route handler for "red".
+		await page.unroute( redLink );
+	} );
+
 	test( 'should ignore styles inside noscript elements during navigation', async ( {
 		page,
 	} ) => {

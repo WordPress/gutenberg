@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
-import { fn } from '@storybook/test';
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies
@@ -24,7 +24,7 @@ const meta: Meta< typeof ConfirmDialog > = {
 			control: false,
 		},
 	},
-	tags: [ 'status-experimental' ],
+	tags: [ 'status-experimental', 'manifest' ],
 	args: {
 		onCancel: fn(),
 		onConfirm: fn(),
@@ -32,6 +32,11 @@ const meta: Meta< typeof ConfirmDialog > = {
 	parameters: {
 		controls: {
 			expanded: true,
+		},
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+			notes: 'Will be superseded by `AlertDialog` in `@wordpress/ui`, but continue using for now.',
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 	},
@@ -58,7 +63,11 @@ const Template: StoryFn< typeof ConfirmDialog > = ( {
 
 	return (
 		<>
-			<Button variant="primary" onClick={ () => setIsOpen( true ) }>
+			<Button
+				__next40pxDefaultSize
+				variant="primary"
+				onClick={ () => setIsOpen( true ) }
+			>
 				Open ConfirmDialog
 			</Button>
 

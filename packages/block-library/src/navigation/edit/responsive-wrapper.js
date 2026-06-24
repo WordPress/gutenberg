@@ -10,11 +10,14 @@ import { close, Icon } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { getColorClassName } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import OverlayMenuIcon from './overlay-menu-icon';
+import { createTemplatePartId } from '../../template-part/edit/utils/create-template-part-id';
 
 export default function ResponsiveWrapper( {
 	children,
@@ -30,13 +33,21 @@ export default function ResponsiveWrapper( {
 	overlay,
 	onNavigateToEntityRecord,
 } ) {
+	const currentTheme = useSelect(
+		( select ) => select( coreStore ).getCurrentTheme()?.stylesheet,
+		[]
+	);
+
 	if ( ! isResponsive ) {
 		return children;
 	}
 
+	// Only apply overlay colors if there's no custom overlay template part.
+	const hasCustomOverlay = !! overlay;
+
 	const responsiveContainerClasses = clsx(
 		'wp-block-navigation__responsive-container',
-		{
+		! hasCustomOverlay && {
 			'has-text-color':
 				!! overlayTextColor.color || !! overlayTextColor?.class,
 			[ getColorClassName( 'color', overlayTextColor?.slug ) ]:
@@ -48,18 +59,22 @@ export default function ResponsiveWrapper( {
 				'background-color',
 				overlayBackgroundColor?.slug
 			) ]: !! overlayBackgroundColor?.slug,
+		},
+		{
 			'is-menu-open': isOpen,
 			'hidden-by-default': isHiddenByDefault,
 		}
 	);
 
-	const styles = {
-		color: ! overlayTextColor?.slug && overlayTextColor?.color,
-		backgroundColor:
-			! overlayBackgroundColor?.slug &&
-			overlayBackgroundColor?.color &&
-			overlayBackgroundColor.color,
-	};
+	const styles = ! hasCustomOverlay
+		? {
+				color: ! overlayTextColor?.slug && overlayTextColor?.color,
+				backgroundColor:
+					! overlayBackgroundColor?.slug &&
+					overlayBackgroundColor?.color &&
+					overlayBackgroundColor.color,
+		  }
+		: {};
 
 	const openButtonClasses = clsx(
 		'wp-block-navigation__responsive-container-open',
@@ -80,8 +95,13 @@ export default function ResponsiveWrapper( {
 	const handleToggleClick = () => {
 		// If an overlay template part is selected, navigate to it instead of toggling
 		if ( overlay && onNavigateToEntityRecord ) {
+			const templatePartId = createTemplatePartId(
+				currentTheme,
+				overlay
+			);
+
 			onNavigateToEntityRecord( {
-				postId: overlay,
+				postId: templatePartId,
 				postType: 'wp_template_part',
 			} );
 			return;

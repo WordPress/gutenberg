@@ -2,7 +2,7 @@
  * External dependencies
  */
 import clsx from 'clsx';
-import fastDeepEqual from 'fast-deep-equal/es6';
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 
 /**
  * WordPress dependencies
@@ -11,16 +11,14 @@ import {
 	useRef,
 	useState,
 	useCallback,
+	useMemo,
 	forwardRef,
 	createContext,
 	useContext,
 } from '@wordpress/element';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useMergeRefs, useInstanceId } from '@wordpress/compose';
-import {
-	__unstableUseRichText as useRichText,
-	removeFormat,
-} from '@wordpress/rich-text';
+import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 import { Popover } from '@wordpress/components';
 import { getBlockBindingsSource } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
@@ -35,13 +33,15 @@ import { blockBindingsKey, isPreviewModeKey } from '../block-edit/context';
 import FormatToolbarContainer from './format-toolbar-container';
 import { store as blockEditorStore } from '../../store';
 import { useMarkPersistent } from './use-mark-persistent';
-import { useFormatTypes } from './use-format-types';
 import { useEventListeners } from './event-listeners';
 import FormatEdit from './format-edit';
 import { getAllowedFormats } from './utils';
 import { Content, valueToHTMLString } from './content';
 import { withDeprecations } from './with-deprecations';
 import BlockContext from '../block-context';
+import { unlock } from '../../lock-unlock';
+
+const { useRichText } = unlock( richTextPrivateApis );
 
 export const keyboardShortcutContext = createContext();
 keyboardShortcutContext.displayName = 'keyboardShortcutContext';
@@ -50,36 +50,6 @@ export const inputEventContext = createContext();
 inputEventContext.displayName = 'inputEventContext';
 
 const instanceIdKey = Symbol( 'instanceId' );
-
-/**
- * Removes props used for the native version of RichText so that they are not
- * passed to the DOM element and log warnings.
- *
- * @param {Object} props Props to filter.
- *
- * @return {Object} Filtered props.
- */
-function removeNativeProps( props ) {
-	const {
-		__unstableMobileNoFocusOnMount,
-		deleteEnter,
-		placeholderTextColor,
-		textAlign,
-		selectionColor,
-		tagsToEliminate,
-		disableEditingMenu,
-		fontSize,
-		fontFamily,
-		fontWeight,
-		fontStyle,
-		minWidth,
-		maxWidth,
-		disableSuggestions,
-		disableAutocorrection,
-		...restProps
-	} = props;
-	return restProps;
-}
 
 export function RichTextWrapper(
 	{
@@ -113,8 +83,6 @@ export function RichTextWrapper(
 	},
 	forwardedRef
 ) {
-	props = removeNativeProps( props );
-
 	if ( onSplit ) {
 		deprecated( 'wp.blockEditor.RichText onSplit prop', {
 			since: '6.4',
@@ -137,7 +105,7 @@ export function RichTextWrapper(
 			return { isSelected: false };
 		}
 
-		const { getSelectionStart, getSelectionEnd, getBlockEditingMode } =
+		const { getSelectionStart, getSelectionEnd } =
 			select( blockEditorStore );
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
@@ -159,17 +127,15 @@ export function RichTextWrapper(
 			selectionStart: isSelected ? selectionStart.offset : undefined,
 			selectionEnd: isSelected ? selectionEnd.offset : undefined,
 			isSelected,
-			isContentOnly: getBlockEditingMode( clientId ) === 'contentOnly',
 		};
 	};
-	const { selectionStart, selectionEnd, isSelected, isContentOnly } =
-		useSelect( selector, [
-			clientId,
-			identifier,
-			instanceId,
-			originalIsSelected,
-			isBlockSelected,
-		] );
+	const { selectionStart, selectionEnd, isSelected } = useSelect( selector, [
+		clientId,
+		identifier,
+		instanceId,
+		originalIsSelected,
+		isBlockSelected,
+	] );
 
 	const { disableBoundBlock, bindingsPlaceholder, bindingsLabel } = useSelect(
 		( select ) => {
@@ -342,62 +308,14 @@ export function RichTextWrapper(
 	);
 
 	const {
-		formatTypes,
-		prepareHandlers,
-		valueHandlers,
-		changeHandlers,
-		dependencies,
-	} = useFormatTypes( {
-		clientId,
-		identifier,
-		allowedFormats: adjustedAllowedFormats,
-		withoutInteractiveFormatting,
-		disableNoneEssentialFormatting: isContentOnly,
-	} );
-
-	function addEditorOnlyFormats( value ) {
-		return valueHandlers.reduce(
-			( accumulator, fn ) => fn( accumulator, value.text ),
-			value.formats
-		);
-	}
-
-	function removeEditorOnlyFormats( value ) {
-		formatTypes.forEach( ( formatType ) => {
-			// Remove formats created by prepareEditableTree, because they are editor only.
-			if ( formatType.__experimentalCreatePrepareEditableTree ) {
-				value = removeFormat(
-					value,
-					formatType.name,
-					0,
-					value.text.length
-				);
-			}
-		} );
-
-		return value.formats;
-	}
-
-	function addInvisibleFormats( value ) {
-		return prepareHandlers.reduce(
-			( accumulator, fn ) => fn( accumulator, value.text ),
-			value.formats
-		);
-	}
-
-	const {
 		value,
 		getValue,
 		onChange,
 		ref: richTextRef,
+		formatTypes,
 	} = useRichText( {
 		value: adjustedValue,
-		onChange( html, { __unstableFormats, __unstableText } ) {
-			adjustedOnChange( html );
-			Object.values( changeHandlers ).forEach( ( changeHandler ) => {
-				changeHandler( __unstableFormats, __unstableText );
-			} );
-		},
+		onChange: adjustedOnChange,
 		selectionStart,
 		selectionEnd,
 		onSelectionChange,
@@ -405,10 +323,16 @@ export function RichTextWrapper(
 		__unstableIsSelected: isSelected,
 		__unstableDisableFormats: disableFormats,
 		preserveWhiteSpace,
-		__unstableDependencies: [ ...dependencies, tagName ],
-		__unstableAfterParse: addEditorOnlyFormats,
-		__unstableBeforeSerialize: removeEditorOnlyFormats,
-		__unstableAddInvisibleFormats: addInvisibleFormats,
+		__unstableDependencies: [ tagName ],
+		allowedFormats: adjustedAllowedFormats,
+		withoutInteractiveFormatting,
+		__unstableFormatTypeHandlerContext: useMemo(
+			() => ( {
+				richTextIdentifier: identifier,
+				blockClientId: clientId,
+			} ),
+			[ identifier, clientId ]
+		),
 	} );
 	const autocompleteProps = useBlockEditorAutocompleteProps( {
 		onReplace,
@@ -493,7 +417,6 @@ export function RichTextWrapper(
 						pastePlainText,
 						onMerge,
 						onRemove,
-						removeEditorOnlyFormats,
 						disableLineBreaks,
 						onSplitAtEnd,
 						onSplitAtDoubleLineEnd,
@@ -577,13 +500,13 @@ const PublicForwardedRichTextContainer = forwardRef( ( props, ref ) => {
 			__unstableAllowPrefixTransformations,
 			readOnly,
 			...contentProps
-		} = removeNativeProps( props );
+		} = props;
 		return (
 			<Tag
 				ref={ ref }
 				{ ...contentProps }
 				dangerouslySetInnerHTML={ {
-					__html: valueToHTMLString( value, multiline ),
+					__html: valueToHTMLString( value, multiline ) || '<br>',
 				} }
 			/>
 		);
@@ -600,4 +523,4 @@ PublicForwardedRichTextContainer.isEmpty = ( value ) => {
 export default PublicForwardedRichTextContainer;
 export { RichTextShortcut } from './shortcut';
 export { RichTextToolbarButton } from './toolbar-button';
-export { __unstableRichTextInputEvent } from './input-event';
+export { RichTextInputEvent as __unstableRichTextInputEvent } from './input-event';

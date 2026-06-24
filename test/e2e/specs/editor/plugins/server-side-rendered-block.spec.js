@@ -23,6 +23,7 @@ test.describe( 'Server-side rendered block', () => {
 			'gutenberg-test-server-side-rendered-block'
 		);
 	} );
+
 	test.beforeEach( async ( { admin, editor } ) => {
 		await admin.createNewPost();
 		await editor.insertBlock( { name: 'test/server-side-rendered-block' } );
@@ -112,20 +113,20 @@ test.describe( 'PHP-only auto-register blocks', () => {
 		);
 	} );
 
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
+	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deactivatePlugin(
 			'gutenberg-test-server-side-rendered-block'
 		);
 	} );
 
-	test.beforeEach( async ( { admin } ) => {
-		await admin.createNewPost();
-	} );
-
-	test( 'should register blocks with auto_register flag', async ( {
+	test( 'should register blocks with autoRegister flag', async ( {
 		editor,
 	} ) => {
-		// Block with auto_register flag should be insertable
+		// Block with autoRegister flag should be insertable
 		await editor.insertBlock( { name: 'test/auto-register-block' } );
 
 		const block = editor.canvas.getByText( 'Auto-register block content' );
@@ -138,7 +139,7 @@ test.describe( 'PHP-only auto-register blocks', () => {
 		} );
 		expect( blockType.apiVersion ).toBe( 3 );
 
-		// Block without auto_register flag should NOT exist in registry
+		// Block without autoRegister flag should NOT exist in registry
 		const blockExists = await editor.page.evaluate( () => {
 			return (
 				window.wp.blocks.getBlockType(
@@ -212,13 +213,24 @@ test.describe( 'PHP-only auto-register blocks', () => {
 		await blockWrapper.click();
 		await editor.openDocumentSettingsSidebar();
 
-		const colorsButton = page.getByRole( 'button', { name: /Color/i } );
-		await colorsButton.click();
+		// Background color now lives in the Background panel and is hidden by
+		// default for this block, so reveal it via the panel options menu.
+		await page
+			.getByRole( 'button', { name: 'Background options' } )
+			.click();
+		await page
+			.getByRole( 'menuitemcheckbox', { name: 'Show Color' } )
+			.click();
 
-		const backgroundButton = page.getByRole( 'button', {
-			name: /Background/i,
-		} );
-		await backgroundButton.click();
+		const backgroundColorButton = page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Background' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } );
+		await backgroundColorButton.click();
+
 		const firstColor = page.getByRole( 'option' ).first();
 		const colorName = await firstColor.getAttribute( 'aria-label' );
 		await firstColor.click();
@@ -231,5 +243,93 @@ test.describe( 'PHP-only auto-register blocks', () => {
 			`Background: ${ colorName.toLowerCase().replace( /\s+/g, '-' ) }`
 		);
 		await expect( colorText ).toBeVisible();
+	} );
+
+	test( 'should generate inspector controls from block attributes', async ( {
+		editor,
+		page,
+	} ) => {
+		// Insert the block with auto-generated controls
+		await editor.insertBlock( {
+			name: 'test/auto-register-with-controls',
+		} );
+
+		// Open the document settings sidebar
+		await editor.openDocumentSettingsSidebar();
+
+		// Verify auto-generated controls are present
+		// String attribute → text input
+		await expect( page.getByLabel( 'Title' ) ).toBeVisible();
+
+		// Integer attribute → number input
+		await expect( page.getByLabel( 'Count' ) ).toBeVisible();
+
+		// Number attribute → number control
+		await expect( page.getByLabel( 'Spacing' ) ).toBeVisible();
+
+		// Boolean attribute → toggle/checkbox
+		await expect( page.getByLabel( 'Show Emojis' ) ).toBeVisible();
+
+		// Enum attribute → select control
+		await expect(
+			page.getByLabel( 'Emoji', { exact: true } )
+		).toBeVisible();
+	} );
+
+	test.describe( 'with block bindings', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activatePlugin(
+				'gutenberg-test-block-bindings'
+			);
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-block-bindings'
+			);
+		} );
+
+		test( 'generated inspector controls should reflect bound attribute values', async ( {
+			editor,
+			page,
+		} ) => {
+			// Insert the block with bindings on multiple attributes.
+			await editor.insertBlock( {
+				name: 'test/auto-register-with-controls',
+				attributes: {
+					metadata: {
+						bindings: {
+							title: {
+								source: 'core/post-meta',
+								args: { key: 'text_custom_field' },
+							},
+							count: {
+								source: 'core/post-meta',
+								args: { key: 'integer' },
+							},
+							spacing: {
+								source: 'core/post-meta',
+								args: { key: 'number_custom_field' },
+							},
+							showEmojis: {
+								source: 'core/post-meta',
+								args: { key: 'boolean' },
+							},
+						},
+					},
+				},
+			} );
+
+			await editor.openDocumentSettingsSidebar();
+
+			// Controls should show bound values from the source,
+			// not the block attribute defaults.
+			await expect( page.getByLabel( 'Title' ) ).toHaveValue(
+				'Value of the text custom field'
+			);
+			await expect( page.getByLabel( 'Count' ) ).toHaveValue( '3' );
+			await expect( page.getByLabel( 'Spacing' ) ).toHaveValue( '0.5' );
+			await expect( page.getByLabel( 'Show Emojis' ) ).toBeChecked();
+		} );
 	} );
 } );

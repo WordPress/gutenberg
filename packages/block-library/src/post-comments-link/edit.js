@@ -1,16 +1,7 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
-import {
-	AlignmentControl,
-	BlockControls,
-	useBlockProps,
-} from '@wordpress/block-editor';
+import { useBlockProps } from '@wordpress/block-editor';
 import { useState, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
@@ -18,16 +9,11 @@ import { addQueryArgs } from '@wordpress/url';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 
-function PostCommentsLinkEdit( { context, attributes, setAttributes } ) {
-	const { textAlign } = attributes;
+function PostCommentsLinkEdit( { context } ) {
 	const { postType, postId } = context;
 	const [ commentsCount, setCommentsCount ] = useState();
 
-	const blockProps = useBlockProps( {
-		className: clsx( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
-	} );
+	const blockProps = useBlockProps();
 
 	useEffect( () => {
 		if ( ! postId ) {
@@ -74,34 +60,23 @@ function PostCommentsLinkEdit( { context, attributes, setAttributes } ) {
 	}
 
 	return (
-		<>
-			<BlockControls group="block">
-				<AlignmentControl
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
-				/>
-			</BlockControls>
-
-			<div { ...blockProps }>
-				{ post?.link && commentsText !== undefined ? (
-					<a
-						href={ post?.link + '#comments' }
-						onClick={ ( event ) => event.preventDefault() }
-					>
-						{ commentsText }
-					</a>
-				) : (
-					<a
-						href="#post-comments-link-pseudo-link"
-						onClick={ ( event ) => event.preventDefault() }
-					>
-						{ __( 'No comments' ) }
-					</a>
-				) }
-			</div>
-		</>
+		<div { ...blockProps }>
+			{ post?.link && commentsText !== undefined ? (
+				<a
+					href={ post?.link + '#comments' }
+					onClick={ ( event ) => event.preventDefault() }
+				>
+					{ commentsText }
+				</a>
+			) : (
+				<a
+					href="#post-comments-link-pseudo-link"
+					onClick={ ( event ) => event.preventDefault() }
+				>
+					{ __( 'No comments' ) }
+				</a>
+			) }
+		</div>
 	);
 }
 

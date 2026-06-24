@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/icons",
-	"version": "11.3.0",
+	"version": "15.0.0",
 	"description": "WordPress Icons package, based on dashicon.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -30,33 +30,38 @@
 		"build-types",
 		"*.md"
 	],
-	"type": "module",
 	"main": "build/index.cjs",
-	"module": "build-module/index.js",
+	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
-			"import": "./build-module/index.js",
+			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
 		"@wordpress/element": "file:../element",
-		"@wordpress/primitives": "file:../primitives"
+		"@wordpress/primitives": "file:../primitives",
+		"change-case": "^4.1.2"
 	},
 	"peerDependencies": {
+		"@types/react": "^18.3.27",
 		"react": "^18.0.0"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"
 	},
 	"scripts": {
-		"prelint": "npm run build",
+		"prelint:js": "npm run build",
 		"prepare": "npm run build",
-		"build": "node lib/generate-library.cjs"
+		"build": "node lib/generate-library.cjs && node lib/generate-manifest-php.cjs"
 	}
 }

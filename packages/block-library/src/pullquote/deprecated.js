@@ -19,6 +19,7 @@ import { select } from '@wordpress/data';
  * Internal dependencies
  */
 import { SOLID_COLOR_CLASS } from './shared';
+import migrateTextAlignAttributeToBlockSupport from '../utils/migrate-text-align';
 
 const blockAttributes = {
 	value: {
@@ -68,6 +69,118 @@ function multilineToInline( value ) {
 	return values.join( '<br>' );
 }
 
+const v6 = {
+	attributes: {
+		value: {
+			type: 'rich-text',
+			source: 'rich-text',
+			selector: 'p',
+			role: 'content',
+		},
+		citation: {
+			type: 'rich-text',
+			source: 'rich-text',
+			selector: 'cite',
+			role: 'content',
+		},
+		textAlign: {
+			type: 'string',
+		},
+	},
+	supports: {
+		anchor: true,
+		align: [ 'left', 'right', 'wide', 'full' ],
+		background: {
+			backgroundImage: true,
+			backgroundSize: true,
+			__experimentalDefaultControls: {
+				backgroundImage: true,
+			},
+		},
+		color: {
+			gradients: true,
+			background: true,
+			link: true,
+			__experimentalDefaultControls: {
+				background: true,
+				text: true,
+			},
+		},
+		dimensions: {
+			minHeight: true,
+		},
+		spacing: {
+			margin: true,
+			padding: true,
+		},
+		typography: {
+			fontSize: true,
+			lineHeight: true,
+			__experimentalFontFamily: true,
+			__experimentalFontWeight: true,
+			__experimentalFontStyle: true,
+			__experimentalTextTransform: true,
+			__experimentalTextDecoration: true,
+			__experimentalLetterSpacing: true,
+			__experimentalDefaultControls: {
+				fontSize: true,
+			},
+		},
+		__experimentalBorder: {
+			color: true,
+			radius: true,
+			style: true,
+			width: true,
+			__experimentalDefaultControls: {
+				color: true,
+				radius: true,
+				style: true,
+				width: true,
+			},
+		},
+		__experimentalStyle: {
+			typography: {
+				fontSize: '1.5em',
+				lineHeight: '1.6',
+			},
+		},
+		interactivity: {
+			clientNavigation: true,
+		},
+	},
+	save( { attributes } ) {
+		const { textAlign, citation, value } = attributes;
+		const shouldShowCitation = ! RichText.isEmpty( citation );
+
+		return (
+			<figure
+				{ ...useBlockProps.save( {
+					className: clsx( {
+						[ `has-text-align-${ textAlign }` ]: textAlign,
+					} ),
+				} ) }
+			>
+				<blockquote>
+					<RichText.Content tagName="p" value={ value } />
+					{ shouldShowCitation && (
+						<RichText.Content tagName="cite" value={ citation } />
+					) }
+				</blockquote>
+			</figure>
+		);
+	},
+	isEligible( attributes ) {
+		return (
+			!! attributes.textAlign ||
+			!! attributes.className?.match(
+				/\bhas-text-align-(left|center|right)\b/
+			)
+		);
+	},
+	migrate: migrateTextAlignAttributeToBlockSupport,
+};
+
+// Version 5 created in #43210 / c4b2ca7f3f. Supports match block.json at the time.
 const v5 = {
 	attributes: {
 		value: {
@@ -86,6 +199,51 @@ const v5 = {
 		},
 		textAlign: {
 			type: 'string',
+		},
+	},
+	supports: {
+		anchor: true,
+		align: [ 'left', 'right', 'wide', 'full' ],
+		color: {
+			gradients: true,
+			background: true,
+			link: true,
+			__experimentalDefaultControls: {
+				background: true,
+				text: true,
+			},
+		},
+		typography: {
+			fontSize: true,
+			lineHeight: true,
+			__experimentalFontFamily: true,
+			__experimentalFontWeight: true,
+			__experimentalFontStyle: true,
+			__experimentalTextTransform: true,
+			__experimentalTextDecoration: true,
+			__experimentalLetterSpacing: true,
+			__experimentalDefaultControls: {
+				fontSize: true,
+				fontAppearance: true,
+			},
+		},
+		__experimentalBorder: {
+			color: true,
+			radius: true,
+			style: true,
+			width: true,
+			__experimentalDefaultControls: {
+				color: true,
+				radius: true,
+				style: true,
+				width: true,
+			},
+		},
+		__experimentalStyle: {
+			typography: {
+				fontSize: '1.5em',
+				lineHeight: '1.6',
+			},
 		},
 	},
 	save( { attributes } ) {
@@ -110,18 +268,34 @@ const v5 = {
 		);
 	},
 	migrate( { value, ...attributes } ) {
-		return {
+		return migrateTextAlignAttributeToBlockSupport( {
 			value: multilineToInline( value ),
 			...attributes,
-		};
+		} );
 	},
 };
 
 // TODO: this is ripe for a bit of a clean up according to the example in https://developer.wordpress.org/block-editor/reference-guides/block-api/block-deprecation/#example
 
+// Version 4 created in #30951 / 92d36a4ea1. Supports match block.json at the time.
 const v4 = {
 	attributes: {
 		...blockAttributes,
+	},
+	supports: {
+		anchor: true,
+		align: [ 'left', 'right', 'wide', 'full' ],
+		color: {
+			gradients: true,
+			background: true,
+			link: true,
+		},
+		__experimentalBorder: {
+			color: true,
+			radius: true,
+			style: true,
+			width: true,
+		},
 	},
 	save( { attributes } ) {
 		const {
@@ -229,15 +403,15 @@ const v4 = {
 			};
 		}
 
-		return {
+		return migrateTextAlignAttributeToBlockSupport( {
 			value: multilineToInline( value ),
 			className,
 			backgroundColor: isSolidColorStyle ? mainColor : undefined,
 			borderColor: isSolidColorStyle ? undefined : mainColor,
 			textAlign: isSolidColorStyle ? 'left' : undefined,
-			style,
 			...attributes,
-		};
+			style,
+		} );
 	},
 };
 
@@ -386,15 +560,15 @@ const v3 = {
 				};
 			}
 		}
-		return {
+		return migrateTextAlignAttributeToBlockSupport( {
 			value: multilineToInline( value ),
 			className,
 			backgroundColor: isSolidColorStyle ? mainColor : undefined,
 			borderColor: isSolidColorStyle ? undefined : mainColor,
 			textAlign: isSolidColorStyle ? 'left' : undefined,
-			style,
 			...attributes,
-		};
+			style,
+		} );
 	},
 };
 
@@ -504,15 +678,15 @@ const v2 = {
 			};
 		}
 
-		return {
+		return migrateTextAlignAttributeToBlockSupport( {
 			value: multilineToInline( value ),
 			className,
 			backgroundColor: isSolidColorStyle ? mainColor : undefined,
 			borderColor: isSolidColorStyle ? undefined : mainColor,
 			textAlign: isSolidColorStyle ? 'left' : undefined,
-			style,
 			...attributes,
-		};
+			style,
+		} );
 	},
 };
 
@@ -581,4 +755,4 @@ const v0 = {
  *
  * See block-deprecation.md
  */
-export default [ v5, v4, v3, v2, v1, v0 ];
+export default [ v6, v5, v4, v3, v2, v1, v0 ];

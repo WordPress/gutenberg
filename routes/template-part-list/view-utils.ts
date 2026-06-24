@@ -2,12 +2,16 @@
  * WordPress dependencies
  */
 import { loadView } from '@wordpress/views';
-import { resolveSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
-import type { Type } from '@wordpress/core-data';
-import type { View } from '@wordpress/dataviews';
+import type { View, Filter } from '@wordpress/dataviews';
 
-const DEFAULT_VIEW: View = {
+/**
+ * Navigation overlay template part area constant.
+ * This should match NAVIGATION_OVERLAY_TEMPLATE_PART_AREA in
+ * packages/block-library/src/navigation/constants.js
+ */
+const NAVIGATION_OVERLAY_TEMPLATE_PART_AREA = 'navigation-overlay';
+
+export const DEFAULT_VIEW: View = {
 	type: 'grid' as const,
 	sort: {
 		field: 'date',
@@ -18,119 +22,68 @@ const DEFAULT_VIEW: View = {
 	mediaField: 'preview',
 };
 
-export const DEFAULT_LAYOUTS = {
-	table: {},
-	grid: {},
-	list: {},
-};
-
 export const DEFAULT_VIEWS: {
 	slug: string;
 	label: string;
-	view: View;
 }[] = [
 	{
 		slug: 'all',
 		label: 'All Template Parts',
-		view: {
-			...DEFAULT_VIEW,
-		},
 	},
 	{
 		slug: 'header',
 		label: 'Headers',
-		view: {
-			...DEFAULT_VIEW,
-			filters: [
-				{
-					field: 'area',
-					operator: 'is',
-					value: 'header',
-				},
-			],
-		},
 	},
 	{
 		slug: 'footer',
 		label: 'Footers',
-		view: {
-			...DEFAULT_VIEW,
-			filters: [
-				{
-					field: 'area',
-					operator: 'is',
-					value: 'footer',
-				},
-			],
-		},
 	},
 	{
 		slug: 'sidebar',
 		label: 'Sidebars',
-		view: {
-			...DEFAULT_VIEW,
-			filters: [
-				{
-					field: 'area',
-					operator: 'is',
-					value: 'sidebar',
-				},
-			],
-		},
 	},
 	{
-		slug: 'overlay',
+		slug: NAVIGATION_OVERLAY_TEMPLATE_PART_AREA,
 		label: 'Overlays',
-		view: {
-			...DEFAULT_VIEW,
-			filters: [
-				{
-					field: 'area',
-					operator: 'is',
-					value: 'overlay',
-				},
-			],
-		},
 	},
 	{
 		slug: 'uncategorized',
 		label: 'General',
-		view: {
-			...DEFAULT_VIEW,
-			filters: [
-				{
-					field: 'area',
-					operator: 'is',
-					value: 'uncategorized',
-				},
-			],
-		},
 	},
 ];
 
-export function getDefaultView(
-	postType: Type | undefined,
-	area?: string
-): View {
-	// Find the view configuration by area
-	const viewConfig = DEFAULT_VIEWS.find( ( v ) => v.slug === area );
+type ActiveViewOverrides = {
+	filters?: Filter[];
+	sort?: View[ 'sort' ];
+};
 
-	// Use the view from the config if found, otherwise use default
-	return viewConfig?.view || DEFAULT_VIEW;
+export function getActiveViewOverridesForTab(
+	area: string
+): ActiveViewOverrides {
+	if ( area === 'all' ) {
+		return {};
+	}
+	return {
+		filters: [
+			{
+				field: 'area',
+				operator: 'is',
+				value: area,
+			},
+		],
+	};
 }
 
 export async function ensureView(
 	area?: string,
 	search?: { page?: number; search?: string }
 ) {
-	const postTypeObject =
-		await resolveSelect( coreStore ).getPostType( 'wp_template_part' );
-	const defaultView = getDefaultView( postTypeObject, area );
 	return loadView( {
 		kind: 'postType',
 		name: 'wp_template_part',
-		slug: area ?? 'all',
-		defaultView,
+		slug: 'default-new',
+		defaultView: DEFAULT_VIEW,
+		activeViewOverrides: getActiveViewOverridesForTab( area ?? 'all' ),
 		queryParams: search,
 	} );
 }

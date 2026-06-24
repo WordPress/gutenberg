@@ -1,14 +1,14 @@
 /**
  * WordPress dependencies
  */
-import type { Attachment, Updatable, Post } from '@wordpress/core-data';
+import type { Attachment, Updatable, Post, User } from '@wordpress/core-data';
 
 export type MediaKind = 'image' | 'video' | 'audio' | 'application';
 
 export interface MediaType {
 	type: MediaKind;
 	label: string;
-	icon: JSX.Element;
+	icon: React.JSX.Element;
 }
 
 // TODO: Update the Attachment type separately.
@@ -18,6 +18,7 @@ export interface MediaItem extends Attachment< 'edit' > {
 	_embedded?: {
 		// TODO: Include wp:attached-to properly, and backport PHP changes from wordpress-develop to support this.
 		'wp:attached-to'?: Post[] | Partial< Post >[];
+		author?: User[] | Partial< User >[];
 	};
 }
 

@@ -5,7 +5,7 @@
 	line-height: form-toggle.$toggle-height;
 
 	&:not(.is-disabled) {
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 	}
 }
 

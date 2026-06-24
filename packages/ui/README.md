@@ -16,18 +16,88 @@ This is a companion to the `@wordpress/theme` package that provides:
 -   **Design Tokens**: A comprehensive system of design tokens for colors, spacing, typography, and more
 -   **Theme System**: A flexible theming provider for consistent theming across applications
 
+## Installation
+
+Install using NPM:
+
+```
+npm install @wordpress/ui
+```
+
+## Setup
+
+As an implementation of the design system and companion to the `@wordpress/theme` package, these components depend on CSS custom properties defined by the theme package. What you need to set up depends on whether you're building for a WordPress context, and how much of the theming features you want to use.
+
+### Within standard WordPress editor screens
+
+In standard WordPress editor screens (such as the post editor or the site editor), stylesheets, isolation styles, and layout styles are managed centrally by Gutenberg. You don't need to add any setup yourself — and you should avoid doing so in this shared context to prevent conflicts.
+
+### Elsewhere
+
+The components ship with built-in fallback values for all CSS custom properties, so they work out of the box without any theme setup. For full theming capabilities, it's recommended that you install and load the design tokens stylesheet:
+
+```
+npm install @wordpress/theme
+```
+
+```js
+import '@wordpress/theme/design-tokens.css';
+```
+
+This stylesheet is universal and does not have a separate RTL version.
+
+To ensure that portaled popovers appear correctly, add these isolation styles to your application's layout root element:
+
+```css
+.root {
+	isolation: isolate;
+}
+```
+
+In order to support overlay elements such as backdrops to correctly cover the whole browser viewport even when scrolled, add the following style to your global styles:
+
+```css
+body {
+	position: relative;
+}
+```
+
+Components in this package use [CSS cascade layers](https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Cascade_layers) when defining their styles, which can conflict in some applications which apply styles on bare element selectors (for example, `input { border-color: #aaa; }`). You should avoid these kinds of bare element selector styling if you can, preferring CSS classes instead where possible.
+
+If you need to customize the cascade layer order relative to your own CSS cascade layers, the component styles are scoped under the `wp-ui` layer, which you can use when defining your own layer order:
+
+```css
+@layer wp-ui, example-app;
+```
+
+#### Mixing with `@wordpress/components`
+
+If your app pairs `@wordpress/ui` with `@wordpress/components` overlays and bundles both packages directly (i.e. without relying on the `window.wp.components` global exposed by WordPress's script-loader), call `useEnableWpCompatOverlaySlot()` once from a long-lived root component:
+
+```tsx
+import { useEnableWpCompatOverlaySlot } from '@wordpress/ui';
+
+function App() {
+	useEnableWpCompatOverlaySlot();
+	return <YourApp />;
+}
+```
+
+This opts the app into a shared body-level overlay container so `@wordpress/ui` overlays reliably stack above `@wordpress/components` overlays. The opt-in is one-way and idempotent. It is not needed in standard WordPress editor screens, where the slot auto-enables based on `window.wp.components`.
+
 ## Usage
 
 ### Basic Component Usage
 
 ```tsx
-import { Box } from '@wordpress/ui';
+import { Stack } from '@wordpress/ui';
 
 function MyComponent() {
 	return (
-		<Box background="neutral" padding="sm">
-			Hello World
-		</Box>
+		<Stack gap="sm">
+			<div>Item 1</div>
+			<div>Item 2</div>
+		</Stack>
 	);
 }
 ```
@@ -41,11 +111,11 @@ All components in the design system follow consistent patterns for maximum flexi
 Every component supports the `render` prop for complete control over the underlying HTML element:
 
 ```tsx
-import { Box } from '@wordpress/ui';
+import { Stack } from '@wordpress/ui';
 
 function MyComponent() {
-	// Render Box as a <span /> instead of the default <div />
-	return <Box render={ <span /> }>{ /* ... */ }</Box>;
+	// Render Stack as a <section /> instead of the default <div />
+	return <Stack render={ <section /> }>{ /* ... */ }</Stack>;
 }
 ```
 
@@ -55,12 +125,12 @@ All components forward refs to their underlying DOM elements:
 
 ```tsx
 import { useRef } from '@wordpress/element';
-import { Box } from '@wordpress/ui';
+import { Stack } from '@wordpress/ui';
 
 function MyComponent() {
-	const boxRef = useRef< HTMLDivElement >( null );
+	const stackRef = useRef< HTMLDivElement >( null );
 
-	return <Box ref={ boxRef }>{ /* ... */ }</Box>;
+	return <Stack ref={ stackRef }>{ /* ... */ }</Stack>;
 }
 ```
 
@@ -69,13 +139,119 @@ function MyComponent() {
 Components merge provided `className` props with their internal styles:
 
 ```tsx
-import { Box } from '@wordpress/ui';
+import { Stack } from '@wordpress/ui';
 
 function MyComponent() {
 	// Your custom CSS className is merged with component styles
-	return <Box className="my-custom-class">{ /* ... */ }</Box>;
+	return <Stack className="my-custom-class">{ /* ... */ }</Stack>;
 }
 ```
+
+### Controlled and Uncontrolled Modes
+
+Interactive components that manage internal state (such as open/closed, selected value, etc.) follow a consistent prop naming convention that supports both **controlled** and **uncontrolled** usage.
+
+#### Prop naming pattern
+
+For a given state `x`, the convention is:
+
+| Prop        | Purpose                                                                                                                                 |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `defaultX`  | Sets the initial value in **uncontrolled** mode. The component manages subsequent state changes internally.                             |
+| `x`         | Sets the current value in **controlled** mode. The consumer is responsible for updating the value in response to changes.               |
+| `onXChange` | Callback invoked when the state changes. Receives the new value as its first argument. Works in both controlled and uncontrolled modes. |
+
+For example, a component with an open/closed state would expose:
+
+-   `defaultOpen` — initial open state (uncontrolled)
+-   `open` — current open state (controlled)
+-   `onOpenChange` — called when the open state changes
+
+And a component with a selectable value would expose:
+
+-   `defaultValue` — initial value (uncontrolled)
+-   `value` — current value (controlled)
+-   `onValueChange` — called when the value changes
+
+#### Uncontrolled usage
+
+In uncontrolled mode, the component manages its own state. Use `defaultX` to set the initial value, and optionally `onXChange` to react to changes:
+
+```tsx
+import { Tabs } from '@wordpress/ui';
+
+function MyTabs() {
+	return (
+		<Tabs.Root
+			defaultValue="tab1"
+			onValueChange={ ( value ) => console.log( value ) }
+		>
+			<Tabs.List>
+				<Tabs.Tab value="tab1">Tab 1</Tabs.Tab>
+				<Tabs.Tab value="tab2">Tab 2</Tabs.Tab>
+			</Tabs.List>
+			<Tabs.Panel value="tab1">Content 1</Tabs.Panel>
+			<Tabs.Panel value="tab2">Content 2</Tabs.Panel>
+		</Tabs.Root>
+	);
+}
+```
+
+#### Controlled usage
+
+In controlled mode, the consumer owns the state and passes it via `x`. State changes are handled through `onXChange`:
+
+```tsx
+import { useState } from '@wordpress/element';
+import { CollapsibleCard } from '@wordpress/ui';
+
+function MyCard() {
+	const [ isOpen, setIsOpen ] = useState( false );
+
+	return (
+		<CollapsibleCard.Root open={ isOpen } onOpenChange={ setIsOpen }>
+			<CollapsibleCard.Header>Details</CollapsibleCard.Header>
+			<CollapsibleCard.Content>
+				Collapsible content here.
+			</CollapsibleCard.Content>
+		</CollapsibleCard.Root>
+	);
+}
+```
+
+When both `x` and `defaultX` are provided, `x` takes precedence and the component behaves in controlled mode. When neither is provided, the component uses its own internal default (typically documented via a `@default` JSDoc tag on the `defaultX` prop).
+
+#### Difference from native `onChange`
+
+The `onXChange` callback is distinct from the native DOM `onChange` event handler. Native `onChange` fires a `React.ChangeEvent` tied to a specific DOM element, while `onXChange` provides the new **value** directly — making it simpler to use and consistent across all components, including compound and non-form components.
+
+Components that wrap native form elements may still support native event handlers (like `onChange`, `onInput`) for interoperability, but `onXChange` is the recommended approach within this package.
+
+#### Guidelines for component authors
+
+When designing props for a new component:
+
+-   Always offer both controlled and uncontrolled modes when the component has user-facing state.
+-   Name the uncontrolled prop `defaultX`, the controlled prop `x`, and the callback `onXChange`.
+-   In JSDoc comments, indicate which mode each prop is for and cross-reference the alternative:
+    ```ts
+    /**
+     * Whether the panel is currently open (controlled).
+     *
+     * To render an uncontrolled component, use the `defaultOpen` prop instead.
+     */
+    open?: boolean;
+    /**
+     * Whether the panel is initially open (uncontrolled).
+     * @default false
+     */
+    defaultOpen?: boolean;
+    /**
+     * Event handler called when the open state changes.
+     */
+    onOpenChange?: ( open: boolean ) => void;
+    ```
+-   Provide a `@default` JSDoc tag for the uncontrolled prop when there is a sensible default.
 
 ## Contributing to this package
 

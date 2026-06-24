@@ -13,11 +13,13 @@ import { store as preferencesStore } from '@wordpress/preferences';
  */
 import BlockSwitcher from '../block-switcher';
 import BlockIcon from '../block-icon';
+import BlockStylesDropdown from './block-styles-dropdown';
 import PatternOverridesDropdown from './pattern-overrides-dropdown';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import { store as blockEditorStore } from '../../store';
 import { hasPatternOverridesDefaultBinding } from '../../utils/block-bindings';
 import { unlock } from '../../lock-unlock';
+import { isIsolatedEditorKey } from '../../store/private-keys';
 
 function getBlockIconVariant( { select, clientIds } ) {
 	const {
@@ -27,8 +29,12 @@ function getBlockIconVariant( { select, clientIds } ) {
 		canRemoveBlocks,
 		getTemplateLock,
 		getBlockEditingMode,
+		canEditBlock,
+		isWithinEditedContentOnlySection,
+		getSettings,
 	} = unlock( select( blockEditorStore ) );
 	const { getBlockStyles } = select( blocksStore );
+	const isIsolatedEditor = !! getSettings()?.[ isIsolatedEditorKey ];
 
 	const hasTemplateLock = clientIds.some(
 		( id ) => getTemplateLock( id ) === 'contentOnly'
@@ -40,7 +46,10 @@ function getBlockIconVariant( { select, clientIds } ) {
 	const hasBlockStyles =
 		isSingleBlock && !! getBlockStyles( blockName )?.length;
 	const hasPatternNameInSelection = clientIds.some(
-		( id ) => !! getBlockAttributes( id )?.metadata?.patternName
+		( id ) =>
+			!! getBlockAttributes( id )?.metadata?.patternName &&
+			! isWithinEditedContentOnlySection( id ) &&
+			! isIsolatedEditor
 	);
 	const hasPatternOverrides = clientIds.every( ( clientId ) =>
 		hasPatternOverridesDefaultBinding(
@@ -53,22 +62,29 @@ function getBlockIconVariant( { select, clientIds } ) {
 			0
 	);
 	const canRemove = canRemoveBlocks( clientIds );
-
-	const isDefaultEditingMode =
-		getBlockEditingMode( clientIds[ 0 ] ) === 'default';
-	const _hideTransformsForSections =
-		window?.__experimentalContentOnlyPatternInsertion &&
-		hasPatternNameInSelection;
+	const canEdit = clientIds.every( ( clientId ) => canEditBlock( clientId ) );
+	const editingMode = getBlockEditingMode( clientIds[ 0 ] );
+	const isDefaultEditingMode = editingMode === 'default';
+	const isContentOnlyMode = editingMode === 'contentOnly';
+	const _hideTransformsForSections = hasPatternNameInSelection;
 	const _showBlockSwitcher =
 		! _hideTransformsForSections &&
 		isDefaultEditingMode &&
 		( hasBlockStyles || canRemove ) &&
-		! hasTemplateLock;
+		! hasTemplateLock &&
+		canEdit;
 
 	const _showPatternOverrides = hasPatternOverrides && hasParentPattern;
 
 	if ( _showBlockSwitcher ) {
 		return 'switcher';
+	} else if (
+		isContentOnlyMode &&
+		hasBlockStyles &&
+		! hasPatternOverrides &&
+		canEdit
+	) {
+		return 'styles-only';
 	} else if ( _showPatternOverrides ) {
 		return 'pattern-overrides';
 	}
@@ -77,24 +93,29 @@ function getBlockIconVariant( { select, clientIds } ) {
 }
 
 function getBlockIcon( { select, clientIds } ) {
-	const { getBlockName, getBlockAttributes } = unlock(
-		select( blockEditorStore )
-	);
+	const {
+		getBlockName,
+		getBlockAttributes,
+		isWithinEditedContentOnlySection,
+		getSettings,
+	} = unlock( select( blockEditorStore ) );
+	const isIsolatedEditor = !! getSettings()?.[ isIsolatedEditorKey ];
 
 	const _isSingleBlock = clientIds.length === 1;
 	const firstClientId = clientIds[ 0 ];
+
 	const blockAttributes = getBlockAttributes( firstClientId );
 	if (
 		_isSingleBlock &&
 		blockAttributes?.metadata?.patternName &&
-		window?.__experimentalContentOnlyPatternInsertion
+		! isWithinEditedContentOnlySection( firstClientId ) &&
+		! isIsolatedEditor
 	) {
 		return symbol;
 	}
 
 	const blockName = getBlockName( firstClientId );
 	const blockType = getBlockType( blockName );
-
 	if ( _isSingleBlock ) {
 		const { getActiveBlockVariation } = select( blocksStore );
 		const match = getActiveBlockVariation( blockName, blockAttributes );
@@ -151,6 +172,18 @@ export default function BlockToolbarIcon( { clientIds, isSynced } ) {
 			>
 				{ BlockIconElement }
 			</BlockSwitcher>
+		);
+	}
+
+	if ( variant === 'styles-only' ) {
+		return (
+			<BlockStylesDropdown
+				clientIds={ clientIds }
+				label={ label }
+				text={ text }
+			>
+				{ BlockIconElement }
+			</BlockStylesDropdown>
 		);
 	}
 

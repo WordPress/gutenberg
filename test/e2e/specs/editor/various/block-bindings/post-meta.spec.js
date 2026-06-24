@@ -67,6 +67,7 @@ test.describe( 'Post Meta source', () => {
 					'false'
 				);
 			} );
+
 			test( 'should show the default value if it is defined', async ( {
 				editor,
 			} ) => {
@@ -93,6 +94,7 @@ test.describe( 'Post Meta source', () => {
 					'Movie field default value'
 				);
 			} );
+
 			test( 'should fall back to the field label if the default value is not defined', async ( {
 				editor,
 			} ) => {
@@ -119,6 +121,7 @@ test.describe( 'Post Meta source', () => {
 					'Field with only label'
 				);
 			} );
+
 			test( 'should fall back to the field key if the field label is not defined', async ( {
 				editor,
 			} ) => {
@@ -174,6 +177,7 @@ test.describe( 'Post Meta source', () => {
 					'Movie field label'
 				);
 			} );
+
 			test( 'should fall back to the field key if the field label is not defined', async ( {
 				editor,
 				page,
@@ -234,6 +238,7 @@ test.describe( 'Post Meta source', () => {
 					.filter( { hasText: 'Movie field label' } );
 				await expect( movieField ).toBeVisible();
 			} );
+
 			test( 'should include global fields in UI to connect attributes', async ( {
 				page,
 			} ) => {
@@ -242,6 +247,7 @@ test.describe( 'Post Meta source', () => {
 					.filter( { hasText: 'text_custom_field' } );
 				await expect( globalField ).toBeVisible();
 			} );
+
 			test( 'should not include protected fields', async ( { page } ) => {
 				// Ensure the fields have loaded by checking the field is visible.
 				const globalField = page
@@ -258,6 +264,7 @@ test.describe( 'Post Meta source', () => {
 					.filter( { hasText: 'show_in_rest_false_field' } );
 				await expect( showInRestFalseField ).toBeHidden();
 			} );
+
 			test( 'should show the default value if it is defined', async ( {
 				page,
 			} ) => {
@@ -268,6 +275,7 @@ test.describe( 'Post Meta source', () => {
 					'Movie field default value'
 				);
 			} );
+
 			// We need to discuss this approach. As now is showing the label, like post-meta getValues function on the editor.
 			test( 'should not show anything if the default value is not defined', async ( {
 				page,
@@ -340,6 +348,7 @@ test.describe( 'Post Meta source', () => {
 
 			await expect( movieField ).toBeHidden();
 		} );
+
 		test( 'should show the key in attributes connected to post meta', async ( {
 			editor,
 		} ) => {
@@ -367,12 +376,23 @@ test.describe( 'Post Meta source', () => {
 	} );
 
 	test.describe( 'Movie CPT post', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.setGutenbergExperiments( [
+				'gutenberg-content-only-inspector-fields',
+			] );
+		} );
+
 		test.beforeEach( async ( { admin } ) => {
 			// CHECK HOW TO CREATE A MOVIE.
 			await admin.createNewPost( {
 				postType: 'movie',
 				title: 'Test bindings',
 			} );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			// Ensure experiments are disabled after test.
+			await requestUtils.setGutenbergExperiments( [] );
 		} );
 
 		test( 'should show the custom field value of that specific post', async ( {
@@ -407,6 +427,7 @@ test.describe( 'Post Meta source', () => {
 				previewPage.locator( '#connected-paragraph' )
 			).toHaveText( 'Movie field default value' );
 		} );
+
 		test( 'should fall back to the key when custom field is not accessible', async ( {
 			editor,
 		} ) => {
@@ -435,6 +456,7 @@ test.describe( 'Post Meta source', () => {
 				'false'
 			);
 		} );
+
 		test( 'should not show or edit the value of a protected field', async ( {
 			editor,
 		} ) => {
@@ -463,6 +485,7 @@ test.describe( 'Post Meta source', () => {
 				'false'
 			);
 		} );
+
 		test( 'should not show or edit the value of a field with `show_in_rest` set to false', async ( {
 			editor,
 		} ) => {
@@ -493,6 +516,7 @@ test.describe( 'Post Meta source', () => {
 				'false'
 			);
 		} );
+
 		test( 'should be possible to edit the value of the connected custom fields', async ( {
 			editor,
 		} ) => {
@@ -536,7 +560,7 @@ test.describe( 'Post Meta source', () => {
 			).toHaveText( 'new value' );
 		} );
 
-		test( 'should be possible to edit the value of the connected custom fields in the inspector control registered by the plugin', async ( {
+		test( 'should be possible to edit the value of the connected custom fields in the inspector control registered by Block Fields experiment', async ( {
 			editor,
 			page,
 		} ) => {
@@ -558,9 +582,9 @@ test.describe( 'Post Meta source', () => {
 				},
 			} );
 			const contentInput = page.getByRole( 'textbox', {
-				name: 'Content',
+				label: 'Content',
 			} );
-			await expect( contentInput ).toHaveValue(
+			await expect( contentInput ).toHaveText(
 				'Movie field default value'
 			);
 			await contentInput.fill( 'new value' );
@@ -583,6 +607,7 @@ test.describe( 'Post Meta source', () => {
 			await editor.insertBlock( {
 				name: 'core/paragraph',
 			} );
+			await page.getByRole( 'tab', { name: 'Settings' } ).click();
 			await page.getByLabel( 'Attributes options' ).click();
 			await page
 				.getByRole( 'menuitemcheckbox', {
@@ -604,6 +629,7 @@ test.describe( 'Post Meta source', () => {
 				.filter( { hasText: 'Movie field label' } );
 			await expect( movieField ).toBeVisible();
 		} );
+
 		test( 'should not be possible to connect non-supported fields through the attributes panel', async ( {
 			editor,
 			page,
@@ -611,6 +637,7 @@ test.describe( 'Post Meta source', () => {
 			await editor.insertBlock( {
 				name: 'core/paragraph',
 			} );
+			await page.getByRole( 'tab', { name: 'Settings' } ).click();
 			await page.getByLabel( 'Attributes options' ).click();
 			await page
 				.getByRole( 'menuitemcheckbox', {

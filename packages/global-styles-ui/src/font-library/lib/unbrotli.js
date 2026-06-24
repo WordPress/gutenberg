@@ -28,8 +28,6 @@
  * SOFTWARE.
  */
 
-/* eslint eslint-comments/no-unlimited-disable: 0 */
-/* eslint-disable */
 export default ( function () {
 	var define, module, exports;
 	return ( function () {
@@ -2685,4 +2683,3 @@ export default ( function () {
 		[ 12 ]
 	)( 12 );
 } )();
-/* eslint-enable */

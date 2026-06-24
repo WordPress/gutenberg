@@ -207,7 +207,7 @@ export function camelCaseJoin( strings: string[] ): string {
 export function safeDecodeURI( uri: string ): string {
 	try {
 		return decodeURI( uri );
-	} catch ( uriError ) {
+	} catch {
 		return uri;
 	}
 }

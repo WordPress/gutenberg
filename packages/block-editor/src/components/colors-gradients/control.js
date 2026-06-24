@@ -12,6 +12,7 @@ import {
 	__experimentalVStack as VStack,
 	ColorPalette,
 	GradientPicker,
+	Notice,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 
@@ -42,11 +43,13 @@ function ColorGradientControlInner( {
 	onColorChange,
 	onGradientChange,
 	colorValue,
+	colorSlug,
 	gradientValue,
 	clearable,
 	showTitle = true,
 	enableAlpha,
 	headingLevel,
+	noticeProps,
 } ) {
 	const canChooseAColor =
 		onColorChange &&
@@ -59,26 +62,42 @@ function ColorGradientControlInner( {
 		return null;
 	}
 
+	const colorPaletteOnChange = canChooseAGradient
+		? ( newColor, _index, newSlug ) => {
+				onColorChange( newColor, newSlug );
+				onGradientChange();
+		  }
+		: ( newColor, _index, newSlug ) => onColorChange( newColor, newSlug );
+
+	const colorPalette = (
+		<ColorPalette
+			value={ colorValue }
+			selectedSlug={ colorSlug }
+			onChange={ colorPaletteOnChange }
+			{ ...{ colors, disableCustomColors } }
+			__experimentalIsRenderedInSidebar={
+				__experimentalIsRenderedInSidebar
+			}
+			clearable={ clearable }
+			enableAlpha={ enableAlpha }
+			headingLevel={ headingLevel }
+		/>
+	);
+
 	const tabPanels = {
+		// The `ColorPalette` must stay at a stable position in the tree whether
+		// or not a notice is present. Wrapping it in a `VStack` only when a
+		// notice appears remounts it, which resets the custom color picker back
+		// to the swatch view mid-edit. Keep `ColorPalette` last and toggle only
+		// the notice ahead of it; the notice's own bottom margin provides the
+		// spacing the wrapper used to.
 		[ TAB_IDS.color ]: (
-			<ColorPalette
-				value={ colorValue }
-				onChange={
-					canChooseAGradient
-						? ( newColor ) => {
-								onColorChange( newColor );
-								onGradientChange();
-						  }
-						: onColorChange
-				}
-				{ ...{ colors, disableCustomColors } }
-				__experimentalIsRenderedInSidebar={
-					__experimentalIsRenderedInSidebar
-				}
-				clearable={ clearable }
-				enableAlpha={ enableAlpha }
-				headingLevel={ headingLevel }
-			/>
+			<>
+				{ noticeProps && (
+					<Notice isDismissible={ false } { ...noticeProps } />
+				) }
+				{ colorPalette }
+			</>
 		),
 		[ TAB_IDS.gradient ]: (
 			<GradientPicker

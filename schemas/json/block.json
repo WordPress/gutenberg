@@ -16,7 +16,7 @@
 			"type": "string"
 		},
 		"apiVersion": {
-			"description": "The version of the Block API used by the block. If the block is registered with API version 2 or lower, the post editor may work as a non-iframe editor. Since all editors are planned to work as iframes in the future, it is recommended to set the `apiVersion` field to 3 and test the block inside the iframe editor.\n\nSee the API versions documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/ for more details.",
+			"description": "The version of the Block API used by the block. If the block is registered with API version 2 or lower, the post editor may work as a non-iframe editor. Since all editors are planned to work as iframes in the future, it is recommended to set the `apiVersion` field to 3 and test the block inside the iframe editor.\n\nSee the API versions documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/block-migration-for-iframe-editor-compatibility/ for more details.",
 			"type": "integer",
 			"const": 3
 		},
@@ -260,7 +260,14 @@
 				},
 				"ariaLabel": {
 					"description": "ARIA-labels let you define an accessible label for elements. This property allows enabling the definition of an aria-label for the block, without exposing a UI field.",
-					"type": "boolean",
+					"oneOf": [
+						{
+							"type": "boolean"
+						},
+						{
+							"type": "object"
+						}
+					],
 					"default": false
 				},
 				"className": {
@@ -310,7 +317,12 @@
 					}
 				},
 				"customClassName": {
-					"description": "This property adds a field to define a custom className for the block’s wrapper.",
+					"description": "This property adds a field to define a custom className for the block's wrapper.",
+					"type": "boolean",
+					"default": true
+				},
+				"customCSS": {
+					"description": "This property adds a field to define custom CSS for the block instance.",
 					"type": "boolean",
 					"default": true
 				},
@@ -330,6 +342,11 @@
 						},
 						"minHeight": {
 							"description": "Allow blocks to define a minimum height value.",
+							"type": "boolean",
+							"default": false
+						},
+						"minWidth": {
+							"description": "Allow blocks to define a minimum width value.",
 							"type": "boolean",
 							"default": false
 						},
@@ -362,6 +379,11 @@
 						},
 						"backgroundSize": {
 							"description": "Allow blocks to define values related to the size of a background image, including size, position, and repeat controls",
+							"type": "boolean",
+							"default": false
+						},
+						"gradient": {
+							"description": "Allow blocks to define gradient values.",
 							"type": "boolean",
 							"default": false
 						}
@@ -473,7 +495,7 @@
 									"default": true
 								},
 								"allowSizingOnChildren": {
-									"description": "For the `flex` layout type only, determines display of sizing controls (Fit/Fill/Fixed) on all child blocks of the flex block.",
+									"description": "For the `flex` layout type only, determines display of sizing controls (Fit/Grow/Max/Fixed) on all child blocks of the flex block.",
 									"type": "boolean",
 									"default": false
 								},
@@ -489,6 +511,11 @@
 								},
 								"allowOrientation": {
 									"description": "For the `flex` layout type only, determines display of the orientation control in the block toolbar.",
+									"type": "boolean",
+									"default": true
+								},
+								"allowWrap": {
+									"description": "For the `flex` layout type only, determines display of the wrap toggle in the block sidebar.",
 									"type": "boolean",
 									"default": true
 								},
@@ -666,6 +693,16 @@
 						}
 					]
 				},
+				"contentRole": {
+					"description": "This property marks the block itself as content. It is intended primarily for blocks that do not declare content attributes, or whose content is expressed only through their inner blocks. When enabled, content-only editing modes can still edit these blocks and allow inner blocks to be added or removed.",
+					"type": "boolean",
+					"default": false
+				},
+				"listView": {
+					"description": "This property enables a dedicated List View panel in the block inspector for the block. When enabled, the inspector shows a List View tree for the block's inner blocks, allowing users to inspect, reorder, and manage the block's items from the sidebar instead of only using the global document List View.",
+					"type": "boolean",
+					"default": false
+				},
 				"splitting": {
 					"description": "This property indicates whether the block can split when the Enter key is pressed or when blocks are pasted.",
 					"type": "boolean",
@@ -729,6 +766,7 @@
 								"aspectRatio": { "type": "string" },
 								"height": { "type": "string" },
 								"minHeight": { "type": "string" },
+								"minWidth": { "type": "string" },
 								"width": { "type": "string" }
 							}
 						}
@@ -770,6 +808,20 @@
 								"textDecoration": { "type": "string" },
 								"textIndent": { "type": "string" },
 								"textTransform": { "type": "string" }
+							}
+						}
+					]
+				},
+				"css": {
+					"description": "Custom CSS selector used when generating the block's custom CSS rules set via Global Styles.",
+					"oneOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "object",
+							"properties": {
+								"root": { "type": "string" }
 							}
 						}
 					]

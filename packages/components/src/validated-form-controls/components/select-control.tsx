@@ -48,3 +48,4 @@ const UnforwardedValidatedSelectControl = (
 export const ValidatedSelectControl = forwardRef(
 	UnforwardedValidatedSelectControl
 );
+ValidatedSelectControl.displayName = 'ValidatedSelectControl';

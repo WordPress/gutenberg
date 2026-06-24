@@ -42,6 +42,7 @@ A transformation of type `block` is an object that takes the following parameter
 -   **type** _(string)_: the value `block`.
 -   **blocks** _(array)_: a list of known block types. It also accepts the wildcard value (`"*"`), meaning that the transform is available to _all_ block types (eg: all blocks can transform into `core/group`).
 -   **transform** _(function)_: a callback that receives the attributes and inner blocks of the block being processed. It should return a block object or an array of block objects.
+-   **variationName** _(string, optional)_: the name of the target block variation when the transform creates a variation of the transformed block type. This lets the transform UI show the variation title and icon instead of the base block type.
 -   **isMatch** _(function, optional)_: a callback that receives the block attributes as the first argument and the block object as the second argument and should return a boolean. Returning `false` from this function will prevent the transform from being available and displayed as an option to the user.
 -   **isMultiBlock** _(boolean, optional)_: whether the transformation can be applied when multiple blocks are selected. If true, the `transform` function's first parameter will be an array containing each selected block's attributes, and the second an array of each selected block's inner blocks. False by default.
 -   **priority** _(number, optional)_: controls the priority with which a transformation is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://developer.wordpress.org/reference/#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
@@ -151,7 +152,7 @@ transforms: {
 				} );
 			},
 		},
-	];
+	],
 }
 ```
 
@@ -182,13 +183,13 @@ transforms: {
 				} );
 			},
 		},
-	];
+	],
 }
 ```
 
 ### Raw
 
-This type of transformations support the _from_ direction, allowing blocks to be created from raw HTML nodes. They're applied when the user executes the "Convert to Blocks" action from within the block setting UI menu, as well as when some content is pasted or dropped into the editor.
+This type of transformation supports the _from_ direction, allowing blocks to be created from raw HTML nodes. They're applied when the user executes the "Convert to Blocks" action from within the block setting UI menu, as well as when some content is pasted or dropped into the editor.
 
 A transformation of type `raw` is an object that takes the following parameters:
 
@@ -246,7 +247,7 @@ We want to tell the editor to allow the inner `h2` and `p` elements. We do this 
 a `<RichText />` component is a good place to allow phrasing content otherwise we'll lose all text formatting on conversion.
 
 ```js
-schema = ({ phrasingContentSchema }) => {
+schema = ({ phrasingContentSchema }) => ({
     div: {
         required: true,
         attributes: [ 'data-post-id' ],
@@ -255,7 +256,7 @@ schema = ({ phrasingContentSchema }) => {
             p: { children: phrasingContentSchema }
         }
     }
-}
+})
 ```
 
 When we successfully match this content every HTML attribute will be stripped away except for `data-post-id` and if we have other arrangements of HTML inside of a given `div` then it won't match our transformer. Likewise we'd fail to match if we found an `<h3>` in there instead of an `<h2>`.
@@ -336,6 +337,33 @@ transforms: {
     ]
 },
 ```
+
+**Example: shortcode with wrapped content to block with InnerBlocks**
+
+Shortcodes that wrap inner content (e.g. `[example]<p>Inner.</p>[/example]`) can be transformed into a block with InnerBlocks by passing `match.shortcode.content` through [`rawHandler`](/packages/blocks/README.md#rawHandler) inside `transform`.
+
+```js
+transforms: {
+    from: [
+        {
+            type: 'shortcode',
+            tag: 'example',
+            transform( attrs, match ) {
+                const innerBlocks = rawHandler( {
+                    HTML: match.shortcode.content || '',
+                } );
+                return createBlock(
+                    'myplugin/example',
+                    { att1: attrs.named.att1 || '' },
+                    innerBlocks
+                );
+            },
+        },
+    ],
+},
+```
+
+`rawHandler` recurses into the content, so nested shortcodes and HTML are converted to blocks the same way pasted content is.
 
 ## `ungroup` blocks
 

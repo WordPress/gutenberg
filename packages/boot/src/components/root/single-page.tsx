@@ -7,8 +7,11 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { privateApis as routePrivateApis } from '@wordpress/route';
-import { EditorSnackbars } from '@wordpress/editor';
+import { SnackbarNotices } from '@wordpress/notices';
 import { SlotFillProvider } from '@wordpress/components';
+import { useMemo } from '@wordpress/element';
+import { getAdminThemeColors } from '@wordpress/admin-ui';
+import { ThemeProvider } from '@wordpress/theme';
 
 /**
  * Internal dependencies
@@ -19,7 +22,6 @@ import { unlock } from '../../lock-unlock';
 import type { CanvasData } from '../../store/types';
 import './style.scss';
 import useRouteTitle from '../app/use-route-title';
-import { UserThemeProvider } from '../user-theme-provider';
 
 const { useMatches, Outlet } = unlock( routePrivateApis );
 
@@ -40,10 +42,15 @@ export default function RootSinglePage() {
 
 	useRouteTitle();
 
+	const themeColors = useMemo( getAdminThemeColors, [] );
+
 	return (
 		<SlotFillProvider>
-			<UserThemeProvider isRoot color={ { bg: '#f8f8f8' } }>
-				<UserThemeProvider color={ { bg: '#1d2327' } }>
+			<ThemeProvider
+				isRoot
+				color={ { ...themeColors, background: '#f8f8f8' } }
+			>
+				<ThemeProvider color={ themeColors }>
 					<div
 						className={ clsx(
 							'boot-layout boot-layout--single-page',
@@ -54,9 +61,14 @@ export default function RootSinglePage() {
 						) }
 					>
 						<SavePanel />
-						<EditorSnackbars />
+						<SnackbarNotices className="boot-notices__snackbar" />
 						<div className="boot-layout__surfaces">
-							<UserThemeProvider color={ { bg: '#ffffff' } }>
+							<ThemeProvider
+								color={ {
+									...themeColors,
+									background: '#ffffff',
+								} }
+							>
 								<Outlet />
 								{ /* Render Canvas in Root to prevent remounting on route changes */ }
 								{ ( canvas || canvas === null ) && (
@@ -69,11 +81,11 @@ export default function RootSinglePage() {
 										/>
 									</div>
 								) }
-							</UserThemeProvider>
+							</ThemeProvider>
 						</div>
 					</div>
-				</UserThemeProvider>
-			</UserThemeProvider>
+				</ThemeProvider>
+			</ThemeProvider>
 		</SlotFillProvider>
 	);
 }

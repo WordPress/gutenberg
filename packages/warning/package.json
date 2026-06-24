@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/warning",
-	"version": "3.36.0",
+	"version": "3.49.0",
 	"description": "Warning utility for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -30,23 +30,24 @@
 		"*.md",
 		"babel-plugin.cjs"
 	],
-	"type": "module",
 	"main": "build/index.cjs",
-	"module": "build-module/index.js",
+	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
-			"import": "./build-module/index.js",
+			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json",
 		"./babel-plugin": "./babel-plugin.cjs"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"wpScriptDefaultExport": true,
 	"types": "build-types",
 	"sideEffects": false,
+	"devDependencies": {
+		"@babel/core": "^7.25.7"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

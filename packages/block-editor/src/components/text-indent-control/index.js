@@ -5,6 +5,7 @@ import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
+	__experimentalView as View,
 	RangeControl,
 	__experimentalSpacer as Spacer,
 	Flex,
@@ -27,6 +28,7 @@ import { useSettings } from '../../components/use-settings';
  * @param {Function}                props.onChange              Handles change in text indent selection.
  * @param {string|number|undefined} props.__unstableInputWidth  Input width to pass through to inner UnitControl. Should be a valid CSS value.
  * @param {boolean}                 props.withSlider            Whether to show the slider control.
+ * @param {boolean}                 props.hasBottomMargin       Whether to add bottom margin below the control.
  * @param {string}                  props.help                  Help text to display below the control.
  *
  * @return {Element} Text indent control.
@@ -37,6 +39,7 @@ export default function TextIndentControl( {
 	onChange,
 	__unstableInputWidth = '60px',
 	withSlider = false,
+	hasBottomMargin = false,
 	help,
 	...otherProps
 } ) {
@@ -59,7 +62,8 @@ export default function TextIndentControl( {
 		units
 	);
 	const isValueUnitRelative =
-		!! valueUnit && [ 'em', 'rem', 'ch', 'vw', 'vh' ].includes( valueUnit );
+		!! valueUnit &&
+		[ 'em', 'rem', '%', 'ch', 'vw', 'vh' ].includes( valueUnit );
 
 	if ( ! withSlider ) {
 		return (
@@ -78,7 +82,7 @@ export default function TextIndentControl( {
 	}
 
 	return (
-		<>
+		<View style={ hasBottomMargin ? { marginBottom: 12 } : undefined }>
 			<BaseControl.VisualLabel>
 				{ __( 'Line indent' ) }
 			</BaseControl.VisualLabel>
@@ -102,7 +106,6 @@ export default function TextIndentControl( {
 					<FlexItem isBlock>
 						<Spacer marginX={ 2 } marginBottom={ 0 }>
 							<RangeControl
-								__nextHasNoMarginBottom
 								__next40pxDefaultSize={ __next40pxDefaultSize }
 								__shouldNotWarnDeprecated36pxSize
 								label={ __( 'Line indent' ) }
@@ -130,6 +133,6 @@ export default function TextIndentControl( {
 			{ help && (
 				<p className="components-base-control__help">{ help }</p>
 			) }
-		</>
+		</View>
 	);
 }

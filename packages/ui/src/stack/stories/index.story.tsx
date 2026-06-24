@@ -1,30 +1,23 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryObj } from '@storybook/react';
-
-/**
- * WordPress dependencies
- */
-import '@wordpress/theme/design-tokens.css';
-
-/**
- * Internal dependencies
- */
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Stack } from '../index';
-import { Box } from '../../box';
 
 const meta: Meta< typeof Stack > = {
+	tags: [ 'manifest' ],
 	title: 'Design System/Components/Stack',
 	component: Stack,
-	tags: [ 'status-experimental' ],
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
+	},
 };
 export default meta;
 
 const DemoBox = ( { variant }: { variant?: 'lg' } ) => (
-	<Box
-		backgroundColor="brand"
+	<div
 		style={ {
+			backgroundColor: 'var(--wpds-color-background-surface-brand)',
 			width: variant === 'lg' ? '150px' : '100px',
 			height: variant === 'lg' ? '150px' : '100px',
 		} }
@@ -35,7 +28,7 @@ type Story = StoryObj< typeof Stack >;
 
 export const Default: Story = {
 	args: {
-		gap: 'sm',
+		gap: 'md',
 		children: (
 			<>
 				<DemoBox />
@@ -104,7 +97,7 @@ export const Nested: Story = {
 		children: (
 			<>
 				<DemoBox variant="lg" />
-				<Stack gap="md">
+				<Stack gap="lg">
 					<DemoBox />
 					<DemoBox />
 				</Stack>

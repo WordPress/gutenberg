@@ -7,9 +7,9 @@ import {
 	Button,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
-	VisuallyHidden,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 
@@ -30,7 +30,7 @@ function VariationsButtons( {
 } ) {
 	return (
 		<fieldset className={ className }>
-			<VisuallyHidden as="legend">
+			<VisuallyHidden render={ <legend /> }>
 				{ __( 'Transform to variation' ) }
 			</VisuallyHidden>
 			{ variations.map( ( variation ) => (
@@ -144,43 +144,48 @@ function VariationsToggleGroupControl( {
 	);
 }
 
-function __experimentalBlockVariationTransforms( { blockClientId } ) {
+function BlockVariationTransforms( { blockClientId } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-	const { activeBlockVariation, variations, isContentOnly, isSection } =
-		useSelect(
-			( select ) => {
-				const { getActiveBlockVariation, getBlockVariations } =
-					select( blocksStore );
+	const {
+		activeBlockVariation,
+		variations,
+		canEdit,
+		isContentOnly,
+		isSection,
+	} = useSelect(
+		( select ) => {
+			const { getActiveBlockVariation, getBlockVariations } =
+				select( blocksStore );
 
-				const {
-					getBlockName,
-					getBlockAttributes,
-					getBlockEditingMode,
-					isSectionBlock,
-				} = unlock( select( blockEditorStore ) );
+			const {
+				getBlockName,
+				getBlockAttributes,
+				getBlockEditingMode,
+				isSectionBlock,
+			} = unlock( select( blockEditorStore ) );
+			const { canEditBlock } = select( blockEditorStore );
 
-				const name = blockClientId && getBlockName( blockClientId );
+			const name = blockClientId && getBlockName( blockClientId );
 
-				const { hasContentRoleAttribute } = unlock(
-					select( blocksStore )
-				);
-				const isContentBlock = hasContentRoleAttribute( name );
+			const { hasContentRoleAttribute } = unlock( select( blocksStore ) );
+			const isContentBlock = hasContentRoleAttribute( name );
 
-				return {
-					activeBlockVariation: getActiveBlockVariation(
-						name,
-						getBlockAttributes( blockClientId ),
-						'transform'
-					),
-					variations: name && getBlockVariations( name, 'transform' ),
-					isContentOnly:
-						getBlockEditingMode( blockClientId ) ===
-							'contentOnly' && ! isContentBlock,
-					isSection: isSectionBlock( blockClientId ),
-				};
-			},
-			[ blockClientId ]
-		);
+			return {
+				activeBlockVariation: getActiveBlockVariation(
+					name,
+					getBlockAttributes( blockClientId ),
+					'transform'
+				),
+				variations: name && getBlockVariations( name, 'transform' ),
+				canEdit: canEditBlock( blockClientId ),
+				isContentOnly:
+					getBlockEditingMode( blockClientId ) === 'contentOnly' &&
+					! isContentBlock,
+				isSection: isSectionBlock( blockClientId ),
+			};
+		},
+		[ blockClientId ]
+	);
 
 	const selectedValue = activeBlockVariation?.name;
 
@@ -205,17 +210,14 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 		} );
 	};
 
-	const hideVariationsForSections =
-		window?.__experimentalContentOnlyPatternInsertion && isSection;
-
-	if ( ! variations?.length || isContentOnly || hideVariationsForSections ) {
+	if ( ! variations?.length || ! canEdit || isContentOnly || isSection ) {
 		return null;
 	}
 
 	const baseClass = 'block-editor-block-variation-transforms';
 
-	// Show buttons if there are more than 5 variations because the ToggleGroupControl does not wrap
-	const showButtons = variations.length > 5;
+	// Show buttons if there are more than 6 variations because the ToggleGroupControl does not wrap
+	const showButtons = variations.length > 6;
 
 	const ButtonComponent = showButtons
 		? VariationsButtons
@@ -233,4 +235,4 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 	);
 }
 
-export default __experimentalBlockVariationTransforms;
+export default BlockVariationTransforms;

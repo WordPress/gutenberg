@@ -1,20 +1,43 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
-import { useState, useCallback, useMemo } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import {
+	createPortal,
+	useState,
+	useCallback,
+	useMemo,
+	useRef,
+	useEffect,
+} from '@wordpress/element';
+import { __, sprintf, _n } from '@wordpress/i18n';
 import {
 	privateApis as coreDataPrivateApis,
 	store as coreStore,
 } from '@wordpress/core-data';
-import { resolveSelect } from '@wordpress/data';
+import { resolveSelect, useDispatch } from '@wordpress/data';
 import { Modal, DropZone, FormFileUpload, Button } from '@wordpress/components';
 import { upload as uploadIcon } from '@wordpress/icons';
 import { DataViewsPicker } from '@wordpress/dataviews';
-import type { View, Field, ActionButton } from '@wordpress/dataviews';
+import type {
+	Field,
+	ActionButton,
+	SupportedLayouts,
+	View,
+} from '@wordpress/dataviews';
+import { useView } from '@wordpress/views';
+import { Stack } from '@wordpress/ui';
 import {
 	altTextField,
+	attachedToField,
+	authorField,
 	captionField,
+	dateAddedField,
+	dateModifiedField,
 	descriptionField,
 	filenameField,
 	filesizeField,
@@ -22,6 +45,7 @@ import {
 	mediaThumbnailField,
 	mimeTypeField,
 } from '@wordpress/media-fields';
+import { store as noticesStore, SnackbarNotices } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -30,6 +54,9 @@ import type { Attachment, RestAttachment } from '../../utils/types';
 import { transformAttachment } from '../../utils/transform-attachment';
 import { uploadMedia } from '../../utils/upload-media';
 import { unlock } from '../../lock-unlock';
+import { UploadStatusPopover } from './upload-status-popover';
+import { useInvalidateAttachmentResolutions } from './use-invalidate-attachment-resolutions';
+import { useUploadStatus } from './use-upload-status';
 
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 
@@ -37,10 +64,57 @@ const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 const LAYOUT_PICKER_GRID = 'pickerGrid';
 const LAYOUT_PICKER_TABLE = 'pickerTable';
 
+// Custom notices context for the media modal
+const NOTICES_CONTEXT = 'media-modal';
+
+// Notice ID - reused for all upload-related notices to prevent flooding
+const NOTICE_ID_UPLOAD_PROGRESS = 'media-modal-upload-progress';
+
+type ViewQueryParams = Pick< View, 'page' | 'search' >;
+
+const defaultQueryParams: ViewQueryParams = {
+	page: 1,
+	search: '',
+};
+
+const defaultView: View = {
+	type: LAYOUT_PICKER_GRID,
+	fields: [],
+	showTitle: false,
+	titleField: 'title',
+	mediaField: 'media_thumbnail',
+	perPage: 50,
+	filters: [],
+	layout: {
+		previewSize: 170,
+		density: 'compact',
+	},
+};
+
+const defaultLayouts: SupportedLayouts = {
+	[ LAYOUT_PICKER_GRID ]: {
+		fields: [],
+		showTitle: false,
+		layout: {
+			previewSize: 170,
+			density: 'compact',
+		},
+	},
+	[ LAYOUT_PICKER_TABLE ]: {
+		fields: [
+			'filename',
+			'filesize',
+			'media_dimensions',
+			'author',
+			'date',
+		],
+		showTitle: true,
+	},
+};
+
 interface MediaUploadModalProps {
 	/**
 	 * Array of allowed media types.
-	 * @default ['image']
 	 */
 	allowedTypes?: string[];
 
@@ -135,7 +209,7 @@ interface MediaUploadModalProps {
  * @return JSX element or null
  */
 export function MediaUploadModal( {
-	allowedTypes = [ 'image' ],
+	allowedTypes,
 	multiple = false,
 	value,
 	onSelect,
@@ -157,18 +231,35 @@ export function MediaUploadModal( {
 			: [ String( value ) ];
 	} );
 
-	// DataViews configuration - allow view updates
-	const [ view, setView ] = useState< View >( () => ( {
-		type: LAYOUT_PICKER_GRID,
-		fields: [],
-		showTitle: false,
-		titleField: 'title',
-		mediaField: 'media_thumbnail',
-		search: '',
-		page: 1,
-		perPage: 20,
-		filters: [],
-	} ) );
+	const { createSuccessNotice, removeAllNotices } =
+		useDispatch( noticesStore );
+	const invalidateAttachmentResolutions =
+		useInvalidateAttachmentResolutions();
+	const [ queryParams, setQueryParams ] = useState< ViewQueryParams >(
+		() => defaultQueryParams
+	);
+
+	// Persist view configuration across sessions via the preferences store.
+	const { view, updateView, isModified, resetToDefault } = useView( {
+		kind: 'postType',
+		name: 'attachment',
+		slug: 'media-modal',
+		defaultView,
+		queryParams,
+		onChangeQueryParams: setQueryParams,
+	} );
+
+	// Normalize undefined transient DataViews values so they do not persist as modified modal preferences.
+	const handleChangeView = useCallback(
+		( nextView: View ) => {
+			const normalizedView = { ...nextView };
+			if ( normalizedView.startPosition === undefined ) {
+				delete normalizedView.startPosition;
+			}
+			updateView( normalizedView );
+		},
+		[ updateView ]
+	);
 
 	// Build query args based on view properties, similar to PostList
 	const queryArgs = useMemo( () => {
@@ -181,12 +272,19 @@ export function MediaUploadModal( {
 			}
 			// Handle author filters
 			if ( filter.field === 'author' ) {
-				filters.author = filter.value;
+				if ( filter.operator === 'isAny' ) {
+					filters.author = filter.value;
+				} else if ( filter.operator === 'isNone' ) {
+					filters.author_exclude = filter.value;
+				}
 			}
 			// Handle date filters
-			if ( filter.field === 'date' ) {
-				filters.after = filter.value?.after;
-				filters.before = filter.value?.before;
+			if ( filter.field === 'date' || filter.field === 'modified' ) {
+				if ( filter.operator === 'before' ) {
+					filters.before = filter.value;
+				} else if ( filter.operator === 'after' ) {
+					filters.after = filter.value;
+				}
 			}
 			// Handle mime type filters
 			if ( filter.field === 'mime_type' ) {
@@ -194,11 +292,34 @@ export function MediaUploadModal( {
 			}
 		} );
 
-		// Base media type on allowedTypes if no filter is set
-		if ( ! filters.media_type ) {
-			filters.media_type = allowedTypes.includes( '*' )
-				? undefined
-				: allowedTypes;
+		// Base media and mime type on allowedTypes if no filter is set
+		if (
+			! filters.media_type &&
+			! filters.mime_type &&
+			allowedTypes &&
+			! allowedTypes.includes( '*' )
+		) {
+			const { mediaTypes, mimeTypes } = allowedTypes.reduce(
+				( acc, type ) => {
+					if ( type.endsWith( '/*' ) ) {
+						acc.mediaTypes.push( type.replace( '/*', '' ) );
+					} else if ( type.includes( '/' ) ) {
+						acc.mimeTypes.push( type );
+					} else {
+						acc.mediaTypes.push( type );
+					}
+
+					return acc;
+				},
+				{ mediaTypes: [] as string[], mimeTypes: [] as string[] }
+			);
+
+			if ( mediaTypes.length ) {
+				filters.media_type = mediaTypes;
+			}
+			if ( mimeTypes.length ) {
+				filters.mime_type = mimeTypes;
+			}
 		}
 
 		return {
@@ -208,9 +329,55 @@ export function MediaUploadModal( {
 			order: view.sort?.direction,
 			orderby: view.sort?.field,
 			search: view.search,
+			_embed: 'author,wp:attached-to',
 			...filters,
 		};
 	}, [ view, allowedTypes ] );
+
+	// Per-batch completion handler: auto-select uploaded items and refresh the grid.
+	const handleBatchComplete = useCallback(
+		( attachments: Partial< Attachment >[] ) => {
+			const uploadedIds = attachments
+				.map( ( attachment ) => String( attachment.id ) )
+				.filter( Boolean );
+
+			if ( multiple ) {
+				setSelection( ( prev ) => {
+					const existing = new Set( prev );
+					const newIds = uploadedIds.filter(
+						( id ) => ! existing.has( id )
+					);
+					return [ ...prev, ...newIds ];
+				} );
+			} else {
+				setSelection( uploadedIds.slice( 0, 1 ) );
+			}
+
+			// Invalidate all cached attachment queries so every page of
+			// results refreshes — not just the page the user is viewing.
+			invalidateAttachmentResolutions();
+		},
+		[ multiple, invalidateAttachmentResolutions ]
+	);
+
+	const {
+		uploadingFiles,
+		registerBatch,
+		dismissError,
+		clearCompleted,
+		allComplete,
+	} = useUploadStatus( { onBatchComplete: handleBatchComplete } );
+
+	const isPopoverOpenRef = useRef( false );
+	const handlePopoverOpenChange = useCallback(
+		( open: boolean ) => {
+			isPopoverOpenRef.current = open;
+			if ( ! open ) {
+				clearCompleted();
+			}
+		},
+		[ clearCompleted ]
+	);
 
 	// Fetch all media attachments using WordPress core data with permissions
 	const {
@@ -240,10 +407,14 @@ export function MediaUploadModal( {
 			altTextField as Field< RestAttachment >,
 			captionField as Field< RestAttachment >,
 			descriptionField as Field< RestAttachment >,
+			dateAddedField as Field< RestAttachment >,
+			dateModifiedField as Field< RestAttachment >,
+			authorField as Field< RestAttachment >,
 			filenameField as Field< RestAttachment >,
 			filesizeField as Field< RestAttachment >,
 			mediaDimensionsField as Field< RestAttachment >,
 			mimeTypeField as Field< RestAttachment >,
+			attachedToField as Field< RestAttachment >,
 		],
 		[]
 	);
@@ -252,7 +423,7 @@ export function MediaUploadModal( {
 		() => [
 			{
 				id: 'select',
-				label: multiple ? __( 'Select' ) : __( 'Select' ),
+				label: __( 'Select' ),
 				isPrimary: true,
 				supportsBulk: multiple,
 				async callback() {
@@ -282,32 +453,79 @@ export function MediaUploadModal( {
 						? transformedPosts
 						: transformedPosts?.[ 0 ];
 
+					removeAllNotices( 'snackbar', NOTICES_CONTEXT );
 					onSelect( selectedItems );
 				},
 			},
 		],
-		[ multiple, onSelect, selection ]
+		[ multiple, onSelect, selection, removeAllNotices ]
 	);
 
 	const handleModalClose = useCallback( () => {
+		removeAllNotices( 'snackbar', NOTICES_CONTEXT );
 		onClose?.();
-	}, [ onClose ] );
+	}, [ removeAllNotices, onClose ] );
+
+	useEffect( () => {
+		if ( ! isOpen ) {
+			setQueryParams( defaultQueryParams );
+		}
+	}, [ isOpen ] );
 
 	// Use onUpload if provided, otherwise fall back to uploadMedia
 	const handleUpload = onUpload || uploadMedia;
+
+	// Show success notice and auto-clear completed entries when all batches finish.
+	const prevAllCompleteRef = useRef( false );
+	useEffect( () => {
+		if ( allComplete && ! prevAllCompleteRef.current ) {
+			const completeCount = uploadingFiles.filter(
+				( file ) => file.status === 'uploaded'
+			).length;
+			if ( completeCount > 0 ) {
+				createSuccessNotice(
+					sprintf(
+						// translators: %s: number of files
+						_n(
+							'Uploaded %s file',
+							'Uploaded %s files',
+							completeCount
+						),
+						completeCount.toLocaleString()
+					),
+					{
+						type: 'snackbar',
+						context: NOTICES_CONTEXT,
+						id: NOTICE_ID_UPLOAD_PROGRESS,
+					}
+				);
+			}
+
+			// Auto-clear completed entries, unless the popover is
+			// open — in that case, they'll be cleared on close.
+			if ( ! isPopoverOpenRef.current ) {
+				clearCompleted();
+			}
+		}
+		prevAllCompleteRef.current = allComplete;
+	}, [ allComplete, uploadingFiles, createSuccessNotice, clearCompleted ] );
 
 	const handleFileSelect = useCallback(
 		( event: React.ChangeEvent< HTMLInputElement > ) => {
 			const files = event.target.files;
 			if ( files && files.length > 0 ) {
 				const filesArray = Array.from( files );
+				const { onFileChange, onError } = registerBatch( filesArray );
+
 				handleUpload( {
 					allowedTypes,
 					filesList: filesArray,
+					onFileChange,
+					onError,
 				} );
 			}
 		},
-		[ allowedTypes, handleUpload ]
+		[ allowedTypes, handleUpload, registerBatch ]
 	);
 
 	const paginationInfo = useMemo(
@@ -318,26 +536,12 @@ export function MediaUploadModal( {
 		[ totalItems, totalPages ]
 	);
 
-	const defaultLayouts = useMemo(
-		() => ( {
-			[ LAYOUT_PICKER_GRID ]: {
-				fields: [],
-				showTitle: false,
-			},
-			[ LAYOUT_PICKER_TABLE ]: {
-				fields: [ 'filename', 'filesize', 'media_dimensions' ],
-				showTitle: true,
-			},
-		} ),
-		[]
-	);
-
 	// Build accept attribute from allowedTypes
 	const acceptTypes = useMemo( () => {
-		if ( allowedTypes.includes( '*' ) ) {
+		if ( allowedTypes?.includes( '*' ) ) {
 			return undefined;
 		}
-		return allowedTypes.join( ',' );
+		return allowedTypes?.join( ',' );
 	}, [ allowedTypes ] );
 
 	if ( ! isOpen ) {
@@ -388,9 +592,14 @@ export function MediaUploadModal( {
 						);
 					}
 					if ( filteredFiles.length > 0 ) {
+						const { onFileChange, onError } =
+							registerBatch( filteredFiles );
+
 						handleUpload( {
 							allowedTypes,
 							filesList: filteredFiles,
+							onFileChange,
+							onError,
 						} );
 					}
 				} }
@@ -400,7 +609,7 @@ export function MediaUploadModal( {
 				data={ mediaRecords || [] }
 				fields={ fields }
 				view={ view }
-				onChangeView={ setView }
+				onChangeView={ handleChangeView }
 				actions={ actions }
 				selection={ selection }
 				onChangeSelection={ setSelection }
@@ -408,10 +617,54 @@ export function MediaUploadModal( {
 				paginationInfo={ paginationInfo }
 				defaultLayouts={ defaultLayouts }
 				getItemId={ ( item: RestAttachment ) => String( item.id ) }
-				search={ search }
-				searchLabel={ searchLabel }
 				itemListLabel={ __( 'Media items' ) }
-			/>
+				onReset={ isModified ? resetToDefault : false }
+			>
+				<Stack
+					direction="row"
+					align="top"
+					justify="space-between"
+					className="dataviews__view-actions"
+					gap="xs"
+				>
+					<Stack
+						direction="row"
+						gap="sm"
+						justify="start"
+						className="dataviews__search"
+					>
+						{ search && (
+							<DataViewsPicker.Search label={ searchLabel } />
+						) }
+						<DataViewsPicker.FiltersToggle />
+					</Stack>
+					<Stack direction="row" gap="xs" style={ { flexShrink: 0 } }>
+						<DataViewsPicker.LayoutSwitcher />
+						<DataViewsPicker.ViewConfig />
+					</Stack>
+				</Stack>
+				<DataViewsPicker.FiltersToggled className="dataviews-filters__container" />
+				<DataViewsPicker.Layout />
+				<div
+					className={ clsx( 'media-upload-modal__footer', {
+						'is-uploading': uploadingFiles.length > 0,
+					} ) }
+				>
+					<UploadStatusPopover
+						uploadingFiles={ uploadingFiles }
+						onDismissError={ dismissError }
+						onOpenChange={ handlePopoverOpenChange }
+					/>
+					<DataViewsPicker.Footer />
+				</div>
+			</DataViewsPicker>
+			{ createPortal(
+				<SnackbarNotices
+					className="media-upload-modal__snackbar"
+					context={ NOTICES_CONTEXT }
+				/>,
+				document.body
+			) }
 		</Modal>
 	);
 }

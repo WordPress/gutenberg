@@ -1,0 +1,69 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer components {
+		.link {
+			text-underline-offset: 0.2em;
+			text-decoration-thickness: from-font;
+		}
+
+		/* Brand tone */
+		.is-brand,
+		.is-brand:visited {
+			--_gcd-a-color: var(--wpds-color-foreground-interactive-brand);
+
+			color: var(--wpds-color-foreground-interactive-brand);
+		}
+
+		.is-brand:hover,
+		.is-brand:active {
+			--_gcd-a-color: var(--wpds-color-foreground-interactive-brand-active);
+
+			color: var(--wpds-color-foreground-interactive-brand-active);
+		}
+
+		/* Neutral tone */
+		.is-neutral,
+		.is-neutral:visited {
+			--_gcd-a-color: var(--wpds-color-foreground-interactive-neutral);
+
+			color: var(--wpds-color-foreground-interactive-neutral);
+			text-decoration-color: var(--wpds-color-stroke-interactive-neutral);
+		}
+
+		.is-neutral:hover,
+		.is-neutral:active {
+			--_gcd-a-color: var(--wpds-color-foreground-interactive-neutral-active);
+
+			color: var(--wpds-color-foreground-interactive-neutral-active);
+		}
+
+		/* Unstyled variant */
+		.is-unstyled {
+			--_gcd-a-color: inherit;
+
+			color: inherit;
+			text-decoration: none;
+		}
+
+		/* Link icon pattern — arrow rendered via ::after pseudo-element to avoid
+		 * Twemoji replacement and text-selection issues. The icon is an
+		 * inline-block so the link underline stays scoped to the text. */
+
+		.link-icon {
+			line-height: 1;
+			display: inline-block;
+			margin-inline-start: var(--wpds-dimension-padding-xs);
+			font-weight: var(--wpds-typography-font-weight-regular);
+			text-decoration: none;
+		}
+
+		.link-icon::after {
+			content: "\2197";
+		}
+
+		.link-icon:dir(rtl)::after {
+			content: "\2196";
+		}
+	}
+}

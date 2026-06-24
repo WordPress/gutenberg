@@ -1,0 +1,132 @@
+/**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+import {
+	useBlockProps,
+	useInnerBlocksProps,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useMemo, useEffect } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import Controls from './controls';
+
+const TEMPLATE = [
+	[
+		'core/paragraph',
+		{
+			placeholder: __( 'Type / to choose a block' ),
+		},
+	],
+];
+
+export default function Edit( { clientId, context, isSelected } ) {
+	// Consume tab indices from context
+	const activeTabIndex = context[ 'core/tabs-activeTabIndex' ];
+	const editorActiveTabIndex = context[ 'core/tabs-editorActiveTabIndex' ];
+	const effectiveActiveIndex = editorActiveTabIndex ?? activeTabIndex;
+
+	const { blockIndex, hasInnerBlocksSelected, tabsClientId } = useSelect(
+		( select ) => {
+			const {
+				getBlockRootClientId,
+				getBlockIndex,
+				hasSelectedInnerBlock,
+			} = select( blockEditorStore );
+
+			// Get the tab-panel parent first
+			const tabPanelsClientId = getBlockRootClientId( clientId );
+			// Then get the tabs parent
+			const _tabsClientId = getBlockRootClientId( tabPanelsClientId );
+
+			// Get data about this instance of core/tab.
+			const _blockIndex = getBlockIndex( clientId );
+			const _hasInnerBlocksSelected = hasSelectedInnerBlock(
+				clientId,
+				true
+			);
+
+			return {
+				blockIndex: _blockIndex,
+				hasInnerBlocksSelected: _hasInnerBlocksSelected,
+				tabsClientId: _tabsClientId,
+			};
+		},
+		[ clientId ]
+	);
+
+	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
+
+	// Sync editorActiveTabIndex when this tab is selected directly
+	useEffect( () => {
+		// Only update if this tab is selected and not already the active index
+		const isTabSelected = isSelected || hasInnerBlocksSelected;
+		if (
+			isTabSelected &&
+			tabsClientId &&
+			effectiveActiveIndex !== blockIndex
+		) {
+			// Mark as non-persistent so it doesn't add to undo history
+			__unstableMarkNextChangeAsNotPersistent();
+			updateBlockAttributes( tabsClientId, {
+				editorActiveTabIndex: blockIndex,
+			} );
+		}
+	}, [
+		isSelected,
+		hasInnerBlocksSelected,
+		tabsClientId,
+		effectiveActiveIndex,
+		blockIndex,
+		updateBlockAttributes,
+		__unstableMarkNextChangeAsNotPersistent,
+	] );
+
+	// Determine if this is the currently active tab (for editor visibility)
+	const isActiveTab = effectiveActiveIndex === blockIndex;
+
+	// Determine if this is the default tab (for the "Default Tab" toggle in controls)
+	const isDefaultTab = activeTabIndex === blockIndex;
+
+	/**
+	 * This hook determines if the current tab panel should be visible.
+	 * This is true if it is the editor active tab, or if it is selected directly.
+	 */
+	const isSelectedTab = useMemo( () => {
+		// Show if this tab is directly selected or has selected inner blocks
+		if ( isSelected || hasInnerBlocksSelected ) {
+			return true;
+		}
+		// Always show the active tab (at effectiveActiveIndex) regardless of other selection state.
+		// This ensures the tab panel remains visible when editing labels in tab-list.
+		if ( isActiveTab ) {
+			return true;
+		}
+		return false;
+	}, [ isSelected, hasInnerBlocksSelected, isActiveTab ] );
+
+	const blockProps = useBlockProps( {
+		hidden: ! isSelectedTab,
+		tabIndex: isSelectedTab ? 0 : -1,
+	} );
+
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		template: TEMPLATE,
+	} );
+
+	return (
+		<section { ...innerBlocksProps }>
+			<Controls
+				tabsClientId={ tabsClientId }
+				blockIndex={ blockIndex }
+				isDefaultTab={ isDefaultTab }
+			/>
+			{ isSelectedTab && innerBlocksProps.children }
+		</section>
+	);
+}

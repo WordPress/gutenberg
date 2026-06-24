@@ -1,0 +1,12 @@
+[
+	{
+		"name": "core/icon",
+		"isValid": true,
+		"attributes": {
+			"flipHorizontal": false,
+			"flipVertical": false,
+			"rotation": 0
+		},
+		"innerBlocks": []
+	}
+]

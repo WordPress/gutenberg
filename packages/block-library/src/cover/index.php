@@ -39,13 +39,13 @@ function render_block_core_cover( $attributes, $content ) {
 				$lower_src = strtolower( $iframe_src );
 				$provider  = null;
 
-				if ( strpos( $lower_src, 'youtube.com' ) !== false || strpos( $lower_src, 'youtu.be' ) !== false ) {
+				if ( str_contains( $lower_src, 'youtube.com' ) || str_contains( $lower_src, 'youtu.be' ) ) {
 					$provider = 'youtube';
-				} elseif ( strpos( $lower_src, 'vimeo.com' ) !== false ) {
+				} elseif ( str_contains( $lower_src, 'vimeo.com' ) ) {
 					$provider = 'vimeo';
-				} elseif ( strpos( $lower_src, 'videopress.com' ) !== false ) {
+				} elseif ( str_contains( $lower_src, 'videopress.com' ) ) {
 					$provider = 'videopress';
-				} elseif ( strpos( $lower_src, 'wordpress.tv' ) !== false ) {
+				} elseif ( str_contains( $lower_src, 'wordpress.tv' ) ) {
 					$provider = 'wordpress-tv';
 				}
 
@@ -66,6 +66,14 @@ function render_block_core_cover( $attributes, $content ) {
 						$query_params['controls']       = '0';
 						$query_params['modestbranding'] = '1';
 						$query_params['playsinline']    = '1';
+
+						// For loop to work, we need the playlist parameter.
+						$path          = $parsed_url['path'] ?? '';
+						$path_segments = explode( '/', $path );
+						$video_id      = end( $path_segments );
+						if ( $video_id ) {
+								$query_params['playlist'] = $video_id;
+						}
 					} elseif ( 'vimeo' === $provider ) {
 						$query_params['autoplay']    = '1';
 						$query_params['muted']       = '1';

@@ -69,7 +69,7 @@ test.describe( 'Template Part', () => {
 		await editor.insertBlock( { name: 'core/template-part' } );
 		await editor.canvas.locator( 'role=button[name="Choose"i]' ).click();
 		await page.click(
-			'role=listbox[name="Block Patterns"i] >> role=option[name="header"i]'
+			'role=listbox[name="Patterns"i] >> role=option[name="header"i]'
 		);
 
 		// There are now two header template parts.
@@ -176,6 +176,7 @@ test.describe( 'Template Part', () => {
 	test( 'can detach blocks from a template part', async ( {
 		admin,
 		editor,
+		page,
 	} ) => {
 		const paragraphText = 'Test 3';
 
@@ -210,10 +211,55 @@ test.describe( 'Template Part', () => {
 		// Detach the paragraph from the header template part.
 		await editor.selectBlocks( templatePartWithParagraph );
 		await editor.clickBlockOptionsMenuItem( 'Detach' );
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Detach' } )
+			.click();
 
 		// There should be a paragraph but no header template part.
 		await expect( paragraph ).toBeVisible();
 		await expect( templatePartWithParagraph ).toBeHidden();
+	} );
+
+	test( 'shows the source block for a pattern wrapper in focus mode', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const templatePart = await requestUtils.createTemplate(
+			'wp_template_part',
+			{
+				slug: 'pattern-header',
+				title: 'Pattern Header',
+				content: `<!-- wp:group {"metadata":{"patternName":"theme/header-wrapper","name":"Header"},"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:paragraph -->
+<p>Template part content</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->`,
+			}
+		);
+
+		await admin.visitSiteEditor( {
+			postId: templatePart.id,
+			postType: 'wp_template_part',
+			canvas: 'edit',
+		} );
+
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Group' } )
+		);
+		await editor.openDocumentSettingsSidebar();
+
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		const blockHeading = editorSettings
+			.getByRole( 'tabpanel', { name: 'Block' } )
+			.getByRole( 'heading' )
+			.first();
+
+		await expect( blockHeading ).toHaveAccessibleName( 'Header Group' );
 	} );
 
 	test( 'shows changes in a template when a template part it contains is modified', async ( {
@@ -348,6 +394,7 @@ test.describe( 'Template Part', () => {
 
 		// Go to Block Inspector -> Advanced.
 		await editor.openDocumentSettingsSidebar();
+		await page.getByRole( 'tab', { name: 'Settings' } ).click();
 		await page.getByRole( 'button', { name: 'Advanced' } ).click();
 
 		// Verify that the widget area import button is not there.
@@ -409,6 +456,6 @@ test.describe( 'Template Part', () => {
 		// Undo the change.
 		await pageUtils.pressKeys( 'primary+z' );
 
-		await expect( paragraph ).toBeFocused();
+		await expect( siteTitleInGroup ).toHaveClass( /is-selected/ );
 	} );
 } );

@@ -352,8 +352,7 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 			$hook_suffix = 'block-editor-assets';
 
 			// Remove unwanted scripts/styles.
-			remove_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_command_palette_assets', 9 );
-			remove_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_command_palette_assets' );
+			remove_action( 'admin_enqueue_scripts', 'wp_enqueue_command_palette_assets' );
 			remove_action( 'admin_enqueue_scripts', 'wp_auth_check_load' );
 			remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
 			remove_action( 'admin_print_styles', 'print_emoji_styles' );
@@ -437,6 +436,9 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 		 *
 		 * @since Gutenberg 5.8.0
 		 *
+		 * @global WP_Scripts $wp_scripts WordPress scripts objects.
+		 * @global WP_Styles  $wp_styles  WordPress styles objects.
+		 *
 		 * @param array $html_templates Optional. Array of HTML template strings.
 		 * @return array Structured asset data.
 		 */
@@ -456,7 +458,7 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 
 			// Get boot module asset file for dependencies.
 			$boot_asset_file   = include __DIR__ . '/../../build/modules/boot/index.min.asset.php';
-			$boot_dependencies = isset( $boot_asset_file['dependencies'] ) ? $boot_asset_file['dependencies'] : array();
+			$boot_dependencies = $boot_asset_file['dependencies'] ?? array();
 
 			// Get all dependencies that should be excluded (boot dependencies + their deep dependencies).
 			$excluded_scripts = $this->get_all_dependencies( $boot_dependencies, $wp_scripts );
@@ -550,7 +552,15 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 			$registered     = array();
 			$reflection     = new ReflectionClass( $script_modules );
 			$property       = $reflection->getProperty( 'registered' );
-			$property->setAccessible( true );
+			/*
+			 * ReflectionProperty::setAccessible is:
+			 * - needed until 8.1.0, as property `registered` is private.
+			 * - redundant as of 8.1.0, which made non-public reflection accessible by default.
+			 * - deprecated as of 8.5.0.
+			 */
+			if ( PHP_VERSION_ID < 80100 ) {
+				$property->setAccessible( true );
+			}
 			$registered = $property->getValue( $script_modules );
 			$import_map = array();
 			foreach ( $registered as $id => $module ) {

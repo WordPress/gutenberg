@@ -1,0 +1,40 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer components {
+		.input {
+			--_gcd-input-padding:
+				var(--wp-ui-input-padding-block, 0)
+				var(--wp-ui-input-layout-padding-inline, 0);
+
+			padding-block: var(--wp-ui-input-padding-block, 0);
+			padding-inline: var(--wp-ui-input-layout-padding-inline, 0);
+			width: 100%;
+			background: transparent;
+			border: none;
+			outline: none;
+			color: var(--wpds-color-foreground-interactive-neutral);
+			font-family: inherit;
+			font-size: inherit;
+			line-height: inherit;
+
+			&::placeholder {
+				color: var(--wpds-color-foreground-interactive-neutral-disabled);
+			}
+
+			&:disabled,
+			&[aria-disabled="true"] {
+				color: var(--wpds-color-foreground-interactive-neutral-disabled);
+
+				@media ( forced-colors: active ) {
+					color: GrayText;
+				}
+			}
+
+			&[type="email"],
+			&[type="url"] {
+				direction: ltr; /* maintain LTR in RTL languages */
+			}
+		}
+	}
+}

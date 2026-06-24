@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/nux",
-	"version": "9.36.0",
-	"description": "NUX (New User eXperience) module for WordPress.",
+	"version": "10.1.0",
+	"description": "Deprecated no-op NUX (New User eXperience) compatibility module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
@@ -30,18 +30,16 @@
 		"build-types",
 		"*.md"
 	],
-	"type": "module",
 	"main": "build/index.cjs",
-	"module": "build-module/index.js",
+	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
-			"import": "./build-module/index.js",
+			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json",
 		"./build-style/": "./build-style/"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"sideEffects": [
 		"build-style/**",
@@ -50,18 +48,17 @@
 		"src/store/index.js",
 		"build/index.cjs",
 		"build/store/index.cjs",
-		"build-module/index.js",
-		"build-module/store/index.js"
+		"build-module/index.mjs",
+		"build-module/store/index.mjs"
 	],
 	"dependencies": {
-		"@wordpress/base-styles": "file:../base-styles",
-		"@wordpress/components": "file:../components",
-		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
-		"@wordpress/deprecated": "file:../deprecated",
-		"@wordpress/element": "file:../element",
-		"@wordpress/i18n": "file:../i18n",
-		"@wordpress/icons": "file:../icons"
+		"@wordpress/deprecated": "file:../deprecated"
+	},
+	"devDependencies": {
+		"@testing-library/dom": "^10.4.1",
+		"@testing-library/react": "^16.3.2",
+		"@testing-library/user-event": "^14.6.1"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",

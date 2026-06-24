@@ -104,7 +104,7 @@ Use the full directory and filename from the Gutenberg repository, not the publi
 An example, the link to this page is: `/docs/contributors/documentation/README.md`
 
 <div class="callout callout-warning">
-<b>Note:</b> The usual link transformation is not applied to links in callouts. See below. 
+<b>Note:</b> The usual link transformation is not applied to links in callouts. See below.
 </div>
 
 ### Code examples
@@ -144,6 +144,7 @@ The recommended way to implement in markdown is to use the raw HTML and `callout
 
 The following classes are available: `info`, `tip`, `alert`, `warning`
 
+```html
 <div class="callout callout-tip">
 This is a **tip** callout.
 </div>
@@ -159,15 +160,15 @@ This is an **alert** callout.
 <div class="callout callout-warning">
 This is a **warning** callout.
 </div>
+```
 
-<div class="callout callout-warning">
-Note: In callout notices, links also need to be HTML `&lt;a href>&lt;/a>` notations. 
+Note: In callout notices, links also need to be HTML `<a href=""></a>` notations.
 The usual link transformation is not applied to links in callouts.
 For instance, to reach the Getting started > Create Block page, the URL in GitHub is
-https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-create-block/
-and will have to be hardcoded for the endpoint in the Block Editor Handbook as 
-<a href="https://developer.wordpress.org/block-editor/getting-started/create-block/">https://developer.wordpress.org/block-editor/getting-started/create-block/</a> to link correctly in the handbook. 
-</div>
+https://github.com/WordPress/gutenberg/blob/trunk/docs/getting-started/devenv/get-started-with-create-block.md/
+and will have to be hardcoded for the endpoint in the Block Editor Handbook as
+`<a href="https://developer.wordpress.org/block-editor/getting-started/create-block/">https://developer.wordpress.org/block-editor/getting-started/create-block/</a>`
+to link correctly in the handbook.
 ### Editor config
 
 You should configure your editor to use Prettier to auto-format markdown documents. See the [Getting Started documentation](/docs/contributors/code/getting-started-with-code-contribution.md) for complete details.
@@ -189,7 +190,7 @@ Depending on where you are viewing this document, the brackets may show as doubl
 
 Videos in the Block Editor Handbook need to be hosted on the [WordPress YouTube channel](https://www.youtube.com/@WordPress) as unlisted videos. This process requires additional permissions. Reach out in the #marketing Slack channel for assistance.
 
-Once the video has been uploaded to YouTube, retrieve the video embed link. It should look something like this: 
+Once the video has been uploaded to YouTube, retrieve the video embed link. It should look something like this:
 
 ```
 https://www.youtube.com/embed/nrut8SfXA44?si=YxvmHmAoYx-BDCog

@@ -2,6 +2,83 @@
 
 ## Unreleased
 
+## 11.9.0 (2026-06-24)
+
+## 11.8.1 (2026-06-16)
+
+## 11.8.0 (2026-06-10)
+
+### Enhancements
+
+-   Use partial clones (`--filter=blob:none`) when downloading git sources and the PHPUnit test suite to reduce download size. ([#78918](https://github.com/WordPress/gutenberg/pull/78918))
+
+### Bug Fixes
+
+-   Replace `extract-zip` with `adm-zip` to fix silent hang on Node 24.16.0 (libuv 1.52.1) when downloading URL-based zip sources. ([#78762](https://github.com/WordPress/gutenberg/issues/78762))
+
+## 11.7.0 (2026-05-27)
+
+## 11.6.0 (2026-05-14)
+
+## 11.5.0 (2026-04-29)
+
+## 11.4.0 (2026-04-15)
+
+### Bug Fixes
+
+-   Fix WP-Cron, REST API loopback, and Site Health loopback failures when wp-env runs on a non-default port. Apache inside the WordPress container now also listens on the host-mapped port, so PHP loopback requests to `WP_HOME` succeed instead of being refused. ([#20569](https://github.com/WordPress/gutenberg/issues/20569))
+
+## 11.3.0 (2026-04-01)
+
+## 11.2.0 (2026-03-18)
+
+## 11.1.0 (2026-03-04)
+
+### Bug Fixes
+
+-   Suppress spinner and success message output when using `--json` flag to ensure clean, parseable JSON output.
+
+## 11.0.0 (2026-02-18)
+
+### Bug Fixes
+
+-   Playground runtime now supports zip archive themes, matching Docker runtime behavior. ([#75140](https://github.com/WordPress/gutenberg/issues/75140)).
+-   Add MySQL healthcheck to prevent race condition where WordPress containers start before MySQL is fully initialized. Uses MariaDB's official `healthcheck.sh` script with `MARIADB_AUTO_UPGRADE` to support both new and existing installations.
+-   Remove non-functional `WP_ENV_MULTISITE` config.
+
+### New Features
+
+-   Added `--auto-port` flag to the `start` command. When passed, `wp-env` automatically finds available ports if the configured ports are busy. Without this flag, ports default to `8888`/`8889` and Docker reports an error if they are busy (matching pre-existing behavior).
+
+### Breaking Changes
+
+-   Pretty permalinks (`/%year%/%monthnum%/%day%/%postname%/`) are now enabled by default, matching WordPress core behavior on fresh installs. Previously, plain permalinks were used because the loopback test that WordPress runs during installation fails inside Docker.
+-   The `port` option now defaults to `null` (auto-select) instead of `8888`. When `null`, `wp-env` tries port 8888 (or 8889 for tests) first, then falls back to an available ephemeral port. Set an explicit port number to preserve the previous behavior.
+-   Replaced `install-path` command with `status` command. The work directory path is now available as part of the status output.
+
+### New Features
+
+-   Added `phpmyadmin` boolean configuration option to enable phpMyAdmin. Setting `phpmyadminPort` also enables phpMyAdmin for backward compatibility.
+-   Added phpMyAdmin support to the Playground runtime. When enabled, phpMyAdmin is available at `http://localhost:<port>/phpmyadmin`.
+-   Added `status` command that shows comprehensive environment information including running state, URLs, ports, configuration, and paths.
+-   Added `--config` global option to specify a custom configuration file path, enabling multiple parallel environments from the same directory.
+-   Added `testsEnvironment` configuration option. Set to `false` to skip creating test containers (`tests-mysql`, `tests-wordpress`, `tests-cli`, `tests-phpmyadmin`), reducing resource usage when test isolation is achieved via separate config files.
+
+## 10.39.0 (2026-01-29)
+
+### New Features
+
+-   Add experimental WordPress Playground runtime support. Use `--runtime=playground` flag to start wp-env with Playground instead of Docker.
+-   Add `cleanup` command to remove environment-specific resources (containers, volumes, networks, and local files) while preserving Docker images for faster re-starts.
+-   Add `--force` flag to both `destroy` and `cleanup` commands to skip the confirmation prompt.
+-   Rename `clean` command to `reset` for clarity. The `clean` command is now deprecated but still works as an alias.
+
+### Deprecation
+
+-   The `clean` command is deprecated. Use `reset` instead. The `afterClean` lifecycle script is also deprecated in favor of `afterReset`.
+
+## 10.38.0 (2026-01-16)
+
 ## 10.36.0 (2025-11-26)
 
 ## 10.35.0 (2025-11-12)

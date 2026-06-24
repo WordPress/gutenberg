@@ -1,19 +1,11 @@
-/**
- * External dependencies
- */
 import {
+	ColorSpace,
 	get,
 	toGamut,
 	OKLCH,
 	sRGB,
 	type PlainColorObject,
-	type ColorSpace,
 } from 'colorjs.io/fn';
-
-/**
- * Internal dependencies
- */
-import './register-color-spaces';
 
 export interface TaperChromaOptions {
 	gamut?: ColorSpace; // target gamut (default `sRGB`)
@@ -44,6 +36,10 @@ export function taperChroma(
 	lTarget: number, // [0..1]
 	options: TaperChromaOptions = {}
 ): { l: number; c: number } | PlainColorObject {
+	// Workaround for upstream toGamut(method:'css') bug.
+	// https://github.com/color-js/color.js/pull/734
+	ColorSpace.register( OKLCH );
+
 	const gamut = options.gamut ?? sRGB;
 	const alpha = options.alpha ?? 0.65; // 0.7-0.8 works well for accent surface
 	const carry = options.carry ?? 0.5;
@@ -55,10 +51,10 @@ export function taperChroma(
 	const achromaEpsilon = options.achromaEpsilon ?? 0.005;
 
 	const cSeed = Math.max( 0, get( seed, [ OKLCH, 'c' ] ) );
-	let hSeed = Number( get( seed, [ OKLCH, 'h' ] ) );
+	let hSeed = get( seed, [ OKLCH, 'h' ] );
 
 	const chromaIsTiny = cSeed < achromaEpsilon;
-	const hueIsInvalid = ! Number.isFinite( hSeed );
+	const hueIsInvalid = hSeed === null || ! Number.isFinite( hSeed );
 
 	if ( chromaIsTiny || hueIsInvalid ) {
 		if ( typeof options.hueFallback === 'number' ) {

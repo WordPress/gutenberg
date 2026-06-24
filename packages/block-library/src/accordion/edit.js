@@ -147,7 +147,6 @@ export default function Edit( {
 						}
 					>
 						<ToggleControl
-							isBlock
 							label={ __( 'Auto-close' ) }
 							onChange={ ( value ) => {
 								setAttributes( {
@@ -167,7 +166,6 @@ export default function Edit( {
 						onDeselect={ () => setAttributes( { showIcon: true } ) }
 					>
 						<ToggleControl
-							isBlock
 							label={ __( 'Show icon' ) }
 							onChange={ ( value ) => {
 								setAttributes( {

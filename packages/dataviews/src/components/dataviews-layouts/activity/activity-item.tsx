@@ -6,10 +6,10 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { VisuallyHidden } from '@wordpress/components';
 import { useRef, useContext, useMemo } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
-import { Stack } from '@wordpress/ui';
+import { useViewportMatch } from '@wordpress/compose';
+import { Stack, VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -67,6 +67,7 @@ function ActivityItem< Item >(
 		};
 	}, [ actions, item ] );
 
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const density = view.layout?.density ?? 'balanced';
 	const mediaContent =
 		showMedia && density !== 'compact' && mediaField?.render ? (
@@ -98,9 +99,9 @@ function ActivityItem< Item >(
 	const verticalGap = useMemo( () => {
 		switch ( density ) {
 			case 'comfortable':
-				return 'sm';
+				return 'md';
 			default:
-				return 'xs';
+				return 'sm';
 		}
 	}, [ density ] );
 
@@ -119,10 +120,10 @@ function ActivityItem< Item >(
 				density === 'comfortable' && 'is-comfortable'
 			) }
 		>
-			<Stack direction="row" gap="md" justify="start" align="flex-start">
+			<Stack direction="row" gap="lg" justify="start" align="flex-start">
 				<Stack
 					direction="column"
-					gap="2xs"
+					gap="xs"
 					align="center"
 					className="dataviews-view-activity__item-type"
 				>
@@ -160,8 +161,8 @@ function ActivityItem< Item >(
 								className="dataviews-view-activity__item-field"
 							>
 								<VisuallyHidden
-									as="span"
 									className="dataviews-view-activity__item-field-label"
+									render={ <span /> }
 								>
 									{ field.label }
 								</VisuallyHidden>
@@ -183,7 +184,12 @@ function ActivityItem< Item >(
 						/>
 					) }
 				</Stack>
-				{ primaryActions.length < eligibleActions.length && (
+				{ ( primaryActions.length < eligibleActions.length ||
+					// Since we hide primary actions on mobile, we need to show the menu
+					// there if there are any actions at all.
+					( isMobileViewport &&
+						// At the same time, only show the menu if there are actions to show.
+						eligibleActions.length > 0 ) ) && (
 					<div className="dataviews-view-activity__item-actions">
 						<ItemActions
 							item={ item }

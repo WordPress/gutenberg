@@ -54,15 +54,12 @@ function BlockKeyboardShortcuts() {
 		const sourceTextAlign =
 			attributes.textAlign || attributes.style?.typography?.textAlign;
 
-		// When destination is heading, preserve heading format (textAlign attribute + level)
-		// When destination is paragraph, use block support format (style.typography.textAlign)
+		// When destination is heading, set the level
 		if ( destinationBlockName === 'core/heading' ) {
 			newAttributes.level = level;
-			if ( sourceTextAlign ) {
-				newAttributes.textAlign = sourceTextAlign;
-			}
-		} else if ( sourceTextAlign ) {
-			// Destination is paragraph
+		}
+
+		if ( sourceTextAlign ) {
 			newAttributes.style = {
 				typography: {
 					textAlign: sourceTextAlign,

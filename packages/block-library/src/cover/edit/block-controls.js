@@ -11,13 +11,13 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-import { MenuItem } from '@wordpress/components';
-import { link } from '@wordpress/icons';
+import { MenuItem, ToolbarButton } from '@wordpress/components';
+import { crop, link } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import { ALLOWED_MEDIA_TYPES } from '../shared';
+import { ALLOWED_MEDIA_TYPES, EMBED_VIDEO_BACKGROUND_TYPE } from '../shared';
 import { unlock } from '../../lock-unlock';
 import EmbedVideoUrlInput from './embed-video-url-input';
 
@@ -31,10 +31,19 @@ export default function CoverBlockControls( {
 	toggleUseFeaturedImage,
 	onClearMedia,
 	onSelectEmbedUrl,
+	onEditMedia,
+	editMediaButtonRef,
+	showEditMediaButton,
 	blockEditingMode,
 } ) {
-	const { contentPosition, id, useFeaturedImage, minHeight, minHeightUnit } =
-		attributes;
+	const {
+		contentPosition,
+		id,
+		useFeaturedImage,
+		minHeight,
+		minHeightUnit,
+		backgroundType,
+	} = attributes;
 	const { hasInnerBlocks, url } = currentSettings;
 
 	const [ prevMinHeightValue, setPrevMinHeightValue ] = useState( minHeight );
@@ -100,6 +109,15 @@ export default function CoverBlockControls( {
 						onToggle={ toggleMinFullHeight }
 						isDisabled={ ! hasInnerBlocks }
 					/>
+					{ showEditMediaButton && (
+						<ToolbarButton
+							ref={ editMediaButtonRef }
+							icon={ crop }
+							label={ __( 'Crop background image' ) }
+							onClick={ onEditMedia }
+							aria-haspopup="dialog"
+						/>
+					) }
 				</BlockControls>
 			) }
 			<BlockControls group="other">
@@ -133,6 +151,11 @@ export default function CoverBlockControls( {
 						onSelectEmbedUrl( embedUrl );
 					} }
 					onClose={ () => setIsEmbedUrlInputOpen( false ) }
+					initialUrl={
+						backgroundType === EMBED_VIDEO_BACKGROUND_TYPE
+							? url
+							: ''
+					}
 				/>
 			) }
 		</>

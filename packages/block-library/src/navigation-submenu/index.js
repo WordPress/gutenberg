@@ -33,10 +33,13 @@ export const settings = {
 
 		const customName = attributes?.metadata?.name;
 
-		// In the list view, use the block's menu label as the label.
+		// In the list view and breadcrumb, use the block's menu label as the label.
 		// If the menu label is empty, fall back to the default label.
-		if ( context === 'list-view' && ( customName || label ) ) {
-			return attributes?.metadata?.name || label;
+		if (
+			( context === 'list-view' || context === 'breadcrumb' ) &&
+			customName
+		) {
+			return customName;
 		}
 
 		return label;
@@ -57,21 +60,26 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		{
 			id: 'label',
 			label: __( 'Label' ),
-			type: 'richtext',
+			type: 'text',
+			Edit: 'rich-text', //TODO: replace with custom component
 		},
 		{
 			id: 'link',
 			label: __( 'Link' ),
-			type: 'link',
-			mapping: {
-				href: 'url',
-				rel: 'rel',
-				// TODO - opens in new tab? id?
-			},
+			type: 'url',
+			Edit: 'link', // TODO: replace with custom component
+			getValue: ( { item } ) => ( {
+				url: item.url,
+				rel: item.rel,
+			} ),
+			setValue: ( { value } ) => ( {
+				url: value.url,
+				rel: value.rel,
+			} ),
 		},
 	];
 	settings[ formKey ] = {
-		fields: [ 'label' ],
+		fields: [ 'label', 'link' ],
 	};
 }
 

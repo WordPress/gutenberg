@@ -50,10 +50,11 @@ import {
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { useBlockLock } from '../block-lock';
+import { useBlockRename, BlockRenameModal } from '../block-rename';
 import AriaReferencedText from './aria-referenced-text';
 import { unlock } from '../../lock-unlock';
 import usePasteStyles from '../use-paste-styles';
-import { cleanEmptyObject } from '../../hooks/utils';
+import { getBlockVisibilityLabel } from '../block-visibility';
 
 function ListViewBlock( {
 	block: { clientId },
@@ -79,7 +80,7 @@ function ListViewBlock( {
 	const settingsRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ settingsAnchorRect, setSettingsAnchorRect ] = useState();
-
+	const [ isRenameModalOpen, setIsRenameModalOpen ] = useState( false );
 	const { isLocked } = useBlockLock( clientId );
 
 	const isFirstSelectedBlock =
@@ -96,8 +97,9 @@ function ListViewBlock( {
 		removeBlocks,
 		insertAfterBlock,
 		insertBeforeBlock,
-		updateBlockAttributes,
+		showViewportModal,
 	} = unlock( useDispatch( blockEditorStore ) );
+
 	const debouncedToggleBlockHighlight = useDebounce(
 		toggleBlockHighlight,
 		50
@@ -110,6 +112,7 @@ function ListViewBlock( {
 		getBlockRootClientId,
 		getBlockOrder,
 		getBlockParents,
+		getBlockEditingMode,
 		getBlocksByClientId,
 		canEditBlock,
 		canMoveBlock,
@@ -122,25 +125,22 @@ function ListViewBlock( {
 
 	const pasteStyles = usePasteStyles();
 
-	const { block, blockName, allowRightClickOverrides, isBlockHidden } =
-		useSelect(
-			( select ) => {
-				const { getBlock, getBlockName, getSettings } =
-					select( blockEditorStore );
-				const { isBlockHidden: _isBlockHidden } = unlock(
-					select( blockEditorStore )
-				);
+	const { block, blockName, allowRightClickOverrides } = useSelect(
+		( select ) => {
+			const { getBlock, getBlockName, getSettings } = unlock(
+				select( blockEditorStore )
+			);
 
-				return {
-					block: getBlock( clientId ),
-					blockName: getBlockName( clientId ),
-					allowRightClickOverrides:
-						getSettings().allowRightClickOverrides,
-					isBlockHidden: _isBlockHidden( clientId ),
-				};
-			},
-			[ clientId ]
-		);
+			return {
+				block: getBlock( clientId ),
+				blockName: getBlockName( clientId ),
+				allowRightClickOverrides:
+					getSettings().allowRightClickOverrides,
+			};
+		},
+		[ clientId ]
+	);
+	const { canRename } = useBlockRename( blockName );
 
 	const showBlockActions =
 		// When a block hides its toolbar it also hides the block settings menu,
@@ -373,30 +373,34 @@ function ListViewBlock( {
 			event.preventDefault();
 			const { blocksToUpdate } = getBlocksToUpdate();
 			const blocks = getBlocksByClientId( blocksToUpdate );
-			const canToggleVisibility = blocks.every( ( blockToUpdate ) =>
-				hasBlockSupport( blockToUpdate.name, 'visibility', true )
+			const supportsBlockVisibility = blocks.every( ( _block ) =>
+				hasBlockSupport( _block.name, 'visibility', true )
 			);
-			if ( ! canToggleVisibility ) {
+
+			if ( ! supportsBlockVisibility ) {
 				return;
 			}
-			const hasHiddenBlock = blocks.some(
-				( blockToUpdate ) =>
-					blockToUpdate.attributes.metadata?.blockVisibility === false
-			);
-			const attributesByClientId = Object.fromEntries(
-				blocks.map( ( { clientId: mapClientId, attributes } ) => [
-					mapClientId,
-					{
-						metadata: cleanEmptyObject( {
-							...attributes?.metadata,
-							blockVisibility: hasHiddenBlock ? undefined : false,
-						} ),
-					},
-				] )
-			);
-			updateBlockAttributes( blocksToUpdate, attributesByClientId, {
-				uniqueByBlock: true,
-			} );
+
+			// Don't allow visibility toggle for blocks that
+			// are not in the default editing mode.
+			if (
+				blocksToUpdate.some(
+					( id ) => getBlockEditingMode( id ) !== 'default'
+				)
+			) {
+				return;
+			}
+
+			// Open the visibility breakpoints modal.
+			showViewportModal( blocksToUpdate );
+		} else if ( isMatch( 'core/block-editor/rename', event ) ) {
+			const { blocksToUpdate } = getBlocksToUpdate();
+			const isContentOnly =
+				getBlockEditingMode( blocksToUpdate[ 0 ] ) === 'contentOnly';
+			if ( blocksToUpdate.length === 1 && canRename && ! isContentOnly ) {
+				event.preventDefault();
+				setIsRenameModalOpen( true );
+			}
 		}
 	}
 
@@ -411,7 +415,12 @@ function ListViewBlock( {
 
 	const selectEditorBlock = useCallback(
 		( event ) => {
-			selectBlock( event, clientId );
+			// For keyboard activation (Enter/Space on a link), transfer focus
+			// to the canvas with the caret at the end of the block.
+			// For mouse clicks, keep focus in the list view so that subsequent
+			// keyboard operations (arrow navigation, copy/paste) still work.
+			const isKeyboardActivation = event?.detail === 0;
+			selectBlock( event, clientId, isKeyboardActivation ? -1 : null );
 			event.preventDefault();
 		},
 		[ clientId, selectBlock ]
@@ -524,9 +533,10 @@ function ListViewBlock( {
 		isLocked
 	);
 
-	const blockVisibilityDescription = isBlockHidden
-		? __( 'Block is hidden.' )
-		: null;
+	// Determine label based on where block is hidden (not when/current viewport)
+	const blockVisibilityDescription = getBlockVisibilityLabel(
+		block?.attributes?.metadata?.blockVisibility
+	);
 
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
@@ -620,6 +630,7 @@ function ListViewBlock( {
 							isExpanded={ canEditBlock ? isExpanded : undefined }
 							selectedClientIds={ selectedClientIds }
 							ariaDescribedBy={ descriptionId }
+							visibilityLabel={ blockVisibilityDescription }
 						/>
 						<AriaReferencedText id={ descriptionId }>
 							{ [
@@ -695,9 +706,20 @@ function ListViewBlock( {
 							__experimentalSelectBlock={
 								updateFocusAndSelection
 							}
+							isContentOnlyListView={
+								!! rootClientId &&
+								getBlockEditingMode( rootClientId ) ===
+									'contentOnly'
+							}
 						/>
 					) }
 				</TreeGridCell>
+			) }
+			{ isRenameModalOpen && (
+				<BlockRenameModal
+					clientId={ clientId }
+					onClose={ () => setIsRenameModalOpen( false ) }
+				/>
 			) }
 		</ListViewLeaf>
 	);
