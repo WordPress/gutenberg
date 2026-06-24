@@ -21,6 +21,10 @@ type PolymorphicElementRef< T extends React.ElementType > =
 const customAttributeRegExp = /^(data|aria|x)-/i;
 const eventHandlerRegExp = /^on[A-Z]/;
 
+// Derived from @emotion/is-prop-valid's React prop allowlist, but split by
+// element type so SVG-only props are intentionally filtered from HTML elements.
+// The event-handler check is also deliberately stricter than Emotion's
+// charCode-based `on*` fallback.
 const svgElementNames = new Set(
 	`animate animateMotion animateTransform circle clipPath defs desc ellipse
 	feBlend feColorMatrix feComponentTransfer feComposite feConvolveMatrix
