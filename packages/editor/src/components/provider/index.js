@@ -403,7 +403,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		}, [ post.type, post.id, setEditedPost, removeNotice ] );
 
 		// Synchronize the editor settings as they change.
-		useEffect( () => {
+		// Do it as a layout effect so that rendered UI with outdated settings is not painted.
+		useLayoutEffect( () => {
 			updateEditorSettings( settings );
 		}, [ settings, updateEditorSettings ] );
 

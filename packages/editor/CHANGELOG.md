@@ -12,6 +12,10 @@
 
 -   Suggest mode: the notes sidebar now summarizes an inline addition or deletion (typed in Suggest mode) as `Add: "…"` / `Delete: "…"` with the proposed text, instead of the generic `Format: content`. The text is resolved from the in-content marker on read, including whitespace-only edits such as a typed space.
 
+## 14.49.0 (2026-06-24)
+
+## 14.48.1 (2026-06-16)
+
 ## 14.48.0 (2026-06-10)
 
 ### New Features

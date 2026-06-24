@@ -22,11 +22,11 @@
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.58.2",
-		"@storybook/react-vite": "^10.2.8",
+		"@storybook/react-vite": "^10.4.3",
 		"@types/node": "^20.19.39",
 		"@wordpress/element": "file:../../packages/element",
 		"@wordpress/storybook": "file:../../storybook",
-		"storybook": "^10.2.8"
+		"storybook": "^10.4.3"
 	},
 	"publishConfig": {
 		"access": "public"

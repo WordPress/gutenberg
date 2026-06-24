@@ -17,10 +17,11 @@
  *   - **Note vs. regular comment divergence**: that `note`-typed comments
  *     follow the new permission model while plain `comment`-type traffic
  *     stays on core's defaults.
- *   - **Meta registration setup**: every test re-registers
- *     `gutenberg_register_block_comment_metadata()` because
+ *   - **Meta registration setup**: every test re-registers the note meta
+ *     (`wp_create_initial_comment_meta()`, core) and the suggestion meta
+ *     (`gutenberg_register_suggestion_meta()`, Gutenberg 7.1) because
  *     `WP_UnitTestCase_Base` wipes `$wp_meta_keys` between tests; without
- *     this hook REST sees `_wp_suggestion` as unregistered and silently
+ *     this REST sees `_wp_suggestion` as unregistered and silently
  *     no-ops on writes, masking real failures.
  *
  * @package Gutenberg
@@ -83,14 +84,19 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	 * Re-register the note/suggestion comment meta before each test.
 	 *
 	 * `WP_UnitTestCase_Base::tear_down()` wipes the global `$wp_meta_keys`
-	 * registry between tests, but `gutenberg_register_block_comment_metadata`
-	 * only fires once on `init`. Without this hook, REST writes to
+	 * registry between tests, but the meta is only registered once on `init`.
+	 * Without re-registering, REST writes to `_wp_note_status` /
 	 * `_wp_suggestion` (and friends) silently no-op for any test after the
 	 * first because the meta isn't recognized as a registered REST field.
+	 *
+	 * `_wp_note_status` graduated to WordPress 6.9 core
+	 * (`wp_create_initial_comment_meta()`); the suggestion meta is the
+	 * Gutenberg 7.1 addition (`gutenberg_register_suggestion_meta()`).
 	 */
 	public function set_up() {
 		parent::set_up();
-		gutenberg_register_block_comment_metadata();
+		wp_create_initial_comment_meta();
+		gutenberg_register_suggestion_meta();
 	}
 
 	/**
@@ -833,10 +839,12 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			$request->set_body( wp_json_encode( $case['body'] ) );
 
 			$reflection = new ReflectionMethod(
-				'Gutenberg_REST_Comment_Controller_6_9',
+				'Gutenberg_REST_Comment_Controller_7_1',
 				'is_suggestion_lifecycle_update'
 			);
-			$reflection->setAccessible( true );
+			if ( PHP_VERSION_ID < 80100 ) {
+				$reflection->setAccessible( true );
+			}
 
 			$this->assertSame(
 				$case['expected'],
@@ -865,10 +873,12 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		);
 
 		$reflection = new ReflectionMethod(
-			'Gutenberg_REST_Comment_Controller_6_9',
+			'Gutenberg_REST_Comment_Controller_7_1',
 			'is_suggestion_lifecycle_update'
 		);
-		$reflection->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$reflection->setAccessible( true );
+		}
 		$this->assertTrue( $reflection->invoke( null, $request ) );
 	}
 }

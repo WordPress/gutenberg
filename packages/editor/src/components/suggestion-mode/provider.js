@@ -66,7 +66,7 @@ const SCHEMA_VERSION = 2;
 /**
  * Maximum byte length of a serialized suggestion payload. Mirrors
  * `GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES` in
- * `lib/compat/wordpress-6.9/block-comments.php`. The client checks before
+ * `lib/compat/wordpress-7.1/block-suggestions.php`. The client checks before
  * submitting so a doomed request never leaves the browser; the REST
  * controller is the authoritative gate.
  */

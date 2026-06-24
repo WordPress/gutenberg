@@ -46,6 +46,7 @@
 import { useRegistry, useSelect } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
+import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -744,6 +745,19 @@ export default function SuggestionStoreInterceptor() {
 					// built up in parents-first iteration order, so its
 					// presence wouldn't distinguish "pre-existing" from
 					// "already-processed-new-block" parents.
+					const block = blockEditor.getBlock?.( clientId );
+
+					// Defer empty placeholder blocks. Clicking the default
+					// block appender (or the empty canvas below the last
+					// block) inserts an unmodified default paragraph, but an
+					// empty block the user hasn't put anything into is not a
+					// suggestion yet. Skip WITHOUT recording a snapshot so the
+					// next fire — once the block has content — re-enters this
+					// branch and registers the insertion.
+					if ( block && isUnmodifiedDefaultBlock( block ) ) {
+						continue;
+					}
+
 					snapshot.set( clientId, current );
 					const parentClientId =
 						blockEditor.getBlockRootClientId?.( clientId ) || null;
@@ -753,7 +767,6 @@ export default function SuggestionStoreInterceptor() {
 					if ( ! parentExisted ) {
 						continue;
 					}
-					const block = blockEditor.getBlock?.( clientId );
 					if ( ! block ) {
 						continue;
 					}

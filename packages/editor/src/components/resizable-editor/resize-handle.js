@@ -4,7 +4,6 @@
 import { __ } from '@wordpress/i18n';
 import { LEFT, RIGHT } from '@wordpress/keycodes';
 import { __unstableMotion as motion } from '@wordpress/components';
-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
 import { Tooltip, VisuallyHidden } from '@wordpress/ui';
 
 const DELTA_DISTANCE = 20; // The distance to resize per keydown in pixels.
