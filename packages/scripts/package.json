@@ -80,6 +80,7 @@
 		"puppeteer-core": "^23.10.1",
 		"react-refresh": "^0.14.0",
 		"read-pkg-up": "^7.0.1",
+		"replace-in-file": "^6.3.2",
 		"resolve-bin": "^0.4.0",
 		"rtlcss": "^4.3.0",
 		"sass": "^1.54.0",
