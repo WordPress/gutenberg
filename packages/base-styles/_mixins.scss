@@ -4,7 +4,7 @@
 
 @use "sass:color";
 @use "sass:math";
-@use "@wordpress/theme/src/prebuilt/scss/design-token-fallbacks" as wpds;
+@use "@wordpress/theme/design-token-fallbacks" as wpds;
 @use "./variables";
 @use "./colors";
 @use "./breakpoints";
