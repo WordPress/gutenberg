@@ -79,6 +79,12 @@ test.describe( 'Push to Global Styles button', () => {
 		// Press the Push button
 		await page.getByRole( 'button', { name: 'Apply globally' } ).click();
 
+		// Confirm applying styles globally.
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Apply' } )
+			.click();
+
 		// Snackbar notification should appear
 		await expect(
 			page.getByRole( 'button', {
