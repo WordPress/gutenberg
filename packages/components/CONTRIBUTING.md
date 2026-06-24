@@ -191,10 +191,10 @@ function useExampleComponent(
 	);
 
 	// Any other reusable rendering logic (e.g. computing className, state, event listeners...)
-	const cx = useCx();
-	const classes = useMemo(
-		() => cx( styles.example, isVisible && styles.visible, className ),
-		[ className, isVisible ]
+	const classes = clsx(
+		styles.example,
+		isVisible && styles.visible,
+		className
 	);
 
 	return {
@@ -418,7 +418,7 @@ On the component's main named export, add a JSDoc comment that includes the main
 
 All new components should be styled using SCSS Modules.
 
-Place component-local styles in a `style.module.scss` file next to the component, import the module from JavaScript or TypeScript, and compose class names with `clsx`. Preserve existing public `components-*` class names where consumers may rely on them. For dynamic values, prefer inline CSS custom properties consumed by the SCSS module. For variants and state, prefer `data-*` attributes or explicit module classes.
+Place component-local styles in a `style.module.scss` file next to the component, import the module from JavaScript or TypeScript, and compose class names with `clsx`. Preserve existing public `components-*` class names where consumers may rely on them. For dynamic values, prefer inline CSS custom properties consumed by the SCSS module. For variants and state, prefer conditional module classes composed with `clsx`.
 
 Legacy components may still use Emotion while they are being migrated, but new Emotion usage should not be added.
 
@@ -445,11 +445,10 @@ function MyComponent( { __nextHasNoOuterMargins = false, className } ) {
 			className={ clsx(
 				'components-my-component',
 				styles.root,
+				! __nextHasNoOuterMargins &&
+					styles.deprecatedOuterMargins,
 				className
 			) }
-			data-has-no-outer-margins={
-				__nextHasNoOuterMargins ? true : undefined
-			}
 		/>
 	);
 }
@@ -461,10 +460,10 @@ Styles should be structured so the deprecated styles are cleanly encapsulated, a
 // style.module.scss
 .root {
 	margin: 0;
+}
 
-	&:not([data-has-no-outer-margins]) {
-		margin: 8px;
-	}
+.deprecatedOuterMargins {
+	margin: 8px;
 }
 ```
 
@@ -691,7 +690,7 @@ component-name/
 ├── hook.ts
 ├── index.ts
 ├── README.md
-├── styles.ts
+├── style.module.scss
 └── types.ts
 ```
 
@@ -704,13 +703,13 @@ component-family-name/
 │   ├── component.tsx
 │   ├── hook.ts
 │   ├── README.md
-│   └── styles.ts
+│   └── style.module.scss
 ├── sub-component-name/
 │   ├── index.ts
 │   ├── component.tsx
 │   ├── hook.ts
 │   ├── README.md
-│   └── styles.ts
+│   └── style.module.scss
 ├── stories
 │   └── index.js
 ├── test
@@ -750,7 +749,7 @@ This second approach involves creating a new, separate version (ie. export) of t
 
 If possible, the legacy version of the component should be rewritten so that it uses the same underlying implementation of the new version, with an extra API "translation" layer to adapt the legacy API surface to the new API surface, e.g:
 
-```
+```tsx
 // legacy-component/index.tsx
 
 function LegacyComponent( props ) {
