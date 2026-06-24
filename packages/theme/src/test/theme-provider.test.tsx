@@ -146,7 +146,10 @@ describe( 'ThemeProvider', () => {
 			beforeAll( () => {
 				prebuiltStyle = document.createElement( 'style' );
 				prebuiltStyle.textContent = readFileSync(
-					join( __dirname, '../prebuilt/css/design-tokens.css' ),
+					join(
+						import.meta.dirname,
+						'../prebuilt/css/design-tokens.css'
+					),
 					'utf8'
 				);
 				document.head.appendChild( prebuiltStyle );

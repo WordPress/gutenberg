@@ -553,11 +553,14 @@ export default dedupePlugins( [
 		},
 	},
 
-	// Override: Storybook + components + ui — relax jsdoc require-param.
+	// Override: Relax JSDoc parameter rules for TypeScript components. A
+	// component always receives props and returns a React element, and its
+	// props should be documented through its TypeScript props types.
 	{
 		files: [
 			'**/@(storybook|stories)/**',
 			'packages/components/src/**/*.tsx',
+			'packages/theme/src/**/*.tsx',
 			'packages/ui/src/**/*.tsx',
 		],
 		rules: {
