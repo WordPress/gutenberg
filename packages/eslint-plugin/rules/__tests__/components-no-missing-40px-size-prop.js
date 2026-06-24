@@ -112,7 +112,6 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 				import {
 					BorderBoxControl,
 					BorderControl,
-					BoxControl,
 					ComboboxControl,
 					CustomSelectControl,
 					FontAppearanceControl,
@@ -131,7 +130,6 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 				<>
 					<BorderBoxControl __next40pxDefaultSize />
 					<BorderControl __next40pxDefaultSize />
-					<BoxControl __next40pxDefaultSize />
 					<ComboboxControl __next40pxDefaultSize />
 					<CustomSelectControl __next40pxDefaultSize />
 					<FontAppearanceControl __next40pxDefaultSize />

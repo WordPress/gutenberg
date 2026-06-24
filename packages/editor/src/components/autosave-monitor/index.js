@@ -1,9 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
-import { compose } from '@wordpress/compose';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { useEffect, useRef } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -11,123 +10,89 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { store as editorStore } from '../../store';
 
-export class AutosaveMonitor extends Component {
-	constructor( props ) {
-		super( props );
-		this.needsAutosave = !! ( props.isDirty && props.isAutosaveable );
-	}
+/**
+ * Calls `callback` every `intervalInSeconds`. The latest `callback` is always
+ * invoked without resetting the timer.
+ *
+ * @param {Function} callback          Function to call on each tick.
+ * @param {number}   intervalInSeconds Seconds between ticks.
+ */
+function useInterval( callback, intervalInSeconds ) {
+	const callbackRef = useRef( callback );
 
-	componentDidMount() {
-		if ( ! this.props.disableIntervalChecks ) {
-			this.setAutosaveTimer();
-		}
-	}
+	useEffect( () => {
+		callbackRef.current = callback;
+	}, [ callback ] );
 
-	componentDidUpdate( prevProps ) {
-		if ( this.props.disableIntervalChecks ) {
-			if ( this.props.editsReference !== prevProps.editsReference ) {
-				this.props.autosave();
-			}
+	useEffect( () => {
+		// Interval can be undefined before editor settings are populated.
+		if ( ! intervalInSeconds ) {
 			return;
 		}
 
-		if ( this.props.interval !== prevProps.interval ) {
-			clearTimeout( this.timerId );
-			this.setAutosaveTimer();
-		}
-
-		if ( ! this.props.isDirty ) {
-			this.needsAutosave = false;
-			return;
-		}
-
-		if ( this.props.isAutosaving && ! prevProps.isAutosaving ) {
-			this.needsAutosave = false;
-			return;
-		}
-
-		if ( this.props.editsReference !== prevProps.editsReference ) {
-			this.needsAutosave = true;
-		}
-	}
-
-	componentWillUnmount() {
-		clearTimeout( this.timerId );
-	}
-
-	setAutosaveTimer( timeout = this.props.interval * 1000 ) {
-		this.timerId = setTimeout( () => {
-			this.autosaveTimerHandler();
-		}, timeout );
-	}
-
-	autosaveTimerHandler() {
-		if ( ! this.props.isAutosaveable ) {
-			this.setAutosaveTimer( 1000 );
-			return;
-		}
-
-		if ( this.needsAutosave ) {
-			this.needsAutosave = false;
-			this.props.autosave();
-		}
-
-		this.setAutosaveTimer();
-	}
-
-	render() {
-		return null;
-	}
+		const id = setInterval(
+			() => callbackRef.current(),
+			intervalInSeconds * 1000
+		);
+		return () => clearInterval( id );
+	}, [ intervalInSeconds ] );
 }
 
 /**
  * Monitors the changes made to the edited post and triggers autosave if necessary.
  *
- * The logic is straightforward: a check is performed every `props.interval` seconds. If any changes are detected, `props.autosave()` is called.
- * The time between the change and the autosave varies but is no larger than `props.interval` seconds. Refer to the code below for more details, such as
- * the specific way of detecting changes.
+ * The post is checked every `interval` seconds and autosaved when there is something new to save.
  *
- * There are two caveats:
- * * If `props.isAutosaveable` happens to be false at a time of checking for changes, the check is retried every second.
- * * The timer may be disabled by setting `props.disableIntervalChecks` to `true`. In that mode, any change will immediately trigger `props.autosave()`.
- *
- * @param {Object}   props                       - The properties passed to the component.
- * @param {Function} props.autosave              - The function to call when changes need to be saved.
- * @param {number}   props.interval              - The maximum time in seconds between an unsaved change and an autosave.
- * @param {boolean}  props.isAutosaveable        - If false, the check for changes is retried every second.
- * @param {boolean}  props.disableIntervalChecks - If true, disables the timer and any change will immediately trigger `props.autosave()`.
- * @param {boolean}  props.isDirty               - Indicates if there are unsaved changes.
+ * @param {Object}   props            The component props.
+ * @param {number}   [props.interval] Time in seconds between checks. Defaults to the editor's
+ *                                    `autosaveInterval` setting.
+ * @param {Function} [props.autosave] Function to call when changes need to be saved. Defaults to the
+ *                                    editor store's `autosave` action.
  *
  * @example
  * ```jsx
- * <AutosaveMonitor interval={30000} />
+ * <AutosaveMonitor interval={ 30 } />
  * ```
  */
-export default compose( [
-	withSelect( ( select, ownProps ) => {
-		const { getReferenceByDistinctEdits } = select( coreStore );
+export default function AutosaveMonitor( { interval, autosave } ) {
+	const { autosave: autosaveAction } = useDispatch( editorStore );
+	const triggerAutosave = autosave ?? autosaveAction;
 
-		const {
-			isEditedPostDirty,
-			isEditedPostAutosaveable,
-			isAutosavingPost,
-			getEditorSettings,
-		} = select( editorStore );
+	const { getReferenceByDistinctEdits } = useSelect( coreStore );
+	const { isEditedPostDirty, isEditedPostAutosaveable, isAutosavingPost } =
+		useSelect( editorStore );
 
-		const { interval = getEditorSettings().autosaveInterval } = ownProps;
+	const autosaveInterval = useSelect(
+		( select ) => {
+			if ( interval !== undefined ) {
+				return interval;
+			}
 
-		return {
-			editsReference: getReferenceByDistinctEdits(),
-			isDirty: isEditedPostDirty(),
-			isAutosaveable: isEditedPostAutosaveable(),
-			isAutosaving: isAutosavingPost(),
-			interval,
-		};
-	} ),
-	withDispatch( ( dispatch, ownProps ) => ( {
-		autosave() {
-			const { autosave = dispatch( editorStore ).autosave } = ownProps;
-			autosave();
+			return select( editorStore ).getEditorSettings().autosaveInterval;
 		},
-	} ) ),
-] )( AutosaveMonitor );
+		[ interval ]
+	);
+
+	// Reference of the edits last considered for autosaving. Mutable state that
+	// must not trigger a re-render, hence a ref.
+	const lastEditsReferenceRef = useRef();
+
+	useInterval( () => {
+		// The post can't be autosaved yet (e.g. its existing autosave is still
+		// loading). Keep any pending edits and try again on the next tick.
+		if ( ! isEditedPostAutosaveable() ) {
+			return;
+		}
+
+		const editsReference = getReferenceByDistinctEdits();
+		const hasNewEdits = editsReference !== lastEditsReferenceRef.current;
+		if ( hasNewEdits && isEditedPostDirty() && ! isAutosavingPost() ) {
+			// Only consume the edits reference when we autosave,
+			// so edits made during an in-flight autosave aren't skipped.
+			lastEditsReferenceRef.current = editsReference;
+			triggerAutosave();
+		}
+	}, autosaveInterval );
+
+	return null;
+}
