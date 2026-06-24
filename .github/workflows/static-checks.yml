@@ -49,9 +49,6 @@ jobs:
         steps:
             - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
               with:
-                  # Need full history on the annotation run so the root-deps
-                  # check can compute the merge-base against the PR base.
-                  fetch-depth: ${{ case(github.event_name == 'pull_request' && matrix.annotations == true, '0', '1') }}
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
 
@@ -83,7 +80,11 @@ jobs:
               if: ${{ matrix.annotations && github.event_name == 'pull_request' }}
               env:
                   BASE_SHA: ${{ github.event.pull_request.base.sha }}
-              run: npm run --workspace @wordpress/validation-tools check-root-dependencies -- --base "$BASE_SHA"
+              # Fetch just the base commit so the check can read its
+              # package.json without a costly full-history checkout.
+              run: |
+                  git fetch --no-tags --depth=1 origin "$BASE_SHA"
+                  npm run --workspace @wordpress/validation-tools check-root-dependencies -- --base "$BASE_SHA"
 
             - name: Lint package-lock.json file
               run: npm run lint:lockfile

@@ -128,14 +128,24 @@ const restrictedImports = [
 	},
 ];
 
+const useIsomorphicLayoutEffectRestrictedImport = {
+	name: '@wordpress/element',
+	importNames: [ 'useLayoutEffect' ],
+	message:
+		'Use `useIsomorphicLayoutEffect` from `@wordpress/compose` instead. It keeps layout effect behavior in the browser while avoiding SSR warnings.',
+};
+
 // Common `no-restricted-imports` configuration for `@wordpress/ui` paths,
 // which occur across multiple override configs. The exclusion here allows
 // Base UI to be imported directly in `@wordpress/ui`, which is the intended
 // abstraction layer for BaseUI components.
 const UI_RESTRICTED_IMPORTS = {
-	paths: restrictedImports.filter(
-		( { name } ) => name !== '@base-ui/react'
-	),
+	paths: [
+		...restrictedImports.filter(
+			( { name } ) => name !== '@base-ui/react'
+		),
+		useIsomorphicLayoutEffectRestrictedImport,
+	],
 	patterns: [],
 };
 
@@ -680,6 +690,22 @@ export default dedupePlugins( [
 		files: [ 'packages/ui/src/**' ],
 		rules: {
 			'no-restricted-imports': [ 'error', UI_RESTRICTED_IMPORTS ],
+		},
+	},
+
+	// Override: Theme src — use the SSR-safe layout effect hook.
+	{
+		files: [ 'packages/theme/src/**' ],
+		rules: {
+			'no-restricted-imports': [
+				'error',
+				{
+					paths: [
+						...restrictedImports,
+						useIsomorphicLayoutEffectRestrictedImport,
+					],
+				},
+			],
 		},
 	},
 
