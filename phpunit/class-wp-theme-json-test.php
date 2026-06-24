@@ -106,9 +106,15 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 * Resets the block metadata cache for WP_Theme_JSON_Gutenberg.
 	 */
 	private function reset_blocks_metadata() {
-		$property = new ReflectionProperty( WP_Theme_JSON_Gutenberg::class, 'blocks_metadata' );
-		$property->setAccessible( true );
-		$property->setValue( null, array() );
+		$reset = Closure::bind(
+			static function () {
+				WP_Theme_JSON_Gutenberg::$blocks_metadata = array();
+			},
+			null,
+			WP_Theme_JSON_Gutenberg::class
+		);
+
+		$reset();
 	}
 
 	/**
@@ -117,9 +123,15 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 * @return array Block metadata.
 	 */
 	private function get_blocks_metadata() {
-		$property = new ReflectionProperty( WP_Theme_JSON_Gutenberg::class, 'blocks_metadata' );
-		$property->setAccessible( true );
-		return $property->getValue();
+		$get = Closure::bind(
+			static function () {
+				return WP_Theme_JSON_Gutenberg::$blocks_metadata;
+			},
+			null,
+			WP_Theme_JSON_Gutenberg::class
+		);
+
+		return $get();
 	}
 
 	public function test_get_settings() {
