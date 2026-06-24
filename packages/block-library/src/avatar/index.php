@@ -64,7 +64,7 @@ function render_block_core_avatar( $attributes, $content, $block ) {
 				/* translators: %s is the Author name. */
 				$label = 'aria-label="' . esc_attr( sprintf( __( '(%s author archive, opens in a new tab)' ), $author_name ) ) . '"';
 			}
-			/* translators: 1: Author archive link. 2: Link target. %3$s Aria label. %4$s Avatar image. */
+			/* translators: 1: Author archive link, 2: Link target, 3: Aria label, 4: Avatar image. */
 			$avatar_block = sprintf( '<a href="%1$s" target="%2$s" %3$s class="wp-block-avatar__link">%4$s</a>', esc_url( get_author_posts_url( $author_id ) ), esc_attr( $attributes['linkTarget'] ), $label, $avatar_block );
 		}
 		return sprintf( '<div %1$s>%2$s</div>', $wrapper_attributes, $avatar_block );
