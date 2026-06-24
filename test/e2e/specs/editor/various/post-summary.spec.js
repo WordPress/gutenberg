@@ -113,6 +113,62 @@ test.describe( 'Post Summary', () => {
 				).toContainText( UPDATED_DESCRIPTION );
 			} );
 		}
+
+		test( 'shows title and sync status while creating a new synced pattern in the post editor', async ( {
+			admin,
+			editor,
+			page,
+		} ) => {
+			const title = 'DataForm direct synced pattern';
+			await admin.createNewPost( { postType: 'wp_block' } );
+
+			const modal = page.getByRole( 'dialog', {
+				name: 'Create pattern',
+			} );
+			await expect( modal ).toBeVisible();
+			await modal.getByRole( 'textbox', { name: 'Name' } ).fill( title );
+			await expect(
+				modal.getByRole( 'checkbox', { name: /Synced/ } )
+			).toBeChecked();
+			await modal.getByRole( 'button', { name: 'Create' } ).click();
+			await expect( modal ).toBeHidden();
+
+			const summary = await openPatternSummary( { editor, page } );
+			const fields = getPatternSummaryFields( { page, summary } );
+
+			await expect( fields.title ).toContainText( title );
+			await expect( fields.syncStatus ).toContainText( 'Synced' );
+		} );
+
+		test( 'shows title and sync status while creating a new unsynced pattern in the post editor', async ( {
+			admin,
+			editor,
+			page,
+		} ) => {
+			const title = 'DataForm direct unsynced pattern';
+			await admin.createNewPost( { postType: 'wp_block' } );
+
+			const modal = page.getByRole( 'dialog', {
+				name: 'Create pattern',
+			} );
+			await expect( modal ).toBeVisible();
+			await modal.getByRole( 'textbox', { name: 'Name' } ).fill( title );
+
+			const syncedToggle = modal.getByRole( 'checkbox', {
+				name: /Synced/,
+			} );
+			await expect( syncedToggle ).toBeChecked();
+			await syncedToggle.click();
+			await expect( syncedToggle ).not.toBeChecked();
+			await modal.getByRole( 'button', { name: 'Create' } ).click();
+			await expect( modal ).toBeHidden();
+
+			const summary = await openPatternSummary( { editor, page } );
+			const fields = getPatternSummaryFields( { page, summary } );
+
+			await expect( fields.title ).toContainText( title );
+			await expect( fields.syncStatus ).toContainText( 'Not synced' );
+		} );
 	} );
 } );
 
@@ -168,6 +224,7 @@ function getPatternSummaryFields( { page, summary } ) {
 	} );
 
 	return {
+		title: summary.locator( '.editor-post-card-panel__title-name' ),
 		description,
 		descriptionTextbox: page.getByRole( 'textbox', {
 			name: 'Description',
