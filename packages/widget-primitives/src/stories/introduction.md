@@ -14,13 +14,8 @@ A _host_ is any context that renders widgets: a dashboard, a sidebar, a plugin p
 
 **Discovery** is `useWidgetTypes( records )`. It takes host-supplied widget-module records, imports each record's metadata module, and returns a `[ WidgetType[], isResolving ]` tuple, where `isResolving` is `true` while the records are still being imported. The hook reaches for no store or endpoint: the host fetches the records however it wants and passes them in.
 
-**Rendering** is `<WidgetRender>`. It resolves a `WidgetType.renderModule` through a host-provided `ResolveWidgetModule` and mounts the component with the `attributes` / `setAttributes` contract. Error handling and chrome stay with the host, and because the module is mounted lazily, the host must wrap it in a Suspense boundary.
+**Rendering** is `<WidgetRender />`. It resolves a `WidgetType.renderModule` through a host-provided `ResolveWidgetModule` and mounts the component with the `attributes` / `setAttributes` contract. Error handling and chrome stay with the host, and because the module is mounted lazily, the host must wrap it in a Suspense boundary.
 
 ## What it does not do
 
 No chrome, no layout, no persistence, no data store of its own, no knowledge of any host. Those are host concerns. Keeping them out is what makes the package publishable and consumable outside the WordPress admin.
-
-## Where to go next
-
--   **Anatomy** breaks down everything a widget declares, layer by layer, and why each property lives where it does.
--   **System Architecture** zooms out to the full dashboard widget pipeline, from the `widgets/` folder through the build and the server registry, and shows where this package sits in it.
