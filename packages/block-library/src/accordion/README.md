@@ -68,7 +68,7 @@ This is a [**hybrid block**](https://developer.wordpress.org/block-editor/gettin
 
 ```html
 <!-- wp:accordion -->
-<div role="group" class="wp-block-accordion">
+<div role="group" class="wp-block-accordion has-icon has-icon-right">
 	<!-- wp:accordion-item -->
 	<div class="wp-block-accordion-item">
 		<!-- wp:accordion-heading -->

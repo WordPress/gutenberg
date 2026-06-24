@@ -48,9 +48,9 @@
 				]
 			}
 		],
-		"innerHTML": "\n<div role=\"group\" class=\"wp-block-accordion has-icon has-icon-right\">\n\t\n</div>\n",
+		"innerHTML": "\n<div role=\"group\" class=\"wp-block-accordion\">\n\t\n</div>\n",
 		"innerContent": [
-			"\n<div role=\"group\" class=\"wp-block-accordion has-icon has-icon-right\">\n\t",
+			"\n<div role=\"group\" class=\"wp-block-accordion\">\n\t",
 			null,
 			"\n</div>\n"
 		]
