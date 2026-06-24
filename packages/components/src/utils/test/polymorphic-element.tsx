@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import styled from '@emotion/styled';
 import { render, screen } from '@testing-library/react';
 
 /**
@@ -13,15 +14,30 @@ import { createElement, createRef } from '@wordpress/element';
  */
 import { PolymorphicElement } from '../polymorphic-element';
 
-describe( 'PolymorphicElement', () => {
+const StyledDiv = styled.div``;
+
+const components = [
+	{
+		name: 'PolymorphicElement',
+		Component: PolymorphicElement,
+	},
+	{
+		name: 'styled.div',
+		Component: StyledDiv,
+	},
+] as const;
+
+describe.each( components )( '$name', ( { Component: RawComponent } ) => {
+	const Component = RawComponent as typeof PolymorphicElement;
+
 	it( 'filters invalid props from intrinsic elements', () => {
 		render(
-			createElement( PolymorphicElement, {
+			createElement( Component, {
 				as: 'label',
 				'data-testid': 'label',
 				htmlFor: 'field',
 				labelPosition: 'top',
-			} as Parameters< typeof PolymorphicElement >[ 0 ] & {
+			} as Parameters< typeof Component >[ 0 ] & {
 				labelPosition: string;
 			} )
 		);
@@ -35,7 +51,7 @@ describe( 'PolymorphicElement', () => {
 
 	it( 'preserves standard props for intrinsic elements', () => {
 		render(
-			<PolymorphicElement
+			<Component
 				aria-label="Notice"
 				className="custom-class"
 				data-testid="notice"
@@ -54,7 +70,7 @@ describe( 'PolymorphicElement', () => {
 
 	it( 'preserves SVG props for SVG intrinsic elements', () => {
 		render(
-			<PolymorphicElement
+			<Component
 				as="svg"
 				data-testid="svg"
 				preserveAspectRatio="xMidYMid meet"
@@ -70,12 +86,12 @@ describe( 'PolymorphicElement', () => {
 
 	it( 'filters invalid props from SVG intrinsic elements', () => {
 		render(
-			createElement( PolymorphicElement, {
+			createElement( Component, {
 				as: 'svg',
 				'data-testid': 'svg',
 				labelPosition: 'top',
 				viewBox: '0 0 24 24',
-			} as Parameters< typeof PolymorphicElement >[ 0 ] & {
+			} as Parameters< typeof Component >[ 0 ] & {
 				labelPosition: string;
 			} )
 		);
@@ -98,7 +114,7 @@ describe( 'PolymorphicElement', () => {
 		}
 
 		render(
-			<PolymorphicElement
+			<Component
 				as={ CustomComponent }
 				data-testid="custom"
 				variant="primary"
@@ -115,7 +131,7 @@ describe( 'PolymorphicElement', () => {
 		const ref = createRef< HTMLButtonElement >();
 
 		render(
-			<PolymorphicElement
+			<Component
 				as="button"
 				data-testid="button"
 				ref={ ref }
