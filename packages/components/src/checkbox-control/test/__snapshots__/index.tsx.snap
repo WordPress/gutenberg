@@ -5,7 +5,7 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -13,14 +13,28 @@
+@@ -13,14 +13,29 @@
           <span
             class="components-checkbox-control__input-container"
           >
@@ -15,10 +15,11 @@ Snapshot Diff:
 +             id="inspector-checkbox-control-7"
               type="checkbox"
               value="1"
-+           />
+            />
 +           <svg
 +             aria-hidden="true"
 +             class="components-checkbox-control__indeterminate"
++             fill="currentColor"
 +             focusable="false"
 +             height="24"
 +             role="presentation"
@@ -28,7 +29,7 @@ Snapshot Diff:
 +           >
 +             <path
 +               d="M7 11.5h10V13H7z"
-              />
++             />
 +           </svg>
           </span>
         </div>

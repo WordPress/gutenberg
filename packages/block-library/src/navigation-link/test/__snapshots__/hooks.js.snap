@@ -9,6 +9,7 @@ exports[`hooks enhanceNavigationLinkVariations enhances variations with icon and
       "attributes": {},
       "description": "A link to a custom URL.",
       "icon": <SVG
+        fill="currentColor"
         viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg"
       >
@@ -26,6 +27,7 @@ exports[`hooks enhanceNavigationLinkVariations enhances variations with icon and
       },
       "description": "A link to a post.",
       "icon": <SVG
+        fill="currentColor"
         viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg"
       >
@@ -43,6 +45,7 @@ exports[`hooks enhanceNavigationLinkVariations enhances variations with icon and
       },
       "description": "A link to a page.",
       "icon": <SVG
+        fill="currentColor"
         viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg"
       >
@@ -63,6 +66,7 @@ exports[`hooks enhanceNavigationLinkVariations enhances variations with icon and
       },
       "description": "A link to a category.",
       "icon": <SVG
+        fill="currentColor"
         viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg"
       >
@@ -82,6 +86,7 @@ exports[`hooks enhanceNavigationLinkVariations enhances variations with icon and
       },
       "description": "A link to a tag.",
       "icon": <SVG
+        fill="currentColor"
         viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg"
       >

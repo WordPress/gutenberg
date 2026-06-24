@@ -107,14 +107,11 @@
 	position: relative;
 	z-index: 1;
 	cursor: help;
-	fill: var(--wpds-color-foreground-content-error-weak);
+	color: var(--wpds-color-foreground-content-error-weak);
 	display: inline-flex;
 	flex-direction: row;
 	align-items: center;
 	gap: var(--wpds-dimension-gap-xs);
-	svg {
-		fill: currentColor;
-	}
 }
 
 .dataforms-layouts-panel__field-control {
