@@ -40,12 +40,15 @@ export interface HeicImageData {
 	/** Rotation angle in degrees counter-clockwise (0, 90, 180, 270). */
 	rotation: number;
 	/**
-	 * EXIF orientation (1-8) to apply when there is no native `irot` transform.
+	 * EXIF orientation (1-8) to apply when there is no native `irot`/`imir`
+	 * transform.
 	 *
 	 * libheif applies the `irot`/`imir` boxes but ignores EXIF orientation for
 	 * HEIF-family inputs, so this captures the orientation for files that carry
-	 * it in an EXIF tag instead. It is 1 (no change) whenever `rotation` is
-	 * non-zero, so the two are never applied together.
+	 * it in an EXIF tag instead. It is 1 (no change) whenever a native transform
+	 * is present, so the two are never applied together. This mirrors
+	 * `getUnappliedExifOrientation` so the canvas decode path and the sub-size
+	 * generation path agree on mirror-only inputs.
 	 */
 	exifOrientation: number;
 }
@@ -703,7 +706,8 @@ export function parseHeic( buffer: ArrayBuffer ): HeicImageData {
 		outputWidth: width,
 		outputHeight: height,
 		rotation,
-		exifOrientation: rotation === 0 ? parseExifOrientation( buffer ) : 1,
+		exifOrientation:
+			rotation === 0 ? getUnappliedExifOrientation( buffer ) : 1,
 	};
 }
 
@@ -843,7 +847,8 @@ function parseGridImage(
 		outputWidth,
 		outputHeight,
 		rotation,
-		exifOrientation: rotation === 0 ? parseExifOrientation( buffer ) : 1,
+		exifOrientation:
+			rotation === 0 ? getUnappliedExifOrientation( buffer ) : 1,
 	};
 }
 
