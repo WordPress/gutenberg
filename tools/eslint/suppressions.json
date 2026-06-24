@@ -132,7 +132,7 @@
 			"count": 2
 		}
 	},
-	"packages/block-editor/src/components/global-styles/color-panel.js": {
+	"packages/block-editor/src/components/global-styles/color-gradient-dropdown-item.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
 		}
@@ -880,11 +880,6 @@
 			"count": 3
 		}
 	},
-	"packages/edit-site/src/components/page-patterns/fields.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/edit-site/src/components/page-templates/fields.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -905,17 +900,7 @@
 			"count": 4
 		}
 	},
-	"packages/edit-site/src/components/save-hub/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/edit-site/src/components/sidebar-global-styles/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/edit-site/src/components/sidebar-navigation-item/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		}
@@ -1098,11 +1083,6 @@
 			"count": 1
 		}
 	},
-	"packages/editor/src/components/sidebar/dataform-post-summary.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/editor/src/components/sidebar/header.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -1116,11 +1096,6 @@
 	"packages/editor/src/components/sidebar/post-revision-summary.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
-		}
-	},
-	"packages/editor/src/components/sidebar/post-summary.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
 		}
 	},
 	"packages/editor/src/components/site-discussion/index.js": {
@@ -1547,26 +1522,6 @@
 			"count": 1
 		}
 	},
-	"packages/patterns/src/components/allow-overrides-modal.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		}
-	},
-	"packages/patterns/src/components/create-pattern-modal.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
-	"packages/patterns/src/components/rename-pattern-category-modal.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
-	"packages/patterns/src/components/rename-pattern-modal.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
 	"packages/preferences/src/components/preferences-modal-tabs/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 6
@@ -1621,11 +1576,6 @@
 		},
 		"@wordpress/use-recommended-components": {
 			"count": 3
-		}
-	},
-	"routes/dashboard/widget-dashboard/components/dashboard-widget-chrome/dashboard-widget-chrome.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
 		}
 	},
 	"routes/experiments-home/stage.tsx": {

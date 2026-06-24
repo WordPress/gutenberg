@@ -19,8 +19,7 @@
 }
 
 .header-content {
-	/* @TODO: Replace with a `size` token once that category exists in the theme package. */
-	min-height: calc(var(--wpds-dimension-base) * 8);
+	min-height: var(--wpds-dimension-size-md);
 }
 
 .header-actions {
@@ -39,9 +38,8 @@
 	grid-template-columns: 1fr;
 	grid-template-rows: 1fr;
 	flex-shrink: 0;
-	/* @TODO: Replace with a `size` token once that category exists in the theme package. */
-	width: calc(var(--wpds-dimension-base) * 6);
-	height: calc(var(--wpds-dimension-base) * 6);
+	width: var(--wpds-dimension-size-sm);
+	height: var(--wpds-dimension-size-sm);
 
 	> * {
 		grid-column: 1 / -1;

@@ -73,6 +73,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-rest-view-config-controller-7-1.php';
 	require __DIR__ . '/compat/wordpress-7.1/rest-api.php';
 	require __DIR__ . '/compat/wordpress-7.1/collaboration.php';
+	require __DIR__ . '/compat/wordpress-7.1/block-bindings.php';
 
 	// Plugin specific code.
 	require_once __DIR__ . '/class-wp-rest-global-styles-controller-gutenberg.php';
@@ -96,6 +97,7 @@ require_once __DIR__ . '/experimental/rest-api-overrides.php';
 // Gutenberg plugin compat.
 require __DIR__ . '/compat/plugin/edit-site-routes-backwards-compat.php';
 require __DIR__ . '/compat/plugin/fonts.php';
+require __DIR__ . '/compat/plugin/style-state-aliases.php';
 
 
 // WordPress 7.0 compat.
@@ -115,6 +117,7 @@ if ( class_exists( '\WordPress\AiClient\AiClient' ) ) {
 }
 
 // WordPress 7.1 compat.
+require __DIR__ . '/compat/wordpress-7.1/kses.php';
 require __DIR__ . '/compat/wordpress-7.1/media.php';
 require __DIR__ . '/compat/wordpress-7.1/preload.php';
 require __DIR__ . '/compat/wordpress-7.1/classic-block.php';
