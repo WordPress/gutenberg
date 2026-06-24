@@ -93,7 +93,6 @@ export default function RenamePatternModal( {
 			<form onSubmit={ onRename }>
 				<Stack direction="column" gap="lg">
 					<TextControl
-						__next40pxDefaultSize
 						label={ __( 'Name' ) }
 						value={ name }
 						onChange={ setName }

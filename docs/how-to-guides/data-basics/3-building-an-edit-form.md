@@ -63,7 +63,6 @@ function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	return (
 		<div className="my-gutenberg-form">
 			<TextControl
-				__next40pxDefaultSize
 				value=''
 				label='Page title:'
 			/>
@@ -140,7 +139,6 @@ function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	return (
 		<div className="my-gutenberg-form">
 			<TextControl
-				__next40pxDefaultSize
 				label='Page title:'
 				value={ page.title.rendered }
 			/>
@@ -166,7 +164,6 @@ function VanillaReactForm({ initialTitle }) {
 	const [title, setTitle] = useState( initialTitle );
 	return (
 		<TextControl
-			__next40pxDefaultSize
 			value={ title }
 			onChange={ setTitle }
 		/>
@@ -236,7 +233,6 @@ function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	return (
 		<div className="my-gutenberg-form">
 			<TextControl
-				__next40pxDefaultSize
 				label="Page title:"
 				value={ page.title }
 				onChange={ handleChange }
@@ -505,7 +501,6 @@ function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	return (
 		<div className="my-gutenberg-form">
 			<TextControl
-				__next40pxDefaultSize
 				label="Page title:"
 				value={ page.title }
 				onChange={ handleChange }

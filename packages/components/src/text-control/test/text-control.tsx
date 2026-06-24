@@ -6,11 +6,7 @@ import { render, screen } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import _TextControl from '..';
-
-const TextControl = ( props: React.ComponentProps< typeof _TextControl > ) => {
-	return <_TextControl { ...props } __next40pxDefaultSize />;
-};
+import TextControl from '..';
 
 const noop = () => {};
 
