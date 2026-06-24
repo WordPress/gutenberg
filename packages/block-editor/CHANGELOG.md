@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Deprecations
+
+-   Soft-deprecate the `__experimentalImageEditor` component. The Media Editor modal is now the default crop experience for core blocks ([#78654](https://github.com/WordPress/gutenberg/pull/78654)).
+
 ## 15.22.0 (2026-06-24)
 
 ### Enhancements
