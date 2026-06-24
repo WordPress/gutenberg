@@ -1088,6 +1088,20 @@ test.describe( 'Registered sources', () => {
 			await expect( contentAttribute ).toBeVisible();
 		} );
 
+		test( 'should be possible to connect the code content', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/code',
+			} );
+			await page.getByLabel( 'Attributes options' ).click();
+			const contentAttribute = page.getByRole( 'menuitemcheckbox', {
+				name: 'Show content',
+			} );
+			await expect( contentAttribute ).toBeVisible();
+		} );
+
 		test( 'should be possible to connect the button supported attributes', async ( {
 			editor,
 			page,
