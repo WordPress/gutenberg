@@ -220,38 +220,24 @@ test.describe( 'Post Summary', () => {
 		}
 
 		function getPatternSummaryFields( { page, summary } ) {
-			const description = getPanelSummaryField( {
-				page,
-				summary,
-				label: 'Description',
-			} );
-
 			return {
 				title: summary.locator( '.editor-post-card-panel__title-name' ),
-				description,
+				description: getDescriptionField( { page, summary } ),
 				descriptionTextbox: page.getByRole( 'textbox', {
 					name: 'Description',
 				} ),
-				revisions: getPanelSummaryField( {
-					page,
-					summary,
-					label: 'Revisions',
-				} ),
-				syncStatus: getRegularSummaryField( {
-					page,
-					summary,
-					label: 'Sync status',
-				} ),
+				revisions: getRevisionsField( { page, summary } ),
+				syncStatus: getSyncStatusField( { page, summary } ),
 			};
 		}
 
-		function getPanelSummaryField( { page, summary, label } ) {
+		function getDescriptionField( { page, summary } ) {
 			const root = summary
 				.locator( '.dataforms-layouts-panel__field-trigger' )
 				.filter( {
 					has: page
 						.locator( '.dataforms-layouts-panel__field-label' )
-						.filter( { hasText: exactText( label ) } ),
+						.filter( { hasText: exactText( 'Description' ) } ),
 				} );
 
 			return {
@@ -260,18 +246,35 @@ test.describe( 'Post Summary', () => {
 					'.dataforms-layouts-panel__field-control'
 				),
 				editButton: root.getByRole( 'button', {
-					name: `Edit ${ label }`,
+					name: 'Edit Description',
 				} ),
 			};
 		}
 
-		function getRegularSummaryField( { page, summary, label } ) {
+		function getRevisionsField( { page, summary } ) {
+			const root = summary
+				.locator( '.dataforms-layouts-panel__field-trigger' )
+				.filter( {
+					has: page
+						.locator( '.dataforms-layouts-panel__field-label' )
+						.filter( { hasText: exactText( 'Revisions' ) } ),
+				} );
+
+			return {
+				root,
+				control: root.locator(
+					'.dataforms-layouts-panel__field-control'
+				),
+			};
+		}
+
+		function getSyncStatusField( { page, summary } ) {
 			const root = summary
 				.locator( '.dataforms-layouts-regular__field' )
 				.filter( {
 					has: page
 						.locator( '.dataforms-layouts-regular__field-label' )
-						.filter( { hasText: exactText( label ) } ),
+						.filter( { hasText: exactText( 'Sync status' ) } ),
 				} );
 
 			return {
