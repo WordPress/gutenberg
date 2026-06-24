@@ -10,6 +10,8 @@
 -   `setEditorIntent` now surfaces mode transitions with a snackbar ('You're suggesting' / 'You're editing' / 'You're viewing') alongside the existing a11y announcement.
 -   Suggestions: introduce a per-attribute conflict check (`hasAttributeConflict`) and a `SuggestionSummary` renderer that replaces the post-`modified_gmt` staleness compare. Adds the `wp/suggestions` architecture doc and updates the `core/editor` data reference to cover the new selectors.
 
+## 14.49.0 (2026-06-24)
+
 ## 14.48.1 (2026-06-16)
 
 ## 14.48.0 (2026-06-10)

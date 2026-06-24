@@ -37,6 +37,7 @@
 		"check-licenses": "node ./check-licenses.mjs",
 		"dependency-audit": "dependency-audit --collapse-root-cause \"../../packages/*\"",
 		"check-local-changes": "node ./check-local-changes.cjs",
+		"check-root-dependencies": "node ./check-root-dependencies.mjs",
 		"test-create-block": "node ./test-create-block.mjs",
 		"validate-package-lock": "node ./validate-package-lock.cjs",
 		"validate-tsconfig": "node ./validate-tsconfig.mjs"

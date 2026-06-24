@@ -14,7 +14,28 @@ import { speak } from '@wordpress/a11y';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
-function ContrastChecker( {
+/**
+ * Computes a contrast warning for the given color combination, if any.
+ *
+ * Shared between the `ContrastChecker` component and the block inspector
+ * contrast warning indicators, which surface the result without rendering
+ * a notice.
+ *
+ * @param {Object}  props
+ * @param {string}  [props.backgroundColor]         Background color.
+ * @param {string}  [props.fallbackBackgroundColor] Fallback background color.
+ * @param {string}  [props.fallbackTextColor]       Fallback text color.
+ * @param {string}  [props.fallbackLinkColor]       Fallback link color.
+ * @param {number}  [props.fontSize]                Font size value in pixels.
+ * @param {boolean} [props.isLargeText]             Whether the text is large.
+ * @param {string}  [props.textColor]               Text color.
+ * @param {string}  [props.linkColor]               Link color.
+ * @param {string}  [props.messageOverride]         Caller-provided copy used in place of the generic guidance.
+ * @param {boolean} [props.enableAlphaChecker]      Whether to warn about transparent text.
+ *
+ * @return {?Object} `{ message, speakMessage }` when contrast is insufficient, otherwise `null`.
+ */
+export function getContrastWarning( {
 	backgroundColor,
 	fallbackBackgroundColor,
 	fallbackTextColor,
@@ -23,6 +44,7 @@ function ContrastChecker( {
 	isLargeText,
 	textColor,
 	linkColor,
+	messageOverride,
 	enableAlphaChecker = false,
 } ) {
 	const currentBackgroundColor = backgroundColor || fallbackBackgroundColor;
@@ -81,6 +103,13 @@ function ContrastChecker( {
 			if ( backgroundColorHasTransparency || textHasTransparency ) {
 				continue;
 			}
+			// A caller can provide panel-specific copy that is clearer and
+			// more concise than the generic brighter/darker guidance.
+			if ( messageOverride ) {
+				message = messageOverride;
+				speakMessage = messageOverride;
+				break;
+			}
 			message =
 				backgroundColorBrightness < colordTextColor.brightness()
 					? sprintf(
@@ -119,11 +148,21 @@ function ContrastChecker( {
 		return null;
 	}
 
+	return { message, speakMessage };
+}
+
+function ContrastChecker( props ) {
+	const warning = getContrastWarning( props );
+
+	if ( ! warning ) {
+		return null;
+	}
+
 	// Note: The `Notice` component can speak messages via its `spokenMessage`
 	// prop, but the contrast checker requires granular control over when the
 	// announcements are made. Notably, the message will be re-announced if a
 	// new color combination is selected and the contrast is still insufficient.
-	speak( speakMessage );
+	speak( warning.speakMessage );
 
 	return (
 		<div className="block-editor-contrast-checker">
@@ -132,7 +171,7 @@ function ContrastChecker( {
 				status="warning"
 				isDismissible={ false }
 			>
-				{ message }
+				{ warning.message }
 			</Notice>
 		</div>
 	);

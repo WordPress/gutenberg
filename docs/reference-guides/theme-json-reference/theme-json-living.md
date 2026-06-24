@@ -337,6 +337,7 @@ Typography styles.
 | textAlign | Sets the `text-align` CSS property. | `string`, `{ ref }` |
 | textColumns | Sets the `column-count` CSS property. | `string`, `{ ref }` |
 | textDecoration | Sets the `text-decoration` CSS property. | `string`, `{ ref }` |
+| textShadow | Sets the `text-shadow` CSS property. | `string`, `{ ref }` |
 | writingMode | Sets the `writing-mode` CSS property. | `string`, `{ ref }` |
 | textTransform | Sets the `text-transform` CSS property. | `string`, `{ ref }` |
 
