@@ -19,6 +19,9 @@ type PolymorphicElementRef< T extends React.ElementType > =
 	React.ComponentPropsWithRef< T >[ 'ref' ];
 
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
+let cachedOwnerDocument: Document | undefined;
+const htmlElementCache = new Map< string, HTMLElement >();
+const svgElementCache = new Map< string, SVGElement >();
 
 const knownIntrinsicElementProps = new Set( [
 	'children',
@@ -38,6 +41,36 @@ const knownIntrinsicElementProps = new Set( [
 	'title',
 ] );
 
+function getCachedIntrinsicElements( element: string ) {
+	const ownerDocument = globalThis.document;
+	if ( ! ownerDocument ) {
+		return;
+	}
+
+	if ( ownerDocument !== cachedOwnerDocument ) {
+		cachedOwnerDocument = ownerDocument;
+		htmlElementCache.clear();
+		svgElementCache.clear();
+	}
+
+	let htmlElement = htmlElementCache.get( element );
+	if ( ! htmlElement ) {
+		htmlElement = ownerDocument.createElement( element );
+		htmlElementCache.set( element, htmlElement );
+	}
+
+	let svgElement = svgElementCache.get( element );
+	if ( ! svgElement ) {
+		svgElement = ownerDocument.createElementNS( SVG_NAMESPACE, element );
+		svgElementCache.set( element, svgElement );
+	}
+
+	return {
+		htmlElement,
+		svgElement,
+	};
+}
+
 function isValidIntrinsicElementProp( prop: string, element: string ) {
 	if (
 		prop.startsWith( 'data-' ) ||
@@ -53,11 +86,11 @@ function isValidIntrinsicElementProp( prop: string, element: string ) {
 		return true;
 	}
 
-	const ownerDocument = globalThis.document;
-	if ( ownerDocument ) {
+	const cachedElements = getCachedIntrinsicElements( element );
+	if ( cachedElements ) {
 		return (
-			prop in ownerDocument.createElement( element ) ||
-			prop in ownerDocument.createElementNS( SVG_NAMESPACE, element )
+			prop in cachedElements.htmlElement ||
+			prop in cachedElements.svgElement
 		);
 	}
 
