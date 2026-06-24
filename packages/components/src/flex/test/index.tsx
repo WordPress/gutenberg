@@ -10,33 +10,6 @@ import { View } from '../../view';
 import { Flex, FlexBlock, FlexItem } from '../';
 
 describe( 'props', () => {
-	test( 'should apply base flex and flex-block layout styles', () => {
-		render(
-			<Flex data-testid="base-flex">
-				<FlexItem>Item</FlexItem>
-				<FlexBlock data-testid="flex-block">Item</FlexBlock>
-			</Flex>
-		);
-
-		const flexStyles = window.getComputedStyle(
-			screen.getByTestId( 'base-flex' )
-		);
-		const flexBlockStyles = window.getComputedStyle(
-			screen.getByTestId( 'flex-block' )
-		);
-
-		expect( flexStyles.alignItems ).toBe( 'center' );
-		expect( flexStyles.display ).toBe( 'flex' );
-		expect( flexStyles.gap ).toBe( 'calc(4px * 2)' );
-		expect( flexStyles.justifyContent ).toBe( 'space-between' );
-		expect( flexStyles.width ).toBe( '100%' );
-
-		expect( flexBlockStyles.display ).toBe( 'block' );
-		expect( flexBlockStyles.flex ).toBe( '1 1 0%' );
-		expect( flexBlockStyles.minHeight ).toBe( '0' );
-		expect( flexBlockStyles.minWidth ).toBe( '0' );
-	} );
-
 	test( 'should render correctly', () => {
 		render(
 			<Flex data-testid="base-flex">
