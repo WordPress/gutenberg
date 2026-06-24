@@ -500,21 +500,28 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
-.block-editor-inserter__attached-media-panel.components-panel {
-	border: 0;
+.block-editor-inserter__attached-media-panel {
 	flex-shrink: 0;
-	margin-left: -$grid-unit-20;
 	margin-top: $grid-unit-20;
-	margin-right: -$grid-unit-20;
+}
+
+// Matches the small uppercase label style used for `&__panel-title`.
+.block-editor-inserter__attached-media-panel-heading {
+	margin: 0 0 $grid-unit-10;
+	font-size: 11px;
+	font-weight: $font-weight-medium;
+	text-transform: uppercase;
+	color: $gray-700;
 }
 
 .block-editor-inserter__attached-media-panel-actions {
-	display: flex;
-	justify-content: flex-start;
-	margin-top: $grid-unit-10;
+	margin-top: $grid-unit-20;
 
+	// Full-width treatment, matching the "Open Media Library" button.
 	.components-button {
-		flex-shrink: 0;
+		justify-content: center;
+		width: 100%;
+		padding: $grid-unit-20;
 	}
 }
 
@@ -532,13 +539,13 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__attached-media-panel-grid {
 	display: grid;
-	grid-template-columns: repeat(4, minmax(0, 1fr));
+	grid-template-columns: repeat(3, minmax(0, 1fr));
 	gap: $grid-unit-10;
 
 	.block-editor-inserter__media-list {
 		display: grid;
 		grid-column: 1 / -1;
-		grid-template-columns: repeat(4, minmax(0, 1fr));
+		grid-template-columns: repeat(3, minmax(0, 1fr));
 		gap: $grid-unit-10;
 		height: auto;
 		overflow: visible;
@@ -665,20 +672,14 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
+// The button's square 24px sizing comes from its `size="small"` variant; this
+// rule only handles the floating overlay treatment (position, chrome, reveal).
 .block-editor-inserter__media-list__item-detach-button.components-button.has-icon {
 	position: absolute;
 	top: $grid-unit-05;
 	right: $grid-unit-05;
 	z-index: 1;
-	width: $grid-unit-30;
-	min-width: $grid-unit-30;
-	max-width: $grid-unit-30;
-	height: $grid-unit-30;
-	min-height: $grid-unit-30;
-	max-height: $grid-unit-30;
-	padding: 0;
-	align-items: center;
-	justify-content: center;
+	border-radius: $radius-small;
 	color: $gray-900;
 	background: $white;
 	box-shadow: 0 0 0 $border-width rgba($black, 0.12), 0 1px 2px rgba($black, 0.12);

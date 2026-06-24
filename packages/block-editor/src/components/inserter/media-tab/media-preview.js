@@ -99,7 +99,7 @@ function MediaPreviewDetachButton( { media, onDetach, title } ) {
 				event.stopPropagation();
 				onDetach( media );
 			} }
-			size="compact"
+			size="small"
 			variant="tertiary"
 		/>
 	);

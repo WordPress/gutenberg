@@ -1,13 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	Button,
-	Modal,
-	Panel,
-	PanelBody,
-	Spinner,
-} from '@wordpress/components';
+import { Button, Modal, Spinner } from '@wordpress/components';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -227,71 +221,71 @@ export default function AttachedMediaPanel( { onInsert, category } ) {
 	);
 
 	return (
-		<Panel className="block-editor-inserter__attached-media-panel">
-			<PanelBody title={ category.labels.name } initialOpen>
-				{ isLoading && (
-					<div className="block-editor-inserter__attached-media-panel-spinner">
-						<Spinner />
-					</div>
-				) }
-				{ ! isLoading && hasError && (
-					<p className="block-editor-inserter__attached-media-panel-message">
-						{ __( 'Could not load attached images.' ) }
-					</p>
-				) }
-				{ ! isLoading && ! hasError && ! mediaList.length && (
-					<p className="block-editor-inserter__attached-media-panel-message">
-						{ __( 'No images attached to this post.' ) }
-					</p>
-				) }
-				{ ! isLoading && ! hasError && !! mediaList.length && (
-					<>
-						<div className="block-editor-inserter__attached-media-panel-grid">
-							<MediaList
-								category={ category }
-								isItemBusy={ ( media ) =>
-									updatingMediaIds.includes( media.id )
-								}
-								label={ __( 'Attached images' ) }
-								mediaList={ mediaList }
-								onClick={ onInsert }
-								onDetach={ setMediaPendingDetach }
-								variant="compact"
-							/>
-							{ remainingMediaCount > 0 && (
-								<MediaLibraryButton
-									className="block-editor-inserter__attached-media-panel-more"
-									label={ sprintf(
-										/* translators: %d: Number of additional attached images. */
-										__( 'View %d more attached images' ),
-										remainingMediaCount
-									) }
-									onSelect={ handleAttach }
-									title={ __( 'Attached images' ) }
-									value={ mediaIds }
-									variant="tertiary"
-								>
-									{ sprintf(
-										/* translators: %d: Number of additional attached images. */
-										__( '+%d' ),
-										remainingMediaCount
-									) }
-								</MediaLibraryButton>
-							) }
-						</div>
-					</>
-				) }
-				<div className="block-editor-inserter__attached-media-panel-actions">
-					<MediaLibraryButton
-						disabled={ isAttaching }
-						icon={ plus }
-						onSelect={ handleAttach }
-						title={ __( 'Attach images' ) }
-					>
-						{ __( 'Add' ) }
-					</MediaLibraryButton>
+		<div className="block-editor-inserter__attached-media-panel">
+			<h3 className="block-editor-inserter__attached-media-panel-heading">
+				{ __( 'Attached images' ) }
+			</h3>
+			{ isLoading && (
+				<div className="block-editor-inserter__attached-media-panel-spinner">
+					<Spinner />
 				</div>
-			</PanelBody>
+			) }
+			{ ! isLoading && hasError && (
+				<p className="block-editor-inserter__attached-media-panel-message">
+					{ __( 'Could not load attached images.' ) }
+				</p>
+			) }
+			{ ! isLoading && ! hasError && ! mediaList.length && (
+				<p className="block-editor-inserter__attached-media-panel-message">
+					{ __( 'No images attached to this post.' ) }
+				</p>
+			) }
+			{ ! isLoading && ! hasError && !! mediaList.length && (
+				<>
+					<div className="block-editor-inserter__attached-media-panel-grid">
+						<MediaList
+							category={ category }
+							isItemBusy={ ( media ) =>
+								updatingMediaIds.includes( media.id )
+							}
+							label={ __( 'Attached images' ) }
+							mediaList={ mediaList }
+							onClick={ onInsert }
+							onDetach={ setMediaPendingDetach }
+							variant="compact"
+						/>
+						{ remainingMediaCount > 0 && (
+							<MediaLibraryButton
+								className="block-editor-inserter__attached-media-panel-more"
+								label={ sprintf(
+									/* translators: %d: Number of additional attached images. */
+									__( 'View %d more attached images' ),
+									remainingMediaCount
+								) }
+								onSelect={ handleAttach }
+								title={ __( 'Attached images' ) }
+								value={ mediaIds }
+								variant="tertiary"
+							>
+								{ sprintf(
+									/* translators: %d: Number of additional attached images. */
+									__( '+%d' ),
+									remainingMediaCount
+								) }
+							</MediaLibraryButton>
+						) }
+					</div>
+				</>
+			) }
+			<div className="block-editor-inserter__attached-media-panel-actions">
+				<MediaLibraryButton
+					disabled={ isAttaching }
+					icon={ plus }
+					onSelect={ handleAttach }
+				>
+					{ __( 'Attach images' ) }
+				</MediaLibraryButton>
+			</div>
 			{ mediaPendingDetach && (
 				<Modal
 					title={ __( 'Detach image' ) }
@@ -321,6 +315,6 @@ export default function AttachedMediaPanel( { onInsert, category } ) {
 					</div>
 				</Modal>
 			) }
-		</Panel>
+		</div>
 	);
 }
