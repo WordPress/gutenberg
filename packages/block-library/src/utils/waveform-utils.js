@@ -53,6 +53,24 @@ export function getNextShuffledTrack( trackIds, currentId, playedIds = [] ) {
 }
 
 /**
+ * Check whether every track has played in the current shuffle cycle.
+ *
+ * @param {string[]} trackIds  - All track unique IDs, in playlist order.
+ * @param {string}   currentId - The currently (or just) played track ID.
+ * @param {string[]} playedIds - Track IDs already played in the current cycle.
+ * @return {boolean} True when the shuffle cycle has completed.
+ */
+export function isShuffleCycleComplete( trackIds, currentId, playedIds = [] ) {
+	const played = playedIds.includes( currentId )
+		? playedIds
+		: [ ...playedIds, currentId ];
+
+	return (
+		trackIds.length > 0 && trackIds.every( ( id ) => played.includes( id ) )
+	);
+}
+
+/**
  * Get computed style for an element, using ownerDocument for iframe compatibility.
  *
  * @param {Element} element - The element to get styles from.
@@ -374,17 +392,16 @@ export function refreshWaveformPlayerColors( player, element ) {
 	return true;
 }
 
-// SVG markup for the playlist control icons. They are decorative (the parent
-// control button carries the aria-label), hence aria-hidden + focusable="false"
-// to match the @wordpress/primitives SVG default. The icon size comes from CSS.
+// SVG markup from the WordPress icon library. They are decorative; the parent
+// control button carries the accessible label.
 const ICON_PREV =
-	'<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M6 6h2v12H6zm3.5 6l8.5 6V6z" /></svg>';
+	'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m17.5 18-9-6 9-6zM8 6.5v11H6.5v-11z" /></svg>';
 const ICON_NEXT =
-	'<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M6 18l8.5-6L6 6v12zm10-12v12h2V6z" /></svg>';
+	'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m15.5 12-9 6V6zm2 5.5H16v-11h1.5z" /></svg>';
 const ICON_SHUFFLE =
-	'<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z" /></svg>';
+	'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M17.192 6.75L15.47 5.03l1.06-1.06 3.537 3.53-3.537 3.53-1.06-1.06 1.723-1.72h-3.19c-.602 0-.993.202-1.28.498-.309.319-.538.792-.695 1.383-.13.488-.222 1.023-.296 1.508-.034.664-.116 1.413-.303 2.117-.193.721-.513 1.467-1.068 2.04-.575.594-1.359.954-2.357.954H4v-1.5h4.003c.601 0 .993-.202 1.28-.498.308-.319.538-.792.695-1.383.149-.557.216-1.093.288-1.662l.039-.31a9.653 9.653 0 0 1 .272-1.653c.193-.722.513-1.467 1.067-2.04.576-.594 1.36-.954 2.358-.954h3.19zM8.004 6.75c.8 0 1.46.23 1.988.628a6.24 6.24 0 0 0-.684 1.396 1.725 1.725 0 0 0-.024-.026c-.287-.296-.679-.498-1.28-.498H4v-1.5h4.003zM12.699 14.726c-.161.459-.38.94-.684 1.396.527.397 1.188.628 1.988.628h3.19l-1.722 1.72 1.06 1.06L20.067 16l-3.537-3.53-1.06 1.06 1.723 1.72h-3.19c-.602 0-.993-.202-1.28-.498a1.96 1.96 0 0 1-.024-.026z" /></svg>';
 const ICON_REPEAT =
-	'<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M17 2l4 4-4 4V7H7a3 3 0 0 0-3 3v1H2v-1a5 5 0 0 1 5-5h10V2zM7 22l-4-4 4-4v3h10a3 3 0 0 0 3-3v-1h2v1a5 5 0 0 1-5 5H7v3z" /></svg>';
+	'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m14.47 11.47 1.06 1.061 1.72-1.72v4.439a.25.25 0 0 1-.25.25h-6.379l-1.5 1.5H17a1.75 1.75 0 0 0 1.75-1.75v-4.438l1.72 1.72 1.06-1.061L18 7.94zM7 7a1.75 1.75 0 0 0-1.75 1.75v4.44l-1.72-1.72-1.06 1.06L6 16.06l3.53-3.53-1.06-1.06-1.72 1.72V8.75A.25.25 0 0 1 7 8.5h6.379l1.5-1.5z" /></svg>';
 
 /**
  * Get or create the row displayed below the waveform.
@@ -459,7 +476,7 @@ function setupPlaylistMetadata( container, instance ) {
 }
 
 /**
- * Create playlist control buttons (prev, shuffle, repeat, next) and insert
+ * Create playlist control buttons (prev/next, repeat/shuffle) and insert
  * them into the waveform player container.
  *
  * @param {Element}  container                 - The waveform player container.
@@ -492,6 +509,10 @@ export function setupPlaylistControls(
 	const doc = container.ownerDocument;
 	const controlsDiv = doc.createElement( 'div' );
 	controlsDiv.className = 'wp-block-playlist__controls';
+	const actionGroup = doc.createElement( 'div' );
+	actionGroup.className = 'wp-block-playlist__controls-group';
+	const toggleGroup = doc.createElement( 'div' );
+	toggleGroup.className = 'wp-block-playlist__controls-group';
 
 	const prevBtn = doc.createElement( 'button' );
 	prevBtn.type = 'button';
@@ -528,10 +549,12 @@ export function setupPlaylistControls(
 	nextBtn.setAttribute( 'title', nextLabel );
 	nextBtn.innerHTML = ICON_NEXT;
 
-	controlsDiv.appendChild( prevBtn );
-	controlsDiv.appendChild( shuffleBtn );
-	controlsDiv.appendChild( repeatBtn );
-	controlsDiv.appendChild( nextBtn );
+	actionGroup.appendChild( prevBtn );
+	actionGroup.appendChild( nextBtn );
+	toggleGroup.appendChild( repeatBtn );
+	toggleGroup.appendChild( shuffleBtn );
+	controlsDiv.appendChild( actionGroup );
+	controlsDiv.appendChild( toggleGroup );
 
 	// The library's container has tabindex="0" and focuses itself on click,
 	// which would steal keyboard focus from these controls. Stop the click

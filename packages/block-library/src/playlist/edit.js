@@ -38,7 +38,11 @@ import { Caption } from '../utils/caption';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { WaveformPlayer } from '../utils/waveform-player';
 import { PlaylistContext } from './context';
-import { logPlayError, getNextShuffledTrack } from '../utils/waveform-utils';
+import {
+	logPlayError,
+	getNextShuffledTrack,
+	isShuffleCycleComplete,
+} from '../utils/waveform-utils';
 import { getTrackAttributes } from './utils';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
@@ -181,19 +185,35 @@ const PlaylistEdit = ( {
 	// Handle track end - advance to next track, respecting shuffle.
 	const onTrackEnded = useCallback(
 		( playerInstance ) => {
-			if ( isRepeating ) {
-				playerInstance?.play()?.catch( logPlayError );
-				return;
-			}
 			if ( isShuffled ) {
+				if (
+					! isRepeating &&
+					isShuffleCycleComplete(
+						tracks.map( ( track ) => track.clientId ),
+						currentTrackClientId,
+						playedTracks
+					)
+				) {
+					return;
+				}
+				if ( isRepeating && tracks.length <= 1 ) {
+					playerInstance?.play()?.catch( logPlayError );
+					return;
+				}
 				advanceShuffled();
 				return;
 			}
 			const currentIndex = tracks.findIndex(
 				( track ) => track.clientId === currentTrackClientId
 			);
-			const nextTrack = tracks[ currentIndex + 1 ] || tracks[ 0 ];
+			const nextTrack =
+				tracks[ currentIndex + 1 ] ||
+				( isRepeating ? tracks[ 0 ] : undefined );
 			if ( nextTrack?.clientId ) {
+				if ( nextTrack.clientId === currentTrackClientId ) {
+					playerInstance?.play()?.catch( logPlayError );
+					return;
+				}
 				setCurrentTrackClientId( nextTrack.clientId );
 			}
 		},
@@ -202,6 +222,7 @@ const PlaylistEdit = ( {
 			currentTrackClientId,
 			isRepeating,
 			isShuffled,
+			playedTracks,
 			setCurrentTrackClientId,
 			tracks,
 		]
