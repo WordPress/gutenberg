@@ -32,6 +32,7 @@
 	padding: 4px 12px; // Allows 32px min-height.
 	border-radius: $radius-small;
 	color: $components-color-foreground;
+	text-wrap: wrap;
 
 	&.is-next-40px-default-size {
 		height: $button-size-next-default-40px;
