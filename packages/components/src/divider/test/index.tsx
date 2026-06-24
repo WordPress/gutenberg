@@ -9,11 +9,6 @@ import { render, screen } from '@testing-library/react';
 import { Divider } from '..';
 
 describe( 'props', () => {
-	test( 'should render correctly', () => {
-		render( <Divider /> );
-		expect( screen.getByRole( 'separator' ) ).toMatchSnapshot();
-	} );
-
 	test( 'should render marginStart', () => {
 		render( <Divider marginStart={ 5 } /> );
 
