@@ -803,7 +803,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$responsive_gap_value = '0px';
 		}
 
-		$should_output_grid_columns = null === $viewport_overrides || $has_viewport_property_override( 'minimumColumnWidth' ) || $has_viewport_property_override( 'columnCount' );
+		$should_output_grid_columns = null === $viewport_overrides || $has_viewport_property_override( 'minimumColumnWidth' ) || $has_viewport_property_override( 'columnCount' ) || $has_viewport_property_override( 'autoFit' );
 		$uses_gap_in_grid_columns   = ! empty( $layout_for_styles['columnCount'] ) && ! empty( $layout_for_styles['minimumColumnWidth'] );
 		if ( $has_block_gap_override && $uses_gap_in_grid_columns ) {
 			$should_output_grid_columns = true;

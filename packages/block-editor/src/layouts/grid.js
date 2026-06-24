@@ -269,6 +269,7 @@ export default {
 			! hasViewportOverrides ||
 			hasViewportOverride( 'minimumColumnWidth' ) ||
 			hasViewportOverride( 'columnCount' ) ||
+			hasViewportOverride( 'autoFit' ) ||
 			( hasBlockGapOverride && minimumColumnWidth && columnCount > 0 );
 		const shouldOutputGridRows =
 			( ! hasViewportOverrides || hasViewportOverride( 'rowCount' ) ) &&
@@ -536,7 +537,7 @@ function GridLayoutFillControl( { layout, onChange } ) {
 			onChange={ ( value ) =>
 				onChange( {
 					...layout,
-					autoFit: value || undefined,
+					autoFit: value,
 				} )
 			}
 		/>
