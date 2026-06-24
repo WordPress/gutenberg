@@ -2,9 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Breadcrumbs, Page } from '@wordpress/admin-ui';
 import { useState } from '@wordpress/element';
 import { wordpress } from '@wordpress/icons';
-import type { CornerRadiusPreset } from '@wordpress/theme';
-import { privateApis as themeApis } from '@wordpress/theme';
-import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
+import { ThemeProvider, type CornerRadiusPreset } from '@wordpress/theme';
 import {
 	Badge,
 	Button,
@@ -20,13 +18,6 @@ import {
 } from '@wordpress/ui';
 
 import { withRouter } from '../../decorators/with-router';
-
-const { unlock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
-	'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
-	'@wordpress/theme'
-);
-
-const { ThemeProvider } = unlock( themeApis );
 
 const sidebarNavItems = [
 	'Dashboard',

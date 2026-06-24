@@ -2,11 +2,7 @@ import { Dialog as _Dialog } from '@base-ui/react/dialog';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-import {
-	type ThemeProvider as ThemeProviderType,
-	privateApis as themePrivateApis,
-} from '@wordpress/theme';
-import { unlock } from '../lock-unlock';
+import { ThemeProvider } from '@wordpress/theme';
 import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
 import { SCROLL_CONTAINER_ATTR } from '../utils/use-overlay-scroll-state-attributes';
 import { renderSlotWithChildren } from '../utils/render-slot-with-children';
@@ -14,9 +10,6 @@ import { DialogValidationProvider, useDialogModal } from './context';
 import { Portal } from './portal';
 import styles from './style.module.css';
 import type { PopupProps } from './types';
-
-const ThemeProvider: typeof ThemeProviderType =
-	unlock( themePrivateApis ).ThemeProvider;
 
 const CLOSE_ICON_ATTR = 'data-wp-ui-dialog-close-icon';
 
