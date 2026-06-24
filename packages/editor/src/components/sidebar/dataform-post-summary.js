@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { DataForm } from '@wordpress/dataviews';
 import { Stack } from '@wordpress/ui';
@@ -211,9 +211,8 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 	// alongside the post record: read-only editor data that the post's own
 	// fields consume (e.g. the `template` field's `available_templates` in
 	// classic themes), and the records of other entities targeted by namespaced
-	// fields (keyed by `${ kind }_${ name }`) together with the id used to
-	// persist edits back to each one.
-	const { entityData, entityIds, availableTemplates } = useSelect(
+	// fields (keyed by `${ kind }_${ name }`).
+	const { entityData, availableTemplates } = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, canUser, getCurrentTheme } =
 				select( coreDataStore );
@@ -224,7 +223,6 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 						.availableTemplates ?? {};
 
 			const extra = {};
-			const ids = {};
 
 			// Other entities the current post type needs merged into its form.
 			for ( const [ key, entity ] of Object.entries(
@@ -248,12 +246,10 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 					entity.name,
 					id
 				);
-				ids[ key ] = id;
 			}
 
 			return {
 				entityData: extra,
-				entityIds: ids,
 				availableTemplates: _availableTemplates,
 			};
 		},
@@ -276,6 +272,7 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 	}, [ record, entityData, availableTemplates ] );
 
 	const { editEntityRecord } = useDispatch( coreDataStore );
+	const registry = useRegistry();
 
 	// Map of namespaced field id to the namespace key its entity is merged under.
 	const fieldNamespaces = useMemo( () => {
@@ -354,12 +351,13 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 		for ( const [ key, value ] of Object.entries( edits ) ) {
 			const entity = entities[ key ];
 			if ( entity ) {
-				editEntityRecord(
-					entity.kind,
-					entity.name,
-					entityIds[ key ],
-					value
-				);
+				// Resolve the id the same way it was resolved to read the
+				// record, so the save targets the right entity regardless of
+				// its key field (`undefined` for the `root/site` singleton).
+				const id = entity.getId
+					? entity.getId( registry.select )
+					: undefined;
+				editEntityRecord( entity.kind, entity.name, id, value );
 			} else {
 				baseEdits[ key ] = value;
 			}
