@@ -317,13 +317,45 @@ function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $pare
 		return array_key_exists( $property, $viewport_overrides );
 	};
 
-	$self_stretch = $child_layout['selfStretch'] ?? null;
+	$self_stretch      = $child_layout['selfStretch'] ?? null;
+	$base_self_stretch = $base_child_layout['selfStretch'] ?? null;
+
+	/*
+	 * These are the serialized `selfStretch` values. `max` used to be called
+	 * "Fixed" in the UI, but was renamed and replaced by `fixedNoShrink`.
+	 */
+	$flex_child_layout_values = array(
+		'fit'   => 'fit',
+		'grow'  => 'fill',
+		'max'   => 'fixed',
+		'fixed' => 'fixedNoShrink',
+	);
+	$flex_size_values         = array(
+		$flex_child_layout_values['max'],
+		$flex_child_layout_values['fixed'],
+	);
 
 	if ( null === $viewport_overrides || $has_viewport_property_override( 'selfStretch' ) || $has_viewport_property_override( 'flexSize' ) ) {
-		if ( 'fixed' === $self_stretch && isset( $child_layout['flexSize'] ) ) {
+		if (
+			null !== $viewport_overrides &&
+			( $flex_child_layout_values['fit'] === $self_stretch || $flex_child_layout_values['grow'] === $self_stretch ) &&
+			in_array( $base_self_stretch, $flex_size_values, true ) &&
+			isset( $base_child_layout['flexSize'] )
+		) {
+			$child_layout_declarations['flex-basis'] = 'unset';
+			if ( $flex_child_layout_values['fixed'] === $base_self_stretch ) {
+				$child_layout_declarations['flex-shrink'] = 'unset';
+			}
+		}
+		if ( in_array( $self_stretch, $flex_size_values, true ) && isset( $child_layout['flexSize'] ) ) {
 			$child_layout_declarations['flex-basis'] = $child_layout['flexSize'];
+			if ( $flex_child_layout_values['fixed'] === $self_stretch ) {
+				$child_layout_declarations['flex-shrink'] = '0';
+			} elseif ( null !== $viewport_overrides && $flex_child_layout_values['fixed'] === $base_self_stretch ) {
+				$child_layout_declarations['flex-shrink'] = 'unset';
+			}
 			$child_layout_declarations['box-sizing'] = 'border-box';
-		} elseif ( 'fill' === $self_stretch ) {
+		} elseif ( $flex_child_layout_values['grow'] === $self_stretch ) {
 			$child_layout_declarations['flex-grow'] = '1';
 		}
 	}
@@ -893,7 +925,10 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 	$block_type            = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	$block_supports_layout = block_has_support( $block_type, array( 'layout' ), false ) || block_has_support( $block_type, array( '__experimentalLayout' ), false );
-	$style_attr            = $block['attrs']['style'] ?? array();
+	$style_attr            = gutenberg_resolve_style_state_aliases(
+		$block['attrs']['style'] ?? array(),
+		$block['blockName']
+	);
 	// If there is any value in style -> layout, the block has a child layout.
 	$child_layout = $style_attr['layout'] ?? null;
 

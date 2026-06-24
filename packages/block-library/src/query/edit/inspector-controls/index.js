@@ -446,7 +446,6 @@ export default function QueryInspectorControls( props ) {
 							} }
 						>
 							<TextControl
-								__next40pxDefaultSize
 								label={ __( 'Keyword' ) }
 								value={ querySearch }
 								onChange={ ( newQuerySearch ) => {
