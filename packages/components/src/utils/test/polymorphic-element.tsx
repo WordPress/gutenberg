@@ -3,6 +3,7 @@
  */
 import styled from '@emotion/styled';
 import { render, screen } from '@testing-library/react';
+import { renderToString } from 'react-dom/server';
 
 /**
  * WordPress dependencies
@@ -68,6 +69,19 @@ describe.each( components )( '$name', ( { Component: RawComponent } ) => {
 		expect( element ).toHaveStyle( { color: 'rgb(255, 0, 0)' } );
 	} );
 
+	it( 'preserves standard props without relying on the DOM', () => {
+		const view = renderToString(
+			createElement( Component, {
+				as: 'form',
+				acceptCharset: 'utf-8',
+			} as Parameters< typeof Component >[ 0 ] & {
+				acceptCharset: string;
+			} )
+		);
+
+		expect( view ).toContain( 'accept-charset="utf-8"' );
+	} );
+
 	it( 'preserves SVG props for SVG intrinsic elements', () => {
 		render(
 			<Component
@@ -88,6 +102,21 @@ describe.each( components )( '$name', ( { Component: RawComponent } ) => {
 		expect( svg ).toHaveAttribute( 'stroke', 'none' );
 		expect( svg ).toHaveAttribute( 'stroke-width', '2' );
 		expect( svg ).toHaveAttribute( 'viewBox', '0 0 24 24' );
+	} );
+
+	it( 'preserves SVG props without relying on the DOM', () => {
+		const view = renderToString(
+			<Component
+				as="svg"
+				fill="currentColor"
+				strokeWidth={ 2 }
+				viewBox="0 0 24 24"
+			/>
+		);
+
+		expect( view ).toContain( 'fill="currentColor"' );
+		expect( view ).toContain( 'stroke-width="2"' );
+		expect( view ).toContain( 'viewBox="0 0 24 24"' );
 	} );
 
 	it( 'preserves SVG props for non-SVG-root intrinsic elements', () => {
@@ -166,5 +195,43 @@ describe.each( components )( '$name', ( { Component: RawComponent } ) => {
 		);
 
 		expect( ref.current ).toBe( screen.getByTestId( 'button' ) );
+	} );
+} );
+
+describe( 'PolymorphicElement prop filtering', () => {
+	it( 'filters invalid on-prefixed props from intrinsic elements', () => {
+		render(
+			createElement( PolymorphicElement, {
+				'data-testid': 'element',
+				on1: 'invalid',
+				'on-foo': 'invalid',
+			} as Parameters< typeof PolymorphicElement >[ 0 ] & {
+				on1: string;
+				'on-foo': string;
+			} )
+		);
+
+		const element = screen.getByTestId( 'element' );
+
+		expect( element ).not.toHaveAttribute( 'on1' );
+		expect( element ).not.toHaveAttribute( 'on-foo' );
+	} );
+
+	it( 'filters SVG-only props from HTML intrinsic elements', () => {
+		render(
+			createElement( PolymorphicElement, {
+				'data-testid': 'element',
+				fill: 'currentColor',
+				strokeWidth: 2,
+			} as Parameters< typeof PolymorphicElement >[ 0 ] & {
+				fill: string;
+				strokeWidth: number;
+			} )
+		);
+
+		const element = screen.getByTestId( 'element' );
+
+		expect( element ).not.toHaveAttribute( 'fill' );
+		expect( element ).not.toHaveAttribute( 'stroke-width' );
 	} );
 } );

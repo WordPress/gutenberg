@@ -21,10 +21,9 @@ type ViewProps< T extends React.ElementType > = WordPressComponentProps<
 };
 
 function UnforwardedView< T extends React.ElementType = 'div' >(
-	{ css: _css, ...restProps }: ViewProps< T >,
+	{ css, ...restProps }: ViewProps< T >,
 	ref: React.ForwardedRef< any >
 ) {
-	void _css;
 	return <PolymorphicElement ref={ ref } { ...restProps } />;
 }
 
