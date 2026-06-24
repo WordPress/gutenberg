@@ -7,11 +7,10 @@ import {
 	Button,
 	Flex,
 	__experimentalGrid as Grid,
-	__experimentalText as WCText,
-	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { focus } from '@wordpress/dom';
+import { Stack, Text } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -37,16 +36,17 @@ function AddPostFormatTemplateModalContent( {
 	}, [ containerRef ] );
 
 	return (
-		<VStack
-			spacing={ 4 }
+		<Stack
+			direction="column"
+			gap="lg"
 			className="edit-site-custom-template-modal__contents-wrapper"
-			alignment="left"
+			align="flex-start"
 		>
-			<WCText as="p">
+			<Text variant="body-md" render={ <p /> }>
 				{ __(
 					'Select the post format to create an archive template for:'
 				) }
-			</WCText>
+			</Text>
 			<Grid
 				columns={ isMobile ? 2 : 3 }
 				gap={ 4 }
@@ -60,20 +60,11 @@ function AddPostFormatTemplateModalContent( {
 						key={ format.slug }
 						onClick={ () => onSelect( format ) }
 					>
-						<WCText
-							as="span"
-							weight={ 500 }
-							lineHeight={ 1.53846153846 } // 20px
-						>
-							{ format.title }
-						</WCText>
+						<Text variant="heading-md">{ format.title }</Text>
 						{ format.description && (
-							<WCText
-								as="span"
-								lineHeight={ 1.53846153846 } // 20px
-							>
+							<Text variant="body-md">
 								{ format.description }
-							</WCText>
+							</Text>
 						) }
 					</Button>
 				) ) }
@@ -87,7 +78,7 @@ function AddPostFormatTemplateModalContent( {
 					{ __( 'Back' ) }
 				</Button>
 			</Flex>
-		</VStack>
+		</Stack>
 	);
 }
 
