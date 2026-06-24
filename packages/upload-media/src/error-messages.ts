@@ -75,6 +75,15 @@ export function getErrorMessage(
 			),
 			action: __( 'Please contact your site administrator.' ),
 		},
+		[ ErrorCode.FETCH_REMOTE_FILE_ERROR ]: {
+			title: __( 'Download failed' ),
+			description: sprintf(
+				/* translators: %s: file name */
+				__( 'Failed to download "%s" for processing.' ),
+				fileName
+			),
+			action: __( 'Please check your connection and try again.' ),
+		},
 		[ ErrorCode.HEIC_DECODE_ERROR ]: {
 			title: __( 'HEIC decode failed' ),
 			description: sprintf(

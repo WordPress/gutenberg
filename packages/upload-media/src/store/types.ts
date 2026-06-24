@@ -286,6 +286,9 @@ export enum ItemStatus {
 
 export enum OperationType {
 	Prepare = 'PREPARE',
+	// Fetches a remote file (e.g. an existing attachment's original) into the
+	// queue so it can be re-processed client-side.
+	FetchRemoteFile = 'FETCH_REMOTE_FILE',
 	Upload = 'UPLOAD',
 	ResizeCrop = 'RESIZE_CROP',
 	Rotate = 'ROTATE',
@@ -318,6 +321,16 @@ export interface ImageSizeCrop {
 }
 
 export interface OperationArgs {
+	[ OperationType.FetchRemoteFile ]: {
+		/** URL of the file to fetch. */
+		url: string;
+		/** File name to use for the fetched file. */
+		fileName?: string;
+		/** Optional new file name to rename the fetched file to. */
+		newFileName?: string;
+		/** List of allowed mime types for the fetched file. */
+		allowedTypes?: string[];
+	};
 	[ OperationType.ResizeCrop ]: {
 		resize: ImageSizeCrop;
 		/**

@@ -14,7 +14,8 @@ type WPDataRegistry = ReturnType< typeof createRegistry >;
 /**
  * Internal dependencies
  */
-import { cloneFile, convertBlobToFile, renameFile } from '../utils';
+import { cloneFile, convertBlobToFile, fetchFile, renameFile } from '../utils';
+import { validateMimeType } from '../validate-mime-type';
 import { canvasConvertToJpeg } from '../canvas-utils';
 import {
 	isClientSideMediaSupported,
@@ -84,6 +85,7 @@ type ActionCreators = {
 	executeRetry: typeof executeRetry;
 	addItem: typeof addItem;
 	addSideloadItem: typeof addSideloadItem;
+	fetchRemoteFile: typeof fetchRemoteFile;
 	removeItem: typeof removeItem;
 	pauseItem: typeof pauseItem;
 	prepareItem: typeof prepareItem;
@@ -424,6 +426,13 @@ export function processItem( id: QueueItemId ) {
 				dispatch.prepareItem( item.id );
 				break;
 
+			case OperationType.FetchRemoteFile:
+				dispatch.fetchRemoteFile(
+					item.id,
+					operationArgs as OperationArgs[ OperationType.FetchRemoteFile ]
+				);
+				break;
+
 			case OperationType.ResizeCrop:
 				dispatch.resizeCropItem(
 					item.id,
@@ -682,6 +691,73 @@ export async function getTranscodeImageOperation(
 			interlaced,
 		},
 	];
+}
+
+/**
+ * Fetches a remote file into the queue so it can be re-processed.
+ *
+ * Used when optimizing an already-uploaded attachment: the original file is
+ * downloaded from its URL, validated, optionally renamed (e.g. to add an
+ * `-optimized` suffix), and stored on the item so the remaining operations
+ * (transcode, upload, sub-size generation) run against it.
+ *
+ * @param id   Item ID.
+ * @param args Operation args (url, fileName, newFileName, allowedTypes).
+ */
+export function fetchRemoteFile(
+	id: QueueItemId,
+	args: OperationArgs[ OperationType.FetchRemoteFile ]
+) {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItem( id );
+		if ( ! item ) {
+			return;
+		}
+
+		try {
+			const sourceFile = await fetchFile( args.url, args.fileName );
+
+			// Only allow formats the client-side pipeline can process. When the
+			// browser can't handle the file, this throws and the item is
+			// cancelled, leaving the original attachment untouched.
+			validateMimeType(
+				sourceFile,
+				args.allowedTypes ?? [ ...CLIENT_SIDE_SUPPORTED_MIME_TYPES ]
+			);
+
+			const file = args.newFileName
+				? renameFile( cloneFile( sourceFile ), args.newFileName )
+				: cloneFile( sourceFile );
+
+			const blobUrl = createBlobURL( file );
+			dispatch< CacheBlobUrlAction >( {
+				type: Type.CacheBlobUrl,
+				id,
+				blobUrl,
+			} );
+
+			dispatch.finishOperation( id, {
+				sourceFile,
+				file,
+				attachment: {
+					url: blobUrl,
+				},
+			} );
+		} catch ( error ) {
+			dispatch.cancelItem(
+				id,
+				error instanceof UploadError
+					? error
+					: new UploadError( {
+							code: ErrorCode.FETCH_REMOTE_FILE_ERROR,
+							message:
+								'File could not be downloaded for processing',
+							file: item.file,
+							cause: error instanceof Error ? error : undefined,
+					  } )
+			);
+		}
+	};
 }
 
 /**

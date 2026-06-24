@@ -17,10 +17,12 @@ type WPDataRegistry = ReturnType< typeof createRegistry >;
 import type {
 	AdditionalData,
 	CancelAction,
+	ImageFormat,
 	OnBatchSuccessHandler,
 	OnChangeHandler,
 	OnErrorHandler,
 	OnSuccessHandler,
+	Operation,
 	QueueItemId,
 	RetryItemAction,
 	ScheduleRetryAction,
@@ -42,6 +44,13 @@ import type {
 import { maybeRecycleVipsWorker, vipsCancelOperations } from './utils';
 import { debug } from './utils/debug-logger';
 import { ErrorCode, UploadError } from '../upload-error';
+import { isClientSideMediaSupported } from '../feature-detection';
+import { StubFile } from '../stub-file';
+import {
+	getFileBasename,
+	getFileExtension,
+	getFileNameFromUrl,
+} from '../utils';
 import { validateMimeType } from '../validate-mime-type';
 import { validateMimeTypeForUser } from '../validate-mime-type-for-user';
 import { validateFileSize } from '../validate-file-size';
@@ -49,6 +58,7 @@ import { validateFileSize } from '../validate-file-size';
 type ActionCreators = {
 	addItem: typeof addItem;
 	addItems: typeof addItems;
+	optimizeExistingItem: typeof optimizeExistingItem;
 	removeItem: typeof removeItem;
 	processItem: typeof processItem;
 	cancelItem: typeof cancelItem;
@@ -58,6 +68,40 @@ type ActionCreators = {
 	revokeBlobUrls: typeof revokeBlobUrls;
 	< T = Record< string, unknown > >( args: T ): void;
 };
+
+/**
+ * Default image quality (0-1) used when the consumer hasn't configured one.
+ *
+ * Matches WordPress core's default JPEG quality and the value used elsewhere
+ * in the client-side processing pipeline.
+ */
+const DEFAULT_OUTPUT_QUALITY = 0.82;
+
+/**
+ * Maps a file extension to the image format the client-side pipeline can
+ * re-encode. Returns `null` for extensions that should not be optimized
+ * (e.g. animated GIFs, or unknown/unsupported types).
+ *
+ * @param extension File extension (without the dot).
+ * @return Image format, or null when the file should not be optimized.
+ */
+function getOptimizableImageFormat(
+	extension: string | null
+): ImageFormat | null {
+	switch ( extension?.toLowerCase() ) {
+		case 'jpg':
+		case 'jpeg':
+			return 'jpeg';
+		case 'png':
+			return 'png';
+		case 'webp':
+			return 'webp';
+		case 'avif':
+			return 'avif';
+		default:
+			return null;
+	}
+}
 
 type AllSelectors = typeof import('./selectors') &
 	typeof import('./private-selectors');
@@ -144,6 +188,124 @@ export function addItems( {
 				additionalData,
 			} );
 		}
+	};
+}
+
+interface OptimizeExistingItemArgs {
+	/** Attachment ID of the existing media to optimize. */
+	id: number;
+	/** URL of the existing file to re-process (ideally the full-size original). */
+	url: string;
+	/** Optional file name. Defaults to the name derived from the URL. */
+	fileName?: string;
+	onChange?: OnChangeHandler;
+	onSuccess?: OnSuccessHandler;
+	onError?: OnErrorHandler;
+	additionalData?: AdditionalData;
+}
+
+/**
+ * Optimizes a previously uploaded attachment.
+ *
+ * Fetches the existing file, re-compresses it client-side (same format,
+ * regenerating sub-sizes), and uploads the result as a new attachment. The
+ * consumer's `onSuccess` callback receives the new attachment so the block
+ * can be repointed at it.
+ *
+ * When the browser cannot process the file (client-side media unsupported,
+ * or an unsupported/animated format) the item is not enqueued and `onError`
+ * is called, leaving the original attachment untouched.
+ *
+ * @param $0
+ * @param $0.id               Attachment ID of the existing media.
+ * @param $0.url              URL of the existing file to re-process.
+ * @param [$0.fileName]       File name. Defaults to the name derived from the URL.
+ * @param [$0.onChange]       Function called each time a representation of the file is available.
+ * @param [$0.onSuccess]      Function called after the optimized file is uploaded.
+ * @param [$0.onError]        Function called when an error happens.
+ * @param [$0.additionalData] Additional data to include in the upload request.
+ */
+export function optimizeExistingItem( {
+	id,
+	url,
+	fileName,
+	onChange,
+	onSuccess,
+	onError,
+	additionalData = {} as AdditionalData,
+}: OptimizeExistingItemArgs ) {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const reportError = ( code: ErrorCode, message: string ) => {
+			onError?.(
+				new UploadError( {
+					code,
+					message,
+					file: new StubFile(),
+				} )
+			);
+		};
+
+		// Bail when the browser can't run the client-side pipeline.
+		if ( ! isClientSideMediaSupported() ) {
+			reportError(
+				ErrorCode.GENERAL,
+				'Client-side media processing is not supported in this browser.'
+			);
+			return;
+		}
+
+		// Avoid optimizing the same attachment twice concurrently.
+		if ( select.isUploadingById( id ) ) {
+			return;
+		}
+
+		const resolvedFileName = fileName || getFileNameFromUrl( url );
+		const extension = getFileExtension( resolvedFileName );
+		const outputFormat = getOptimizableImageFormat( extension );
+
+		// Only known, re-encodable image formats can be optimized client-side.
+		if ( ! outputFormat ) {
+			reportError(
+				ErrorCode.MIME_TYPE_NOT_SUPPORTED,
+				'This file type cannot be optimized in the browser.'
+			);
+			return;
+		}
+
+		const newFileName = `${ getFileBasename(
+			resolvedFileName
+		) }-optimized.${ extension }`;
+
+		const outputQuality =
+			select.getSettings().imageQuality ?? DEFAULT_OUTPUT_QUALITY;
+
+		const operations: Operation[] = [
+			[
+				OperationType.FetchRemoteFile,
+				{ url, fileName: resolvedFileName, newFileName },
+			],
+			[
+				OperationType.TranscodeImage,
+				{ outputFormat, outputQuality, interlaced: false },
+			],
+			OperationType.Upload,
+			OperationType.ThumbnailGeneration,
+			OperationType.Finalize,
+		];
+
+		dispatch.addItem( {
+			file: new StubFile(),
+			onChange,
+			onSuccess,
+			onError,
+			additionalData: {
+				generate_sub_sizes: false,
+				...additionalData,
+			},
+			sourceUrl: url,
+			sourceAttachmentId: id,
+			operations,
+		} );
 	};
 }
 
