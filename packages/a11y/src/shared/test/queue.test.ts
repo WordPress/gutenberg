@@ -60,10 +60,10 @@ describe( 'polite announcement queue', () => {
 			jest.advanceTimersByTime( 100 );
 			expect( containerPolite ).toHaveTextContent( 'first' );
 
-			jest.advanceTimersByTime( 1600 ); // 1500ms reading + 100ms fill.
+			jest.advanceTimersByTime( 600 ); // 500ms reading + 100ms fill.
 			expect( containerPolite ).toHaveTextContent( 'second' );
 
-			jest.advanceTimersByTime( 1600 );
+			jest.advanceTimersByTime( 600 );
 			expect( containerPolite ).toHaveTextContent( 'third' );
 		} );
 
@@ -74,7 +74,7 @@ describe( 'polite announcement queue', () => {
 			jest.advanceTimersByTime( 100 );
 			expect( containerPolite ).toHaveTextContent( 'first' );
 
-			jest.advanceTimersByTime( 1500 );
+			jest.advanceTimersByTime( 500 );
 			expect( containerPolite ).toBeEmptyDOMElement();
 
 			jest.advanceTimersByTime( 100 );
@@ -91,7 +91,7 @@ describe( 'polite announcement queue', () => {
 			expect( containerPolite ).toHaveTextContent( 'first' );
 
 			// 'second' fills after the reading window + fill delay.
-			jest.advanceTimersByTime( 1600 );
+			jest.advanceTimersByTime( 600 );
 			expect( containerPolite ).toHaveTextContent( 'second' );
 		} );
 	} );
@@ -104,13 +104,13 @@ describe( 'polite announcement queue', () => {
 
 			// After the reading window the queue is empty; the container is
 			// not cleared until the next drain cycle begins.
-			jest.advanceTimersByTime( 1500 );
+			jest.advanceTimersByTime( 500 );
 			expect( containerPolite ).toHaveTextContent( 'only' );
 		} );
 
 		it( 'should accept new messages after the queue has fully drained', () => {
 			enqueuePolite( 'first batch' );
-			jest.advanceTimersByTime( 1700 ); // Full cycle: fill + reading.
+			jest.advanceTimersByTime( 700 ); // Full cycle: fill + reading.
 
 			enqueuePolite( 'second batch' );
 			jest.advanceTimersByTime( 100 );

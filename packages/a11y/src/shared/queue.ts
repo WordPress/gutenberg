@@ -1,5 +1,5 @@
 const CLEAR_FILL_DELAY = 100;
-const ANNOUNCE_WAIT = 1500;
+const ANNOUNCE_WAIT = 500;
 
 const politeQueue: string[] = [];
 let isDraining = false;

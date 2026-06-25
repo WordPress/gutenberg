@@ -88,11 +88,11 @@ describe( 'speak', () => {
 			jest.advanceTimersByTime( 100 );
 			expect( containerPolite ).toHaveTextContent( 'first' );
 
-			// After reading window (1500ms) + clear + fill delay (100ms).
-			jest.advanceTimersByTime( 1600 );
+			// After reading window (500ms) + clear + fill delay (100ms).
+			jest.advanceTimersByTime( 600 );
 			expect( containerPolite ).toHaveTextContent( 'second' );
 
-			jest.advanceTimersByTime( 1600 );
+			jest.advanceTimersByTime( 600 );
 			expect( containerPolite ).toHaveTextContent( 'third' );
 		} );
 
@@ -104,7 +104,7 @@ describe( 'speak', () => {
 			expect( containerPolite ).toHaveTextContent( 'first' );
 
 			// Reading window expires; container is cleared before next fill.
-			jest.advanceTimersByTime( 1500 );
+			jest.advanceTimersByTime( 500 );
 			expect( containerPolite ).toBeEmptyDOMElement();
 
 			jest.advanceTimersByTime( 100 );
@@ -127,7 +127,7 @@ describe( 'speak', () => {
 			expect( containerPolite ).toHaveTextContent( 'polite first' );
 
 			// Polite queue continues draining normally.
-			jest.advanceTimersByTime( 1400 );
+			jest.advanceTimersByTime( 400 );
 			expect( containerPolite ).toBeEmptyDOMElement();
 			jest.advanceTimersByTime( 100 );
 			expect( containerPolite ).toHaveTextContent( 'polite second' );
