@@ -2,7 +2,7 @@
  * External dependencies
  */
 import clsx from 'clsx';
-import type { ReactNode } from 'react';
+import type { MouseEvent, ReactNode } from 'react';
 
 /**
  * WordPress dependencies
@@ -47,6 +47,10 @@ interface NavigationItemProps {
 	 * Optional trailing action shown alongside the navigation link.
 	 */
 	action?: ReactNode;
+	/**
+	 * Optional click handler for custom navigation behavior.
+	 */
+	onClick?: ( event: MouseEvent< HTMLAnchorElement > ) => void;
 }
 
 export default function NavigationItem( {
@@ -56,6 +60,7 @@ export default function NavigationItem( {
 	children,
 	to,
 	action,
+	onClick,
 }: NavigationItemProps ) {
 	// Check if the 'to' prop is an external URL
 	const isExternal = ! String(
@@ -75,6 +80,7 @@ export default function NavigationItem( {
 			as="a"
 			href={ to }
 			className={ clsx( 'boot-navigation-item', className ) }
+			onClick={ onClick }
 		>
 			{ content }
 		</Item>
@@ -82,6 +88,7 @@ export default function NavigationItem( {
 		<RouterLinkItem
 			to={ to }
 			className={ clsx( 'boot-navigation-item', className ) }
+			onClick={ onClick }
 		>
 			{ content }
 		</RouterLinkItem>

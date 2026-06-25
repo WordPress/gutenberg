@@ -93,6 +93,19 @@ function Navigation( {
 	);
 
 	const renderItem = ( item: MenuItem ) => {
+		const onClick =
+			item.id === 'home'
+				? ( event: MouseEvent< HTMLAnchorElement > ) => {
+						event.preventDefault();
+						navigate( {
+							to: '/',
+							search: () => ( {
+								homepagePreviewReset: Date.now().toString(),
+							} ),
+						} as never );
+				  }
+				: undefined;
+
 		const action =
 			item.id === 'home' ? (
 				<Button
@@ -151,6 +164,7 @@ function Navigation( {
 				icon={ item.icon }
 				shouldShowPlaceholder={ hasRealIcons }
 				action={ action }
+				onClick={ onClick }
 			>
 				{ item.label }
 			</NavigationItem>

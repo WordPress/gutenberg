@@ -818,6 +818,15 @@ function PreviewToolbar( {
 }
 
 function FrontendPreviewCanvas( { canvas }: CanvasProps ) {
+	const searchParams = useSearch( { strict: false } ) as Record<
+		string,
+		unknown
+	>;
+	const homepagePreviewReset =
+		canvas.previewStatus === 'homepage' &&
+		typeof searchParams.homepagePreviewReset === 'string'
+			? searchParams.homepagePreviewReset
+			: '';
 	const fallbackPreviewMetadata = useMemo(
 		() => ( {
 			previewLabel: canvas.previewLabel,
@@ -867,7 +876,9 @@ function FrontendPreviewCanvas( { canvas }: CanvasProps ) {
 	}, [ previewHistoryIndex ] );
 
 	useEffect( () => {
+		previewContextRequestRef.current += 1;
 		const nextPreviewUrl = addPreviewQueryArg( canvas.previewUrl );
+		setIsResolving( false );
 		setCurrentEditLink( canvas.editLink );
 		setPreviewMetadata( fallbackPreviewMetadata );
 		setFrameSrc( nextPreviewUrl );
@@ -875,7 +886,13 @@ function FrontendPreviewCanvas( { canvas }: CanvasProps ) {
 		setPreviewHistoryIndex( 0 );
 		setExternalPreviewUrl( undefined );
 		pendingHistoryIndexRef.current = null;
-	}, [ canvas.editLink, fallbackPreviewMetadata, canvas.previewUrl ] );
+		setFrameRefreshKey( ( key ) => key + 1 );
+	}, [
+		canvas.editLink,
+		fallbackPreviewMetadata,
+		homepagePreviewReset,
+		canvas.previewUrl,
+	] );
 
 	const resolveEditLink = useCallback(
 		async ( url?: string ) => {
