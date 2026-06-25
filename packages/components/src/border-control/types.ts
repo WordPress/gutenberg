@@ -121,7 +121,7 @@ export type BorderControlProps = ColorProps &
 	};
 
 export type DropdownProps = ColorProps &
-	Pick< BorderControlProps, 'enableStyle' | 'size' > & {
+	Pick< BorderControlProps, 'enableStyle' > & {
 		/**
 		 * An object representing a border or `undefined`. This component will
 		 * extract the border color and style selections from this object to use as

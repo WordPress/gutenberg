@@ -93,7 +93,6 @@ const UnconnectedBorderControl = (
 								__experimentalIsRenderedInSidebar={
 									__experimentalIsRenderedInSidebar
 								}
-								size="__unstable-large"
 							/>
 						</Spacer>
 					}

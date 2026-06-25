@@ -26,8 +26,6 @@ export function useBorderControlDropdown(
 		onChange,
 		previousStyleSelection,
 		__experimentalIsRenderedInSidebar = false,
-		// Deprecated props, no longer used.
-		size: _size,
 		...otherProps
 	} = useContextSystem( props, 'BorderControlDropdown' );
 
