@@ -176,6 +176,7 @@ const restrictedSyntax = [
 		'FocalPointPicker',
 		'FontSizePicker',
 		'QueryControls',
+		'SearchControl',
 		'TextControl',
 	].map( ( componentName ) => ( {
 		selector: `JSXElement[openingElement.name.name="${ componentName }"] JSXAttribute[name.name="__next40pxDefaultSize"]`,

@@ -5,10 +5,13 @@ import type { InputControlProps } from '../input-control/types';
 
 export type SearchControlProps = Pick< InputControlProps, 'help' | 'value' > & {
 	/**
-	 * @deprecated This is now the default.
+	 * Start opting into the larger default height that will become the
+	 * default size in a future version.
+	 *
+	 * @deprecated Default behavior since WP 6.7. Prop can be safely removed.
 	 * @ignore
 	 */
-	__next40pxDefaultSize?: InputControlProps[ '__next40pxDefaultSize' ];
+	__next40pxDefaultSize?: boolean;
 	/**
 	 * Start opting into the new margin-free styles that will become the default in a future version.
 	 *
