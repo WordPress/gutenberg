@@ -25,8 +25,9 @@ export function useBorderControlDropdown(
 		enableStyle = true,
 		onChange,
 		previousStyleSelection,
-		size = 'default',
 		__experimentalIsRenderedInSidebar = false,
+		// Deprecated props, no longer used.
+		size: _size,
 		...otherProps
 	} = useContextSystem( props, 'BorderControlDropdown' );
 
@@ -65,8 +66,8 @@ export function useBorderControlDropdown(
 	}, [ cx ] );
 
 	const indicatorWrapperClassName = useMemo( () => {
-		return cx( styles.colorIndicatorWrapper( border, size ) );
-	}, [ border, cx, size ] );
+		return cx( styles.colorIndicatorWrapper( border, '__unstable-large' ) );
+	}, [ border, cx ] );
 
 	const popoverControlsClassName = useMemo( () => {
 		return cx( styles.borderControlPopoverControls );
@@ -95,7 +96,6 @@ export function useBorderControlDropdown(
 		popoverContentClassName,
 		popoverControlsClassName,
 		resetButtonWrapperClassName,
-		size,
 		__experimentalIsRenderedInSidebar,
 	};
 }

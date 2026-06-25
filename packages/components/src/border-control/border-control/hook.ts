@@ -32,15 +32,16 @@ export function useBorderControl(
 		enableAlpha = true,
 		enableStyle = true,
 		shouldSanitizeBorder = true,
-		size = 'default',
 		value: border,
 		width,
 		__experimentalIsRenderedInSidebar = false,
-		__next40pxDefaultSize: _,
+		// Deprecated props, no longer used.
+		size: _size,
+		__next40pxDefaultSize: _next40pxDefaultSize,
 		...otherProps
 	} = useContextSystem( props, 'BorderControl' );
 
-	const computedSize = size === 'default' ? '__unstable-large' : size;
+	const computedSize = '__unstable-large';
 
 	const [ widthValue, originalWidthUnit ] = parseQuantityAndUnitFromRawValue(
 		border?.width
@@ -128,7 +129,7 @@ export function useBorderControl(
 	if ( isCompact ) {
 		// Widths below represent the minimum usable width for compact controls.
 		// Taller controls contain greater internal padding, thus greater width.
-		wrapperWidth = size === '__unstable-large' ? '116px' : '90px';
+		wrapperWidth = '116px';
 	}
 	const innerWrapperClassName = useMemo( () => {
 		const widthStyle = !! wrapperWidth && styles.wrapperWidth;
@@ -158,7 +159,6 @@ export function useBorderControl(
 		value: border,
 		widthUnit,
 		widthValue,
-		size: computedSize,
 		__experimentalIsRenderedInSidebar,
 	};
 }

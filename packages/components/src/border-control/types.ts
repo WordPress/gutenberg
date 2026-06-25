@@ -45,19 +45,8 @@ export type LabelProps = {
 	label?: string;
 };
 
-type DeprecatedBorderControlProps = {
-	/**
-	 * Start opting into the larger default height that will become the default size in a future version.
-	 *
-	 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
-	 * @ignore
-	 */
-	__next40pxDefaultSize?: boolean;
-};
-
 export type BorderControlProps = ColorProps &
-	LabelProps &
-	DeprecatedBorderControlProps & {
+	LabelProps & {
 		/**
 		 * This controls whether unit selection should be disabled.
 		 */
@@ -103,7 +92,8 @@ export type BorderControlProps = ColorProps &
 		/**
 		 * Size of the control.
 		 *
-		 * @default 'default'
+		 * @deprecated This prop no longer has any effect.
+		 * @ignore
 		 */
 		size?: 'default' | '__unstable-large';
 		/**
@@ -121,6 +111,13 @@ export type BorderControlProps = ColorProps &
 		 * `RangeControl` for additional control over a border's width.
 		 */
 		withSlider?: boolean;
+		/**
+		 * Start opting into the larger default height that will become the default size in a future version.
+		 *
+		 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
+		 * @ignore
+		 */
+		__next40pxDefaultSize?: boolean;
 	};
 
 export type DropdownProps = ColorProps &

@@ -125,13 +125,6 @@ new border value.
 -   Required: No
 -   Default: `true`
 
-### `size`: `string`
-
-Size of the control.
-
--   Required: No
--   Default: `default`
--   Allowed values: `default`, `__unstable-large`
 
 ### `value`: `Object`
 

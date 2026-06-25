@@ -56,7 +56,6 @@ const UnconnectedBorderControl = (
 		__unstablePopoverProps,
 		previousStyleSelection,
 		showDropdownHeader,
-		size,
 		sliderClassName,
 		value: border,
 		widthUnit,
@@ -94,7 +93,7 @@ const UnconnectedBorderControl = (
 								__experimentalIsRenderedInSidebar={
 									__experimentalIsRenderedInSidebar
 								}
-								size={ size }
+								size="__unstable-large"
 							/>
 						</Spacer>
 					}
@@ -106,7 +105,7 @@ const UnconnectedBorderControl = (
 					placeholder={ placeholder }
 					disableUnits={ disableUnits }
 					__unstableInputWidth={ inputWidth }
-					size={ size }
+					size="__unstable-large"
 				/>
 				{ withSlider && (
 					<RangeControl
