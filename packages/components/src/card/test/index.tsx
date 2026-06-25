@@ -238,14 +238,20 @@ describe( 'Card', () => {
 					<EmotionStylePrimer styleFragment={ styles.borderless } />
 				);
 				render(
-					<CardHeader data-testid="card-header" isBorderless>
-						Header
-					</CardHeader>
+					<Card>
+						<CardHeader data-testid="card-header" isBorderless>
+							Header
+						</CardHeader>
+						<CardBody>Body</CardBody>
+					</Card>
 				);
 
 				expectComposedEmotionClassName(
 					screen.getByTestId( 'card-header' ),
 					[ 'Header', 'borderRadius', 'borderColor', 'borderless' ]
+				);
+				expect( screen.getByTestId( 'card-header' ) ).toHaveStyle(
+					'border: none'
 				);
 			} );
 		} );
@@ -274,14 +280,20 @@ describe( 'Card', () => {
 					<EmotionStylePrimer styleFragment={ styles.borderless } />
 				);
 				render(
-					<CardFooter data-testid="card-footer" isBorderless>
-						Footer
-					</CardFooter>
+					<Card>
+						<CardBody>Body</CardBody>
+						<CardFooter data-testid="card-footer" isBorderless>
+							Footer
+						</CardFooter>
+					</Card>
 				);
 
 				expectComposedEmotionClassName(
 					screen.getByTestId( 'card-footer' ),
 					[ 'Footer', 'borderRadius', 'borderColor', 'borderless' ]
+				);
+				expect( screen.getByTestId( 'card-footer' ) ).toHaveStyle(
+					'border: none'
 				);
 			} );
 		} );
