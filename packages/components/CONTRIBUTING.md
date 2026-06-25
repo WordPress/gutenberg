@@ -418,7 +418,7 @@ On the component's main named export, add a JSDoc comment that includes the main
 
 All new components should be styled using SCSS Modules.
 
-Place component-local styles in a `style.module.scss` file next to the component, import the module from JavaScript or TypeScript, and compose class names with `clsx`. Preserve existing public `components-*` class names where consumers may rely on them. For dynamic values, prefer inline CSS custom properties consumed by the SCSS module. For variants and state, prefer conditional module classes composed with `clsx`.
+Place component-local styles in a `style.module.scss` file next to the component, import the module from JavaScript or TypeScript, and compose class names with `clsx`. Preserve existing public `components-*` class names where consumers may rely on them. For dynamic values, prefer inline CSS custom properties consumed by the SCSS module. For variants and state, prefer conditional module classes composed with `clsx`. When a conditional class comes from a CSS module, use `condition && styles.className` instead of a computed object key (`{ [ styles.className ]: condition }`), because CSS modules are mocked as empty objects in Jest tests, which result in a literal `undefined` class.
 
 Legacy components may still use Emotion while they are being migrated, but new Emotion usage should not be added.
 
@@ -445,9 +445,9 @@ function MyComponent( { __nextHasNoOuterMargins = false, className } ) {
 			className={ clsx(
 				'components-my-component',
 				styles.root,
+				className,
 				! __nextHasNoOuterMargins &&
-					styles.deprecatedOuterMargins,
-				className
+					styles.deprecatedOuterMargins
 			) }
 		/>
 	);

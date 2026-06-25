@@ -20,7 +20,7 @@ const blockToBlocks = ( block ) =>
 	} );
 
 export default function BlockInvalidWarning( { clientId } ) {
-	const { block, canInsertHTMLBlock, canInsertClassicBlock } = useSelect(
+	const { block, canInsertHTMLBlock } = useSelect(
 		( select ) => {
 			const { canInsertBlockType, getBlock, getBlockRootClientId } =
 				select( blockEditorStore );
@@ -31,10 +31,6 @@ export default function BlockInvalidWarning( { clientId } ) {
 				block: getBlock( clientId ),
 				canInsertHTMLBlock: canInsertBlockType(
 					'core/html',
-					rootClientId
-				),
-				canInsertClassicBlock: canInsertBlockType(
-					'core/freeform',
 					rootClientId
 				),
 			};
@@ -48,12 +44,6 @@ export default function BlockInvalidWarning( { clientId } ) {
 
 	const convert = useMemo(
 		() => ( {
-			toClassic() {
-				const classicBlock = createBlock( 'core/freeform', {
-					content: block.originalContent,
-				} );
-				return replaceBlock( block.clientId, classicBlock );
-			},
 			toHTML() {
 				const htmlBlock = createBlock( 'core/html', {
 					content: block.originalContent,
@@ -88,12 +78,8 @@ export default function BlockInvalidWarning( { clientId } ) {
 					title: __( 'Convert to HTML' ),
 					onClick: convert.toHTML,
 				},
-				canInsertClassicBlock && {
-					title: __( 'Convert to Classic Block' ),
-					onClick: convert.toClassic,
-				},
 			].filter( Boolean ),
-		[ canInsertHTMLBlock, canInsertClassicBlock, convert ]
+		[ canInsertHTMLBlock, convert ]
 	);
 
 	return (

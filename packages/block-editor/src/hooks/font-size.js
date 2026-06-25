@@ -131,7 +131,6 @@ export function FontSizeEdit( props ) {
 			valueMode={ fontSize ? 'slug' : 'literal' }
 			withReset={ false }
 			withSlider
-			size="__unstable-large"
 		/>
 	);
 }

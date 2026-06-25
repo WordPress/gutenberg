@@ -117,13 +117,7 @@ function Edit( {
 			} );
 		};
 
-		if ( tabsList.length > prevCount ) {
-			// Tab added — focus the last (newly added) button.
-			focusButtonAt( tabsList.length - 1 );
-		} else {
-			// Tab removed — focus the new active button.
-			focusButtonAt( effectiveActiveIndex );
-		}
+		focusButtonAt( effectiveActiveIndex );
 	}, [ tabsList.length, effectiveActiveIndex ] );
 
 	const blockProps = useBlockProps( {

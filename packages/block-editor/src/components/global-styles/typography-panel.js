@@ -625,7 +625,6 @@ export default function TypographyPanel( {
 						disableCustomFontSizes={ disableCustomFontSizes }
 						withReset={ false }
 						withSlider
-						size="__unstable-large"
 					/>
 				</ToolsPanelItem>
 			) }
