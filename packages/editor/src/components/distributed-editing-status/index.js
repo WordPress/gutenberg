@@ -5571,17 +5571,57 @@ export function DistributedEditingPresenceRoster( {
 		pinnedPresenceEntryKey || hoveredPresenceEntryKey;
 	const presenceDetailsBaseId = useId();
 	const presenceCaterpillarRef = useRef( null );
+	const presenceHoverCloseTimerRef = useRef( null );
+	const presencePointerPositionRef = useRef( null );
 	const repeatedRefreshSchedulerTokenRef = useRef( null );
 	const documentStateHeartbeatKeyRef = useRef( null );
 	const startupHeartbeatRuntimeKeyRef = useRef( null );
 	const startupHeartbeatRuntimeSentRef = useRef( false );
 	const startupSnapshotRuntimeKeyRef = useRef( null );
 	const startupSnapshotRuntimeSentRef = useRef( false );
+	const cancelPresenceHoverClose = useCallback( () => {
+		if ( presenceHoverCloseTimerRef.current ) {
+			globalThis.clearTimeout( presenceHoverCloseTimerRef.current );
+			presenceHoverCloseTimerRef.current = null;
+		}
+	}, [] );
+	const updatePresencePointerPosition = useCallback( ( event ) => {
+		presencePointerPositionRef.current = {
+			x: event.clientX,
+			y: event.clientY,
+		};
+	}, [] );
+	const isPresencePointerInsideExpandedSurface = useCallback( () => {
+		const position = presencePointerPositionRef.current;
+		const root = presenceCaterpillarRef.current;
+
+		if ( ! position || ! root ) {
+			return false;
+		}
+
+		const expandedSurfaces = root.querySelectorAll(
+			[
+				'.editor-distributed-editing-status__presence-caterpillar-item--expanded',
+				'.editor-distributed-editing-status__presence-caterpillar-details',
+			].join( ', ' )
+		);
+
+		return [ ...expandedSurfaces ].some( ( element ) => {
+			const rect = element.getBoundingClientRect();
+
+			return (
+				position.x >= rect.left &&
+				position.x <= rect.right &&
+				position.y >= rect.top &&
+				position.y <= rect.bottom
+			);
+		} );
+	}, [] );
 	const setAuthorshipFocusEntry = useCallback(
-		( entry ) => {
+		( entry, presenceEntryKey = getPresenceRosterEntryUiKey( entry ) ) => {
 			updateDistributedEditingSessionState?.( {
 				authorshipFocusAttributionKey: entry?.attributionKey || null,
-				authorshipFocusPresenceEntryKey: entry?.key || null,
+				authorshipFocusPresenceEntryKey: presenceEntryKey || null,
 				authorshipFocusDisplayName:
 					entry?.displayName ||
 					getPresenceRosterEntryDisplayName( entry ) ||
@@ -5605,6 +5645,38 @@ export function DistributedEditingPresenceRoster( {
 			} );
 		},
 		[ pinnedPresenceEntryKey, updateDistributedEditingSessionState ]
+	);
+	const schedulePresenceHoverClose = useCallback(
+		( presenceEntryKey, event = null ) => {
+			if ( pinnedPresenceEntryKey === presenceEntryKey ) {
+				return;
+			}
+
+			if ( event ) {
+				updatePresencePointerPosition( event );
+			}
+
+			cancelPresenceHoverClose();
+			presenceHoverCloseTimerRef.current = globalThis.setTimeout( () => {
+				if ( isPresencePointerInsideExpandedSurface() ) {
+					presenceHoverCloseTimerRef.current = null;
+					return;
+				}
+
+				setHoveredPresenceEntryKey( ( currentKey ) =>
+					currentKey === presenceEntryKey ? null : currentKey
+				);
+				clearAuthorshipFocusEntry();
+				presenceHoverCloseTimerRef.current = null;
+			}, 150 );
+		},
+		[
+			cancelPresenceHoverClose,
+			clearAuthorshipFocusEntry,
+			isPresencePointerInsideExpandedSurface,
+			pinnedPresenceEntryKey,
+			updatePresencePointerPosition,
+		]
 	);
 	const presenceEditorContentState = useSelect( ( select ) => {
 		const { getCurrentPost, getEditedPostContent } = select( editorStore );
@@ -5893,6 +5965,8 @@ export function DistributedEditingPresenceRoster( {
 		presenceStorageReadinessRecheckState.visible;
 	const shouldShowPresenceActions = shouldShowPresenceFreshnessIndicator;
 
+	useEffect( () => cancelPresenceHoverClose, [ cancelPresenceHoverClose ] );
+
 	useEffect( () => {
 		if ( ! expandedPresenceEntryKey ) {
 			return undefined;
@@ -5911,12 +5985,14 @@ export function DistributedEditingPresenceRoster( {
 				presenceCaterpillarRef.current &&
 				! presenceCaterpillarRef.current.contains( event.target )
 			) {
+				cancelPresenceHoverClose();
 				setPinnedPresenceEntryKey( null );
 				setHoveredPresenceEntryKey( null );
 			}
 		};
 		const handleKeyDown = ( event ) => {
 			if ( event.key === 'Escape' ) {
+				cancelPresenceHoverClose();
 				setPinnedPresenceEntryKey( null );
 				setHoveredPresenceEntryKey( null );
 			}
@@ -5929,7 +6005,7 @@ export function DistributedEditingPresenceRoster( {
 			ownerDocument.removeEventListener( 'mousedown', handlePointerDown );
 			ownerDocument.removeEventListener( 'keydown', handleKeyDown );
 		};
-	}, [ expandedPresenceEntryKey ] );
+	}, [ cancelPresenceHoverClose, expandedPresenceEntryKey ] );
 
 	useEffect( () => {
 		if (
@@ -6989,6 +7065,10 @@ export function DistributedEditingPresenceRoster( {
 					ref={ presenceCaterpillarRef }
 				>
 					{ rosterDisplayEntries.map( ( entry, index ) => {
+						const presenceEntryKey = getPresenceRosterEntryUiKey(
+							entry,
+							index
+						);
 						const displayName =
 							getPresenceRosterEntryDisplayName( entry );
 						const statusLabel =
@@ -6996,8 +7076,9 @@ export function DistributedEditingPresenceRoster( {
 						const statusTone =
 							getPresenceRosterEntryStatusTone( entry );
 						const isExpanded =
-							expandedPresenceEntryKey === entry.key;
-						const isPinned = pinnedPresenceEntryKey === entry.key;
+							expandedPresenceEntryKey === presenceEntryKey;
+						const isPinned =
+							pinnedPresenceEntryKey === presenceEntryKey;
 						const detailsId = `${ presenceDetailsBaseId }-${ index }`;
 						const sessionDurationLabel =
 							getPresenceRosterEntrySessionDurationLabel( entry );
@@ -7112,26 +7193,27 @@ export function DistributedEditingPresenceRoster( {
 								data-distributed-editing-presence-row-visual-treatment="subtle-status-stripe"
 								data-distributed-editing-presence-row-visual-treatment-color-only="false"
 								data-distributed-editing-presence-row-visual-treatment-layout-stable="true"
-								key={ entry.key }
-								onMouseEnter={ () => {
-									setHoveredPresenceEntryKey( entry.key );
+								key={ presenceEntryKey }
+								onPointerEnter={ ( event ) => {
+									updatePresencePointerPosition( event );
+									cancelPresenceHoverClose();
+									setHoveredPresenceEntryKey(
+										presenceEntryKey
+									);
 									if ( ! pinnedPresenceEntryKey ) {
-										setAuthorshipFocusEntry( entry );
-									}
-								} }
-								onMouseLeave={ () => {
-									if (
-										pinnedPresenceEntryKey !== entry.key
-									) {
-										setHoveredPresenceEntryKey(
-											( currentKey ) =>
-												currentKey === entry.key
-													? null
-													: currentKey
+										setAuthorshipFocusEntry(
+											entry,
+											presenceEntryKey
 										);
-										clearAuthorshipFocusEntry();
 									}
 								} }
+								onPointerLeave={ ( event ) => {
+									schedulePresenceHoverClose(
+										presenceEntryKey,
+										event
+									);
+								} }
+								onPointerMove={ updatePresencePointerPosition }
 							>
 								<button
 									aria-controls={
@@ -7153,6 +7235,7 @@ export function DistributedEditingPresenceRoster( {
 									data-distributed-editing-presence-avatar-button="true"
 									onClick={ ( event ) => {
 										event.preventDefault();
+										cancelPresenceHoverClose();
 										if ( isPinned ) {
 											setPinnedPresenceEntryKey( null );
 											clearAuthorshipFocusEntry( {
@@ -7160,19 +7243,24 @@ export function DistributedEditingPresenceRoster( {
 											} );
 										} else {
 											setPinnedPresenceEntryKey(
-												entry.key
+												presenceEntryKey
 											);
-											setAuthorshipFocusEntry( entry );
+											setAuthorshipFocusEntry(
+												entry,
+												presenceEntryKey
+											);
 										}
 										setHoveredPresenceEntryKey( null );
 									} }
 									onBlur={ () => {
 										if (
-											pinnedPresenceEntryKey !== entry.key
+											pinnedPresenceEntryKey !==
+											presenceEntryKey
 										) {
 											setHoveredPresenceEntryKey(
 												( currentKey ) =>
-													currentKey === entry.key
+													currentKey ===
+													presenceEntryKey
 														? null
 														: currentKey
 											);
@@ -7180,9 +7268,15 @@ export function DistributedEditingPresenceRoster( {
 										}
 									} }
 									onFocus={ () => {
-										setHoveredPresenceEntryKey( entry.key );
+										cancelPresenceHoverClose();
+										setHoveredPresenceEntryKey(
+											presenceEntryKey
+										);
 										if ( ! pinnedPresenceEntryKey ) {
-											setAuthorshipFocusEntry( entry );
+											setAuthorshipFocusEntry(
+												entry,
+												presenceEntryKey
+											);
 										}
 									} }
 									type="button"
@@ -7216,6 +7310,30 @@ export function DistributedEditingPresenceRoster( {
 										data-distributed-editing-presence-details-exposes-private-fields="false"
 										data-distributed-editing-presence-details-exposes-raw-content="false"
 										id={ detailsId }
+										onPointerEnter={ ( event ) => {
+											updatePresencePointerPosition(
+												event
+											);
+											cancelPresenceHoverClose();
+											setHoveredPresenceEntryKey(
+												presenceEntryKey
+											);
+											if ( ! pinnedPresenceEntryKey ) {
+												setAuthorshipFocusEntry(
+													entry,
+													presenceEntryKey
+												);
+											}
+										} }
+										onPointerLeave={ ( event ) => {
+											schedulePresenceHoverClose(
+												presenceEntryKey,
+												event
+											);
+										} }
+										onPointerMove={
+											updatePresencePointerPosition
+										}
 										role="tooltip"
 									>
 										<strong className="editor-distributed-editing-status__presence-caterpillar-details-name">
@@ -7313,6 +7431,15 @@ function getPresenceRosterDisplayEntries( entries = [] ) {
 
 		return true;
 	} );
+}
+
+function getPresenceRosterEntryUiKey( entry, index = 0 ) {
+	return (
+		entry?.attributionKey ||
+		entry?.authorshipAttributionKey ||
+		entry?.key ||
+		`presence-editor-${ index + 1 }`
+	);
 }
 
 function getPresenceRosterEntryRelationshipPriority( entry ) {
