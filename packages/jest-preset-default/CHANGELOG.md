@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Mock CSS Module class names with kebab-case values in unit tests ([#79535](https://github.com/WordPress/gutenberg/pull/79535)).
+-   Mock CSS Module class names with identity values in unit tests ([#79535](https://github.com/WordPress/gutenberg/pull/79535)).
 
 ## 12.49.0 (2026-06-24)
 

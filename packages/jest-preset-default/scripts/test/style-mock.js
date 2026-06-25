@@ -1,10 +1,10 @@
 const styles = require( '../style-mock' );
 
 describe( 'style mock', () => {
-	it( 'returns kebab-case class names for CSS Module properties', () => {
+	it( 'returns identity class names for CSS Module properties', () => {
 		expect( styles.root ).toBe( 'root' );
-		expect( styles.className ).toBe( 'class-name' );
-		expect( styles.singleLineClamp ).toBe( 'single-line-clamp' );
+		expect( styles.className ).toBe( 'className' );
+		expect( styles.singleLineClamp ).toBe( 'singleLineClamp' );
 		expect( styles[ 'already-kebab' ] ).toBe( 'already-kebab' );
 	} );
 

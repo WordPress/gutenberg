@@ -1,10 +1,3 @@
-function toKebabCase( value ) {
-	return String( value )
-		.replace( /([a-z0-9])([A-Z])/g, '$1-$2' )
-		.replace( /([A-Z])([A-Z][a-z])/g, '$1-$2' )
-		.toLowerCase();
-}
-
 const styles = new Proxy(
 	{},
 	{
@@ -17,7 +10,7 @@ const styles = new Proxy(
 				return target[ property ];
 			}
 
-			return toKebabCase( property );
+			return property;
 		},
 	}
 );
