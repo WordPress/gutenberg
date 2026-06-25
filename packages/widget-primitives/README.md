@@ -4,9 +4,9 @@
 This package is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 
-The host-agnostic toolkit for dashboard widgets: the contract types that define
-what a widget is, plus the runtime to discover the registered widget types and
-resolve their render modules. It belongs to no host.
+The host-agnostic toolkit for widgets: the contract types that define what a
+widget is, plus the runtime to discover widget types and resolve their render
+modules.
 
 ## Installation
 
@@ -24,34 +24,36 @@ in your code._
 
 ## Setup
 
-This package ships no stylesheets and injects no styles; there is nothing
-to enqueue or import.
+This package ships no stylesheets; there is nothing to enqueue or import.
 
-The contract types and `<WidgetRender>` work in any React application. The
-`useWidgetTypes()` hook reads the `widgetModule` entity through
-`@wordpress/core-data`, so it expects to run against a WordPress site that
-exposes the `/wp/v2/widget-modules` REST endpoint.
+The contract types, `<WidgetRender>`, and `useWidgetTypes()` work in any
+React application. The host fetches the widget-module records however it
+wants and passes them in; `useWidgetTypes( records )` imports each record's
+metadata module and returns the resolved `WidgetType[]`.
 
-That endpoint ships with the Gutenberg plugin and, at this experimental
-stage, is registered only while the `gutenberg-dashboard-widgets` experiment
-is enabled. On a site without it, `useWidgetTypes()` resolves to an empty
-list; the contract types and `<WidgetRender>` do not depend on the endpoint
-and work regardless.
+On a WordPress site the records come from the `/wp/v2/widget-modules` REST
+endpoint, exposed while the `gutenberg-dashboard-widgets` experiment is
+enabled. The dashboard reads it through a `@wordpress/core-data` entity and
+passes the records to the hook.
+
+With no records, or an empty list, `useWidgetTypes()` returns an empty list.
 
 ## Public API
 
 -   `<WidgetRender>`: canonical entry point for any host that mounts a widget.
     Resolves the widget's render module via a host-provided `resolveWidgetModule`
     and mounts the resulting component with the standard `attributes` plus
-    `setAttributes` render contract. Suspense, error handling, and chrome are
-    host concerns and live outside the package.
--   `useWidgetTypes()` → `[ widgetTypes, isResolvingWidgetTypes ]`: the
-    `WidgetType[]` available on the current page, plus a flag that is true while
-    they are still resolving.
+    `setAttributes` render contract. Error handling and chrome are host
+    concerns; because the component is mounted lazily, the host must also
+    wrap it in a `Suspense` boundary.
+-   `useWidgetTypes( records )` → `[ widgetTypes, isResolvingWidgetTypes ]`:
+    takes host-supplied records (`WidgetModuleRecord[]`, or `null` while
+    loading) and imports each record's metadata module;
+    `isResolvingWidgetTypes` stays `true` until they resolve.
 -   Contract types: `WidgetType`, `WidgetName`, `WidgetIcon`,
-    `WidgetRenderProps`, `ResolveWidgetModule`. `WidgetIcon` is a rendered SVG
-    element (typically one from `@wordpress/icons`); hosts pass it to their
-    icon primitive as is.
+    `WidgetRenderProps`, `ResolveWidgetModule`, `WidgetModuleRecord`.
+    `WidgetIcon` is a rendered SVG element; hosts pass it to their icon
+    primitive as is.
 
 ## Architecture
 

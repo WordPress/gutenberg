@@ -136,6 +136,12 @@
 				@media not ( prefers-reduced-motion ) {
 					transition: opacity 0.1s ease-out;
 				}
+
+				@media ( forced-colors: active ) {
+					border-color: ButtonText;
+					border-block-end-style: none;
+					border-inline-start-style: none;
+				}
 			}
 		}
 
@@ -225,13 +231,17 @@
 			--wp-ui-button-height: var(--wpds-dimension-size-md);
 		}
 
-		.is-loading {
+		.is-loading:not(.is-unstyled) {
 			color: transparent;
 
 			/* Keep text transparent when a loading button is hovered — needed because
 			 the hover state now sets `color` as a property declaration. */
 			&:not([data-disabled]):is(:hover, :active, :focus) {
 				color: transparent;
+			}
+
+			@media ( forced-colors: active ) {
+				color: ButtonFace;
 			}
 
 			* {

@@ -14,7 +14,7 @@
 
 	&--label-side {
 		flex-direction: row;
-		gap: var(--wpds-dimension-gap-md);
+		gap: var(--wpds-dimension-gap-sm);
 	}
 
 	&--label-top {
@@ -107,14 +107,11 @@
 	position: relative;
 	z-index: 1;
 	cursor: help;
-	fill: var(--wpds-color-foreground-content-error-weak);
+	color: var(--wpds-color-foreground-content-error-weak);
 	display: inline-flex;
 	flex-direction: row;
 	align-items: center;
 	gap: var(--wpds-dimension-gap-xs);
-	svg {
-		fill: currentColor;
-	}
 }
 
 .dataforms-layouts-panel__field-control {

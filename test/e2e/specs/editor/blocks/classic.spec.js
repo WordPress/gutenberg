@@ -87,7 +87,9 @@ test.describe( 'Classic', () => {
 			.poll( editor.getEditedPostContent )
 			.toMatch( /\[gallery ids=\"\d+\"\]/ );
 
-		await editor.clickBlockToolbarButton( 'Convert to blocks' );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Convert to blocks' } )
+			.click();
 		const galleryBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Gallery',
 		} );
@@ -102,7 +104,9 @@ test.describe( 'Classic', () => {
 			.poll( editor.getEditedPostContent )
 			.toMatch( /\[gallery ids=\"\d+\"\]/ );
 
-		await editor.clickBlockToolbarButton( 'Convert to blocks' );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Convert to blocks' } )
+			.click();
 		await expect
 			.poll( editor.getEditedPostContent )
 			.toMatch( /<!-- wp:gallery/ );

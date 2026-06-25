@@ -71,7 +71,7 @@ describe( 'Post actions', () => {
 			unlock(
 				registry.dispatch( editorStore )
 			).updateDeviceTypeForViewportState( {
-				viewport: 'mobile',
+				viewport: '@mobile',
 				showStateOnCanvas: true,
 			} );
 
@@ -87,7 +87,7 @@ describe( 'Post actions', () => {
 			unlock(
 				registry.dispatch( editorStore )
 			).updateDeviceTypeForViewportState( {
-				viewport: 'mobile',
+				viewport: '@mobile',
 				showStateOnCanvas: false,
 			} );
 
