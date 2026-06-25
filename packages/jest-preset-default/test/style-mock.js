@@ -1,5 +1,5 @@
 const clsx = require( 'clsx' );
-const styles = require( '../style-mock' );
+const styles = require( '../scripts/style-mock' );
 
 describe( 'style mock', () => {
 	it( 'returns prefixed class names for CSS Module properties', () => {
