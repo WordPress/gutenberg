@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { v4 as uuid } from 'uuid';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -17,7 +12,6 @@ import { __ } from '@wordpress/i18n';
 export function getTrackAttributes( media ) {
 	return {
 		id: media.id || media.url, // Attachment ID or URL.
-		uniqueId: uuid(), // Unique ID for the track.
 		src: media.url,
 		title: media.title,
 		artist:

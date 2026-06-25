@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.34.0 (2026-06-24)
+
 ### Enhancement
 
 -   Add `ErrorCode` enum and localized `getErrorMessage()` helper. Existing `UploadError` throw sites now use enum values, and `ErrorCode` / `getErrorMessage` are exported from the package entry point ([#74917](https://github.com/WordPress/gutenberg/pull/74917)).

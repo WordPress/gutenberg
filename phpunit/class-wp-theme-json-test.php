@@ -8092,4 +8092,167 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'padding', $result, 'Boolean value should be skipped' );
 		$this->assertStringNotContainsString( 'gap', $result, 'Array value should be skipped' );
 	}
+
+	/**
+	 * Tests that prepend_to_selector correctly prepends to single and
+	 * compound (comma-separated) selectors.
+	 *
+	 * @dataProvider data_prepend_to_selector
+	 *
+	 * @param string $selector   Original CSS selector.
+	 * @param string $to_prepend Selector to prepend.
+	 * @param string $expected   Expected resulting selector.
+	 */
+	public function test_prepend_to_selector( $selector, $to_prepend, $expected ) {
+		$theme_json = new ReflectionClass( 'WP_Theme_JSON_Gutenberg' );
+
+		$func = $theme_json->getMethod( 'prepend_to_selector' );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$func->setAccessible( true );
+		}
+
+		$actual = $func->invoke( null, $selector, $to_prepend );
+
+		$this->assertSame( $expected, $actual );
+	}
+
+	/**
+	 * Data provider for prepend_to_selector tests.
+	 *
+	 * @return array[]
+	 */
+	public function data_prepend_to_selector() {
+		return array(
+			'single class selector'                        => array(
+				'selector'   => '.inner',
+				'to_prepend' => '.wrapper ',
+				'expected'   => '.wrapper .inner',
+			),
+			'single element selector'                      => array(
+				'selector'   => 'p',
+				'to_prepend' => '.wrapper ',
+				'expected'   => '.wrapper p',
+			),
+			'single id selector'                           => array(
+				'selector'   => '#main',
+				'to_prepend' => '.wrapper ',
+				'expected'   => '.wrapper #main',
+			),
+			'two comma-separated selectors without spaces' => array(
+				'selector'   => 'h1,h2',
+				'to_prepend' => '.wrapper ',
+				'expected'   => '.wrapper h1,.wrapper h2',
+			),
+			'three comma-separated selectors without spaces' => array(
+				'selector'   => 'h1,h2,h3',
+				'to_prepend' => '.some-class ',
+				'expected'   => '.some-class h1,.some-class h2,.some-class h3',
+			),
+			'comma-separated class selectors without spaces' => array(
+				'selector'   => '.foo,.bar',
+				'to_prepend' => '.prefix ',
+				'expected'   => '.prefix .foo,.prefix .bar',
+			),
+			'prepend without trailing space'               => array(
+				'selector'   => '.child',
+				'to_prepend' => '.parent',
+				'expected'   => '.parent.child',
+			),
+			'compound selector without trailing space no comma spaces' => array(
+				'selector'   => '.a,.b',
+				'to_prepend' => '.parent',
+				'expected'   => '.parent.a,.parent.b',
+			),
+			'descendant selector prepended'                => array(
+				'selector'   => '.block .inner',
+				'to_prepend' => '.scope ',
+				'expected'   => '.scope .block .inner',
+			),
+			'descendant selectors comma-separated without spaces' => array(
+				'selector'   => '.block .inner,.block .alt',
+				'to_prepend' => '.scope ',
+				'expected'   => '.scope .block .inner,.scope .block .alt',
+			),
+			'empty selector'                               => array(
+				'selector'   => '',
+				'to_prepend' => '.prefix ',
+				'expected'   => '.prefix ',
+			),
+			'empty prepend'                                => array(
+				'selector'   => '.child',
+				'to_prepend' => '',
+				'expected'   => '.child',
+			),
+			'both empty'                                   => array(
+				'selector'   => '',
+				'to_prepend' => '',
+				'expected'   => '',
+			),
+			'attribute selector'                           => array(
+				'selector'   => '[data-type="example"]',
+				'to_prepend' => '.scope ',
+				'expected'   => '.scope [data-type="example"]',
+			),
+			'pseudo-class selector'                        => array(
+				'selector'   => ':where(.is-layout-flex)',
+				'to_prepend' => '.editor ',
+				'expected'   => '.editor :where(.is-layout-flex)',
+			),
+			'many comma-separated selectors without spaces' => array(
+				'selector'   => 'h1,h2,h3,h4,h5,h6',
+				'to_prepend' => '.content ',
+				'expected'   => '.content h1,.content h2,.content h3,.content h4,.content h5,.content h6',
+			),
+			'real world block element selector'            => array(
+				'selector'   => 'p',
+				'to_prepend' => '.wp-block-group ',
+				'expected'   => '.wp-block-group p',
+			),
+			'real world compound block element selectors'  => array(
+				'selector'   => 'a,.wp-element-button',
+				'to_prepend' => '.wp-block-group ',
+				'expected'   => '.wp-block-group a,.wp-block-group .wp-element-button',
+			),
+			'spaces after commas are preserved'            => array(
+				'selector'   => 'h1, h2, h3',
+				'to_prepend' => '.some-class ',
+				'expected'   => '.some-class h1,.some-class  h2,.some-class  h3',
+			),
+			'spaces after commas preserved with class selectors' => array(
+				'selector'   => '.foo, .bar',
+				'to_prepend' => '.prefix ',
+				'expected'   => '.prefix .foo,.prefix  .bar',
+			),
+			'mixed whitespace around commas preserved'     => array(
+				'selector'   => '.a ,  .b , .c',
+				'to_prepend' => '.pre ',
+				'expected'   => '.pre .a ,.pre   .b ,.pre  .c',
+			),
+			'where with internal commas no top-level comma' => array(
+				'selector'   => ':where(.a, .b)',
+				'to_prepend' => '.scope ',
+				'expected'   => '.scope :where(.a, .b)',
+			),
+			'where with internal commas and top-level comma' => array(
+				'selector'   => ':where(.a, .b),.c',
+				'to_prepend' => '.scope ',
+				'expected'   => '.scope :where(.a, .b),.scope .c',
+			),
+			'is with internal commas and top-level comma'  => array(
+				'selector'   => ':is(.x, .y),.z',
+				'to_prepend' => '.wrapper ',
+				'expected'   => '.wrapper :is(.x, .y),.wrapper .z',
+			),
+			'multiple parenthesized selectors with top-level comma' => array(
+				'selector'   => ':where(.a, .b),:is(.c, .d)',
+				'to_prepend' => '.scope ',
+				'expected'   => '.scope :where(.a, .b),.scope :is(.c, .d)',
+			),
+			'nested parentheses with commas'               => array(
+				'selector'   => ':where(:not(.a, .b), .c),.d',
+				'to_prepend' => '.scope ',
+				'expected'   => '.scope :where(:not(.a, .b), .c),.scope .d',
+			),
+		);
+	}
 }

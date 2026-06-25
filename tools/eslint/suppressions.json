@@ -910,11 +910,6 @@
 			"count": 2
 		}
 	},
-	"packages/components/src/surface/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/tabs/styles.ts": {
 		"no-restricted-imports": {
 			"count": 1

@@ -306,7 +306,7 @@ class Gutenberg_Guidelines_Post_Type {
 	 * @return bool True if it's a block guideline meta key.
 	 */
 	public static function is_block_meta_key( string $meta_key ): bool {
-		return strpos( $meta_key, self::BLOCK_META_PREFIX ) === 0;
+		return str_starts_with( $meta_key, self::BLOCK_META_PREFIX );
 	}
 
 	/**

@@ -109,6 +109,25 @@ describe( 'useOpenImageMediaEditorModal', () => {
 		jest.clearAllMocks();
 	} );
 
+	it( 'returns no opener when the media editor modal setting is unavailable', () => {
+		useRegistry.mockReturnValue( createRegistry() );
+		mockMediaEditorModalSetting( undefined );
+
+		const { result } = renderHook( () =>
+			useOpenImageMediaEditorModal( {
+				attributes: {
+					id: 1,
+					url: 'original.jpg',
+					alt: '',
+					caption: '',
+				},
+				setAttributes: jest.fn(),
+			} )
+		);
+
+		expect( result.current ).toBeUndefined();
+	} );
+
 	it( 'passes an onClose handler for returning focus when the media editor closes', async () => {
 		const cropButton = document.createElement( 'button' );
 		const otherButton = document.createElement( 'button' );
