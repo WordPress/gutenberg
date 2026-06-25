@@ -384,7 +384,6 @@ function gutenberg_site_editor_get_content_post_types() {
 	$excluded_post_types = array(
 		'attachment',
 		'nav_menu_item',
-		'page',
 		'wp_block',
 		'wp_font_face',
 		'wp_font_family',
@@ -409,6 +408,57 @@ function gutenberg_site_editor_get_content_post_types() {
 			return ! in_array( $post_type->name, $excluded_post_types, true );
 		}
 	);
+}
+
+/**
+ * Sort content post types for the site editor sidebar.
+ *
+ * @param WP_Post_Type[] $post_types Post type objects keyed by post type name.
+ * @return WP_Post_Type[] Sorted post type objects.
+ */
+function gutenberg_site_editor_sort_content_post_types( $post_types ) {
+	$preferred_order = array(
+		'page' => 0,
+		'post' => 1,
+	);
+
+	uksort(
+		$post_types,
+		function ( $a, $b ) use ( $preferred_order ) {
+			$a_order = $preferred_order[ $a ] ?? 100;
+			$b_order = $preferred_order[ $b ] ?? 100;
+
+			if ( $a_order !== $b_order ) {
+				return $a_order <=> $b_order;
+			}
+
+			return strnatcasecmp( $a, $b );
+		}
+	);
+
+	return $post_types;
+}
+
+/**
+ * Get the sidebar icon for a content post type.
+ *
+ * @param WP_Post_Type $post_type Post type object.
+ * @return string Menu item icon.
+ */
+function gutenberg_site_editor_get_content_post_type_icon( $post_type ) {
+	if ( 'page' === $post_type->name ) {
+		return 'dashicons-admin-page';
+	}
+
+	if ( 'post' === $post_type->name ) {
+		return 'dashicons-admin-post';
+	}
+
+	if ( is_string( $post_type->menu_icon ) && 0 === strpos( $post_type->menu_icon, 'dashicons-' ) ) {
+		return $post_type->menu_icon;
+	}
+
+	return 'dashicons-admin-post';
 }
 
 /**
@@ -1279,22 +1329,24 @@ add_action( 'rest_api_init', 'gutenberg_site_editor_register_template_context_re
  * Register default menu items for the site editor page.
  */
 function gutenberg_site_editor_register_default_menu_items() {
-	$content_post_types      = gutenberg_site_editor_get_content_post_types();
+	$content_post_types      = gutenberg_site_editor_sort_content_post_types( gutenberg_site_editor_get_content_post_types() );
 	$content_post_type_names = array_keys( $content_post_types );
 	$content_target          = ! empty( $content_post_type_names )
 		? '/types/' . $content_post_type_names[0]
 		: '/types/post';
 
 	gutenberg_register_site_editor_v2_menu_item( 'home', __( 'Homepage', 'gutenberg' ), '/', '' );
-	gutenberg_register_site_editor_v2_menu_item( 'pages', __( 'Pages', 'gutenberg' ), '/types/page', '' );
 	gutenberg_register_site_editor_v2_menu_item( 'content', __( 'Content', 'gutenberg' ), $content_target, '', 'drilldown' );
 	foreach ( $content_post_types as $post_type ) {
-			gutenberg_register_site_editor_v2_menu_item(
-				'content-' . $post_type->name,
-				$post_type->labels->menu_name ? $post_type->labels->menu_name : $post_type->label,
-				'/types/' . $post_type->name,
-				'content'
-			);
+		$item_id = 'page' === $post_type->name ? 'pages' : 'content-' . $post_type->name;
+		gutenberg_register_site_editor_v2_menu_item(
+			$item_id,
+			$post_type->labels->menu_name ? $post_type->labels->menu_name : $post_type->label,
+			'/types/' . $post_type->name,
+			'content',
+			'',
+			gutenberg_site_editor_get_content_post_type_icon( $post_type )
+		);
 	}
 	gutenberg_register_site_editor_v2_menu_item( 'navigation', __( 'Navigation Menus', 'gutenberg' ), '/navigation', '' );
 	gutenberg_register_site_editor_v2_menu_item( 'design', __( 'Design', 'gutenberg' ), '/styles', '', 'drilldown' );

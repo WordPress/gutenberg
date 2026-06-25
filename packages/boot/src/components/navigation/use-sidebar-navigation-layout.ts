@@ -15,7 +15,7 @@ import type { WorkspaceConfig } from '../workspaces';
 
 const PREFERENCE_SCOPE = 'wordpress/boot';
 const PREFERENCE_KEY = 'sidebarNavigation';
-const PREFERENCE_VERSION = 1;
+const PREFERENCE_VERSION = 2;
 const DEFAULT_SECTION_ID = 'default';
 const ADVANCED_SECTION_ID = 'advanced';
 const CUSTOM_SECTION_PREFIX = 'custom:';
