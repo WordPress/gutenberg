@@ -112,7 +112,6 @@ const UnconnectedBorderBoxControl = (
 						value={ linkedValue }
 						withSlider
 						width="116px"
-						size="__unstable-large"
 						__experimentalIsRenderedInSidebar={
 							__experimentalIsRenderedInSidebar
 						}

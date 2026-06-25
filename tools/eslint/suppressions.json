@@ -975,16 +975,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/truncate/hook.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/components/src/truncate/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/unit-control/styles/unit-control-styles.ts": {
 		"no-restricted-imports": {
 			"count": 2
