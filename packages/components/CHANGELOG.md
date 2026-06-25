@@ -15,6 +15,7 @@
 
 ### Internal
 
+-   Enforce CSS Module class selector naming for component-library packages ([#79504](https://github.com/WordPress/gutenberg/pull/79504)).
 -   `Surface`: Migrate styles from Emotion to SCSS Modules and use WPDS tokens for migrated visual values ([#79445](https://github.com/WordPress/gutenberg/pull/79445)).
 -   `Truncate`: Migrate styles from Emotion to SCSS Modules ([#79446](https://github.com/WordPress/gutenberg/pull/79446)).
 
@@ -48,6 +49,7 @@
 ### Documentation
 
 -   `Menu`: Fix `overriden` typo to `overridden` in `CheckboxItemProps` and `RadioItemProps`. ([#79331](https://github.com/WordPress/gutenberg/pull/79331))
+-   Add component documentation for `ColorPicker`, `CustomSelectControl`, `Navigator`, `NumberControl`, `ResizableBox`, and `Slot` components ([#79460](https://github.com/WordPress/gutenberg/pull/79460)).
 
 ### Code Quality
 

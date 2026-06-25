@@ -116,7 +116,6 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 					FontFamilyControl,
 					FormTokenField,
 					InputControl,
-					LetterSpacingControl,
 					LineHeightControl,
 					NumberControl,
 					RangeControl,
@@ -131,7 +130,6 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 					<FontFamilyControl __next40pxDefaultSize />
 					<FormTokenField __next40pxDefaultSize />
 					<InputControl __next40pxDefaultSize />
-					<LetterSpacingControl __next40pxDefaultSize />
 					<LineHeightControl __next40pxDefaultSize />
 					<NumberControl __next40pxDefaultSize />
 					<RangeControl __next40pxDefaultSize />

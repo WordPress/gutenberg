@@ -182,21 +182,6 @@ function gutenberg_initialize_experiments_settings() {
 add_action( 'rest_api_init', 'gutenberg_initialize_experiments_settings' );
 
 /**
- * Registers the Experiments submenu page under the Gutenberg menu.
- */
-function gutenberg_experiments_menu() {
-	add_submenu_page(
-		'gutenberg',
-		__( 'Experiments Settings', 'gutenberg' ),
-		__( 'Experiments', 'gutenberg' ),
-		'manage_options',
-		'experiments-wp-admin',
-		'gutenberg_experiments_wp_admin_render_page'
-	);
-}
-add_action( 'admin_menu', 'gutenberg_experiments_menu' );
-
-/**
  * Allows the legacy `gutenberg-experiments` route. Without this, accessing
  * `?page=gutenberg-experiments` results in an HTTP 403 error.
  *
@@ -212,9 +197,7 @@ add_action( 'admin_menu', 'gutenberg_experiments_legacy_menu', 9 );
  * `?page=experiments-wp-admin` URL.
  */
 function gutenberg_redirect_legacy_experiments_page() {
-	wp_safe_redirect( admin_url( 'admin.php?page=experiments-wp-admin' ) );
+	wp_safe_redirect( admin_url( 'options-general.php?page=experiments-wp-admin' ) );
 	exit;
 }
 add_action( 'load-admin_page_gutenberg-experiments', 'gutenberg_redirect_legacy_experiments_page' );
-add_action( 'load-toplevel_page_gutenberg-experiments', 'gutenberg_redirect_legacy_experiments_page' );
-add_action( 'load-gutenberg_page_gutenberg-experiments', 'gutenberg_redirect_legacy_experiments_page' );
