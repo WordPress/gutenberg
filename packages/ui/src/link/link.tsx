@@ -11,8 +11,6 @@ import defenseStyles from '../utils/css/global-css-defense.module.css';
 /**
  * A styled anchor element with support for semantic color tones and an
  * unstyled escape hatch.
- *
- * @see {@link https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-button-usage-guidelines--docs When to use Button, Link, or LinkButton}
  */
 export const Link = forwardRef< HTMLAnchorElement, LinkProps >( function Link(
 	{

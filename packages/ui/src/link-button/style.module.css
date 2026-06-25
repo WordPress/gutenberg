@@ -3,8 +3,7 @@
 
 	@layer components {
 		.link-button {
-			/* Bridge `Button` foreground tokens into the unlayered `.a` global CSS
-			   defense. */
+			/* Bridge `Button` foreground tokens into the unlayered `.a` global CSS defense. */
 			--_gcd-a-color: var(--wp-ui-button-foreground-color);
 
 			&:visited {
