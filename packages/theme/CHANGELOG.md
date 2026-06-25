@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Fix package export type paths for `.mjs` subpaths to match the generated `.d.mts` declarations ([#79553](https://github.com/WordPress/gutenberg/pull/79553)).
+
 ## 0.16.0 (2026-06-24)
 
 ### Breaking Changes
