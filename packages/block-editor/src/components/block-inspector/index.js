@@ -43,6 +43,7 @@ import { unlock } from '../../lock-unlock';
 import {
 	hasPseudoBlockStyleState,
 	hasViewportBlockStyleState,
+	isDefaultBlockStyleState,
 } from '../../hooks/block-style-state';
 
 function StyleInspectorSlots( {
@@ -263,13 +264,9 @@ function BlockInspector() {
 		useBlockInspectorAnimationSettings( blockType );
 
 	const hasSelectedBlocks = selectedBlockCount > 1;
-	// The viewport state is global, so only treat it as selected for
-	// blocks that actually support viewport styles. Pseudo states are
-	// only ever set for blocks that support them.
-	const isBlockStyleStateSelected =
-		( !! blockType?.attributes?.style &&
-			hasViewportBlockStyleState( selectedBlockStyleState ) ) ||
-		hasPseudoBlockStyleState( selectedBlockStyleState );
+	const isBlockStyleStateSelected = ! isDefaultBlockStyleState(
+		selectedBlockStyleState
+	);
 
 	if ( hasSelectedBlocks && ! isSectionBlockInSelection ) {
 		return (
