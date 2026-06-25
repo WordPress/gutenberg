@@ -21,8 +21,7 @@ import { useCallback, useEffect, useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import AddTabToolbarControl from '../tab-panel/add-tab-toolbar-control';
-import RemoveTabToolbarControl from '../tab-panel/remove-tab-toolbar-control';
+import TabToolbarControls from '../tab-panel/tab-toolbar-controls';
 
 const EMPTY_ARRAY = [];
 
@@ -117,13 +116,7 @@ function Edit( {
 			} );
 		};
 
-		if ( tabsList.length > prevCount ) {
-			// Tab added — focus the last (newly added) button.
-			focusButtonAt( tabsList.length - 1 );
-		} else {
-			// Tab removed — focus the new active button.
-			focusButtonAt( effectiveActiveIndex );
-		}
+		focusButtonAt( effectiveActiveIndex );
 	}, [ tabsList.length, effectiveActiveIndex ] );
 
 	const blockProps = useBlockProps( {
@@ -144,8 +137,7 @@ function Edit( {
 
 	return (
 		<>
-			<AddTabToolbarControl tabsClientId={ tabsClientId } />
-			<RemoveTabToolbarControl tabsClientId={ tabsClientId } />
+			<TabToolbarControls tabsClientId={ tabsClientId } />
 			<div { ...blockProps }>
 				{ tabsList.map( ( tab, index ) => {
 					const isActive = index === effectiveActiveIndex;
