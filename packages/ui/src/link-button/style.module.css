@@ -3,17 +3,16 @@
 
 	@layer components {
 		.link-button {
-			/* Bridge `Button` foreground tokens into the unlayered `.link-button`
-			   global CSS defense. */
-			--_gcd-link-button-color: var(--wp-ui-button-foreground-color);
-			--_gcd-link-button-text-decoration: none;
+			/* Bridge `Button` foreground tokens into the unlayered `.a` global CSS
+			   defense. */
+			--_gcd-a-color: var(--wp-ui-button-foreground-color);
 
 			&:visited {
-				--_gcd-link-button-color: var(--wp-ui-button-foreground-color);
+				--_gcd-a-color: var(--wp-ui-button-foreground-color);
 			}
 
 			&:is(:hover, :active, :focus) {
-				--_gcd-link-button-color: var(--wp-ui-button-foreground-color-active);
+				--_gcd-a-color: var(--wp-ui-button-foreground-color-active);
 			}
 		}
 	}

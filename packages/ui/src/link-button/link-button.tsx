@@ -28,7 +28,7 @@ export const LinkButton = forwardRef< HTMLAnchorElement, LinkButtonProps >(
 		ref
 	) {
 		const mergedClassName = clsx(
-			defenseStyles[ 'link-button' ],
+			defenseStyles.a,
 			styles[ 'link-button' ],
 			resetStyles[ 'box-sizing' ],
 			focusStyles[ 'outset-ring--focus-except-active' ],
