@@ -32,7 +32,6 @@ const BorderBoxControlSplitControls = (
 		popoverPlacement,
 		popoverOffset,
 		rightAlignedClassName,
-		size = 'default',
 		value,
 		__experimentalIsRenderedInSidebar,
 		...otherProps
@@ -66,16 +65,16 @@ const BorderBoxControlSplitControls = (
 		enableStyle,
 		isCompact: true,
 		__experimentalIsRenderedInSidebar,
-		size,
 	};
 
 	const mergedRef = useMergeRefs( [ setPopoverAnchor, forwardedRef ] );
 
 	return (
 		<Grid { ...otherProps } ref={ mergedRef } gap={ 3 }>
-			<BorderBoxControlVisualizer value={ value } size={ size } />
+			<BorderBoxControlVisualizer value={ value } />
 
 			<BorderControl
+				size="__unstable-large"
 				className={ centeredClassName }
 				hideLabelFromVision
 				label={ __( 'Top border' ) }
@@ -85,6 +84,7 @@ const BorderBoxControlSplitControls = (
 				{ ...sharedBorderControlProps }
 			/>
 			<BorderControl
+				size="__unstable-large"
 				hideLabelFromVision
 				label={ __( 'Left border' ) }
 				onChange={ ( newBorder ) => onChange( newBorder, 'left' ) }
@@ -93,6 +93,7 @@ const BorderBoxControlSplitControls = (
 				{ ...sharedBorderControlProps }
 			/>
 			<BorderControl
+				size="__unstable-large"
 				className={ rightAlignedClassName }
 				hideLabelFromVision
 				label={ __( 'Right border' ) }
@@ -102,6 +103,7 @@ const BorderBoxControlSplitControls = (
 				{ ...sharedBorderControlProps }
 			/>
 			<BorderControl
+				size="__unstable-large"
 				className={ centeredClassName }
 				hideLabelFromVision
 				label={ __( 'Bottom border' ) }

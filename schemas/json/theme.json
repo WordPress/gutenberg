@@ -1797,6 +1797,13 @@
 								{ "$ref": "#/definitions/refComplete" }
 							]
 						},
+						"textShadow": {
+							"description": "Sets the `text-shadow` CSS property.",
+							"oneOf": [
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
+							]
+						},
 						"writingMode": {
 							"description": "Sets the `writing-mode` CSS property.",
 							"oneOf": [

@@ -128,14 +128,24 @@ const restrictedImports = [
 	},
 ];
 
+const useIsomorphicLayoutEffectRestrictedImport = {
+	name: '@wordpress/element',
+	importNames: [ 'useLayoutEffect' ],
+	message:
+		'Use `useIsomorphicLayoutEffect` from `@wordpress/compose` instead. It keeps layout effect behavior in the browser while avoiding SSR warnings.',
+};
+
 // Common `no-restricted-imports` configuration for `@wordpress/ui` paths,
 // which occur across multiple override configs. The exclusion here allows
 // Base UI to be imported directly in `@wordpress/ui`, which is the intended
 // abstraction layer for BaseUI components.
 const UI_RESTRICTED_IMPORTS = {
-	paths: restrictedImports.filter(
-		( { name } ) => name !== '@base-ui/react'
-	),
+	paths: [
+		...restrictedImports.filter(
+			( { name } ) => name !== '@base-ui/react'
+		),
+		useIsomorphicLayoutEffectRestrictedImport,
+	],
 	patterns: [],
 };
 
@@ -159,18 +169,12 @@ const restrictedSyntax = [
 		selector: 'JSXAttribute[name.name="__nextHasNoMarginBottom"]',
 		message: 'The `__nextHasNoMarginBottom` prop is no longer needed.',
 	},
-	{
-		selector:
-			'JSXElement[openingElement.name.name="TextControl"] JSXAttribute[name.name="__next40pxDefaultSize"]',
-		message:
-			'The `__next40pxDefaultSize` prop is no longer needed on `TextControl`.',
-	},
-	{
-		selector:
-			'JSXElement[openingElement.name.name="BorderControl"] JSXAttribute[name.name="__next40pxDefaultSize"]',
-		message:
-			'The `__next40pxDefaultSize` prop is no longer needed on `BorderControl`.',
-	},
+	...[ 'BorderBoxControl', 'BorderControl', 'BoxControl', 'TextControl' ].map(
+		( componentName ) => ( {
+			selector: `JSXElement[openingElement.name.name="${ componentName }"] JSXAttribute[name.name="__next40pxDefaultSize"]`,
+			message: `The \`__next40pxDefaultSize\` prop is no longer needed on \`${ componentName }\`.`,
+		} )
+	),
 	{
 		selector:
 			'CallExpression[callee.name="withDispatch"] > :function > BlockStatement > :not(VariableDeclaration,ReturnStatement)',
@@ -559,11 +563,14 @@ export default dedupePlugins( [
 		},
 	},
 
-	// Override: Storybook + components + ui — relax jsdoc require-param.
+	// Override: Relax JSDoc parameter rules for TypeScript components. A
+	// component always receives props and returns a React element, and its
+	// props should be documented through its TypeScript props types.
 	{
 		files: [
 			'**/@(storybook|stories)/**',
 			'packages/components/src/**/*.tsx',
+			'packages/theme/src/**/*.tsx',
 			'packages/ui/src/**/*.tsx',
 		],
 		rules: {
@@ -660,7 +667,8 @@ export default dedupePlugins( [
 		},
 	},
 
-	// Override: Components src — allow ariakit and framer-motion imports.
+	// Override: Components src — allow ariakit/framer-motion imports and
+	// prevent new Emotion usage while existing styles are migrated.
 	{
 		files: [ 'packages/components/src/**' ],
 		rules: {
@@ -671,8 +679,9 @@ export default dedupePlugins( [
 						( { name } ) =>
 							! [ '@ariakit/react', 'framer-motion' ].includes(
 								name
-							)
+							) && ! name.startsWith( '@emotion/' )
 					),
+					patterns: [ '@emotion/**' ],
 				},
 			],
 		},
@@ -683,6 +692,22 @@ export default dedupePlugins( [
 		files: [ 'packages/ui/src/**' ],
 		rules: {
 			'no-restricted-imports': [ 'error', UI_RESTRICTED_IMPORTS ],
+		},
+	},
+
+	// Override: Theme src — use the SSR-safe layout effect hook.
+	{
+		files: [ 'packages/theme/src/**' ],
+		rules: {
+			'no-restricted-imports': [
+				'error',
+				{
+					paths: [
+						...restrictedImports,
+						useIsomorphicLayoutEffectRestrictedImport,
+					],
+				},
+			],
 		},
 	},
 

@@ -22,16 +22,12 @@ export const wrapper = css`
 	position: relative;
 `;
 
-export const borderBoxControlLinkedButton = (
-	size?: 'default' | '__unstable-large'
-) => {
-	return css`
-		position: absolute;
-		top: ${ size === '__unstable-large' ? '8px' : '3px' };
-		${ rtl( { right: 0 } )() }
-		line-height: 0;
-	`;
-};
+export const borderBoxControlLinkedButton = css`
+	position: absolute;
+	top: 8px;
+	${ rtl( { right: 0 } )() }
+	line-height: 0;
+`;
 
 const borderBoxStyleWithFallback = ( border?: Border ) => {
 	const {
@@ -48,33 +44,25 @@ const borderBoxStyleWithFallback = ( border?: Border ) => {
 	return `${ color } ${ borderStyle } ${ clampedWidth }`;
 };
 
-export const borderBoxControlVisualizer = (
-	borders?: Borders,
-	size?: 'default' | '__unstable-large'
-) => {
-	return css`
-		position: absolute;
-		top: ${ size === '__unstable-large' ? '20px' : '15px' };
-		right: ${ size === '__unstable-large' ? '39px' : '29px' };
-		bottom: ${ size === '__unstable-large' ? '20px' : '15px' };
-		left: ${ size === '__unstable-large' ? '39px' : '29px' };
-		border-top: ${ borderBoxStyleWithFallback( borders?.top ) };
-		border-bottom: ${ borderBoxStyleWithFallback( borders?.bottom ) };
-		${ rtl( {
-			borderLeft: borderBoxStyleWithFallback( borders?.left ),
-		} )() }
-		${ rtl( {
-			borderRight: borderBoxStyleWithFallback( borders?.right ),
-		} )() }
-	`;
-};
+export const borderBoxControlVisualizer = ( borders?: Borders ) => css`
+	position: absolute;
+	top: 20px;
+	right: 39px;
+	bottom: 20px;
+	left: 39px;
+	border-top: ${ borderBoxStyleWithFallback( borders?.top ) };
+	border-bottom: ${ borderBoxStyleWithFallback( borders?.bottom ) };
+	${ rtl( {
+		borderLeft: borderBoxStyleWithFallback( borders?.left ),
+	} )() }
+	${ rtl( {
+		borderRight: borderBoxStyleWithFallback( borders?.right ),
+	} )() }
+`;
 
-export const borderBoxControlSplitControls = (
-	size?: 'default' | '__unstable-large'
-) => css`
+export const borderBoxControlSplitControls = css`
 	position: relative;
 	flex: 1;
-	width: ${ size === '__unstable-large' ? undefined : '80%' };
 `;
 
 export const centeredBorderControl = css`

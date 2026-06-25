@@ -11,6 +11,7 @@ if ( ! function_exists( 'wp_declare_classic_block_necessary' ) ) {
 	 * Declares a flag that the Classic block is necessary for the current post.
 	 *
 	 * @since 7.1.0
+	 * @access private
 	 */
 	function wp_declare_classic_block_necessary(): void {
 		/**

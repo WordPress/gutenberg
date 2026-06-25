@@ -2,10 +2,19 @@
 
 ## Unreleased
 
+### Internal
+
+-   `Surface`: Migrate styles from Emotion to SCSS Modules and use WPDS tokens for migrated visual values ([#79445](https://github.com/WordPress/gutenberg/pull/79445)).
+
+## 36.0.0 (2026-06-24)
+
 ### Breaking Changes
 
--   `TextControl`: The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed ([#79386](https://github.com/WordPress/gutenberg/pull/79386)).
--   `BorderControl`: The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed ([#79418](https://github.com/WordPress/gutenberg/pull/79418)).
+-   The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed ([#79386](https://github.com/WordPress/gutenberg/pull/79386), [#79418](https://github.com/WordPress/gutenberg/pull/79418), [#79419](https://github.com/WordPress/gutenberg/pull/79419), [#79420](https://github.com/WordPress/gutenberg/pull/79420)):
+    -   `BorderBoxControl`
+    -   `BorderControl`
+    -   `BoxControl`
+    -   `TextControl`
 
 ### Enhancements
 
@@ -15,12 +24,16 @@
 ### Bug Fixes
 
 -   `SandBox`: Fix the viewport-unit (`vh`, `vw`, etc.) stripping so user-supplied HTML using these units in `width`/`height` no longer triggers a runaway resize loop in the preview ([#78677](https://github.com/WordPress/gutenberg/pull/78677)).
+-   `BoxControl`: Respect a consumer-supplied `placeholder` passed via `inputProps`, falling back to it when there is no mixed-value placeholder ([#79466](https://github.com/WordPress/gutenberg/pull/79466)).
 
 ### Internal
 
 -   `ResizableBox`: Make the `children` prop optional ([#79370](https://github.com/WordPress/gutenberg/pull/79370)).
+-   Add documentation and lint guardrails for the ongoing Emotion migration ([#79442](https://github.com/WordPress/gutenberg/pull/79442)).
+-   `Divider`: Migrate styles from Emotion to SCSS Modules ([#79444](https://github.com/WordPress/gutenberg/pull/79444)).
 -   Adopt `--wpds-dimension-size-*` design tokens [#79093](https://github.com/WordPress/gutenberg/pull/79093).
 -   Point the legacy `--wp-components-*` color fallbacks at the design system tokens (`--wpds-*` / `--wp-admin-theme-color*`), so component styles get sensible defaults from the prebuilt token stylesheet without a runtime `<ThemeProvider>` ([#78664](https://github.com/WordPress/gutenberg/pull/78664)).
+-   `withFallbackStyles`: Refactor from a class component to a function component with hooks ([#78837](https://github.com/WordPress/gutenberg/pull/78837)).
 
 ### Documentation
 

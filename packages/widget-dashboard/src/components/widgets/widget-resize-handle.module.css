@@ -13,8 +13,8 @@
 
 .handle:focus-visible {
 	outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
-	/* @TODO: Replace with a `size` token once that category exists in the theme package. */
-	outline-offset: calc(var(--wpds-dimension-base) * 0.5);
+	/* Offset the ring by an amount equal to its own width. */
+	outline-offset: var(--wpds-border-width-focus);
 	border-radius: var(--wpds-border-radius-sm);
 }
 
