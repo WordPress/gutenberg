@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
+import { archive } from '@wordpress/icons';
+import { Icon } from '../../icon';
 import * as Menu from '../';
 
 const meta: Meta< typeof Menu.Root > = {
@@ -43,6 +45,13 @@ export const Default: Story = {
 				<Menu.Trigger>Open menu</Menu.Trigger>
 				<Menu.Popup>
 					<Menu.Item>Add to library</Menu.Item>
+					<Menu.Item
+						prefix={
+							<Icon icon={ archive } size={ 24 } aria-hidden />
+						}
+					>
+						Archive
+					</Menu.Item>
 					<Menu.Item suffix="⌘S">Save</Menu.Item>
 					<Menu.Separator />
 					<Menu.Group>

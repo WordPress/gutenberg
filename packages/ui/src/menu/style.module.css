@@ -7,7 +7,9 @@
 		}
 
 		.popup {
-			min-width: max(var(--anchor-width, 0px), 160px);
+			--wp-ui-menu-min-width: calc(var(--wpds-dimension-size-lg) * 4);
+
+			min-width: max(var(--anchor-width, 0px), var(--wp-ui-menu-min-width));
 		}
 
 		.list {
@@ -72,6 +74,7 @@
 			justify-content: space-between;
 			gap: var(--wpds-dimension-gap-md);
 			min-width: 0;
+			/* Keep clicks on presentational labels and suffixes routed to the menu item. */
 			pointer-events: none;
 		}
 
@@ -108,8 +111,8 @@
 		}
 
 		.radio-indicator {
-			width: 6px;
-			height: 6px;
+			width: var(--wpds-dimension-size-4xs);
+			height: var(--wpds-dimension-size-4xs);
 			border-radius: 50%;
 			background-color: currentColor;
 		}

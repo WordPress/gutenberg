@@ -57,12 +57,12 @@ export interface PopupProps extends ComponentProps< typeof _Menu.Popup > {
 
 export interface MenuItemLayoutProps {
 	/**
-	 * Content displayed before the item label.
+	 * Presentational content displayed before the item label.
 	 */
 	prefix?: ReactNode;
 
 	/**
-	 * Content displayed after the item label.
+	 * Presentational content displayed after the item label.
 	 */
 	suffix?: ReactNode;
 }
