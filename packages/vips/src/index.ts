@@ -3,11 +3,11 @@
  */
 import Vips from 'wasm-vips';
 
-// @ts-expect-error - WASM files are inlined as base64 data URLs at build time
+// @ts-expect-error - WASM files are inlined as Uint8Array at build time.
 import VipsModule from 'wasm-vips/vips.wasm';
 
-// @ts-expect-error - WASM files are inlined as base64 data URLs at build time
-import VipsJxlModule from 'wasm-vips/vips-jxl.wasm';
+// @ts-expect-error - WASM files are inlined as Uint8Array at build time.
+import VipsHeifModule from 'wasm-vips/vips-heif.wasm';
 
 /**
  * Internal dependencies
@@ -28,7 +28,33 @@ interface EmscriptenModule {
 
 let cleanup: () => void;
 
-let vipsInstance: typeof Vips;
+let vipsPromise: Promise< typeof Vips > | undefined;
+
+/**
+ * Caches Blob URLs created for inlined WASM binaries.
+ *
+ * The WASM binaries are inlined as `Uint8Array` values at build time. wasm-vips
+ * loads them (including the HEIF dynamic library) by fetching a URL, so the
+ * bytes are wrapped in a Blob URL the first time each is requested.
+ */
+const wasmUrls = new WeakMap< Uint8Array< ArrayBuffer >, string >();
+
+/**
+ * Returns a Blob URL for an inlined WASM binary, creating it on first use.
+ *
+ * @param bytes The inlined WASM binary.
+ * @return A Blob URL pointing at the binary.
+ */
+function getWasmUrl( bytes: Uint8Array< ArrayBuffer > ): string {
+	let url = wasmUrls.get( bytes );
+	if ( ! url ) {
+		url = URL.createObjectURL(
+			new Blob( [ bytes ], { type: 'application/wasm' } )
+		);
+		wasmUrls.set( bytes, url );
+	}
+	return url;
+}
 
 /**
  * Instantiates and returns a new vips instance.
@@ -36,22 +62,25 @@ let vipsInstance: typeof Vips;
  * Reuses any existing instance.
  */
 async function getVips(): Promise< typeof Vips > {
-	if ( vipsInstance ) {
-		return vipsInstance;
+	if ( vipsPromise ) {
+		return await vipsPromise;
 	}
 
-	vipsInstance = await Vips( {
-		// Only load JXL module, skip HEIF due to trademark issues.
-		// wasm-vips defaults to ["vips-jxl.wasm", "vips-heif.wasm"].
-		dynamicLibraries: [ 'vips-jxl.wasm' ],
+	vipsPromise = Vips( {
+		// Load HEIF dynamic module for HEIF/HEIC and AVIF format support.
+		// JXL is omitted as WordPress Core does not currently support it.
+		// It can be re-added when Core adds JXL support.
+		dynamicLibraries: [ 'vips-heif.wasm' ],
 		locateFile: ( fileName: string ) => {
-			// WASM files are inlined as base64 data URLs at build time,
-			// eliminating the need for separate file downloads and avoiding
-			// issues with hosts not serving WASM files with correct MIME types.
+			// WASM files are inlined as a Uint8Array at build time and exposed
+			// here as Blob URLs. This eliminates the need for separate file
+			// downloads and avoids issues with hosts not serving WASM files
+			// with correct MIME types, while keeping the inlined bytes
+			// compressible (see the build-time binary encoding).
 			if ( fileName.endsWith( 'vips.wasm' ) ) {
-				return VipsModule;
-			} else if ( fileName.endsWith( 'vips-jxl.wasm' ) ) {
-				return VipsJxlModule;
+				return getWasmUrl( VipsModule );
+			} else if ( fileName.endsWith( 'vips-heif.wasm' ) ) {
+				return getWasmUrl( VipsHeifModule );
 			}
 			return fileName;
 		},
@@ -62,7 +91,24 @@ async function getVips(): Promise< typeof Vips > {
 				cleanup = fn;
 			} );
 		},
+		// Redirect wasm-vips internal stdout/stderr to prevent console errors
+		// (e.g. AVIF codec warnings that are not actionable for users).
+		// Set globalThis.__vipsDebug to a function to capture this output during development.
+		print: ( text: string ) => {
+			( globalThis as any ).__vipsDebug?.( text );
+		},
+		printErr: ( text: string ) => {
+			( globalThis as any ).__vipsDebug?.( text );
+		},
 	} );
+
+	const vipsInstance = await vipsPromise;
+
+	// Disable the operation cache to prevent out-of-memory crashes
+	// during repeated image processing. libvips caches results from
+	// previous operations which accumulates WASM memory over time.
+	// See https://github.com/WordPress/gutenberg/issues/76706
+	vipsInstance.Cache.max( 0 );
 
 	return vipsInstance;
 }
@@ -134,7 +180,11 @@ export async function convertImageFormat(
 			}
 		};
 
-		const saveOptions: SaveOptions< typeof outputType > = {};
+		const saveOptions: SaveOptions< typeof outputType > = {
+			// Strip metadata except ICC color profiles,
+			// matching WordPress core's behavior.
+			keep: 'icc',
+		};
 
 		if ( supportsQuality( outputType ) ) {
 			saveOptions.Q = quality * 100;
@@ -182,13 +232,190 @@ export async function compressImage(
 }
 
 /**
+ * Applies resize and optional crop logic to produce a thumbnail.
+ *
+ * Handles three crop modes: no crop (simple downscale), boolean `true`
+ * (center/attention crop), and positional crop (e.g. ['center', 'top']).
+ *
+ * @param resize          Resize options including target dimensions and crop mode.
+ * @param originalWidth   Width of the source image.
+ * @param originalHeight  Height (pageHeight) of the source image.
+ * @param smartCrop       Whether to use saliency-aware cropping.
+ * @param createThumbnail Callback that creates a thumbnail at the given width/options.
+ * @return The resized (and optionally cropped) image.
+ */
+function applyResizeAndCrop<
+	T extends {
+		width: number;
+		height: number;
+		crop: ( ...args: number[] ) => T;
+		// Optional UltraHDR support: present on Vips.Image instances when the
+		// source has an embedded gain map.
+		gainmap?: T;
+		copy?: () => T;
+		setImage?: ( name: string, value: T ) => void;
+	},
+>(
+	resize: ImageSizeCrop,
+	originalWidth: number,
+	originalHeight: number,
+	smartCrop: boolean,
+	createThumbnail: ( width: number, options: ThumbnailOptions ) => T
+): T {
+	// Clone so we don't mutate the caller's config.
+	// If resize.height is zero, calculate from aspect ratio.
+	const target: ImageSizeCrop = {
+		...resize,
+		height:
+			resize.height || ( originalHeight / originalWidth ) * resize.width,
+	};
+
+	const thumbnailOptions: ThumbnailOptions = {
+		size: 'down',
+		height: target.height,
+	};
+
+	let resizeWidth = target.width;
+
+	if ( ! target.crop ) {
+		return createThumbnail( resizeWidth, thumbnailOptions );
+	}
+
+	if ( true === target.crop ) {
+		thumbnailOptions.crop = smartCrop ? 'attention' : 'centre';
+		return createThumbnail( resizeWidth, thumbnailOptions );
+	}
+
+	// Positional crop: first resize, then crop to exact dimensions.
+	if ( originalWidth < originalHeight ) {
+		resizeWidth =
+			target.width >= target.height
+				? target.width
+				: ( originalWidth / originalHeight ) * target.height;
+		thumbnailOptions.height =
+			target.width >= target.height
+				? ( originalHeight / originalWidth ) * resizeWidth
+				: target.height;
+	} else {
+		resizeWidth =
+			target.width >= target.height
+				? ( originalWidth / originalHeight ) * target.height
+				: target.width;
+		thumbnailOptions.height =
+			target.width >= target.height
+				? target.height
+				: ( originalHeight / originalWidth ) * resizeWidth;
+	}
+
+	const image = createThumbnail( resizeWidth, thumbnailOptions );
+
+	let left = 0;
+	if ( 'center' === target.crop[ 0 ] ) {
+		left = ( image.width - target.width ) / 2;
+	} else if ( 'right' === target.crop[ 0 ] ) {
+		left = image.width - target.width;
+	}
+
+	let top = 0;
+	if ( 'center' === target.crop[ 1 ] ) {
+		top = ( image.height - target.height ) / 2;
+	} else if ( 'bottom' === target.crop[ 1 ] ) {
+		top = image.height - target.height;
+	}
+
+	// Address rounding errors where `left` or `top` become negative integers
+	// and `target.width` / `target.height` are bigger than the actual dimensions.
+	// Downside: one side could be 1px smaller than the requested size.
+	left = Math.max( 0, left );
+	top = Math.max( 0, top );
+	const cropWidth = Math.min( image.width, target.width );
+	const cropHeight = Math.min( image.height, target.height );
+
+	const cropped = image.crop( left, top, cropWidth, cropHeight );
+
+	// For UltraHDR sources, also crop the attached gain map. The gain map
+	// can be smaller than the main image, so we scale the crop coordinates
+	// to its resolution. See:
+	// https://www.libvips.org/API/current/uhdr.html#a-la-carte-processing
+	const gainmap = image.gainmap;
+	const copy = cropped.copy;
+	const setImage = cropped.setImage;
+	if ( ! gainmap || ! copy || ! setImage ) {
+		return cropped;
+	}
+
+	// Scale the crop rect to the gain map's resolution. `crop` expects integer
+	// pixel coordinates, so round here rather than relying on an implicit
+	// float-to-int conversion, and clamp to the gain map bounds so the rect
+	// never extends past its edges.
+	const hscale = gainmap.width / image.width;
+	const vscale = gainmap.height / image.height;
+	const gainmapLeft = Math.round( left * hscale );
+	const gainmapTop = Math.round( top * vscale );
+	const gainmapWidth = Math.min(
+		Math.round( cropWidth * hscale ),
+		gainmap.width - gainmapLeft
+	);
+	const gainmapHeight = Math.min(
+		Math.round( cropHeight * vscale ),
+		gainmap.height - gainmapTop
+	);
+	const newGainmap = gainmap.crop(
+		gainmapLeft,
+		gainmapTop,
+		gainmapWidth,
+		gainmapHeight
+	);
+
+	// setImage mutates, so produce a unique copy first.
+	const result = copy.call( cropped );
+	setImage.call( result, 'gainmap', newGainmap );
+	return result;
+}
+
+/**
+ * Builds save options for writing an image to a buffer.
+ *
+ * @param type    Output mime type.
+ * @param quality Desired quality (0-1).
+ * @return Save options object.
+ */
+function buildSaveOptions(
+	type: string,
+	quality: number
+): SaveOptions< typeof type > {
+	const saveOptions: SaveOptions< typeof type > = {
+		// Strip metadata except ICC color profiles or gainmaps,
+		// matching WordPress core's behavior.
+		keep: 'icc|gainmap',
+	};
+
+	if ( supportsQuality( type ) ) {
+		saveOptions.Q = quality * 100;
+	}
+
+	// See https://github.com/swissspidy/media-experiments/issues/324.
+	if ( 'image/avif' === type ) {
+		saveOptions.effort = 2;
+	}
+
+	return saveOptions;
+}
+
+/**
  * Resizes an image using vips.
+ *
+ * UltraHDR JPEGs are auto-detected and preserved: libvips's `uhdrload*`
+ * has higher priority than `jpegload*`, so `newFromBuffer`/`thumbnailBuffer`
+ * decode the gain map alongside the base image, and `jpegsave*` delegates
+ * to `uhdrsave*` on output when a gain map is attached.
  *
  * @param id        Item ID.
  * @param buffer    Original file buffer.
  * @param type      Mime type.
  * @param resize    Resize options.
  * @param smartCrop Whether to use smart cropping (i.e. saliency-aware).
+ * @param quality   Desired quality (0-1).
  * @return Processed file data plus the old and new dimensions.
  */
 export async function resizeImage(
@@ -196,7 +423,8 @@ export async function resizeImage(
 	buffer: ArrayBuffer,
 	type: string,
 	resize: ImageSizeCrop,
-	smartCrop = false
+	smartCrop = false,
+	quality = 0.82
 ): Promise< {
 	buffer: ArrayBuffer | ArrayBufferLike;
 	width: number;
@@ -210,9 +438,6 @@ export async function resizeImage(
 
 	try {
 		const vips = await getVips();
-		const thumbnailOptions: ThumbnailOptions = {
-			size: 'down',
-		};
 
 		let strOptions = '';
 		const loadOptions: LoadOptions< typeof type > = {};
@@ -221,7 +446,6 @@ export async function resizeImage(
 		// But only if we're not cropping.
 		if ( supportsAnimation( type ) && ! resize.crop ) {
 			strOptions = '[n=-1]';
-			thumbnailOptions.option_string = strOptions;
 			( loadOptions as LoadOptions< typeof type > ).n = -1;
 		}
 
@@ -238,91 +462,26 @@ export async function resizeImage(
 
 		const { width, pageHeight } = image;
 
-		// If resize.height is zero.
-		resize.height = resize.height || ( pageHeight / width ) * resize.width;
-
-		let resizeWidth = resize.width;
-		thumbnailOptions.height = resize.height;
-
-		if ( ! resize.crop ) {
-			image = vips.Image.thumbnailBuffer(
-				buffer,
-				resizeWidth,
-				thumbnailOptions
-			);
-
-			image.onProgress = onProgress;
-		} else if ( true === resize.crop ) {
-			thumbnailOptions.crop = smartCrop ? 'attention' : 'centre';
-
-			image = vips.Image.thumbnailBuffer(
-				buffer,
-				resizeWidth,
-				thumbnailOptions
-			);
-
-			image.onProgress = onProgress;
-		} else {
-			// First resize, then do the cropping.
-			// This allows operating on the second bitmap with the correct dimensions.
-
-			if ( width < pageHeight ) {
-				resizeWidth =
-					resize.width >= resize.height
-						? resize.width
-						: ( width / pageHeight ) * resize.height;
-				thumbnailOptions.height =
-					resize.width >= resize.height
-						? ( pageHeight / width ) * resizeWidth
-						: resize.height;
-			} else {
-				resizeWidth =
-					resize.width >= resize.height
-						? ( width / pageHeight ) * resize.height
-						: resize.width;
-				thumbnailOptions.height =
-					resize.width >= resize.height
-						? resize.height
-						: ( pageHeight / width ) * resizeWidth;
+		image = applyResizeAndCrop(
+			resize,
+			width,
+			pageHeight,
+			smartCrop,
+			( resizeWidth, thumbnailOptions ) => {
+				if ( strOptions ) {
+					thumbnailOptions.option_string = strOptions;
+				}
+				const thumb = vips.Image.thumbnailBuffer(
+					buffer,
+					resizeWidth,
+					thumbnailOptions
+				);
+				thumb.onProgress = onProgress;
+				return thumb;
 			}
+		);
 
-			image = vips.Image.thumbnailBuffer(
-				buffer,
-				resizeWidth,
-				thumbnailOptions
-			);
-
-			image.onProgress = onProgress;
-
-			let left = 0;
-			if ( 'center' === resize.crop[ 0 ] ) {
-				left = ( image.width - resize.width ) / 2;
-			} else if ( 'right' === resize.crop[ 0 ] ) {
-				left = image.width - resize.width;
-			}
-
-			let top = 0;
-			if ( 'center' === resize.crop[ 1 ] ) {
-				top = ( image.height - resize.height ) / 2;
-			} else if ( 'bottom' === resize.crop[ 1 ] ) {
-				top = image.height - resize.height;
-			}
-
-			// Address rounding errors where `left` or `top` become negative integers
-			// and `resize.width` / `resize.height` are bigger than the actual dimensions.
-			// Downside: one side could be 1px smaller than the requested size.
-			left = Math.max( 0, left );
-			top = Math.max( 0, top );
-			resize.width = Math.min( image.width, resize.width );
-			resize.height = Math.min( image.height, resize.height );
-
-			image = image.crop( left, top, resize.width, resize.height );
-
-			image.onProgress = onProgress;
-		}
-
-		// TODO: Allow passing quality?
-		const saveOptions: SaveOptions< typeof type > = {};
+		const saveOptions = buildSaveOptions( type, quality );
 		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
 
 		const result = {
@@ -339,6 +498,66 @@ export async function resizeImage(
 		return result;
 	} finally {
 		inProgressOperations.delete( id );
+	}
+}
+
+/**
+ * Information returned by getUltraHdrInfo() for a successfully probed
+ * UltraHDR JPEG.
+ */
+interface UltraHdrInfo {
+	width: number;
+	height: number;
+	/** HDR headroom in stops (log2 of the linear capacity). */
+	hdrCapacity: number;
+}
+
+/**
+ * Probes a JPEG to determine whether it is an UltraHDR image with an embedded
+ * gain map.
+ *
+ * Returns dimensions and HDR headroom on success, or `null` if the buffer is
+ * not a valid UltraHDR JPEG (no gain map, decode failure, or unsupported
+ * format).
+ *
+ * @param buffer Image buffer.
+ * @return UltraHDR info, or null when the buffer is not UltraHDR.
+ */
+export async function getUltraHdrInfo(
+	buffer: ArrayBuffer
+): Promise< UltraHdrInfo | null > {
+	try {
+		const vips = await getVips();
+		const image = vips.Image.uhdrloadBuffer( buffer );
+		if ( ! image.gainmap ) {
+			cleanup?.();
+			return null;
+		}
+
+		// `gainmap-hdr-capacity-max` is libultrahdr's linear-scale max capacity.
+		// Convert to log2 stops so the value stored in attachment metadata
+		// represents HDR headroom in stops.
+		let hdrCapacityLinear = 1;
+		try {
+			hdrCapacityLinear = image.getDouble( 'gainmap-hdr-capacity-max' );
+		} catch {
+			// Field may be missing; fall back to no headroom.
+		}
+		const hdrCapacity =
+			hdrCapacityLinear > 0 ? Math.log2( hdrCapacityLinear ) : 0;
+
+		const info: UltraHdrInfo = {
+			width: image.width,
+			height: image.pageHeight,
+			hdrCapacity,
+		};
+
+		cleanup?.();
+		return info;
+	} catch {
+		// Not an UltraHDR image (or libultrahdr decoder unavailable).
+		cleanup?.();
+		return null;
 	}
 }
 
@@ -473,5 +692,6 @@ export {
 	resizeImage as vipsResizeImage,
 	rotateImage as vipsRotateImage,
 	hasTransparency as vipsHasTransparency,
+	getUltraHdrInfo as vipsGetUltraHdrInfo,
 	cancelOperations as vipsCancelOperations,
 };

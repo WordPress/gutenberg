@@ -18,6 +18,7 @@ import deprecated from '@wordpress/deprecated';
  */
 import { Input, SpinButton, styles } from './styles/number-control-styles';
 import * as inputControlActionTypes from '../input-control/reducer/actions';
+import type { StateReducer } from '../input-control/reducer/state';
 import { add, subtract, clamp, ensureValidStep } from '../utils/math';
 import { ensureNumber, isValueEmpty } from '../utils/values';
 import type { WordPressComponentProps } from '../context/wordpress-component';
@@ -120,93 +121,91 @@ function UnforwardedNumberControl(
 	 *
 	 * @return The updated state to apply to InputControl
 	 */
-	const numberControlStateReducer: NumberControlProps[ '__unstableStateReducer' ] =
-		( state, action ) => {
-			const nextState = { ...state };
+	const numberControlStateReducer: StateReducer = ( state, action ) => {
+		const nextState = { ...state };
 
-			const { type, payload } = action;
-			const event = payload.event;
-			const currentValue = nextState.value;
+		const { type, payload } = action;
+		const event = payload.event;
+		const currentValue = nextState.value;
 
-			/**
-			 * Handles custom UP and DOWN Keyboard events
-			 */
-			if (
-				type === inputControlActionTypes.PRESS_UP ||
-				type === inputControlActionTypes.PRESS_DOWN
-			) {
-				nextState.value = spinValue(
-					currentValue,
-					type === inputControlActionTypes.PRESS_UP ? 'up' : 'down',
-					event as KeyboardEvent | undefined
+		/**
+		 * Handles custom UP and DOWN Keyboard events
+		 */
+		if (
+			type === inputControlActionTypes.PRESS_UP ||
+			type === inputControlActionTypes.PRESS_DOWN
+		) {
+			nextState.value = spinValue(
+				currentValue,
+				type === inputControlActionTypes.PRESS_UP ? 'up' : 'down',
+				event as KeyboardEvent | undefined
+			);
+		}
+
+		/**
+		 * Handles drag to update events
+		 */
+		if ( type === inputControlActionTypes.DRAG && isDragEnabled ) {
+			const [ x, y ] = payload.delta;
+			const enableShift = payload.shiftKey && isShiftStepEnabled;
+			const modifier = enableShift
+				? ensureNumber( shiftStep ) * baseSpin
+				: baseSpin;
+
+			let directionModifier;
+			let delta;
+
+			switch ( dragDirection ) {
+				case 'n':
+					delta = y;
+					directionModifier = -1;
+					break;
+
+				case 'e':
+					delta = x;
+					directionModifier = isRTL() ? -1 : 1;
+					break;
+
+				case 's':
+					delta = y;
+					directionModifier = 1;
+					break;
+
+				case 'w':
+					delta = x;
+					directionModifier = isRTL() ? 1 : -1;
+					break;
+			}
+
+			if ( delta !== 0 ) {
+				delta = Math.ceil( Math.abs( delta ) ) * Math.sign( delta );
+				const distance = delta * modifier * directionModifier;
+
+				nextState.value = constrainValue(
+					// @ts-expect-error TODO: Investigate if it's ok for currentValue to be undefined
+					add( currentValue, distance ),
+					enableShift ? modifier : undefined
 				);
 			}
+		}
 
-			/**
-			 * Handles drag to update events
-			 */
-			if ( type === inputControlActionTypes.DRAG && isDragEnabled ) {
-				const [ x, y ] = payload.delta;
-				const enableShift = payload.shiftKey && isShiftStepEnabled;
-				const modifier = enableShift
-					? ensureNumber( shiftStep ) * baseSpin
-					: baseSpin;
+		/**
+		 * Handles commit (ENTER key press or blur)
+		 */
+		if (
+			type === inputControlActionTypes.PRESS_ENTER ||
+			type === inputControlActionTypes.COMMIT
+		) {
+			const applyEmptyValue = required === false && currentValue === '';
 
-				let directionModifier;
-				let delta;
+			nextState.value = applyEmptyValue
+				? currentValue
+				: // @ts-expect-error TODO: Investigate if it's ok for currentValue to be undefined
+				  constrainValue( currentValue );
+		}
 
-				switch ( dragDirection ) {
-					case 'n':
-						delta = y;
-						directionModifier = -1;
-						break;
-
-					case 'e':
-						delta = x;
-						directionModifier = isRTL() ? -1 : 1;
-						break;
-
-					case 's':
-						delta = y;
-						directionModifier = 1;
-						break;
-
-					case 'w':
-						delta = x;
-						directionModifier = isRTL() ? 1 : -1;
-						break;
-				}
-
-				if ( delta !== 0 ) {
-					delta = Math.ceil( Math.abs( delta ) ) * Math.sign( delta );
-					const distance = delta * modifier * directionModifier;
-
-					nextState.value = constrainValue(
-						// @ts-expect-error TODO: Investigate if it's ok for currentValue to be undefined
-						add( currentValue, distance ),
-						enableShift ? modifier : undefined
-					);
-				}
-			}
-
-			/**
-			 * Handles commit (ENTER key press or blur)
-			 */
-			if (
-				type === inputControlActionTypes.PRESS_ENTER ||
-				type === inputControlActionTypes.COMMIT
-			) {
-				const applyEmptyValue =
-					required === false && currentValue === '';
-
-				nextState.value = applyEmptyValue
-					? currentValue
-					: // @ts-expect-error TODO: Investigate if it's ok for currentValue to be undefined
-					  constrainValue( currentValue );
-			}
-
-			return nextState;
-		};
+		return stateReducerProp?.( nextState, action ) ?? nextState;
+	};
 
 	const buildSpinButtonClickHandler =
 		( direction: 'up' | 'down' ) =>
@@ -238,10 +237,7 @@ function UnforwardedNumberControl(
 			type={ typeProp }
 			// @ts-expect-error TODO: Resolve discrepancy between `value` types in InputControl based components
 			value={ valueProp }
-			__unstableStateReducer={ ( state, action ) => {
-				const baseState = numberControlStateReducer( state, action );
-				return stateReducerProp?.( baseState, action ) ?? baseState;
-			} }
+			__unstableStateReducer={ numberControlStateReducer }
 			size={ size }
 			__shouldNotWarnDeprecated36pxSize
 			suffix={

@@ -406,6 +406,7 @@ _Parameters_
 -   _props.label_ `?string`: A label for the control.
 -   _props.onChange_ `( value: string ) => void`: Called when the dimension value changes.
 -   _props.value_ `string`: The current dimension value.
+-   _props.dimensionSizes_ `?Object`: Optional dimension size presets. Falls back to settings from the store.
 
 _Returns_
 
@@ -936,12 +937,12 @@ Applies a series of CSS rule transforms to wrap selectors inside a given class a
 _Parameters_
 
 -   _styles_ `EditorStyle[]`: CSS rules.
--   _wrapperSelector_ `string`: Wrapper selector.
+-   _wrapperSelector_ Wrapper selector.
 -   _transformOptions_ `TransformOptions`: Additional options for style transformation.
 
 _Returns_
 
--   `Array`: converted rules.
+-   converted rules.
 
 ### Typewriter
 

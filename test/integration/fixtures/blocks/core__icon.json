@@ -3,11 +3,9 @@
 		"name": "core/icon",
 		"isValid": true,
 		"attributes": {
-			"style": {
-				"dimensions": {
-					"width": "24px"
-				}
-			}
+			"flipHorizontal": false,
+			"flipVertical": false,
+			"rotation": 0
 		},
 		"innerBlocks": []
 	}

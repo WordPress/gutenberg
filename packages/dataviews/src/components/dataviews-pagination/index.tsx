@@ -72,6 +72,7 @@ export function DataViewsPagination() {
 						),
 						{
 							div: <div aria-hidden />,
+							// @ts-expect-error — Tag injected via sprintf argument, not visible in format string.
 							CurrentPage: (
 								<SelectControl
 									aria-label={ __( 'Current page' ) }

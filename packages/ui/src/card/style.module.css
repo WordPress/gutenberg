@@ -1,0 +1,59 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer components {
+		.root {
+			--wp-ui-card-padding: var(--wpds-dimension-padding-2xl);
+			--wp-ui-card-header-content-gap: var(--wpds-dimension-gap-xl);
+			--wp-ui-card-header-content-margin: calc(var(--wp-ui-card-header-content-gap) - var(--wp-ui-card-padding));
+
+			display: flex;
+			flex-direction: column;
+			border: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
+			border-radius: var(--wpds-border-radius-lg);
+			overflow: clip;
+			background-color: var(--wpds-color-background-surface-neutral-strong);
+			color: var(--wpds-color-foreground-content-neutral);
+		}
+
+		/* Padding is applied to the individual header/content elements to enable
+		 * the higher-level `CollapsibleCard` component to be fully clickable
+		 * to expand/collapse the card.
+		*/
+		.header,
+		.content {
+			padding: var(--wp-ui-card-padding);
+
+			&:not(:first-child):not(:last-child) {
+				padding-block-end: 0;
+			}
+		}
+
+		/* Custom vertical gap between header and content */
+		.header + .content {
+			padding-block-start: 0;
+			margin-block-start: var(--wp-ui-card-header-content-margin);
+		}
+
+		.fullbleed {
+			margin-inline: calc(-1 * var(--wp-ui-card-padding));
+			width: calc(100% + 2 * var(--wp-ui-card-padding));
+		}
+
+		/*
+		 * When FullBleed sits at the start of the first *root* card section, extend
+		 * it flush to the card's top edge. Must use `.root >` so `Card.Content`
+		 * nested inside `CollapsibleCard`'s panel is not treated as `:first-child`
+		 * (which would pull FullBleed up into the header gap).
+		 */
+		.root > :is(.header, .content):first-child > .fullbleed:first-child {
+			margin-block-start: calc(-1 * var(--wp-ui-card-padding));
+		}
+
+		/* When FullBleed sits at the end of the last card section, extend it flush to the card's bottom edge. */
+		:is(.header, .content):last-child > .fullbleed:last-child {
+			margin-block-end: calc(-1 * var(--wp-ui-card-padding));
+		}
+
+	}
+}

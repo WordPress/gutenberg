@@ -2,6 +2,31 @@
 
 ## Unreleased
 
+## 2.49.0 (2026-06-24)
+
+## 2.48.1 (2026-06-16)
+
+## 2.48.0 (2026-06-10)
+
+## 2.47.0 (2026-05-27)
+
+## 2.46.0 (2026-05-14)
+
+## 2.45.0 (2026-04-29)
+
+## 2.44.0 (2026-04-15)
+
+## 2.43.0 (2026-04-01)
+
+## 2.42.0 (2026-03-18)
+
+### Bug Fixes
+
+-   Fix race condition where router evaluates before `hydrateRegions()` completes on Safari and Firefox, causing interactive regions to be permanently non-functional (dead DOM). ([#76053](https://github.com/WordPress/gutenberg/pull/76053))
+## 2.41.0 (2026-03-04)
+
+## 2.40.0 (2026-02-18)
+
 ### Deprecations
 
 -   Move `state.navigation.hasStarted` and `state.navigation.hasFinished` to a private store and deprecate direct access from the public `core/router` store. ([#70882](https://github.com/WordPress/gutenberg/pull/70882))

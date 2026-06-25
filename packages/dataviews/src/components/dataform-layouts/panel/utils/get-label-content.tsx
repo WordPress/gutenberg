@@ -1,8 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { BaseControl, Icon, Tooltip } from '@wordpress/components';
+import { Icon as WCIcon } from '@wordpress/components';
 import { error as errorIcon } from '@wordpress/icons';
+import { Tooltip, VisuallyHidden } from '@wordpress/ui';
 
 function getLabelContent(
 	showError?: boolean,
@@ -10,16 +11,20 @@ function getLabelContent(
 	fieldLabel?: string
 ) {
 	return showError ? (
-		<Tooltip text={ errorMessage } placement="top">
-			<span className="dataforms-layouts-panel__field-label-error-content">
-				<Icon icon={ errorIcon } size={ 16 } />
-				<BaseControl.VisualLabel>
-					{ fieldLabel }
-				</BaseControl.VisualLabel>
-			</span>
-		</Tooltip>
+		<Tooltip.Root>
+			<Tooltip.Trigger
+				render={
+					<span className="dataforms-layouts-panel__field-label-error-content">
+						<WCIcon icon={ errorIcon } size={ 16 } />
+						<VisuallyHidden>{ errorMessage }: </VisuallyHidden>
+						{ fieldLabel }
+					</span>
+				}
+			/>
+			<Tooltip.Popup>{ errorMessage }</Tooltip.Popup>
+		</Tooltip.Root>
 	) : (
-		<BaseControl.VisualLabel>{ fieldLabel }</BaseControl.VisualLabel>
+		fieldLabel
 	);
 }
 

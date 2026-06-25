@@ -1,0 +1,41 @@
+{
+	"ignore": [
+		{
+			"comment": "equivalent-key-map ships no type declarations and has no @types/* package. Referenced only in @wordpress/data's emitted .d.ts.",
+			"package": "equivalent-key-map"
+		},
+		{
+			"comment": "moment-timezone's deep import (moment-timezone/moment-timezone.js) has no resolvable declarations and there is no @types/moment-timezone for it. Referenced in @wordpress/date's emitted .d.ts.",
+			"package": "moment-timezone"
+		},
+		{
+			"comment": "@wordpress/edit-site-init's build/index.cjs require()s @wordpress/boot, which exposes only an ESM `import` condition (no CJS entry). A real packaging mismatch to resolve separately.",
+			"specifier": "@wordpress/boot",
+			"surface": "runtime",
+			"kind": "unresolved"
+		},
+		{
+			"comment": "@wordpress/interactivity-router's build/index.cjs require()s @wordpress/interactivity, which exposes only an ESM `import` condition (no CJS entry). A real packaging mismatch to resolve separately.",
+			"specifier": "@wordpress/interactivity",
+			"surface": "runtime",
+			"kind": "unresolved"
+		},
+		{
+			"comment": "@wordpress/e2e-tests ships test-fixture plugins under plugins/ (imports of @wordpress/connectors as test data and sibling `test/*` script-modules registered by the harness, not real npm packages). Scoped to that package and path so it can never mask a real finding elsewhere.",
+			"target": "@wordpress/e2e-tests",
+			"path": "plugins/**"
+		},
+		{
+			"comment": "@wordpress/scripts intentionally deep-imports puppeteer-core/install (its install entrypoint), which puppeteer-core does not expose via exports.",
+			"specifier": "puppeteer-core/install",
+			"surface": "runtime",
+			"kind": "unresolved"
+		},
+		{
+			"comment": "@wordpress/scripts references puppeteer-firefox conditionally in its puppeteer jest environment; it is an optional, environment-gated import rather than a hard dependency.",
+			"specifier": "puppeteer-firefox",
+			"surface": "runtime",
+			"kind": "undeclared"
+		}
+	]
+}

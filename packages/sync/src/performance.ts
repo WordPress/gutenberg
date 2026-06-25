@@ -13,7 +13,11 @@ export function logPerformanceTiming<
 		const end = performance.now();
 
 		// eslint-disable-next-line no-console
-		console.log( `${ fn.name } took ${ ( end - start ).toFixed( 2 ) } ms` );
+		console.log(
+			`[SyncManager][performance]: ${ fn.name } took ${ (
+				end - start
+			).toFixed( 2 ) } ms`
+		);
 
 		return result;
 	};

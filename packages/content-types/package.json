@@ -1,0 +1,66 @@
+{
+	"name": "@wordpress/content-types",
+	"version": "1.0.0",
+	"private": true,
+	"description": "User-defined content types (post types and taxonomies) editor components and data model.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"content-types",
+		"post-types",
+		"taxonomies"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/content-types/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/content-types"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs"
+		},
+		"./build-style/": "./build-style/",
+		"./package.json": "./package.json"
+	},
+	"wpScriptModuleExports": "./build-module/index.mjs",
+	"types": "build-types",
+	"dependencies": {
+		"@wordpress/admin-ui": "file:../admin-ui",
+		"@wordpress/base-styles": "file:../base-styles",
+		"@wordpress/components": "file:../components",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/core-data": "file:../core-data",
+		"@wordpress/data": "file:../data",
+		"@wordpress/dataviews": "file:../dataviews",
+		"@wordpress/element": "file:../element",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
+		"@wordpress/notices": "file:../notices",
+		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/route": "file:../route",
+		"@wordpress/ui": "file:../ui",
+		"@wordpress/url": "file:../url",
+		"@wordpress/views": "file:../views"
+	},
+	"peerDependencies": {
+		"@types/react": "^18.3.27",
+		"react": "^18.0.0"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

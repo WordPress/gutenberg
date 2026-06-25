@@ -679,6 +679,25 @@ _Returns_
 
 -   `boolean`: Whether there is a next edit or not.
 
+### hasRevision
+
+Returns true if a revision has been received for the given set of parameters, or false otherwise.
+
+Note: This does not trigger a request for the revision from the API if it's not available in the local state.
+
+_Parameters_
+
+-   _state_ `State`: State tree
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordKey_ `EntityRecordKey`: The key of the entity record whose revision you want to check.
+-   _revisionKey_ `EntityRecordKey`: The revision's key.
+-   _query_ `GetRecordsHttpQuery`: Optional query.
+
+_Returns_
+
+-   `boolean`: Whether a revision has been received.
+
 ### hasUndo
 
 Returns true if there is a previous edit from the current undo offset for the entity records edits history, and false otherwise.
@@ -791,6 +810,10 @@ _Parameters_
 -   _kind_ `string`: Kind of the entity.
 -   _name_ `string`: Name of the entity.
 -   _recordId_ `number|string`: Record ID of the entity record.
+
+_Returns_
+
+-   `Object`: Action object.
 
 ### deleteEntityRecord
 

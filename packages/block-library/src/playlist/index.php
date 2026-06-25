@@ -17,28 +17,23 @@
  * @return string Returns the Playlist.
  */
 function render_block_core_playlist( $attributes, $content, $block ) {
-	if ( empty( $attributes['currentTrack'] ) ) {
-		return '';
-	}
-
-	$current_media_id  = $attributes['currentTrack'];
-	$playlist_id       = wp_unique_id( 'playlist-' );
-	$playlist_tracks   = array();
-	$tracks_data       = array();
-	$current_unique_id = null;
+	$playlist_id     = wp_unique_id( 'playlist-' );
+	$playlist_tracks = array();
+	$tracks_data     = array();
 
 	// Parse inner blocks to extract track data.
 	// This approach avoids duplicating track data in the HTML output.
 	if ( ! empty( $block->inner_blocks ) ) {
 		foreach ( $block->inner_blocks as $inner_block ) {
 			if ( 'core/playlist-track' === $inner_block->name ) {
-				$inner_block->context['playlistId'] = $playlist_id;
+				$track_attributes = $inner_block->attributes;
 
-				$track_attributes  = $inner_block->attributes;
-				$unique_id         = $track_attributes['uniqueId'] ?? wp_unique_id( 'playlist-track-' );
-				$playlist_tracks[] = $unique_id;
+				if ( empty( $track_attributes['id'] ) ) {
+					continue;
+				}
 
-				$inner_block->attributes['uniqueId'] = $unique_id;
+				$track_id          = 'track-' . count( $playlist_tracks );
+				$playlist_tracks[] = $track_id;
 
 				// Extract track metadata from block attributes.
 				$title      = isset( $track_attributes['title'] ) && ! empty( $track_attributes['title'] ) ? $track_attributes['title'] : __( 'Unknown title' );
@@ -58,26 +53,22 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 					);
 				}
 
-				$tracks_data[ $unique_id ] = array(
+				// Data is passed to wp_interactivity_state() which JSON-encodes it,
+				// so we use wp_strip_all_tags() instead of esc_html() to prevent
+				// HTML injection without double-encoding. URLs still use esc_url().
+				$tracks_data[ $track_id ] = array(
 					'url'       => esc_url( $url ),
-					'title'     => esc_html( $title ),
-					'artist'    => esc_html( $artist ),
-					'album'     => esc_html( $album ),
+					'title'     => wp_strip_all_tags( $title ),
+					'artist'    => wp_strip_all_tags( $artist ),
+					'album'     => wp_strip_all_tags( $album ),
 					'image'     => esc_url( $image ),
-					'ariaLabel' => esc_attr( $aria_label ),
+					'ariaLabel' => wp_strip_all_tags( $aria_label ),
 				);
-
-				if ( $unique_id === $current_media_id ) {
-					$current_unique_id = $unique_id;
-				}
 			}
 		}
 	}
 
-	// If there are no tracks but there is a currentTrack set, do not render the block.
-	// This can happen for example if the currentTrack was not deleted correctly
-	// or if the block is manually edited in the code editor mode.
-	if ( empty( $playlist_tracks ) || ! in_array( $current_media_id, $playlist_tracks, true ) ) {
+	if ( empty( $playlist_tracks ) ) {
 		return '';
 	}
 
@@ -96,43 +87,16 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 		)
 	);
 
-	// Create the HTML for the current track which shows above the tracklist.
-	$html = '<div class="wp-block-playlist__current-item">';
+	// Add waveform player container with translated button labels.
+	$label_play  = esc_attr__( 'Play' );
+	$label_pause = esc_attr__( 'Pause' );
+	$html        = '<div class="wp-block-playlist__waveform-player"
+		data-wp-watch="callbacks.initWaveformPlayer"
+		data-label-play="' . $label_play . '"
+		data-label-pause="' . $label_pause . '"
+	></div>';
 
-	// The alt attribute is intentionally left empty, as the image is decorative.
-	if ( $attributes['showImages'] ?? false ) {
-		$html .=
-		'<img
-			class="wp-block-playlist__item-image"
-			alt=""
-			width="70px"
-			height="70px"
-			data-wp-bind--src="state.currentTrack.image"
-			data-wp-bind--hidden="!state.currentTrack.image"
-		/>';
-	}
-
-	$html .= '
-		<div>
-			<span class="wp-block-playlist__item-title" data-wp-text="state.currentTrack.title"></span>
-			<div class="wp-block-playlist__current-item-artist-album">
-				<span class="wp-block-playlist__item-artist" data-wp-text="state.currentTrack.artist"></span>
-				<span class="wp-block-playlist__item-album" data-wp-text="state.currentTrack.album"></span>
-			</div>
-		</div>
-	</div>
-		<audio
-			controls="controls"
-			data-wp-on--ended="actions.nextSong"
-			data-wp-on--play="actions.isPlaying"
-			data-wp-on--pause="actions.isPaused"
-			data-wp-bind--src="state.currentTrack.url"
-			data-wp-bind--aria-label="state.currentTrack.ariaLabel"
-			data-wp-watch="callbacks.autoPlay"
-		></audio>
-	';
-
-	// Add the HTML for the current track inside the figure.
+	// Add the waveform player container inside the figure.
 	$figure = null;
 	preg_match( '/<figure[^>]*>/', $content, $figure );
 	if ( ! empty( $figure[0] ) ) {
@@ -142,17 +106,46 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 	$processor = new WP_HTML_Tag_Processor( $content );
 	$processor->next_tag( 'figure' );
 	$processor->set_attribute( 'data-wp-interactive', 'core/playlist' );
+	// Extract the waveform style from the block style variation class.
+	$waveform_style = 'bars';
+	if ( ! empty( $attributes['className'] ) && preg_match( '/is-style-([\w-]+)/', $attributes['className'], $matches ) ) {
+		$waveform_style = $matches[1];
+	}
+
 	$processor->set_attribute(
 		'data-wp-context',
-		json_encode(
+		wp_json_encode(
 			array(
-				'playlistId' => $playlist_id,
-				'currentId'  => $current_unique_id,
-				'tracks'     => $playlist_tracks,
-				'isPlaying'  => false,
+				'playlistId'    => $playlist_id,
+				'currentId'     => $playlist_tracks[0],
+				'tracks'        => $playlist_tracks,
+				'waveformStyle' => $waveform_style,
 			)
 		)
 	);
+
+	// Track IDs are render-time only. Add them after inner blocks have rendered
+	// so track buttons can update the Interactivity API state without storing
+	// persistent unique IDs in post content.
+	$track_index = 0;
+	while ( $processor->next_tag( array( 'class_name' => 'wp-block-playlist-track__button' ) ) ) {
+		$track_id = $playlist_tracks[ $track_index ] ?? null;
+
+		if ( null === $track_id ) {
+			break;
+		}
+
+		$processor->set_attribute(
+			'data-wp-context',
+			wp_json_encode(
+				array(
+					'trackId' => $track_id,
+				)
+			)
+		);
+
+		++$track_index;
+	}
 
 	return $processor->get_updated_html();
 }

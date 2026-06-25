@@ -13,9 +13,10 @@ import { createUndoManager } from '@wordpress/undo-manager';
 /**
  * Internal dependencies
  */
-import { ifMatchingAction, replaceAction } from './utils';
+import { clearUnchangedEdits, ifMatchingAction, replaceAction } from './utils';
 import { reducer as queriedDataReducer } from './queried-data';
 import { rootEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
+import { ConnectionErrorCode } from './sync';
 
 /** @typedef {import('./types').AnyFunction} AnyFunction */
 
@@ -149,19 +150,23 @@ const withMultiEntityRecordEdits = ( reducer ) => ( state, action ) => {
 
 		let newState = state;
 		record.forEach( ( { id: { kind, name, recordId }, changes } ) => {
+			const persistedRecord =
+				state?.queriedData?.items?.default?.[ recordId ];
+			const edits = Object.fromEntries(
+				Object.entries( changes ).map( ( [ key, value ] ) => [
+					key,
+					action.type === 'UNDO' ? value.from : value.to,
+				] )
+			);
+
 			newState = reducer( newState, {
 				type: 'EDIT_ENTITY_RECORD',
 				kind,
 				name,
 				recordId,
-				edits: Object.entries( changes ).reduce(
-					( acc, [ key, value ] ) => {
-						acc[ key ] =
-							action.type === 'UNDO' ? value.from : value.to;
-						return acc;
-					},
-					{}
-				),
+				// Clear edits matching the persisted record so the entity is
+				// no longer dirty after undoing back to its saved state.
+				edits: clearUnchangedEdits( edits, persistedRecord ),
 			} );
 		} );
 		return newState;
@@ -214,8 +219,11 @@ function entity( entityConfig ) {
 						}
 
 						const nextState = { ...state };
+						const itemsList = Array.isArray( action.items )
+							? action.items
+							: [ action.items ];
 
-						for ( const record of action.items ) {
+						for ( const record of itemsList ) {
 							const recordId = record?.[ action.key ];
 							const edits = nextState[ recordId ];
 							if ( ! edits ) {
@@ -456,6 +464,22 @@ export function undoManager( state = createUndoManager() ) {
 	return state;
 }
 
+// Stores a snapshot of the sync undo manager's undo/redo availability so
+// core-data selectors can react to undo stack changes.
+export function syncUndoManagerState(
+	state = { hasRedo: false, hasUndo: false },
+	action
+) {
+	switch ( action.type ) {
+		case 'SYNC_UNDO_MANAGER_CHANGE':
+			return {
+				hasRedo: action.hasRedo,
+				hasUndo: action.hasUndo,
+			};
+	}
+	return state;
+}
+
 export function editsReference( state = {}, action ) {
 	switch ( action.type ) {
 		case 'EDIT_ENTITY_RECORD':
@@ -661,17 +685,84 @@ export function editorAssets( state = null, action ) {
 }
 
 /**
- * Reducer managing icons.
+ * Reducer managing sync connection states for entities.
+ * Keyed by "kind/name:id" (e.g., "postType/post:123").
  *
- * @param {Array}  state  Current state.
- * @param {Object} action Action object.
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
- * @return {Array} Updated state.
+ * @return {Object} Updated state.
  */
-export function icons( state = [], action ) {
+export function syncConnectionStatuses( state = {}, action ) {
 	switch ( action.type ) {
-		case 'RECEIVE_ICONS':
-			return action.icons;
+		case 'SET_SYNC_CONNECTION_STATUS': {
+			const key = `${ action.kind }/${ action.name }:${ action.key }`;
+			return {
+				...state,
+				[ key ]: action.status,
+			};
+		}
+		case 'CLEAR_SYNC_CONNECTION_STATUS': {
+			const key = `${ action.kind }/${ action.name }:${ action.key }`;
+			const { [ key ]: _, ...rest } = state;
+			return rest;
+		}
+	}
+	return state;
+}
+
+/**
+ * Reducer managing whether collaboration is supported.
+ *
+ * Default to true, as collaboration is supported by default
+ * unless explicitly disabled due to unsupported conditions
+ * such as metaboxes.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function collaborationSupported( state = true, action ) {
+	switch ( action.type ) {
+		case 'SET_COLLABORATION_SUPPORTED':
+			return action.supported;
+
+		case 'SET_SYNC_CONNECTION_STATUS':
+			if (
+				ConnectionErrorCode.DOCUMENT_SIZE_LIMIT_EXCEEDED ===
+				action.status?.error?.code
+			) {
+				return false;
+			}
+
+			return state;
+	}
+	return state;
+}
+
+/**
+ * Reducer managing view configs, keyed by `kind/name`.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function viewConfigs( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_VIEW_CONFIG': {
+			const key = `${ action.kind }/${ action.name }`;
+			// Merge so a partial (`_fields`) response doesn't clobber
+			// properties already received for the same entity.
+			return {
+				...state,
+				[ key ]: {
+					...state[ key ],
+					...action.config,
+				},
+			};
+		}
 	}
 	return state;
 }
@@ -686,6 +777,7 @@ export default combineReducers( {
 	themeGlobalStyleRevisions,
 	entities,
 	editsReference,
+	syncUndoManagerState,
 	undoManager,
 	embedPreviews,
 	userPermissions,
@@ -698,5 +790,7 @@ export default combineReducers( {
 	registeredPostMeta,
 	editorSettings,
 	editorAssets,
-	icons,
+	syncConnectionStatuses,
+	collaborationSupported,
+	viewConfigs,
 } );

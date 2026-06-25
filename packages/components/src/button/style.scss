@@ -18,7 +18,7 @@
 	font-weight: $font-weight-medium;
 	margin: 0;
 	border: 0;
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 	appearance: none;
 	background: none;
 
@@ -46,11 +46,6 @@
 	// See https://github.com/WordPress/gutenberg/issues/13267 for more context on these selectors.
 	&:focus:not(:active) {
 		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
-	}
-
-	// Windows High Contrast mode will show this outline, but not the box-shadow.
-	&:focus {
-		outline: 3px solid transparent;
 	}
 
 	/**
@@ -158,7 +153,7 @@
 		&:disabled:not(:focus),
 		&[aria-disabled="true"]:not(:focus),
 		&[aria-disabled="true"]:hover:not(:focus) {
-			box-shadow: inset 0 0 0 $border-width $gray-300;
+			box-shadow: inset 0 0 0 $border-width var(--wpds-color-stroke-interactive-neutral-disabled);
 		}
 
 		&:focus:not(:active) {
@@ -257,6 +252,8 @@
 		font-weight: $font-weight-regular;
 		color: $components-color-accent;
 		text-decoration: underline;
+		text-underline-offset: 0.2em;
+		text-decoration-thickness: from-font;
 
 		@media not (prefers-reduced-motion) {
 			transition-property: border, background, color;
@@ -274,6 +271,14 @@
 		&[aria-disabled="true"] {
 			color: $gray-600;
 		}
+	}
+
+	// Windows High Contrast mode will show this outline, but not the box-shadow.
+	// This rule is placed after variant outline declarations (e.g. is-primary,
+	// is-secondary, is-tertiary) to ensure it wins by source order at the same
+	// specificity, while not using `:not(:active)` to avoid outline flicker.
+	&:focus {
+		outline: 3px solid transparent;
 	}
 
 	&:not(:disabled, [aria-disabled="true"]):active {
@@ -316,14 +321,14 @@
 	}
 
 	&.is-small {
-		height: $button-size-small;
+		height: var(--wpds-dimension-size-sm);
 		line-height: 22px;
 		padding: 0 8px;
 		font-size: 11px;
 
 		&.has-icon:not(.has-text) {
 			padding: 0;
-			min-width: $button-size-small;
+			min-width: var(--wpds-dimension-size-sm);
 		}
 	}
 
@@ -388,6 +393,14 @@
 		}
 	}
 
+	// Hide focus outline on :active to provide click feedback in forced-colors
+	// mode, where box-shadow is not visible. Higher specificity (0,3,0)
+	// ensures this wins over variant outline declarations. Placed after
+	// .is-pressed to also win by source order at equal specificity (0,3,0).
+	&:focus:active {
+		outline: none;
+	}
+
 	svg {
 		fill: currentColor;
 		outline: none;
@@ -398,12 +411,6 @@
 		@media (forced-colors: active) {
 			fill: CanvasText;
 		}
-	}
-
-	// Fixes a Safari+VoiceOver bug, where the screen reader text is announced not respecting the source order.
-	// See https://core.trac.wordpress.org/ticket/42006 and https://github.com/h5bp/html5-boilerplate/issues/1985
-	.components-visually-hidden {
-		height: auto;
 	}
 }
 

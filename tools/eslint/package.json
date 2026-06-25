@@ -1,0 +1,50 @@
+{
+	"name": "@wordpress/eslint-tools",
+	"version": "1.0.0",
+	"description": "Consolidated ESLint configuration for the repo.",
+	"private": true,
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"eslint"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/tools/eslint",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/WordPress/gutenberg.git",
+		"directory": "tools/eslint"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"type": "module",
+	"exports": {
+		"./config": "./config.mjs",
+		"./config/strict": "./config.strict.mjs"
+	},
+	"dependencies": {
+		"@eslint-community/eslint-plugin-eslint-comments": "^4.7.0",
+		"@eslint/compat": "^2.0.0",
+		"@eslint/js": "^10.0.0",
+		"@wordpress/eslint-plugin": "file:../../packages/eslint-plugin",
+		"@wordpress/scripts": "file:../../packages/scripts",
+		"eslint": "^10.0.0",
+		"eslint-formatter-compact": "^9.0.1",
+		"eslint-import-resolver-typescript": "^4.4.4",
+		"eslint-plugin-import": "^2.31.0",
+		"eslint-plugin-jest": "^28.11.0",
+		"eslint-plugin-jest-dom": "^5.5.0",
+		"eslint-plugin-prettier": "^5.5.5",
+		"eslint-plugin-react-hooks": "^7.1.1",
+		"eslint-plugin-storybook": "^10.4.3",
+		"eslint-plugin-testing-library": "^7.16.0",
+		"glob": "^7.1.2",
+		"globals": "^16.0.0",
+		"typescript-eslint": "^8.57.1"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

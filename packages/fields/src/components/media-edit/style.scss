@@ -30,6 +30,11 @@ fieldset.fields__media-edit {
 		color: $gray-900;
 	}
 
+	.fields__media-edit-description {
+		font-size: $helptext-font-size;
+		line-height: 1.5;
+	}
+
 	/* stylelint-disable-next-line property-no-unknown -- '@container' not globally permitted */
 	container-type: inline-size;
 
@@ -98,7 +103,7 @@ fieldset.fields__media-edit {
 		border-radius: $radius-small;
 		padding: $grid-unit-05 $grid-unit-10;
 		min-height: $grid-unit-50;
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 		min-width: 0;
 
 		&:not(.has-attachment) {
@@ -165,7 +170,7 @@ fieldset.fields__media-edit {
 		.fields__media-edit-expanded-preview {
 			position: relative;
 			width: 100%;
-			aspect-ratio: 3/2;
+			aspect-ratio: var(--fields-media-edit-expanded-multiple-aspect-ratio, 3/2);
 			border-radius: $radius-small;
 			padding: $grid-unit-05;
 			overflow: hidden;
@@ -256,16 +261,12 @@ fieldset.fields__media-edit {
 		}
 
 		&.is-multiple:not(.is-empty) {
-			grid-template-columns: repeat(3, 1fr);
+			// Auto-fill columns based on minimum item width
+			grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
 
 			/* stylelint-disable-next-line property-no-unknown -- '@container' not globally permitted */
-			@container (max-width: 768px) {
-				grid-template-columns: repeat(2, 1fr);
-			}
-
-			/* stylelint-disable-next-line property-no-unknown -- '@container' not globally permitted */
-			@container (max-width: 280px) {
-				grid-template-columns: 1fr;
+			@container (max-width: 500px) {
+				grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
 			}
 		}
 
@@ -278,7 +279,7 @@ fieldset.fields__media-edit {
 				display: flex;
 				align-items: center;
 				justify-content: center;
-				aspect-ratio: 3/2;
+				aspect-ratio: var(--fields-media-edit-expanded-multiple-aspect-ratio, 3/2);
 			}
 		}
 	}

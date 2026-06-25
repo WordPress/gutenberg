@@ -41,7 +41,7 @@ $ wp-env start --runtime=playground
 | Requires Docker | Yes | No |
 | Xdebug | Yes | Yes |
 | SPX profiling | Yes | No |
-| phpMyAdmin | Yes | No |
+| phpMyAdmin | Yes | Yes |
 | MySQL database | Yes | No (SQLite) |
 | Multisite | Yes | Yes |
 | Custom PHP version | Yes | Yes |
@@ -363,7 +363,10 @@ Options:
              with a built-in web UI. See
              https://github.com/NoiseByNorthwest/php-spx for more information.
                                                                         [string]
-  --scripts  Execute any configured lifecycle scripts. [boolean] [default: true]
+  --scripts    Execute any configured lifecycle scripts.
+                                                      [boolean] [default: true]
+  --auto-port  Automatically find available ports when configured ports are
+               busy.                                  [boolean]
 ```
 
 ### `wp-env stop`
@@ -488,7 +491,7 @@ Success: Installed 1 of 1 plugins.
 
 #### Changing the permalink structure
 
-You might want to do this to enable access to the REST API (`wp-env/wp/v2/`) endpoint in your wp-env environment. The endpoint is not available with plain permalinks.
+Pretty permalinks are enabled by default using the `/%year%/%monthnum%/%day%/%postname%/` structure, matching the WordPress core behavior on fresh installs. You can change the structure if needed:
 
 **Examples**
 
@@ -583,6 +586,15 @@ Options:
 
 You can customize the WordPress installation, plugins and themes that the development environment will use by specifying a `.wp-env.json` file in the directory that you run `wp-env` from.
 
+To enable editor autocomplete and validation, add a `$schema` key:
+
+```json
+{
+	"$schema": "https://schemas.wp.org/trunk/wp-env.json",
+	"plugins": [ "." ]
+}
+```
+
 `.wp-env.json` supports the following fields:
 
 | Field                | Type           | Default                                | Description                                                                                                                      |
@@ -591,16 +603,31 @@ You can customize the WordPress installation, plugins and themes that the develo
 | `"phpVersion"`       | `string\|null` | `null`                                 | The PHP version to use. If `null` is specified, `wp-env` will use the default version used with production release of WordPress. |
 | `"plugins"`          | `string[]`     | `[]`                                   | A list of plugins to install and activate in the environment.                                                                    |
 | `"themes"`           | `string[]`     | `[]`                                   | A list of themes to install in the environment.                                                                                  |
-| `"port"`             | `integer`      | `8888`                                 | The primary port number to use for the installation. You'll access the instance through the port: 'http://localhost:8888'.       |
+| `"port"`             | `integer`      | `8888`                                 | The port number to use for the installation. |
 | `"testsEnvironment"` | `boolean`      | `false`                                | _Deprecated._ Whether to create a separate test environment with its own database and containers. Use `--config` with a separate config file instead. |
+| `"testsPort"`        | `integer`      | `8889`                                 | The port number for the test site. |
+| `"autoPort"`         | `boolean`      | `false`                                | Whether to automatically find available HTTP ports when configured ports are busy. |
 | `"config"`           | `Object`       | See below.                             | Mapping of wp-config.php constants to their desired values.                                                                      |
 | `"mappings"`         | `Object`       | `"{}"`                                 | Mapping of WordPress directories to local directories to be mounted in the WordPress instance.                                   |
 | `"mysqlPort"`        | `integer`      | `null` (randomly assigned)             | The MySQL port number to expose.                                                                                                 |
-| `"phpmyadminPort"`   | `integer`      | `null`                                 | The port number for phpMyAdmin. If provided, you'll access phpMyAdmin through: http://localhost:<port>                           |
+| `"phpmyadmin"`       | `boolean`      | `false`                                | Whether to enable phpMyAdmin for database management.                                                                            |
+| `"phpmyadminPort"`   | `integer`      | `null` (randomly assigned)             | The port number for phpMyAdmin (Docker only). Setting this also enables phpMyAdmin.                                              |
 | `"multisite"`        | `boolean`      | `false`                                | Whether to set up a multisite installation.                                                                                      |
 | `"lifecycleScripts"` | `Object`       | `"{}"`                                 | Mapping of commands that should be executed at certain points in the lifecycle.                                                   |
 
 _Note: the port number environment variable (`WP_ENV_PORT`) takes precedence over the .wp-env.json value._
+
+### Automatic Port Selection
+
+By default, `wp-env` uses fixed ports (`8888` for development, `8889` for tests). If a port is busy, Docker will report an error at start time.
+
+To opt in to automatic port selection, pass the `--auto-port` flag:
+
+```sh
+wp-env start --auto-port
+```
+
+When `--auto-port` (or `"autoPort": true`) is enabled and a configured port is busy, `wp-env` scans upward from the configured port to find the next available one (for example: `8888`, `8889`, `8890`, ...). Automatic port selection is disabled when `CI` is set.
 
 Several types of strings can be passed into the `core`, `plugins`, `themes`, and `mappings` fields.
 
@@ -691,7 +718,7 @@ This is useful for plugin development when upstream Core changes need to be test
 
 ```json
 {
-	"core": "WordPress/WordPress#master",
+	"core": "WordPress/WordPress#trunk",
 	"plugins": [ "." ]
 }
 ```
@@ -784,8 +811,9 @@ You can tell `wp-env` to use a custom port number so that your instance does not
 
 These can also be set via environment variables:
 
-- `WP_ENV_PORT` to override the web server's port.
-- phpMyAdmin is not enabled by default, but its port can also be overridden via `WP_ENV_PHPMYADMIN_PORT`.
+- `WP_ENV_PORT` to override the development environment's web server's port.
+- `WP_ENV_TESTS_PORT` to override the testing environment's web server's port.
+- phpMyAdmin is not enabled by default. Enable it with `"phpmyadmin": true` in `.wp-env.json`. The Docker runtime port can also be overridden via `WP_ENV_PHPMYADMIN_PORT`.
 - By default, MySQL isn't exposed to the host, which means no chance of port conflicts. But this can also be overridden via `WP_ENV_MYSQL_PORT`.
 
 ### Specific PHP Version

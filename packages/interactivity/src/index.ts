@@ -13,7 +13,7 @@ import { batch, effect } from '@preact/signals';
  */
 import registerDirectives, { routerRegions } from './directives';
 import {
-	initialVdom,
+	initialVdomPromise,
 	hydrateRegions,
 	getRegionRootFragment,
 } from './hydration';
@@ -22,7 +22,13 @@ import { directive } from './hooks';
 import { getNamespace } from './namespaces';
 import { parseServerData, populateServerData } from './store';
 import { proxifyState } from './proxies';
-import { deepReadOnly, navigationSignal, onDOMReady, warn } from './utils';
+import {
+	deepReadOnly,
+	navigationSignal,
+	onDOMReady,
+	sessionId,
+	warn,
+} from './utils';
 
 export {
 	store,
@@ -72,7 +78,7 @@ export const privateApis = (
 	if ( lock === requiredConsent ) {
 		return {
 			getRegionRootFragment,
-			initialVdom,
+			initialVdomPromise,
 			toVdom,
 			directive,
 			getNamespace,
@@ -86,6 +92,7 @@ export const privateApis = (
 			routerRegions,
 			deepReadOnly,
 			navigationSignal,
+			sessionId,
 			warn,
 		};
 	}
@@ -105,3 +112,29 @@ registerDirectives();
 // asynchronous modules, or modules importing this module asynchronously, this
 // cannot be guaranteed.
 onDOMReady( hydrateRegions );
+
+// Tag the current history entry with the session ID so that, within the same
+// session, all entries share the same ID and back/forward works normally.
+window.history.replaceState(
+	{ ...window.history.state, wpInteractivityId: sessionId },
+	''
+);
+
+// When the browser fires `popstate` for a history entry that was created in a
+// different session (i.e., before a full page reload), force a reload so the
+// server can render the correct content. Without this, the URL would change but
+// the page content would remain stale because the interactivity router — which
+// handles client-side navigations — might not be loaded yet.
+//
+// Some `popstate` events (e.g., anchor/fragment navigations like
+// clicking `<a href="#section">`) have `null` state. These are
+// same-document navigations and must NOT trigger a reload — the browser
+// should just scroll to the target element as normal.
+window.addEventListener( 'popstate', ( event ) => {
+	if (
+		event.state !== null &&
+		event.state?.wpInteractivityId !== sessionId
+	) {
+		window.location.reload();
+	}
+} );

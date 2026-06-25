@@ -1,9 +1,8 @@
 // File copied as is from the y-utilities package.
-/* eslint-disable eslint-comments/disable-enable-pair */
-/* eslint-disable eslint-comments/no-unlimited-disable */
+/* eslint-disable @eslint-community/eslint-comments/disable-enable-pair */
+/* eslint-disable @eslint-community/eslint-comments/no-unlimited-disable */
 /* eslint-disable */
 // @ts-nocheck
-/* eslint-env browser */
 
 import * as array from 'lib0/array';
 import * as map from 'lib0/map';

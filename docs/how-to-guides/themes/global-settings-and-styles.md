@@ -239,6 +239,7 @@ The settings section has the following structure:
 			"aspectRatio": false,
 			"height": false,
 			"minHeight": false,
+			"minWidth": false,
 			"width": false,
 		},
 		"layout": {
@@ -304,7 +305,7 @@ There's one special setting property, `appearanceTools`, which is a boolean and 
 - background: backgroundImage, backgroundSize
 - border: color, radius, style, width
 - color: link
-- dimensions: aspectRatio, height, minHeight, width
+- dimensions: aspectRatio, height, minHeight, minWidth, width
 - position: sticky
 - spacing: blockGap, margin, padding
 - typography: lineHeight
@@ -776,6 +777,7 @@ Each block declares which style properties it exposes via the [block supports me
 			"aspectRatio": "value",
 			"height": "value"
 			"minHeight": "value"
+			"minWidth": "value"
 			"width": "value"
 		},
 		"filter": {
@@ -1055,6 +1057,83 @@ Pseudo selectors `:hover`, `:focus`, `:focus-visible`, `:visited`, `:active`, `:
 		}
 	}
 ```
+
+#### Responsive styles
+
+Block styles can be scoped to two named breakpoints: `@mobile` and `@tablet`. Any style property that is valid at the block or element level can be nested under one of these keys.
+
+| Key | Media query applied |
+| --- | --- |
+| `@mobile` | `@media (width <= 480px)` |
+| `@tablet` | `@media (480px < width <= 782px)` |
+
+Responsive overrides can be placed directly on a block node:
+
+```json
+{
+	"version": 3,
+	"styles": {
+		"blocks": {
+			"core/group": {
+				"color": {
+					"text": "black"
+				},
+				"@mobile": {
+					"color": {
+						"text": "hotpink"
+					}
+				}
+			}
+		}
+	}
+}
+```
+
+```css
+:root :where(.wp-block-group) { color: black; }
+@media (width <= 480px) { :root :where(.wp-block-group) { color: hotpink; } }
+```
+
+They can also be placed on element nodes within a block:
+
+```json
+{
+	"version": 3,
+	"styles": {
+		"blocks": {
+			"core/group": {
+				"elements": {
+					"link": {
+						"color": { "text": "blue" },
+						":hover": {
+							"color": { "text": "navy" }
+						}
+					}
+				},
+				"@mobile": {
+					"elements": {
+						"link": {
+							"color": { "text": "red" },
+							":hover": {
+								"color": { "text": "darkred" }
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+```
+
+```css
+:root :where(.wp-block-group a)        { color: blue; }
+@media (width <= 480px) { :root :where(.wp-block-group a)       { color: red; } }
+:root :where(.wp-block-group a:hover)  { color: navy; }
+@media (width <= 480px) { :root :where(.wp-block-group a:hover) { color: darkred; } }
+```
+
+Responsive overrides are always output after the default styles they override, so the cascade order is preserved without needing to increase specificity.
 
 #### Variations
 

@@ -2,12 +2,11 @@
  * External dependencies
  */
 import clsx from 'clsx';
-import { v4 as uuid } from 'uuid';
 
 /**
  * WordPress dependencies
  */
-import { useState, useCallback, useEffect } from '@wordpress/element';
+import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import {
 	store as blockEditorStore,
 	MediaPlaceholder,
@@ -23,15 +22,13 @@ import {
 	ToggleControl,
 	Disabled,
 	SelectControl,
-	Spinner,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-import { __, _x, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { audio as icon } from '@wordpress/icons';
-import { safeHTML, __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { createBlock } from '@wordpress/blocks';
 
 /**
@@ -39,99 +36,11 @@ import { createBlock } from '@wordpress/blocks';
  */
 import { Caption } from '../utils/caption';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { WaveformPlayer } from '../utils/waveform-player';
+import { PlaylistContext } from './context';
+import { getTrackAttributes } from './utils';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
-
-const CurrentTrack = ( { track, showImages, onTrackEnd } ) => {
-	/**
-	 * dangerouslySetInnerHTML and safeHTML are used because
-	 * the media library allows using some HTML tags in the title, artist, and album fields.
-	 */
-	const trackTitle = {
-		dangerouslySetInnerHTML: {
-			__html: safeHTML( track?.title ? track.title : __( 'Untitled' ) ),
-		},
-	};
-	const trackArtist = {
-		dangerouslySetInnerHTML: {
-			__html: safeHTML(
-				track?.artist ? track.artist : __( 'Unknown artist' )
-			),
-		},
-	};
-	const trackAlbum = {
-		dangerouslySetInnerHTML: {
-			__html: safeHTML(
-				track?.album ? track.album : __( 'Unknown album' )
-			),
-		},
-	};
-
-	let ariaLabel;
-	if ( track?.title && track?.artist && track?.album ) {
-		ariaLabel = stripHTML(
-			sprintf(
-				/* translators: %1$s: track title, %2$s artist name, %3$s: album name. */
-				_x(
-					'%1$s by %2$s from the album %3$s',
-					'track title, artist name, album name'
-				),
-				track?.title,
-				track?.artist,
-				track?.album
-			)
-		);
-	} else if ( track?.title ) {
-		ariaLabel = stripHTML( track.title );
-	} else {
-		ariaLabel = stripHTML( __( 'Untitled' ) );
-	}
-
-	return (
-		<>
-			<div className="wp-block-playlist__current-item">
-				{ showImages && track?.image && (
-					<img
-						className="wp-block-playlist__item-image"
-						src={ track.image }
-						alt=""
-						width="70px"
-						height="70px"
-					/>
-				) }
-				<div>
-					{ ! track?.title ? (
-						<span className="wp-block-playlist__item-title">
-							<Spinner />
-						</span>
-					) : (
-						<span
-							className="wp-block-playlist__item-title"
-							{ ...trackTitle }
-						/>
-					) }
-					<div className="wp-block-playlist__current-item-artist-album">
-						<span
-							className="wp-block-playlist__item-artist"
-							{ ...trackArtist }
-						/>
-						<span
-							className="wp-block-playlist__item-album"
-							{ ...trackAlbum }
-						/>
-					</div>
-				</div>
-			</div>
-			<audio
-				controls="controls"
-				src={ track?.url ? track.url : '' }
-				onEnded={ onTrackEnd }
-				aria-label={ ariaLabel }
-				tabIndex={ 0 }
-			/>
-		</>
-	);
-};
 
 const PlaylistEdit = ( {
 	attributes,
@@ -146,18 +55,20 @@ const PlaylistEdit = ( {
 		showNumbers,
 		showImages,
 		showArtists,
-		currentTrack,
+		showTrackLength,
 	} = attributes;
-	const [ trackListIndex, setTrackListIndex ] = useState( 0 );
+
+	// Extract the waveform style from the block style variation class.
+	const waveformStyle =
+		attributes.className?.match( /is-style-([\w-]+)/ )?.[ 1 ] || 'bars';
 	const blockProps = useBlockProps();
-	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
+	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const [ currentTrackClientId, setCurrentTrackClientId ] = useState( null );
 
 	const { innerBlockTracks } = useSelect(
 		( select ) => {
@@ -169,61 +80,44 @@ const PlaylistEdit = ( {
 		[ clientId ]
 	);
 
-	// Ensure that each inner block has a unique ID,
-	// even if a track is duplicated.
-	useEffect( () => {
-		const seen = new Set();
-		let hasDuplicates = false;
-		const updatedBlocks = innerBlockTracks.map( ( block ) => {
-			if ( seen.has( block.attributes.uniqueId ) ) {
-				hasDuplicates = true;
-				return {
-					...block,
-					attributes: {
-						...block.attributes,
-						uniqueId: uuid(),
-					},
-				};
-			}
-			seen.add( block.attributes.uniqueId );
-			return block;
-		} );
-		if ( hasDuplicates ) {
-			replaceInnerBlocks( clientId, updatedBlocks );
-		}
-	}, [ innerBlockTracks, clientId, replaceInnerBlocks ] );
-
 	// Create a list of tracks from the inner blocks,
-	// but skip blocks that do not have a uniqueId attribute, such as the media placeholder.
-	const validTracks = innerBlockTracks.filter(
-		( block ) => !! block.attributes.uniqueId
+	// but skip blocks that do not have a source, such as the media placeholder.
+	const validTracks = useMemo(
+		() =>
+			innerBlockTracks.filter(
+				( block ) => !! block.attributes.src || !! block.attributes.blob
+			),
+		[ innerBlockTracks ]
 	);
-	const tracks = validTracks.map( ( block ) => block.attributes );
-	const firstTrackId = validTracks[ 0 ]?.attributes?.uniqueId;
+	const tracks = useMemo(
+		() =>
+			validTracks.map( ( block ) => ( {
+				...block.attributes,
+				clientId: block.clientId,
+			} ) ),
+		[ validTracks ]
+	);
 
-	// updateBlockAttributes is used to force updating the parent playlist block
-	// when the currentTrack changes. Using setAttributes directly does not update
-	// the currentTrack when multiple tracks are moved at the same time.
 	useEffect( () => {
-		if ( tracks.length === 0 ) {
-			// If there are no tracks but currentTrack is set, set it to null.
-			if ( currentTrack !== null ) {
-				updateBlockAttributes( clientId, { currentTrack: null } );
+		if ( validTracks.length === 0 ) {
+			if ( currentTrackClientId !== null ) {
+				setCurrentTrackClientId( null );
 			}
-		} else if (
-			// If the currentTrack is not the first track, update it to the first track.
-			firstTrackId &&
-			firstTrackId !== currentTrack
-		) {
-			updateBlockAttributes( clientId, { currentTrack: firstTrackId } );
+			return;
 		}
-	}, [
-		tracks,
-		currentTrack,
-		firstTrackId,
-		clientId,
-		updateBlockAttributes,
-	] );
+
+		const currentTrackExists = validTracks.some(
+			( block ) => block.clientId === currentTrackClientId
+		);
+		if ( ! currentTrackExists ) {
+			setCurrentTrackClientId( validTracks[ 0 ].clientId );
+		}
+	}, [ currentTrackClientId, setCurrentTrackClientId, validTracks ] );
+
+	const playlistContext = useMemo(
+		() => ( { currentTrackClientId, setCurrentTrackClientId } ),
+		[ currentTrackClientId, setCurrentTrackClientId ]
+	);
 
 	const onSelectTracks = useCallback(
 		( media ) => {
@@ -235,76 +129,33 @@ const PlaylistEdit = ( {
 				media = [ media ];
 			}
 
-			const trackAttributes = ( track ) => ( {
-				id: track.id || track.url, // Attachment ID or URL.
-				uniqueId: uuid(), // Unique ID for the track.
-				src: track.url,
-				title: track.title,
-				artist:
-					track.artist ||
-					track?.meta?.artist ||
-					track?.media_details?.artist ||
-					__( 'Unknown artist' ),
-				album:
-					track.album ||
-					track?.meta?.album ||
-					track?.media_details?.album ||
-					__( 'Unknown album' ),
-				length:
-					track?.fileLength || track?.media_details?.length_formatted,
-				// Prevent using the default media attachment icon as the track image.
-				// Note: Image is not available when a new track is uploaded.
-				image:
-					track?.image?.src &&
-					track?.image?.src.endsWith( '/images/media/audio.svg' )
-						? ''
-						: track?.image?.src,
-			} );
-
-			const trackList = media.map( trackAttributes );
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( {
-				currentTrack:
-					trackList.length > 0 ? trackList[ 0 ].uniqueId : null,
-			} );
+			const trackList = media.map( getTrackAttributes );
 
 			const newBlocks = trackList.map( ( track ) =>
 				createBlock( 'core/playlist-track', track )
 			);
+			setCurrentTrackClientId( newBlocks[ 0 ]?.clientId ?? null );
 			// Replace the inner blocks with the new tracks.
 			replaceInnerBlocks( clientId, newBlocks );
 		},
-		[
-			__unstableMarkNextChangeAsNotPersistent,
-			setAttributes,
-			replaceInnerBlocks,
-			clientId,
-		]
+		[ replaceInnerBlocks, clientId, setCurrentTrackClientId ]
 	);
 
-	const onTrackEnd = useCallback( () => {
-		/* If there are tracks left, play the next track */
-		if ( trackListIndex < tracks.length - 1 ) {
-			if ( tracks[ trackListIndex + 1 ]?.uniqueId ) {
-				setTrackListIndex( trackListIndex + 1 );
-				setAttributes( {
-					currentTrack: tracks[ trackListIndex + 1 ].uniqueId,
-				} );
-			}
-		} else {
-			setTrackListIndex( 0 );
-			if ( tracks[ 0 ].uniqueId ) {
-				setAttributes( { currentTrack: tracks[ 0 ].uniqueId } );
-			} else if ( tracks.length > 0 ) {
-				const validTrack = tracks.find(
-					( track ) => track.uniqueId !== undefined
-				);
-				if ( validTrack ) {
-					setAttributes( { currentTrack: validTrack.uniqueId } );
-				}
-			}
+	// Get current track data by finding the track with matching client ID.
+	const currentTrackData =
+		tracks.find( ( track ) => track.clientId === currentTrackClientId ) ??
+		tracks[ 0 ];
+
+	// Handle track end - advance to next track or loop to first.
+	const onTrackEnded = useCallback( () => {
+		const currentIndex = tracks.findIndex(
+			( track ) => track.clientId === currentTrackClientId
+		);
+		const nextTrack = tracks[ currentIndex + 1 ] || tracks[ 0 ];
+		if ( nextTrack?.clientId ) {
+			setCurrentTrackClientId( nextTrack.clientId );
 		}
-	}, [ setAttributes, trackListIndex, tracks ] );
+	}, [ currentTrackClientId, setCurrentTrackClientId, tracks ] );
 
 	const onChangeOrder = useCallback(
 		( trackOrder ) => {
@@ -317,25 +168,18 @@ const PlaylistEdit = ( {
 				}
 				return titleB.localeCompare( titleA );
 			} );
-			const sortedTracks = sortedBlocks.map(
-				( block ) => block.attributes
-			);
 			replaceInnerBlocks( clientId, sortedBlocks );
+			setCurrentTrackClientId( sortedBlocks[ 0 ]?.clientId ?? null );
 			setAttributes( {
 				order: trackOrder,
-				currentTrack:
-					sortedTracks.length > 0 &&
-					sortedTracks[ 0 ].uniqueId !== currentTrack
-						? sortedTracks[ 0 ].uniqueId
-						: currentTrack,
 			} );
 		},
 		[
 			clientId,
-			currentTrack,
 			innerBlockTracks,
 			replaceInnerBlocks,
 			setAttributes,
+			setCurrentTrackClientId,
 		]
 	);
 
@@ -358,7 +202,7 @@ const PlaylistEdit = ( {
 		renderAppender: hasAnySelected && InnerBlocks.ButtonBlockAppender,
 	} );
 
-	if ( ! tracks || ( Array.isArray( tracks ) && tracks.length === 0 ) ) {
+	if ( tracks.length === 0 ) {
 		return (
 			<div
 				{ ...blockProps }
@@ -405,6 +249,7 @@ const PlaylistEdit = ( {
 							showTracklist: true,
 							showArtists: true,
 							showNumbers: true,
+							showTrackLength: true,
 							showImages: true,
 							order: 'asc',
 						} );
@@ -461,6 +306,24 @@ const PlaylistEdit = ( {
 									checked={ showNumbers }
 								/>
 							</ToolsPanelItem>
+							<ToolsPanelItem
+								label={ __( 'Show track length in Tracklist' ) }
+								isShownByDefault
+								hasValue={ () => showTrackLength !== true }
+								onDeselect={ () =>
+									setAttributes( { showTrackLength: true } )
+								}
+							>
+								<ToggleControl
+									label={ __(
+										'Show track length in Tracklist'
+									) }
+									onChange={ toggleAttribute(
+										'showTrackLength'
+									) }
+									checked={ showTrackLength }
+								/>
+							</ToolsPanelItem>
 						</>
 					) }
 					<ToolsPanelItem
@@ -498,10 +361,13 @@ const PlaylistEdit = ( {
 			</InspectorControls>
 			<figure { ...blockProps }>
 				<Disabled isDisabled={ ! isSelected }>
-					<CurrentTrack
-						track={ tracks[ trackListIndex ] }
-						showImages={ showImages }
-						onTrackEnd={ onTrackEnd }
+					<WaveformPlayer
+						src={ currentTrackData?.src }
+						title={ currentTrackData?.title }
+						artist={ currentTrackData?.artist }
+						image={ currentTrackData?.image }
+						waveformStyle={ waveformStyle }
+						onEnded={ onTrackEnded }
 					/>
 				</Disabled>
 				{ showTracklist && (
@@ -509,9 +375,13 @@ const PlaylistEdit = ( {
 						className={ clsx( 'wp-block-playlist__tracklist', {
 							'wp-block-playlist__tracklist-show-numbers':
 								showNumbers,
+							'wp-block-playlist__tracklist-length-is-hidden':
+								! showTrackLength,
 						} ) }
 					>
-						{ innerBlocksProps.children }
+						<PlaylistContext.Provider value={ playlistContext }>
+							{ innerBlocksProps.children }
+						</PlaylistContext.Provider>
 					</ol>
 				) }
 				<Caption

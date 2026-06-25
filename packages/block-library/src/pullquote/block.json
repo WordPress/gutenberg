@@ -18,9 +18,6 @@
 			"source": "rich-text",
 			"selector": "cite",
 			"role": "content"
-		},
-		"textAlign": {
-			"type": "string"
 		}
 	},
 	"supports": {
@@ -43,10 +40,7 @@
 			}
 		},
 		"dimensions": {
-			"minHeight": true,
-			"__experimentalDefaultControls": {
-				"minHeight": false
-			}
+			"minHeight": true
 		},
 		"spacing": {
 			"margin": true,
@@ -55,6 +49,7 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,

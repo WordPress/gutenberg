@@ -375,6 +375,7 @@ function StyleBook(
  * @param {Function} props.onPathChange Callback when the path changes.
  * @param {Object}   props.userConfig   User configuration.
  * @param {boolean}  props.isStatic     Whether the stylebook is static or clickable.
+ * @param {Object}   props.settings     Optional editor settings to use instead of the editor store settings.
  * @return {Object} Style Book Preview component.
  */
 export const StyleBookPreview = ( {
@@ -382,10 +383,11 @@ export const StyleBookPreview = ( {
 	isStatic = false,
 	path,
 	onPathChange,
+	settings: settingsProp,
 } ) => {
 	const editorSettings = useSelect(
-		( select ) => select( editorStore ).getEditorSettings(),
-		[]
+		( select ) => settingsProp ?? select( editorStore ).getEditorSettings(),
+		[ settingsProp ]
 	);
 
 	const canUserUploadMedia = useSelect(
@@ -498,7 +500,7 @@ export const StyleBookPreview = ( {
 			return { examples: examplesForSinglePageUse };
 		}
 
-		if ( blockVariation ) {
+		if ( blockVariation && filteredExamples?.examples?.length ) {
 			return {
 				examples: applyBlockVariationsToExamples(
 					filteredExamples.examples,
@@ -618,7 +620,7 @@ export const StyleBookBody = ( {
 			<style>
 				{ STYLE_BOOK_IFRAME_STYLES }
 				{ !! onClick &&
-					'body { cursor: pointer; } body * { pointer-events: none; }' }
+					'body { cursor: var(--wpds-cursor-control); } body * { pointer-events: none; }' }
 			</style>
 			<Examples
 				className="editor-style-book__examples"

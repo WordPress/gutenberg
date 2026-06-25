@@ -3,6 +3,91 @@
  */
 import { areGlobalStylesEqual } from '@wordpress/global-styles-engine';
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
+import { __ } from '@wordpress/i18n';
+
+/**
+ * State definition with value and label.
+ */
+export interface StateDefinition {
+	value: string;
+	label: string;
+}
+
+/**
+ * Valid states for elements with their labels.
+ * This mirrors the PHP constant in lib/class-wp-theme-json-gutenberg.php
+ */
+export const VALID_ELEMENT_STATES: Record< string, StateDefinition[] > = {
+	link: [
+		{ value: ':link', label: __( 'Link' ) },
+		{ value: ':any-link', label: __( 'Any Link' ) },
+		{ value: ':visited', label: __( 'Visited' ) },
+		{ value: ':hover', label: __( 'Hover' ) },
+		{ value: ':focus', label: __( 'Focus' ) },
+		{ value: ':focus-visible', label: __( 'Focus-visible' ) },
+		{ value: ':active', label: __( 'Active' ) },
+	],
+	button: [
+		{ value: ':link', label: __( 'Link' ) },
+		{ value: ':any-link', label: __( 'Any Link' ) },
+		{ value: ':visited', label: __( 'Visited' ) },
+		{ value: ':hover', label: __( 'Hover' ) },
+		{ value: ':focus', label: __( 'Focus' ) },
+		{ value: ':focus-visible', label: __( 'Focus-visible' ) },
+		{ value: ':active', label: __( 'Active' ) },
+	],
+};
+
+/**
+ * Valid states for blocks with their labels.
+ * This mirrors the PHP constant in lib/class-wp-theme-json-gutenberg.php
+ */
+export const VALID_BLOCK_STATES: Record< string, StateDefinition[] > = {
+	'core/button': [
+		{ value: ':hover', label: __( 'Hover' ) },
+		{ value: ':focus', label: __( 'Focus' ) },
+		{ value: ':focus-visible', label: __( 'Focus-visible' ) },
+		{ value: ':active', label: __( 'Active' ) },
+	],
+};
+
+/**
+ * Responsive breakpoint states available for all blocks.
+ * These map to CSS media queries wrapping the block's styles.
+ */
+export const RESPONSIVE_STATES: StateDefinition[] = [
+	{ value: '@tablet', label: __( 'Tablet' ) },
+	{ value: '@mobile', label: __( 'Mobile' ) },
+];
+
+/**
+ * Get the valid pseudo states for a given block or element.
+ *
+ * @param name The block name (e.g., 'core/button') or element name (e.g., 'button')
+ * @return Array of valid pseudo state definitions, or empty array if none
+ */
+export function getValidPseudoStates( name: string ): StateDefinition[] {
+	// Check if it's a block (contains a slash, e.g. 'core/button').
+	if ( VALID_BLOCK_STATES[ name ] ) {
+		return VALID_BLOCK_STATES[ name ] ?? [];
+	}
+
+	// Check if it's an element
+	if ( VALID_ELEMENT_STATES[ name ] ) {
+		return VALID_ELEMENT_STATES[ name ];
+	}
+
+	return [];
+}
+
+/**
+ * Get the valid viewport state definitions.
+ *
+ * @return Array of valid viewport state definitions.
+ */
+export function getValidViewportStates(): StateDefinition[] {
+	return RESPONSIVE_STATES;
+}
 
 /**
  * Removes all instances of properties from an object.

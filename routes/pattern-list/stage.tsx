@@ -22,11 +22,11 @@ import { useMemo, useCallback, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { privateApis as patternPrivateApis } from '@wordpress/patterns';
 import { __ } from '@wordpress/i18n';
+import { unlock } from '@wordpress/routes-lock-unlock';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../lock-unlock';
 import { DEFAULT_VIEW, DEFAULT_VIEWS, DEFAULT_LAYOUTS } from './view-utils';
 import { previewField } from './fields/preview';
 import { patternStatusField } from './fields/sync-status';
@@ -258,6 +258,7 @@ function PatternList() {
 	return (
 		<Page
 			title={ __( 'Patterns' ) }
+			headingLevel={ 2 }
 			subTitle={ __(
 				'Reusable design elements for your site. Create once, use everywhere.'
 			) }

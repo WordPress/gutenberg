@@ -182,6 +182,8 @@ export default function PageListEdit( {
 				'background-color',
 				context.backgroundColor
 			) ]: !! context.backgroundColor,
+			'open-on-click': context.submenuVisibility === 'click',
+			'open-always': context.submenuVisibility === 'always',
 		} ),
 		style: { ...context.style?.color },
 	} );
@@ -252,7 +254,6 @@ export default function PageListEdit( {
 	);
 
 	const {
-		isNested,
 		hasSelectedChild,
 		parentClientId,
 		hasDraggedChild,
@@ -264,18 +265,12 @@ export default function PageListEdit( {
 				hasSelectedInnerBlock,
 				hasDraggedInnerBlock,
 			} = select( blockEditorStore );
-			const blockParents = getBlockParentsByBlockName(
-				clientId,
-				'core/navigation-submenu',
-				true
-			);
 			const navigationBlockParents = getBlockParentsByBlockName(
 				clientId,
 				'core/navigation',
 				true
 			);
 			return {
-				isNested: blockParents.length > 0,
 				isChildOfNavigation: navigationBlockParents.length > 0,
 				hasSelectedChild: hasSelectedInnerBlock( clientId, true ),
 				hasDraggedChild: hasDraggedInnerBlock( clientId, true ),
@@ -315,10 +310,6 @@ export default function PageListEdit( {
 		selectBlock,
 		openModal,
 	] );
-
-	useEffect( () => {
-		setAttributes( { isNested } );
-	}, [ isNested, setAttributes ] );
 
 	return (
 		<>

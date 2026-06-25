@@ -92,6 +92,76 @@ describe( 'PresetInputControl', () => {
 		expect( mockOnChange ).toHaveBeenCalledWith( '25px' );
 	} );
 
+	it( 'clears value with undefined when input is fully erased via backspace', () => {
+		render(
+			<PresetInputControl
+				{ ...defaultProps }
+				presets={ presets }
+				value="60px"
+				disableCustomValues={ false }
+			/>
+		);
+
+		const input = screen.getByRole( 'spinbutton' );
+
+		// Simulate the bug scenario: backspace through "60" one character
+		// at a time. fireEvent.change is used here (rather than userEvent
+		// keyboard interactions) because the controlled UnitControl input
+		// does not respond to synthesised key events in jsdom. The
+		// intermediate "6" forwarding is expected and correct; the bug
+		// was that the final clear silently failed to propagate, leaving
+		// the parent stuck on the partial value.
+		fireEvent.change( input, { target: { value: '6' } } );
+		fireEvent.change( input, { target: { value: '' } } );
+
+		// The final clear must propagate as undefined, not be swallowed,
+		// and never be persisted as an empty string.
+		expect( mockOnChange ).toHaveBeenLastCalledWith( undefined );
+		expect( mockOnChange ).not.toHaveBeenCalledWith( '' );
+	} );
+
+	it( 'clears value with undefined when input is cleared in one shot', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<PresetInputControl
+				{ ...defaultProps }
+				presets={ presets }
+				value="25px"
+				disableCustomValues={ false }
+			/>
+		);
+
+		const input = screen.getByRole( 'spinbutton' );
+		await user.clear( input );
+
+		expect( mockOnChange ).toHaveBeenCalledWith( undefined );
+		expect( mockOnChange ).not.toHaveBeenCalledWith( '' );
+	} );
+
+	it( 'does not call onChange for non-numeric intermediate input', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<PresetInputControl
+				{ ...defaultProps }
+				presets={ presets }
+				value="15px"
+				disableCustomValues={ false }
+			/>
+		);
+
+		const input = screen.getByRole( 'spinbutton' );
+		await user.clear( input );
+		mockOnChange.mockClear();
+
+		// Typing a stray non-numeric character should not propagate a change.
+		await user.type( input, 'a' );
+
+		expect( mockOnChange ).not.toHaveBeenCalledWith( 'a' );
+		expect( mockOnChange ).not.toHaveBeenCalledWith( 'apx' );
+	} );
+
 	it( 'uses select dropdown for many presets', async () => {
 		const manyPresets = Array.from( { length: 12 }, ( _, i ) => ( {
 			name: `Preset ${ i + 1 }`,

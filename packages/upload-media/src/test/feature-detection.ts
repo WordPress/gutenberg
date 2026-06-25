@@ -4,7 +4,9 @@
 import {
 	detectClientSideMediaSupport,
 	isClientSideMediaSupported,
+	isHeicCanvasSupported,
 	clearFeatureDetectionCache,
+	exceedsClientProcessingMemory,
 } from '../feature-detection';
 
 describe( 'feature-detection', () => {
@@ -14,9 +16,25 @@ describe( 'feature-detection', () => {
 	const originalCreateObjectURL = global.URL.createObjectURL;
 	const originalRevokeObjectURL = global.URL.revokeObjectURL;
 
+	// Store original property descriptors for navigator properties.
+	const originalDeviceMemoryDescriptor = Object.getOwnPropertyDescriptor(
+		navigator,
+		'deviceMemory'
+	);
+	const originalConnectionDescriptor = Object.getOwnPropertyDescriptor(
+		navigator,
+		'connection'
+	);
+	const originalHardwareConcurrencyDescriptor =
+		Object.getOwnPropertyDescriptor( navigator, 'hardwareConcurrency' );
+
 	beforeEach( () => {
 		// Clear the cache before each test.
 		clearFeatureDetectionCache();
+
+		// Restore WebAssembly and SharedArrayBuffer before each test.
+		global.WebAssembly = originalWebAssembly;
+		global.SharedArrayBuffer = originalSharedArrayBuffer;
 
 		// By default, provide a mock Worker that does not throw (CSP allows blob workers).
 		global.Worker = class MockWorker {
@@ -28,6 +46,21 @@ describe( 'feature-detection', () => {
 			() => 'blob:http://localhost/test'
 		);
 		global.URL.revokeObjectURL = jest.fn();
+
+		// Remove navigator.deviceMemory and navigator.connection by default
+		// so they don't interfere with unrelated tests.
+		if ( 'deviceMemory' in navigator ) {
+			// @ts-ignore
+			delete navigator.deviceMemory;
+		}
+		if ( 'connection' in navigator ) {
+			// @ts-ignore
+			delete navigator.connection;
+		}
+		if ( 'hardwareConcurrency' in navigator ) {
+			// @ts-ignore
+			delete navigator.hardwareConcurrency;
+		}
 	} );
 
 	afterEach( () => {
@@ -37,14 +70,46 @@ describe( 'feature-detection', () => {
 		global.Worker = originalWorker;
 		global.URL.createObjectURL = originalCreateObjectURL;
 		global.URL.revokeObjectURL = originalRevokeObjectURL;
+
+		// Restore navigator.deviceMemory.
+		if ( originalDeviceMemoryDescriptor ) {
+			Object.defineProperty(
+				navigator,
+				'deviceMemory',
+				originalDeviceMemoryDescriptor
+			);
+		} else if ( 'deviceMemory' in navigator ) {
+			// @ts-ignore
+			delete navigator.deviceMemory;
+		}
+
+		// Restore navigator.connection.
+		if ( originalConnectionDescriptor ) {
+			Object.defineProperty(
+				navigator,
+				'connection',
+				originalConnectionDescriptor
+			);
+		} else if ( 'connection' in navigator ) {
+			// @ts-ignore
+			delete navigator.connection;
+		}
+
+		// Restore navigator.hardwareConcurrency.
+		if ( originalHardwareConcurrencyDescriptor ) {
+			Object.defineProperty(
+				navigator,
+				'hardwareConcurrency',
+				originalHardwareConcurrencyDescriptor
+			);
+		} else if ( 'hardwareConcurrency' in navigator ) {
+			// @ts-ignore
+			delete navigator.hardwareConcurrency;
+		}
 	} );
 
 	describe( 'detectClientSideMediaSupport', () => {
 		it( 'returns supported when all features are available', () => {
-			// Ensure all features are available.
-			global.WebAssembly = originalWebAssembly;
-			global.SharedArrayBuffer = originalSharedArrayBuffer;
-
 			const result = detectClientSideMediaSupport();
 
 			expect( result.supported ).toBe( true );
@@ -59,12 +124,11 @@ describe( 'feature-detection', () => {
 
 			expect( result.supported ).toBe( false );
 			expect( result.reason ).toBe(
-				'WebAssembly is not supported in this browser'
+				'WebAssembly is not supported in this browser.'
 			);
 		} );
 
 		it( 'returns not supported when SharedArrayBuffer is unavailable', () => {
-			global.WebAssembly = originalWebAssembly;
 			// @ts-ignore - Intentionally setting SharedArrayBuffer to undefined for testing.
 			global.SharedArrayBuffer = undefined;
 
@@ -74,10 +138,115 @@ describe( 'feature-detection', () => {
 			expect( result.reason ).toContain( 'SharedArrayBuffer' );
 		} );
 
-		it( 'returns not supported when CSP blocks blob workers', () => {
-			global.WebAssembly = originalWebAssembly;
-			global.SharedArrayBuffer = originalSharedArrayBuffer;
+		it( 'returns not supported when Worker is unavailable', () => {
+			// @ts-ignore - Intentionally setting Worker to undefined for testing.
+			global.Worker = undefined;
 
+			const result = detectClientSideMediaSupport();
+
+			expect( result.supported ).toBe( false );
+			expect( result.reason ).toBe(
+				'Web Workers are not supported in this browser.'
+			);
+		} );
+
+		it( 'returns not supported when device memory is 2 GB or less', () => {
+			Object.defineProperty( navigator, 'deviceMemory', {
+				value: 2,
+				configurable: true,
+			} );
+
+			const result = detectClientSideMediaSupport();
+
+			expect( result.supported ).toBe( false );
+			expect( result.reason ).toContain( 'insufficient memory' );
+		} );
+
+		it( 'returns supported when device memory is greater than 2 GB', () => {
+			Object.defineProperty( navigator, 'deviceMemory', {
+				value: 4,
+				configurable: true,
+			} );
+
+			const result = detectClientSideMediaSupport();
+
+			expect( result.supported ).toBe( true );
+		} );
+
+		it( 'returns not supported when hardware concurrency is less than 2', () => {
+			Object.defineProperty( navigator, 'hardwareConcurrency', {
+				value: 1,
+				configurable: true,
+			} );
+
+			const result = detectClientSideMediaSupport();
+
+			expect( result.supported ).toBe( false );
+			expect( result.reason ).toContain( 'insufficient CPU cores' );
+		} );
+
+		it( 'returns supported when hardware concurrency is 2 or more', () => {
+			Object.defineProperty( navigator, 'hardwareConcurrency', {
+				value: 2,
+				configurable: true,
+			} );
+
+			const result = detectClientSideMediaSupport();
+
+			expect( result.supported ).toBe( true );
+		} );
+
+		it( 'returns not supported when data saver is enabled', () => {
+			Object.defineProperty( navigator, 'connection', {
+				value: { saveData: true, effectiveType: '4g' },
+				configurable: true,
+			} );
+
+			const result = detectClientSideMediaSupport();
+
+			expect( result.supported ).toBe( false );
+			expect( result.reason ).toBe( 'Data saver mode is enabled.' );
+		} );
+
+		it( 'returns not supported when connection is 2g', () => {
+			Object.defineProperty( navigator, 'connection', {
+				value: { saveData: false, effectiveType: '2g' },
+				configurable: true,
+			} );
+
+			const result = detectClientSideMediaSupport();
+
+			expect( result.supported ).toBe( false );
+			expect( result.reason ).toContain( 'too slow' );
+		} );
+
+		it( 'returns supported when connection is 3g', () => {
+			Object.defineProperty( navigator, 'connection', {
+				value: { saveData: false, effectiveType: '3g' },
+				configurable: true,
+			} );
+
+			const result = detectClientSideMediaSupport();
+
+			expect( result.supported ).toBe( true );
+		} );
+
+		it( 'returns not supported when connection is slow-2g', () => {
+			Object.defineProperty( navigator, 'connection', {
+				value: {
+					saveData: false,
+					effectiveType: 'slow-2g',
+				},
+				configurable: true,
+			} );
+
+			const result = detectClientSideMediaSupport();
+
+			expect( result.supported ).toBe( false );
+			expect( result.reason ).toContain( 'too slow' );
+		} );
+
+		it( 'returns not supported when CSP blocks blob workers', () => {
 			// Simulate CSP blocking blob URL workers by throwing a SecurityError.
 			global.Worker = class ThrowingWorker {
 				constructor() {
@@ -96,9 +265,6 @@ describe( 'feature-detection', () => {
 		} );
 
 		it( 'caches the result', () => {
-			global.WebAssembly = originalWebAssembly;
-			global.SharedArrayBuffer = originalSharedArrayBuffer;
-
 			const result1 = detectClientSideMediaSupport();
 			expect( result1.supported ).toBe( true );
 
@@ -114,9 +280,6 @@ describe( 'feature-detection', () => {
 
 	describe( 'isClientSideMediaSupported', () => {
 		it( 'returns true when all features are available', () => {
-			global.WebAssembly = originalWebAssembly;
-			global.SharedArrayBuffer = originalSharedArrayBuffer;
-
 			expect( isClientSideMediaSupported() ).toBe( true );
 		} );
 
@@ -128,11 +291,69 @@ describe( 'feature-detection', () => {
 		} );
 	} );
 
+	describe( 'isHeicCanvasSupported', () => {
+		const originalCreateImageBitmap =
+			global.createImageBitmap as typeof createImageBitmap;
+		const originalOffscreenCanvas =
+			global.OffscreenCanvas as typeof OffscreenCanvas;
+
+		afterEach( () => {
+			// Restore globals after each test.
+			if ( originalCreateImageBitmap !== undefined ) {
+				global.createImageBitmap =
+					originalCreateImageBitmap as typeof createImageBitmap;
+			} else {
+				// @ts-ignore
+				delete global.createImageBitmap;
+			}
+			if ( originalOffscreenCanvas !== undefined ) {
+				global.OffscreenCanvas =
+					originalOffscreenCanvas as typeof OffscreenCanvas;
+			} else {
+				// @ts-ignore
+				delete global.OffscreenCanvas;
+			}
+		} );
+
+		it( 'returns true when both createImageBitmap and OffscreenCanvas are available', () => {
+			global.createImageBitmap =
+				jest.fn() as unknown as typeof createImageBitmap;
+			global.OffscreenCanvas =
+				jest.fn() as unknown as typeof OffscreenCanvas;
+
+			expect( isHeicCanvasSupported() ).toBe( true );
+		} );
+
+		it( 'returns false when createImageBitmap is unavailable', () => {
+			// @ts-ignore
+			delete global.createImageBitmap;
+			global.OffscreenCanvas =
+				jest.fn() as unknown as typeof OffscreenCanvas;
+
+			expect( isHeicCanvasSupported() ).toBe( false );
+		} );
+
+		it( 'returns false when OffscreenCanvas is unavailable', () => {
+			global.createImageBitmap =
+				jest.fn() as unknown as typeof createImageBitmap;
+			// @ts-ignore
+			delete global.OffscreenCanvas;
+
+			expect( isHeicCanvasSupported() ).toBe( false );
+		} );
+
+		it( 'returns false when both are unavailable', () => {
+			// @ts-ignore
+			delete global.createImageBitmap;
+			// @ts-ignore
+			delete global.OffscreenCanvas;
+
+			expect( isHeicCanvasSupported() ).toBe( false );
+		} );
+	} );
+
 	describe( 'clearFeatureDetectionCache', () => {
 		it( 'clears the cached result', () => {
-			global.WebAssembly = originalWebAssembly;
-			global.SharedArrayBuffer = originalSharedArrayBuffer;
-
 			const result1 = detectClientSideMediaSupport();
 			expect( result1.supported ).toBe( true );
 
@@ -143,6 +364,65 @@ describe( 'feature-detection', () => {
 
 			const result2 = detectClientSideMediaSupport();
 			expect( result2.supported ).toBe( false );
+		} );
+	} );
+
+	describe( 'exceedsClientProcessingMemory', () => {
+		it( 'allows typical images', () => {
+			expect(
+				exceedsClientProcessingMemory( {
+					width: 4000,
+					height: 3000,
+					interlaced: false,
+				} )
+			).toBe( false );
+			expect(
+				exceedsClientProcessingMemory( {
+					width: 4000,
+					height: 3000,
+					interlaced: true,
+				} )
+			).toBe( false );
+		} );
+
+		it( 'gates the reported interlaced flower.jpg (20000x11857)', () => {
+			expect(
+				exceedsClientProcessingMemory( {
+					width: 20000,
+					height: 11857,
+					interlaced: true,
+				} )
+			).toBe( true );
+		} );
+
+		it( 'applies a tighter budget to interlaced images', () => {
+			// ~150 MP: over the ~0.5 GiB interlaced budget but under the
+			// ~0.9 GiB baseline budget.
+			const dimensions = { width: 15000, height: 10000 };
+
+			expect(
+				exceedsClientProcessingMemory( {
+					...dimensions,
+					interlaced: true,
+				} )
+			).toBe( true );
+			expect(
+				exceedsClientProcessingMemory( {
+					...dimensions,
+					interlaced: false,
+				} )
+			).toBe( false );
+		} );
+
+		it( 'gates extremely large baseline images', () => {
+			// ~300 MP exceeds even the generous baseline budget.
+			expect(
+				exceedsClientProcessingMemory( {
+					width: 20000,
+					height: 15000,
+					interlaced: false,
+				} )
+			).toBe( true );
 		} );
 	} );
 } );

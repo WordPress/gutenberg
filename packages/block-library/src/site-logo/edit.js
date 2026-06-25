@@ -10,6 +10,7 @@ import { isBlobURL } from '@wordpress/blob';
 import {
 	createInterpolateElement,
 	useEffect,
+	useRef,
 	useState,
 } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
@@ -33,8 +34,8 @@ import {
 	MediaReplaceFlow,
 	useBlockProps,
 	store as blockEditorStore,
-	__experimentalImageEditor as ImageEditor,
 	useBlockEditingMode,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -46,9 +47,13 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import { MIN_SIZE } from '../image/constants';
 import { MediaControl, MediaControlPreview } from '../utils/media-control';
+import { unlock } from '../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
+const { mediaEditKey, openMediaEditorModalKey } = unlock(
+	blockEditorPrivateApis
+);
 
 const SiteLogo = ( {
 	alt,
@@ -67,15 +72,22 @@ const SiteLogo = ( {
 	const isWideAligned = [ 'wide', 'full' ].includes( align );
 	const isResizable = ! isWideAligned && isLargeViewport;
 	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
-	const [ isEditingImage, setIsEditingImage ] = useState( false );
-	const { toggleSelection } = useDispatch( blockEditorStore );
+	const cropButtonRef = useRef();
+	const { toggleSelection, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	// Check if we're in contentOnly mode
 	const blockEditingMode = useBlockEditingMode();
 	const isContentOnlyMode = blockEditingMode === 'contentOnly';
 
-	const { imageEditing, maxWidth, title } = useSelect( ( select ) => {
+	const {
+		imageEditing,
+		maxWidth,
+		title,
+		editMediaEntity,
+		openMediaEditorModal,
+	} = useSelect( ( select ) => {
 		const settings = select( blockEditorStore ).getSettings();
 		const siteEntities = select( coreStore ).getEntityRecord(
 			'root',
@@ -85,6 +97,8 @@ const SiteLogo = ( {
 			title: siteEntities?.name,
 			imageEditing: settings.imageEditing,
 			maxWidth: settings.maxWidth,
+			editMediaEntity: settings?.[ mediaEditKey ],
+			openMediaEditorModal: settings?.[ openMediaEditorModalKey ],
 		};
 	}, [] );
 
@@ -93,15 +107,17 @@ const SiteLogo = ( {
 		// fallen out of sync. This can happen if the toggle is saved in the `on` position,
 		// but changes are later made to the site icon in the Customizer.
 		if ( shouldSyncIcon && logoId !== iconId ) {
+			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( { shouldSyncIcon: false } );
 		}
 	}, [] );
 
-	useEffect( () => {
-		if ( ! isSelected ) {
-			setIsEditingImage( false );
+	// Always apply modal updates as snackbar Undo may restore the original id.
+	const handleMediaUpdate = ( { id: newId } ) => {
+		if ( typeof newId === 'number' ) {
+			setLogo( newId );
 		}
-	}, [ isSelected ] );
+	};
 
 	function onResizeStart() {
 		toggleSelection( false );
@@ -200,62 +216,14 @@ const SiteLogo = ( {
 	/* eslint-enable no-lonely-if */
 
 	const canEditImage =
-		logoId && naturalWidth && naturalHeight && imageEditing;
+		logoId &&
+		naturalWidth &&
+		naturalHeight &&
+		imageEditing &&
+		!! editMediaEntity;
 
 	// Hide crop and dimensions editing in write mode
 	const shouldShowCropAndDimensions = ! isContentOnlyMode;
-
-	let imgEdit;
-	if ( canEditImage && isEditingImage ) {
-		imgEdit = (
-			<ImageEditor
-				id={ logoId }
-				url={ logoUrl }
-				width={ currentWidth }
-				height={ currentHeight }
-				naturalHeight={ naturalHeight }
-				naturalWidth={ naturalWidth }
-				onSaveImage={ ( imageAttributes ) => {
-					setLogo( imageAttributes.id );
-				} }
-				onFinishEditing={ () => {
-					setIsEditingImage( false );
-				} }
-			/>
-		);
-	} else {
-		// Always render ResizableBox but disable resize functionality in contentOnly mode
-		imgEdit = (
-			<ResizableBox
-				size={ {
-					width: currentWidth,
-					height: currentHeight,
-				} }
-				showHandle={ isSelected && shouldShowCropAndDimensions }
-				minWidth={ minWidth }
-				maxWidth={ maxWidthBuffer }
-				minHeight={ minHeight }
-				maxHeight={ maxWidthBuffer / ratio }
-				lockAspectRatio
-				enable={ {
-					top: false,
-					right: showRightHandle,
-					bottom: true,
-					left: showLeftHandle,
-				} }
-				onResizeStart={ onResizeStart }
-				onResizeStop={ ( event, direction, elt, delta ) => {
-					onResizeStop();
-					setAttributes( {
-						width: parseInt( currentWidth + delta.width, 10 ),
-						height: parseInt( currentHeight + delta.height, 10 ),
-					} );
-				} }
-			>
-				{ imgWrapper }
-			</ResizableBox>
-		);
-	}
 
 	// Support the previous location for the Site Icon settings. To be removed
 	// when the required WP core version for Gutenberg is >= 6.5.0.
@@ -271,11 +239,11 @@ const SiteLogo = ( {
 		),
 		{
 			a: (
-				// eslint-disable-next-line jsx-a11y/anchor-has-content
+				// eslint-disable-next-line jsx-a11y/anchor-has-content, react/jsx-no-target-blank
 				<a
 					href={ siteIconSettingsUrl }
 					target="_blank"
-					rel="noopener noreferrer"
+					rel="noopener"
 				/>
 			),
 		}
@@ -373,17 +341,54 @@ const SiteLogo = ( {
 				</ToolsPanel>
 			</InspectorControls>
 			{ canEditImage &&
-				! isEditingImage &&
+				openMediaEditorModal &&
 				shouldShowCropAndDimensions && (
 					<BlockControls group="block">
 						<ToolbarButton
-							onClick={ () => setIsEditingImage( true ) }
+							ref={ cropButtonRef }
+							onClick={ () =>
+								openMediaEditorModal( {
+									id: logoId,
+									onUpdate: handleMediaUpdate,
+									onClose: () =>
+										cropButtonRef.current?.focus(),
+								} )
+							}
+							aria-haspopup="dialog"
 							icon={ crop }
 							label={ __( 'Crop' ) }
 						/>
 					</BlockControls>
 				) }
-			{ imgEdit }
+			{ /* Always render ResizableBox but disable resize functionality in contentOnly mode */ }
+			<ResizableBox
+				size={ {
+					width: currentWidth,
+					height: currentHeight,
+				} }
+				showHandle={ isSelected && shouldShowCropAndDimensions }
+				minWidth={ minWidth }
+				maxWidth={ maxWidthBuffer }
+				minHeight={ minHeight }
+				maxHeight={ maxWidthBuffer / ratio }
+				lockAspectRatio
+				enable={ {
+					top: false,
+					right: showRightHandle,
+					bottom: true,
+					left: showLeftHandle,
+				} }
+				onResizeStart={ onResizeStart }
+				onResizeStop={ ( event, direction, elt, delta ) => {
+					onResizeStop();
+					setAttributes( {
+						width: parseInt( currentWidth + delta.width, 10 ),
+						height: parseInt( currentHeight + delta.height, 10 ),
+					} );
+				} }
+			>
+				{ imgWrapper }
+			</ResizableBox>
 		</>
 	);
 };
@@ -620,7 +625,6 @@ export default function LogoEdit( {
 					>
 						<MediaControlPreview
 							url={ mediaItemData?.source_url }
-							alt={ mediaItemData?.alt_text }
 							filename={
 								mediaItemData?.media_details?.sizes?.full
 									?.file || mediaItemData?.slug
@@ -642,7 +646,6 @@ export default function LogoEdit( {
 						<MediaControl
 							mediaId={ siteLogoId }
 							mediaUrl={ logoUrl }
-							alt={ mediaItemData?.alt_text }
 							filename={
 								mediaItemData?.media_details?.sizes?.full
 									?.file || mediaItemData?.slug
@@ -652,7 +655,7 @@ export default function LogoEdit( {
 							onError={ onUploadError }
 							onReset={ onRemoveLogo }
 							isUploading={ !! temporaryURL }
-							emptyLabel={ __( 'Choose logo' ) }
+							emptyLabel={ __( 'Logo' ) }
 						/>
 					</ToolsPanelItem>
 				) }

@@ -13,8 +13,25 @@
 
 	svg {
 		box-sizing: border-box;
-		width: 100%;
-		height: 100%;
 		fill: currentColor;
+
+		&.is-flip-horizontal {
+			transform: scaleX(-1);
+		}
+
+		&.is-flip-vertical {
+			transform: scaleY(-1);
+		}
+
+		&.is-flip-horizontal.is-flip-vertical {
+			transform: scaleX(-1) scaleY(-1);
+		}
 	}
+}
+
+// Use :where() so these defaults have zero specificity and can be overridden
+// by global styles, which target `.wp-block-icon svg` at higher specificity.
+:where(.wp-block-icon) svg {
+	width: 100%;
+	height: 100%;
 }

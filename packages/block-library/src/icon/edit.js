@@ -11,11 +11,14 @@ import {
 	DropdownMenu,
 	TextControl,
 	ToolbarButton,
-	ToolbarGroup,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	Placeholder,
 } from '@wordpress/components';
+import {
+	flipHorizontal as flipHorizontalIcon,
+	flipVertical as flipVerticalIcon,
+	rotateRight,
+} from '@wordpress/icons';
 import {
 	BlockControls,
 	InspectorControls,
@@ -25,11 +28,11 @@ import {
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 	getDimensionsClassesAndStyles as useDimensionsProps,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useState } from '@wordpress/element';
+import { SVG, Rect, Path } from '@wordpress/primitives';
+import { useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
-import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -37,15 +40,32 @@ import { useState, useEffect } from '@wordpress/element';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
 import { CustomInserterModal } from './components';
-import { unlock } from '../lock-unlock';
+
+const IconPlaceholder = ( { className, style } ) => (
+	<SVG
+		xmlns="http://www.w3.org/2000/svg"
+		viewBox="0 0 60 60"
+		preserveAspectRatio="none"
+		fill="none"
+		aria-hidden="true"
+		className={ clsx( 'wp-block-icon__placeholder', className ) }
+		style={ style }
+	>
+		<Rect width="60" height="60" fill="currentColor" fillOpacity={ 0.1 } />
+		<Path
+			vectorEffect="non-scaling-stroke"
+			stroke="currentColor"
+			strokeOpacity={ 0.25 }
+			d="M60 60 0 0"
+		/>
+	</SVG>
+);
 
 export function Edit( { attributes, setAttributes } ) {
-	const { icon, ariaLabel, style } = attributes;
+	const { icon, ariaLabel, flipHorizontal, flipVertical, rotation } =
+		attributes;
 
 	const [ isInserterOpen, setInserterOpen ] = useState( false );
-
-	const { __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
 
 	const isContentOnlyMode = useBlockEditingMode() === 'contentOnly';
 
@@ -54,42 +74,67 @@ export function Edit( { attributes, setAttributes } ) {
 	const borderProps = useBorderProps( attributes );
 	const dimensionsProps = useDimensionsProps( attributes );
 
-	const allIcons = useSelect( ( select ) => {
-		return unlock( select( coreDataStore ) ).getIcons();
-	}, [] );
+	const { selectedIcon, allIcons = [] } = useSelect(
+		( select ) => {
+			const { getEntityRecord, getEntityRecords } =
+				select( coreDataStore );
+			return {
+				selectedIcon: icon
+					? getEntityRecord( 'root', 'icon', icon )
+					: null,
+				allIcons: isInserterOpen
+					? getEntityRecords( 'root', 'icon' )
+					: undefined,
+			};
+		},
+		[ isInserterOpen, icon ]
+	);
 
-	// Is the width value is 0, reset it to the minimum value.
-	useEffect( () => {
-		if (
-			! style?.dimensions?.width ||
-			parseFloat( style?.dimensions?.width ) === 0
-		) {
-			// To avoid interfering with undo/redo operations any changes in this
-			// effect must not make history and should be preceded by
-			// `__unstableMarkNextChangeAsNotPersistent()`.
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( {
-				style: {
-					...style,
-					dimensions: { ...style?.dimensions, width: '12px' },
-				},
-			} );
-		}
-	}, [
-		icon,
-		style,
-		setAttributes,
-		__unstableMarkNextChangeAsNotPersistent,
-	] );
+	const iconToDisplay = selectedIcon?.content || '';
 
-	const iconToDisplay =
-		allIcons?.length > 0
-			? allIcons?.find( ( { name } ) => name === icon )?.content
-			: '';
+	const flipClasses = {
+		'is-flip-horizontal': flipHorizontal,
+		'is-flip-vertical': flipVertical,
+	};
+
+	const rotationStyle = rotation ? { rotate: `${ rotation }deg` } : {};
 
 	const blockControls = (
 		<>
-			<BlockControls group={ isContentOnlyMode ? 'inline' : 'other' }>
+			{ icon && (
+				<BlockControls group="block">
+					<ToolbarButton
+						icon={ flipHorizontalIcon }
+						label={ __( 'Flip horizontal' ) }
+						isPressed={ flipHorizontal }
+						onClick={ () =>
+							setAttributes( {
+								flipHorizontal: ! flipHorizontal,
+							} )
+						}
+					/>
+					<ToolbarButton
+						icon={ flipVerticalIcon }
+						label={ __( 'Flip vertical' ) }
+						isPressed={ flipVertical }
+						onClick={ () =>
+							setAttributes( {
+								flipVertical: ! flipVertical,
+							} )
+						}
+					/>
+					<ToolbarButton
+						icon={ rotateRight }
+						label={ __( 'Rotate' ) }
+						onClick={ () =>
+							setAttributes( {
+								rotation: ( ( rotation || 0 ) + 90 ) % 360,
+							} )
+						}
+					/>
+				</BlockControls>
+			) }
+			<BlockControls group="other">
 				<ToolbarButton
 					onClick={ () => {
 						setInserterOpen( true );
@@ -97,38 +142,38 @@ export function Edit( { attributes, setAttributes } ) {
 				>
 					{ icon ? __( 'Replace' ) : __( 'Choose icon' ) }
 				</ToolbarButton>
+				{ isContentOnlyMode && icon && (
+					// Add some extra controls for content attributes when content only mode is active.
+					// With content only mode active, the inspector is hidden, so users need another way
+					// to edit these attributes.
+					<DropdownMenu
+						icon=""
+						toggleProps={ {
+							as: ToolbarButton,
+						} }
+						popoverProps={ {
+							className: 'is-alternate',
+						} }
+						text={ __( 'Label' ) }
+					>
+						{ () => (
+							<TextControl
+								className="wp-block-icon__toolbar-content"
+								label={ __( 'Label' ) }
+								value={ ariaLabel || '' }
+								onChange={ ( value ) =>
+									setAttributes( {
+										ariaLabel: value,
+									} )
+								}
+								help={ __(
+									'Briefly describe the icon to help screen reader users. Leave blank for decorative icons.'
+								) }
+							/>
+						) }
+					</DropdownMenu>
+				) }
 			</BlockControls>
-			{ isContentOnlyMode && icon && (
-				// Add some extra controls for content attributes when content only mode is active.
-				// With content only mode active, the inspector is hidden, so users need another way
-				// to edit these attributes.
-				<BlockControls group="other">
-					<ToolbarGroup className="components-toolbar-group">
-						<DropdownMenu
-							icon=""
-							popoverProps={ {
-								className: 'is-alternate',
-							} }
-							text={ __( 'Label' ) }
-						>
-							{ () => (
-								<TextControl
-									className="wp-block-icon__toolbar-content"
-									label={ __( 'Label' ) }
-									value={ ariaLabel || '' }
-									onChange={ ( value ) =>
-										setAttributes( { ariaLabel: value } )
-									}
-									help={ __(
-										'Briefly describe the icon to help screen reader users. Leave blank for decorative icons.'
-									) }
-									__next40pxDefaultSize
-								/>
-							) }
-						</DropdownMenu>
-					</ToolbarGroup>
-				</BlockControls>
-			) }
 		</>
 	);
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -161,7 +206,6 @@ export function Edit( { attributes, setAttributes } ) {
 							onChange={ ( value ) =>
 								setAttributes( { ariaLabel: value } )
 							}
-							__next40pxDefaultSize
 						/>
 					</ToolsPanelItem>
 				</ToolsPanel>
@@ -182,29 +226,32 @@ export function Edit( { attributes, setAttributes } ) {
 								colorProps.className,
 								borderProps.className,
 								spacingProps.className,
-								dimensionsProps.className
+								dimensionsProps.className,
+								flipClasses
 							),
 							style: {
 								...colorProps.style,
 								...borderProps.style,
 								...spacingProps.style,
 								...dimensionsProps.style,
+								...rotationStyle,
 							},
 						} }
 					/>
 				) : (
-					<Placeholder
-						withIllustration
+					<IconPlaceholder
 						className={ clsx(
 							borderProps.className,
 							spacingProps.className,
-							dimensionsProps.className
+							dimensionsProps.className,
+							flipClasses
 						) }
 						style={ {
 							...borderProps.style,
 							...spacingProps.style,
 							...dimensionsProps.style,
-							aspectRatio: '1',
+							...rotationStyle,
+							height: 'auto',
 						} }
 					/>
 				) }

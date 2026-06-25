@@ -1,11 +1,21 @@
+/**
+ * @jest-environment node
+ */
+import plugin from '../no-setting-wpds-custom-properties.mjs';
 import { getStylelintResult } from './utils';
+
+const CONFIG = {
+	plugins: [ plugin ],
+	rules: { 'plugin-wpds/no-setting-wpds-custom-properties': true },
+};
 
 describe( 'flags no warnings with valid wpds custom properties css', () => {
 	let result: ReturnType< typeof getStylelintResult >;
 
-	beforeEach( () => {
+	beforeAll( () => {
 		result = getStylelintResult(
-			'./fixtures/no-setting-wpds-custom-properties-valid.css'
+			'./fixtures/no-setting-wpds-custom-properties-valid.css',
+			CONFIG
 		);
 	} );
 
@@ -23,9 +33,10 @@ describe( 'flags no warnings with valid wpds custom properties css', () => {
 describe( 'flags warnings with invalid wpds custom properties css', () => {
 	let result: ReturnType< typeof getStylelintResult >;
 
-	beforeEach( () => {
+	beforeAll( () => {
 		result = getStylelintResult(
-			'./fixtures/no-setting-wpds-custom-properties-invalid.css'
+			'./fixtures/no-setting-wpds-custom-properties-invalid.css',
+			CONFIG
 		);
 	} );
 

@@ -172,7 +172,7 @@ function gutenberg_test_block_bindings_registration() {
 			'type'         => 'number',
 			'show_in_rest' => true,
 			'single'       => true,
-			'default'      => 5.5,
+			'default'      => 0.5,
 		)
 	);
 	register_meta(
@@ -183,7 +183,7 @@ function gutenberg_test_block_bindings_registration() {
 			'type'         => 'integer',
 			'show_in_rest' => true,
 			'single'       => true,
-			'default'      => 5,
+			'default'      => 3,
 		)
 	);
 	register_meta(

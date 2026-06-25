@@ -22,7 +22,10 @@ export function useIsMultiselectPicker< Item >(
 	actions: Action< Item >[] | undefined
 ) {
 	return useMemo( () => {
-		return actions?.every( ( action ) => action.supportsBulk );
+		return (
+			!! actions?.length &&
+			actions?.every( ( action ) => action.supportsBulk )
+		);
 	}, [ actions ] );
 }
 
@@ -32,14 +35,31 @@ function BulkSelectionCheckbox< Item >( {
 	onChangeSelection,
 	data,
 	getItemId,
+	disableSelectAll = false,
 }: {
 	selection: string[];
 	selectedItems: Item[];
 	onChangeSelection: SetSelection;
 	data: Item[];
 	getItemId: ( item: Item ) => string;
+	disableSelectAll?: boolean;
 } ) {
+	const hasSelection = selection.length > 0;
 	const areAllSelected = selectedItems.length === data.length;
+
+	if ( disableSelectAll ) {
+		return (
+			<CheckboxControl
+				className="dataviews-view-table-selection-checkbox"
+				checked={ hasSelection }
+				disabled={ ! hasSelection }
+				onChange={ () => {
+					onChangeSelection( [] );
+				} }
+				aria-label={ __( 'Deselect all' ) }
+			/>
+		);
+	}
 
 	return (
 		<CheckboxControl
@@ -128,7 +148,7 @@ function ActionButtons< Item >( {
 	);
 }
 
-export function DataViewsPickerFooter() {
+function PickerBulkSelectionInfo() {
 	const {
 		data,
 		selection,
@@ -136,21 +156,110 @@ export function DataViewsPickerFooter() {
 		getItemId,
 		actions = EMPTY_ARRAY,
 		paginationInfo,
+		view,
 	} = useContext( DataViewsContext );
 
 	const isMultiselect = useIsMultiselectPicker( actions );
-
-	const message = getFooterMessage(
-		selection.length,
-		data.length,
-		paginationInfo.totalItems
-	);
 
 	const selectedItems = useMemo(
 		() =>
 			data.filter( ( item ) => selection.includes( getItemId( item ) ) ),
 		[ selection, getItemId, data ]
 	);
+
+	// The count and the selection checkbox belong with the actions, mirroring `DataViews`.
+	if ( ! actions.length ) {
+		return null;
+	}
+
+	const message = getFooterMessage(
+		selection.length,
+		data.length,
+		paginationInfo.totalItems,
+		!! view.infiniteScrollEnabled
+	);
+
+	return (
+		<Stack
+			direction="row"
+			className="dataviews-picker-footer__bulk-selection"
+			gap="md"
+			align="center"
+		>
+			{ isMultiselect && (
+				<BulkSelectionCheckbox
+					selection={ selection }
+					selectedItems={ selectedItems }
+					onChangeSelection={ onChangeSelection }
+					data={ data }
+					getItemId={ getItemId }
+					disableSelectAll={ !! view.infiniteScrollEnabled }
+				/>
+			) }
+			<span className="dataviews-bulk-actions-footer__item-count">
+				{ message }
+			</span>
+		</Stack>
+	);
+}
+
+function PickerActions() {
+	const {
+		data,
+		selection,
+		getItemId,
+		actions = EMPTY_ARRAY,
+	} = useContext( DataViewsContext );
+
+	const selectedItems = useMemo(
+		() =>
+			data.filter( ( item ) => selection.includes( getItemId( item ) ) ),
+		[ selection, getItemId, data ]
+	);
+
+	if ( ! actions.length ) {
+		return null;
+	}
+
+	return (
+		<div className="dataviews-picker-footer__actions">
+			<ActionButtons
+				actions={ actions }
+				items={ selectedItems }
+				selection={ selection }
+			/>
+		</div>
+	);
+}
+
+// The bulk-selection info and action buttons without pagination — the picker
+// counterpart to `DataViews.BulkActionToolbar`, for free composition.
+export function DataViewsPickerBulkActionToolbar() {
+	return (
+		<Stack direction="row" gap="md" align="center">
+			<PickerBulkSelectionInfo />
+			<PickerActions />
+		</Stack>
+	);
+}
+
+// The full picker footer: bulk-selection info, pagination, and actions — the
+// picker counterpart to `DataViews.Footer`.
+export function DataViewsPickerFooter() {
+	const {
+		actions = EMPTY_ARRAY,
+		paginationInfo,
+		view,
+	} = useContext( DataViewsContext );
+
+	const hasPagination =
+		! view.infiniteScrollEnabled &&
+		!! paginationInfo.totalItems &&
+		paginationInfo.totalPages > 1;
+
+	if ( ! actions.length && ! hasPagination ) {
+		return null;
+	}
 
 	return (
 		<Stack
@@ -160,35 +269,9 @@ export function DataViewsPickerFooter() {
 			className="dataviews-footer"
 			gap="sm"
 		>
-			<Stack
-				direction="row"
-				className="dataviews-picker-footer__bulk-selection"
-				gap="md"
-				align="center"
-			>
-				{ isMultiselect && (
-					<BulkSelectionCheckbox
-						selection={ selection }
-						selectedItems={ selectedItems }
-						onChangeSelection={ onChangeSelection }
-						data={ data }
-						getItemId={ getItemId }
-					/>
-				) }
-				<span className="dataviews-bulk-actions-footer__item-count">
-					{ message }
-				</span>
-			</Stack>
+			<PickerBulkSelectionInfo />
 			<DataViewsPagination />
-			{ Boolean( actions?.length ) && (
-				<div className="dataviews-picker-footer__actions">
-					<ActionButtons
-						actions={ actions }
-						items={ selectedItems }
-						selection={ selection }
-					/>
-				</div>
-			) }
+			<PickerActions />
 		</Stack>
 	);
 }

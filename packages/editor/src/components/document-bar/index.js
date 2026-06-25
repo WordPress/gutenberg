@@ -10,7 +10,7 @@ import { __, isRTL } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	Button,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
 } from '@wordpress/components';
@@ -141,6 +141,8 @@ export default function DocumentBar( props ) {
 	const { open: openCommandCenter } = useDispatch( commandsStore );
 	const isReducedMotion = useReducedMotion();
 
+	const hasShortcut = ! window.__experimentalAdminBarInEditor;
+
 	const isTemplate = TEMPLATE_POST_TYPES.includes( postType );
 	const hasBackButton =
 		!! onNavigateToPreviousEntityRecord || !! unlockedPatternInfo;
@@ -175,6 +177,7 @@ export default function DocumentBar( props ) {
 		<div
 			className={ clsx( 'editor-document-bar', {
 				'has-back-button': hasBackButton,
+				'has-shortcut': hasShortcut,
 			} ) }
 		>
 			<AnimatePresence>
@@ -206,7 +209,7 @@ export default function DocumentBar( props ) {
 				/>
 			) }
 			{ isNotFound ? (
-				<Text>{ __( 'Document not found' ) }</Text>
+				<WCText>{ __( 'Document not found' ) }</WCText>
 			) : (
 				<Button
 					className="editor-document-bar__command"
@@ -236,7 +239,7 @@ export default function DocumentBar( props ) {
 						}
 					>
 						{ icon && <BlockIcon icon={ icon } /> }
-						<Text size="body" as="h1">
+						<WCText size="body" as="h1">
 							<span className="editor-document-bar__post-title">
 								{ title
 									? stripHTML( title )
@@ -265,11 +268,13 @@ export default function DocumentBar( props ) {
 										) }` }
 									</span>
 								) }
-						</Text>
+						</WCText>
 					</motion.div>
-					<span className="editor-document-bar__shortcut">
-						{ displayShortcut.primary( 'k' ) }
-					</span>
+					{ hasShortcut && (
+						<span className="editor-document-bar__shortcut">
+							{ displayShortcut.primary( 'k' ) }
+						</span>
+					) }
 				</Button>
 			) }
 		</div>

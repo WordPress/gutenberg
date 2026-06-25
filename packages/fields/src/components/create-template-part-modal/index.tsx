@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import {
-	Icon,
+	Icon as WCIcon,
 	BaseControl,
 	TextControl,
 	Button,
@@ -25,7 +25,6 @@ import {
 	symbolFilled as symbolFilledIcon,
 } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
-// @ts-expect-error serialize is not typed
 import { serialize } from '@wordpress/blocks';
 
 /**
@@ -196,7 +195,6 @@ export function CreateTemplatePartModalContents( {
 		>
 			<VStack spacing="4">
 				<TextControl
-					__next40pxDefaultSize
 					label={ __( 'Name' ) }
 					value={ title }
 					onChange={ setTitle }
@@ -232,7 +230,7 @@ export function CreateTemplatePartModalContents( {
 												instanceId
 											) }
 										/>
-										<Icon
+										<WCIcon
 											icon={ icon }
 											className="fields-create-template-part-modal__area-radio-icon"
 										/>
@@ -245,7 +243,7 @@ export function CreateTemplatePartModalContents( {
 										>
 											{ item.label }
 										</label>
-										<Icon
+										<WCIcon
 											icon={ check }
 											className="fields-create-template-part-modal__area-radio-checkmark"
 										/>

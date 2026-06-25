@@ -51,14 +51,18 @@ export type ModalProps = {
 	 */
 	contentLabel?: string;
 	/**
-	 * If this property is true, it will focus the first tabbable element
-	 * rendered in the modal.
+	 * Determines focus behavior when the modal opens.
+	 *
+	 * - `"firstElement"` focuses the first tabbable element within.
+	 * - `"firstInputElement"` focuses the first value control within.
+	 * - `"firstContentElement"` focuses the first tabbable element within the modal’s content element.
+	 * - `true` focuses the element itself.
+	 * - `false` does nothing and _should not be used unless an accessible
+	 *    substitute behavior is implemented_.
 	 *
 	 * @default true
 	 */
-	focusOnMount?:
-		| Parameters< typeof useFocusOnMount >[ 0 ]
-		| 'firstContentElement';
+	focusOnMount?: useFocusOnMount.Mode | 'firstContentElement';
 	/**
 	 * Elements that are injected into the modal header to the left of the close button (if rendered).
 	 * Hidden if `__experimentalHideHeader` is `true`.

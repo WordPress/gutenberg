@@ -2,12 +2,193 @@
 
 ## Unreleased
 
+## 17.0.0 (2026-06-24)
+
+### Breaking Changes
+
+- `DataViewsPicker`: `DataViewsPicker.BulkActionToolbar` now renders only the bulk-selection info and action buttons, without pagination, matching `DataViews.BulkActionToolbar`. The full footer it previously rendered (including pagination) is now exposed as `DataViewsPicker.Footer`, matching `DataViews.Footer`. [#79180](https://github.com/WordPress/gutenberg/pull/79180)
+
+### Bug Fix
+
+- DataForm panel layout: fix double-clicking a field row leaving the flyout stuck open. [#79348](https://github.com/WordPress/gutenberg/pull/79348)
+- DataForm panel layout: use `overflow: clip` on field controls so focus rings of inner elements are no longer clipped. [#79275](https://github.com/WordPress/gutenberg/pull/79275)
+
+### Code Quality
+
+- Move `@types/react` from `dependencies` to an optional peer dependency so consumers' React type version is used [#79095](https://github.com/WordPress/gutenberg/pull/79095).
+- DataForm panel layout: remove button/dropdown-specific overrides from `.dataforms-layouts-panel__field-control`; those overrides are no longer needed. [#79275](https://github.com/WordPress/gutenberg/pull/79275)
+- DataForm panel layout: align `label-side` gap with the regular layout by using `--wpds-dimension-gap-sm` (8px). [#79311](https://github.com/WordPress/gutenberg/pull/79311)
+
+### Documentation
+
+- Fix `overriden` typo to `overridden` in README. ([#79331](https://github.com/WordPress/gutenberg/pull/79331))
+
+### Internal
+
+- Adopt `--wpds-dimension-size-*` design tokens [#79093](https://github.com/WordPress/gutenberg/pull/79093).
+- Migrate the remaining `var(--wpds-dimension-base)` usages off the removed primitive token [#79254](https://github.com/WordPress/gutenberg/pull/79254).
+
+## 16.0.1 (2026-06-16)
+
+## 16.0.0 (2026-06-10)
+
+### Breaking Changes
+
+- Revert React back to v18 [#78940](https://github.com/WordPress/gutenberg/pull/78940).
+
+### Enhancements
+
+-   DataViewsPicker: Add a new `pickerActivity` layout that renders selectable items as a vertical activity timeline. [#78941](https://github.com/WordPress/gutenberg/pull/78941)
+
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+### Documentation
+
+-   Include DataViews components in [WordPress Design System MCP Server](https://github.com/WordPress/gutenberg/tree/trunk/packages/design-system-mcp) documented components ([#78960](https://github.com/WordPress/gutenberg/pull/78960)).
+
+### Internal
+
+-   Update `@ariakit/react` to `0.4.29` ([#79055](https://github.com/WordPress/gutenberg/pull/79055)).
+-   Dependency updates ([#77954](https://github.com/WordPress/gutenberg/pull/77954)).
+
+## 15.0.0 (2026-05-27)
+
+### Breaking Changes
+
+- Upgrade React to v19 ([#61521](https://github.com/WordPress/gutenberg/pull/61521)).
+
+### Enhancements
+
+- DataViews: Lower the sticky footer z-index and isolate grid card stacking contexts. [#78315](https://github.com/WordPress/gutenberg/pull/78315)
+- DataViews: Refresh filter chip styling to align with `Button`. [#75204](https://github.com/WordPress/gutenberg/pull/75204)
+- DataForms: Increase the minimum width of the panel layout popover from 256px to 320px so option labels have more room. [#75204](https://github.com/WordPress/gutenberg/pull/75204)
+
+### Bug Fixes
+
+- DataViewsPicker: Fix first-click row selection in the table layout being swallowed by Ariakit's focus shift, which also scrolled the active row under the sticky header. [#78423](https://github.com/WordPress/gutenberg/pull/78423)
+- DataViews: Restore the `padding` rule on grid item titles that was lost when the wrapping element's class was renamed. [#75204](https://github.com/WordPress/gutenberg/pull/75204)
+- DataViews: Restore the original 16px padding on the first/last table header cells (had drifted to 32px during the token migration). [#75204](https://github.com/WordPress/gutenberg/pull/75204)
+- DataViews: Restore the original 4px gap inside table header buttons (had drifted to 8px during the token migration). [#75204](https://github.com/WordPress/gutenberg/pull/75204)
+- DataViews: Restore the original 24px gap on the default-density grid (had drifted to 32px during the token migration). [#75204](https://github.com/WordPress/gutenberg/pull/75204)
+- DataForms: Restore the original 24px minimum height on panel-layout fields (trigger, label, control) (had drifted to 32px during the token migration). [#75204](https://github.com/WordPress/gutenberg/pull/75204)
+- DataViews: Restore the original 28px end-padding on resettable filter chips (had drifted to 32px during the token migration). [#75204](https://github.com/WordPress/gutenberg/pull/75204)
+- DataViews: Fix wrapper height not resolving in flex layouts, enabling proper internal scrolling. [#76945](https://github.com/WordPress/gutenberg/pull/76945)
+
+### Code Quality
+
+- DataViews: Migrate styles from `@wordpress/base-styles` SCSS variables to `@wordpress/theme` CSS custom properties (design tokens) where possible. [#75204](https://github.com/WordPress/gutenberg/pull/75204)
+
+### Internal
+
+- DataViews: Migrate `Tooltip` consumers from `@wordpress/components` to the new compositional `Tooltip` in `@wordpress/ui`. [#78470](https://github.com/WordPress/gutenberg/pull/78470)
+
+## 14.3.0 (2026-05-14)
+
+## 14.2.0 (2026-04-29)
+
+### Enhancements
+
+- DataForm: Render field `description` as help text in the `array` control.[#77554](https://github.com/WordPress/gutenberg/pull/77554)
+
+## 14.1.0 (2026-04-15)
+
+### Enhancements
+
+- DataForm: Add `min`/`max` date range validation support for `date` and `datetime` fields. [#77201](https://github.com/WordPress/gutenberg/pull/77201)
+- DataForm: support `isDisabled` field property. [#77090](https://github.com/WordPress/gutenberg/pull/77090)
+- `DataViews`, `DataForm`: Use `--wpds-cursor-control` for interactive cursor styling. [#77259](https://github.com/WordPress/gutenberg/pull/77259)
+- DataViews/DataViewsPicker: simplify `defaultLayouts` property. [#77232](https://github.com/WordPress/gutenberg/pull/77232)
+- DataForm: Show tooltip in edit button in `panel` layout. [#77024](https://github.com/WordPress/gutenberg/pull/77024)
+- DataViewsPicker: Add `onReset` prop to support view reset functionality. [#77288](https://github.com/WordPress/gutenberg/pull/77288)
+
+### Bug Fixes
+
+- DataForm: Fix disabled state for date(time) control. [#77138](https://github.com/WordPress/gutenberg/pull/77138)
+- DataViews: Fix `compact` density clipping and remove top/bottom padding. [#77054](https://github.com/WordPress/gutenberg/pull/77054)
+- DataForm: Remove `text-transform` from `panel` field labels. [#77196](https://github.com/WordPress/gutenberg/pull/77196)
+
+### Code Quality
+
+- DataViewsPicker: Remove unnecessary ref callbacks in grid and table layouts. [#77179](https://github.com/WordPress/gutenberg/pull/77179)
+
+## 14.0.0 (2026-04-01)
+
+### Breaking Changes
+
+- DataViews: Use intersectionObserver to improve performance by unloading invisible items. Change how infinite scroll is enabled to require only 2 view properties: `infiniteScrollEnabled` and `startPosition`. [#74378](https://github.com/WordPress/gutenberg/pull/74378)
+- DataForm: The card layout now uses `Card` and `CollapsibleCard` from `@wordpress/ui` instead of `Card`, `CardHeader`, and `CardBody` from `@wordpress/components`. This changes the card's visual appearance (spacing, typography, and removal of the header/content separator). Custom CSS targeting `.components-card__body` within DataViews has been removed. Consumers wrapping DataViews or DataForm in a card should migrate to the `Card` and `CollapsibleCard` components from `@wordpress/ui`. [#76282](https://github.com/WordPress/gutenberg/pull/76282)
+
+### Enhancements
+
+- DataForm: Add `compact` configuration option to the `datetime` control. [#76905](https://github.com/WordPress/gutenberg/pull/76905)
+- DataViews: Field's description can accept ReactElements. [#76829](https://github.com/WordPress/gutenberg/pull/76829)
+- DataForm: Use `CollapsibleCard.HeaderDescription` for card layout header descriptions instead of manual `aria-describedby`. [#76867](https://github.com/WordPress/gutenberg/pull/76867)
+
+## 13.1.0 (2026-03-18)
+
+### Enhancements
+
+- DataForm: Reduce panel's dialog min-width. [#76345](https://github.com/WordPress/gutenberg/pull/76345)
+- DataViews: Add border to sticky table headers. [#76396](https://github.com/WordPress/gutenberg/pull/76396)
+- DataViews: Update scrolling so the scrollbar appears on the active layout when DataViews is rendered in a constrained-height container. This may slightly change the UI depending on the container height. [#76453](https://github.com/WordPress/gutenberg/pull/76453)
+- DataViews: Add density option to Grid and PickerGrid layouts. [#75887](https://github.com/WordPress/gutenberg/pull/75887)
+
+### Bug Fixes
+
+- DataViews: Fix last column classname in table layout. [#76133](https://github.com/WordPress/gutenberg/pull/76133)
+- DataViews: Add spinner in DataViewsLayout in initial load of data. [#76486](https://github.com/WordPress/gutenberg/pull/76486)
+- DataForm: Properly handle dates in datetime control. [#76193](https://github.com/WordPress/gutenberg/pull/76193)
+
+### Code Quality
+
+- DataForm: Consolidate `date` and `datetime` input placement. [#76136](https://github.com/WordPress/gutenberg/pull/76136)
+
+## 13.0.0 (2026-03-04)
+
+### Breaking Changes
+
+- DataViews: Align to end integer and number field types. [#75917](https://github.com/WordPress/gutenberg/pull/75917)
+
+### Bug Fixes
+
+- DataViews: Fix sort indicator not resetting across column menus. [#76041](https://github.com/WordPress/gutenberg/pull/76041)
+- DataForm: Fix label color of array control. [#75730](https://github.com/WordPress/gutenberg/pull/75730)
+- DataForm: Fix text overflow for long unhyphenated text in panel layout. [#76073](https://github.com/WordPress/gutenberg/pull/76073)
+- DataForm: Fix `card` layout's toggle button screen reader text. [#76039](https://github.com/WordPress/gutenberg/pull/76039)
+- DataViews: Fix focus transfer while searching in `list` layout. [#75999](https://github.com/WordPress/gutenberg/pull/75999)
+- DataForm: Fix focus loss when collapsing in Card view. [#75689](https://github.com/WordPress/gutenberg/pull/75689)
+- DataViews: Avoid flickering while refreshing. [#74572](https://github.com/WordPress/gutenberg/pull/74572)
+- DataViews: Fix spacing in first column. [#75693](https://github.com/WordPress/gutenberg/pull/75693)
+- DataViews: Fix filter toggle flickering when there are locked or primary filters. [#75913](https://github.com/WordPress/gutenberg/pull/75913)
+- DataViews: Fix search input losing characters during debounce when externally synced. [#75810](https://github.com/WordPress/gutenberg/pull/75810)
+- DataForm: Fix vertical alignment of summary fields in card layout. [#75864](https://github.com/WordPress/gutenberg/pull/75864)
+- DataViews: Remove visual divider between quick and regular actions in the actions menu. [#75893](https://github.com/WordPress/gutenberg/pull/75893)
+- DataForm: field label for panel layout are no longer uppercased. [#75944](https://github.com/WordPress/gutenberg/pull/75944)
+
+### Enhancements
+
+- DataForm: Add `applyLabel` and `cancelLabel` options to `panel` layout's `openAs` modal config for customizing modal button labels. [#76099](https://github.com/WordPress/gutenberg/pull/76099)
+- Documentation: Update README.md. [#75881](https://github.com/WordPress/gutenberg/pull/75881)
+- DataViews: Improve UI in `list` layout when we render only title and/or media fields. [#76042](https://github.com/WordPress/gutenberg/pull/76042)
+- DataViews: Adjust column spacing in table layout when no titleField is provided. [#75410](https://github.com/WordPress/gutenberg/pull/75410)
+- DataViews: minimize padding for primary actions. [#75721](https://github.com/WordPress/gutenberg/pull/75721)
+
+### Code Quality
+
+- Remove unused dependencies from `package.json`. [#76075](https://github.com/WordPress/gutenberg/pull/76075)
+
+## 12.0.0 (2026-02-18)
+
 ### Breaking Changes
 
 - The design tokens stylesheet (`@wordpress/theme/design-tokens.css`) is no longer embedded in the DataViews stylesheet. Applications using DataViews outside of WordPress must now explicitly include the design tokens stylesheet. See the README for installation instructions. [#75182](https://github.com/WordPress/gutenberg/pull/75182)
 
 ### Bug Fixes
 
+- DataViews: Fix first/last column header text misalignment in table layout when no bulk actions are present. [#75372](https://github.com/WordPress/gutenberg/issues/75372)
+- DataForm: Fix text selection in panel layout summary rows by replacing `::after` overlay with accessible card pattern. [#75565](https://github.com/WordPress/gutenberg/pull/75565)
 - DataViews: Improve styling for filters when long values are in use. [#75369](https://github.com/WordPress/gutenberg/pull/75369)
 - DataForm: Fix label case for regular layout. [#75292](https://github.com/WordPress/gutenberg/pull/75292)
 - DataViews: Add title attribute in grid item title field. [#75085](https://github.com/WordPress/gutenberg/pull/75085)
@@ -26,6 +207,7 @@
 - DataViews: Consistent rendering of selection checkbox and actions in grid layout. [#75056](https://github.com/WordPress/gutenberg/pull/75056)
 
 ### Code Quality
+
 - DataForm: Style SummaryButton in panel layout with `is-disabled` classname. [#75470](https://github.com/WordPress/gutenberg/pull/75470)
 
 ### Internal
@@ -33,8 +215,9 @@
 - DataForm: Use public `ColorPicker` component instead of internal `Picker` in color control. [#75394](https://github.com/WordPress/gutenberg/pull/75394)
 - Update Testing Library packages used in unit tests. [#75340](https://github.com/WordPress/gutenberg/pull/75340)
 - Always specify initial values for `useRef` calls. [#75513](https://github.com/WordPress/gutenberg/pull/75513)
-- Clean up type declarations using the `React` namespace. ([#75508](https://github.com/WordPress/gutenberg/pull/75508)
+- Clean up type declarations using the `React` namespace. [#75508](https://github.com/WordPress/gutenberg/pull/75508)
 - Update `RefObject` type usage for React 19 compatibility. [#75567](https://github.com/WordPress/gutenberg/pull/75567)
+- Upgraded `@ariakit/react` (v0.4.21). [#75620](https://github.com/WordPress/gutenberg/pull/75620)
 
 ## 11.3.0 (2026-01-29)
 

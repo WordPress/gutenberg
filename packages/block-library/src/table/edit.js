@@ -24,7 +24,7 @@ import {
 	__experimentalUseBorderProps as useBorderProps,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	Button,
 	Placeholder,
@@ -91,8 +91,8 @@ const cellAriaLabel = {
 };
 
 const placeholder = {
-	head: __( 'Header label' ),
-	foot: __( 'Footer label' ),
+	head: _x( 'Header label', 'table header' ),
+	foot: _x( 'Footer label', 'table footer' ),
 };
 
 function TSection( { name, ...props } ) {
@@ -563,7 +563,6 @@ function TableEdit( {
 						onSubmit={ onCreateTable }
 					>
 						<TextControl
-							__next40pxDefaultSize
 							type="number"
 							label={ __( 'Column count' ) }
 							value={ initialColumnCount }
@@ -572,7 +571,6 @@ function TableEdit( {
 							className="blocks-table__placeholder-input"
 						/>
 						<TextControl
-							__next40pxDefaultSize
 							type="number"
 							label={ __( 'Row count' ) }
 							value={ initialRowCount }
@@ -631,6 +629,7 @@ const Cell = memo( function ( {
 			) }
 		>
 			<RichText
+				identifier={ `${ name }.${ rowIndex }.cells.${ columnIndex }.content` }
 				value={ content }
 				onChange={ onChange }
 				onFocus={ () => {

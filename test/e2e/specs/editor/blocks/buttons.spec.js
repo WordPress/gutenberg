@@ -223,7 +223,7 @@ test.describe( 'Buttons', () => {
 						attributes: {
 							text: 'WordPress',
 							url: 'https://www.wordpress.org/',
-							rel: 'noreferrer noopener',
+							rel: 'noopener',
 							linkTarget: '_blank',
 						},
 					},
@@ -257,7 +257,7 @@ test.describe( 'Buttons', () => {
 						attributes: {
 							text: 'WordPress',
 							url: 'https://www.wordpress.org/',
-							rel: 'noreferrer noopener nofollow',
+							rel: 'noopener nofollow',
 							linkTarget: '_blank',
 						},
 					},
@@ -266,46 +266,29 @@ test.describe( 'Buttons', () => {
 		] );
 	} );
 
-	test( 'can resize width', async ( { editor, page } ) => {
-		await editor.insertBlock( { name: 'core/buttons' } );
-		await page.keyboard.type( 'Content' );
-		await editor.openDocumentSettingsSidebar();
-		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'tab', { name: 'Settings' } )
-			.click();
-		await page
-			.getByRole( 'radiogroup', { name: 'Width' } )
-			.getByRole( 'radio', { name: '25%' } )
-			.click();
-
-		// Check the content.
-		const content = await editor.getEditedPostContent();
-		expect( content ).toBe(
-			`<!-- wp:buttons -->
-<div class="wp-block-buttons"><!-- wp:button {"width":25} -->
-<div class="wp-block-button has-custom-width wp-block-button__width-25"><a class="wp-block-button__link wp-element-button">Content</a></div>
-<!-- /wp:button --></div>
-<!-- /wp:buttons -->`
-		);
-	} );
-
 	test( 'can apply named colors', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/buttons' } );
 		await page.keyboard.type( 'Content' );
 		await editor.openDocumentSettingsSidebar();
 
-		// Switch to the Styles tab.
-		await page.click(
-			`role=region[name="Editor settings"i] >> role=tab[name="Styles"i]`
-		);
-		await page.click(
-			'role=region[name="Editor settings"i] >> role=button[name="Text"i]'
-		);
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await editorSettings
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Typography' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } )
+			.click();
 		await page.click( 'role=option[name="Cyan bluish gray"i]' );
-		await page.click(
-			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
-		);
+		await editorSettings
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Background' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } )
+			.click();
 		await page.click( 'role=option[name="Vivid red"i]' );
 
 		// Check the content.
@@ -324,19 +307,26 @@ test.describe( 'Buttons', () => {
 		await page.keyboard.type( 'Content' );
 		await editor.openDocumentSettingsSidebar();
 
-		// Switch to the Styles tab.
-		await page.click(
-			`role=region[name="Editor settings"i] >> role=tab[name="Styles"i]`
-		);
-		await page.click(
-			'role=region[name="Editor settings"i] >> role=button[name="Text"i]'
-		);
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await editorSettings
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Typography' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } )
+			.click();
 		await page.click( 'role=button[name="Custom color picker"i]' );
 		await page.fill( 'role=textbox[name="Hex color"i]', 'ff0000' );
 
-		await page.click(
-			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
-		);
+		await editorSettings
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Background' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } )
+			.click();
 		await page.click( 'role=button[name="Custom color picker"i]' );
 		await page.fill( 'role=textbox[name="Hex color"i]', '00ff00' );
 
@@ -359,14 +349,10 @@ test.describe( 'Buttons', () => {
 		await page.keyboard.type( 'Content' );
 		await editor.openDocumentSettingsSidebar();
 
-		// Switch to the Styles tab.
-		await page.click(
-			`role=region[name="Editor settings"i] >> role=tab[name="Styles"i]`
-		);
-		await page.click(
-			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
-		);
-		await page.click( 'role=tab[name="Gradient"i]' );
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Gradient', exact: true } )
+			.click();
 		await page.click( 'role=option[name="Gradient: Purple to yellow"i]' );
 
 		// Check the content.
@@ -388,14 +374,10 @@ test.describe( 'Buttons', () => {
 		await page.keyboard.type( 'Content' );
 		await editor.openDocumentSettingsSidebar();
 
-		// Switch to the Styles tab.
-		await page.click(
-			`role=region[name="Editor settings"i] >> role=tab[name="Styles"i]`
-		);
-		await page.click(
-			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
-		);
-		await page.click( 'role=tab[name="Gradient"i]' );
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Gradient', exact: true } )
+			.click();
 		await page.click(
 			'role=button[name=/^Gradient control point at position 0% with color code/]'
 		);
@@ -415,6 +397,144 @@ test.describe( 'Buttons', () => {
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->`
 		);
+	} );
+
+	test( 'copies attributes when inserting a sibling via the appender', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/buttons' } );
+		await page.keyboard.type( 'Content' );
+		await editor.openDocumentSettingsSidebar();
+
+		// Apply named colors to the first button. Text and background color
+		// controls now live in the Typography and Background panels.
+		const settings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await settings
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Typography' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } )
+			.click();
+		await page.getByRole( 'option', { name: 'Cyan bluish gray' } ).click();
+		await settings
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Background' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } )
+			.click();
+		await page.getByRole( 'option', { name: 'Vivid red' } ).click();
+
+		// Select the parent Buttons block so the appender is visible.
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Buttons' } )
+		);
+
+		// Insert a sibling via the appender; should auto-insert a button.
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add button' } )
+			.click();
+
+		// The new button should inherit color attributes from its sibling.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/buttons',
+				innerBlocks: [
+					{
+						name: 'core/button',
+						attributes: {
+							text: 'Content',
+							backgroundColor: 'vivid-red',
+							textColor: 'cyan-bluish-gray',
+						},
+					},
+					{
+						name: 'core/button',
+						attributes: {
+							backgroundColor: 'vivid-red',
+							textColor: 'cyan-bluish-gray',
+						},
+					},
+				],
+			},
+		] );
+	} );
+
+	test.describe( 'Width support', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activateTheme( 'emptytheme' );
+		} );
+
+		test.beforeEach( async ( { admin } ) => {
+			await admin.createNewPost();
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.activateTheme( 'twentytwentyone' );
+		} );
+
+		test( 'can resize width', async ( { editor, page } ) => {
+			// Mock spacing units to include % for the width control
+			await page.waitForFunction( () => window?.wp?.data );
+			await page.evaluate( () => {
+				const settings = window.wp.data
+					.select( 'core/block-editor' )
+					.getSettings();
+				window.wp.data.dispatch( 'core/block-editor' ).updateSettings( {
+					...settings,
+					spacing: { units: [ 'px', '%', 'em', 'rem', 'vh', 'vw' ] },
+				} );
+			} );
+
+			await editor.insertBlock( { name: 'core/buttons' } );
+			await page.keyboard.type( 'Content' );
+
+			// Select the inner Button block (not the outer Buttons container)
+			const buttonBlock = editor.canvas
+				.getByRole( 'document', {
+					name: 'Block: Button',
+					exact: true,
+				} )
+				.filter( { hasText: 'Content' } );
+			await editor.selectBlocks( buttonBlock );
+
+			await editor.openDocumentSettingsSidebar();
+
+			const settingsPanel = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+
+			// Switch from preset slider to custom value input
+			await settingsPanel
+				.getByRole( 'group', { name: 'Width' } )
+				.getByLabel( 'Set custom value' )
+				.click();
+
+			// Change the unit from px to % using the combobox
+			await settingsPanel
+				.getByRole( 'combobox', { name: 'Select unit' } )
+				.first()
+				.selectOption( '%' );
+
+			// Set the width value
+			await settingsPanel
+				.getByRole( 'spinbutton', { name: 'Width', exact: true } )
+				.fill( '25' );
+
+			// Check the content.
+			const content = await editor.getEditedPostContent();
+			expect( content ).toBe(
+				`<!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button {"style":{"dimensions":{"width":"25%"}}} -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button">Content</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->`
+			);
+		} );
 	} );
 
 	test.describe( 'Block transforms', () => {

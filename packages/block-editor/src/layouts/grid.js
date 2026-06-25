@@ -8,12 +8,13 @@ import {
 	Flex,
 	FlexItem,
 	RangeControl,
+	ToggleControl,
 	__experimentalNumberControl as NumberControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalUnitControl as UnitControl,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
-	__experimentalVStack as VStack,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
@@ -21,8 +22,9 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { appendSelectors, getBlockGapCSS } from './utils';
-import { getGapCSSValue } from '../hooks/gap';
-import { shouldSkipSerialization } from '../hooks/utils';
+import { getGapCSSValue, getGapBoxControlValueFromStyle } from '../hooks/gap';
+import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
+import { cleanEmptyObject, shouldSkipSerialization } from '../hooks/utils';
 import { LAYOUT_DEFINITIONS } from './definitions';
 
 const RANGE_CONTROL_MAX_VALUES = {
@@ -69,6 +71,8 @@ export default {
 		layout = {},
 		onChange,
 		layoutBlockSupport = {},
+		resetLayout = {},
+		clientId,
 	} ) {
 		const { allowSizingOnChildren = false } = layoutBlockSupport;
 
@@ -78,29 +82,111 @@ export default {
 		const showMinWidthControl =
 			! layout?.isManualPlacement ||
 			window.__experimentalEnableGridInteractivity;
+		// Auto-fit/auto-fill only applies when grid items are placed
+		// automatically, so the control is irrelevant in manual placement mode.
+		const showFillControl = ! layout?.isManualPlacement;
+		const defaultColumnCount = layout.isManualPlacement ? 3 : undefined;
+		const hasLayoutValue = ( key, defaultValue ) =>
+			( layout?.[ key ] ?? defaultValue ) !==
+			( resetLayout?.[ key ] ?? defaultValue );
+		const hasGridTypeValue = () =>
+			hasLayoutValue( 'isManualPlacement', false );
+		const hasColumnsAndRowsValue = () =>
+			hasLayoutValue( 'columnCount', defaultColumnCount ) ||
+			hasLayoutValue( 'rowCount' );
+		const hasMinimumColumnWidthValue = () =>
+			hasLayoutValue( 'minimumColumnWidth' );
+		const hasFillValue = () => hasLayoutValue( 'autoFit', false );
+		const resetGridType = () =>
+			onChange(
+				cleanEmptyObject( {
+					...layout,
+					isManualPlacement: resetLayout?.isManualPlacement,
+					rowCount: resetLayout?.rowCount,
+					minimumColumnWidth: resetLayout?.minimumColumnWidth,
+				} )
+			);
+		const resetColumnsAndRows = () =>
+			onChange(
+				cleanEmptyObject( {
+					...layout,
+					columnCount: resetLayout?.columnCount ?? defaultColumnCount,
+					rowCount: resetLayout?.rowCount,
+				} )
+			);
+		const resetMinimumColumnWidth = () =>
+			onChange(
+				cleanEmptyObject( {
+					...layout,
+					minimumColumnWidth: resetLayout?.minimumColumnWidth,
+				} )
+			);
+		const resetFill = () =>
+			onChange(
+				cleanEmptyObject( {
+					...layout,
+					autoFit: resetLayout?.autoFit,
+				} )
+			);
+
 		return (
 			<>
 				{ window.__experimentalEnableGridInteractivity && (
-					<GridLayoutTypeControl
-						layout={ layout }
-						onChange={ onChange }
-					/>
+					<ToolsPanelItem
+						label={ __( 'Grid item position' ) }
+						hasValue={ hasGridTypeValue }
+						onDeselect={ resetGridType }
+						isShownByDefault
+						panelId={ clientId }
+					>
+						<GridLayoutTypeControl
+							layout={ layout }
+							onChange={ onChange }
+						/>
+					</ToolsPanelItem>
 				) }
-				<VStack spacing={ 4 }>
-					{ showColumnsControl && (
+				{ showColumnsControl && (
+					<ToolsPanelItem
+						label={ __( 'Columns and rows' ) }
+						hasValue={ hasColumnsAndRowsValue }
+						onDeselect={ resetColumnsAndRows }
+						isShownByDefault
+						panelId={ clientId }
+					>
 						<GridLayoutColumnsAndRowsControl
 							layout={ layout }
 							onChange={ onChange }
 							allowSizingOnChildren={ allowSizingOnChildren }
 						/>
-					) }
-					{ showMinWidthControl && (
+					</ToolsPanelItem>
+				) }
+				{ showMinWidthControl && (
+					<ToolsPanelItem
+						label={ __( 'Min. column width' ) }
+						hasValue={ hasMinimumColumnWidthValue }
+						onDeselect={ resetMinimumColumnWidth }
+						isShownByDefault
+						panelId={ clientId }
+					>
 						<GridLayoutMinimumWidthControl
 							layout={ layout }
 							onChange={ onChange }
 						/>
-					) }
-				</VStack>
+					</ToolsPanelItem>
+				) }
+				{ showFillControl && (
+					<ToolsPanelItem
+						label={ __( 'Fill available space' ) }
+						hasValue={ hasFillValue }
+						onDeselect={ resetFill }
+						panelId={ clientId }
+					>
+						<GridLayoutFillControl
+							layout={ layout }
+							onChange={ onChange }
+						/>
+					</ToolsPanelItem>
+				) }
 			</>
 		);
 	},
@@ -109,18 +195,30 @@ export default {
 	},
 	getLayoutStyle: function getLayoutStyle( {
 		selector,
-		layout,
+		layout = {},
+		viewportOverrides,
 		style,
 		blockName,
 		hasBlockGapSupport,
 		globalBlockGapValue,
 		layoutDefinitions = LAYOUT_DEFINITIONS,
 	} ) {
+		const hasViewportOverrides = viewportOverrides !== undefined;
+		const effectiveLayout = hasViewportOverrides
+			? { ...layout, ...viewportOverrides }
+			: layout;
+		const hasViewportOverride = ( key ) =>
+			Object.hasOwn( viewportOverrides || {}, key );
 		const {
 			minimumColumnWidth = null,
 			columnCount = null,
 			rowCount = null,
-		} = layout;
+			autoFit = false,
+		} = effectiveLayout;
+
+		// When enabled, columns stretch to fill the available space using
+		// `auto-fit`; otherwise empty tracks are preserved with `auto-fill`.
+		const autoPlacement = autoFit ? 'auto-fit' : 'auto-fill';
 
 		// Check that the grid layout attributes are of the correct type, so that we don't accidentally
 		// write code that stores a string attribute instead of a number.
@@ -137,16 +235,21 @@ export default {
 			if ( rowCount && typeof rowCount !== 'number' ) {
 				throw new Error( 'rowCount must be a number' );
 			}
+			if ( autoFit && typeof autoFit !== 'boolean' ) {
+				throw new Error( 'autoFit must be a boolean' );
+			}
 		}
 
 		// Use the global blockGap value as fallback when available.
 		// If the gap value has both top and left (separated by space), use the left value for horizontal calculations.
 		let fallbackGapValue = '1.2rem';
 		if ( globalBlockGapValue ) {
-			const processedGap = getGapCSSValue( globalBlockGapValue, '0.5em' );
-			const gapParts = processedGap.split( ' ' );
+			const gapBox =
+				getGapBoxControlValueFromStyle( globalBlockGapValue );
 			fallbackGapValue =
-				gapParts.length > 1 ? gapParts[ 1 ] : gapParts[ 0 ];
+				getSpacingPresetCssVar( gapBox?.left ) ||
+				getSpacingPresetCssVar( gapBox?.top ) ||
+				'1.2rem';
 		}
 
 		// If a block's block.json skips serialization for spacing or spacing.blockGap,
@@ -156,11 +259,28 @@ export default {
 			! shouldSkipSerialization( blockName, 'spacing', 'blockGap' )
 				? getGapCSSValue( style?.spacing?.blockGap, fallbackGapValue )
 				: undefined;
+		const hasBlockGapOverride =
+			! hasViewportOverrides ||
+			Object.hasOwn( style?.spacing || {}, 'blockGap' );
 
 		let output = '';
 		const rules = [];
+		const shouldOutputGridColumns =
+			! hasViewportOverrides ||
+			hasViewportOverride( 'minimumColumnWidth' ) ||
+			hasViewportOverride( 'columnCount' ) ||
+			hasViewportOverride( 'autoFit' ) ||
+			( hasBlockGapOverride && minimumColumnWidth && columnCount > 0 );
+		const shouldOutputGridRows =
+			( ! hasViewportOverrides || hasViewportOverride( 'rowCount' ) ) &&
+			columnCount &&
+			rowCount;
 
-		if ( minimumColumnWidth && columnCount > 0 ) {
+		if (
+			shouldOutputGridColumns &&
+			minimumColumnWidth &&
+			columnCount > 0
+		) {
 			let blockGapToUse = blockGapValue || fallbackGapValue;
 			// Ensure 0 values have a unit so they work in calc().
 			if ( blockGapToUse === '0' || blockGapToUse === 0 ) {
@@ -170,29 +290,36 @@ export default {
 				columnCount - 1
 			}) ) / ${ columnCount })`;
 			rules.push(
-				`grid-template-columns: repeat(auto-fill, minmax(${ maxValue }, 1fr))`,
-				`container-type: inline-size`
+				`grid-template-columns: repeat(${ autoPlacement }, minmax(${ maxValue }, 1fr))`
 			);
-			if ( rowCount ) {
-				rules.push(
-					`grid-template-rows: repeat(${ rowCount }, minmax(1rem, auto))`
-				);
-			}
-		} else if ( columnCount ) {
+		} else if ( shouldOutputGridColumns && columnCount ) {
 			rules.push(
 				`grid-template-columns: repeat(${ columnCount }, minmax(0, 1fr))`
 			);
-			if ( rowCount ) {
-				rules.push(
-					`grid-template-rows: repeat(${ rowCount }, minmax(1rem, auto))`
-				);
-			}
-		} else {
+		} else if ( shouldOutputGridColumns ) {
 			rules.push(
-				`grid-template-columns: repeat(auto-fill, minmax(min(${
+				`grid-template-columns: repeat(${ autoPlacement }, minmax(min(${
 					minimumColumnWidth || '12rem'
-				}, 100%), 1fr))`,
-				'container-type: inline-size'
+				}, 100%), 1fr))`
+			);
+		}
+
+		if ( shouldOutputGridColumns ) {
+			const baseHasContainerType =
+				! layout?.columnCount ||
+				( layout?.columnCount && layout?.minimumColumnWidth );
+			const needsContainerType = ! columnCount || minimumColumnWidth;
+			if (
+				needsContainerType &&
+				( ! hasViewportOverrides || ! baseHasContainerType )
+			) {
+				rules.push( 'container-type: inline-size' );
+			}
+		}
+
+		if ( shouldOutputGridRows ) {
+			rules.push(
+				`grid-template-rows: repeat(${ rowCount }, minmax(1rem, auto))`
 			);
 		}
 
@@ -203,7 +330,7 @@ export default {
 		}
 
 		// Output blockGap styles based on rules contained in layout definitions in theme.json.
-		if ( hasBlockGapSupport && blockGapValue ) {
+		if ( hasBlockGapSupport && hasBlockGapOverride && blockGapValue ) {
 			output += getBlockGapCSS(
 				selector,
 				layoutDefinitions,
@@ -392,6 +519,28 @@ function GridLayoutColumnsAndRowsControl( {
 				</Flex>
 			</fieldset>
 		</>
+	);
+}
+
+// Enables stretching grid columns to fill the available space (auto-fit)
+// instead of leaving empty tracks at the end of a row (auto-fill).
+function GridLayoutFillControl( { layout, onChange } ) {
+	const { autoFit = false } = layout;
+
+	return (
+		<ToggleControl
+			label={ __( 'Fill available space' ) }
+			help={ __(
+				'Stretch columns to fill the available space, instead of leaving gaps when there are too few items to fill a row.'
+			) }
+			checked={ autoFit }
+			onChange={ ( value ) =>
+				onChange( {
+					...layout,
+					autoFit: value,
+				} )
+			}
+		/>
 	);
 }
 

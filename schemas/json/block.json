@@ -345,6 +345,11 @@
 							"type": "boolean",
 							"default": false
 						},
+						"minWidth": {
+							"description": "Allow blocks to define a minimum width value.",
+							"type": "boolean",
+							"default": false
+						},
 						"width": {
 							"description": "Allow blocks to define a width value.",
 							"type": "boolean",
@@ -374,6 +379,11 @@
 						},
 						"backgroundSize": {
 							"description": "Allow blocks to define values related to the size of a background image, including size, position, and repeat controls",
+							"type": "boolean",
+							"default": false
+						},
+						"gradient": {
+							"description": "Allow blocks to define gradient values.",
 							"type": "boolean",
 							"default": false
 						}
@@ -466,6 +476,11 @@
 										"columnCount": {
 											"description": "The column count value.",
 											"type": "number"
+										},
+										"autoFit": {
+											"description": "Whether grid columns stretch to fill the available space (auto-fit) instead of leaving empty tracks (auto-fill).",
+											"type": "boolean",
+											"default": false
 										}
 									}
 								},
@@ -485,7 +500,7 @@
 									"default": true
 								},
 								"allowSizingOnChildren": {
-									"description": "For the `flex` layout type only, determines display of sizing controls (Fit/Fill/Fixed) on all child blocks of the flex block.",
+									"description": "For the `flex` layout type only, determines display of sizing controls (Fit/Grow/Max/Fixed) on all child blocks of the flex block.",
 									"type": "boolean",
 									"default": false
 								},
@@ -683,6 +698,16 @@
 						}
 					]
 				},
+				"contentRole": {
+					"description": "This property marks the block itself as content. It is intended primarily for blocks that do not declare content attributes, or whose content is expressed only through their inner blocks. When enabled, content-only editing modes can still edit these blocks and allow inner blocks to be added or removed.",
+					"type": "boolean",
+					"default": false
+				},
+				"listView": {
+					"description": "This property enables a dedicated List View panel in the block inspector for the block. When enabled, the inspector shows a List View tree for the block's inner blocks, allowing users to inspect, reorder, and manage the block's items from the sidebar instead of only using the global document List View.",
+					"type": "boolean",
+					"default": false
+				},
 				"splitting": {
 					"description": "This property indicates whether the block can split when the Enter key is pressed or when blocks are pasted.",
 					"type": "boolean",
@@ -746,6 +771,7 @@
 								"aspectRatio": { "type": "string" },
 								"height": { "type": "string" },
 								"minHeight": { "type": "string" },
+								"minWidth": { "type": "string" },
 								"width": { "type": "string" }
 							}
 						}
@@ -787,6 +813,20 @@
 								"textDecoration": { "type": "string" },
 								"textIndent": { "type": "string" },
 								"textTransform": { "type": "string" }
+							}
+						}
+					]
+				},
+				"css": {
+					"description": "Custom CSS selector used when generating the block's custom CSS rules set via Global Styles.",
+					"oneOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "object",
+							"properties": {
+								"root": { "type": "string" }
 							}
 						}
 					]

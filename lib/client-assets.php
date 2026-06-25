@@ -87,24 +87,15 @@ function gutenberg_override_translation_file( $file, $handle ) {
 add_filter( 'load_script_translation_file', 'gutenberg_override_translation_file', 10, 2 );
 
 /**
- * Handle special case dependencies for wp-block-library that depend on runtime conditions.
- *
- * This adds the 'editor' dependency conditionally based on experiments and classic block requirements.
- * All other script registrations are handled by the auto-generated build/scripts.php file.
+ * Adds the 'editor' dependency to wp-block-library, required by the Classic block.
  *
  * @param WP_Scripts $scripts WP_Scripts instance.
  */
 function gutenberg_register_block_library_script_special_case( $scripts ) {
 	$handle = 'wp-block-library';
 	$script = $scripts->query( $handle, 'registered' );
-	if (
-		! gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ||
-		! empty( $_GET['requiresTinymce'] ) ||
-		gutenberg_post_being_edited_requires_classic_block()
-	) {
-		if ( ! in_array( 'editor', $script->deps, true ) ) {
-			$script->deps[] = 'editor';
-		}
+	if ( ! in_array( 'editor', $script->deps, true ) ) {
+		$script->deps[] = 'editor';
 	}
 }
 add_action( 'wp_default_scripts', 'gutenberg_register_block_library_script_special_case', 11 );
@@ -152,12 +143,27 @@ function gutenberg_register_packages_styles( $styles ) {
 	// wp-customize-widgets: add wp-edit-blocks (custom handle not auto-inferred)
 	$styles->query( 'wp-customize-widgets', 'registered' )->deps[] = 'wp-edit-blocks';
 
+	// Register wp-theme (Design System tokens from @wordpress/theme) as a
+	// dependency of wp-base-styles so its `:root` token block loads
+	// everywhere wp-base-styles does, including the editor iframe via
+	// $wp_edit_blocks_dependencies below.
+	gutenberg_override_style(
+		$styles,
+		'wp-theme',
+		gutenberg_url( 'build/styles/theme/design-tokens' . $suffix . '.css' ),
+		array(),
+		$version
+	);
+	$styles->add_data( 'wp-theme', 'rtl', 'replace' );
+	$styles->add_data( 'wp-theme', 'suffix', $suffix );
+	$styles->add_data( 'wp-theme', 'path', gutenberg_dir_path() . 'build/styles/theme/design-tokens' . $suffix . '.css' );
+
 	// Register wp-base-styles and add it to the already registered wp-admin stylesheet
 	gutenberg_override_style(
 		$styles,
 		'wp-base-styles',
 		gutenberg_url( 'build/styles/base-styles/admin-schemes' . $suffix . '.css' ),
-		array(),
+		array( 'wp-theme' ),
 		$version
 	);
 	$styles->add_data( 'wp-base-styles', 'rtl', 'replace' );
@@ -189,6 +195,10 @@ function gutenberg_register_packages_styles( $styles ) {
 
 	// Only add CONTENT styles here that should be enqueued in the iframe!
 	$wp_edit_blocks_dependencies = array(
+		// Design System tokens load first so the `:root` CSS custom
+		// properties are defined before any consuming stylesheet reads
+		// them inside the editor iframe.
+		'wp-theme',
 		'wp-components',
 		// This need to be added before the block library styles,
 		// The block library styles override the "reset" styles.
@@ -367,32 +377,39 @@ function gutenberg_enqueue_stored_styles( $options = array() ) {
  * @param WP_Scripts $scripts WP_Scripts instance.
  */
 function gutenberg_register_vendor_scripts( $scripts ) {
-	$extension = SCRIPT_DEBUG ? '.js' : '.min.js';
+	$extension   = SCRIPT_DEBUG ? '.js' : '.min.js';
+	$vendors_dir = gutenberg_dir_path() . 'build/scripts/vendors/';
 
-	gutenberg_override_script(
-		$scripts,
-		'react',
-		gutenberg_url( 'build/scripts/vendors/react' . $extension ),
-		// WordPress Core in `wp_register_development_scripts` sets `wp-react-refresh-entry` as a dependency to `react` when `SCRIPT_DEBUG` is true.
-		// We need to preserve that here.
-		SCRIPT_DEBUG ? array( 'wp-react-refresh-entry', 'wp-polyfill' ) : array( 'wp-polyfill' ),
-		'18'
-	);
-	gutenberg_override_script(
-		$scripts,
-		'react-dom',
-		gutenberg_url( 'build/scripts/vendors/react-dom' . $extension ),
-		array( 'react' ),
-		'18'
-	);
+	// When the React 19 experiment is enabled, register React 19 vendor
+	// scripts under the `react`, `react-dom`, and `react-jsx-runtime` handles.
+	$use_react_19 = gutenberg_is_experiment_enabled( 'gutenberg-react-19' );
 
-	gutenberg_override_script(
-		$scripts,
-		'react-jsx-runtime',
-		gutenberg_url( 'build/scripts/vendors/react-jsx-runtime' . $extension ),
-		array( 'react' ),
-		'18'
-	);
+	$vendor_handles = array( 'react', 'react-dom', 'react-jsx-runtime' );
+
+	foreach ( $vendor_handles as $handle ) {
+		$source       = $use_react_19 ? $handle . '-19' : $handle;
+		$asset_file   = $vendors_dir . $source . '.min.asset.php';
+		$asset        = file_exists( $asset_file ) ? require $asset_file : array();
+		$dependencies = $asset['dependencies'] ?? array();
+		$version      = $asset['version'] ?? '0';
+
+		gutenberg_override_script(
+			$scripts,
+			$handle,
+			gutenberg_url( 'build/scripts/vendors/' . $source . $extension ),
+			$dependencies,
+			$version
+		);
+	}
+
+	// WordPress Core in `wp_register_development_scripts` sets `wp-react-refresh-entry`
+	// as a dependency to `react` when `SCRIPT_DEBUG` is true. Preserve that here.
+	if ( SCRIPT_DEBUG ) {
+		$react = $scripts->query( 'react', 'registered' );
+		if ( $react && ! in_array( 'wp-react-refresh-entry', $react->deps, true ) ) {
+			$react->deps[] = 'wp-react-refresh-entry';
+		}
+	}
 }
 add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
 

@@ -4,21 +4,28 @@
 .editor-collaborators-presence {
 	display: flex;
 	align-items: center;
+	flex-shrink: 0;
 	height: $button-size-compact;
-	min-width: 0;
 	background: $gray-100;
 	border-radius: $grid-unit-05;
-	margin-right: $grid-unit-10;
 
 	&:hover {
 		background-color: $gray-200;
 	}
+
+	&:has(.is-pressed) {
+		background-color: $gray-200;
+	}
+}
+
+.editor-header__center .editor-collaborators-presence {
+	margin-right: $grid-unit-10;
 }
 
 .editor-collaborators-presence__button.editor-collaborators-presence__button.components-button {
 	display: flex;
 	align-items: center;
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 	position: relative;
 	padding: $grid-unit-05;
 	border-radius: $grid-unit-05;
@@ -33,10 +40,10 @@
 		color: $gray-800;
 	}
 
-	// Override pressed state - keep it like document bar style
+	// Override pressed state - let the container handle the background
 	&.is-pressed,
 	&.is-pressed:hover {
-		background: $gray-300;
+		background: transparent;
 		color: $gray-800;
 	}
 
@@ -45,5 +52,4 @@
 		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus, 2px) var(--wp-admin-theme-color, #007cba);
 		outline: none;
 	}
-
 }

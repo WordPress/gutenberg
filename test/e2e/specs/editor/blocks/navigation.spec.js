@@ -426,8 +426,9 @@ test.describe( 'Navigation block', () => {
 				await navigation.useLinkShortcut();
 
 				await navigation.addSubmenuPage( 'Dog' );
-				await pageUtils.pressKeys( 'ArrowUp' );
-				await pageUtils.pressKeys( 'ArrowRight' );
+				// Navigate to the Dog link content using ArrowLeft (ArrowUp skips
+				// blocks with nested focusables).
+				await pageUtils.pressKeys( 'ArrowLeft', { times: 2 } );
 			} );
 
 			await test.step( 'can use the shortcut to open the preview with the keyboard and escape keypress sends focus back to the navigation link block in the submenu', async () => {
@@ -448,8 +449,8 @@ test.describe( 'Navigation block', () => {
 
 			await test.step( 'focus returns to the submenu appender when exiting the submenu link creation without creating a link', async () => {
 				// Move focus to the submenu navigation appender
-				await page.keyboard.press( 'End' );
-				await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
+				await pageUtils.pressKeys( 'ArrowDown' );
+				await pageUtils.pressKeys( 'ArrowRight' );
 
 				await pageUtils.pressKeys( 'ArrowDown' );
 
@@ -512,9 +513,9 @@ test.describe( 'Navigation block', () => {
 			 */
 			// Exit the toolbar
 			await page.keyboard.press( 'Escape' );
-			// Move to the submenu item
-			await pageUtils.pressKeys( 'ArrowUp', { times: 2 } );
-			await page.keyboard.press( 'Home' );
+			// Move to the submenu item (only one ArrowUp needed - skips the
+			// submenu wrapper directly to Cat's content)
+			await page.keyboard.press( 'ArrowUp' );
 
 			// Check we're on our submenu link
 			await navigation.checkLabelFocus( 'Cat' );
@@ -569,15 +570,15 @@ test.describe( 'Navigation block', () => {
 			 * Test: Deleting first item returns focus to the parent submenu item
 			 */
 			// Add a link back so we can delete the first submenu link.
-			await page.keyboard.press( 'End' );
-			await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
+			await pageUtils.pressKeys( 'ArrowDown' );
+			await pageUtils.pressKeys( 'ArrowRight' );
 			await navigation.useBlockInserter();
 			await navigation.addCustomURL( 'https://wordpress.org' );
 			await navigation.expectToHaveTextSelected( 'wordpress.org' );
 
-			await pageUtils.pressKeys( 'ArrowUp', { times: 2 } );
+			// One ArrowUp to get to Dog (skips wrapper)
+			await page.keyboard.press( 'ArrowUp' );
 			await navigation.checkLabelFocus( 'Dog' );
-			await pageUtils.pressKeys( 'ArrowUp', { times: 1 } );
 			await pageUtils.pressKeys( 'access+z' );
 			await pageUtils.pressKeys( 'ArrowDown' );
 			await navigation.checkLabelFocus( 'example.com' );
@@ -1141,6 +1142,77 @@ test.describe( 'Navigation block', () => {
 			// from /wp-json/ back to /?rest_route=/. We need to refresh the cached URL
 			// to prevent 404 errors.
 			await requestUtils.setupRest();
+		} );
+
+		test( 'can update a bound page link label from the inline Link UI', async ( {
+			editor,
+			admin,
+			navigation,
+			requestUtils,
+			pageUtils,
+		} ) => {
+			await admin.createNewPost();
+
+			const linkAttributes = JSON.stringify( {
+				id: testPage1.id,
+				label: 'Test Page 1',
+				kind: 'post-type',
+				type: 'page',
+				url: testPage1.link,
+				metadata: {
+					bindings: {
+						url: {
+							source: 'core/post-data',
+							args: {
+								field: 'link',
+							},
+						},
+					},
+				},
+			} );
+
+			const menu = await requestUtils.createNavigationMenu( {
+				title: 'Test Menu',
+				content: `<!-- wp:navigation-link ${ linkAttributes } /-->`,
+			} );
+
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: {
+					ref: menu.id,
+				},
+			} );
+
+			const navLinkBlock = navigation
+				.getNavBlock()
+				.getByRole( 'document', {
+					name: 'Block: Page Link',
+				} )
+				.first();
+			await expect( navLinkBlock ).toBeVisible( { timeout: 10000 } );
+			await editor.selectBlocks( navLinkBlock );
+			await pageUtils.pressKeys( 'primary+k' );
+
+			const linkPopover = navigation.getLinkPopover();
+			await expect( linkPopover ).toBeVisible();
+			await expect(
+				linkPopover.getByRole( 'link', { name: /Test Page 1/ } )
+			).toBeVisible();
+			await linkPopover
+				.getByRole( 'button', { name: 'Edit link' } )
+				.click();
+
+			const textInput = linkPopover.getByRole( 'textbox', {
+				name: 'Text',
+			} );
+			await expect( textInput ).toHaveValue( 'Test Page 1' );
+
+			await textInput.fill( 'Updated Page Label' );
+			await linkPopover.getByRole( 'button', { name: 'Apply' } ).click();
+
+			await expect(
+				navigation.getNavBlock().getByText( 'Updated Page Label' )
+			).toBeVisible();
 		} );
 
 		test( 'can bind to a page', async ( {
@@ -1889,7 +1961,7 @@ test.describe( 'Navigation block', () => {
 				} );
 				await expect( linkButton ).toBeVisible();
 				await expect( linkButton ).toBeEnabled();
-				await expect( linkButton ).toContainText( 'localhost' );
+				await expect( linkButton ).toContainText( 'Test Page 1' );
 			} );
 
 			await test.step( 'Click LinkPicker button to open dropdown', async () => {
@@ -2313,9 +2385,7 @@ class Navigation {
 	 * @param {string} label Nav label text
 	 */
 	async checkLabelFocus( label ) {
-		await this.page.keyboard.press( 'Home' );
-		// Select all the text
-		await this.pageUtils.pressKeys( 'Shift+End' );
+		await this.pageUtils.pressKeys( 'primary+a' );
 		await this.expectToHaveTextSelected( label );
 		// Move caret back to starting position
 		await this.pageUtils.pressKeys( 'ArrowLeft' );

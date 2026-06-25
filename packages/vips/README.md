@@ -57,6 +57,20 @@ _Parameters_
 -   _quality_ Desired quality.
 -   _interlaced_ Whether to use interlaced/progressive mode. Only used if the outputType supports it.
 
+### getUltraHdrInfo
+
+Probes a JPEG to determine whether it is an UltraHDR image with an embedded gain map.
+
+Returns dimensions and HDR headroom on success, or `null` if the buffer is not a valid UltraHDR JPEG (no gain map, decode failure, or unsupported format).
+
+_Parameters_
+
+-   _buffer_ `ArrayBuffer`: Image buffer.
+
+_Returns_
+
+-   `Promise< UltraHdrInfo | null >`: UltraHDR info, or null when the buffer is not UltraHDR.
+
 ### hasTransparency
 
 Determines whether an image has an alpha channel.
@@ -73,6 +87,8 @@ _Returns_
 
 Resizes an image using vips.
 
+UltraHDR JPEGs are auto-detected and preserved: libvips's `uhdrload*` has higher priority than `jpegload*`, so `newFromBuffer`/`thumbnailBuffer` decode the gain map alongside the base image, and `jpegsave*` delegates to `uhdrsave*` on output when a gain map is attached.
+
 _Parameters_
 
 -   _id_ `ItemId`: Item ID.
@@ -80,6 +96,7 @@ _Parameters_
 -   _type_ `string`: Mime type.
 -   _resize_ `ImageSizeCrop`: Resize options.
 -   _smartCrop_ Whether to use smart cropping (i.e. saliency-aware).
+-   _quality_ Desired quality (0-1).
 
 _Returns_
 
@@ -145,6 +162,20 @@ _Parameters_
 -   _quality_ Desired quality.
 -   _interlaced_ Whether to use interlaced/progressive mode. Only used if the outputType supports it.
 
+### vipsGetUltraHdrInfo
+
+Probes a JPEG to determine whether it is an UltraHDR image with an embedded gain map.
+
+Returns dimensions and HDR headroom on success, or `null` if the buffer is not a valid UltraHDR JPEG (no gain map, decode failure, or unsupported format).
+
+_Parameters_
+
+-   _buffer_ `ArrayBuffer`: Image buffer.
+
+_Returns_
+
+-   `Promise< UltraHdrInfo | null >`: UltraHDR info, or null when the buffer is not UltraHDR.
+
 ### vipsHasTransparency
 
 Determines whether an image has an alpha channel.
@@ -161,6 +192,8 @@ _Returns_
 
 Resizes an image using vips.
 
+UltraHDR JPEGs are auto-detected and preserved: libvips's `uhdrload*` has higher priority than `jpegload*`, so `newFromBuffer`/`thumbnailBuffer` decode the gain map alongside the base image, and `jpegsave*` delegates to `uhdrsave*` on output when a gain map is attached.
+
 _Parameters_
 
 -   _id_ `ItemId`: Item ID.
@@ -168,6 +201,7 @@ _Parameters_
 -   _type_ `string`: Mime type.
 -   _resize_ `ImageSizeCrop`: Resize options.
 -   _smartCrop_ Whether to use smart cropping (i.e. saliency-aware).
+-   _quality_ Desired quality (0-1).
 
 _Returns_
 
