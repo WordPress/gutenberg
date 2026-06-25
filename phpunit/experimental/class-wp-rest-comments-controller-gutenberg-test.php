@@ -836,7 +836,12 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 				'Gutenberg_REST_Comment_Suggestions_Controller',
 				'is_suggestion_lifecycle_update'
 			);
-			$reflection->setAccessible( true );
+			// PHP < 8.1 requires explicit accessibility to invoke a private
+			// method; from 8.1 it is automatic and setAccessible() is a no-op
+			// that 8.5 deprecates, so only call it on older versions.
+			if ( PHP_VERSION_ID < 80100 ) {
+				$reflection->setAccessible( true );
+			}
 
 			$this->assertSame(
 				$case['expected'],
@@ -868,7 +873,12 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			'Gutenberg_REST_Comment_Suggestions_Controller',
 			'is_suggestion_lifecycle_update'
 		);
-		$reflection->setAccessible( true );
+		// PHP < 8.1 requires explicit accessibility to invoke a private
+		// method; from 8.1 it is automatic and setAccessible() is a no-op
+		// that 8.5 deprecates, so only call it on older versions.
+		if ( PHP_VERSION_ID < 80100 ) {
+			$reflection->setAccessible( true );
+		}
 		$this->assertTrue( $reflection->invoke( null, $request ) );
 	}
 }
