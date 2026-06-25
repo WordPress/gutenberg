@@ -261,7 +261,73 @@ describe( 'Waveform utilities', () => {
 			);
 		} );
 
-		it( 'keeps aria value attributes in sync on time and duration changes', () => {
+		it( 'substitutes non-positional and repeated value-text placeholders', () => {
+			// Translators may localize the "%1$s of %2$s" template using
+			// non-positional ("%s of %s") or repeated placeholders, both of
+			// which PHP sprintf accepts. Every placeholder must still resolve,
+			// or the raw "%s"/"%1$s" leaks into the announced value text.
+			const nonPositional = createSeekControlFixture();
+			setupSeekControlAccessibility(
+				nonPositional.container,
+				nonPositional.instance,
+				{ valueText: '%s of %s' }
+			);
+			expect( nonPositional.seekControl ).toHaveAttribute(
+				'aria-valuetext',
+				'0:45 of 3:00'
+			);
+
+			document.body.innerHTML = '';
+
+			const repeated = createSeekControlFixture();
+			setupSeekControlAccessibility(
+				repeated.container,
+				repeated.instance,
+				{ valueText: '%1$s / %1$s of %2$s' }
+			);
+			expect( repeated.seekControl ).toHaveAttribute(
+				'aria-valuetext',
+				'0:45 / 0:45 of 3:00'
+			);
+		} );
+
+		it( 'does not change the announced value during passive playback', () => {
+			const { audio, container, instance, seekControl } =
+				createSeekControlFixture( { duration: 180, currentTime: 0 } );
+
+			setupSeekControlAccessibility( container, instance );
+			expect( seekControl ).toHaveAttribute( 'aria-valuenow', '0' );
+
+			// Unfocused playback must not change the announced value.
+			audio.currentTime = 30;
+			instance.options.onTimeUpdate( 30, 180, instance );
+			expect( seekControl ).toHaveAttribute( 'aria-valuenow', '0' );
+
+			// Focusing refreshes the value to the current position once, so a
+			// screen reader reads the live time when navigating onto it.
+			seekControl.focus();
+			expect( seekControl ).toHaveAttribute( 'aria-valuenow', '30' );
+
+			// Continued playback must NOT keep updating it, even while focused:
+			// browser focus lingers on the slider after a screen reader's
+			// virtual cursor moves away, which would otherwise announce every
+			// tick.
+			audio.currentTime = 90;
+			instance.options.onTimeUpdate( 90, 180, instance );
+			expect( seekControl ).toHaveAttribute( 'aria-valuenow', '30' );
+
+			// Play and end events are not seeks either, so they leave the
+			// announced value untouched while the slider holds focus.
+			container.dispatchEvent( new CustomEvent( 'waveformplayer:play' ) );
+			audio.currentTime = 120;
+			instance.options.onTimeUpdate( 120, 180, instance );
+			container.dispatchEvent(
+				new CustomEvent( 'waveformplayer:ended' )
+			);
+			expect( seekControl ).toHaveAttribute( 'aria-valuenow', '30' );
+		} );
+
+		it( 'updates the announced value on metadata change but not playback', () => {
 			const { audio, container, instance, seekControl } =
 				createSeekControlFixture( {
 					duration: 60,
@@ -270,6 +336,7 @@ describe( 'Waveform utilities', () => {
 
 			setupSeekControlAccessibility( container, instance );
 
+			// Metadata (duration) changes update the baseline value.
 			audio.duration = 90;
 			audio.currentTime = 30;
 			audio.dispatchEvent( new Event( 'durationchange' ) );
@@ -281,14 +348,12 @@ describe( 'Waveform utilities', () => {
 				'0:30 of 1:30'
 			);
 
+			// A playback tick leaves the announced value alone, even focused.
+			seekControl.focus();
 			audio.currentTime = 45;
 			instance.options.onTimeUpdate( 45, 90, instance );
 
-			expect( seekControl ).toHaveAttribute( 'aria-valuenow', '45' );
-			expect( seekControl ).toHaveAttribute(
-				'aria-valuetext',
-				'0:45 of 1:30'
-			);
+			expect( seekControl ).toHaveAttribute( 'aria-valuenow', '30' );
 		} );
 
 		it( 'seeks exactly once on arrow keydown', () => {

@@ -196,9 +196,18 @@ function getSeekControlLabel( label ) {
  * @return {string} Formatted seek value text.
  */
 function formatSeekValueText( template, currentTime, duration ) {
-	return ( template || DEFAULT_SEEK_VALUE_TEXT )
-		.replace( '%1$s', currentTime )
-		.replace( '%2$s', duration );
+	const args = [ currentTime, duration ];
+	let sequentialIndex = 0;
+	// Substitute both positional (%1$s/%2$s) and non-positional (%s)
+	// placeholders, replacing every occurrence, so any printf-style
+	// translation of the template resolves the same way PHP sprintf would.
+	return ( template || DEFAULT_SEEK_VALUE_TEXT ).replace(
+		/%(?:(\d+)\$)?s/g,
+		( match, position ) => {
+			const index = position ? Number( position ) - 1 : sequentialIndex++;
+			return args[ index ] ?? match;
+		}
+	);
 }
 
 /**
@@ -262,6 +271,13 @@ export function setupSeekControlAccessibility(
 	const updateSeekControl = ( {
 		syncPlayhead = isPlaying,
 		currentTimeOverride,
+		// The announced value attributes (aria-valuenow/valuetext) are only
+		// refreshed for discrete events — a user seek, metadata load, or the
+		// slider gaining focus (default true). Passive playback ticks pass
+		// `false`: the value must not change continuously, because browser
+		// focus lingers on the slider after a screen reader's virtual cursor
+		// moves away, and any value change on a focused slider is announced.
+		syncAria = true,
 	} = {} ) => {
 		const duration = getFiniteTime( audio.duration );
 		const currentTime = Math.min(
@@ -272,16 +288,18 @@ export function setupSeekControlAccessibility(
 			playheadTime = currentTime;
 		}
 
-		seekControl.setAttribute( 'aria-valuemax', String( duration ) );
-		seekControl.setAttribute( 'aria-valuenow', String( currentTime ) );
-		seekControl.setAttribute(
-			'aria-valuetext',
-			formatSeekValueText(
-				valueText,
-				formatTimestamp( currentTime ),
-				formatTimestamp( duration )
-			)
-		);
+		if ( syncAria ) {
+			seekControl.setAttribute( 'aria-valuemax', String( duration ) );
+			seekControl.setAttribute( 'aria-valuenow', String( currentTime ) );
+			seekControl.setAttribute(
+				'aria-valuetext',
+				formatSeekValueText(
+					valueText,
+					formatTimestamp( currentTime ),
+					formatTimestamp( duration )
+				)
+			);
+		}
 
 		positionOverlay( playhead, playheadTime, duration );
 	};
@@ -297,10 +315,20 @@ export function setupSeekControlAccessibility(
 		updateSeekControl( {
 			syncPlayhead: true,
 			currentTimeOverride: currentTime,
+			// Never announce during passive playback (see syncAria above); the
+			// playhead overlay still tracks the position visually.
+			syncAria: false,
 		} );
 		originalOnTimeUpdate?.( currentTime, duration, player );
 	};
 	instance.options.onTimeUpdate = onTimeUpdate;
+
+	// Refresh the announced value when focus lands on the slider, so a screen
+	// reader reads the live position rather than a stale one left over from
+	// before playback advanced while unfocused.
+	const onSeekFocus = () => {
+		updateSeekControl( { syncPlayhead: false } );
+	};
 
 	const seekTo = ( seconds ) => {
 		playheadTime = Math.max(
@@ -405,7 +433,9 @@ export function setupSeekControlAccessibility(
 
 	const onPlay = () => {
 		isPlaying = true;
-		updateSeekControl();
+		// Keep the playhead overlay and internal state current, but don't
+		// announce — only focus and user seeks should speak (see syncAria).
+		updateSeekControl( { syncAria: false } );
 	};
 	const onPause = () => {
 		isPlaying = false;
@@ -416,10 +446,12 @@ export function setupSeekControlAccessibility(
 		updateSeekControl( {
 			syncPlayhead: false,
 			currentTimeOverride: playheadTime,
+			syncAria: false,
 		} );
 	};
 
 	seekControl.addEventListener( 'keydown', onKeyDown, true );
+	seekControl.addEventListener( 'focus', onSeekFocus );
 	container.addEventListener( 'click', onContainerClickCapture, true );
 	container.addEventListener( 'click', onContainerClick );
 	container.addEventListener( 'focusin', onContainerFocusIn );
@@ -433,6 +465,7 @@ export function setupSeekControlAccessibility(
 
 	return () => {
 		seekControl.removeEventListener( 'keydown', onKeyDown, true );
+		seekControl.removeEventListener( 'focus', onSeekFocus );
 		container.removeEventListener( 'click', onContainerClickCapture, true );
 		container.removeEventListener( 'click', onContainerClick );
 		container.removeEventListener( 'focusin', onContainerFocusIn );
