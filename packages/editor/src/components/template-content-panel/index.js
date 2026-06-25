@@ -41,7 +41,7 @@ function TemplateContentPanelInner( { postType } ) {
 	}
 
 	return (
-		<PanelBody title={ __( 'Content' ) }>
+		<PanelBody title={ __( 'Content' ) } initialOpen>
 			<BlockQuickNavigation
 				clientIds={ clientIds }
 				onSelect={ () => {

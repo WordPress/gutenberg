@@ -10,7 +10,10 @@ import { useCallback, useContext, useEffect, useRef } from '@wordpress/element';
 import { isRTL, __, _x } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
+import {
+	PanelBody,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { store as interfaceStore } from '@wordpress/interface';
 
 /**
@@ -22,6 +25,10 @@ import PluginSidebar from '../plugin-sidebar';
 import PostSummary from './post-summary';
 import PostRevisionSummary from './post-revision-summary';
 import InlineTemplatePartSummary from './inline-template-part-summary';
+import PageLayoutPanel from '../post-template/page-layout-panel';
+import PostCardPanel from '../post-card-panel';
+import PostPanelSection from '../post-panel-section';
+import PostStatusPanel from '../post-status';
 import PostTaxonomiesPanel from '../post-taxonomies/panel';
 import PostTransformPanel from '../post-transform-panel';
 import SidebarHeader from './header';
@@ -43,6 +50,32 @@ import {
 const { Tabs } = unlock( componentsPrivateApis );
 
 const SIDEBAR_ACTIVE_BY_DEFAULT = true;
+const PAGE_DETAILS_EXCLUDED_FIELD_IDS = [ 'status' ];
+
+const PageSidebarOverview = ( { onActionPerformed } ) => {
+	const { postType, postId } = useSelect( ( select ) => {
+		const { getCurrentPostType, getCurrentPostId } = select( editorStore );
+		return {
+			postType: getCurrentPostType(),
+			postId: getCurrentPostId(),
+		};
+	}, [] );
+
+	if ( postType !== 'page' ) {
+		return null;
+	}
+
+	return (
+		<PostPanelSection className="editor-sidebar__page-overview">
+			<PostCardPanel
+				postType={ postType }
+				postId={ postId }
+				onActionPerformed={ onActionPerformed }
+			/>
+			<PostStatusPanel />
+		</PostPanelSection>
+	);
+};
 
 const SidebarContent = ( {
 	tabName,
@@ -102,11 +135,35 @@ const SidebarContent = ( {
 			</>
 		);
 	} else {
+		const isPageEntity = postType === 'page';
+		const postSummary = (
+			<PostSummary onActionPerformed={ onActionPerformed } />
+		);
+		const pageDetailsPanel = (
+			<PanelBody
+				title={ __( 'Details' ) }
+				initialOpen={ false }
+				className="editor-sidebar__details-panel"
+			>
+				<PostSummary
+					onActionPerformed={ onActionPerformed }
+					hidePostCard
+					excludedFieldIds={ PAGE_DETAILS_EXCLUDED_FIELD_IDS }
+				/>
+			</PanelBody>
+		);
 		tabContent = (
 			<>
-				<PostSummary onActionPerformed={ onActionPerformed } />
-				<PluginDocumentSettingPanel.Slot />
+				{ isPageEntity ? (
+					<PageSidebarOverview
+						onActionPerformed={ onActionPerformed }
+					/>
+				) : (
+					postSummary
+				) }
+				{ isPageEntity && <PageLayoutPanel /> }
 				<TemplateContentPanel />
+				<PluginDocumentSettingPanel.Slot />
 				{ window?.__experimentalDataFormInspector &&
 					[ 'page', 'post' ].includes( postType ) && (
 						<TemplateActionsPanel />
@@ -116,6 +173,7 @@ const SidebarContent = ( {
 				<PostTaxonomiesPanel />
 				<PatternOverridesPanel />
 				{ extraPanels }
+				{ isPageEntity && pageDetailsPanel }
 			</>
 		);
 	}
