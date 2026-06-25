@@ -8,11 +8,51 @@
 
 class WP_Duotone_Gutenberg_Test extends WP_UnitTestCase {
 	/**
+	 * @var string|null
+	 */
+	private $theme_root;
+
+	/**
+	 * @var array|null
+	 */
+	private $orig_theme_dir;
+
+	/**
 	 * Cleans up CSS added to block-supports from duotone styles. We need to do this
 	 * in order to avoid impacting other tests.
 	 */
 	public static function wpTearDownAfterClass() {
 		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
+	}
+
+	public function set_up() {
+		parent::set_up();
+
+		$this->theme_root     = realpath( __DIR__ . '/data/themedir1' );
+		$this->orig_theme_dir = $GLOBALS['wp_theme_directories'];
+
+		// /themes is necessary as theme.php functions assume /themes is the root if there is only one root.
+		$GLOBALS['wp_theme_directories'] = array( WP_CONTENT_DIR . '/themes', $this->theme_root );
+
+		add_filter( 'theme_root', array( $this, 'filter_set_theme_root' ) );
+		add_filter( 'stylesheet_root', array( $this, 'filter_set_theme_root' ) );
+		add_filter( 'template_root', array( $this, 'filter_set_theme_root' ) );
+
+		wp_clean_themes_cache();
+		unset( $GLOBALS['wp_themes'] );
+	}
+
+	public function tear_down() {
+		$GLOBALS['wp_theme_directories'] = $this->orig_theme_dir;
+		wp_clean_themes_cache();
+		unset( $GLOBALS['wp_themes'] );
+		WP_Theme_JSON_Resolver::clean_cached_data();
+
+		parent::tear_down();
+	}
+
+	public function filter_set_theme_root() {
+		return $this->theme_root;
 	}
 
 	public function test_gutenberg_render_duotone_support_preset() {
@@ -49,37 +89,12 @@ class WP_Duotone_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	public function test_gutenberg_restore_image_outer_container_moves_duotone_class_to_wrapper() {
-		$theme_root                      = realpath( __DIR__ . '/data/themedir1' );
-		$original_theme_dirs             = $GLOBALS['wp_theme_directories'];
-		$original_stylesheet             = get_stylesheet();
-		$filter_set_theme_root           = static function () use ( $theme_root ) {
-			return $theme_root;
-		};
-		$GLOBALS['wp_theme_directories'] = array( WP_CONTENT_DIR . '/themes', $theme_root );
+		switch_theme( 'default' );
 
-		add_filter( 'theme_root', $filter_set_theme_root );
-		add_filter( 'stylesheet_root', $filter_set_theme_root );
-		add_filter( 'template_root', $filter_set_theme_root );
-		wp_clean_themes_cache();
-		unset( $GLOBALS['wp_themes'] );
+		$block_content = '<div class="wp-block-image"><figure class="alignright wp-duotone-blue-orange size-full"><img src="/my-image.jpg"/></figure></div>';
+		$expected      = '<div class="wp-block-image wp-duotone-blue-orange"><figure class="alignright size-full"><img src="/my-image.jpg"/></figure></div>';
 
-		try {
-			switch_theme( 'default' );
-
-			$block_content = '<div class="wp-block-image"><figure class="alignright wp-duotone-blue-orange size-full"><img src="/my-image.jpg"/></figure></div>';
-			$expected      = '<div class="wp-block-image wp-duotone-blue-orange"><figure class="alignright size-full"><img src="/my-image.jpg"/></figure></div>';
-
-			$this->assertSame( $expected, WP_Duotone_Gutenberg::restore_image_outer_container( $block_content ) );
-		} finally {
-			switch_theme( $original_stylesheet );
-			remove_filter( 'theme_root', $filter_set_theme_root );
-			remove_filter( 'stylesheet_root', $filter_set_theme_root );
-			remove_filter( 'template_root', $filter_set_theme_root );
-			$GLOBALS['wp_theme_directories'] = $original_theme_dirs;
-			wp_clean_themes_cache();
-			unset( $GLOBALS['wp_themes'] );
-			WP_Theme_JSON_Resolver::clean_cached_data();
-		}
+		$this->assertSame( $expected, WP_Duotone_Gutenberg::restore_image_outer_container( $block_content ) );
 	}
 
 
