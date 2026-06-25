@@ -7,7 +7,7 @@
 	margin-block-start: var(--wp-components-divider-margin-start, 0);
 	margin-block-end: var(--wp-components-divider-margin-end, 0);
 
-	&[aria-orientation="vertical"] {
+	&:where([aria-orientation="vertical"]) {
 		display: inline;
 		border-block-end: 0;
 		border-inline-end: 1px solid currentColor;
