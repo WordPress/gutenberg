@@ -22,7 +22,17 @@ const RichTextToolbarButtonUnsafe =
 const name = 'core/language';
 const title = __( 'Language' );
 
-export const language = {
+export const language: {
+	name: string;
+	title: string;
+	tagName: string;
+	className: null;
+	attributes: {
+		lang: string;
+		dir: string;
+	};
+	edit: ( props: LanguageEditProps ) => JSX.Element;
+} = {
 	name,
 	title,
 	tagName: 'bdo',
@@ -75,10 +85,9 @@ function InlineLanguageUI( {
 	onClose,
 }: InlineLanguageUIProps ) {
 	const popoverAnchor = useAnchor( {
-		editableContentElement:
-			// eslint-disable-next-line react-hooks/refs
-			contentRef.current as HTMLElement | null,
-		settings: language as any,
+		// eslint-disable-next-line react-hooks/refs
+		editableContentElement: contentRef.current as HTMLElement | null,
+		settings: language as typeof language,
 	} );
 
 	const [ lang, setLang ] = useState( '' );

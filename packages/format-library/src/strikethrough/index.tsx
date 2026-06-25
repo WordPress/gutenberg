@@ -7,7 +7,7 @@ import {
 } from '@wordpress/block-editor';
 import { formatStrikethrough } from '@wordpress/icons';
 
-interface StrikethroughEditProps {
+export interface StrikethroughEditProps {
 	value: RichTextValue;
 	onChange: ( value: RichTextValue ) => void;
 	isActive: boolean;

@@ -2,7 +2,8 @@
  * Stores the type of a rich text format, such as core/bold.
  */
 export type RichTextFormat = {
-	title: string;
+	title?: string;
+	attributes?: Record< string, string >;
 	type:
 		| 'core/bold'
 		| 'core/italic'

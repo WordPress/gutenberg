@@ -7,6 +7,7 @@ import {
 	textColor as textColorIcon,
 } from '@wordpress/icons';
 import { removeFormat } from '@wordpress/rich-text';
+import type { RichTextValue } from '@wordpress/rich-text';
 import { default as InlineColorUI, getActiveColors } from './inline';
 
 export const transparentValue = 'rgba(0, 0, 0, 0)';
@@ -14,13 +15,16 @@ export const transparentValue = 'rgba(0, 0, 0, 0)';
 const name = 'core/text-color';
 const title = __( 'Highlight' );
 
-const EMPTY_ARRAY = [];
+const EMPTY_ARRAY: string[] = [];
 
-function getComputedStyleProperty( element, property ) {
+const RichTextToolbarButtonUnsafe =
+	RichTextToolbarButton as React.ComponentType< any >;
+
+function getComputedStyleProperty( element: HTMLElement, property: string ) {
 	const { ownerDocument } = element;
 	const { defaultView } = ownerDocument;
-	const style = defaultView.getComputedStyle( element );
-	const value = style.getPropertyValue( property );
+	const style = defaultView?.getComputedStyle( element );
+	const value = style?.getPropertyValue( property );
 
 	if (
 		property === 'background-color' &&
@@ -33,7 +37,10 @@ function getComputedStyleProperty( element, property ) {
 	return value;
 }
 
-function fillComputedColors( element, { color, backgroundColor } ) {
+function fillComputedColors(
+	element: HTMLElement,
+	{ color, backgroundColor }: { color?: string; backgroundColor?: string }
+) {
 	if ( ! color && ! backgroundColor ) {
 		return;
 	}
@@ -53,6 +60,12 @@ function TextColorEdit( {
 	isActive,
 	activeAttributes,
 	contentRef,
+}: {
+	value: RichTextValue;
+	onChange: ( value: RichTextValue ) => void;
+	isActive: boolean;
+	activeAttributes: Record< string, string >;
+	contentRef: React.RefObject< HTMLElement >;
 } ) {
 	const [ allowCustomControl, colors = EMPTY_ARRAY ] = useSettings(
 		'color.custom',
@@ -62,7 +75,7 @@ function TextColorEdit( {
 	const colorIndicatorStyle = useMemo(
 		() =>
 			fillComputedColors(
-				contentRef.current,
+				contentRef.current as HTMLElement,
 				getActiveColors( value, name, colors )
 			),
 		[ contentRef, value, colors ]
@@ -75,7 +88,7 @@ function TextColorEdit( {
 
 	return (
 		<>
-			<RichTextToolbarButton
+			<RichTextToolbarButtonUnsafe
 				className="format-library-text-color-button"
 				isActive={ isActive }
 				icon={
@@ -101,6 +114,7 @@ function TextColorEdit( {
 				<InlineColorUI
 					name={ name }
 					onClose={ () => setIsAddingColor( false ) }
+					// @ts-expect-error -- InlineColorUI does not have a type for activeAttributes yet.
 					activeAttributes={ activeAttributes }
 					value={ value }
 					onChange={ onChange }

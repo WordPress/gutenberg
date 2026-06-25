@@ -6,7 +6,7 @@ import { RichTextShortcut } from '@wordpress/block-editor';
 const name = 'core/non-breaking-space';
 const title = __( 'Non breaking space' );
 
-interface NonBreakingSpaceEditProps {
+export interface NonBreakingSpaceEditProps {
 	value: RichTextValue;
 	onChange: ( value: RichTextValue ) => void;
 }

@@ -4,6 +4,7 @@ import {
 	RichTextShortcut,
 	__unstableRichTextInputEvent,
 } from '@wordpress/block-editor';
+import type { RichTextValue } from '@wordpress/rich-text';
 
 const name = 'core/underline';
 const title = __( 'Underline' );
@@ -16,7 +17,13 @@ export const underline = {
 	attributes: {
 		style: 'style',
 	},
-	edit( { value, onChange } ) {
+	edit( {
+		value,
+		onChange,
+	}: {
+		value: RichTextValue;
+		onChange: ( value: RichTextValue ) => void;
+	} ) {
 		const onToggle = () => {
 			onChange(
 				toggleFormat( value, {

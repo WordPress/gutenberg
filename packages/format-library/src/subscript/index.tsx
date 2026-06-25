@@ -9,7 +9,7 @@ const title = __( 'Subscript' );
 const RichTextToolbarButtonUnsafe =
 	RichTextToolbarButton as React.ComponentType< any >;
 
-interface SubscriptEditProps {
+export interface SubscriptEditProps {
 	isActive: boolean;
 	value: any;
 	onChange: ( value: any ) => void;
