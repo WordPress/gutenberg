@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed from the following:
+    -   `BorderBoxControl` ([#79420](https://github.com/WordPress/gutenberg/pull/79420))
+    -   `FontSizePicker` ([#79481](https://github.com/WordPress/gutenberg/pull/79481))
+
 ### Internal
 
 -   `Surface`: Migrate styles from Emotion to SCSS Modules and use WPDS tokens for migrated visual values ([#79445](https://github.com/WordPress/gutenberg/pull/79445)).
@@ -10,9 +16,9 @@
 
 ### Breaking Changes
 
--   The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed ([#79386](https://github.com/WordPress/gutenberg/pull/79386), [#79419](https://github.com/WordPress/gutenberg/pull/79419)):
-    -   `BoxControl`
-    -   `TextControl`
+-   The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed from the following:
+    -   `BoxControl` ([#79419](https://github.com/WordPress/gutenberg/pull/79419))
+    -   `TextControl` ([#79386](https://github.com/WordPress/gutenberg/pull/79386))
 
 ### Enhancements
 
