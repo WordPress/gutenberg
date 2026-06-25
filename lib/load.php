@@ -74,6 +74,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.1/rest-api.php';
 	require __DIR__ . '/compat/wordpress-7.1/collaboration.php';
 	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-rest-comment-suggestions-controller.php';
+	require __DIR__ . '/compat/wordpress-6.9/block-comments.php';
 	require __DIR__ . '/compat/wordpress-7.1/block-comment-suggestions.php';
 	require __DIR__ . '/compat/wordpress-7.1/block-bindings.php';
 	require __DIR__ . '/compat/wordpress-6.9/block-comments.php';
