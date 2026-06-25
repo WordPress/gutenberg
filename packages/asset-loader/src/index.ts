@@ -133,6 +133,10 @@ function loadScript( handle: string, scriptData: Script ): HTMLScriptElement {
 	return script;
 }
 
+function isScriptLoaded( handle: string ) {
+	return !! document.getElementById( handle + '-js' );
+}
+
 // Function to inject inline styles
 function injectInlineStyle(
 	handle: string,
@@ -383,6 +387,10 @@ async function loadAssets(
 	const scriptElements: HTMLScriptElement[] = [];
 
 	for ( const handle of orderedScripts ) {
+		if ( isScriptLoaded( handle ) ) {
+			continue;
+		}
+
 		const beforeInline = inlineScripts.before?.[ handle ];
 		if ( beforeInline ) {
 			scriptElements.push(
