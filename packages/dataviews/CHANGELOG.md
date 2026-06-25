@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+- DataViews: Stop infinite-scroll anchor restoration from undoing the user's scrolling while a page loads asynchronously, which made the list jump upward as each page settled. [#79546](https://github.com/WordPress/gutenberg/pull/79546)
+
 ## 17.1.0 (2026-07-01)
 
 ## 17.0.0 (2026-06-24)

@@ -28,6 +28,7 @@ function captureAnchorElement(
 	anchorElementRef: React.MutableRefObject< {
 		posinset: number;
 		viewportOffset: number;
+		scrollTop: number;
 		direction: 'up' | 'down' | null;
 	} | null >,
 	direction: 'up' | 'down'
@@ -61,6 +62,7 @@ function captureAnchorElement(
 	anchorElementRef.current = {
 		posinset,
 		viewportOffset: anchorRect.top - containerRect.top,
+		scrollTop: container.scrollTop,
 		direction,
 	};
 	return true;
@@ -95,6 +97,7 @@ export function useInfiniteScroll( {
 	const anchorElementRef = useRef< {
 		posinset: number;
 		viewportOffset: number;
+		scrollTop: number;
 		direction: 'up' | 'down' | null;
 	} | null >( null );
 	const viewRef = useRef( view );
@@ -174,8 +177,16 @@ export function useInfiniteScroll( {
 			const anchorRect = anchorElement.getBoundingClientRect();
 			const currentOffset = anchorRect.top - containerRect.top;
 
-			// Calculate how much the anchor has moved and adjust scroll to compensate
-			const scrollAdjustment = currentOffset - anchor.viewportOffset;
+			// Compensate only for the content-driven shift, not for any scrolling
+			// the user did between capture (in the throttled scroll handler) and
+			// this restoration (which is gated on `isLoading`). When pages load
+			// asynchronously the user keeps scrolling in that gap; adding back the
+			// intervening scroll delta prevents the list from snapping back to the
+			// capture-time position and undoing that scroll.
+			const scrollAdjustment =
+				currentOffset -
+				anchor.viewportOffset +
+				( container.scrollTop - anchor.scrollTop );
 
 			if ( Math.abs( scrollAdjustment ) > 1 ) {
 				container.scrollTop += scrollAdjustment;
