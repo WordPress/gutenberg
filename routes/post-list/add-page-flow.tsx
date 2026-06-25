@@ -345,6 +345,27 @@ function replacePostContentBlocks(
 	};
 }
 
+function removePostFeaturedImageBlocks( blocks: any[] ): any[] {
+	return blocks.flatMap( ( block ) => {
+		if ( block.name === 'core/post-featured-image' ) {
+			return [];
+		}
+
+		const innerBlocks = block.innerBlocks?.length
+			? removePostFeaturedImageBlocks( block.innerBlocks )
+			: block.innerBlocks;
+
+		return [
+			innerBlocks === block.innerBlocks
+				? block
+				: {
+						...block,
+						innerBlocks,
+				  },
+		];
+	} );
+}
+
 function getPatternPreviewBlocks(
 	pattern: BlockPattern,
 	pageTemplateContent?: string
@@ -352,7 +373,7 @@ function getPatternPreviewBlocks(
 	const patternBlocks = parse( pattern.content );
 
 	if ( ! pageTemplateContent ) {
-		return patternBlocks;
+		return removePostFeaturedImageBlocks( patternBlocks as any[] );
 	}
 
 	const templateBlocks = parse( pageTemplateContent );
@@ -361,7 +382,9 @@ function getPatternPreviewBlocks(
 		patternBlocks as any[]
 	);
 
-	return preview.didReplace ? preview.blocks : patternBlocks;
+	return removePostFeaturedImageBlocks(
+		preview.didReplace ? preview.blocks : ( patternBlocks as any[] )
+	);
 }
 
 function usePageLayoutPatterns() {
