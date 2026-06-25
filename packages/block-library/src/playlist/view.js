@@ -11,8 +11,7 @@ import {
 	logPlayError,
 	updateSeekControlLabel,
 	setupPlayButtonArtwork,
-	getNextShuffledTrack,
-	isShuffleCycleComplete,
+	getPlaylistPlaybackAction,
 } from '../utils/waveform-utils';
 
 /**
@@ -157,18 +156,6 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 		repeat: ref.dataset.labelRepeat,
 	};
 
-	// Advance to the next shuffled track, recording it so no track repeats
-	// until every other track has played once.
-	const advanceShuffled = () => {
-		const { nextId, playedIds } = getNextShuffledTrack(
-			context.tracks,
-			context.currentId,
-			context.playedTracks
-		);
-		context.playedTracks = playedIds;
-		context.currentId = nextId;
-	};
-
 	// Initialize using the shared core.
 	const player = initWaveformPlayer( ref, {
 		src: track.url,
@@ -180,30 +167,22 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 		labels,
 		waveformStyle: context.waveformStyle,
 		onEnded: () => {
-			if ( context.isRepeating ) {
+			const { action, nextId, playedIds } = getPlaylistPlaybackAction(
+				context.tracks,
+				context.currentId,
+				{
+					isRepeating: context.isRepeating,
+					isShuffled: context.isShuffled,
+					playedTracks: context.playedTracks,
+				}
+			);
+			context.playedTracks = playedIds;
+			if ( action === 'repeat' ) {
 				player.instance.play()?.catch( logPlayError );
 				return;
 			}
-			if ( context.isShuffled ) {
-				if (
-					isShuffleCycleComplete(
-						context.tracks,
-						context.currentId,
-						context.playedTracks
-					)
-				) {
-					return;
-				}
-				advanceShuffled();
-				return;
-			}
-			// Advance to next track (autoPlay handles playback).
-			const currentIndex = context.tracks.findIndex(
-				( trackId ) => trackId === context.currentId
-			);
-			const nextTrack = context.tracks[ currentIndex + 1 ];
-			if ( nextTrack ) {
-				context.currentId = nextTrack;
+			if ( nextId ) {
+				context.currentId = nextId;
 			}
 		},
 		onPrev: () => {
@@ -218,17 +197,19 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 			}
 		},
 		onNext: () => {
-			if ( context.isShuffled ) {
-				advanceShuffled();
-				return;
-			}
-			const currentIndex = context.tracks.findIndex(
-				( uniqueId ) => uniqueId === context.currentId
+			const { nextId, playedIds } = getPlaylistPlaybackAction(
+				context.tracks,
+				context.currentId,
+				{
+					isRepeating: context.isRepeating,
+					isShuffled: context.isShuffled,
+					playedTracks: context.playedTracks,
+					isUserInitiated: true,
+				}
 			);
-			const nextTrack =
-				context.tracks[ currentIndex + 1 ] || context.tracks[ 0 ];
-			if ( nextTrack ) {
-				context.currentId = nextTrack;
+			context.playedTracks = playedIds;
+			if ( nextId ) {
+				context.currentId = nextId;
 			}
 		},
 		onShuffleToggle: () => {

@@ -71,6 +71,69 @@ export function isShuffleCycleComplete( trackIds, currentId, playedIds = [] ) {
 }
 
 /**
+ * Get the next playlist playback action for track end or skip controls.
+ *
+ * Repeat only applies when a track ends. User-initiated skip controls still
+ * advance through the playlist, using shuffle when it is active.
+ *
+ * @param {string[]} trackIds                - All track unique IDs, in playlist order.
+ * @param {string}   currentId               - The current track ID.
+ * @param {Object}   options                 - Playback state.
+ * @param {boolean}  options.isRepeating     - Whether repeat is active.
+ * @param {boolean}  options.isShuffled      - Whether shuffle is active.
+ * @param {string[]} options.playedTracks    - Shuffled tracks already played in the current cycle.
+ * @param {boolean}  options.isUserInitiated - Whether this action came from a skip control.
+ * @return {{action: string, nextId: (string|undefined), playedIds: string[]}} Playback action and updated shuffle state.
+ */
+export function getPlaylistPlaybackAction(
+	trackIds,
+	currentId,
+	{
+		isRepeating = false,
+		isShuffled = false,
+		playedTracks = [],
+		isUserInitiated = false,
+	} = {}
+) {
+	if ( ! trackIds.length || ! currentId ) {
+		return { action: 'stop', nextId: undefined, playedIds: playedTracks };
+	}
+
+	if ( isRepeating && ! isUserInitiated ) {
+		return { action: 'repeat', nextId: currentId, playedIds: playedTracks };
+	}
+
+	if ( isShuffled ) {
+		if (
+			! isUserInitiated &&
+			isShuffleCycleComplete( trackIds, currentId, playedTracks )
+		) {
+			return {
+				action: 'stop',
+				nextId: undefined,
+				playedIds: playedTracks,
+			};
+		}
+		const { nextId, playedIds } = getNextShuffledTrack(
+			trackIds,
+			currentId,
+			playedTracks
+		);
+		return { action: 'advance', nextId, playedIds };
+	}
+
+	const currentIndex = trackIds.findIndex( ( id ) => id === currentId );
+	const nextId =
+		trackIds[ currentIndex + 1 ] || ( isUserInitiated && trackIds[ 0 ] );
+
+	if ( nextId ) {
+		return { action: 'advance', nextId, playedIds: playedTracks };
+	}
+
+	return { action: 'stop', nextId: undefined, playedIds: playedTracks };
+}
+
+/**
  * Get computed style for an element, using ownerDocument for iframe compatibility.
  *
  * @param {Element} element - The element to get styles from.

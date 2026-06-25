@@ -15,6 +15,7 @@ import {
 	logPlayError,
 	getNextShuffledTrack,
 	isShuffleCycleComplete,
+	getPlaylistPlaybackAction,
 	refreshWaveformPlayerColors,
 	setupPlaylistControls,
 } from '../waveform-utils';
@@ -617,6 +618,96 @@ describe( 'Waveform utilities', () => {
 			expect(
 				isShuffleCycleComplete( [ 'a', 'b', 'c' ], 'b', [ 'a' ] )
 			).toBe( false );
+		} );
+	} );
+
+	describe( 'getPlaylistPlaybackAction', () => {
+		let randomSpy;
+
+		beforeEach( () => {
+			randomSpy = jest.spyOn( Math, 'random' ).mockReturnValue( 0 );
+		} );
+
+		afterEach( () => {
+			randomSpy.mockRestore();
+		} );
+
+		it( 'replays the current track when repeat is active and a track ends', () => {
+			expect(
+				getPlaylistPlaybackAction( [ 'a', 'b', 'c' ], 'b', {
+					isRepeating: true,
+				} )
+			).toEqual( {
+				action: 'repeat',
+				nextId: 'b',
+				playedIds: [],
+			} );
+		} );
+
+		it( 'loads the next track in order when repeat is active and skip is pressed', () => {
+			expect(
+				getPlaylistPlaybackAction( [ 'a', 'b', 'c' ], 'b', {
+					isRepeating: true,
+					isUserInitiated: true,
+				} )
+			).toEqual( {
+				action: 'advance',
+				nextId: 'c',
+				playedIds: [],
+			} );
+		} );
+
+		it( 'loads a shuffled track when shuffle is active and a track ends', () => {
+			expect(
+				getPlaylistPlaybackAction( [ 'a', 'b', 'c' ], 'a', {
+					isShuffled: true,
+				} )
+			).toEqual( {
+				action: 'advance',
+				nextId: 'b',
+				playedIds: [ 'a', 'b' ],
+			} );
+		} );
+
+		it( 'loads a shuffled track when shuffle is active and skip is pressed', () => {
+			expect(
+				getPlaylistPlaybackAction( [ 'a', 'b', 'c' ], 'a', {
+					isShuffled: true,
+					isUserInitiated: true,
+				} )
+			).toEqual( {
+				action: 'advance',
+				nextId: 'b',
+				playedIds: [ 'a', 'b' ],
+			} );
+		} );
+
+		it( 'replays the current track when repeat and shuffle are active and a track ends', () => {
+			expect(
+				getPlaylistPlaybackAction( [ 'a', 'b', 'c' ], 'b', {
+					isRepeating: true,
+					isShuffled: true,
+					playedTracks: [ 'a', 'b' ],
+				} )
+			).toEqual( {
+				action: 'repeat',
+				nextId: 'b',
+				playedIds: [ 'a', 'b' ],
+			} );
+		} );
+
+		it( 'loads a shuffled track when repeat and shuffle are active and skip is pressed', () => {
+			expect(
+				getPlaylistPlaybackAction( [ 'a', 'b', 'c' ], 'a', {
+					isRepeating: true,
+					isShuffled: true,
+					isUserInitiated: true,
+				} )
+			).toEqual( {
+				action: 'advance',
+				nextId: 'b',
+				playedIds: [ 'a', 'b' ],
+			} );
 		} );
 	} );
 
