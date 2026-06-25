@@ -128,7 +128,6 @@ export default {
 	'--wpds-color-stroke-surface-warning': '#e1bc7c',
 	'--wpds-color-stroke-surface-warning-strong': '#926300',
 	'--wpds-cursor-control': 'pointer',
-	'--wpds-dimension-base': '4px',
 	'--wpds-dimension-gap-2xl': '32px',
 	'--wpds-dimension-gap-3xl': '40px',
 	'--wpds-dimension-gap-lg': '16px',

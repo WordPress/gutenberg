@@ -2,11 +2,7 @@ import { Popover as _Popover } from '@base-ui/react/popover';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-import {
-	type ThemeProvider as ThemeProviderType,
-	privateApis as themePrivateApis,
-} from '@wordpress/theme';
-import { unlock } from '../lock-unlock';
+import { ThemeProvider } from '@wordpress/theme';
 import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
 import { renderSlotWithChildren } from '../utils/render-slot-with-children';
 import { PopoverValidationProvider } from './context';
@@ -14,9 +10,6 @@ import { Portal } from './portal';
 import { Positioner } from './positioner';
 import styles from './style.module.css';
 import type { PopupProps } from './types';
-
-const ThemeProvider: typeof ThemeProviderType =
-	unlock( themePrivateApis ).ThemeProvider;
 
 const CLOSE_ATTR = 'data-wp-ui-popover-close';
 

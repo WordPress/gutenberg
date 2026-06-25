@@ -8,6 +8,8 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
+import { useDispatch } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -24,13 +26,21 @@ export default function EnhancedPaginationModal( {
 } ) {
 	const [ isOpen, setOpen ] = useState( false );
 	const hasUnsupportedBlocks = useUnsupportedBlocks( clientId );
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 
 	useEffect( () => {
 		if ( enhancedPagination && hasUnsupportedBlocks ) {
+			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( { enhancedPagination: false } );
 			setOpen( true );
 		}
-	}, [ enhancedPagination, hasUnsupportedBlocks, setAttributes ] );
+	}, [
+		enhancedPagination,
+		hasUnsupportedBlocks,
+		setAttributes,
+		__unstableMarkNextChangeAsNotPersistent,
+	] );
 
 	const closeModal = () => {
 		setOpen( false );

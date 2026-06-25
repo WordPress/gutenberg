@@ -169,7 +169,6 @@ export function Edit( { attributes, setAttributes } ) {
 								help={ __(
 									'Briefly describe the icon to help screen reader users. Leave blank for decorative icons.'
 								) }
-								__next40pxDefaultSize
 							/>
 						) }
 					</DropdownMenu>
@@ -207,7 +206,6 @@ export function Edit( { attributes, setAttributes } ) {
 							onChange={ ( value ) =>
 								setAttributes( { ariaLabel: value } )
 							}
-							__next40pxDefaultSize
 						/>
 					</ToolsPanelItem>
 				</ToolsPanel>

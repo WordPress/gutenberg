@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/theme",
-	"version": "0.15.1",
+	"version": "0.16.0",
 	"description": "Theme and context provider for the WordPress Design System.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -79,8 +79,8 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
+		"@wordpress/compose": "file:../compose",
 		"@wordpress/element": "file:../element",
-		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/style-runtime": "file:../style-runtime",
 		"colorjs.io": "^0.6.0",
 		"memize": "^2.1.0"
