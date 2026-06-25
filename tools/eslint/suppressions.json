@@ -576,11 +576,6 @@
 			"count": 1
 		}
 	},
-	"packages/boot/src/components/sidebar/index.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
 	"packages/boot/src/index.tsx": {
 		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 2
@@ -1007,16 +1002,6 @@
 			"count": 1
 		}
 	},
-	"packages/compose/src/hooks/use-dragging/index.js": {
-		"react-hooks/immutability": {
-			"count": 1
-		}
-	},
-	"packages/compose/src/hooks/use-focus-return/index.js": {
-		"react-hooks/immutability": {
-			"count": 2
-		}
-	},
 	"packages/compose/src/hooks/use-merge-refs/index.ts": {
 		"react-hooks/refs": {
 			"count": 1
@@ -1345,11 +1330,6 @@
 			"count": 1
 		}
 	},
-	"packages/editor/src/components/post-revisions-panel/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
 	"packages/editor/src/components/post-status/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -1371,11 +1351,6 @@
 		}
 	},
 	"packages/editor/src/components/post-visibility/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/editor/src/components/sidebar/dataform-post-summary.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		}
@@ -1832,11 +1807,6 @@
 	"packages/rich-text/src/hook/index.js": {
 		"react-hooks/refs": {
 			"count": 12
-		}
-	},
-	"packages/theme/src/stories/index.story.tsx": {
-		"react-hooks/refs": {
-			"count": 5
 		}
 	},
 	"packages/ui/src/alert-dialog/root.tsx": {

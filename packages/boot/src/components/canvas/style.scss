@@ -49,7 +49,7 @@
 	flex-shrink: 0;
 	gap: var(--wpds-dimension-gap-sm);
 	grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-	min-block-size: calc(var(--wpds-dimension-base) * 8);
+	min-block-size: var(--wpds-dimension-size-md);
 	padding: var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-md);
 }
 

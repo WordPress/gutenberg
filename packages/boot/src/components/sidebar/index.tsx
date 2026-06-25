@@ -145,7 +145,9 @@ export default function Sidebar() {
 
 	return (
 		<div className="boot-sidebar__scrollable">
-			{ hasAdminBarInEditor && <div className="boot-sidebar__top-spacer" /> }
+			{ hasAdminBarInEditor && (
+				<div className="boot-sidebar__top-spacer" />
+			) }
 			<div className="boot-sidebar__content">
 				{ isCustomizingNavigation ? (
 					<CustomizeNavigation />
