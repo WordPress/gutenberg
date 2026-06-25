@@ -44,9 +44,12 @@ class WP_Duotone_Gutenberg_Test extends WP_UnitTestCase {
 
 	public function tear_down() {
 		$GLOBALS['wp_theme_directories'] = $this->orig_theme_dir;
+		remove_filter( 'theme_root', array( $this, 'filter_set_theme_root' ) );
+		remove_filter( 'stylesheet_root', array( $this, 'filter_set_theme_root' ) );
+		remove_filter( 'template_root', array( $this, 'filter_set_theme_root' ) );
 		wp_clean_themes_cache();
 		unset( $GLOBALS['wp_themes'] );
-		WP_Theme_JSON_Resolver::clean_cached_data();
+		_gutenberg_clean_theme_json_caches();
 
 		parent::tear_down();
 	}
