@@ -103,6 +103,13 @@ export default function PostTemplateEdit( {
 			parents,
 			pages,
 			format,
+			metaKey,
+			metaType,
+			dateRange,
+			metaValue,
+			metaCompare,
+			metaDateStart,
+			metaDateEnd,
 			// We gather extra query args to pass to the REST API call.
 			// This way extenders of Query Loop can add their own query args,
 			// and have accurate previews in the editor.
@@ -203,6 +210,23 @@ export default function PostTemplateEdit( {
 			if ( format?.length ) {
 				query.format = format;
 			}
+			if ( metaKey ) {
+				query.meta_key = metaKey;
+				query.meta_type = metaType || 'CHAR';
+			}
+			if ( dateRange ) {
+				query.date_range = dateRange;
+			}
+			if ( metaValue ) {
+				query.meta_value_filter = metaValue;
+				query.meta_compare = metaCompare;
+			}
+			if ( metaDateStart ) {
+				query.meta_date_start = metaDateStart;
+			}
+			if ( metaDateEnd ) {
+				query.meta_date_end = metaDateEnd;
+			}
 
 			/*
 			 * Handle cases where sticky is set to `exclude` or `only`.
@@ -267,6 +291,13 @@ export default function PostTemplateEdit( {
 			taxQuery,
 			parents,
 			format,
+			metaKey,
+			metaType,
+			metaValue,
+			metaCompare,
+			dateRange,
+			metaDateStart,
+			metaDateEnd,
 			restQueryArgs,
 			previewPostType,
 		]

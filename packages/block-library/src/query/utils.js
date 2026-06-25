@@ -192,9 +192,11 @@ export function useIsPostTypeHierarchical( postType ) {
  * List of avaiable options to order by.
  *
  * @param {string} postType The post type to check.
+ * @param {string} metaKey  Optional meta key; when provided, meta-value ordering options are appended to the list.
+ * @param {string} metaType The data type of the meta field.
  * @return {OrderByOption[]} List of order options.
  */
-export function useOrderByOptions( postType ) {
+export function useOrderByOptions( postType, metaKey = '', metaType = 'CHAR' ) {
 	const supportsCustomOrder = useSelect(
 		( select ) => {
 			const type = select( coreStore ).getPostType( postType );
@@ -240,8 +242,36 @@ export function useOrderByOptions( postType ) {
 			);
 		}
 
+		if ( metaKey ) {
+			const isNumericSorting = metaType !== 'CHAR';
+
+			if ( isNumericSorting ) {
+				orderByOptions.push(
+					{
+						label: __( 'Meta value (Ascending)' ),
+						value: 'meta_value_num/asc',
+					},
+					{
+						label: __( 'Meta value (Descending)' ),
+						value: 'meta_value_num/desc',
+					}
+				);
+			} else {
+				orderByOptions.push(
+					{
+						label: __( 'Meta value (A → Z)' ),
+						value: 'meta_value/asc',
+					},
+					{
+						label: __( 'Meta value (Z → A)' ),
+						value: 'meta_value/desc',
+					}
+				);
+			}
+		}
+
 		return orderByOptions;
-	}, [ supportsCustomOrder ] );
+	}, [ supportsCustomOrder, metaKey, metaType ] );
 }
 
 /**

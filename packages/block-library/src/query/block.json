@@ -27,7 +27,14 @@
 				"inherit": true,
 				"taxQuery": null,
 				"parents": [],
-				"format": []
+				"format": [],
+				"metaKey": "",
+				"metaType": "CHAR",
+				"dateRange": "",
+				"metaValue": "",
+				"metaCompare": "=",
+				"metaDateStart": "",
+				"metaDateEnd": ""
 			}
 		},
 		"tagName": {

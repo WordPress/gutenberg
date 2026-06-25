@@ -150,3 +150,136 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 }
 
 add_filter( 'render_block_data', 'block_core_query_disable_enhanced_pagination', 10, 1 );
+
+/**
+ * Applies meta key ordering and filtering to the Query Loop block's WP_Query arguments.
+ *
+ * Parses the `query` context attributes configured in the block's inspector controls
+ * and translates them into native `WP_Query` and `WP_Meta_Query` parameters.
+ * Supports meta value sorting, preset and custom date-range filtering, and generic
+ * text/numeric filtering. Includes the `query_loop_meta_clause` filter to allow
+ * third-party plugins to intercept and modify the generated meta clause.
+ *
+ * @since 23.4.0
+ *
+ * @param array    $query WP_Query arguments array being built.
+ * @param WP_Block $block The Query Loop block instance.
+ * @return array Returns the modified WP_Query arguments.
+ */
+function block_core_query_apply_meta_query_vars( $query, $block ) {
+	$query_context = $block->context['query'] ?? array();
+
+	$post_type  = isset( $query_context['postType'] ) ? sanitize_text_field( $query_context['postType'] ) : 'post';
+	$meta_key   = isset( $query_context['metaKey'] ) ? sanitize_key( $query_context['metaKey'] ) : '';
+	$meta_type  = isset( $query_context['metaType'] ) ? sanitize_text_field( $query_context['metaType'] ) : 'CHAR';
+	$date_range = isset( $query_context['dateRange'] ) ? sanitize_text_field( $query_context['dateRange'] ) : '';
+	$meta_value = isset( $query_context['metaValue'] ) ? sanitize_text_field( $query_context['metaValue'] ) : '';
+	$start_date = isset( $query_context['metaDateStart'] ) ? sanitize_text_field( $query_context['metaDateStart'] ) : '';
+	$end_date   = isset( $query_context['metaDateEnd'] ) ? sanitize_text_field( $query_context['metaDateEnd'] ) : '';
+
+	$meta_compare_raw = isset( $query_context['metaCompare'] ) ? sanitize_text_field( $query_context['metaCompare'] ) : '=';
+	$meta_compare     = html_entity_decode( $meta_compare_raw );
+	if ( ! in_array( $meta_compare, array( '=', '!=', '>', '<', 'LIKE' ), true ) ) {
+		$meta_compare = '=';
+	}
+
+	$order_by = $query['orderby'] ?? '';
+
+	if ( empty( $meta_key ) || is_protected_meta( $meta_key, $post_type ) ) {
+		return $query;
+	}
+
+	$meta_order_types = array( 'meta_value', 'meta_value_num' );
+	if ( in_array( $order_by, $meta_order_types, true ) ) {
+		/*
+		* Using `meta_key` can result in slow queries on sites with large amounts of post meta.
+		* However, it is a necessary evil for filtering by custom field values.
+		*/
+		$query['meta_key']  = $meta_key; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+		$query['meta_type'] = $meta_type;
+
+		if ( 'DATE' === $meta_type ) {
+			$query['orderby'] = 'meta_value';
+		}
+	}
+
+	$meta_clause = null;
+
+	if ( ! empty( $date_range ) ) {
+		$today = current_time( 'Y-m-d' );
+
+		if ( 'custom' === $date_range ) {
+			if ( $start_date && $end_date ) {
+				$meta_clause = array(
+					'key'     => $meta_key,
+					'value'   => array( $start_date, $end_date ),
+					'compare' => 'BETWEEN',
+					'type'    => $meta_type,
+				);
+			} elseif ( $start_date ) {
+				$meta_clause = array(
+					'key'     => $meta_key,
+					'value'   => $start_date,
+					'compare' => '>=',
+					'type'    => $meta_type,
+				);
+			} elseif ( $end_date ) {
+				$meta_clause = array(
+					'key'     => $meta_key,
+					'value'   => $end_date,
+					'compare' => '<=',
+					'type'    => $meta_type,
+				);
+			}
+		} else {
+			$compare_map = array(
+				'future' => '>=',
+				'past'   => '<',
+				'today'  => '=',
+			);
+
+			if ( isset( $compare_map[ $date_range ] ) ) {
+				$meta_clause = array(
+					'key'     => $meta_key,
+					'value'   => $today,
+					'compare' => $compare_map[ $date_range ],
+					'type'    => $meta_type,
+				);
+			}
+		}
+	} elseif ( '' !== $meta_value ) {
+		$meta_clause = array(
+			'key'     => $meta_key,
+			'value'   => $meta_value,
+			'compare' => $meta_compare,
+			'type'    => $meta_type,
+		);
+	}
+
+	if ( $meta_clause ) {
+		$meta_clause = apply_filters( 'query_loop_meta_clause', $meta_clause, $meta_key, $date_range, $meta_type, $start_date, $end_date );
+
+		if ( $meta_clause && is_array( $meta_clause ) ) {
+			if ( ! empty( $query['meta_query'] ) ) {
+				/*
+				* Using `meta_query` can result in slow queries on sites with large amounts of post meta.
+				* However, it is a necessary evil for filtering by custom field values.
+				*/
+				$query['meta_query'] = array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+					'relation' => 'AND',
+					$query['meta_query'],
+					$meta_clause,
+				);
+			} else {
+				/*
+				* Using `meta_query` can result in slow queries on sites with large amounts of post meta.
+				* However, it is a necessary evil for filtering by custom field values.
+				*/
+				$query['meta_query'] = array( $meta_clause ); // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+			}
+		}
+	}
+
+	return $query;
+}
+add_filter( 'query_loop_block_query_vars', 'block_core_query_apply_meta_query_vars', 10, 3 );

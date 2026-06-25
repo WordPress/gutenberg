@@ -29,6 +29,7 @@ import StickyControl from './sticky-control';
 import PerPageControl from './per-page-control';
 import OffsetControl from './offset-controls';
 import PagesControl from './pages-control';
+import MetaQueryControls from './meta-query-controls';
 import {
 	usePostTypes,
 	useIsPostTypeHierarchical,
@@ -55,6 +56,13 @@ export default function QueryInspectorControls( props ) {
 		taxQuery,
 		parents,
 		format,
+		metaKey = '',
+		metaType = 'CHAR',
+		metaDateStart,
+		metaDateEnd,
+		dateRange = '',
+		metaValue = '',
+		metaCompare = '=',
 	} = query;
 	const allowedControls = useAllowedControls( attributes );
 	const showSticky = postType === 'post';
@@ -119,7 +127,7 @@ export default function QueryInspectorControls( props ) {
 		}, 250 );
 	}, [ setQuery ] );
 
-	const orderByOptions = useOrderByOptions( postType );
+	const orderByOptions = useOrderByOptions( postType, metaKey, metaType );
 	const showInheritControl = isControlAllowed( allowedControls, 'inherit' );
 	const showPostTypeControl =
 		! inherit && isControlAllowed( allowedControls, 'postType' );
@@ -171,12 +179,15 @@ export default function QueryInspectorControls( props ) {
 		[ allowedControls, postTypeHasFormatSupport ]
 	);
 
+	const showMetaQueryControl =
+		! inherit && isControlAllowed( allowedControls, 'metaQuery' );
 	const showFiltersPanel =
 		showTaxControl ||
 		showAuthorControl ||
 		showSearchControl ||
 		showParentControl ||
-		showFormatControl;
+		showFormatControl ||
+		showMetaQueryControl;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const showPostCountControl = isControlAllowed(
@@ -386,6 +397,13 @@ export default function QueryInspectorControls( props ) {
 							search: '',
 							taxQuery: null,
 							format: [],
+							metaKey: '',
+							metaDateStart: '',
+							metaDateEnd: '',
+							metaValue: '',
+							metaCompare: '=',
+							metaType: 'CHAR',
+							dateRange: '',
 						} );
 						setQuerySearch( '' );
 					} }
@@ -464,6 +482,41 @@ export default function QueryInspectorControls( props ) {
 							<FormatControls
 								onChange={ setQuery }
 								query={ query }
+							/>
+						</ToolsPanelItem>
+					) }
+					{ showMetaQueryControl && (
+						<ToolsPanelItem
+							label={ __( 'Meta field' ) }
+							hasValue={ () => !! metaKey }
+							onDeselect={ () =>
+								setQuery( {
+									metaKey: '',
+									metaType: 'CHAR',
+									metaDateStart: '',
+									metaDateEnd: '',
+									dateRange: '',
+									metaValue: '',
+									metaCompare: '=',
+									...( [
+										'meta_value',
+										'meta_value_num',
+									].includes( orderBy ) && {
+										orderBy: 'date',
+										order: 'desc',
+									} ),
+								} )
+							}
+						>
+							<MetaQueryControls
+								metaKey={ metaKey }
+								metaType={ metaType }
+								metaDateStart={ metaDateStart }
+								metaDateEnd={ metaDateEnd }
+								dateRange={ dateRange }
+								metaValue={ metaValue }
+								metaCompare={ metaCompare }
+								onChange={ setQuery }
 							/>
 						</ToolsPanelItem>
 					) }
