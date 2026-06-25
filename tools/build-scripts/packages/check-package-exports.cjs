@@ -41,6 +41,51 @@ function formatExportPath( trail ) {
 	);
 }
 
+function escapeRegExp( value ) {
+	return value.replace( /[|\\{}()[\]^$+?.*]/g, '\\$&' );
+}
+
+function hasMatchingTarget( packageRoot, directory, pattern ) {
+	return fs
+		.readdirSync( directory, { withFileTypes: true } )
+		.some( ( entry ) => {
+			const entryPath = path.join( directory, entry.name );
+			const relativePath = `./${ path
+				.relative( packageRoot, entryPath )
+				.split( path.sep )
+				.join( '/' ) }`;
+
+			return (
+				pattern.test( relativePath ) ||
+				( entry.isDirectory() &&
+					hasMatchingTarget( packageRoot, entryPath, pattern ) )
+			);
+		} );
+}
+
+function exportTargetExists( packageRoot, target ) {
+	if ( ! target.includes( '*' ) ) {
+		return fs.existsSync( path.join( packageRoot, target ) );
+	}
+
+	const wildcardIndex = target.indexOf( '*' );
+	const targetPrefix = target.slice( 0, wildcardIndex );
+	const searchRoot = path.join(
+		packageRoot,
+		targetPrefix.slice( 0, targetPrefix.lastIndexOf( '/' ) + 1 )
+	);
+
+	if ( ! fs.existsSync( searchRoot ) ) {
+		return false;
+	}
+
+	const pattern = new RegExp(
+		`^${ escapeRegExp( target ).replace( /\\\*/g, '.*' ) }$`
+	);
+
+	return hasMatchingTarget( packageRoot, searchRoot, pattern );
+}
+
 function checkPackageExports( packagePath ) {
 	const packageRoot = path.resolve( ROOT_DIR, packagePath );
 	const packageJsonPath = path.join( packageRoot, 'package.json' );
@@ -50,8 +95,7 @@ function checkPackageExports( packagePath ) {
 	const missingTargets = collectExportTargets( packageJson.exports )
 		.filter( ( { target } ) => target.startsWith( './' ) )
 		.filter(
-			( { target } ) =>
-				! fs.existsSync( path.join( packageRoot, target ) )
+			( { target } ) => ! exportTargetExists( packageRoot, target )
 		);
 
 	if ( ! missingTargets.length ) {
