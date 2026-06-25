@@ -8,6 +8,7 @@ import domReady from '@wordpress/dom-ready';
  */
 import { setup, speak } from '../';
 import filterMessage from '../shared/filter-message';
+import { resetQueue } from '../shared/queue';
 
 jest.useFakeTimers();
 
@@ -29,6 +30,7 @@ describe( 'speak', () => {
 	beforeEach( () => {
 		containerPolite!.textContent = '';
 		containerAssertive!.textContent = '';
+		resetQueue();
 		jest.clearAllTimers();
 	} );
 
