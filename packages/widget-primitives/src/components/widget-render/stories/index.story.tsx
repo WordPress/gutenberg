@@ -201,7 +201,7 @@ export const Default: StoryObj = {
 The minimal contract between a host and a widget:
 
 - \`attributes\` flow into the widget as plain data.
-- The widget writes back through \`setAttributes\`. Here, the "Next world" button updates the \`world\` attribute from inside the widget.
+- The widget writes back through \`setAttributes\`, which the host provides. The "Next world" button calls it from inside the widget, and the host applies the change.
 
 The primitive resolves the render component with \`lazy()\`, so the surrounding \`Suspense\` boundary, and with it the loading UI, is a host decision.
 `,
@@ -271,7 +271,7 @@ export const WithSettings: StoryObj = {
 		docs: {
 			description: {
 				story: `
-A widget type declares its settings as a dataviews \`Field[]\` under \`attributes\`. That single declaration is enough for a host to build a settings UI:
+Where Default lets the widget ask for changes, here the host edits the values itself. A widget type declares its settings as a dataviews \`Field[]\` under \`attributes\`, and that single declaration is enough for a host to build a settings UI:
 
 - The \`DataForm\` on the right is mounted straight from the schema, with no per-widget form wiring.
 - Validation comes from the same source: the \`greeting\` field is marked as required, and \`useFormValidity\` surfaces the result in the form.
