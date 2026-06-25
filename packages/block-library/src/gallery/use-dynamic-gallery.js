@@ -113,17 +113,27 @@ export default function useDynamicGallery( {
 		[ query ]
 	);
 
+	// The only gallery settings that affect how an image renders, and so the
+	// only ones `buildImageBlockAttributes` reads. Depending on this narrowed
+	// set (rather than the whole `attributes` object) keeps the preview from
+	// rebuilding on unrelated edits, e.g. typing in the gallery caption.
+	const { sizeSlug, linkTo, linkTarget, aspectRatio } = attributes;
+	const imageAttributes = useMemo(
+		() => ( { sizeSlug, linkTo, linkTarget, aspectRatio } ),
+		[ sizeSlug, linkTo, linkTarget, aspectRatio ]
+	);
+
 	// The (non-persisted) `core/image` blocks used for the editor preview.
-	// Rebuilt when the resolved media or any gallery setting changes.
+	// Rebuilt when the resolved media or an image-relevant setting changes.
 	const dynamicImageBlocks = useMemo(
 		() =>
 			dynamicMedia.map( ( mediaItem ) =>
 				createBlock(
 					'core/image',
-					buildImageBlockAttributes( mediaItem, attributes )
+					buildImageBlockAttributes( mediaItem, imageAttributes )
 				)
 			),
-		[ dynamicMedia, attributes ]
+		[ dynamicMedia, imageAttributes ]
 	);
 
 	// Context the gallery provides to its (previewed) image blocks.
@@ -155,7 +165,7 @@ export default function useDynamicGallery( {
 		const blocks = dynamicMedia.map( ( mediaItem ) =>
 			createBlock(
 				'core/image',
-				buildImageBlockAttributes( mediaItem, attributes )
+				buildImageBlockAttributes( mediaItem, imageAttributes )
 			)
 		);
 		replaceInnerBlocks( clientId, blocks );
