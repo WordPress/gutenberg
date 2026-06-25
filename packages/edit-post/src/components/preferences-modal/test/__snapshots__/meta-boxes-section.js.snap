@@ -50,9 +50,6 @@ exports[`MetaBoxesSection renders a Custom Fields option 1`] = `
   max-width: 100%;
   min-height: 0;
   min-width: 0;
-}
-
-.emotion-9 {
   -webkit-flex: 1;
   -ms-flex: 1;
   flex: 1;
@@ -103,7 +100,7 @@ exports[`MetaBoxesSection renders a Custom Fields option 1`] = `
               />
             </span>
             <label
-              class="emotion-7 emotion-8 emotion-9 components-flex-item components-flex-block components-toggle-control__label"
+              class="emotion-7 components-flex-item components-flex-block components-toggle-control__label"
               data-wp-c16t="true"
               data-wp-component="FlexBlock"
               for="inspector-toggle-control-0"
@@ -168,9 +165,6 @@ exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`
   max-width: 100%;
   min-height: 0;
   min-width: 0;
-}
-
-.emotion-9 {
   -webkit-flex: 1;
   -ms-flex: 1;
   flex: 1;
@@ -221,7 +215,7 @@ exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`
               />
             </span>
             <label
-              class="emotion-7 emotion-8 emotion-9 components-flex-item components-flex-block components-toggle-control__label"
+              class="emotion-7 components-flex-item components-flex-block components-toggle-control__label"
               data-wp-c16t="true"
               data-wp-component="FlexBlock"
               for="inspector-toggle-control-3"
@@ -263,7 +257,7 @@ exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`
               />
             </span>
             <label
-              class="emotion-7 emotion-8 emotion-9 components-flex-item components-flex-block components-toggle-control__label"
+              class="emotion-7 components-flex-item components-flex-block components-toggle-control__label"
               data-wp-c16t="true"
               data-wp-component="FlexBlock"
               for="inspector-toggle-control-4"
@@ -305,7 +299,7 @@ exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`
               />
             </span>
             <label
-              class="emotion-7 emotion-8 emotion-9 components-flex-item components-flex-block components-toggle-control__label"
+              class="emotion-7 components-flex-item components-flex-block components-toggle-control__label"
               data-wp-c16t="true"
               data-wp-component="FlexBlock"
               for="inspector-toggle-control-5"
@@ -370,9 +364,6 @@ exports[`MetaBoxesSection renders meta box options 1`] = `
   max-width: 100%;
   min-height: 0;
   min-width: 0;
-}
-
-.emotion-9 {
   -webkit-flex: 1;
   -ms-flex: 1;
   flex: 1;
@@ -424,7 +415,7 @@ exports[`MetaBoxesSection renders meta box options 1`] = `
               />
             </span>
             <label
-              class="emotion-7 emotion-8 emotion-9 components-flex-item components-flex-block components-toggle-control__label"
+              class="emotion-7 components-flex-item components-flex-block components-toggle-control__label"
               data-wp-c16t="true"
               data-wp-component="FlexBlock"
               for="inspector-toggle-control-1"
@@ -466,7 +457,7 @@ exports[`MetaBoxesSection renders meta box options 1`] = `
               />
             </span>
             <label
-              class="emotion-7 emotion-8 emotion-9 components-flex-item components-flex-block components-toggle-control__label"
+              class="emotion-7 components-flex-item components-flex-block components-toggle-control__label"
               data-wp-c16t="true"
               data-wp-component="FlexBlock"
               for="inspector-toggle-control-2"

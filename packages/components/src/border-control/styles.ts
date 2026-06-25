@@ -53,6 +53,18 @@ export const wrapperHeight = css`
 	height: 40px;
 `;
 
+export function getInnerWrapperStyles( {
+	hasWidth,
+}: {
+	hasWidth: boolean;
+} ) {
+	return css(
+		innerWrapper(),
+		hasWidth && wrapperWidth,
+		wrapperHeight
+	);
+}
+
 export const borderControlDropdown = css`
 	background: #fff;
 

@@ -14,7 +14,7 @@ Snapshot Diff:
     data-wp-component="Flex"
   >
     <div
-      class="css-14ac8g8-Item css-119tq0c-sx-Base components-flex-item"
+      class="css-1rk86jm-Item-base-itemStyles components-flex-item"
       data-wp-c16t="true"
       data-wp-component="FlexItem"
     >
@@ -23,7 +23,7 @@ Snapshot Diff:
 -   <div />
 -   <div />
     <div
-      class="css-14ac8g8-Item css-119tq0c-sx-Base css-1ya6i3g-block components-flex-item components-flex-block"
+      class="css-7ugsc8-Item-base-block-itemStyles components-flex-item components-flex-block"
       data-wp-c16t="true"
       data-wp-component="FlexBlock"
     >
@@ -94,7 +94,12 @@ exports[`props should render correctly 1`] = `
   min-width: 0;
 }
 
-.emotion-7 {
+.emotion-4 {
+  display: block;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
   -webkit-flex: 1;
   -ms-flex: 1;
   flex: 1;
@@ -107,14 +112,14 @@ exports[`props should render correctly 1`] = `
   data-wp-component="Flex"
 >
   <div
-    class="emotion-3 emotion-4 components-flex-item"
+    class="emotion-3 components-flex-item"
     data-wp-c16t="true"
     data-wp-component="FlexItem"
   >
     Item
   </div>
   <div
-    class="emotion-3 emotion-4 emotion-7 components-flex-item components-flex-block"
+    class="emotion-4 components-flex-item components-flex-block"
     data-wp-c16t="true"
     data-wp-component="FlexBlock"
   >

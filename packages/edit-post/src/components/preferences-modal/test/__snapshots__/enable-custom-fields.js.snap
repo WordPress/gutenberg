@@ -50,9 +50,6 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation 
   max-width: 100%;
   min-height: 0;
   min-width: 0;
-}
-
-.emotion-9 {
   -webkit-flex: 1;
   -ms-flex: 1;
   flex: 1;
@@ -89,7 +86,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation 
             />
           </span>
           <label
-            class="emotion-7 emotion-8 emotion-9 components-flex-item components-flex-block components-toggle-control__label"
+            class="emotion-7 components-flex-item components-flex-block components-toggle-control__label"
             data-wp-c16t="true"
             data-wp-component="FlexBlock"
             for="inspector-toggle-control-3"
@@ -162,9 +159,6 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields 
   max-width: 100%;
   min-height: 0;
   min-width: 0;
-}
-
-.emotion-9 {
   -webkit-flex: 1;
   -ms-flex: 1;
   flex: 1;
@@ -202,7 +196,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields 
             />
           </span>
           <label
-            class="emotion-7 emotion-8 emotion-9 components-flex-item components-flex-block components-toggle-control__label"
+            class="emotion-7 components-flex-item components-flex-block components-toggle-control__label"
             data-wp-c16t="true"
             data-wp-component="FlexBlock"
             for="inspector-toggle-control-0"
@@ -264,9 +258,6 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
   max-width: 100%;
   min-height: 0;
   min-width: 0;
-}
-
-.emotion-9 {
   -webkit-flex: 1;
   -ms-flex: 1;
   flex: 1;
@@ -304,7 +295,7 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
             />
           </span>
           <label
-            class="emotion-7 emotion-8 emotion-9 components-flex-item components-flex-block components-toggle-control__label"
+            class="emotion-7 components-flex-item components-flex-block components-toggle-control__label"
             data-wp-c16t="true"
             data-wp-component="FlexBlock"
             for="inspector-toggle-control-2"
@@ -377,9 +368,6 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox when custom fiel
   max-width: 100%;
   min-height: 0;
   min-width: 0;
-}
-
-.emotion-9 {
   -webkit-flex: 1;
   -ms-flex: 1;
   flex: 1;
@@ -416,7 +404,7 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox when custom fiel
             />
           </span>
           <label
-            class="emotion-7 emotion-8 emotion-9 components-flex-item components-flex-block components-toggle-control__label"
+            class="emotion-7 components-flex-item components-flex-block components-toggle-control__label"
             data-wp-c16t="true"
             data-wp-component="FlexBlock"
             for="inspector-toggle-control-1"
