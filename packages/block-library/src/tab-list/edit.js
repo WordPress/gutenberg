@@ -61,7 +61,7 @@ function Edit( {
 	const { __unstableMarkNextChangeAsNotPersistent, updateBlockAttributes } =
 		useDispatch( blockEditorStore );
 
-	const handleTabClick = useCallback(
+	const selectTabPanel = useCallback(
 		( tabIndex ) => {
 			if ( tabsClientId && tabIndex !== effectiveActiveIndex ) {
 				__unstableMarkNextChangeAsNotPersistent();
@@ -152,7 +152,14 @@ function Edit( {
 							tabIndex={ -1 }
 							onClick={ ( event ) => {
 								event.preventDefault();
-								handleTabClick( index );
+								selectTabPanel( index );
+							} }
+							// Activate the matching panel when the caret moves
+							// into this tab's label via the keyboard, mirroring
+							// the click behavior. `onFocus` bubbles from the
+							// inner RichText editable.
+							onFocus={ () => {
+								selectTabPanel( index );
 							} }
 						>
 							<RichText
