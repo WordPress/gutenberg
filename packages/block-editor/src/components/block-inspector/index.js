@@ -402,6 +402,8 @@ const BlockInspectorSingleBlock = ( {
 	const listViewRef = useRef( null );
 	const hasMultipleTabs = availableTabs?.length > 1;
 	const hasPseudoState = hasPseudoBlockStyleState( selectedBlockStyleState );
+	const isEditingStyleState =
+		isBlockStyleStateSelected || isResponsiveEditing;
 	const hasParentChildBlockCards =
 		editedContentOnlySection &&
 		editedContentOnlySection !== renderedBlockClientId;
@@ -452,38 +454,37 @@ const BlockInspectorSingleBlock = ( {
 					)
 				}
 			/>
-			{ blockEditingMode === 'default' &&
-				( hasPseudoState || isResponsiveEditing ) && (
-					<Spacer paddingX={ 4 } paddingY={ 2 }>
-						{ hasPseudoState && (
-							<ToggleControl
-								label={ __( 'Show state on canvas' ) }
-								checked={ showStateOnCanvas }
-								onChange={ onShowStateOnCanvasChange }
-							/>
-						) }
-						<BlockStateBadges
-							name={ blockName }
-							value={ selectedBlockStyleState }
-							isResponsiveEditing={ isResponsiveEditing }
+			{ blockEditingMode === 'default' && isEditingStyleState && (
+				<Spacer paddingX={ 4 } paddingY={ 2 }>
+					{ hasPseudoState && (
+						<ToggleControl
+							label={ __( 'Show state on canvas' ) }
+							checked={ showStateOnCanvas }
+							onChange={ onShowStateOnCanvasChange }
 						/>
-					</Spacer>
-				) }
+					) }
+					<BlockStateBadges
+						name={ blockName }
+						value={ selectedBlockStyleState }
+						isResponsiveEditing={ isResponsiveEditing }
+					/>
+				</Spacer>
+			) }
 			<ViewportVisibilityInfo clientId={ renderedBlockClientId } />
 			<EditContents clientId={ renderedBlockClientId } />
-			{ ! isBlockStyleStateSelected && (
+			{ ! isEditingStyleState && (
 				<BlockVariationTransforms
 					blockClientId={ renderedBlockClientId }
 				/>
 			) }
 			<BlockInspectorPreTabsSlot />
-			{ isBlockStyleStateSelected && ! isSectionBlock && (
+			{ isEditingStyleState && ! isSectionBlock && (
 				<StyleStateInspectorSlots
 					blockName={ blockName }
 					selectedBlockStyleState={ selectedBlockStyleState }
 				/>
 			) }
-			{ ! isBlockStyleStateSelected && hasMultipleTabs && (
+			{ ! isEditingStyleState && hasMultipleTabs && (
 				<>
 					<InspectorControlsTabs
 						hasBlockStyles={ hasBlockStyles }
@@ -495,7 +496,7 @@ const BlockInspectorSingleBlock = ( {
 					/>
 				</>
 			) }
-			{ ! isBlockStyleStateSelected && ! hasMultipleTabs && (
+			{ ! isEditingStyleState && ! hasMultipleTabs && (
 				<>
 					{ hasBlockStyles && (
 						<BlockStyles clientId={ renderedBlockClientId } />
@@ -509,9 +510,7 @@ const BlockInspectorSingleBlock = ( {
 					) }
 				</>
 			) }
-			{ ! isBlockStyleStateSelected && (
-				<InspectorControlsLastItem.Slot />
-			) }
+			{ ! isEditingStyleState && <InspectorControlsLastItem.Slot /> }
 			<SkipToSelectedBlock key="back" />
 		</div>
 	);
