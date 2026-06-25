@@ -110,7 +110,6 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 		{
 			code: `
 				import {
-					BorderControl,
 					ComboboxControl,
 					CustomSelectControl,
 					FontAppearanceControl,
@@ -126,7 +125,6 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 					UnitControl,
 				} from '@wordpress/components';
 				<>
-					<BorderControl __next40pxDefaultSize />
 					<ComboboxControl __next40pxDefaultSize />
 					<CustomSelectControl __next40pxDefaultSize />
 					<FontAppearanceControl __next40pxDefaultSize />
