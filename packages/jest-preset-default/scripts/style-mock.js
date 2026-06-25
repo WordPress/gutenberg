@@ -1,16 +1,14 @@
+const cssClass = ( property ) => `style-${ property }`;
+
 const styles = new Proxy(
 	{},
 	{
 		get( target, property ) {
-			if ( property === '__esModule' ) {
-				return false;
+			if ( typeof property === 'string' && property !== '__esModule' ) {
+				return cssClass( property );
 			}
 
-			if ( typeof property === 'symbol' ) {
-				return target[ property ];
-			}
-
-			return property;
+			return Reflect.get( target, property );
 		},
 	}
 );
