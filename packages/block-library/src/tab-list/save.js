@@ -12,6 +12,7 @@ import {
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
 	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
 } from '@wordpress/block-editor';
+import { safeHTML } from '@wordpress/dom';
 
 export default function save( { attributes } ) {
 	const { tabs } = attributes;
@@ -40,9 +41,10 @@ export default function save( { attributes } ) {
 					style={ buttonStyle }
 					type="button"
 					role="tab"
-				>
-					{ tab.label }
-				</button>
+					dangerouslySetInnerHTML={ {
+						__html: safeHTML( tab.label ) || '',
+					} }
+				/>
 			) ) }
 		</div>
 	);
