@@ -15,18 +15,16 @@ import { useSettings } from '../../components/use-settings';
 /**
  * Control for letter-spacing.
  *
- * @param {Object}                  props                       Component props.
- * @param {boolean}                 props.__next40pxDefaultSize Start opting into the larger default height that will become the default size in a future version.
- *
- * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
- * @ignore
- * @param {string}                  props.value                 Currently selected letter-spacing.
- * @param {Function}                props.onChange              Handles change in letter-spacing selection.
- * @param {string|number|undefined} props.__unstableInputWidth  Input width to pass through to inner UnitControl. Should be a valid CSS value.
+ * @param {Object}                  props                         Component props.
+ * @param {boolean}                 [props.__next40pxDefaultSize] Start opting into the larger default height that will become the default size in a future version.
+ * @param {string}                  props.value                   Currently selected letter-spacing.
+ * @param {Function}                props.onChange                Handles change in letter-spacing selection.
+ * @param {string|number|undefined} props.__unstableInputWidth    Input width to pass through to inner UnitControl. Should be a valid CSS value.
  *
  * @return {Element} Letter-spacing control.
  */
 export default function LetterSpacingControl( {
+	/** @deprecated Default behavior since WordPress 7.1. Prop can be safely removed. */
 	__next40pxDefaultSize: _next40pxDefaultSize,
 	value,
 	onChange,
