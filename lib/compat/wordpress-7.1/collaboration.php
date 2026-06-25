@@ -264,10 +264,9 @@ if ( ! function_exists( 'gutenberg_prevent_stale_crdt_document_meta_update' ) ) 
 	 * @param int       $object_id  Post ID.
 	 * @param string    $meta_key   Meta key.
 	 * @param mixed     $meta_value Meta value.
-	 * @param mixed     $prev_value Previous meta value.
 	 * @return null|bool Whether to short-circuit the update.
 	 */
-	function gutenberg_prevent_stale_crdt_document_meta_update( $check, int $object_id, string $meta_key, $meta_value, $prev_value ) {
+	function gutenberg_prevent_stale_crdt_document_meta_update( $check, int $object_id, string $meta_key, $meta_value ) {
 		if ( null !== $check || '_crdt_document' !== $meta_key ) {
 			return $check;
 		}
@@ -279,7 +278,7 @@ if ( ! function_exists( 'gutenberg_prevent_stale_crdt_document_meta_update' ) ) 
 
 		return $check;
 	}
-	add_filter( 'update_post_metadata', 'gutenberg_prevent_stale_crdt_document_meta_update', 10, 5 );
+	add_filter( 'update_post_metadata', 'gutenberg_prevent_stale_crdt_document_meta_update', 10, 4 );
 }
 
 if ( ! function_exists( 'gutenberg_prevent_stale_crdt_document_meta_add' ) ) {
@@ -292,11 +291,9 @@ if ( ! function_exists( 'gutenberg_prevent_stale_crdt_document_meta_add' ) ) {
 	 * @param null|bool $check      Whether to short-circuit the add.
 	 * @param int       $object_id  Post ID.
 	 * @param string    $meta_key   Meta key.
-	 * @param mixed     $meta_value Meta value.
-	 * @param bool      $unique     Whether only one value may exist.
 	 * @return null|bool Whether to short-circuit the add.
 	 */
-	function gutenberg_prevent_stale_crdt_document_meta_add( $check, int $object_id, string $meta_key, $meta_value, bool $unique ) {
+	function gutenberg_prevent_stale_crdt_document_meta_add( $check, int $object_id, string $meta_key ) {
 		if ( null !== $check || '_crdt_document' !== $meta_key ) {
 			return $check;
 		}
@@ -314,7 +311,7 @@ if ( ! function_exists( 'gutenberg_prevent_stale_crdt_document_meta_add' ) ) {
 
 		return $check;
 	}
-	add_filter( 'add_post_metadata', 'gutenberg_prevent_stale_crdt_document_meta_add', 10, 5 );
+	add_filter( 'add_post_metadata', 'gutenberg_prevent_stale_crdt_document_meta_add', 10, 3 );
 }
 
 if ( ! function_exists( 'gutenberg_reject_stale_crdt_document_rest_update' ) ) {
