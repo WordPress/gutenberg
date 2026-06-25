@@ -31,7 +31,12 @@ class WP_Duotone_Gutenberg_Test extends WP_UnitTestCase {
 		$this->theme_root     = realpath( __DIR__ . '/data/themedir1' );
 		$this->orig_theme_dir = $GLOBALS['wp_theme_directories'];
 
-		// /themes is necessary as theme.php functions assume /themes is the root if there is only one root.
+		/*
+		 * WP_UnitTestCase restores hooks after each test, so the fixture
+		 * theme root filters must be re-added for every test.
+		 * /themes is necessary as theme.php functions assume /themes is the
+		 * root if there is only one root.
+		 */
 		$GLOBALS['wp_theme_directories'] = array( WP_CONTENT_DIR . '/themes', $this->theme_root );
 
 		add_filter( 'theme_root', array( $this, 'filter_set_theme_root' ) );
