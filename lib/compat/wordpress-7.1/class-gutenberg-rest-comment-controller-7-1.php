@@ -803,41 +803,6 @@ class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller 
 	}
 
 	/**
-	 * Prepares links for the request.
-	 *
-	 * Extends the 6.9 implementation to also handle 'reaction' type
-	 * for children link embedding.
-	 *
-	 * @since 7.1.0
-	 *
-	 * @param WP_Comment $comment Comment object.
-	 * @return array Links for the given comment.
-	 */
-	protected function prepare_links( $comment ) {
-		$links = WP_REST_Comments_Controller::prepare_links( $comment );
-
-		// Embedding children for notes and reactions requires `type` and `status` inheritance.
-		if ( isset( $links['children'] ) && $this->is_note_or_reaction( $comment->comment_type ) ) {
-			// Notes have reaction children; reactions don't have children.
-			$child_type = 'note' === $comment->comment_type ? 'reaction' : $comment->comment_type;
-			$args       = array(
-				'parent' => $comment->comment_ID,
-				'type'   => $child_type,
-				'status' => 'all',
-			);
-
-			$rest_url = add_query_arg( $args, rest_url( $this->namespace . '/' . $this->rest_base ) );
-
-			$links['children'] = array(
-				'href'       => $rest_url,
-				'embeddable' => true,
-			);
-		}
-
-		return $links;
-	}
-
-	/**
 	 * Checks if comment content is allowed.
 	 *
 	 * Extends the 6.9 implementation to also allow reaction content
