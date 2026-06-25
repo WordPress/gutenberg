@@ -77,7 +77,9 @@
 	},
 	"wpScript": true,
 	"types": "build-types",
-	"sideEffects": false,
+	"sideEffects": [
+		"src/prebuilt/css/design-tokens.css"
+	],
 	"dependencies": {
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/element": "file:../element",
