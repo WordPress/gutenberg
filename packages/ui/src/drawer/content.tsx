@@ -44,7 +44,7 @@ const Content = forwardRef< HTMLDivElement, ContentProps >(
 			props: mergeProps< 'div' >( props, {
 				className: clsx(
 					styles.content,
-					focusStyles[ 'outset-ring-focus-visible' ],
+					focusStyles[ 'outset-ring--focus-visible' ],
 					className
 				),
 				onScroll: scrollStateOnScroll,

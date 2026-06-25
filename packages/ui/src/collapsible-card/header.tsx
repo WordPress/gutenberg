@@ -74,7 +74,7 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 										// the focus ring will be displayed only on the icon to visually
 										// emulate it being the button.
 										focusStyles[
-											'outset-ring-focus-parent-visible'
+											'outset-ring--focus-parent-visible'
 										]
 									) }
 								>

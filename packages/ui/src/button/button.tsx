@@ -31,7 +31,7 @@ export const Button = forwardRef< HTMLButtonElement, ButtonProps >(
 		const mergedClassName = clsx(
 			defenseStyles.button,
 			resetStyles[ 'box-sizing' ],
-			focusStyles[ 'outset-ring-focus-except-active' ],
+			focusStyles[ 'outset-ring--focus-except-active' ],
 			variant !== 'unstyled' && styles.button,
 			styles[ `is-${ tone }` ],
 			styles[ `is-${ variant }` ],

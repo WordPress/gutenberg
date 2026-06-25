@@ -21,7 +21,7 @@ export const Panel = forwardRef< HTMLDivElement, TabPanelProps >(
 				ref={ forwardedRef }
 				className={ clsx(
 					defenseStyles.div,
-					focusStyles[ 'outset-ring-focus-visible' ],
+					focusStyles[ 'outset-ring--focus-visible' ],
 					className
 				) }
 				{ ...otherProps }

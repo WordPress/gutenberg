@@ -2,10 +2,10 @@
 const CSS_BASELINE_2024_FUNCTIONS = [ 'round', 'rem', 'mod' ];
 
 const SELECTOR_CLASS_PATTERN = [
-	'^([a-z][a-z0-9]*)(-[a-z0-9]+)*$',
+	'^[a-z][a-z0-9]*(?:(?:__|--|-)[a-z0-9]+)*$',
 	{
 		message:
-			'Selector should use lowercase and separate words with hyphens (selector-class-pattern)',
+			'Selector should use lowercase class segments separated with hyphens, double hyphens, or double underscores (selector-class-pattern)',
 	},
 ];
 
