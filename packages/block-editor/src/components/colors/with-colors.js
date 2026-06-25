@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useCallback, useRef } from '@wordpress/element';
+import { useMemo, useRef } from '@wordpress/element';
 import { compose, createHigherOrderComponent } from '@wordpress/compose';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 
@@ -167,17 +167,12 @@ function createColorHOC( colorTypes, withColorPalette ) {
 					return result;
 				}, [ attributes, _colors, setAttributes ] );
 
-				const getMostReadableColorFn = useCallback(
-					( colorValue ) =>
-						getMostReadableColor( _colors, colorValue ),
-					[ _colors ]
-				);
-
-				const colorUtils = useMemo(
+			const colorUtils = useMemo(
 					() => ( {
-						getMostReadableColor: getMostReadableColorFn,
+						getMostReadableColor: ( colorValue ) =>
+							getMostReadableColor( _colors, colorValue ),
 					} ),
-					[ getMostReadableColorFn ]
+					[ _colors ]
 				);
 
 				return (

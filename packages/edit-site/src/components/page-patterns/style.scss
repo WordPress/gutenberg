@@ -92,7 +92,7 @@
 		box-shadow: 0 0 0.5px 0.5px var(--wp-admin-theme-color);
 		box-sizing: border-box;
 		z-index: 1;
-		background-color: var(--wpds-color-bg-surface-neutral-strong);
+		background-color: var(--wpds-color-background-surface-neutral-strong);
 		width: calc(100% + 2px); // Account for the border width of the token field.
 		left: -1px;
 		min-width: initial;

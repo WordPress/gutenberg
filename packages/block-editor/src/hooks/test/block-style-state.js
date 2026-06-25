@@ -38,12 +38,12 @@ describe( 'getStyleForState', () => {
 	it( 'returns the selected viewport state style', () => {
 		const style = {
 			color: { text: '#000000' },
-			mobile: { color: { text: '#ff0000' } },
+			'@mobile': { color: { text: '#ff0000' } },
 		};
 
 		expect(
 			getStyleForState( style, {
-				viewport: 'mobile',
+				viewport: '@mobile',
 				pseudo: 'default',
 			} )
 		).toEqual( {
@@ -53,14 +53,14 @@ describe( 'getStyleForState', () => {
 
 	it( 'returns the selected viewport pseudo state style', () => {
 		const style = {
-			mobile: {
+			'@mobile': {
 				':hover': { color: { text: '#ff0000' } },
 			},
 		};
 
 		expect(
 			getStyleForState( style, {
-				viewport: 'mobile',
+				viewport: '@mobile',
 				pseudo: ':hover',
 			} )
 		).toEqual( {
@@ -105,14 +105,14 @@ describe( 'setStyleForState', () => {
 			setStyleForState(
 				{
 					color: { text: '#000000' },
-					mobile: { color: { text: '#ff0000' } },
+					'@mobile': { color: { text: '#ff0000' } },
 				},
-				{ viewport: 'mobile', pseudo: 'default' },
+				{ viewport: '@mobile', pseudo: 'default' },
 				{ typography: { fontSize: '32px' } }
 			)
 		).toEqual( {
 			color: { text: '#000000' },
-			mobile: { typography: { fontSize: '32px' } },
+			'@mobile': { typography: { fontSize: '32px' } },
 		} );
 	} );
 
@@ -121,17 +121,17 @@ describe( 'setStyleForState', () => {
 			setStyleForState(
 				{
 					color: { text: '#000000' },
-					mobile: {
+					'@mobile': {
 						color: { text: '#ff0000' },
 						':hover': { color: { text: '#00ff00' } },
 					},
 				},
-				{ viewport: 'mobile', pseudo: ':hover' },
+				{ viewport: '@mobile', pseudo: ':hover' },
 				{ typography: { fontSize: '32px' } }
 			)
 		).toEqual( {
 			color: { text: '#000000' },
-			mobile: {
+			'@mobile': {
 				color: { text: '#ff0000' },
 				':hover': { typography: { fontSize: '32px' } },
 			},
@@ -234,7 +234,7 @@ describe( 'scopeResetAllFilterToState', () => {
 		const attributes = {
 			style: {
 				color: { text: '#000000' },
-				mobile: {
+				'@mobile': {
 					color: { text: '#ff0000' },
 					':hover': { color: { text: '#00ff00' } },
 				},
@@ -242,17 +242,17 @@ describe( 'scopeResetAllFilterToState', () => {
 		};
 
 		const result = scopeResetAllFilterToState(
-			{ viewport: 'mobile', pseudo: ':hover' },
+			{ viewport: '@mobile', pseudo: ':hover' },
 			innerReset
 		)( attributes );
 
 		expect( innerReset ).toHaveBeenCalledWith( {
-			style: attributes.style.mobile[ ':hover' ],
+			style: attributes.style[ '@mobile' ][ ':hover' ],
 		} );
 		expect( result ).toEqual( {
 			style: {
 				color: { text: '#000000' },
-				mobile: { color: { text: '#ff0000' } },
+				'@mobile': { color: { text: '#ff0000' } },
 			},
 		} );
 	} );

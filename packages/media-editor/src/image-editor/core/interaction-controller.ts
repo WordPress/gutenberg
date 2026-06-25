@@ -286,6 +286,11 @@ export class InteractionController {
 		if ( e.button !== 0 ) {
 			return;
 		}
+		// Touch gestures are handled by touchstart/touchmove. Starting the
+		// pointer drag path too can briefly toggle drag UI before pinch begins.
+		if ( e.pointerType === 'touch' ) {
+			return;
+		}
 		e.preventDefault();
 
 		// Blur any focused handle so its focus ring doesn't linger,
@@ -568,6 +573,7 @@ export class InteractionController {
 		if ( ! touch ) {
 			return;
 		}
+		moveEvent.preventDefault();
 
 		cancelAnimationFrame( this.rafId );
 		this.rafId = requestAnimationFrame( () => {
@@ -641,20 +647,28 @@ export class InteractionController {
 							? ( my - startMy ) / visSize.height
 							: 0;
 
-					// Focal-point zoom correction.
-					const zoomRatio = s.zoom !== 0 ? 1 - newZoom / s.zoom : 0;
-					const focalNormX = mx / visSize.width;
-					const focalNormY = my / visSize.height;
-					const zoomCropX =
-						s.pan.x + ( focalNormX - s.pan.x ) * zoomRatio;
-					const zoomCropY =
-						s.pan.y + ( focalNormY - s.pan.y ) * zoomRatio;
+					// Focal-point zoom correction. Keep this based on the
+					// pinch-start state; using the current reducer state here
+					// compounds prior touchmove frames and makes a fixed pinch
+					// center drift after the image is already zoomed or panned.
+					const zoomRatio =
+						touch.startZoom !== 0
+							? 1 - newZoom / touch.startZoom
+							: 0;
+					const startFocalNormX = startMx / visSize.width;
+					const startFocalNormY = startMy / visSize.height;
 
-					// Combined: pan drift + zoom correction.
+					// Combined: midpoint drift + zoom around the pinch-start
+					// midpoint, so moving both fingers together pans while
+					// symmetric pinches keep the start center stationary.
 					const newCropX =
-						touch.startPanX + panDx + ( zoomCropX - s.pan.x );
+						touch.startPanX +
+						panDx +
+						( startFocalNormX - touch.startPanX ) * zoomRatio;
 					const newCropY =
-						touch.startPanY + panDy + ( zoomCropY - s.pan.y );
+						touch.startPanY +
+						panDy +
+						( startFocalNormY - touch.startPanY ) * zoomRatio;
 
 					const { pan: clampedCrop } = restrictPanZoom(
 						{

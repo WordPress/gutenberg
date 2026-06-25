@@ -2,12 +2,24 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   Add `ErrorCode` enum and localized `getErrorMessage()` helper. Existing `UploadError` throw sites now use enum values, and `ErrorCode` / `getErrorMessage` are exported from the package entry point ([#74917](https://github.com/WordPress/gutenberg/pull/74917)).
+-   Log upload cancellations and batch completions via a `SCRIPT_DEBUG`-gated `console.debug` diagnostic; top-level cancellations without an `onError` handler are surfaced via `console.error` ([#74917](https://github.com/WordPress/gutenberg/pull/74917)).
+-   Emit User Timings API entries for upload, sideload, resize, rotate, and transcode operations under a custom "Upload Media" DevTools track when `SCRIPT_DEBUG` is enabled ([#74917](https://github.com/WordPress/gutenberg/pull/74917)).
+
+### Bug Fix
+
+-   `uploadItem` no longer dispatches `finishOperation` twice when both `onFileChange` and `onSuccess` fire for the same attachment ([#74917](https://github.com/WordPress/gutenberg/pull/74917)).
+
+## 0.33.1 (2026-06-16)
+
 ## 0.33.0 (2026-06-10)
 
 ### Enhancement
 
-- UltraHDR (ISO 21496-1 gain map) JPEGs are now detected and resized via libvips's native `uhdrload`/`uhdrsave` pipeline, so gain maps are preserved automatically through the existing resize step ([#74873](https://github.com/WordPress/gutenberg/pull/74873)).
-- Automatically retry failed uploads with exponential backoff for transient (network/server) errors. Retry behavior is configurable via the `retry` store setting; non-transient failures and child sideloads are not retried. The upload queue can also be paused and resumed, allowing uploads to halt while the browser is offline and continue on reconnect ([#76765](https://github.com/WordPress/gutenberg/pull/76765)).
+-   UltraHDR (ISO 21496-1 gain map) JPEGs are now detected and resized via libvips's native `uhdrload`/`uhdrsave` pipeline, so gain maps are preserved automatically through the existing resize step ([#74873](https://github.com/WordPress/gutenberg/pull/74873)).
+-   Automatically retry failed uploads with exponential backoff for transient (network/server) errors. Retry behavior is configurable via the `retry` store setting; non-transient failures and child sideloads are not retried. The upload queue can also be paused and resumed, allowing uploads to halt while the browser is offline and continue on reconnect ([#76765](https://github.com/WordPress/gutenberg/pull/76765)).
 
 ### Bug Fix
 
@@ -21,8 +33,8 @@
 
 ### Bug Fix
 
-- Fix `-scaled` suffix propagating to every sub-size filename when an image exceeds `big_image_size_threshold`. Threshold scaling now runs as a sideload after the original is uploaded, so sub-sizes inherit the un-suffixed basename — matching WordPress core's `wp_create_image_subsizes()` naming.
-- Propagate the post-finalize attachment from `mediaFinalize` back to the queue so the block markup picks up the `-scaled` URL. Without this, oversized client-side uploads kept the unscaled original's URL in the block, and `wp_calculate_image_srcset()` could not match the `src` to any entry in `$image_meta['sizes']` — so the front-end `<img>` shipped without `srcset`.
+-   Fix `-scaled` suffix propagating to every sub-size filename when an image exceeds `big_image_size_threshold`. Threshold scaling now runs as a sideload after the original is uploaded, so sub-sizes inherit the un-suffixed basename — matching WordPress core's `wp_create_image_subsizes()` naming.
+-   Propagate the post-finalize attachment from `mediaFinalize` back to the queue so the block markup picks up the `-scaled` URL. Without this, oversized client-side uploads kept the unscaled original's URL in the block, and `wp_calculate_image_srcset()` could not match the `src` to any entry in `$image_meta['sizes']` — so the front-end `<img>` shipped without `srcset`.
 
 ## 0.31.0 (2026-05-14)
 
@@ -30,7 +42,7 @@
 
 ### Enhancement
 
-- Remove sideload upload serialization: thumbnail uploads now run concurrently, governed by `maxConcurrentUploads` instead of being queued one-at-a-time per attachment ([#75257](https://github.com/WordPress/gutenberg/pull/75257)).
+-   Remove sideload upload serialization: thumbnail uploads now run concurrently, governed by `maxConcurrentUploads` instead of being queued one-at-a-time per attachment ([#75257](https://github.com/WordPress/gutenberg/pull/75257)).
 
 ## 0.29.0 (2026-04-15)
 
