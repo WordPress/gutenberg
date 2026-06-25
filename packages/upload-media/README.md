@@ -79,6 +79,25 @@ _Parameters_
 
 -   _id_ `QueueItemId`: Item ID.
 
+#### optimizeExistingItem
+
+Optimizes a previously uploaded attachment.
+
+Fetches the existing file, re-compresses it client-side (same format, regenerating sub-sizes), and uploads the result as a new attachment. The consumer's `onSuccess` callback receives the new attachment so the block can be repointed at it.
+
+When the browser cannot process the file (client-side media unsupported, or an unsupported/animated format) the item is not enqueued and `onError` is called, leaving the original attachment untouched.
+
+_Parameters_
+
+-   _$0_ `OptimizeExistingItemArgs`:
+-   _$0.id_ `OptimizeExistingItemArgs[ 'id' ]`: Attachment ID of the existing media.
+-   _$0.url_ `OptimizeExistingItemArgs[ 'url' ]`: URL of the existing file to re-process.
+-   _$0.fileName_ `[OptimizeExistingItemArgs[ 'fileName' ]]`: File name. Defaults to the name derived from the URL.
+-   _$0.onChange_ `[OptimizeExistingItemArgs[ 'onChange' ]]`: Function called each time a representation of the file is available.
+-   _$0.onSuccess_ `[OptimizeExistingItemArgs[ 'onSuccess' ]]`: Function called after the optimized file is uploaded.
+-   _$0.onError_ `[OptimizeExistingItemArgs[ 'onError' ]]`: Function called when an error happens.
+-   _$0.additionalData_ `[OptimizeExistingItemArgs[ 'additionalData' ]]`: Additional data to include in the upload request.
+
 #### retryItem
 
 Retries a failed item in the queue.
