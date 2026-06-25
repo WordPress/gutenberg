@@ -6,21 +6,10 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 /**
  * Internal dependencies
  */
-const { recordRequests } = require( './record-requests' );
-
-/**
- * Returns the major Chromium version, or 0 if the browser is not Chromium.
- *
- * @param {import('@playwright/test').Browser} browser Playwright browser object.
- * @return {number} Major Chromium version.
- */
-function getChromiumMajorVersion( browser ) {
-	if ( browser.browserType().name() !== 'chromium' ) {
-		return 0;
-	}
-	const match = browser.version().match( /^(\d+)/ );
-	return match ? parseInt( match[ 1 ], 10 ) : 0;
-}
+const {
+	recordRequests,
+	waitForRequestsToSettle,
+} = require( './record-requests' );
 
 test.describe( 'Preload', () => {
 	let postId;
@@ -32,23 +21,6 @@ test.describe( 'Preload', () => {
 			status: 'draft',
 		} );
 		postId = post.id;
-	} );
-
-	test.beforeEach( async ( { browser } ) => {
-		// These editor-startup request assertions time out in CI starting
-		// with the Playwright upgrade to Chrome for Testing 148/149 (#78632).
-		// Chrome >= 148 is the first CI browser to support
-		// Document-Isolation-Policy, so the editor screen now loads
-		// cross-origin isolated; in that mode startup never reaches the
-		// (deprecated) `networkidle` state these specs wait on, the page is
-		// torn down and the test times out. The exact reason isolation keeps
-		// the network busy is not yet root-caused. Skip on the affected
-		// browsers until the wait is reworked off `networkidle` or the cause
-		// is found. See https://github.com/WordPress/gutenberg/pull/78632.
-		test.skip(
-			getChromiumMajorVersion( browser ) >= 148,
-			'Editor startup never reaches networkidle under cross-origin isolation on Chromium 148+'
-		);
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -87,11 +59,10 @@ test.describe( 'Preload', () => {
 			.filter( { hasText: 'Hello' } )
 			.waitFor();
 		// This spec is explicitly testing network behaviour, so waiting for
-		// the network to settle (rather than a UI marker) is the right
+		// the REST traffic to settle (rather than a UI marker) is the right
 		// signal here: it ensures trailing startup fetches and the racy
 		// resolver duplicates have all been observed before we assert.
-		// eslint-disable-next-line playwright/no-networkidle
-		await page.waitForLoadState( 'networkidle' );
+		await waitForRequestsToSettle( requests );
 		stop();
 
 		// Only collab side effects (CRDT persist + first wp-sync poll)
