@@ -28,6 +28,14 @@ export type WidgetName = `${ string }/${ string }`;
 export type WidgetIcon = ReactElement< ComponentProps< 'svg' > >;
 
 /**
+ * Authoring helper for a widget's `attributes` schema: a DataViews `Field`
+ * whose `id` is narrowed to the keys of the widget's attribute object (`Item`).
+ */
+export type WidgetAttributeField< Item > = Field< Item > & {
+	id: keyof Item & string;
+};
+
+/**
  * Literal contents of a widget's `widget.json` metadata file.
  *
  * Captures the *authoring* shape only; module entry points and style
