@@ -8,13 +8,12 @@ import clsx from 'clsx';
  */
 import { parse } from '@wordpress/blocks';
 import { BlockPreview } from '@wordpress/block-editor';
-import { Button, PanelBody } from '@wordpress/components';
+import { PanelBody } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -56,41 +55,30 @@ export default function PageLayoutPanel() {
 	const layouts = usePageLayoutTemplates();
 	const currentTemplateSlug = useCurrentTemplateSlug();
 	const currentValue = currentTemplateSlug || '';
-	const [ selectedValue, setSelectedValue ] = useState( currentValue );
 	const { editEntityRecord } = useDispatch( coreStore );
-	const { createSuccessNotice } = useDispatch( noticesStore );
 
-	useEffect( () => {
-		setSelectedValue( currentValue );
-	}, [ currentValue ] );
+	const updateLayout = useCallback(
+		( layout ) => {
+			if ( layout.layoutValue === currentValue ) {
+				return;
+			}
+
+			editEntityRecord(
+				'postType',
+				postType,
+				postId,
+				{
+					template: layout.isDefault ? '' : layout.slug,
+				},
+				{ undoIgnore: true }
+			);
+		},
+		[ currentValue, editEntityRecord, postId, postType ]
+	);
 
 	if ( postType !== 'page' || ! layouts.length ) {
 		return null;
 	}
-
-	const selectedLayout = layouts.find(
-		( layout ) => layout.layoutValue === selectedValue
-	);
-	const hasChanges = selectedValue !== currentValue;
-
-	const applyLayout = () => {
-		if ( ! selectedLayout || ! hasChanges ) {
-			return;
-		}
-
-		editEntityRecord(
-			'postType',
-			postType,
-			postId,
-			{
-				template: selectedLayout.isDefault ? '' : selectedLayout.slug,
-			},
-			{ undoIgnore: true }
-		);
-		createSuccessNotice( __( 'Layout updated.' ), {
-			type: 'snackbar',
-		} );
-	};
 
 	return (
 		<PanelBody title={ __( 'Page Layout' ) } initialOpen>
@@ -101,7 +89,6 @@ export default function PageLayoutPanel() {
 					className="editor-page-layout-panel__options"
 				>
 					{ layouts.map( ( layout ) => {
-						const isSelected = layout.layoutValue === selectedValue;
 						const isCurrent = layout.layoutValue === currentValue;
 						const inputId = `editor-page-layout-${
 							layout.id || layout.slug || 'default'
@@ -114,7 +101,7 @@ export default function PageLayoutPanel() {
 								className={ clsx(
 									'editor-page-layout-panel__option',
 									{
-										'is-selected': isSelected,
+										'is-selected': isCurrent,
 									}
 								) }
 							>
@@ -123,10 +110,8 @@ export default function PageLayoutPanel() {
 									type="radio"
 									name="editor-page-layout"
 									value={ layout.layoutValue }
-									checked={ isSelected }
-									onChange={ () =>
-										setSelectedValue( layout.layoutValue )
-									}
+									checked={ isCurrent }
+									onChange={ () => updateLayout( layout ) }
 								/>
 								<div className="editor-page-layout-panel__preview">
 									<PageLayoutPreview template={ layout } />
@@ -143,15 +128,6 @@ export default function PageLayoutPanel() {
 						);
 					} ) }
 				</div>
-				<Button
-					__next40pxDefaultSize
-					variant="primary"
-					onClick={ applyLayout }
-					disabled={ ! hasChanges || ! selectedLayout }
-					accessibleWhenDisabled
-				>
-					{ __( 'Apply' ) }
-				</Button>
 			</div>
 		</PanelBody>
 	);
