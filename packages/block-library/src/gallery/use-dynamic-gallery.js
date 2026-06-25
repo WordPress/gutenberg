@@ -57,6 +57,24 @@ function buildImageBlockAttributes( media, galleryAttributes ) {
 }
 
 /**
+ * Builds a set of `core/image` blocks from the resolved media, applying the
+ * gallery-wide settings. Each call mints fresh client IDs, so it can produce
+ * both the editor preview and the materialized inner blocks on convert.
+ *
+ * @param {Object[]} media             Media records from the REST API.
+ * @param {Object}   galleryAttributes The image-relevant gallery attributes.
+ * @return {Object[]} New `core/image` block instances.
+ */
+function buildImageBlocks( media, galleryAttributes ) {
+	return media.map( ( mediaItem ) =>
+		createBlock(
+			'core/image',
+			buildImageBlockAttributes( mediaItem, galleryAttributes )
+		)
+	);
+}
+
+/**
  * Bundles the Gallery block's "dynamic mode" source resolution and actions.
  *
  * Dynamic mode resolves the gallery's images from a configured source
@@ -130,13 +148,7 @@ export default function useDynamicGallery( {
 	// The (non-persisted) `core/image` blocks used for the editor preview.
 	// Rebuilt when the resolved media or an image-relevant setting changes.
 	const dynamicImageBlocks = useMemo(
-		() =>
-			dynamicMedia.map( ( mediaItem ) =>
-				createBlock(
-					'core/image',
-					buildImageBlockAttributes( mediaItem, imageAttributes )
-				)
-			),
+		() => buildImageBlocks( dynamicMedia, imageAttributes ),
 		[ dynamicMedia, imageAttributes ]
 	);
 
@@ -166,13 +178,13 @@ export default function useDynamicGallery( {
 	// "Pins" a dynamic gallery: materializes the currently-resolved media as
 	// real, editable image blocks and leaves dynamic mode.
 	function convertToStatic() {
-		const blocks = dynamicMedia.map( ( mediaItem ) =>
-			createBlock(
-				'core/image',
-				buildImageBlockAttributes( mediaItem, imageAttributes )
-			)
+		// Build fresh blocks rather than reusing the preview's `dynamicImageBlocks`
+		// so the materialized inner blocks get their own client IDs, distinct from
+		// the (disabled) preview instances.
+		replaceInnerBlocks(
+			clientId,
+			buildImageBlocks( dynamicMedia, imageAttributes )
 		);
-		replaceInnerBlocks( clientId, blocks );
 		setAttributes( { dynamicContent: undefined } );
 	}
 
