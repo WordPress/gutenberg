@@ -12,7 +12,8 @@ import styles from './style.module.css';
  * A link that looks like a `Button`. Prefer `Link` for navigation unless
  * button prominence is intentional.
  *
- * @see {@link https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-button-usage-guidelines--docs When to use Button, Link, or LinkButton}
+ * See the [Usage Guidelines](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-button-usage-guidelines--docs)
+ * for when to use `Button`, `Link`, or `LinkButton`.
  */
 export const LinkButton = forwardRef< HTMLAnchorElement, LinkButtonProps >(
 	function LinkButton(

@@ -15,12 +15,6 @@ const meta: Meta< typeof LinkButton > = {
 			whereUsed: 'global',
 			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components` and text overflow behavior. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
-		docs: {
-			description: {
-				component:
-					'See [Usage Guidelines](?path=/docs/design-system-components-button-usage-guidelines--docs) for when to use `Button`, `Link`, or `LinkButton`.',
-			},
-		},
 	},
 };
 export default meta;
