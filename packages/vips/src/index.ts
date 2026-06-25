@@ -197,6 +197,15 @@ export async function convertImageFormat(
 		// See https://github.com/swissspidy/media-experiments/issues/324.
 		if ( 'image/avif' === outputType ) {
 			saveOptions.effort = 2;
+
+			// Preserve the source bit depth so high-bit-depth (10/12-bit) HDR
+			// images stay high-bit-depth when compressed or converted to AVIF
+			// instead of being flattened to 8-bit. Unlike resizing, this path
+			// keeps the decoded 16-bit image, so no extra handling is needed.
+			const sourceBitdepth = getSourceBitdepth( image );
+			if ( sourceBitdepth > 8 ) {
+				saveOptions.bitdepth = sourceBitdepth;
+			}
 		}
 
 		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
@@ -374,15 +383,42 @@ function applyResizeAndCrop<
 }
 
 /**
+ * Reads the source bit depth of a decoded HEIF/AVIF image.
+ *
+ * High-bit-depth (10/12-bit) AVIF/HEIF images decode into a 16-bit `ushort`
+ * container and expose a `heif-bitdepth` metadata field. Standard 8-bit images
+ * report 8 or omit the field. Used to keep HDR sub-sizes at their original bit
+ * depth instead of silently flattening them to 8-bit.
+ *
+ * @param image Decoded vips image.
+ * @return Source bit depth (typically 8, 10, or 12).
+ */
+function getSourceBitdepth< T extends { getInt: ( name: string ) => number } >(
+	image: T
+): number {
+	try {
+		const bitdepth = image.getInt( 'heif-bitdepth' );
+		if ( bitdepth > 8 ) {
+			return bitdepth;
+		}
+	} catch {
+		// Field absent: standard (8-bit) image.
+	}
+	return 8;
+}
+
+/**
  * Builds save options for writing an image to a buffer.
  *
- * @param type    Output mime type.
- * @param quality Desired quality (0-1).
+ * @param type     Output mime type.
+ * @param quality  Desired quality (0-1).
+ * @param bitdepth Source bit depth; values above 8 are preserved for AVIF.
  * @return Save options object.
  */
 function buildSaveOptions(
 	type: string,
-	quality: number
+	quality: number,
+	bitdepth = 8
 ): SaveOptions< typeof type > {
 	const saveOptions: SaveOptions< typeof type > = {
 		// Strip metadata except ICC color profiles or gainmaps,
@@ -397,9 +433,76 @@ function buildSaveOptions(
 	// See https://github.com/swissspidy/media-experiments/issues/324.
 	if ( 'image/avif' === type ) {
 		saveOptions.effort = 2;
+
+		// Preserve the source bit depth so high-bit-depth (10/12-bit) HDR
+		// images are not flattened to 8-bit on output.
+		if ( bitdepth > 8 ) {
+			saveOptions.bitdepth = bitdepth;
+		}
 	}
 
 	return saveOptions;
+}
+
+/**
+ * Resizes a decoded high-bit-depth image while preserving its 16-bit samples.
+ *
+ * libvips `thumbnail` performs a colour-managed export that flattens samples to
+ * 8-bit sRGB, which would silently turn HDR sub-sizes into 8-bit. `resize` and
+ * `crop` keep the full 16-bit precision, so this mirrors `thumbnail`'s geometry
+ * (shrink-to-fit, or fill-then-centre-crop when a crop is requested) using those
+ * operations instead. Attention/smart cropping is unavailable here and falls
+ * back to a centre crop. `size: 'down'` semantics are preserved: images are
+ * never enlarged.
+ *
+ * @param image       Decoded 16-bit source image.
+ * @param targetWidth Target width in pixels.
+ * @param options     Thumbnail options (target height and optional crop).
+ * @return The resized (and optionally cropped) 16-bit image.
+ */
+function resizeHighBitDepth<
+	T extends {
+		width: number;
+		pageHeight: number;
+		resize: ( scale: number ) => T;
+		crop: ( left: number, top: number, width: number, height: number ) => T;
+	},
+>( image: T, targetWidth: number, options: ThumbnailOptions ): T {
+	const targetHeight = options.height ?? targetWidth;
+
+	if ( options.crop ) {
+		// Fill the target box, then centre-crop to the exact dimensions.
+		const scale = Math.min(
+			1,
+			Math.max(
+				targetWidth / image.width,
+				targetHeight / image.pageHeight
+			)
+		);
+		const resized = image.resize( scale );
+		const cropWidth = Math.min( resized.width, Math.round( targetWidth ) );
+		const cropHeight = Math.min(
+			resized.pageHeight,
+			Math.round( targetHeight )
+		);
+		const left = Math.max(
+			0,
+			Math.round( ( resized.width - cropWidth ) / 2 )
+		);
+		const top = Math.max(
+			0,
+			Math.round( ( resized.pageHeight - cropHeight ) / 2 )
+		);
+		return resized.crop( left, top, cropWidth, cropHeight );
+	}
+
+	// Shrink to fit within the target box, preserving the aspect ratio.
+	const scale = Math.min(
+		1,
+		targetWidth / image.width,
+		targetHeight / image.pageHeight
+	);
+	return image.resize( scale );
 }
 
 /**
@@ -462,12 +565,33 @@ export async function resizeImage(
 
 		const { width, pageHeight } = image;
 
+		// Detect high-bit-depth (10/12-bit) AVIF sources. `thumbnail` would
+		// flatten these to 8-bit sRGB, so they are resized directly from the
+		// decoded 16-bit image, which keeps full precision. Animated images
+		// keep the streaming `thumbnail` path (multi-page resize/crop is not
+		// handled here, and HDR is a still-image concern).
+		const sourceBitdepth =
+			'image/avif' === type && ! strOptions
+				? getSourceBitdepth( image )
+				: 8;
+		const isHighBitDepth = sourceBitdepth > 8;
+		const sourceImage = image;
+
 		image = applyResizeAndCrop(
 			resize,
 			width,
 			pageHeight,
 			smartCrop,
 			( resizeWidth, thumbnailOptions ) => {
+				if ( isHighBitDepth ) {
+					const resized = resizeHighBitDepth(
+						sourceImage,
+						resizeWidth,
+						thumbnailOptions
+					);
+					resized.onProgress = onProgress;
+					return resized;
+				}
 				if ( strOptions ) {
 					thumbnailOptions.option_string = strOptions;
 				}
@@ -481,7 +605,7 @@ export async function resizeImage(
 			}
 		);
 
-		const saveOptions = buildSaveOptions( type, quality );
+		const saveOptions = buildSaveOptions( type, quality, sourceBitdepth );
 		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
 
 		const result = {
