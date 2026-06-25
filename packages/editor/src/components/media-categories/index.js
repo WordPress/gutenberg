@@ -193,6 +193,21 @@ const invalidateAttachedImagesQueries = ( postId, query = {} ) => {
 	}
 };
 
+/**
+ * Builds the "attached images" inserter media category for the current post.
+ *
+ * Beyond the standard category shape (`name`, `labels`, `mediaType`, `fetch`),
+ * this returns a self-contained behaviour bundle: `attach`, `detach`,
+ * `invalidate`, and `getTotalItems`, plus the `isCurrentPostMedia` flag that
+ * routes it to the dedicated panel in `block-editor`. All of the
+ * WordPress-attachment-specific logic (querying by `parent`, saving the `post`
+ * field) is encapsulated here so `block-editor` can host the panel without
+ * knowing anything about attachments. The capability is opt-in: categories that
+ * don't set `isCurrentPostMedia` (e.g. Images, Openverse) are unaffected.
+ *
+ * @param {number} postId The current post ID.
+ * @return {Object} The attached-images inserter media category.
+ */
 const getAttachedImagesCategory = ( postId ) => ( {
 	name: 'attached-images',
 	labels: {

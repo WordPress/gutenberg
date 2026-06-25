@@ -21,7 +21,6 @@ import MediaUploadCheck from '../../media-upload/check';
 import MediaUpload from '../../media-upload';
 
 const ATTACHED_MEDIA_ITEMS_PER_PAGE = 20;
-const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 function useAttachedMedia( category, query ) {
 	const [ mediaList, setMediaList ] = useState( [] );
@@ -86,6 +85,7 @@ function useAttachedMedia( category, query ) {
 }
 
 function MediaLibraryButton( {
+	allowedTypes,
 	children,
 	className,
 	disabled,
@@ -101,7 +101,7 @@ function MediaLibraryButton( {
 			<MediaUpload
 				multiple="add"
 				onSelect={ onSelect }
-				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				allowedTypes={ allowedTypes }
 				title={ title }
 				value={ value }
 				render={ ( { open } ) => (
@@ -127,10 +127,35 @@ function MediaLibraryButton( {
 	);
 }
 
+/**
+ * Generic host panel for a "current post media" category — one that opts in via
+ * `isCurrentPostMedia` and supplies its own behaviour (`attach`, `detach`,
+ * `invalidate`, `getTotalItems`) alongside the usual `fetch`. See
+ * `getAttachedImagesCategory` in the `editor` package for the WordPress
+ * attachments implementation.
+ *
+ * The category owns all of the source-specific concerns — what the collection
+ * is called (`labels.name`), its media type (`mediaType`), and how items are
+ * attached/detached — so this component stays media-source-agnostic, mirroring
+ * the way `getReportUrl` drives the Openverse "Report" affordance without
+ * `block-editor` knowing anything about Openverse.
+ *
+ * @param {Object}   props
+ * @param {Function} props.onInsert Called with a block to insert when an item is clicked.
+ * @param {Object}   props.category The current-post media category to render.
+ */
 export default function AttachedMediaPanel( { onInsert, category } ) {
 	const query = useMemo(
 		() => ( { per_page: ATTACHED_MEDIA_ITEMS_PER_PAGE } ),
 		[]
+	);
+	const categoryLabel = category.labels?.name;
+	// The upload frame's `allowedTypes` is conventionally an array. Default to the
+	// category's single `mediaType`, but let a category opt into a broader set by
+	// supplying its own `allowedTypes` array.
+	const allowedTypes = useMemo(
+		() => category.allowedTypes ?? [ category.mediaType ],
+		[ category.allowedTypes, category.mediaType ]
 	);
 	const { mediaList, totalItems, isLoading, hasError, refresh } =
 		useAttachedMedia( category, query );
@@ -236,7 +261,7 @@ export default function AttachedMediaPanel( { onInsert, category } ) {
 	return (
 		<div className="block-editor-inserter__attached-media-panel">
 			<h3 className="block-editor-inserter__attached-media-panel-heading">
-				{ __( 'Attached images' ) }
+				{ categoryLabel }
 			</h3>
 			{ isLoading && ! mediaList.length && (
 				<div className="block-editor-inserter__attached-media-panel-spinner">
@@ -265,7 +290,7 @@ export default function AttachedMediaPanel( { onInsert, category } ) {
 					>
 						<MediaList
 							category={ category }
-							label={ __( 'Attached images' ) }
+							label={ categoryLabel }
 							mediaList={ mediaList }
 							onClick={ onInsert }
 							onDetach={ setMediaPendingDetach }
@@ -273,6 +298,7 @@ export default function AttachedMediaPanel( { onInsert, category } ) {
 						/>
 						{ remainingMediaCount > 0 && (
 							<MediaLibraryButton
+								allowedTypes={ allowedTypes }
 								className="block-editor-inserter__attached-media-panel-more"
 								label={ sprintf(
 									/* translators: %d: Number of additional attached images. */
@@ -280,7 +306,7 @@ export default function AttachedMediaPanel( { onInsert, category } ) {
 									remainingMediaCount
 								) }
 								onSelect={ handleAttach }
-								title={ __( 'Attached images' ) }
+								title={ categoryLabel }
 								value={ mediaIds }
 								variant="tertiary"
 							>
@@ -301,6 +327,7 @@ export default function AttachedMediaPanel( { onInsert, category } ) {
 			) }
 			<div className="block-editor-inserter__attached-media-panel-actions">
 				<MediaLibraryButton
+					allowedTypes={ allowedTypes }
 					disabled={ isAttaching }
 					icon={ plus }
 					onSelect={ handleAttach }
