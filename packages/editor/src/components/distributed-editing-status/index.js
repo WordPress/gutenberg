@@ -86,6 +86,7 @@ const DISTRIBUTED_EDITING_STARTUP_SNAPSHOT_DELAY_MS = 1000;
 const DISTRIBUTED_EDITING_DOCUMENT_STATE_HEARTBEAT_DEBOUNCE_MS = 500;
 const DISTRIBUTED_EDITING_CONFIRMED_SAVE_SHELL_HOLD_MS = 4000;
 const DISTRIBUTED_EDITING_CONFIRMED_SAVE_STATUS_HOLD_MS = 7000;
+const DISTRIBUTED_EDITING_DISMISSIBLE_STATUS_HOLD_MS = 8000;
 const DISTRIBUTED_EDITING_SAME_BLOCK_CONFLICT_REASONS = new Set( [
 	'same_block_changed',
 	'same_serialized_block_changed',
@@ -1478,9 +1479,37 @@ export function DistributedEditingStatusSurface( {
 		getDistributedEditingConfirmedSaveStatusHoldMs();
 	const [ quietedConfirmedSaveStatusIds, setQuietedConfirmedSaveStatusIds ] =
 		useState( [] );
+	const [ dismissedStatusItemKeys, setDismissedStatusItemKeys ] = useState(
+		[]
+	);
 	const unloadWarningMessage =
 		getDistributedEditingUnloadWarningMessage( unloadWarningState );
 	const actionStatusMessage = actionStatus?.message;
+	const rawStatusItemDismissalKeys = statusItems
+		.map( getDistributedEditingStatusSurfaceDismissalKey )
+		.join( '\n' );
+	const visibleStatusItems = statusItems.filter(
+		( item ) =>
+			! dismissedStatusItemKeys.includes(
+				getDistributedEditingStatusSurfaceDismissalKey( item )
+			)
+	);
+	const visibleDismissibleStatusItemKeys = visibleStatusItems
+		.filter( isDismissibleStatusItem )
+		.map( getDistributedEditingStatusSurfaceDismissalKey )
+		.join( '\n' );
+	const dismissibleStatusHoldMs =
+		getDistributedEditingDismissibleStatusHoldMs();
+	const dismissStatusItem = useCallback( ( item ) => {
+		const dismissalKey =
+			getDistributedEditingStatusSurfaceDismissalKey( item );
+
+		setDismissedStatusItemKeys( ( currentKeys ) =>
+			currentKeys.includes( dismissalKey )
+				? currentKeys
+				: [ ...currentKeys, dismissalKey ]
+		);
+	}, [] );
 
 	useEffect( () => {
 		if ( ! confirmedSaveStatusItemsKey ) {
@@ -1504,8 +1533,38 @@ export function DistributedEditingStatusSurface( {
 		confirmedSaveStatusItemsKey,
 	] );
 
+	useEffect( () => {
+		const activeKeys = rawStatusItemDismissalKeys
+			.split( '\n' )
+			.filter( Boolean );
+
+		setDismissedStatusItemKeys( ( currentKeys ) =>
+			currentKeys.filter( ( key ) => activeKeys.includes( key ) )
+		);
+	}, [ rawStatusItemDismissalKeys ] );
+
+	useEffect( () => {
+		if ( ! visibleDismissibleStatusItemKeys ) {
+			return undefined;
+		}
+
+		const timeoutId = setTimeout( () => {
+			const keys = visibleDismissibleStatusItemKeys
+				.split( '\n' )
+				.filter( Boolean );
+
+			setDismissedStatusItemKeys( ( currentKeys ) => [
+				...new Set( [ ...currentKeys, ...keys ] ),
+			] );
+		}, dismissibleStatusHoldMs );
+
+		return () => {
+			clearTimeout( timeoutId );
+		};
+	}, [ dismissibleStatusHoldMs, visibleDismissibleStatusItemKeys ] );
+
 	if (
-		! statusItems.length &&
+		! visibleStatusItems.length &&
 		! unloadWarningMessage &&
 		! actionStatusMessage
 	) {
@@ -1519,7 +1578,7 @@ export function DistributedEditingStatusSurface( {
 			data-distributed-editing-placement={ placement }
 			role="region"
 		>
-			{ statusItems.map( ( item ) => {
+			{ visibleStatusItems.map( ( item ) => {
 				const freshReviewAuthorityStatus =
 					getFreshReviewAuthorityStatusProps( item );
 				const nextStepMessage = item.nextStepMessage;
@@ -1535,6 +1594,7 @@ export function DistributedEditingStatusSurface( {
 				const isQuietedConfirmedSaveStatus =
 					isConfirmedSaveStatus &&
 					quietedConfirmedSaveStatusIds.includes( item.id );
+				const isDismissible = isDismissibleStatusItem( item );
 
 				return (
 					<div
@@ -1632,10 +1692,18 @@ export function DistributedEditingStatusSurface( {
 						data-distributed-editing-save-now-step={
 							item.saveNowContextStep || undefined
 						}
+						data-distributed-editing-status-dismissible={ formatDataBoolean(
+							isDismissible
+						) }
 					>
 						<Notice
 							className="editor-distributed-editing-status__notice"
-							isDismissible={ false }
+							isDismissible={ isDismissible }
+							onRemove={
+								isDismissible
+									? () => dismissStatusItem( item )
+									: undefined
+							}
 							status={ item.status }
 							actions={ getNoticeActions( item, onAction ) }
 						>
@@ -5011,6 +5079,21 @@ function getDistributedEditingConfirmedSaveStatusHoldMs() {
 	}
 
 	return DISTRIBUTED_EDITING_CONFIRMED_SAVE_STATUS_HOLD_MS;
+}
+
+function getDistributedEditingDismissibleStatusHoldMs() {
+	const holdMs =
+		globalThis.__experimentalDistributedEditingDismissibleStatusHoldMs;
+
+	if (
+		typeof holdMs === 'number' &&
+		Number.isFinite( holdMs ) &&
+		holdMs >= 0
+	) {
+		return holdMs;
+	}
+
+	return DISTRIBUTED_EDITING_DISMISSIBLE_STATUS_HOLD_MS;
 }
 
 function getDistributedEditingQuietedConfirmedSaveShellState( shellState ) {
@@ -8449,6 +8532,7 @@ function getDistributedEditingStatusSurfaceItem( descriptor ) {
 				...getRetrySaveStatusText( descriptor ),
 				retrySaveReviewRequired: descriptor.retrySaveReviewRequired,
 				retrySaveStatus: descriptor.retrySaveStatus,
+				retrySaveReason: descriptor.retrySaveReason,
 				retrySaveConfirmedMergedEdits:
 					descriptor.retrySaveConfirmedMergedEdits,
 				retrySaveFreshReviewConsumed:
@@ -8587,10 +8671,38 @@ function getBaseStatusItem( descriptor ) {
 		id: descriptor.id || descriptor.kind,
 		kind: descriptor.kind,
 		status: descriptor.status || 'info',
+		reasonCode: descriptor.reasonCode,
+		disposition: descriptor.disposition,
+		isDismissible: isDismissibleStatusDescriptor( descriptor ),
 		actionKeys: Array.isArray( descriptor.actionKeys )
 			? descriptor.actionKeys
 			: [],
 	};
+}
+
+function isDismissibleStatusDescriptor( descriptor ) {
+	return Boolean(
+		descriptor?.noticeOptions?.isDismissible &&
+			descriptor?.kind === DISTRIBUTED_EDITING_NOTICE_KINDS.RETRY_SAVE &&
+			descriptor?.retrySaveReviewRequired
+	);
+}
+
+function isDismissibleStatusItem( item ) {
+	return Boolean( item?.isDismissible );
+}
+
+function getDistributedEditingStatusSurfaceDismissalKey( item ) {
+	return JSON.stringify( [
+		item?.id || '',
+		item?.kind || '',
+		item?.status || '',
+		item?.title || '',
+		item?.message || '',
+		item?.reasonCode || '',
+		item?.retrySaveStatus || '',
+		item?.retrySaveReason || '',
+	] );
 }
 
 function getFreshReviewStatusItemTestId( item, freshReviewAuthorityStatus ) {

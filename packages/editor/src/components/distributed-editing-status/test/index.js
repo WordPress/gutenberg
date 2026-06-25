@@ -8423,7 +8423,8 @@ describe( 'DistributedEditingStatus', () => {
 		).toBeVisible();
 	} );
 
-	it( 'renders review-required retry-save chrome without export or refetch actions', () => {
+	it( 'renders dismissible review-required retry-save chrome without export or refetch actions', async () => {
+		const user = userEvent.setup();
 		const writeText = jest.fn().mockResolvedValue();
 		const actions = setupDistributedEditingStatusDispatch();
 
@@ -8471,6 +8472,7 @@ describe( 'DistributedEditingStatus', () => {
 		expect(
 			screen.queryByRole( 'button', { name: 'Get latest post' } )
 		).not.toBeInTheDocument();
+		expect( screen.getByRole( 'button', { name: 'Close' } ) ).toBeVisible();
 		expect( writeText ).not.toHaveBeenCalled();
 		expect(
 			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
@@ -8484,6 +8486,145 @@ describe( 'DistributedEditingStatus', () => {
 		expect(
 			actions.__experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof
 		).not.toHaveBeenCalled();
+
+		await user.click( screen.getByRole( 'button', { name: 'Close' } ) );
+
+		expect(
+			screen.queryByText( 'Safe parts saved' )
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByText(
+				'WordPress saved the safe parts, but one block was blocked.'
+			)
+		).not.toBeInTheDocument();
+		expect(
+			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalPrepareDistributedEditingRetrySubmitAfterLocalRebase
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof
+		).not.toHaveBeenCalled();
+	} );
+
+	it( 'auto-dismisses review-required retry-save chrome after the notice hold', () => {
+		const previousHoldMs =
+			globalThis.__experimentalDistributedEditingDismissibleStatusHoldMs;
+		globalThis.__experimentalDistributedEditingDismissibleStatusHoldMs = 1000;
+		jest.useFakeTimers();
+
+		try {
+			setupDistributedEditingStatusDispatch();
+			setupDistributedEditingStatusSelect( {
+				currentPost: { id: 45, type: 'post' },
+				editedPostContent:
+					'<!-- wp:html --><script>window.localChange = true;</script><!-- /wp:html -->',
+				sessionState: {
+					disposition:
+						DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
+					reasonCode:
+						DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: false,
+					retrySaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
+					retrySaveReason:
+						DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
+				},
+			} );
+
+			render( <DistributedEditingStatusChrome /> );
+
+			expect( screen.getByText( 'Safe parts saved' ) ).toBeVisible();
+
+			act( () => {
+				jest.advanceTimersByTime( 1000 );
+			} );
+
+			expect(
+				screen.queryByText( 'Safe parts saved' )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByText(
+					'WordPress saved the safe parts, but one block was blocked.'
+				)
+			).not.toBeInTheDocument();
+		} finally {
+			jest.useRealTimers();
+			if ( previousHoldMs === undefined ) {
+				delete globalThis.__experimentalDistributedEditingDismissibleStatusHoldMs;
+			} else {
+				globalThis.__experimentalDistributedEditingDismissibleStatusHoldMs =
+					previousHoldMs;
+			}
+		}
+	} );
+
+	it( 'renders a changed dismissible status after an earlier one is dismissed', async () => {
+		const user = userEvent.setup();
+		const firstDescriptor = {
+			id: 'de-rtc-retry-save',
+			kind: DISTRIBUTED_EDITING_NOTICE_KINDS.RETRY_SAVE,
+			status: 'warning',
+			reasonCode:
+				DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
+			retrySaveStatus:
+				DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
+			retrySaveReason:
+				DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
+			retrySaveReviewRequired: true,
+			noticeOptions: {
+				isDismissible: true,
+			},
+		};
+		const secondDescriptor = {
+			...firstDescriptor,
+			status: 'error',
+			reasonCode:
+				DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_REVIEW_APPROVAL_REQUIRES_UNFILTERED_HTML,
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_PERMISSION_DENIED,
+			retrySaveStatus:
+				DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_PERMISSION_DENIED,
+			retrySaveReason:
+				DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_REVIEW_APPROVAL_REQUIRES_UNFILTERED_HTML,
+		};
+
+		const { rerender } = render(
+			<DistributedEditingStatusSurface
+				noticeDescriptors={ [ firstDescriptor ] }
+			/>
+		);
+
+		expect( screen.getByText( 'Safe parts saved' ) ).toBeVisible();
+
+		await user.click( screen.getByRole( 'button', { name: 'Close' } ) );
+
+		expect(
+			screen.queryByText( 'Safe parts saved' )
+		).not.toBeInTheDocument();
+
+		rerender(
+			<DistributedEditingStatusSurface
+				noticeDescriptors={ [ secondDescriptor ] }
+			/>
+		);
+
+		expect(
+			screen.getByText( 'Save needs HTML permission' )
+		).toBeVisible();
+		expect(
+			screen.getByText(
+				'The HTML review was accepted, but this account cannot perform the final HTML-capable save. Ask someone with HTML permission to complete the save.'
+			)
+		).toBeVisible();
 	} );
 
 	it( 'exports a fresh-review handoff for unavailable reviewed tokens without saving or leaking proof internals', async () => {

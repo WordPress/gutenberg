@@ -10416,6 +10416,7 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 						  ]
 						: [] ),
 				],
+				isDismissible: retrySaveReviewRequired,
 				extra: getDistributedEditingRetrySaveDescriptorFields(
 					normalized
 				),
