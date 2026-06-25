@@ -8,6 +8,7 @@
  */
 import { colord } from 'colord';
 import WaveformPlayerLib from '@arraypress/waveform-player';
+import { __, _x, sprintf } from '@wordpress/i18n';
 
 /**
  * Configuration constants.
@@ -195,7 +196,7 @@ function getFiniteTime( value ) {
 export function setupSeekControlAccessibility(
 	container,
 	instance,
-	{ label = 'Seek' } = {}
+	{ label = __( 'Seek' ) } = {}
 ) {
 	const seekControl = container.querySelector( '.waveform-container' );
 	const { audio } = instance;
@@ -249,9 +250,12 @@ export function setupSeekControlAccessibility(
 		seekControl.setAttribute( 'aria-valuenow', String( currentTime ) );
 		seekControl.setAttribute(
 			'aria-valuetext',
-			`${ formatTimestamp( currentTime ) } of ${ formatTimestamp(
-				duration
-			) }`
+			sprintf(
+				/* translators: %1$s: current audio time, %2$s: total audio duration. */
+				_x( '%1$s of %2$s', 'audio current time of total duration' ),
+				formatTimestamp( currentTime ),
+				formatTimestamp( duration )
+			)
 		);
 
 		positionOverlay( playhead, playheadTime, duration );
@@ -259,7 +263,7 @@ export function setupSeekControlAccessibility(
 
 	seekControl.setAttribute( 'tabindex', '0' );
 	seekControl.setAttribute( 'role', 'slider' );
-	seekControl.setAttribute( 'aria-label', label || 'Seek' );
+	seekControl.setAttribute( 'aria-label', label || __( 'Seek' ) );
 	seekControl.setAttribute( 'aria-valuemin', '0' );
 	updateSeekControl();
 
@@ -434,7 +438,7 @@ export function updateSeekControlLabel( instance, label ) {
 	);
 
 	if ( seekControl ) {
-		seekControl.setAttribute( 'aria-label', label || 'Seek' );
+		seekControl.setAttribute( 'aria-label', label || __( 'Seek' ) );
 	}
 }
 
@@ -500,7 +504,7 @@ export function initWaveformPlayer(
 	const cleanupSeekControlAccessibility = setupSeekControlAccessibility(
 		container,
 		instance,
-		{ label: labels?.seek || title || 'Seek' }
+		{ label: labels?.seek || title || __( 'Seek' ) }
 	);
 	let cleanupPlayButtonAccessibility;
 	const handlers = {
