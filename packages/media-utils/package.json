@@ -48,7 +48,6 @@
 	],
 	"dependencies": {
 		"@wordpress/api-fetch": "file:../api-fetch",
-		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/components": "file:../components",
@@ -56,6 +55,7 @@
 		"@wordpress/data": "file:../data",
 		"@wordpress/dataviews": "file:../dataviews",
 		"@wordpress/element": "file:../element",
+		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/media-fields": "file:../media-fields",
