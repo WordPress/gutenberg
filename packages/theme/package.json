@@ -40,9 +40,7 @@
 		},
 		"./design-tokens.css": "./src/prebuilt/css/design-tokens.css",
 		"./design-token-fallbacks": {
-			"sass": "./design-token-fallbacks.scss",
-			"style": "./design-token-fallbacks.scss",
-			"default": "./design-token-fallbacks.scss"
+			"sass": "./design-token-fallbacks.scss"
 		},
 		"./design-tokens.js": {
 			"types": "./build-types/prebuilt/js/design-tokens.d.ts",
