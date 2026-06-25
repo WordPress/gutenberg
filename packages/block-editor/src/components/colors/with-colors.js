@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useCallback } from '@wordpress/element';
+import { useMemo, useCallback, useRef } from '@wordpress/element';
 import { compose, createHigherOrderComponent } from '@wordpress/compose';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 
@@ -94,53 +94,83 @@ function createColorHOC( colorTypes, withColorPalette ) {
 		};
 	}, {} );
 
-	function computeDerivedColorState( attributes, colors, prevState = {} ) {
-		return Object.entries( colorMap ).reduce(
-			( acc, [ colorAttributeName, colorContext ] ) => {
-				const customAttr = `custom${ upperFirst(
-					colorAttributeName
-				) }`;
-				const colorObject = getColorObjectByAttributeValues(
-					colors,
-					attributes[ colorAttributeName ],
-					attributes[ customAttr ]
-				);
-
-				const prevColor = prevState[ colorAttributeName ]?.color;
-				const prevColorObject = prevState[ colorAttributeName ];
-
-				acc[ colorAttributeName ] =
-					prevColor === colorObject.color && prevColorObject
-						? prevColorObject
-						: {
-								...colorObject,
-								class: getColorClassName(
-									colorContext,
-									colorObject.slug
-								),
-						  };
-
-				return acc;
-			},
-			{}
-		);
-	}
-
 	return compose( [
 		withColorPalette,
 		( WrappedComponent ) => {
 			return function WithColors( props ) {
-				const { colors, attributes, setAttributes } = props;
+				const { colors: _colors, ...passedProps } = props;
+				const { attributes, setAttributes } = passedProps;
+				const prevColorPropsRef = useRef( null );
 
-				const colorState = useMemo(
-					() => computeDerivedColorState( attributes, colors ),
-					[ attributes, colors ]
-				);
+				const colorProps = useMemo( () => {
+					const prevColorProps = prevColorPropsRef.current;
+
+					const result = Object.fromEntries(
+						Object.entries( colorMap ).flatMap(
+							( [ colorAttributeName, colorContext ] ) => {
+								const customAttr = `custom${ upperFirst(
+									colorAttributeName
+								) }`;
+								const upperFirstColorAttributeName =
+									upperFirst( colorAttributeName );
+
+								const colorObject =
+									getColorObjectByAttributeValues(
+										_colors,
+										attributes[ colorAttributeName ],
+										attributes[ customAttr ]
+									);
+
+								const prevColorValue =
+									prevColorProps?.[ colorAttributeName ];
+								const colorValue =
+									prevColorValue?.color ===
+										colorObject.color && prevColorValue
+										? prevColorValue
+										: {
+												...colorObject,
+												class: getColorClassName(
+													colorContext,
+													colorObject.slug
+												),
+										  };
+
+								const setter = ( newColorValue ) => {
+									const resolvedColorObject =
+										getColorObjectByColorValue(
+											_colors,
+											newColorValue
+										);
+									setAttributes( {
+										[ colorAttributeName ]:
+											resolvedColorObject?.slug ||
+											undefined,
+										[ customAttr ]:
+											resolvedColorObject?.slug
+												? undefined
+												: newColorValue,
+									} );
+								};
+
+								return [
+									[ colorAttributeName, colorValue ],
+									[
+										`set${ upperFirstColorAttributeName }`,
+										setter,
+									],
+								];
+							}
+						)
+					);
+
+					prevColorPropsRef.current = result;
+					return result;
+				}, [ attributes, _colors, setAttributes ] );
 
 				const getMostReadableColorFn = useCallback(
 					( colorValue ) =>
-						getMostReadableColor( colors, colorValue ),
-					[ colors ]
+						getMostReadableColor( _colors, colorValue ),
+					[ _colors ]
 				);
 
 				const colorUtils = useMemo(
@@ -150,44 +180,11 @@ function createColorHOC( colorTypes, withColorPalette ) {
 					[ getMostReadableColorFn ]
 				);
 
-				const setters = useMemo( () => {
-					return Object.keys( colorMap ).reduce(
-						( acc, colorAttributeName ) => {
-							const upperFirstColorAttributeName =
-								upperFirst( colorAttributeName );
-							const customColorAttributeName = `custom${ upperFirstColorAttributeName }`;
-
-							acc[ `set${ upperFirstColorAttributeName }` ] = (
-								colorValue
-							) => {
-								const colorObject = getColorObjectByColorValue(
-									colors,
-									colorValue
-								);
-
-								setAttributes( {
-									[ colorAttributeName ]:
-										colorObject?.slug || undefined,
-									[ customColorAttributeName ]:
-										colorObject?.slug
-											? undefined
-											: colorValue,
-								} );
-							};
-
-							return acc;
-						},
-						{}
-					);
-				}, [ colors, setAttributes ] );
-
 				return (
 					<WrappedComponent
 						{ ...{
-							...props,
-							colors: undefined,
-							...colorState,
-							...setters,
+							...passedProps,
+							...colorProps,
 							colorUtils,
 						} }
 					/>

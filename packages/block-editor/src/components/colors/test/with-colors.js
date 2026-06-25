@@ -22,21 +22,22 @@ describe( 'createCustomColorsHOC', () => {
 			<EnhancedComponent attributes={ { backgroundColor: null } } />
 		);
 
-		const props = BaseComponent.mock.calls[ 0 ][ 0 ];
-		expect( props ).toMatchObject( {
-			attributes: {
-				backgroundColor: null,
-			},
-			backgroundColor: {
-				class: undefined,
-				color: undefined,
-			},
-			colorUtils: {
-				getMostReadableColor: expect.any( Function ),
-			},
-			colors: undefined,
-			setBackgroundColor: expect.any( Function ),
-		} );
+		expect( BaseComponent ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				attributes: expect.objectContaining( {
+					backgroundColor: null,
+				} ),
+				backgroundColor: expect.objectContaining( {
+					class: undefined,
+					color: undefined,
+				} ),
+				colorUtils: expect.objectContaining( {
+					getMostReadableColor: expect.any( Function ),
+				} ),
+				setBackgroundColor: expect.any( Function ),
+			} ),
+			expect.anything()
+		);
 	} );
 
 	it( 'setting the color to a value in the provided custom color array updated the backgroundColor attribute', async () => {
