@@ -9,20 +9,9 @@ import type { PositionerProps } from './types';
  * Used to apply custom positioning to `Menu`'s floating content.
  */
 const Positioner = forwardRef< HTMLDivElement, PositionerProps >(
-	function MenuPositioner(
-		{
-			align = 'start',
-			className,
-			side = 'bottom',
-			sideOffset = 8,
-			...props
-		},
-		ref
-	) {
+	function MenuPositioner( { className, sideOffset = 8, ...props }, ref ) {
 		return (
 			<_Menu.Positioner
-				align={ align }
-				side={ side }
 				sideOffset={ sideOffset }
 				{ ...props }
 				ref={ ref }

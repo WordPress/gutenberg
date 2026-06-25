@@ -136,6 +136,44 @@ describe( 'Menu', () => {
 		);
 	} );
 
+	it( 'preserves Base UI nested menu placement defaults', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Menu.Root>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.Item>Duplicate</Menu.Item>
+					<Menu.SubmenuRoot>
+						<Menu.SubmenuTrigger openOnHover={ false }>
+							Move to
+						</Menu.SubmenuTrigger>
+						<Menu.Popup
+							positioner={
+								<Menu.Positioner data-testid="submenu-positioner" />
+							}
+						>
+							<Menu.Item>Archive</Menu.Item>
+						</Menu.Popup>
+					</Menu.SubmenuRoot>
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+		await user.click(
+			await screen.findByRole( 'menuitem', { name: 'Move to' } )
+		);
+
+		expect(
+			await screen.findByRole( 'menuitem', { name: 'Archive' } )
+		).toBeVisible();
+		expect( screen.getByTestId( 'submenu-positioner' ) ).toHaveAttribute(
+			'data-side',
+			expect.stringMatching( /^inline-/ )
+		);
+	} );
+
 	it( 'forwards refs', async () => {
 		const user = userEvent.setup();
 		const triggerRef = createRef< HTMLButtonElement >();
