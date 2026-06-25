@@ -16,6 +16,7 @@ const UnforwardedValidatedInputControl = (
 		required,
 		customValidity,
 		markWhenOptional,
+		revalidateOn,
 		...restProps
 	}: Omit<
 		React.ComponentProps< typeof InputControl >,
@@ -27,11 +28,15 @@ const UnforwardedValidatedInputControl = (
 	const validityTargetRef = useRef< HTMLInputElement >( null );
 	const mergedRefs = useMergeRefs( [ forwardedRef, validityTargetRef ] );
 
+	const _revalidateOn =
+		revalidateOn ?? ( restProps.type === 'email' ? 'blur' : 'change' );
+
 	return (
 		<ControlWithError
 			required={ required }
 			markWhenOptional={ markWhenOptional }
 			customValidity={ customValidity }
+			revalidateOn={ _revalidateOn }
 			getValidityTarget={ () => validityTargetRef.current }
 		>
 			<InputControl

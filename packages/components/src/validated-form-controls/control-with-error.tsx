@@ -65,6 +65,7 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 		required,
 		markWhenOptional,
 		customValidity,
+		revalidateOn = 'change',
 		getValidityTarget,
 		children,
 	}: {
@@ -77,6 +78,7 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 		 */
 		markWhenOptional?: boolean;
 		customValidity?: ValidatedControlProps[ 'customValidity' ];
+		revalidateOn?: ValidatedControlProps[ 'revalidateOn' ];
 		/**
 		 * A function that returns the actual element on which the validity data should be applied.
 		 */
@@ -309,6 +311,15 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 					markWhenOptional
 				),
 				required,
+				onChange: ( ...args: any[] ) => {
+					if ( revalidateOn === 'blur' ) {
+						setShowMessage( false );
+						setIsTouched( false );
+					}
+					if ( children.props.onChange ) {
+						children.props.onChange( ...args );
+					}
+				},
 			} ) }
 			<div aria-live="polite">{ visibleMessage }</div>
 		</div>

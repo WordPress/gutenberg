@@ -27,6 +27,10 @@ export type DataFormValidatedTextControlProps< Item > =
 		 * Optional suffix element to display after the input.
 		 */
 		suffix?: React.ReactElement;
+		/**
+		 * When to revalidate the control.
+		 */
+		revalidateOn?: 'change' | 'blur';
 	};
 
 export default function ValidatedText< Item >( {
@@ -39,6 +43,7 @@ export default function ValidatedText< Item >( {
 	prefix,
 	suffix,
 	validity,
+	revalidateOn,
 }: DataFormValidatedTextControlProps< Item > ) {
 	const { label, placeholder, description, getValue, setValue, isValid } =
 		field;
@@ -61,6 +66,7 @@ export default function ValidatedText< Item >( {
 			required={ !! isValid.required }
 			markWhenOptional={ markWhenOptional }
 			customValidity={ getCustomValidity( isValid, validity ) }
+			revalidateOn={ revalidateOn }
 			label={ label }
 			placeholder={ placeholder }
 			value={ value ?? '' }
