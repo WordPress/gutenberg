@@ -104,6 +104,7 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 		play: ref.dataset.labelPlay,
 		pause: ref.dataset.labelPause,
 		seek: ref.dataset.labelSeek,
+		seekValueText: ref.dataset.labelSeekValue,
 	};
 
 	// Initialize using the shared core.

@@ -8,13 +8,14 @@
  */
 import { colord } from 'colord';
 import WaveformPlayerLib from '@arraypress/waveform-player';
-import { __, _x, sprintf } from '@wordpress/i18n';
 
 /**
  * Configuration constants.
  * Note: DEFAULT_WAVEFORM_HEIGHT should match $waveform-player-height in style.scss.
  */
 const DEFAULT_WAVEFORM_HEIGHT = 100;
+const DEFAULT_SEEK_LABEL = 'Seek';
+const DEFAULT_SEEK_VALUE_TEXT = '%1$s of %2$s';
 const SEEK_STEP_SECONDS = 5;
 const SEEK_LARGE_STEP_SECONDS = 10;
 
@@ -177,6 +178,30 @@ function getFiniteTime( value ) {
 }
 
 /**
+ * Get the accessible label for the waveform seek control.
+ *
+ * @param {string} label - Accessible label for the seek control.
+ * @return {string} The provided label or translated fallback.
+ */
+function getSeekControlLabel( label ) {
+	return label || DEFAULT_SEEK_LABEL;
+}
+
+/**
+ * Format the accessible seek value text.
+ *
+ * @param {string} template    - Value text template.
+ * @param {string} currentTime - Current audio time.
+ * @param {string} duration    - Total audio duration.
+ * @return {string} Formatted seek value text.
+ */
+function formatSeekValueText( template, currentTime, duration ) {
+	return ( template || DEFAULT_SEEK_VALUE_TEXT )
+		.replace( '%1$s', currentTime )
+		.replace( '%2$s', duration );
+}
+
+/**
  * Set up waveform seek control accessibility.
  *
  * This is a shim over `@arraypress/waveform-player`, which does not expose the
@@ -187,16 +212,17 @@ function getFiniteTime( value ) {
  * reduced to just localizing the accessible name.
  * See https://github.com/arraypress/waveform-player/issues/8.
  *
- * @param {Element} container     - The waveform player container element.
- * @param {Object}  instance      - The WaveformPlayer instance.
- * @param {Object}  options       - Accessibility options.
- * @param {string}  options.label - Accessible label for the seek control.
+ * @param {Element} container         - The waveform player container element.
+ * @param {Object}  instance          - The WaveformPlayer instance.
+ * @param {Object}  options           - Accessibility options.
+ * @param {string}  options.label     - Accessible label for the seek control.
+ * @param {string}  options.valueText - Accessible value text template.
  * @return {Function|undefined} Cleanup function.
  */
 export function setupSeekControlAccessibility(
 	container,
 	instance,
-	{ label = __( 'Seek' ) } = {}
+	{ label, valueText } = {}
 ) {
 	const seekControl = container.querySelector( '.waveform-container' );
 	const { audio } = instance;
@@ -250,9 +276,8 @@ export function setupSeekControlAccessibility(
 		seekControl.setAttribute( 'aria-valuenow', String( currentTime ) );
 		seekControl.setAttribute(
 			'aria-valuetext',
-			sprintf(
-				/* translators: %1$s: current audio time, %2$s: total audio duration. */
-				_x( '%1$s of %2$s', 'audio current time of total duration' ),
+			formatSeekValueText(
+				valueText,
 				formatTimestamp( currentTime ),
 				formatTimestamp( duration )
 			)
@@ -263,7 +288,7 @@ export function setupSeekControlAccessibility(
 
 	seekControl.setAttribute( 'tabindex', '0' );
 	seekControl.setAttribute( 'role', 'slider' );
-	seekControl.setAttribute( 'aria-label', label || __( 'Seek' ) );
+	seekControl.setAttribute( 'aria-label', getSeekControlLabel( label ) );
 	seekControl.setAttribute( 'aria-valuemin', '0' );
 	updateSeekControl();
 
@@ -438,7 +463,7 @@ export function updateSeekControlLabel( instance, label ) {
 	);
 
 	if ( seekControl ) {
-		seekControl.setAttribute( 'aria-label', label || __( 'Seek' ) );
+		seekControl.setAttribute( 'aria-label', getSeekControlLabel( label ) );
 	}
 }
 
@@ -504,7 +529,10 @@ export function initWaveformPlayer(
 	const cleanupSeekControlAccessibility = setupSeekControlAccessibility(
 		container,
 		instance,
-		{ label: labels?.seek || title || __( 'Seek' ) }
+		{
+			label: labels?.seek || title,
+			valueText: labels?.seekValueText,
+		}
 	);
 	let cleanupPlayButtonAccessibility;
 	const handlers = {
