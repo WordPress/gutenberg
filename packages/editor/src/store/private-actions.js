@@ -25,21 +25,6 @@ import { unlock } from '../lock-unlock';
 export * from '../dataviews/store/private-actions';
 
 /**
- * Sets whether Responsive editing is enabled. When enabled, the device preview
- * also drives which viewport block style edits are applied to. Session-only.
- *
- * @param {boolean} enabled Whether Responsive editing is enabled.
- *
- * @return {Object} Action object.
- */
-export function setResponsiveEditing( enabled ) {
-	return {
-		type: 'SET_RESPONSIVE_EDITING',
-		enabled,
-	};
-}
-
-/**
  * Returns an action object used to set which template is currently being used/edited.
  *
  * @param {string} id Template Id.
@@ -602,7 +587,7 @@ export function resetStylesNavigation() {
  * @param {number} width The width of the canvas in pixels.
  */
 export function setCanvasWidth( width ) {
-	return ( { dispatch, select, registry } ) => {
+	return ( { dispatch, registry } ) => {
 		dispatch( {
 			type: 'SET_CANVAS_WIDTH',
 			width,
@@ -611,7 +596,9 @@ export function setCanvasWidth( width ) {
 		// While Responsive editing is enabled, the canvas width also drives the
 		// viewport style state, whether changed via the device preview or by
 		// manually resizing the canvas.
-		if ( select.isResponsiveEditing() ) {
+		if (
+			unlock( registry.select( blockEditorStore ) ).isResponsiveEditing()
+		) {
 			const deviceType = getDeviceTypeByCanvasWidth( width );
 			unlock(
 				registry.dispatch( blockEditorStore )

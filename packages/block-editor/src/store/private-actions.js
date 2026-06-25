@@ -574,3 +574,18 @@ export function setStyleStateViewport( viewport ) {
 		viewport,
 	};
 }
+
+/**
+ * Sets whether Responsive editing is enabled. When enabled, the device preview
+ * also drives which viewport block style edits are applied to. Session-only.
+ *
+ * @param {boolean} enabled Whether Responsive editing is enabled.
+ *
+ * @return {Object} Action object.
+ */
+export function setResponsiveEditing( enabled ) {
+	return {
+		type: 'SET_RESPONSIVE_EDITING',
+		enabled,
+	};
+}

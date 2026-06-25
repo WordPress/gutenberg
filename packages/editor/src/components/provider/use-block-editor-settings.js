@@ -114,7 +114,6 @@ const {
 	getMediaSelectKey,
 	isIsolatedEditorKey,
 	deviceTypeKey,
-	isResponsiveEditingKey,
 	isNavigationOverlayContextKey,
 	isNavigationPostEditorKey,
 	mediaUploadOnSuccessKey,
@@ -151,7 +150,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		restBlockPatternCategories,
 		sectionRootClientId,
 		deviceType,
-		isResponsiveEditing,
 		isNavigationOverlayContext,
 		isRevisionsMode,
 	} = useSelect(
@@ -164,11 +162,9 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			} = select( coreStore );
 			const { get } = select( preferencesStore );
 			const { getBlockTypes } = select( blocksStore );
-			const {
-				getDeviceType,
-				isResponsiveEditing: _isResponsiveEditing,
-				isRevisionsMode: _isRevisionsMode,
-			} = unlock( select( editorStore ) );
+			const { getDeviceType, isRevisionsMode: _isRevisionsMode } = unlock(
+				select( editorStore )
+			);
 			const { getBlocksByName, getBlockAttributes } =
 				select( blockEditorStore );
 			const siteSettings = canUser( 'read', {
@@ -227,7 +223,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				restBlockPatternCategories: getBlockPatternCategories(),
 				sectionRootClientId: getSectionRootBlock(),
 				deviceType: getDeviceType(),
-				isResponsiveEditing: _isResponsiveEditing(),
 				isNavigationOverlayContext:
 					postType === 'wp_template_part' && postId
 						? getEntityRecord(
@@ -419,7 +414,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				renderingMode === 'template-locked' ||
 				settings.disableContentOnlyForTemplateParts,
 			...( deviceType ? { [ deviceTypeKey ]: deviceType } : {} ),
-			[ isResponsiveEditingKey ]: isResponsiveEditing,
 			[ isNavigationOverlayContextKey ]: isNavigationOverlayContext,
 		};
 
@@ -456,7 +450,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		editMediaEntity,
 		openMediaEditorModal,
 		deviceType,
-		isResponsiveEditing,
 		allImageSizes,
 		bigImageSizeThreshold,
 		isNavigationOverlayContext,

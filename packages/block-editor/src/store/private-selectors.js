@@ -1165,6 +1165,18 @@ export function getStyleStateViewport( state ) {
 }
 
 /**
+ * Returns whether Responsive editing is enabled. When enabled, the device
+ * preview also drives which viewport block style edits are applied to.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether Responsive editing is enabled.
+ */
+export function isResponsiveEditing( state ) {
+	return state.isResponsiveEditing;
+}
+
+/**
  * Returns the selected style state for a block's style controls.
  *
  * @param {Object} state    Global application state.

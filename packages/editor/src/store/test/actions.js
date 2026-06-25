@@ -64,32 +64,6 @@ const getMethod = ( options ) =>
 	options.headers?.[ 'X-HTTP-Method-Override' ] || options.method || 'GET';
 
 describe( 'Post actions', () => {
-	describe( 'setResponsiveEditing', () => {
-		it( 'enables and disables Responsive editing', () => {
-			const registry = createRegistryWithStores();
-
-			expect(
-				unlock( registry.select( editorStore ) ).isResponsiveEditing()
-			).toBe( false );
-
-			unlock( registry.dispatch( editorStore ) ).setResponsiveEditing(
-				true
-			);
-
-			expect(
-				unlock( registry.select( editorStore ) ).isResponsiveEditing()
-			).toBe( true );
-
-			unlock( registry.dispatch( editorStore ) ).setResponsiveEditing(
-				false
-			);
-
-			expect(
-				unlock( registry.select( editorStore ) ).isResponsiveEditing()
-			).toBe( false );
-		} );
-	} );
-
 	describe( 'setCanvasWidth', () => {
 		it( 'syncs the viewport style state while Responsive editing is enabled', () => {
 			const registry = createRegistryWithStores();
@@ -102,9 +76,9 @@ describe( 'Post actions', () => {
 					width
 				);
 
-			unlock( registry.dispatch( editorStore ) ).setResponsiveEditing(
-				true
-			);
+			unlock(
+				registry.dispatch( blockEditorStore )
+			).setResponsiveEditing( true );
 
 			// A tablet-sized canvas selects the tablet viewport.
 			setCanvasWidth( 600 );

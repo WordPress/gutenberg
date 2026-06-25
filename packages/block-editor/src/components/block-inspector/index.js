@@ -44,7 +44,6 @@ import {
 	hasPseudoBlockStyleState,
 	hasViewportBlockStyleState,
 } from '../../hooks/block-style-state';
-import { isResponsiveEditingKey } from '../../store/private-keys';
 
 function StyleInspectorSlots( {
 	blockName,
@@ -163,8 +162,8 @@ function BlockInspector() {
 			getBlockEditingMode,
 			getSelectedBlockStyleState,
 			isSelectedBlockStyleStateShownOnCanvas,
+			isResponsiveEditing: _isResponsiveEditing,
 		} = unlock( select( blockEditorStore ) );
-		const blockEditorSettings = select( blockEditorStore ).getSettings();
 		const { getBlockStyles } = select( blocksStore );
 		const _selectedBlockClientId = getSelectedBlockClientId();
 		const isWithinEditedSection = isWithinEditedContentOnlySection(
@@ -202,8 +201,7 @@ function BlockInspector() {
 			showStateOnCanvas: isSelectedBlockStyleStateShownOnCanvas(
 				_renderedBlockClientId
 			),
-			isResponsiveEditing:
-				blockEditorSettings?.[ isResponsiveEditingKey ],
+			isResponsiveEditing: _isResponsiveEditing(),
 		};
 	}, [] );
 

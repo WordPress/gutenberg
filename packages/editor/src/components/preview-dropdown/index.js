@@ -47,8 +47,10 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			getCurrentTemplateId,
 			getRenderingMode,
 			getDeviceType,
-			isResponsiveEditing: _isResponsiveEditing,
 		} = unlock( select( editorStore ) );
+		const { isResponsiveEditing: _isResponsiveEditing } = unlock(
+			select( blockEditorStore )
+		);
 		const { getEntityRecord, getPostType } = select( coreStore );
 		const { get } = select( preferencesStore );
 		const _currentPostType = getCurrentPostType();
@@ -63,15 +65,11 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			isResponsiveEditing: _isResponsiveEditing(),
 		};
 	}, [] );
-	const {
-		setDeviceType,
-		setRenderingMode,
-		setDefaultRenderingMode,
-		setResponsiveEditing,
-	} = unlock( useDispatch( editorStore ) );
-	const { resetZoomLevel, setStyleStateViewport } = unlock(
-		useDispatch( blockEditorStore )
+	const { setDeviceType, setRenderingMode, setDefaultRenderingMode } = unlock(
+		useDispatch( editorStore )
 	);
+	const { resetZoomLevel, setStyleStateViewport, setResponsiveEditing } =
+		unlock( useDispatch( blockEditorStore ) );
 
 	const handleDevicePreviewChange = ( newDeviceType ) => {
 		setDeviceType( newDeviceType );

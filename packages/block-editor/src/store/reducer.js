@@ -2406,6 +2406,23 @@ export function styleStateViewport( state = 'default', action ) {
 	return state;
 }
 
+/**
+ * Reducer for whether Responsive editing is enabled. When enabled, the device
+ * preview also drives which viewport block style edits are applied to.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function isResponsiveEditing( state = false, action ) {
+	if ( action.type === 'SET_RESPONSIVE_EDITING' ) {
+		return action.enabled;
+	}
+
+	return state;
+}
+
 const combinedReducers = combineReducers( {
 	blocks,
 	isDragging,
@@ -2443,6 +2460,7 @@ const combinedReducers = combineReducers( {
 	requestedInspectorTab,
 	selectedBlockStyleState,
 	styleStateViewport,
+	isResponsiveEditing,
 } );
 
 /**

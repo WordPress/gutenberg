@@ -364,17 +364,6 @@ export function getCanvasWidth( state ) {
 }
 
 /**
- * Returns whether Responsive editing is enabled. When enabled, the device
- * preview also drives which viewport block style edits are applied to.
- *
- * @param {Object} state Global application state.
- * @return {boolean} Whether Responsive editing is enabled.
- */
-export function isResponsiveEditing( state ) {
-	return state.isResponsiveEditing;
-}
-
-/**
  * Returns the current revisions page number.
  *
  * @param {Object} state Global application state.
