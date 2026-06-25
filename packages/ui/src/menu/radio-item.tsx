@@ -1,6 +1,8 @@
 import { Menu as _Menu } from '@base-ui/react/menu';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
+import { check } from '@wordpress/icons';
+import { Icon } from '../icon';
 import itemPopupStyles from '../utils/css/item-popup.module.css';
 import resetStyles from '../utils/css/resets.module.css';
 import styles from './style.module.css';
@@ -21,6 +23,7 @@ const RadioItem = forwardRef< HTMLDivElement, RadioItemProps >(
 					resetStyles[ 'box-sizing' ],
 					itemPopupStyles.item,
 					styles.item,
+					styles[ 'has-prefix' ],
 					className
 				) }
 				{ ...props }
@@ -30,7 +33,7 @@ const RadioItem = forwardRef< HTMLDivElement, RadioItemProps >(
 						keepMounted
 						className={ styles[ 'item-indicator' ] }
 					>
-						<span className={ styles[ 'radio-indicator' ] } />
+						<Icon icon={ check } size={ 24 } />
 					</_Menu.RadioItemIndicator>
 					{ prefix }
 				</span>

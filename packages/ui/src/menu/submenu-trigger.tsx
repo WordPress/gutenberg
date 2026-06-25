@@ -24,6 +24,7 @@ const SubmenuTrigger = forwardRef< HTMLDivElement, SubmenuTriggerProps >(
 					resetStyles[ 'box-sizing' ],
 					itemPopupStyles.item,
 					styles.item,
+					prefix && styles[ 'has-prefix' ],
 					className
 				) }
 				{ ...props }

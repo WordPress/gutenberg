@@ -13,8 +13,15 @@ function ItemContent( {
 }: Pick< ItemProps, 'children' | 'prefix' | 'suffix' > ) {
 	return (
 		<>
-			<span className={ styles[ 'item-prefix' ] }>{ prefix }</span>
-			<span className={ styles[ 'item-content' ] }>
+			{ prefix && (
+				<span className={ styles[ 'item-prefix' ] }>{ prefix }</span>
+			) }
+			<span
+				className={ clsx(
+					styles[ 'item-content' ],
+					! prefix && styles[ 'item-content-without-prefix' ]
+				) }
+			>
 				<span className={ styles[ 'item-label' ] }>{ children }</span>
 				{ suffix && (
 					<span className={ styles[ 'item-suffix' ] }>
@@ -40,6 +47,7 @@ const Item = forwardRef< HTMLDivElement, ItemProps >( function MenuItem(
 				resetStyles[ 'box-sizing' ],
 				itemPopupStyles.item,
 				styles.item,
+				prefix && styles[ 'has-prefix' ],
 				className
 			) }
 			{ ...props }
