@@ -16,6 +16,12 @@ function collectExportTargets( value, trail = [] ) {
 		return [ { trail, target: value } ];
 	}
 
+	if ( Array.isArray( value ) ) {
+		return value.flatMap( ( nestedValue, index ) =>
+			collectExportTargets( nestedValue, [ ...trail, index ] )
+		);
+	}
+
 	if ( value && typeof value === 'object' && ! Array.isArray( value ) ) {
 		return Object.entries( value ).flatMap( ( [ key, nestedValue ] ) =>
 			collectExportTargets( nestedValue, [ ...trail, key ] )
