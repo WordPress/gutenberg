@@ -96,7 +96,6 @@ function InlineUI( {
 			<div style={ { minWidth: '300px', padding: '4px' } }>
 				<Stack direction="column" gap="xs">
 					<TextControl
-						__next40pxDefaultSize
 						hideLabelFromVision
 						label={ __( 'LaTeX math syntax' ) }
 						value={ latex }

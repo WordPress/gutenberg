@@ -834,7 +834,7 @@ describe( 'state', () => {
 				blocks: [
 					{
 						clientId: 'ribs',
-						name: 'core/freeform',
+						name: 'core/registered-block',
 						innerBlocks: [],
 					},
 				],
@@ -880,7 +880,7 @@ describe( 'state', () => {
 				blocks: [
 					{
 						clientId: 'wings',
-						name: 'core/freeform',
+						name: 'core/registered-block',
 						innerBlocks: [],
 					},
 				],
@@ -888,7 +888,7 @@ describe( 'state', () => {
 
 			expect( state.byClientId.size ).toBe( 1 );
 			expect( state.byClientId.get( 'wings' ).name ).toBe(
-				'core/freeform'
+				'core/registered-block'
 			);
 			expect( state.byClientId.get( 'wings' ).clientId ).toBe( 'wings' );
 			expect( Object.fromEntries( state.order ) ).toEqual( {
@@ -903,7 +903,7 @@ describe( 'state', () => {
 			);
 			expect( state.tree.get( 'wings' ) ).toEqual( {
 				clientId: 'wings',
-				name: 'core/freeform',
+				name: 'core/registered-block',
 				innerBlocks: [],
 			} );
 		} );
@@ -955,7 +955,7 @@ describe( 'state', () => {
 				blocks: [
 					{
 						clientId: 'wings',
-						name: 'core/freeform',
+						name: 'core/registered-block',
 						innerBlocks: [],
 					},
 				],
@@ -974,7 +974,7 @@ describe( 'state', () => {
 			);
 			expect( state.tree.get( 'wings' ) ).toEqual( {
 				clientId: 'wings',
-				name: 'core/freeform',
+				name: 'core/registered-block',
 				innerBlocks: [],
 			} );
 		} );
@@ -1037,7 +1037,7 @@ describe( 'state', () => {
 				blocks: [
 					{
 						clientId: 'chicken',
-						name: 'core/freeform',
+						name: 'core/registered-block',
 						innerBlocks: [],
 					},
 				],
@@ -1048,7 +1048,7 @@ describe( 'state', () => {
 				'core/test-block'
 			);
 			expect( replacedState.byClientId.get( 'chicken' ).name ).toBe(
-				'core/freeform'
+				'core/registered-block'
 			);
 			expect( replacedState.byClientId.get( 'chicken' ).clientId ).toBe(
 				'chicken'
@@ -1072,7 +1072,7 @@ describe( 'state', () => {
 			] );
 			const replacementNestedBlock = {
 				clientId: 'chicken',
-				name: 'core/freeform',
+				name: 'core/registered-block',
 				attributes: {},
 				innerBlocks: [],
 			};
@@ -1098,7 +1098,7 @@ describe( 'state', () => {
 				'core/test-block'
 			);
 			expect( replacedNestedState.byClientId.get( 'chicken' ).name ).toBe(
-				'core/freeform'
+				'core/registered-block'
 			);
 		} );
 
@@ -1603,7 +1603,7 @@ describe( 'state', () => {
 				blocks: [
 					{
 						clientId: 'persimmon',
-						name: 'core/freeform',
+						name: 'core/registered-block',
 						innerBlocks: [],
 					},
 				],
@@ -5860,6 +5860,57 @@ describe( 'state', () => {
 				);
 			} );
 		} );
+
+		describe( 'template parts with disableContentOnlyForTemplateParts enabled', () => {
+			let initialState;
+			beforeAll( () => {
+				initialState = dispatchActions(
+					[
+						{
+							type: 'UPDATE_SETTINGS',
+							settings: {
+								disableContentOnlyForTemplateParts: true,
+							},
+						},
+						{
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									name: 'core/template-part',
+									clientId: 'template-part',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						},
+						{
+							type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+							clientId: 'template-part',
+							hasControlledInnerBlocks: true,
+						},
+						{
+							type: 'REPLACE_INNER_BLOCKS',
+							rootClientId: 'template-part',
+							blocks: [
+								{
+									name: 'core/paragraph',
+									clientId: 'template-part-paragraph',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						},
+					],
+					testReducer
+				);
+			} );
+
+			it( 'returns no derived editing modes for template parts when disableContentOnlyForTemplateParts is true', () => {
+				expect( initialState.derivedBlockEditingModes ).toEqual(
+					new Map()
+				);
+			} );
+		} );
 	} );
 
 	describe( 'selectedBlockStyleState', () => {
@@ -5873,14 +5924,14 @@ describe( 'state', () => {
 			const state = selectedBlockStyleState( undefined, {
 				type: 'SET_SELECTED_BLOCK_STYLE_STATE',
 				clientId: 'client-1',
-				value: { viewport: 'mobile' },
+				value: { viewport: '@mobile' },
 			} );
 
 			expect( state ).toEqual( {
 				clientId: 'client-1',
 				showStateOnCanvas: true,
 				value: {
-					viewport: 'mobile',
+					viewport: '@mobile',
 					pseudo: 'default',
 				},
 			} );
@@ -5907,7 +5958,7 @@ describe( 'state', () => {
 			const state = selectedBlockStyleState(
 				{
 					clientId: 'client-1',
-					value: { viewport: 'mobile', pseudo: 'default' },
+					value: { viewport: '@mobile', pseudo: 'default' },
 				},
 				{
 					type: 'SET_SELECTED_BLOCK_STYLE_STATE',
@@ -5920,7 +5971,7 @@ describe( 'state', () => {
 				clientId: 'client-1',
 				showStateOnCanvas: true,
 				value: {
-					viewport: 'mobile',
+					viewport: '@mobile',
 					pseudo: ':hover',
 				},
 			} );
@@ -5930,7 +5981,7 @@ describe( 'state', () => {
 			const state = selectedBlockStyleState(
 				{
 					clientId: 'client-1',
-					value: { viewport: 'mobile', pseudo: ':hover' },
+					value: { viewport: '@mobile', pseudo: ':hover' },
 				},
 				{
 					type: 'SET_SELECTED_BLOCK_STYLE_STATE',
@@ -5953,7 +6004,7 @@ describe( 'state', () => {
 			const state = selectedBlockStyleState(
 				{
 					clientId: 'client-1',
-					value: { viewport: 'mobile', pseudo: ':hover' },
+					value: { viewport: '@mobile', pseudo: ':hover' },
 				},
 				{
 					type: 'SET_SELECTED_BLOCK_STYLE_STATE',
@@ -6186,7 +6237,7 @@ describe( 'state', () => {
 			const state = selectedBlockStyleState(
 				{
 					clientId: 'client-1',
-					value: { viewport: 'mobile', pseudo: ':hover' },
+					value: { viewport: '@mobile', pseudo: ':hover' },
 				},
 				{
 					type: 'SET_SELECTED_BLOCK_STYLE_STATE_CANVAS_PREVIEW',
@@ -6198,7 +6249,7 @@ describe( 'state', () => {
 			expect( state ).toEqual( {
 				clientId: 'client-1',
 				showStateOnCanvas: false,
-				value: { viewport: 'mobile', pseudo: ':hover' },
+				value: { viewport: '@mobile', pseudo: ':hover' },
 			} );
 		} );
 
@@ -6207,7 +6258,7 @@ describe( 'state', () => {
 				{
 					clientId: 'client-1',
 					showStateOnCanvas: false,
-					value: { viewport: 'mobile', pseudo: 'default' },
+					value: { viewport: '@mobile', pseudo: 'default' },
 				},
 				{
 					type: 'SET_SELECTED_BLOCK_STYLE_STATE',
@@ -6219,7 +6270,7 @@ describe( 'state', () => {
 			expect( state ).toEqual( {
 				clientId: 'client-1',
 				showStateOnCanvas: false,
-				value: { viewport: 'mobile', pseudo: ':hover' },
+				value: { viewport: '@mobile', pseudo: ':hover' },
 			} );
 		} );
 	} );

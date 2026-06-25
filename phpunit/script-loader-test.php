@@ -76,4 +76,71 @@ class WP_Script_Loader_Test extends WP_UnitTestCase {
 			'Registered styles with handle of "wp-style-engine-my-styles" do not match expected value from the Style Engine store.'
 		);
 	}
+
+	/**
+	 * Tests that the Classic block is hidden from the inserter by default.
+	 *
+	 * @covers ::wp_declare_classic_block_necessary
+	 */
+	public function test_wp_declare_classic_block_necessary_does_nothing_by_default() {
+		wp_register_script( 'wp-block-library', 'https://example.org/wp-block-library.js' );
+
+		wp_declare_classic_block_necessary();
+
+		$this->assertFalse(
+			wp_scripts()->get_data( 'wp-block-library', 'before' ),
+			'No inline script should be enqueued when the filter is not used.'
+		);
+	}
+
+	/**
+	 * Tests that the Classic block can be opted into the inserter via the filter.
+	 *
+	 * @covers ::wp_declare_classic_block_necessary
+	 */
+	public function test_wp_declare_classic_block_necessary_enqueues_flag_when_filter_enabled() {
+		wp_register_script( 'wp-block-library', 'https://example.org/wp-block-library.js' );
+		add_filter( 'wp_classic_block_supports_inserter', '__return_true' );
+
+		wp_declare_classic_block_necessary();
+
+		$before = wp_scripts()->get_data( 'wp-block-library', 'before' );
+		$this->assertIsArray(
+			$before,
+			'An inline script should be enqueued when the filter opts in.'
+		);
+		$this->assertContains(
+			'window.__needsClassicBlock = true;',
+			$before,
+			'The Classic block flag should be added to the wp-block-library inline scripts.'
+		);
+	}
+
+	/**
+	 * Tests that the current post is passed to the filter.
+	 *
+	 * @covers ::wp_declare_classic_block_necessary
+	 */
+	public function test_wp_declare_classic_block_necessary_passes_post_to_filter() {
+		wp_register_script( 'wp-block-library', 'https://example.org/wp-block-library.js' );
+
+		$post_id         = self::factory()->post->create();
+		$GLOBALS['post'] = get_post( $post_id );
+
+		$filter_post = false;
+		add_filter(
+			'wp_classic_block_supports_inserter',
+			static function ( $supports_inserter, $post ) use ( &$filter_post ) {
+				$filter_post = $post;
+				return $supports_inserter;
+			},
+			10,
+			2
+		);
+
+		wp_declare_classic_block_necessary();
+
+		$this->assertInstanceOf( WP_Post::class, $filter_post, 'The post should be passed to the filter.' );
+		$this->assertSame( $post_id, $filter_post->ID, 'The current post should be passed to the filter.' );
+	}
 }
