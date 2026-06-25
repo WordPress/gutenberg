@@ -149,7 +149,7 @@ const modalContentMap = {
 	customGenericTemplate: 3,
 };
 
-function NewTemplateModal( { onClose } ) {
+export function NewTemplateModal( { onClose } ) {
 	const [ modalContent, setModalContent ] = useState(
 		modalContentMap.templatesList
 	);
