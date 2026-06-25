@@ -2,6 +2,8 @@
 	border: 0;
 	margin: 0;
 
+	// Keep the horizontal selector at the pre-#79444 specificity so existing custom
+	// border color overrides continue to win.
 	&:where([aria-orientation="horizontal"]) {
 		border-block-end: 1px solid currentColor;
 		block-size: 0;
