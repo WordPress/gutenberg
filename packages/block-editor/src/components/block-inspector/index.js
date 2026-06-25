@@ -416,8 +416,6 @@ const BlockInspectorSingleBlock = ( {
 		setSelectedBlockStyleStateCanvasPreview,
 	} = unlock( useDispatch( blockEditorStore ) );
 	const onBlockStyleStateChange = ( value ) => {
-		// Persist only the changed per-block state. The viewport is global, so
-		// it must not be written back into the per-block state here.
 		setSelectedBlockStyleState( renderedBlockClientId, value );
 	};
 	const onShowStateOnCanvasChange = ( value ) => {
