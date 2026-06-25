@@ -492,6 +492,59 @@ class Tests_Collaboration_WpSyncPostMetaStorage extends WP_UnitTestCase {
 		$this->assertSame( array( 'name' => 'Current' ), $awareness[0] );
 	}
 
+	public function test_limited_update_fetch_advances_cursor_to_returned_window() {
+		global $wpdb;
+
+		$storage = new WP_Sync_Post_Meta_Storage();
+		$room    = $this->get_room() . ':bounded-fetch';
+
+		$updates = array(
+			array(
+				'client_id' => 1,
+				'type'      => 'update',
+				'data'      => base64_encode( 'first' ),
+			),
+			array(
+				'client_id' => 2,
+				'type'      => 'update',
+				'data'      => base64_encode( 'second' ),
+			),
+			array(
+				'client_id' => 3,
+				'type'      => 'update',
+				'data'      => base64_encode( 'third' ),
+			),
+		);
+
+		foreach ( $updates as $update ) {
+			$this->assertTrue( $storage->add_update( $room, $update ) );
+		}
+
+		$lineages = $this->get_storage_post_lineages( $room );
+		$this->assertCount( 1, $lineages );
+
+		$first_row_size = (int) $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT CHAR_LENGTH(meta_value) FROM {$wpdb->postmeta}
+				WHERE post_id = %d AND meta_key = %s
+				ORDER BY meta_id ASC
+				LIMIT 1",
+				$lineages[0]->ID,
+				WP_Sync_Post_Meta_Storage::SYNC_UPDATE_META_KEY
+			)
+		);
+
+		$first_page = $storage->get_updates_after_cursor( $room, 0, $first_row_size );
+		$cursor     = $storage->get_cursor( $room );
+
+		$this->assertSame( array( $updates[0] ), $first_page );
+		$this->assertGreaterThan( 0, $cursor );
+
+		$remaining = $storage->get_updates_after_cursor( $room, $cursor, PHP_INT_MAX );
+
+		$this->assertSame( array_slice( $updates, 1 ), $remaining );
+	}
+
 	/*
 	 * Race-condition tests.
 	 *

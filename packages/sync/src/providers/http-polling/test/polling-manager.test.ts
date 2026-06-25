@@ -9,7 +9,7 @@ import {
 	it,
 	jest,
 } from '@jest/globals';
-import { type SyncPayload, type SyncResponse } from '../types';
+import { SyncUpdateType, type SyncPayload, type SyncResponse } from '../types';
 
 // Mock all external dependencies before imports.
 jest.mock( 'yjs', () => ( {
@@ -157,6 +157,8 @@ describe( 'polling-manager', () => {
 		typeof import('../utils').postSyncUpdateNonBlocking
 	>;
 	let mockApplyFilters: jest.Mock;
+	let mockEncoding: jest.Mocked< typeof import('lib0/encoding') >;
+	let mockYjs: jest.Mocked< typeof import('yjs') >;
 
 	beforeEach( () => {
 		jest.useFakeTimers();
@@ -169,6 +171,8 @@ describe( 'polling-manager', () => {
 			mockPostSyncUpdateNonBlocking =
 				require( '../utils' ).postSyncUpdateNonBlocking;
 			mockApplyFilters = require( '@wordpress/hooks' ).applyFilters;
+			mockEncoding = require( 'lib0/encoding' );
+			mockYjs = require( 'yjs' );
 		} );
 	} );
 
@@ -276,6 +280,202 @@ describe( 'polling-manager', () => {
 					} ),
 				} )
 			);
+		} );
+
+		it( 'falls back to compaction when a generated sync step 2 update is oversized', async () => {
+			const onStatusChange = jest.fn();
+			const doc = createMockDoc( 1 );
+
+			mockPostSyncUpdate
+				.mockResolvedValueOnce( {
+					rooms: [
+						{
+							room: 'test-room',
+							end_cursor: 1,
+							awareness: { 1: {}, 2: {} },
+							updates: [
+								{
+									type: SyncUpdateType.SYNC_STEP_1,
+									data: 'AQ==',
+								},
+							],
+						},
+					],
+				} )
+				.mockResolvedValue( syncResponse );
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc,
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange,
+				onSync: jest.fn(),
+			} );
+
+			mockEncoding.toUint8Array.mockReturnValueOnce(
+				new Uint8Array( 11 )
+			);
+			mockYjs.encodeStateAsUpdateV2.mockReturnValueOnce(
+				new Uint8Array( 10 )
+			);
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			await jest.advanceTimersByTimeAsync( 1000 );
+
+			expect( onStatusChange ).not.toHaveBeenCalledWith( {
+				status: 'disconnected',
+				error: expect.objectContaining( {
+					code: 'document-size-limit-exceeded',
+				} ),
+			} );
+			expect( mockPostSyncUpdateNonBlocking ).not.toHaveBeenCalledWith(
+				expect.objectContaining( {
+					rooms: expect.arrayContaining( [
+						expect.objectContaining( {
+							room: 'test-room',
+							awareness: null,
+						} ),
+					] ),
+				} )
+			);
+			expect(
+				( mockPostSyncUpdate.mock.calls[ 1 ][ 0 ] as SyncPayload )
+					.rooms[ 0 ].updates
+			).toEqual( [
+				expect.objectContaining( {
+					type: SyncUpdateType.COMPACTION,
+				} ),
+			] );
+		} );
+
+		it( 'skips an oversized sync step 2 response when fallback compaction is oversized', async () => {
+			const onStatusChange = jest.fn();
+			const doc = createMockDoc( 1 );
+
+			mockPostSyncUpdate
+				.mockResolvedValueOnce( {
+					rooms: [
+						{
+							room: 'test-room',
+							end_cursor: 1,
+							awareness: { 1: {}, 2: {} },
+							updates: [
+								{
+									type: SyncUpdateType.SYNC_STEP_1,
+									data: 'AQ==',
+								},
+							],
+						},
+					],
+				} )
+				.mockResolvedValue( syncResponse );
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc,
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange,
+				onSync: jest.fn(),
+			} );
+
+			mockEncoding.toUint8Array.mockReturnValueOnce(
+				new Uint8Array( 11 )
+			);
+			mockYjs.encodeStateAsUpdateV2.mockReturnValueOnce(
+				new Uint8Array( 11 )
+			);
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			await jest.advanceTimersByTimeAsync( 1000 );
+
+			expect( onStatusChange ).not.toHaveBeenCalledWith( {
+				status: 'disconnected',
+				error: expect.objectContaining( {
+					code: 'document-size-limit-exceeded',
+				} ),
+			} );
+			expect( mockPostSyncUpdateNonBlocking ).not.toHaveBeenCalledWith(
+				expect.objectContaining( {
+					rooms: expect.arrayContaining( [
+						expect.objectContaining( {
+							room: 'test-room',
+							awareness: null,
+						} ),
+					] ),
+				} )
+			);
+			const retryPayload = mockPostSyncUpdate.mock
+				.calls[ 1 ][ 0 ] as SyncPayload;
+			const retryUpdates = retryPayload.rooms[ 0 ].updates;
+			expect( retryUpdates ).not.toEqual(
+				expect.arrayContaining( [
+					expect.objectContaining( {
+						type: SyncUpdateType.SYNC_STEP_2,
+					} ),
+					expect.objectContaining( {
+						type: SyncUpdateType.COMPACTION,
+					} ),
+				] )
+			);
+		} );
+
+		it( 'skips an oversized generated compaction update without disconnecting', async () => {
+			const onStatusChange = jest.fn();
+			const doc = createMockDoc( 1 );
+
+			mockPostSyncUpdate
+				.mockResolvedValueOnce( {
+					rooms: [
+						{
+							room: 'test-room',
+							end_cursor: 1,
+							awareness: {},
+							updates: [],
+							should_compact: true,
+						},
+					],
+				} )
+				.mockResolvedValue( syncResponse );
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc,
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange,
+				onSync: jest.fn(),
+			} );
+
+			mockYjs.encodeStateAsUpdateV2.mockReturnValueOnce(
+				new Uint8Array( 11 )
+			);
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			await jest.advanceTimersByTimeAsync( 4000 );
+
+			expect( onStatusChange ).not.toHaveBeenCalledWith( {
+				status: 'disconnected',
+				error: expect.objectContaining( {
+					code: 'document-size-limit-exceeded',
+				} ),
+			} );
+			expect( mockPostSyncUpdateNonBlocking ).not.toHaveBeenCalledWith(
+				expect.objectContaining( {
+					rooms: expect.arrayContaining( [
+						expect.objectContaining( {
+							room: 'test-room',
+							awareness: null,
+						} ),
+					] ),
+				} )
+			);
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+			expect(
+				( mockPostSyncUpdate.mock.calls[ 1 ][ 0 ] as SyncPayload )
+					.rooms[ 0 ].updates
+			).toEqual( [] );
 		} );
 	} );
 
@@ -583,6 +783,65 @@ describe( 'polling-manager', () => {
 	} );
 
 	describe( 'collaborator queue resumption', () => {
+		it( 'does not publish sync-manager bootstrap updates when queues resume', async () => {
+			mockPostSyncUpdate.mockResolvedValue( {
+				rooms: [
+					{
+						room: 'primary-room',
+						end_cursor: 1,
+						awareness: {
+							1: { collaboratorInfo: { id: 100 } },
+							2: { collaboratorInfo: { id: 200 } },
+						},
+						updates: [],
+					},
+				],
+			} );
+
+			const doc = createMockDoc( 1 );
+
+			pollingManager.registerRoom( {
+				room: 'primary-room',
+				doc,
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+
+			// First poll detects collaborators and resumes the queue for later polls.
+			await jest.advanceTimersByTimeAsync( 0 );
+
+			const onDocUpdate = getOnDocUpdate( doc );
+			onDocUpdate( new Uint8Array( [ 1, 2, 3 ] ), 'syncManager' );
+			onDocUpdate( new Uint8Array( [ 4, 5, 6 ] ), 'gutenberg' );
+
+			mockPostSyncUpdate.mockResolvedValue( {
+				rooms: [
+					{
+						room: 'primary-room',
+						end_cursor: 2,
+						awareness: {
+							1: { collaboratorInfo: { id: 100 } },
+							2: { collaboratorInfo: { id: 200 } },
+						},
+						updates: [],
+					},
+				],
+			} );
+
+			await jest.advanceTimersByTimeAsync( 1000 );
+
+			const secondCallPayload = mockPostSyncUpdate.mock.calls[ 1 ][ 0 ];
+			const updates = secondCallPayload.rooms[ 0 ].updates;
+			const updateData = updates.map(
+				( update: { data: string } ) => update.data
+			);
+
+			expect( updateData ).toContain( 'BAUG' );
+			expect( updateData ).not.toContain( 'AQID' );
+		} );
+
 		it( 'resumes non-primary room queues when collaborators are detected on primary room', async () => {
 			// First poll: primary room has collaborators, collection room has none.
 			mockPostSyncUpdate.mockResolvedValue( {
@@ -1928,6 +2187,21 @@ describe( 'polling-manager', () => {
 			);
 			expect( beaconsSent.every( ( n ) => n <= 10 ) ).toBe( true );
 			expect( beaconsSent.reduce( ( a, b ) => a + b, 0 ) ).toBe( 21 );
+		} );
+
+		it( 'does not send disconnect beacons for persisted pagehide events', async () => {
+			mockPostSyncUpdate.mockResolvedValue( { rooms: [] } );
+
+			registerPrimaryAndOverflow( pollingManager, 2 );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			mockPostSyncUpdateNonBlocking.mockClear();
+
+			const event = new Event( 'pagehide' );
+			Object.defineProperty( event, 'persisted', { value: true } );
+			window.dispatchEvent( event );
+
+			expect( mockPostSyncUpdateNonBlocking ).not.toHaveBeenCalled();
 		} );
 	} );
 } );

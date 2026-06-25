@@ -37,7 +37,8 @@ The sync manager (`src/manager.ts`) orchestrates the lifecycle of synced entitie
 -   **`update(objectType, objectId, changes, origin, options)`**: Apply local changes to the entity's CRDT document. The sync config's `applyChangesToCRDTDoc` is called inside a Yjs transaction.
 -   **`unload(objectType, objectId)`**: Disconnect providers, remove observers, and destroy the `Y.Doc`.
 -   **`getAwareness(objectType, objectId)`**: Return the awareness instance for the entity, if one exists.
--   **`createPersistedCRDTDoc(objectType, objectId)`**: Serialize the entity's CRDT document for persistence (see "Persistence" below).
+-   **`applyPersistedCRDTDoc(objectType, objectId, record)`**: Merge a freshly fetched persisted CRDT document into the local `Y.Doc`.
+-   **`createPersistedCRDTDoc(objectType, objectId, options)`**: Serialize the entity's CRDT document for persistence (see "Persistence" below).
 -   **`undoManager`**: The sync-aware undo manager, lazily created when the first entity is loaded (see "Undo / redo" below).
 
 ### Data flow
@@ -103,7 +104,7 @@ addFilter( 'sync.providers', 'my-plugin/websocket-provider', ( providers ) => {
 CRDT documents can be persisted so that a user returning to an entity can restore its CRDT state (including the full edit history needed for proper merging). See `src/utils.ts` for serialization helpers.
 
 -   **Initialization problem**: Persisting CRDT documents establishes a shared starting point for all peers. This is critical to prevent data loss and ensure proper merging of concurrent edits.
--   **Serialization**: The sync manager's `createPersistedCRDTDoc` method returns a serialized `Y.Doc`. The consumer is responsible for storing this string.
+-   **Serialization**: The sync manager's `createPersistedCRDTDoc` method returns a serialized `Y.Doc`. When the consumer passes the last known persisted document in `options.basePersistedCRDTDoc`, the serialized value includes a base version so the server can reject stale persistence writes.
 -   **Restoration**: On `load`, if the entity's sync config provides `getPersistedCRDTDoc`, the sync manager calls it to retrieve the serialized CRDT document.
 -   **Invalidation**: After restoring, the sync manager compares the CRDT document against the current entity record (via `getChangesFromCRDTDoc`). If they differ (e.g., the server mutated the entity on save, or an out-of-band update occurred), the differences are applied to the CRDT document and a save is triggered to re-persist it.
 

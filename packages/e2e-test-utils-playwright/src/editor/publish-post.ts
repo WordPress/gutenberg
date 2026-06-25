@@ -33,17 +33,38 @@ export async function publishPost( this: Editor ) {
 		await entitiesSaveButton.click();
 	}
 
+	const editorPublishRegion = this.page.getByRole( 'region', {
+		name: 'Editor publish',
+	} );
+	const confirmPublishButton = editorPublishRegion.getByRole( 'button', {
+		name: 'Publish',
+		exact: true,
+	} );
+	const openPublishPanelButton = editorPublishRegion.getByRole( 'button', {
+		name: 'Open publish panel',
+		exact: true,
+	} );
+
+	if ( ! ( await confirmPublishButton.isVisible() ) ) {
+		if ( await openPublishPanelButton.isVisible() ) {
+			await openPublishPanelButton.click();
+		}
+	}
+
 	// Handle saving just the post.
-	await this.page
-		.getByRole( 'region', {
-			name: 'Editor publish',
-		} )
-		.getByRole( 'button', { name: 'Publish', exact: true } )
-		.click();
+	await confirmPublishButton.click();
 
 	await this.page
 		.getByRole( 'button', { name: 'Dismiss this notice' } )
 		.filter( { hasText: 'published' } )
+		.or(
+			this.page
+				.locator(
+					'.components-snackbar, .components-notice, [role="status"], [aria-live]'
+				)
+				.filter( { hasText: /published/i } )
+		)
+		.first()
 		.waitFor();
 	const postId = new URL( this.page.url() ).searchParams.get( 'post' );
 

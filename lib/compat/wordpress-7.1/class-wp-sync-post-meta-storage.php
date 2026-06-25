@@ -407,11 +407,12 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		 *
 		 * @global wpdb $wpdb WordPress database abstraction object.
 		 *
-		 * @param string $room   Room identifier.
-		 * @param int    $cursor Return updates after this cursor (meta_id).
+		 * @param string   $room             Room identifier.
+		 * @param int      $cursor           Return updates after this cursor (meta_id).
+		 * @param int|null $max_update_bytes Optional maximum serialized update bytes to return.
 		 * @return array<int, mixed> Sync updates.
 		 */
-		public function get_updates_after_cursor( string $room, int $cursor ): array {
+		public function get_updates_after_cursor( string $room, int $cursor, ?int $max_update_bytes = null ): array {
 			global $wpdb;
 
 			$post_id = $this->get_storage_post_id( $room );
@@ -434,33 +435,60 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 			$max_meta_id   = $stats ? (int) $stats->max_meta_id : 0;
 
 			$this->room_update_counts[ $room ] = $total_updates;
-			$this->room_cursors[ $room ]       = $max_meta_id;
+			$this->room_cursors[ $room ]       = $cursor;
 
-			if ( $max_meta_id <= $cursor ) {
+			if ( $max_meta_id <= $cursor || 0 === $max_update_bytes ) {
 				return array();
 			}
 
-			$rows = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = %s AND meta_id > %d AND meta_id <= %d ORDER BY meta_id ASC",
-					$post_id,
-					self::SYNC_UPDATE_META_KEY,
-					$cursor,
-					$max_meta_id
-				)
-			);
+			$updates                        = array();
+			$returned_update_bytes          = 0;
+			$last_scanned_update_meta_id    = $cursor;
+			$storage_update_fetch_page_size = 100;
 
-			if ( ! $rows ) {
-				return array();
-			}
+			while ( $last_scanned_update_meta_id < $max_meta_id ) {
+				$rows = $wpdb->get_results(
+					$wpdb->prepare(
+						"SELECT meta_id, meta_value FROM {$wpdb->postmeta}
+						WHERE post_id = %d
+							AND meta_key = %s
+							AND meta_id > %d
+							AND meta_id <= %d
+						ORDER BY meta_id ASC
+						LIMIT %d",
+						$post_id,
+						self::SYNC_UPDATE_META_KEY,
+						$last_scanned_update_meta_id,
+						$max_meta_id,
+						$storage_update_fetch_page_size
+					)
+				);
 
-			$updates = array();
-			foreach ( $rows as $row ) {
-				$decoded = json_decode( $row->meta_value, true );
-				if ( null !== $decoded ) {
-					$updates[] = $decoded;
+				if ( ! $rows ) {
+					break;
+				}
+
+				foreach ( $rows as $row ) {
+					$update_bytes = strlen( $row->meta_value );
+					if (
+						null !== $max_update_bytes &&
+						$returned_update_bytes + $update_bytes > $max_update_bytes
+					) {
+						$this->room_cursors[ $room ] = $last_scanned_update_meta_id;
+						return $updates;
+					}
+
+					$last_scanned_update_meta_id = (int) $row->meta_id;
+					$returned_update_bytes      += $update_bytes;
+
+					$decoded = json_decode( $row->meta_value, true );
+					if ( null !== $decoded ) {
+						$updates[] = $decoded;
+					}
 				}
 			}
+
+			$this->room_cursors[ $room ] = $last_scanned_update_meta_id;
 
 			return $updates;
 		}

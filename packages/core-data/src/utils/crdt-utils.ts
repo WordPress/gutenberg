@@ -167,6 +167,83 @@ export function getYTextByAttributeKey(
 }
 
 /**
+ * Resolve the current RichText attribute key for a Y.Text by walking the
+ * block attributes tree. Direct top-level keys are checked first to preserve
+ * the lookup semantics of getYTextByAttributeKey for keys that contain dots.
+ *
+ * @param attributes The block attributes map.
+ * @param yText      The Y.Text to locate.
+ * @return The current attribute key, or null when no representable key exists.
+ */
+export function getAttributeKeyForYText(
+	attributes: Y.Map< unknown >,
+	yText: Y.Text
+): string | null {
+	for ( const key of attributes.keys() ) {
+		if ( attributes.get( key ) === yText ) {
+			return key;
+		}
+	}
+
+	for ( const key of attributes.keys() ) {
+		if ( key.includes( '.' ) ) {
+			continue;
+		}
+
+		const path = findYTextPath( attributes.get( key ), yText, [ key ] );
+		if ( path ) {
+			return path.join( '.' );
+		}
+	}
+
+	return null;
+}
+
+function findYTextPath(
+	value: unknown,
+	yText: Y.Text,
+	path: string[]
+): string[] | null {
+	if ( value === yText ) {
+		return path;
+	}
+
+	if ( value instanceof Y.Text ) {
+		return null;
+	}
+
+	if ( value instanceof Y.Map ) {
+		for ( const key of value.keys() ) {
+			if ( key.includes( '.' ) ) {
+				continue;
+			}
+
+			const nestedPath = findYTextPath( value.get( key ), yText, [
+				...path,
+				key,
+			] );
+			if ( nestedPath ) {
+				return nestedPath;
+			}
+		}
+	}
+
+	if ( value instanceof Y.Array ) {
+		for ( let index = 0; index < value.length; index++ ) {
+			const nestedPath = findYTextPath( value.get( index ), yText, [
+				...path,
+				index.toString(),
+			] );
+			if ( nestedPath ) {
+				return nestedPath;
+			}
+		}
+	}
+
+	return null;
+}
+
+/**
  * Given a block ID and a Y.Doc, find the block in the document.
  *
  * @param blockId The block ID to find

@@ -351,6 +351,81 @@ describe( 'useBlockSync hook', () => {
 		expect( onInput ).not.toHaveBeenCalled();
 	} );
 
+	it( 'does not treat a local inner block insertion as incoming after a no-op controlled reset', async () => {
+		const onChange = jest.fn();
+		const onInput = jest.fn();
+		const replaceInnerBlocks = jest.spyOn(
+			blockEditorActions,
+			'replaceInnerBlocks'
+		);
+
+		const value1 = [];
+		let registry;
+		const setRegistry = ( reg ) => {
+			registry = reg;
+		};
+		const { rerender } = render(
+			<TestWrapper
+				setRegistry={ setRegistry }
+				clientId="test"
+				value={ value1 }
+				onChange={ onChange }
+				onInput={ onInput }
+			/>
+		);
+
+		registry.dispatch( blockEditorStore ).resetBlocks( [
+			{
+				name: 'test/test-block',
+				clientId: 'test',
+				innerBlocks: [],
+				attributes: { foo: 1 },
+			},
+		] );
+
+		onChange.mockClear();
+		onInput.mockClear();
+		replaceInnerBlocks.mockClear();
+
+		const value2 = [];
+
+		rerender(
+			<TestWrapper
+				setRegistry={ setRegistry }
+				clientId="test"
+				value={ value2 }
+				onChange={ onChange }
+				onInput={ onInput }
+			/>
+		);
+
+		expect( replaceInnerBlocks ).toHaveBeenCalledWith( 'test', [] );
+		expect( onChange ).not.toHaveBeenCalled();
+		expect( onInput ).not.toHaveBeenCalled();
+
+		registry.dispatch( blockEditorStore ).replaceInnerBlocks( 'test', [
+			{
+				name: 'test/test-block',
+				clientId: 'inner-a',
+				innerBlocks: [],
+				attributes: { foo: 3 },
+			},
+		] );
+
+		expect( onChange ).toHaveBeenCalledWith(
+			[
+				{
+					name: 'test/test-block',
+					clientId: 'inner-a',
+					innerBlocks: [],
+					attributes: { foo: 3 },
+				},
+			],
+			expect.objectContaining( { selection: expect.any( Object ) } )
+		);
+		expect( onInput ).not.toHaveBeenCalled();
+	} );
+
 	it( 'avoids updating the parent if there is a pending incoming change', async () => {
 		const replaceInnerBlocks = jest.spyOn(
 			blockEditorActions,

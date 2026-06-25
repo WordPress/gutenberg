@@ -30,6 +30,7 @@ import {
 	DISCONNECT_DIALOG_RETRY_MS,
 	MANUAL_RETRY_INTERVAL_MS,
 } from './config';
+import { LOCAL_SYNC_MANAGER_ORIGIN } from '../../config';
 import { ConnectionError, ConnectionErrorCode } from '../../errors';
 import type { ConnectionStatus } from '../../types';
 import {
@@ -211,6 +212,106 @@ function handleForbiddenError(
 }
 
 const roomStates: Map< string, RoomState > = new Map();
+
+function disconnectRoomForDocumentSizeLimit(
+	state: RoomState,
+	updateSizeInBytes: number
+): void {
+	state.log( 'Document size limit exceeded', {
+		maxUpdateSizeInBytes: MAX_UPDATE_SIZE_IN_BYTES,
+		updateSizeInBytes,
+	} );
+
+	state.onStatusChange( {
+		status: 'disconnected',
+		error: new ConnectionError(
+			ConnectionErrorCode.DOCUMENT_SIZE_LIMIT_EXCEEDED,
+			'Document size limit exceeded'
+		),
+	} );
+
+	// This is an unrecoverable error. Unregister the room to prevent syncing.
+	unregisterRoom( state.room );
+}
+
+function getSyncUpdateByteLength( update: SyncUpdate ): number {
+	return base64ToUint8Array( update.data ).byteLength;
+}
+
+function queueUpdateOrDisconnect(
+	state: RoomState,
+	update: SyncUpdate
+): boolean {
+	const updateSizeInBytes = getSyncUpdateByteLength( update );
+
+	if ( updateSizeInBytes > MAX_UPDATE_SIZE_IN_BYTES ) {
+		disconnectRoomForDocumentSizeLimit( state, updateSizeInBytes );
+		return false;
+	}
+
+	state.updateQueue.add( update );
+	return true;
+}
+
+function queueCompactionUpdate( state: RoomState ): boolean {
+	const compactionUpdate = state.createCompactionUpdate();
+	const compactionUpdateSize = getSyncUpdateByteLength( compactionUpdate );
+
+	if ( compactionUpdateSize > MAX_UPDATE_SIZE_IN_BYTES ) {
+		state.log( 'Generated compaction update exceeded document size limit', {
+			compactionUpdateSize,
+			maxUpdateSizeInBytes: MAX_UPDATE_SIZE_IN_BYTES,
+		} );
+		return false;
+	}
+
+	state.updateQueue.clear();
+	state.updateQueue.add( compactionUpdate );
+	return true;
+}
+
+function queueUpdatesOrDisconnect(
+	state: RoomState,
+	updates: SyncUpdate[]
+): boolean {
+	const oversizedUpdate = updates.find(
+		( update ) =>
+			getSyncUpdateByteLength( update ) > MAX_UPDATE_SIZE_IN_BYTES
+	);
+
+	if ( oversizedUpdate ) {
+		if ( oversizedUpdate.type === SyncUpdateType.SYNC_STEP_2 ) {
+			if ( queueCompactionUpdate( state ) ) {
+				state.log(
+					'Generated sync step 2 exceeded document size limit, queueing compaction update instead',
+					{
+						syncStep2UpdateSize:
+							getSyncUpdateByteLength( oversizedUpdate ),
+					}
+				);
+			} else {
+				state.log(
+					'Generated sync step 2 exceeded document size limit, skipping response',
+					{
+						syncStep2UpdateSize:
+							getSyncUpdateByteLength( oversizedUpdate ),
+					}
+				);
+			}
+
+			return true;
+		}
+
+		disconnectRoomForDocumentSizeLimit(
+			state,
+			getSyncUpdateByteLength( oversizedUpdate )
+		);
+		return false;
+	}
+
+	state.updateQueue.addBulk( updates );
+	return true;
+}
 
 /**
  * Create a compaction update by merging existing updates. This preserves
@@ -465,10 +566,21 @@ function handleBeforeUnload(): void {
 }
 
 /**
- * Send a disconnect signal for all registered rooms when the page is
- * being unloaded. Uses `sendBeacon` so the request survives navigation.
+ * Send a disconnect signal for all registered rooms when the page is being
+ * unloaded. A persisted pagehide means the page is entering the back/forward
+ * cache rather than leaving permanently; keep the rooms registered so a
+ * restored page can continue polling instead of looking like a disconnected
+ * collaborator that still has an open editor.
+ *
+ * Uses a keepalive request so the request survives navigation.
+ *
+ * @param event Page transition event.
  */
-function handlePageHide(): void {
+function handlePageHide( event: PageTransitionEvent ): void {
+	if ( event.persisted ) {
+		return;
+	}
+
 	const rooms = Array.from( roomStates.entries() ).map(
 		( [ room, state ] ) => ( {
 			after: 0,
@@ -483,6 +595,19 @@ function handlePageHide(): void {
 		postSyncUpdateNonBlocking( {
 			rooms: rooms.slice( i, i + MAX_ROOMS_PER_REQUEST ),
 		} );
+	}
+}
+
+/**
+ * Resume polling immediately when a page is restored from the back/forward
+ * cache. Timers can be paused while the page is cached, so waiting for the
+ * previous timeout can leave the document stale after restore.
+ *
+ * @param event Page transition event.
+ */
+function handlePageShow( event: PageTransitionEvent ): void {
+	if ( event.persisted ) {
+		retryNow();
 	}
 }
 
@@ -770,21 +895,23 @@ function poll(): void {
 					}
 				}
 
-				roomState.updateQueue.addBulk( responseUpdates );
+				if (
+					! queueUpdatesOrDisconnect( roomState, responseUpdates )
+				) {
+					return;
+				}
 
 				// Respond to compaction requests from server. The server asks only one
 				// client at a time to compact (lowest active client ID). We encode our
 				// full document state to replace all prior updates on the server.
 				if ( room.should_compact ) {
 					roomState.log( 'Server requested compaction update' );
-					roomState.updateQueue.clear();
-					roomState.updateQueue.add(
-						roomState.createCompactionUpdate()
-					);
+					queueCompactionUpdate( roomState );
 				} else if ( room.compaction_request ) {
 					// Deprecated
 					roomState.log( 'Server requested (old) compaction update' );
-					roomState.updateQueue.add(
+					queueUpdateOrDisconnect(
+						roomState,
 						createDeprecatedCompactionUpdate(
 							room.compaction_request
 						)
@@ -902,7 +1029,10 @@ function poll(): void {
 
 					if ( room.updates.length > 0 && state.endCursor > 0 ) {
 						state.updateQueue.clear();
-						state.updateQueue.add( state.createCompactionUpdate() );
+						queueUpdateOrDisconnect(
+							state,
+							state.createCompactionUpdate()
+						);
 					} else if ( room.updates.length > 0 ) {
 						state.updateQueue.restore( room.updates );
 					}
@@ -1001,7 +1131,10 @@ function registerRoom( {
 	}
 
 	function onDocUpdate( update: Uint8Array, origin: unknown ): void {
-		if ( POLLING_MANAGER_ORIGIN === origin ) {
+		if (
+			POLLING_MANAGER_ORIGIN === origin ||
+			LOCAL_SYNC_MANAGER_ORIGIN === origin
+		) {
 			return;
 		}
 
@@ -1011,21 +1144,7 @@ function registerRoom( {
 				return;
 			}
 
-			state.log( 'Document size limit exceeded', {
-				maxUpdateSizeInBytes: MAX_UPDATE_SIZE_IN_BYTES,
-				updateSizeInBytes: update.byteLength,
-			} );
-
-			state.onStatusChange( {
-				status: 'disconnected',
-				error: new ConnectionError(
-					ConnectionErrorCode.DOCUMENT_SIZE_LIMIT_EXCEEDED,
-					'Document size limit exceeded'
-				),
-			} );
-
-			// This is an unrecoverable error. Unregister the room to prevent syncing.
-			unregisterRoom( room );
+			disconnectRoomForDocumentSizeLimit( state, update.byteLength );
 			return;
 		}
 
@@ -1067,6 +1186,7 @@ function registerRoom( {
 	if ( ! areListenersRegistered ) {
 		window.addEventListener( 'beforeunload', handleBeforeUnload );
 		window.addEventListener( 'pagehide', handlePageHide );
+		window.addEventListener( 'pageshow', handlePageShow );
 		document.addEventListener( 'visibilitychange', handleVisibilityChange );
 		areListenersRegistered = true;
 	}
@@ -1105,6 +1225,7 @@ function unregisterRoom(
 	if ( 0 === roomStates.size && areListenersRegistered ) {
 		window.removeEventListener( 'beforeunload', handleBeforeUnload );
 		window.removeEventListener( 'pagehide', handlePageHide );
+		window.removeEventListener( 'pageshow', handlePageShow );
 		document.removeEventListener(
 			'visibilitychange',
 			handleVisibilityChange

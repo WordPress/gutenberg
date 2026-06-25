@@ -52,9 +52,25 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		const MAX_BODY_SIZE = 16 * MB_IN_BYTES;
 
 		/**
-		 * Maximum number of rooms allowed per request.
+		 * Maximum target size (in bytes) of the response body.
 		 *
 		 * @since 7.0.0
+		 * @var int
+		 */
+		const MAX_RESPONSE_BODY_SIZE = 16 * MB_IN_BYTES;
+
+		/**
+		 * Per-room headroom for response metadata outside returned update rows.
+		 *
+		 * @since 7.1.0
+		 * @var int
+		 */
+		const RESPONSE_BODY_ROOM_HEADROOM = 8 * 1024;
+
+		/**
+		 * Maximum number of rooms allowed per request.
+		 *
+		 * @since 7.1.0
 		 * @var int
 		 */
 		const MAX_ROOMS_PER_REQUEST = 50;
@@ -320,8 +336,18 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 					}
 				}
 
-				// Get updates for this client.
-				$room_response              = $this->get_updates( $room, $client_id, $cursor, $is_compactor );
+				// Get updates for this client without allowing one bloated
+				// room to make the whole multi-room response too large.
+				$empty_room_response        = array(
+					'awareness'      => $merged_awareness,
+					'end_cursor'     => $cursor,
+					'room'           => $room,
+					'should_compact' => false,
+					'total_updates'  => 0,
+					'updates'        => array(),
+				);
+				$max_update_bytes           = $this->get_remaining_response_update_bytes( $response, $empty_room_response );
+				$room_response              = $this->get_updates( $room, $client_id, $cursor, $is_compactor, $max_update_bytes );
 				$room_response['awareness'] = $merged_awareness;
 
 				$response['rooms'][] = $room_response;
@@ -406,7 +432,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 					 * Check for a newer compaction update first. If one exists, skip this
 					 * compaction to avoid overwriting it.
 					 */
-					$updates_after_cursor = $this->storage->get_updates_after_cursor( $room, $cursor );
+					$updates_after_cursor = $this->storage->get_updates_after_cursor( $room, $cursor, self::MAX_RESPONSE_BODY_SIZE );
 					$has_newer_compaction = false;
 
 					foreach ( $updates_after_cursor as $existing ) {
@@ -489,6 +515,28 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		}
 
 		/**
+		 * Calculates the remaining serialized update budget for a room response.
+		 *
+		 * @since 7.1.0
+		 *
+		 * @param array<string, mixed> $response            Response built so far.
+		 * @param array<string, mixed> $empty_room_response Room response without updates.
+		 * @return int Remaining bytes available for serialized update rows.
+		 */
+		private function get_remaining_response_update_bytes( array $response, array $empty_room_response ): int {
+			$candidate_response            = $response;
+			$candidate_response['rooms'][] = $empty_room_response;
+			$encoded_response              = wp_json_encode( $candidate_response );
+
+			if ( ! is_string( $encoded_response ) ) {
+				return 0;
+			}
+
+			$remaining_bytes = self::MAX_RESPONSE_BODY_SIZE - strlen( $encoded_response ) - self::RESPONSE_BODY_ROOM_HEADROOM;
+			return max( 0, $remaining_bytes );
+		}
+
+		/**
 		 * Gets sync updates for a specific client from a room after a given cursor.
 		 *
 		 * Delegates cursor-based retrieval to the storage layer, then applies
@@ -499,7 +547,8 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		 * @param string $room         Room identifier.
 		 * @param int    $client_id    Client identifier.
 		 * @param int    $cursor       Return updates after this cursor.
-		 * @param bool   $is_compactor True if this client is nominated to perform compaction.
+		 * @param bool   $is_compactor     True if this client is nominated to perform compaction.
+		 * @param int    $max_update_bytes Maximum serialized update bytes to include.
 		 * @return array{
 		 *   end_cursor: int,
 		 *   should_compact: bool,
@@ -508,8 +557,8 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		 *   updates: array<int, array{data: string, type: string}>,
 		 * } Response data for this room.
 		 */
-		private function get_updates( string $room, int $client_id, int $cursor, bool $is_compactor ): array {
-			$updates_after_cursor = $this->storage->get_updates_after_cursor( $room, $cursor );
+		private function get_updates( string $room, int $client_id, int $cursor, bool $is_compactor, int $max_update_bytes ): array {
+			$updates_after_cursor = $this->storage->get_updates_after_cursor( $room, $cursor, $max_update_bytes );
 			$total_updates        = $this->storage->get_update_count( $room );
 
 			// Filter out this client's updates, except compaction updates.

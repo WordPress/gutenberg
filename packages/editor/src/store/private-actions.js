@@ -709,7 +709,7 @@ export const restoreRevision =
 
 		// Build the edits object with all restorable fields from the revision.
 		const edits = {
-			blocks: undefined,
+			blocks: parse( revision.content.raw ),
 			content: revision.content.raw,
 		};
 		if ( revision.title?.raw !== undefined ) {
@@ -729,7 +729,10 @@ export const restoreRevision =
 		dispatch.setCurrentRevisionId( null );
 
 		// Save the post to persist the restored revision.
-		await dispatch.savePost();
+		await dispatch.savePost( {
+			__unstableIsRevisionRestore: true,
+			__unstableRevisionRestoreEdits: edits,
+		} );
 
 		// Show success notice.
 		registry.dispatch( noticesStore ).createSuccessNotice(
