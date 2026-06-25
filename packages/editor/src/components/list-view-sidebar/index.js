@@ -8,7 +8,7 @@ import {
 import { useFocusOnMount, useMergeRefs } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { focus } from '@wordpress/dom';
-import { useCallback, useRef, useState } from '@wordpress/element';
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { ESCAPE } from '@wordpress/keycodes';
@@ -25,6 +25,12 @@ const { TabbedSidebar } = unlock( blockEditorPrivateApis );
 export default function ListViewSidebar() {
 	const { setIsListViewOpened } = useDispatch( editorStore );
 	const { getListViewToggleRef } = unlock( useSelect( editorStore ) );
+
+	// Tracks our current tab.
+	const { listViewTab: tab } = useSelect( ( select ) => ( {
+		listViewTab: unlock( select( editorStore ) ).getListViewTab(),
+	} ) );
+	const { setListViewTab: setTab } = unlock( useDispatch( editorStore ) );
 
 	// This hook handles focus when the sidebar first renders.
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
@@ -48,8 +54,6 @@ export default function ListViewSidebar() {
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the dropZoneElement updates.
 	const [ dropZoneElement, setDropZoneElement ] = useState( null );
-	// Tracks our current tab.
-	const [ tab, setTab ] = useState( 'list-view' );
 
 	// This ref refers to the sidebar as a whole.
 	const sidebarRef = useRef();
@@ -57,6 +61,8 @@ export default function ListViewSidebar() {
 	const tabsRef = useRef();
 	// This ref refers to the list view application area.
 	const listViewRef = useRef();
+	// This ref refers to the outline application area.
+	const outlineRef = useRef();
 
 	// Must merge the refs together so focus can be handled properly in the next function.
 	const listViewContainerRef = useMergeRefs( [
@@ -89,7 +95,16 @@ export default function ListViewSidebar() {
 			listViewFocusArea.focus();
 			// Outline tab is selected.
 		} else {
-			tabPanelFocus.focus();
+			// Try to focus the first tabbable element in the outline, otherwise focus the tab panel.
+			const outlineApplicationFocus = focus.tabbable.find(
+				outlineRef.current
+			)[ 0 ];
+			const outlineFocusArea = sidebarRef.current.contains(
+				outlineApplicationFocus
+			)
+				? outlineApplicationFocus
+				: tabPanelFocus;
+			outlineFocusArea.focus();
 		}
 	}
 
@@ -110,6 +125,18 @@ export default function ListViewSidebar() {
 	// This only fires when the sidebar is open because of the conditional rendering.
 	// It is the same shortcut to open but that is defined as a global shortcut and only fires when the sidebar is closed.
 	useShortcut( 'core/editor/toggle-list-view', handleToggleListViewShortcut );
+
+	// Handle focus when tab changes (e.g., from command execution).
+	useEffect( () => {
+		// Only manage focus if the sidebar is already open and we're switching tabs.
+		if ( sidebarRef.current && tabsRef.current ) {
+			// Small delay to ensure the tab panel has rendered.
+			const timeoutId = setTimeout( () => {
+				handleSidebarFocus( tab );
+			}, 0 );
+			return () => clearTimeout( timeoutId );
+		}
+	}, [ tab ] );
 
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
@@ -142,11 +169,12 @@ export default function ListViewSidebar() {
 								<ListViewOutline />
 							</div>
 						),
+						panelRef: outlineRef,
 					},
 				] }
 				onClose={ closeListView }
 				onSelect={ ( tabName ) => setTab( tabName ) }
-				defaultTabId="list-view"
+				selectedTab={ tab }
 				ref={ tabsRef }
 				closeButtonLabel={ __( 'Close' ) }
 			/>

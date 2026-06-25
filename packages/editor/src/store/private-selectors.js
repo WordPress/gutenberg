@@ -334,6 +334,15 @@ export const getDefaultRenderingMode = createRegistrySelector(
 );
 
 /**
+ * Returns the current list view tab.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string} The current list view tab.
+ */
+export const getListViewTab = ( state ) => state.listViewTab ?? 'list-view';
+
+/**
  * Get the current global styles navigation path.
  *
  * @param {Object} state Global application state.

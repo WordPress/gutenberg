@@ -27,6 +27,7 @@ import EditorHistoryUndo from '../editor-history/undo';
 function DocumentTools( { className, disableBlockTools = false } ) {
 	const { setIsInserterOpened, setIsListViewOpened } =
 		useDispatch( editorStore );
+	const { setListViewTab } = unlock( useDispatch( editorStore ) );
 	const {
 		isDistractionFree,
 		isInserterOpened,
@@ -77,10 +78,15 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 	/* translators: accessibility text for the editor toolbar */
 	const toolbarAriaLabel = __( 'Document tools' );
 
-	const toggleListView = useCallback(
-		() => setIsListViewOpened( ! isListViewOpen ),
-		[ setIsListViewOpened, isListViewOpen ]
-	);
+	const toggleListView = useCallback( () => {
+		if ( ! isListViewOpen ) {
+			// When opening the list view, always reset to the list-view tab
+			setIsListViewOpened( true );
+			setListViewTab( 'list-view' );
+		} else {
+			setIsListViewOpened( false );
+		}
+	}, [ setIsListViewOpened, setListViewTab, isListViewOpen ] );
 
 	const toggleInserter = useCallback(
 		() => setIsInserterOpened( ! isInserterOpened ),

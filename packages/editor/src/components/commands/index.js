@@ -3,6 +3,7 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, isRTL, sprintf } from '@wordpress/i18n';
+import { speak } from '@wordpress/a11y';
 import {
 	blockDefault,
 	code,
@@ -54,10 +55,12 @@ const getEditorCommandLoader = () =>
 			isCodeEditingEnabled,
 			isRichEditingEnabled,
 			isPublishSidebarEnabled,
+			currentListViewTab,
 		} = useSelect( ( select ) => {
 			const { get } = select( preferencesStore );
 			const { isListViewOpened, getCurrentPostType, getEditorSettings } =
 				select( editorStore );
+			const { getListViewTab } = unlock( select( editorStore ) );
 			const { getSettings } = select( blockEditorStore );
 			const { getPostType } = select( coreStore );
 
@@ -74,6 +77,7 @@ const getEditorCommandLoader = () =>
 				isRichEditingEnabled: getEditorSettings().richEditingEnabled,
 				isPublishSidebarEnabled:
 					select( editorStore ).isPublishSidebarEnabled(),
+				currentListViewTab: getListViewTab(),
 			};
 		}, [] );
 		const { getActiveComplementaryArea } = useSelect( interfaceStore );
@@ -87,6 +91,10 @@ const getEditorCommandLoader = () =>
 			toggleSpotlightMode,
 			toggleTopToolbar,
 		} = useDispatch( editorStore );
+
+		// We need to use unlock here because the `useDispatch` hook is used before the `useSelect` hook.
+		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+		const { setListViewTab } = unlock( useDispatch( editorStore ) ); // disabled eslint due to error "Variables should not be assigned until just prior its first reference".
 		const { openModal, enableComplementaryArea, disableComplementaryArea } =
 			useDispatch( interfaceStore );
 		const { getCurrentPostId } = useSelect( editorStore );
@@ -146,23 +154,74 @@ const getEditorCommandLoader = () =>
 
 		commands.push( {
 			name: 'core/toggle-list-view',
-			label: isListViewOpen
-				? __( 'Close List View' )
-				: __( 'Open List View' ),
+			label:
+				isListViewOpen && currentListViewTab === 'list-view'
+					? __( 'Close List View' )
+					: __( 'Open List View' ),
 			icon: listView,
 			category: 'command',
 			callback: ( { close } ) => {
-				setIsListViewOpened( ! isListViewOpen );
-				close();
-				createInfoNotice(
-					isListViewOpen
-						? __( 'List View off.' )
-						: __( 'List View on.' ),
-					{
+				if ( ! isListViewOpen ) {
+					// When opening the list view, always reset to the list-view tab
+					setIsListViewOpened( true );
+					setListViewTab( 'list-view' );
+					createInfoNotice( __( 'List View opened.' ), {
 						id: 'core/editor/toggle-list-view/notice',
 						type: 'snackbar',
-					}
-				);
+					} );
+				} else if ( currentListViewTab !== 'list-view' ) {
+					// When closing
+					setListViewTab( 'list-view' );
+					createInfoNotice( __( 'List View opened.' ), {
+						id: 'core/editor/toggle-list-view/notice',
+						type: 'snackbar',
+					} );
+				} else {
+					setIsListViewOpened( false );
+					createInfoNotice( __( 'List View closed.' ), {
+						id: 'core/editor/toggle-list-view/notice',
+						type: 'snackbar',
+					} );
+				}
+				close();
+			},
+		} );
+
+		commands.push( {
+			name: 'core/show-outline',
+			label: __( 'Show or hide document outline' ),
+			icon: listView,
+			callback: ( { close } ) => {
+				// If list view is closed, open it with outline tab
+				if ( ! isListViewOpen ) {
+					setIsListViewOpened( true );
+					setListViewTab( 'outline' );
+					const message = __( 'Document outline opened.' );
+					speak( message, 'assertive' );
+					createInfoNotice( message, {
+						id: 'core/editor/show-outline/notice',
+						type: 'snackbar',
+					} );
+				} else if ( currentListViewTab !== 'outline' ) {
+					// Currently on list-view tab, so switch to outline tab
+					setListViewTab( 'outline' );
+					const message = __( 'Document outline opened.' );
+					speak( message, 'assertive' );
+					createInfoNotice( message, {
+						id: 'core/editor/show-outline/notice',
+						type: 'snackbar',
+					} );
+				} else {
+					// Currently on outline tab, so close the list view
+					setIsListViewOpened( false );
+					const message = __( 'Document outline closed.' );
+					speak( message, 'assertive' );
+					createInfoNotice( message, {
+						id: 'core/editor/show-outline/notice',
+						type: 'snackbar',
+					} );
+				}
+				close();
 			},
 		} );
 

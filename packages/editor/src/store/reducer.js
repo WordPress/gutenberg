@@ -385,6 +385,21 @@ export function publishSidebarActive( state = false, action ) {
 }
 
 /**
+ * Reducer to set the tab in the list view.
+ * @param {string} state  Current state.
+ * @param {Object} action Dispatched action.
+ * @return {string} Updated state.
+ */
+export function listViewTab( state = 'list-view', action ) {
+	switch ( action.type ) {
+		case 'SET_LIST_VIEW_TAB':
+			return action.tab;
+		default:
+			return state;
+	}
+}
+
+/**
  * Reducer for the current global styles navigation path.
  *
  * @param {string} state  Current state.
@@ -514,4 +529,5 @@ export default combineReducers( {
 	showRevisionDiff,
 	selectedNote,
 	dataviews: dataviewsReducer,
+	listViewTab,
 } );
