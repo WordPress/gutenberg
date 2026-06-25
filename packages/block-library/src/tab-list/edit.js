@@ -150,14 +150,9 @@ function Edit( {
 							className={ buttonClassName || undefined }
 							style={ buttonStyle }
 							tabIndex={ -1 }
-							onClick={ ( event ) => {
-								event.preventDefault();
-								selectTabPanel( index );
-							} }
-							// Activate the matching panel when the caret moves
-							// into this tab's label via the keyboard, mirroring
-							// the click behavior. `onFocus` bubbles from the
-							// inner RichText editable.
+							// Activate the matching panel whenever this tab
+							// receives focus — whether from a click or the caret
+							// moving into the label via the keyboard.
 							onFocus={ () => {
 								selectTabPanel( index );
 							} }
