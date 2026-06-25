@@ -85,11 +85,11 @@ test.describe( 'Post Summary', () => {
 				await expect( fields.description.control ).toHaveText(
 					INITIAL_DESCRIPTION
 				);
-				await expect( fields.descriptionTextbox ).toHaveCount( 0 );
+				await expect( fields.description.dropdown ).toHaveCount( 0 );
 
 				await fields.description.editButton.click();
-				await expect( fields.descriptionTextbox ).toBeVisible();
-				await fields.descriptionTextbox.fill( UPDATED_DESCRIPTION );
+				await expect( fields.description.textbox ).toBeVisible();
+				await fields.description.textbox.fill( UPDATED_DESCRIPTION );
 				await page.keyboard.press( 'Escape' );
 				await expect( fields.description.control ).toHaveText(
 					UPDATED_DESCRIPTION
@@ -223,9 +223,6 @@ test.describe( 'Post Summary', () => {
 			return {
 				title: summary.locator( '.editor-post-card-panel__title-name' ),
 				description: getDescriptionField( { page, summary } ),
-				descriptionTextbox: page.getByRole( 'textbox', {
-					name: 'Description',
-				} ),
 				revisions: getRevisionsField( { page, summary } ),
 				syncStatus: getSyncStatusField( { page, summary } ),
 			};
@@ -235,19 +232,20 @@ test.describe( 'Post Summary', () => {
 			const root = summary
 				.locator( '.dataforms-layouts-panel__field-trigger' )
 				.filter( {
-					has: page
-						.locator( '.dataforms-layouts-panel__field-label' )
-						.filter( { hasText: exactText( 'Description' ) } ),
+					has: page.getByText( 'Description', { exact: true } ),
 				} );
+			const dropdown = page.locator(
+				'.dataforms-layouts-panel__field-dropdown'
+			);
 
 			return {
 				root,
 				control: root.locator(
 					'.dataforms-layouts-panel__field-control'
 				),
-				editButton: root.getByRole( 'button', {
-					name: 'Edit Description',
-				} ),
+				dropdown,
+				textbox: dropdown.getByRole( 'textbox' ),
+				editButton: root.getByRole( 'button' ),
 			};
 		}
 
@@ -255,9 +253,7 @@ test.describe( 'Post Summary', () => {
 			const root = summary
 				.locator( '.dataforms-layouts-panel__field-trigger' )
 				.filter( {
-					has: page
-						.locator( '.dataforms-layouts-panel__field-label' )
-						.filter( { hasText: exactText( 'Revisions' ) } ),
+					has: page.getByText( 'Revisions', { exact: true } ),
 				} );
 
 			return {
@@ -272,9 +268,7 @@ test.describe( 'Post Summary', () => {
 			const root = summary
 				.locator( '.dataforms-layouts-regular__field' )
 				.filter( {
-					has: page
-						.locator( '.dataforms-layouts-regular__field-label' )
-						.filter( { hasText: exactText( 'Sync status' ) } ),
+					has: page.getByText( 'Sync status', { exact: true } ),
 				} );
 
 			return {
@@ -283,12 +277,6 @@ test.describe( 'Post Summary', () => {
 					'.dataforms-layouts-regular__field-control'
 				),
 			};
-		}
-
-		function exactText( text ) {
-			return new RegExp(
-				`^${ text.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' ) }$`
-			);
 		}
 	} );
 } );

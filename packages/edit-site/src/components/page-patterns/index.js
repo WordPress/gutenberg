@@ -12,7 +12,6 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useView, useViewConfig } from '@wordpress/views';
 import { useSelect } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
-import { patternSyncStatusField } from '@wordpress/fields';
 
 /**
  * Internal dependencies
@@ -31,8 +30,7 @@ import { previewField } from './fields';
 import usePatternCategories from '../sidebar-navigation-screen-patterns/use-pattern-categories';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
-const { usePostActions, usePostFields, patternTitleField } =
-	unlock( editorPrivateApis );
+const { usePostActions, usePostFields } = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
@@ -105,18 +103,20 @@ export default function DataviewsPatterns() {
 		syncStatus: viewSyncStatus,
 	} );
 
-	const templatePartFields = usePostFields( {
-		postType: TEMPLATE_PART_POST_TYPE,
-	} );
-	const templatePartAuthorField = templatePartFields.find(
+	const postTypeFields = usePostFields( { postType } );
+	const titleField = postTypeFields.find( ( field ) => field.id === 'title' );
+	const syncStatusField = postTypeFields.find(
+		( field ) => field.id === 'sync-status'
+	);
+	const templatePartAuthorField = postTypeFields.find(
 		( field ) => field.id === 'author'
 	);
 
 	const fields = useMemo( () => {
-		const _fields = [ previewField, patternTitleField ];
+		const _fields = [ previewField, titleField ].filter( Boolean );
 
-		if ( postType === PATTERN_TYPES.user ) {
-			_fields.push( patternSyncStatusField );
+		if ( postType === PATTERN_TYPES.user && syncStatusField ) {
+			_fields.push( syncStatusField );
 		} else if (
 			postType === TEMPLATE_PART_POST_TYPE &&
 			templatePartAuthorField
@@ -125,7 +125,7 @@ export default function DataviewsPatterns() {
 		}
 
 		return _fields;
-	}, [ postType, templatePartAuthorField ] );
+	}, [ postType, syncStatusField, templatePartAuthorField, titleField ] );
 
 	const { data, paginationInfo } = useMemo( () => {
 		// Search is managed server-side as well as filters for patterns.
