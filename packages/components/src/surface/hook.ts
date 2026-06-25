@@ -1,16 +1,15 @@
 /**
- * WordPress dependencies
+ * External dependencies
  */
-import { useMemo } from '@wordpress/element';
+import clsx from 'clsx';
 
 /**
  * Internal dependencies
  */
 import { useContextSystem } from '../context';
-import * as styles from './styles';
-import { useCx } from '../utils/hooks/use-cx';
 import type { SurfaceProps } from './types';
 import type { WordPressComponentProps } from '../context';
+import styles from './style.module.scss';
 
 export function useSurface(
 	props: WordPressComponentProps< SurfaceProps, 'div' >
@@ -22,42 +21,37 @@ export function useSurface(
 		borderRight = false,
 		borderTop = false,
 		className,
+		style,
 		variant = 'primary',
 		...otherProps
 	} = useContextSystem( props, 'Surface' );
 
-	const cx = useCx();
+	const hasPatternBackground = variant === 'dotted' || variant === 'grid';
+	const surfaceStyle = hasPatternBackground
+		? {
+				...style,
+				'--wp-components-surface-background-size': `${ backgroundSize }px`,
+				'--wp-components-surface-background-size-dotted': `${
+					backgroundSize - 1
+				}px`,
+		  }
+		: style;
 
-	const classes = useMemo( () => {
-		const sx = {
-			borders: styles.getBorders( {
-				borderBottom,
-				borderLeft,
-				borderRight,
-				borderTop,
-			} ),
-		};
-
-		return cx(
-			styles.Surface,
-			sx.borders,
-			styles.getVariant(
-				variant,
-				`${ backgroundSize }px`,
-				`${ backgroundSize - 1 }px`
-			),
+	return {
+		...otherProps,
+		className: clsx(
+			styles.surface,
+			{
+				[ styles[ 'border-bottom' ] ]: borderBottom,
+				[ styles[ 'border-left' ] ]: borderLeft,
+				[ styles[ 'border-right' ] ]: borderRight,
+				[ styles[ 'border-top' ] ]: borderTop,
+				[ styles.secondary ]: variant === 'secondary',
+				[ styles.dotted ]: variant === 'dotted',
+				[ styles.grid ]: variant === 'grid',
+			},
 			className
-		);
-	}, [
-		backgroundSize,
-		borderBottom,
-		borderLeft,
-		borderRight,
-		borderTop,
-		className,
-		cx,
-		variant,
-	] );
-
-	return { ...otherProps, className: classes };
+		),
+		style: surfaceStyle,
+	};
 }

@@ -32,7 +32,6 @@ const BorderBoxControlSplitControls = (
 		popoverPlacement,
 		popoverOffset,
 		rightAlignedClassName,
-		size = 'default',
 		value,
 		__experimentalIsRenderedInSidebar,
 		...otherProps
@@ -66,19 +65,16 @@ const BorderBoxControlSplitControls = (
 		enableStyle,
 		isCompact: true,
 		__experimentalIsRenderedInSidebar,
-		size,
-		__shouldNotWarnDeprecated36pxSize: true,
 	};
 
 	const mergedRef = useMergeRefs( [ setPopoverAnchor, forwardedRef ] );
 
 	return (
 		<Grid { ...otherProps } ref={ mergedRef } gap={ 3 }>
-			<BorderBoxControlVisualizer value={ value } size={ size } />
+			<BorderBoxControlVisualizer value={ value } />
 
-			{ /* Disable reason: BorderControl's size is being controlled via the `size` prop by the parent component  */ }
-			{ /* eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop */ }
 			<BorderControl
+				size="__unstable-large"
 				className={ centeredClassName }
 				hideLabelFromVision
 				label={ __( 'Top border' ) }
@@ -87,9 +83,8 @@ const BorderBoxControlSplitControls = (
 				value={ value?.top }
 				{ ...sharedBorderControlProps }
 			/>
-			{ /* Disable reason: BorderControl's size is being controlled via the `size` prop by the parent component  */ }
-			{ /* eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop */ }
 			<BorderControl
+				size="__unstable-large"
 				hideLabelFromVision
 				label={ __( 'Left border' ) }
 				onChange={ ( newBorder ) => onChange( newBorder, 'left' ) }
@@ -97,9 +92,8 @@ const BorderBoxControlSplitControls = (
 				value={ value?.left }
 				{ ...sharedBorderControlProps }
 			/>
-			{ /* Disable reason: BorderControl's size is being controlled via the `size` prop by the parent component  */ }
-			{ /* eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop */ }
 			<BorderControl
+				size="__unstable-large"
 				className={ rightAlignedClassName }
 				hideLabelFromVision
 				label={ __( 'Right border' ) }
@@ -108,9 +102,8 @@ const BorderBoxControlSplitControls = (
 				value={ value?.right }
 				{ ...sharedBorderControlProps }
 			/>
-			{ /* Disable reason: BorderControl's size is being controlled via the `size` prop by the parent component  */ }
-			{ /* eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop */ }
 			<BorderControl
+				size="__unstable-large"
 				className={ centeredClassName }
 				hideLabelFromVision
 				label={ __( 'Bottom border' ) }

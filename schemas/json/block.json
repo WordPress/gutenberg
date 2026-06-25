@@ -476,6 +476,11 @@
 										"columnCount": {
 											"description": "The column count value.",
 											"type": "number"
+										},
+										"autoFit": {
+											"description": "Whether grid columns stretch to fill the available space (auto-fit) instead of leaving empty tracks (auto-fill).",
+											"type": "boolean",
+											"default": false
 										}
 									}
 								},

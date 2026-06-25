@@ -17,28 +17,23 @@
  * @return string Returns the Playlist.
  */
 function render_block_core_playlist( $attributes, $content, $block ) {
-	if ( empty( $attributes['currentTrack'] ) ) {
-		return '';
-	}
-
-	$current_media_id  = $attributes['currentTrack'];
-	$playlist_id       = wp_unique_id( 'playlist-' );
-	$playlist_tracks   = array();
-	$tracks_data       = array();
-	$current_unique_id = null;
+	$playlist_id     = wp_unique_id( 'playlist-' );
+	$playlist_tracks = array();
+	$tracks_data     = array();
 
 	// Parse inner blocks to extract track data.
 	// This approach avoids duplicating track data in the HTML output.
 	if ( ! empty( $block->inner_blocks ) ) {
 		foreach ( $block->inner_blocks as $inner_block ) {
 			if ( 'core/playlist-track' === $inner_block->name ) {
-				$inner_block->context['playlistId'] = $playlist_id;
+				$track_attributes = $inner_block->attributes;
 
-				$track_attributes  = $inner_block->attributes;
-				$unique_id         = $track_attributes['uniqueId'] ?? wp_unique_id( 'playlist-track-' );
-				$playlist_tracks[] = $unique_id;
+				if ( empty( $track_attributes['id'] ) ) {
+					continue;
+				}
 
-				$inner_block->attributes['uniqueId'] = $unique_id;
+				$track_id          = 'track-' . count( $playlist_tracks );
+				$playlist_tracks[] = $track_id;
 
 				// Extract track metadata from block attributes.
 				$title      = isset( $track_attributes['title'] ) && ! empty( $track_attributes['title'] ) ? $track_attributes['title'] : __( 'Unknown title' );
@@ -61,7 +56,7 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 				// Data is passed to wp_interactivity_state() which JSON-encodes it,
 				// so we use wp_strip_all_tags() instead of esc_html() to prevent
 				// HTML injection without double-encoding. URLs still use esc_url().
-				$tracks_data[ $unique_id ] = array(
+				$tracks_data[ $track_id ] = array(
 					'url'       => esc_url( $url ),
 					'title'     => wp_strip_all_tags( $title ),
 					'artist'    => wp_strip_all_tags( $artist ),
@@ -69,18 +64,11 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 					'image'     => esc_url( $image ),
 					'ariaLabel' => wp_strip_all_tags( $aria_label ),
 				);
-
-				if ( $unique_id === $current_media_id ) {
-					$current_unique_id = $unique_id;
-				}
 			}
 		}
 	}
 
-	// If there are no tracks but there is a currentTrack set, do not render the block.
-	// This can happen for example if the currentTrack was not deleted correctly
-	// or if the block is manually edited in the code editor mode.
-	if ( empty( $playlist_tracks ) || ! in_array( $current_media_id, $playlist_tracks, true ) ) {
+	if ( empty( $playlist_tracks ) ) {
 		return '';
 	}
 
@@ -108,7 +96,7 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 		data-label-pause="' . $label_pause . '"
 	></div>';
 
-	// Add the HTML for the current track inside the figure.
+	// Add the waveform player container inside the figure.
 	$figure = null;
 	preg_match( '/<figure[^>]*>/', $content, $figure );
 	if ( ! empty( $figure[0] ) ) {
@@ -126,15 +114,38 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 
 	$processor->set_attribute(
 		'data-wp-context',
-		json_encode(
+		wp_json_encode(
 			array(
 				'playlistId'    => $playlist_id,
-				'currentId'     => $current_unique_id,
+				'currentId'     => $playlist_tracks[0],
 				'tracks'        => $playlist_tracks,
 				'waveformStyle' => $waveform_style,
 			)
 		)
 	);
+
+	// Track IDs are render-time only. Add them after inner blocks have rendered
+	// so track buttons can update the Interactivity API state without storing
+	// persistent unique IDs in post content.
+	$track_index = 0;
+	while ( $processor->next_tag( array( 'class_name' => 'wp-block-playlist-track__button' ) ) ) {
+		$track_id = $playlist_tracks[ $track_index ] ?? null;
+
+		if ( null === $track_id ) {
+			break;
+		}
+
+		$processor->set_attribute(
+			'data-wp-context',
+			wp_json_encode(
+				array(
+					'trackId' => $track_id,
+				)
+			)
+		);
+
+		++$track_index;
+	}
 
 	return $processor->get_updated_html();
 }
