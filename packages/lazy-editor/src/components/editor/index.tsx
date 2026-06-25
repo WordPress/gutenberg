@@ -8,9 +8,9 @@ import type { ReactNode } from 'react';
  */
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { store as coreDataStore } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { Spinner } from '@wordpress/components';
-import { useMemo } from '@wordpress/element';
+import { useEffect, useMemo, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -20,9 +20,14 @@ import { useEditorSettings } from '../../hooks/use-editor-settings';
 import { useEditorAssets } from '../../hooks/use-editor-assets';
 import { unlock } from '../../lock-unlock';
 
-const { Editor: PrivateEditor, BackButton } = unlock( editorPrivateApis );
+const {
+	Editor: PrivateEditor,
+	BackButton,
+	interfaceStore,
+} = unlock( editorPrivateApis );
 
 const ISOLATED_POST_TYPES = [ 'wp_template_part', 'wp_block', 'wp_navigation' ];
+const PAGE_DOCUMENT_SIDEBAR = 'edit-post/document';
 
 interface EditorProps {
 	postType?: string;
@@ -100,6 +105,31 @@ export function Editor( {
 		} ),
 		[ editorSettings, settings ]
 	);
+	const openedPageSidebarForRef = useRef< string | undefined >();
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
+	const shouldOpenPageSidebar =
+		resolvedPostType === 'page' &&
+		!! resolvedPostId &&
+		! finalSettings.isPreviewMode;
+	const pageSidebarKey = shouldOpenPageSidebar
+		? `${ resolvedPostType }:${ resolvedPostId }`
+		: undefined;
+
+	useEffect( () => {
+		if ( ! settingsReady || ! assetsReady || ! pageSidebarKey ) {
+			return;
+		}
+		if ( openedPageSidebarForRef.current === pageSidebarKey ) {
+			return;
+		}
+		openedPageSidebarForRef.current = pageSidebarKey;
+		enableComplementaryArea( 'core', PAGE_DOCUMENT_SIDEBAR );
+	}, [
+		assetsReady,
+		enableComplementaryArea,
+		pageSidebarKey,
+		settingsReady,
+	] );
 
 	// Show loading spinner while assets or settings are loading
 	if ( ! settingsReady || ! assetsReady ) {
