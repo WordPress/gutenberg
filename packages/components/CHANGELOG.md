@@ -2,13 +2,30 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed from the following:
+    -   `BorderBoxControl` ([#79420](https://github.com/WordPress/gutenberg/pull/79420))
+    -   `BorderControl` ([#79418](https://github.com/WordPress/gutenberg/pull/79418))
+    -   `FontSizePicker` ([#79481](https://github.com/WordPress/gutenberg/pull/79481))
+
+### Documentation
+
+-   Document the safe `clsx` pattern for conditional CSS Module classes ([#79490](https://github.com/WordPress/gutenberg/pull/79490)).
+
+### Internal
+
+-   Enforce CSS Module class selector naming for component-library packages ([#79504](https://github.com/WordPress/gutenberg/pull/79504)).
+-   `Surface`: Migrate styles from Emotion to SCSS Modules and use WPDS tokens for migrated visual values ([#79445](https://github.com/WordPress/gutenberg/pull/79445)).
+-   `Truncate`: Migrate styles from Emotion to SCSS Modules ([#79446](https://github.com/WordPress/gutenberg/pull/79446)).
+
 ## 36.0.0 (2026-06-24)
 
 ### Breaking Changes
 
--   The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed ([#79386](https://github.com/WordPress/gutenberg/pull/79386), [#79419](https://github.com/WordPress/gutenberg/pull/79419)):
-    -   `BoxControl`
-    -   `TextControl`
+-   The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed from the following:
+    -   `BoxControl` ([#79419](https://github.com/WordPress/gutenberg/pull/79419))
+    -   `TextControl` ([#79386](https://github.com/WordPress/gutenberg/pull/79386))
 
 ### Enhancements
 
@@ -32,6 +49,7 @@
 ### Documentation
 
 -   `Menu`: Fix `overriden` typo to `overridden` in `CheckboxItemProps` and `RadioItemProps`. ([#79331](https://github.com/WordPress/gutenberg/pull/79331))
+-   Add component documentation for `ColorPicker`, `CustomSelectControl`, `Navigator`, `NumberControl`, `ResizableBox`, and `Slot` components ([#79460](https://github.com/WordPress/gutenberg/pull/79460)).
 
 ### Code Quality
 

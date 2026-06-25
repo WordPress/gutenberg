@@ -46,4 +46,36 @@ describe( 'getLayoutStyle', () => {
 
 		expect( result ).toBe( expected );
 	} );
+	it( 'should use `auto-fit` instead of `auto-fill` when autoFit is enabled', () => {
+		const expected = `.my-container { grid-template-columns: repeat(auto-fit, minmax(min(12rem, 100%), 1fr)); container-type: inline-size; }`;
+
+		const result = grid.getLayoutStyle( {
+			selector: '.my-container',
+			layout: { autoFit: true },
+			style: {},
+			blockName: 'test-block',
+			hasBlockGapSupport: false,
+			layoutDefinitions: undefined,
+		} );
+
+		expect( result ).toBe( expected );
+	} );
+	it( 'should use `auto-fit` with max() function when autoFit is enabled and both minimumColumnWidth and columnCount are provided', () => {
+		const expected = `.my-container { grid-template-columns: repeat(auto-fit, minmax(max(min( 12rem, 100%), ( 100% - (1.2rem*2) ) / 3), 1fr)); container-type: inline-size; }`;
+
+		const result = grid.getLayoutStyle( {
+			selector: '.my-container',
+			layout: {
+				minimumColumnWidth: '12rem',
+				columnCount: 3,
+				autoFit: true,
+			},
+			style: {},
+			blockName: 'test-block',
+			hasBlockGapSupport: false,
+			layoutDefinitions: undefined,
+		} );
+
+		expect( result ).toBe( expected );
+	} );
 } );

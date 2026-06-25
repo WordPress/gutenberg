@@ -169,7 +169,17 @@ const restrictedSyntax = [
 		selector: 'JSXAttribute[name.name="__nextHasNoMarginBottom"]',
 		message: 'The `__nextHasNoMarginBottom` prop is no longer needed.',
 	},
-	...[ 'BoxControl', 'TextControl' ].map( ( componentName ) => ( {
+	...[
+		'BorderBoxControl',
+		'BorderControl',
+		'BoxControl',
+		'FocalPointPicker',
+		'FontSizePicker',
+		'LetterSpacingControl',
+		'QueryControls',
+		'SearchControl',
+		'TextControl',
+	].map( ( componentName ) => ( {
 		selector: `JSXElement[openingElement.name.name="${ componentName }"] JSXAttribute[name.name="__next40pxDefaultSize"]`,
 		message: `The \`__next40pxDefaultSize\` prop is no longer needed on \`${ componentName }\`.`,
 	} ) ),
@@ -565,12 +575,7 @@ export default dedupePlugins( [
 	// component always receives props and returns a React element, and its
 	// props should be documented through its TypeScript props types.
 	{
-		files: [
-			'**/@(storybook|stories)/**',
-			'packages/components/src/**/*.tsx',
-			'packages/theme/src/**/*.tsx',
-			'packages/ui/src/**/*.tsx',
-		],
+		files: [ '**/@(storybook|stories)/**', '**/*.tsx' ],
 		rules: {
 			'jsdoc/require-param': 'off',
 		},
