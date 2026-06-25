@@ -77,13 +77,15 @@ export type FontSizePickerProps = {
 	/**
 	 * Start opting into the larger default height that will become the default size in a future version.
 	 *
-	 * @default false
+	 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
+	 * @ignore
 	 */
 	__next40pxDefaultSize?: boolean;
 	/**
 	 * Size of the control.
 	 *
-	 * @default 'default'
+	 * @deprecated This prop no longer has any effect.
+	 * @ignore
 	 */
 	size?: 'default' | '__unstable-large';
 };
@@ -114,7 +116,7 @@ export type FontSize = {
 
 export type FontSizePickerSelectProps = Pick<
 	FontSizePickerProps,
-	'value' | 'size' | 'valueMode'
+	'value' | 'valueMode'
 > & {
 	fontSizes: NonNullable< FontSizePickerProps[ 'fontSizes' ] >;
 	disableCustomFontSizes: NonNullable<
@@ -125,7 +127,6 @@ export type FontSizePickerSelectProps = Pick<
 		selectedItem?: FontSize
 	) => void;
 	onSelectCustom: () => void;
-	__next40pxDefaultSize: boolean;
 };
 
 export type FontSizePickerSelectOption = {
@@ -137,7 +138,7 @@ export type FontSizePickerSelectOption = {
 
 export type FontSizePickerToggleGroupProps = Pick<
 	FontSizePickerProps,
-	'value' | 'size' | '__next40pxDefaultSize' | 'valueMode'
+	'value' | 'valueMode'
 > & {
 	fontSizes: NonNullable< FontSizePickerProps[ 'fontSizes' ] >;
 	onChange: (

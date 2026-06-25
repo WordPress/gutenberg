@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/core-data",
-	"version": "7.48.1",
+	"version": "7.49.0",
 	"description": "Access to and manipulation of core WordPress entities.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

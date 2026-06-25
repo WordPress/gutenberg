@@ -1303,11 +1303,18 @@ class WP_Theme_JSON_Gutenberg {
 		if ( ! str_contains( $selector, ',' ) ) {
 			return $to_prepend . $selector;
 		}
+
+		// Gate fast path, won't work for all selectors
+		if ( ! str_contains( $selector, '(' ) ) {
+			return $to_prepend . str_replace( ',', ',' . $to_prepend, $selector );
+		}
+
 		$new_selectors = array();
 		$selectors     = static::split_selector_list( $selector );
 		foreach ( $selectors as $sel ) {
 			$new_selectors[] = $to_prepend . $sel;
 		}
+
 		return implode( ',', $new_selectors );
 	}
 

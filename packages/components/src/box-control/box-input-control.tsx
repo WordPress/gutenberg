@@ -76,7 +76,6 @@ function getSidesToModify(
 }
 
 export default function BoxInputControl( {
-	__next40pxDefaultSize,
 	onChange = noop,
 	onFocus = noop,
 	values,
@@ -208,7 +207,7 @@ export default function BoxInputControl( {
 							{ ...props }
 							min={ min }
 							__shouldNotWarnDeprecated36pxSize
-							__next40pxDefaultSize={ __next40pxDefaultSize }
+							__next40pxDefaultSize
 							className="component-box-control__unit-control"
 							id={ inputId }
 							isPressEnterToChange
@@ -224,7 +223,7 @@ export default function BoxInputControl( {
 					</Tooltip>
 
 					<FlexedRangeControl
-						__next40pxDefaultSize={ __next40pxDefaultSize }
+						__next40pxDefaultSize
 						__shouldNotWarnDeprecated36pxSize
 						aria-controls={ inputId }
 						label={ LABELS[ side ] }
