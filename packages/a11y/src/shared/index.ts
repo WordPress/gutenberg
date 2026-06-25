@@ -1,8 +1,10 @@
 /**
  * Internal dependencies
  */
-import clear from './clear';
 import filterMessage from './filter-message';
+import { enqueuePolite } from './queue';
+
+const CLEAR_FILL_DELAY = 100;
 
 /**
  * Allows you to easily announce dynamic interface updates to screen readers using ARIA live regions.
@@ -26,31 +28,46 @@ export function speak(
 	message: string,
 	ariaLive?: 'polite' | 'assertive'
 ): void {
-	/*
-	 * Clear previous messages to allow repeated strings being read out and hide
-	 * the explanatory text from assistive technologies.
-	 */
-	clear();
-
 	message = filterMessage( message );
 
-	const introText = document.getElementById( 'a11y-speak-intro-text' );
-	const containerAssertive = document.getElementById(
-		'a11y-speak-assertive'
-	);
-	const containerPolite = document.getElementById( 'a11y-speak-polite' );
+	if ( ariaLive === 'assertive' ) {
+		/*
+		 * Clear only the assertive container so the polite queue is not
+		 * disturbed. A 100ms gap between the clear and the fill gives
+		 * VoiceOver time to observe the blank state as a distinct DOM
+		 * mutation before new content arrives.
+		 */
+		const containerAssertive = document.getElementById(
+			'a11y-speak-assertive'
+		);
+		const containerPolite = document.getElementById( 'a11y-speak-polite' );
+		const target = containerAssertive ?? containerPolite;
 
-	if ( containerAssertive && ariaLive === 'assertive' ) {
-		containerAssertive.textContent = message;
-	} else if ( containerPolite ) {
-		containerPolite.textContent = message;
-	}
+		if ( target ) {
+			target.textContent = '';
+		}
 
-	/*
-	 * Make the explanatory text available to assistive technologies by removing
-	 * the 'hidden' HTML attribute.
-	 */
-	if ( introText ) {
-		introText.removeAttribute( 'hidden' );
+		setTimeout( () => {
+			const assertive = document.getElementById( 'a11y-speak-assertive' );
+			const polite = document.getElementById( 'a11y-speak-polite' );
+			const introText = document.getElementById(
+				'a11y-speak-intro-text'
+			);
+			const dest = assertive ?? polite;
+
+			if ( dest ) {
+				dest.textContent = message;
+			}
+
+			if ( introText ) {
+				introText.removeAttribute( 'hidden' );
+			}
+		}, CLEAR_FILL_DELAY );
+	} else {
+		/*
+		 * Polite messages are serialised through a queue. The queue owns
+		 * the clear-fill cycle so rapid speak() calls do not drop messages.
+		 */
+		enqueuePolite( message );
 	}
 }
