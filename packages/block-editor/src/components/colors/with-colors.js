@@ -167,7 +167,7 @@ function createColorHOC( colorTypes, withColorPalette ) {
 					return result;
 				}, [ attributes, _colors, setAttributes ] );
 
-			const colorUtils = useMemo(
+				const colorUtils = useMemo(
 					() => ( {
 						getMostReadableColor: ( colorValue ) =>
 							getMostReadableColor( _colors, colorValue ),
