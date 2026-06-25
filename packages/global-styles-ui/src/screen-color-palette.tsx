@@ -21,10 +21,14 @@ function ScreenColorPalette( { name }: { name?: string } ) {
 				) }
 			/>
 			<Tabs.Root defaultValue="color">
-				<Tabs.List>
-					<Tabs.Tab value="color">{ __( 'Color' ) }</Tabs.Tab>
-					<Tabs.Tab value="gradient">{ __( 'Gradient' ) }</Tabs.Tab>
-				</Tabs.List>
+				<div className="global-styles-ui-color-palette__tablist-container">
+					<Tabs.List className="global-styles-ui-color-palette__tablist">
+						<Tabs.Tab value="color">{ __( 'Color' ) }</Tabs.Tab>
+						<Tabs.Tab value="gradient">
+							{ __( 'Gradient' ) }
+						</Tabs.Tab>
+					</Tabs.List>
+				</div>
 				<Tabs.Panel value="color" tabIndex={ -1 }>
 					<ColorPalettePanel name={ name } />
 				</Tabs.Panel>
