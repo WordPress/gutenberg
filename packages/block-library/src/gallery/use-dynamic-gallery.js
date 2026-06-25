@@ -36,6 +36,7 @@ const EMPTY_ARRAY = [];
  */
 function buildImageBlockAttributes( media, galleryAttributes ) {
 	const { sizeSlug, linkTo, linkTarget, aspectRatio } = galleryAttributes;
+	const hasAspectRatio = !! aspectRatio && aspectRatio !== 'auto';
 
 	return {
 		id: media.id,
@@ -48,7 +49,10 @@ function buildImageBlockAttributes( media, galleryAttributes ) {
 		// side applies that filter.
 		caption: media.caption?.raw || '',
 		alt: media.alt_text || '',
-		aspectRatio: aspectRatio === 'auto' ? undefined : aspectRatio,
+		aspectRatio: hasAspectRatio ? aspectRatio : undefined,
+		// Pair `scale` with `aspectRatio` so the image crops rather than stretches,
+		// matching the image block's UI and the frontend (`index.php`).
+		scale: hasAspectRatio ? 'cover' : undefined,
 	};
 }
 
