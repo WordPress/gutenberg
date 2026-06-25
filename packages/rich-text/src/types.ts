@@ -4,6 +4,7 @@
 export type RichTextFormat = {
 	title?: string;
 	attributes?: Record< string, string >;
+	innerHTML?: string;
 	type:
 		| 'core/bold'
 		| 'core/italic'

@@ -13,6 +13,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { math as icon } from '@wordpress/icons';
+import type { RichTextValue } from '@wordpress/rich-text';
 import { unlock } from '../lock-unlock';
 
 const { ValidatedInputControl } = unlock( componentsPrivateApis );
@@ -20,26 +21,55 @@ const { ValidatedInputControl } = unlock( componentsPrivateApis );
 const name = 'core/math';
 const title = __( 'Math' );
 
+interface InlineUIProps {
+	value: RichTextValue;
+	onChange: ( value: RichTextValue ) => void;
+	activeAttributes: Record< string, string > | null;
+	contentRef: React.RefObject< HTMLElement >;
+	latexToMathML: (
+		latex: string,
+		options?: { displayMode?: boolean }
+	) => string;
+}
+
+interface EditProps {
+	isObjectActive: boolean;
+	activeObjectAttributes: Record< string, string > | null;
+	value: RichTextValue;
+	onChange: ( value: RichTextValue ) => void;
+	onFocus: () => void;
+	contentRef: React.RefObject< HTMLElement >;
+	latexToMathML: (
+		latex: string,
+		options?: { displayMode?: boolean }
+	) => string;
+}
+const RichTextToolbarButtonUnsafe =
+	RichTextToolbarButton as React.ComponentType< any >;
+
 function InlineUI( {
 	value,
 	onChange,
 	activeAttributes,
 	contentRef,
 	latexToMathML,
-} ) {
+}: InlineUIProps ) {
 	const [ latex, setLatex ] = useState(
 		activeAttributes?.[ 'data-latex' ] || ''
 	);
-	const [ error, setError ] = useState( null );
+	const [ error, setError ] = useState< string | null >( null );
 	const formRef = useRef();
 
 	const popoverAnchor = useAnchor( {
-		editableContentElement: contentRef.current,
+		// eslint-disable-next-line react-hooks/refs
+		editableContentElement: contentRef.current as HTMLElement | null,
 		settings: math,
 	} );
 
 	// Update the math object in real-time as the user types
-	const handleLatexChange = ( newLatex ) => {
+	const handleLatexChange = ( newLatex: string ) => {
+		let mathML = '';
+
 		setLatex( newLatex );
 
 		let mathML = '';
@@ -47,7 +77,7 @@ function InlineUI( {
 			try {
 				mathML = latexToMathML( newLatex, { displayMode: false } );
 				setError( null );
-			} catch ( err ) {
+			} catch ( err: any ) {
 				setError( err.message );
 			}
 		} else {
@@ -102,6 +132,15 @@ function InlineUI( {
 	);
 }
 
+interface EditProps {
+	value: RichTextValue;
+	onChange: ( value: RichTextValue ) => void;
+	onFocus: () => void;
+	isObjectActive: boolean;
+	activeObjectAttributes: Record< string, string > | null;
+	contentRef: React.RefObject< HTMLElement >;
+}
+
 function Edit( {
 	value,
 	onChange,
@@ -109,8 +148,11 @@ function Edit( {
 	isObjectActive,
 	activeObjectAttributes,
 	contentRef,
-} ) {
-	const [ latexToMathML, setLatexToMathML ] = useState();
+}: EditProps ) {
+	const [ latexToMathML, setLatexToMathML ] =
+		useState<
+			( latex: string, options?: { displayMode?: boolean } ) => string
+		>();
 
 	useEffect( () => {
 		import( '@wordpress/latex-to-mathml' ).then( ( module ) => {
@@ -158,13 +200,13 @@ function Edit( {
 
 	return (
 		<>
-			<RichTextToolbarButton
+			<RichTextToolbarButtonUnsafe
 				icon={ icon }
 				title={ title }
 				onClick={ onClick }
 				isActive={ isObjectActive }
 			/>
-			{ isObjectActive && (
+			{ isObjectActive && latexToMathML && (
 				<InlineUI
 					value={ value }
 					onChange={ onChange }

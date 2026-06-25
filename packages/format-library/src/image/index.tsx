@@ -8,6 +8,7 @@ import { inlineImage } from '@wordpress/icons';
 import { Link, Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
+import type { RichTextValue } from '@wordpress/rich-text';
 import { insertObject, useAnchor } from '@wordpress/rich-text';
 import {
 	MediaUpload,
@@ -20,13 +21,32 @@ const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const name = 'core/image';
 const title = __( 'Inline image' );
 
+export interface EditProps {
+	value: RichTextValue;
+	onChange: ( value: RichTextValue ) => void;
+	onFocus?: () => void;
+	isObjectActive?: boolean;
+	activeObjectAttributes: {
+		style?: string;
+		alt?: string | undefined;
+		className?: string;
+		url?: string;
+	} | null;
+	contentRef: React.RefObject< HTMLElement >;
+}
+
+const RichTextToolbarButtonUnsafe =
+	RichTextToolbarButton as React.ComponentType< any >;
+
 /**
  * Extracts the image ID from the className attribute.
  *
  * @param {Object} activeObjectAttributes The attributes of the active object.
  * @return {number|undefined} The extracted image ID or undefined if not found.
  */
-function getCurrentImageId( activeObjectAttributes ) {
+function getCurrentImageId(
+	activeObjectAttributes: EditProps[ 'activeObjectAttributes' ]
+) {
 	if ( ! activeObjectAttributes?.className ) {
 		return undefined;
 	}
@@ -53,13 +73,21 @@ export const image = {
 	edit: Edit,
 };
 
-function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
-	const { style, alt } = activeObjectAttributes;
+function InlineUI( {
+	value,
+	onChange,
+	activeObjectAttributes,
+	contentRef,
+}: EditProps ) {
+	const style = activeObjectAttributes?.style;
+	const alt = activeObjectAttributes?.alt;
+
 	const width = style?.replace( /\D/g, '' );
 	const [ editedWidth, setEditedWidth ] = useState( width );
 	const [ editedAlt, setEditedAlt ] = useState( alt );
 	const hasChanged = editedWidth !== width || editedAlt !== alt;
 	const popoverAnchor = useAnchor( {
+		// eslint-disable-next-line react-hooks/refs
 		editableContentElement: contentRef.current,
 		settings: image,
 	} );
@@ -82,7 +110,7 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 							style: editedWidth
 								? `width: ${ editedWidth }px;`
 								: '',
-							alt: editedAlt,
+							alt: editedAlt ?? '',
 						},
 					};
 
@@ -105,7 +133,7 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 					/>
 					<TextareaControl
 						label={ __( 'Alternative text' ) }
-						value={ editedAlt }
+						value={ editedAlt ?? '' }
 						onChange={ ( newAlt ) => {
 							setEditedAlt( newAlt );
 						} }
@@ -153,13 +181,24 @@ function Edit( {
 	isObjectActive,
 	activeObjectAttributes,
 	contentRef,
-} ) {
+}: EditProps ) {
 	return (
 		<MediaUploadCheck>
 			<MediaUpload
+				// @ts-ignore -- MediaUpload types are incomplete in @wordpress/block-editor
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				value={ getCurrentImageId( activeObjectAttributes ) }
-				onSelect={ ( { id, url, alt, width: imgWidth } ) => {
+				onSelect={ ( {
+					id,
+					url,
+					alt,
+					width: imgWidth,
+				}: {
+					id: string;
+					url: string;
+					alt: string;
+					width: number;
+				} ) => {
 					onChange(
 						insertObject( value, {
 							type: name,
@@ -174,7 +213,7 @@ function Edit( {
 							},
 						} )
 					);
-					onFocus();
+					onFocus?.();
 				} }
 				render={ ( { open } ) => (
 					<RichTextToolbarButton
