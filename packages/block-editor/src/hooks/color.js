@@ -267,7 +267,7 @@ export function ColorEdit( {
 	label,
 	defaultControls,
 } ) {
-	const { selectedState, viewportState } = useBlockStyleState();
+	const selectedState = useBlockStyleState();
 	const isEnabled = useHasColorPanel( settings );
 
 	const { style, textColor, backgroundColor, gradient } = useSelect(
@@ -292,14 +292,11 @@ export function ColorEdit( {
 		[ clientId, isEnabled ]
 	);
 
-	const isStateSelected = ! isDefaultBlockStyleState(
-		selectedState,
-		viewportState
-	);
+	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
 
 	const value = useMemo( () => {
 		if ( isStateSelected ) {
-			return getStyleForState( style, selectedState, viewportState );
+			return getStyleForState( style, selectedState );
 		}
 		return attributesToStyle( {
 			style,
@@ -310,7 +307,6 @@ export function ColorEdit( {
 	}, [
 		isStateSelected,
 		selectedState,
-		viewportState,
 		style,
 		textColor,
 		backgroundColor,
@@ -320,12 +316,7 @@ export function ColorEdit( {
 	const onChange = isStateSelected
 		? ( newStyle ) => {
 				setAttributes( {
-					style: setStyleForState(
-						style,
-						selectedState,
-						newStyle,
-						viewportState
-					),
+					style: setStyleForState( style, selectedState, newStyle ),
 				} );
 		  }
 		: ( newStyle ) => {

@@ -2389,7 +2389,7 @@ export function selectedBlockStyleState( state = undefined, action ) {
 }
 
 /**
- * Reducer holding the globally selected viewport state. When set to a
+ * Reducer holding the globally selected viewport style state. When set to a
  * value other than 'default', block style edits in the inspector are applied to
  * that viewport. Driven by the editor's device preview (Responsive editing).
  *
@@ -2398,8 +2398,8 @@ export function selectedBlockStyleState( state = undefined, action ) {
  *
  * @return {string} Updated state.
  */
-export function viewportState( state = 'default', action ) {
-	if ( action.type === 'SET_VIEWPORT_STATE' ) {
+export function styleStateViewport( state = 'default', action ) {
+	if ( action.type === 'SET_STYLE_STATE_VIEWPORT' ) {
 		return action.viewport ?? 'default';
 	}
 
@@ -2442,7 +2442,7 @@ const combinedReducers = combineReducers( {
 	listViewContentPanelOpen,
 	requestedInspectorTab,
 	selectedBlockStyleState,
-	viewportState,
+	styleStateViewport,
 } );
 
 /**

@@ -170,7 +170,7 @@ export function BackgroundImagePanel( {
 	setAttributes,
 	settings,
 } ) {
-	const { selectedState, viewportState } = useBlockStyleState();
+	const selectedState = useBlockStyleState();
 	const { style, className, inheritedValue } = useSelect(
 		( select ) => {
 			const { getBlockAttributes, getSettings } =
@@ -220,20 +220,12 @@ export function BackgroundImagePanel( {
 		return null;
 	}
 
-	const isStateSelected = ! isDefaultBlockStyleState(
-		selectedState,
-		viewportState
-	);
+	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
 
 	const onChange = isStateSelected
 		? ( newStyle ) => {
 				setAttributes( {
-					style: setStyleForState(
-						style,
-						selectedState,
-						newStyle,
-						viewportState
-					),
+					style: setStyleForState( style, selectedState, newStyle ),
 				} );
 		  }
 		: ( newStyle ) => {
@@ -320,7 +312,7 @@ export function BackgroundImagePanel( {
 			defaultControls={ defaultControls }
 			value={
 				isStateSelected
-					? getStyleForState( style, selectedState, viewportState )
+					? getStyleForState( style, selectedState )
 					: styleValue
 			}
 		/>

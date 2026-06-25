@@ -52,39 +52,31 @@ const DimensionControls = ( {
 	attributes,
 	setAttributes,
 	selectedStyleState,
-	viewportState,
 	hasSelectedStyleState = false,
 } ) => {
 	const { style } = attributes;
-	const selectedStyleStateKey = getStyleStateKey(
-		selectedStyleState,
-		viewportState
-	);
+	const selectedStyleStateKey = getStyleStateKey( selectedStyleState );
 	const activeAspectRatio = getActiveDimensionValue( {
 		attributes,
 		selectedState: selectedStyleState,
-		viewportState,
 		hasSelectedStyleState,
 		attributeKey: 'aspectRatio',
 	} );
 	const activeWidth = getActiveDimensionValue( {
 		attributes,
 		selectedState: selectedStyleState,
-		viewportState,
 		hasSelectedStyleState,
 		attributeKey: 'width',
 	} );
 	const activeHeight = getActiveDimensionValue( {
 		attributes,
 		selectedState: selectedStyleState,
-		viewportState,
 		hasSelectedStyleState,
 		attributeKey: 'height',
 	} );
 	const activeScale = getActiveDimensionValue( {
 		attributes,
 		selectedState: selectedStyleState,
-		viewportState,
 		hasSelectedStyleState,
 		attributeKey: 'scale',
 		styleKey: 'objectFit',
@@ -108,7 +100,6 @@ const DimensionControls = ( {
 			getDimensionUpdateAttributes( {
 				style,
 				selectedState: selectedStyleState,
-				viewportState,
 				hasSelectedStyleState,
 				nextDimensions: nextImageDimensions,
 				dimensionKeyMap: { scale: 'objectFit' },

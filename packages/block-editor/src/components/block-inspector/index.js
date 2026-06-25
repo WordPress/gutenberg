@@ -42,8 +42,7 @@ import ViewportVisibilityInfo from '../block-visibility/viewport-visibility-info
 import { unlock } from '../../lock-unlock';
 import {
 	hasPseudoBlockStyleState,
-	hasViewportState,
-	isDefaultBlockStyleState,
+	hasViewportBlockStyleState,
 } from '../../hooks/block-style-state';
 import { isResponsiveEditingKey } from '../../store/private-keys';
 
@@ -91,14 +90,10 @@ function StyleInspectorSlots( {
 	);
 }
 
-function StyleStateInspectorSlots( {
-	blockName,
-	selectedBlockStyleState,
-	viewportState,
-} ) {
+function StyleStateInspectorSlots( { blockName, selectedBlockStyleState } ) {
 	const borderPanelLabel = useBorderPanelLabel( { blockName } );
 	const showLayoutControls =
-		hasViewportState( viewportState ) &&
+		hasViewportBlockStyleState( selectedBlockStyleState ) &&
 		! hasPseudoBlockStyleState( selectedBlockStyleState );
 	return (
 		<>
@@ -143,7 +138,6 @@ function BlockInspector() {
 		editedContentOnlySection,
 		blockEditingMode,
 		selectedBlockStyleState,
-		viewportState,
 		showStateOnCanvas,
 		isResponsiveEditing,
 	} = useSelect( ( select ) => {
@@ -158,7 +152,6 @@ function BlockInspector() {
 			isWithinEditedContentOnlySection,
 			getBlockEditingMode,
 			getSelectedBlockStyleState,
-			getViewportState,
 			isSelectedBlockStyleStateShownOnCanvas,
 		} = unlock( select( blockEditorStore ) );
 		const blockEditorSettings = select( blockEditorStore ).getSettings();
@@ -196,7 +189,6 @@ function BlockInspector() {
 			selectedBlockStyleState: getSelectedBlockStyleState(
 				_renderedBlockClientId
 			),
-			viewportState: getViewportState(),
 			showStateOnCanvas: isSelectedBlockStyleStateShownOnCanvas(
 				_renderedBlockClientId
 			),
@@ -263,10 +255,13 @@ function BlockInspector() {
 		useBlockInspectorAnimationSettings( blockType );
 
 	const hasSelectedBlocks = selectedBlockCount > 1;
-	const isBlockStyleStateSelected = ! isDefaultBlockStyleState(
-		selectedBlockStyleState,
-		viewportState
-	);
+	// The viewport state is global, so only treat it as selected for
+	// blocks that actually support viewport styles. Pseudo states are
+	// only ever set for blocks that support them.
+	const isBlockStyleStateSelected =
+		( !! blockType?.attributes?.style &&
+			hasViewportBlockStyleState( selectedBlockStyleState ) ) ||
+		hasPseudoBlockStyleState( selectedBlockStyleState );
 
 	if ( hasSelectedBlocks && ! isSectionBlockInSelection ) {
 		return (
@@ -336,7 +331,6 @@ function BlockInspector() {
 				editedContentOnlySection={ editedContentOnlySection }
 				blockEditingMode={ blockEditingMode }
 				selectedBlockStyleState={ selectedBlockStyleState }
-				viewportState={ viewportState }
 				showStateOnCanvas={ showStateOnCanvas }
 				isResponsiveEditing={ isResponsiveEditing }
 				isBlockStyleStateSelected={ isBlockStyleStateSelected }
@@ -393,7 +387,6 @@ const BlockInspectorSingleBlock = ( {
 	editedContentOnlySection,
 	blockEditingMode,
 	selectedBlockStyleState,
-	viewportState,
 	showStateOnCanvas,
 	isResponsiveEditing,
 	isBlockStyleStateSelected,
@@ -416,6 +409,8 @@ const BlockInspectorSingleBlock = ( {
 		setSelectedBlockStyleStateCanvasPreview,
 	} = unlock( useDispatch( blockEditorStore ) );
 	const onBlockStyleStateChange = ( value ) => {
+		// Persist only the changed per-block state. The viewport is global, so
+		// it must not be written back into the per-block state here.
 		setSelectedBlockStyleState( renderedBlockClientId, value );
 	};
 	const onShowStateOnCanvasChange = ( value ) => {
@@ -461,8 +456,7 @@ const BlockInspectorSingleBlock = ( {
 						) }
 						<BlockStateBadges
 							name={ blockName }
-							selectedBlockStyleState={ selectedBlockStyleState }
-							viewportState={ viewportState }
+							value={ selectedBlockStyleState }
 							isResponsiveEditing={ isResponsiveEditing }
 						/>
 					</Spacer>
@@ -479,7 +473,6 @@ const BlockInspectorSingleBlock = ( {
 				<StyleStateInspectorSlots
 					blockName={ blockName }
 					selectedBlockStyleState={ selectedBlockStyleState }
-					viewportState={ viewportState }
 				/>
 			) }
 			{ ! isBlockStyleStateSelected && hasMultipleTabs && (

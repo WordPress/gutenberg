@@ -147,7 +147,7 @@ function BordersInspectorControl( { label, children, resetAllFilter } ) {
 }
 
 export function BorderPanel( { clientId, name, setAttributes, settings } ) {
-	const { selectedState, viewportState } = useBlockStyleState();
+	const selectedState = useBlockStyleState();
 	const isEnabled = useHasBorderPanel( settings );
 	const { style, borderColor } = useSelect(
 		( select ) => {
@@ -162,27 +162,19 @@ export function BorderPanel( { clientId, name, setAttributes, settings } ) {
 		[ clientId, isEnabled ]
 	);
 
-	const isStateSelected = ! isDefaultBlockStyleState(
-		selectedState,
-		viewportState
-	);
+	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
 
 	const value = useMemo( () => {
 		if ( isStateSelected ) {
-			return getStyleForState( style, selectedState, viewportState );
+			return getStyleForState( style, selectedState );
 		}
 		return attributesToStyle( { style, borderColor } );
-	}, [ isStateSelected, selectedState, viewportState, style, borderColor ] );
+	}, [ isStateSelected, selectedState, style, borderColor ] );
 
 	const onChange = isStateSelected
 		? ( newStyle ) => {
 				setAttributes( {
-					style: setStyleForState(
-						style,
-						selectedState,
-						newStyle,
-						viewportState
-					),
+					style: setStyleForState( style, selectedState, newStyle ),
 				} );
 		  }
 		: ( newStyle ) => {

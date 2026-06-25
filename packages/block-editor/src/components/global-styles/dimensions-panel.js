@@ -32,7 +32,7 @@ import { setImmutably } from '../../utils/object';
 import {
 	DEFAULT_BLOCK_STYLE_STATE,
 	hasPseudoBlockStyleState,
-	hasViewportState,
+	hasViewportBlockStyleState,
 } from '../../hooks/block-style-state';
 
 const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
@@ -246,7 +246,6 @@ export default function DimensionsPanel( {
 	// in global styles but not in block inspector.
 	includeLayoutControls = false,
 	styleState = DEFAULT_BLOCK_STYLE_STATE,
-	viewportState,
 } ) {
 	const { dimensions, spacing } = settings;
 
@@ -741,7 +740,9 @@ export default function DimensionsPanel( {
 					onChange={ setChildLayout }
 					parentLayout={ settings?.parentLayout }
 					panelId={ panelId }
-					showGridSpanDefaults={ ! hasViewportState( viewportState ) }
+					showGridSpanDefaults={
+						! hasViewportBlockStyleState( styleState )
+					}
 					isShownByDefault={
 						defaultControls.childLayout ??
 						DEFAULT_CONTROLS.childLayout

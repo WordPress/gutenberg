@@ -12,8 +12,8 @@ const { cleanEmptyObject, getStyleForState, setStyleForState } = unlock(
 	blockEditorPrivateApis
 );
 
-function getStateStyle( style, selectedState, viewportState ) {
-	return getStyleForState( style, selectedState, viewportState ) || {};
+function getStateStyle( style, selectedState ) {
+	return getStyleForState( style, selectedState ) || {};
 }
 
 function getMappedDimensions( dimensions, dimensionKeyMap = {} ) {
@@ -35,17 +35,15 @@ function getControlledDimensions( dimensions, dimensionKeys ) {
 	);
 }
 
-export function getStyleStateKey( selectedState, viewportState ) {
+export function getStyleStateKey( selectedState ) {
 	return [
-		viewportState || 'default',
+		selectedState?.viewport || 'default',
 		selectedState?.pseudo || 'default',
 	].join( ':' );
 }
 
-export function getStateDimensions( style, selectedState, viewportState ) {
-	return (
-		getStateStyle( style, selectedState, viewportState )?.dimensions || {}
-	);
+export function getStateDimensions( style, selectedState ) {
+	return getStateStyle( style, selectedState )?.dimensions || {};
 }
 
 export function getActiveDimensionValue( options = {} ) {
@@ -53,7 +51,6 @@ export function getActiveDimensionValue( options = {} ) {
 		attributes = {},
 		style = attributes?.style,
 		selectedState,
-		viewportState,
 		hasSelectedStyleState,
 		attributeKey,
 		styleKey = attributeKey,
@@ -61,9 +58,7 @@ export function getActiveDimensionValue( options = {} ) {
 	} = options;
 
 	if ( hasSelectedStyleState ) {
-		return getStateDimensions( style, selectedState, viewportState )?.[
-			styleKey
-		];
+		return getStateDimensions( style, selectedState )?.[ styleKey ];
 	}
 
 	if ( Object.hasOwn( options, 'rootValue' ) ) {
@@ -73,13 +68,8 @@ export function getActiveDimensionValue( options = {} ) {
 	return attributes?.[ attributeKey ];
 }
 
-export function setStateDimensions(
-	style,
-	selectedState,
-	viewportState,
-	nextDimensions
-) {
-	const stateStyle = getStateStyle( style, selectedState, viewportState );
+export function setStateDimensions( style, selectedState, nextDimensions ) {
+	const stateStyle = getStateStyle( style, selectedState );
 
 	return setStyleForState(
 		style,
@@ -90,15 +80,13 @@ export function setStateDimensions(
 				...stateStyle?.dimensions,
 				...nextDimensions,
 			} ),
-		} ),
-		viewportState
+		} )
 	);
 }
 
 export function getDimensionUpdateAttributes( {
 	style,
 	selectedState,
-	viewportState,
 	hasSelectedStyleState,
 	nextDimensions,
 	dimensionKeyMap,
@@ -117,7 +105,6 @@ export function getDimensionUpdateAttributes( {
 		style: setStateDimensions(
 			style,
 			selectedState,
-			viewportState,
 			getMappedDimensions( controlledDimensions, dimensionKeyMap )
 		),
 	};
@@ -137,20 +124,11 @@ export function resetDimensions( style, keys ) {
 	} );
 }
 
-export function resetStateDimensions(
-	style,
-	selectedState,
-	viewportState,
-	keys
-) {
+export function resetStateDimensions( style, selectedState, keys ) {
 	return setStyleForState(
 		style,
 		selectedState,
-		resetDimensions(
-			getStateStyle( style, selectedState, viewportState ),
-			keys
-		),
-		viewportState
+		resetDimensions( getStateStyle( style, selectedState ), keys )
 	);
 }
 
@@ -158,7 +136,6 @@ export function getDimensionResetAttributes( {
 	attributes = {},
 	style = attributes?.style,
 	selectedState,
-	viewportState,
 	hasSelectedStyleState,
 	keys,
 	defaultAttributes = {},
@@ -168,7 +145,7 @@ export function getDimensionResetAttributes( {
 			? {}
 			: { ...attributes, ...defaultAttributes } ),
 		style: hasSelectedStyleState
-			? resetStateDimensions( style, selectedState, viewportState, keys )
+			? resetStateDimensions( style, selectedState, keys )
 			: resetDimensions( style, keys ),
 	};
 }

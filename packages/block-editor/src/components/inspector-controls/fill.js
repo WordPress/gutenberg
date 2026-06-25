@@ -119,15 +119,10 @@ export default function InspectorControlsFill( {
 function RegisterResetAll( { resetAllFilter, children } ) {
 	const { registerResetAllFilter, deregisterResetAllFilter } =
 		useContext( ToolsPanelContext );
-	const { selectedState, viewportState } = useBlockStyleState();
+	const selectedState = useBlockStyleState();
 	const scopedResetAllFilter = useMemo(
-		() =>
-			scopeResetAllFilterToState(
-				selectedState,
-				viewportState,
-				resetAllFilter
-			),
-		[ resetAllFilter, selectedState, viewportState ]
+		() => scopeResetAllFilterToState( selectedState, resetAllFilter ),
+		[ resetAllFilter, selectedState ]
 	);
 	useEffect( () => {
 		if (

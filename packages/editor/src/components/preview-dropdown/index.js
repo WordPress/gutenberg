@@ -69,7 +69,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		setDefaultRenderingMode,
 		setResponsiveEditing,
 	} = unlock( useDispatch( editorStore ) );
-	const { resetZoomLevel, setViewportState } = unlock(
+	const { resetZoomLevel, setStyleStateViewport } = unlock(
 		useDispatch( blockEditorStore )
 	);
 
@@ -81,7 +81,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	const handleResponsiveEditingChange = () => {
 		const newIsResponsiveEditing = ! isResponsiveEditing;
 		setResponsiveEditing( newIsResponsiveEditing );
-		setViewportState(
+		setStyleStateViewport(
 			newIsResponsiveEditing
 				? VIEWPORT_STATE_BY_DEVICE_TYPE[ deviceType ] ?? 'default'
 				: 'default'

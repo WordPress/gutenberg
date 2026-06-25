@@ -89,19 +89,13 @@ export function BlockStatesControl( { name, value, onChange } ) {
 /**
  * Renders badges for the active style states of a block.
  *
- * @param {Object}  props                         Component props.
- * @param {string}  props.name                    Block name.
- * @param {Object}  props.selectedBlockStyleState Currently selected per-block pseudo style state.
- * @param {string}  props.viewportState           Currently selected viewport state.
- * @param {boolean} props.isResponsiveEditing     Whether Responsive editing is enabled.
+ * @param {Object}  props                     Component props.
+ * @param {string}  props.name                Block name.
+ * @param {Object}  props.value               Currently selected style-state value.
+ * @param {boolean} props.isResponsiveEditing Whether Responsive editing is enabled.
  * @return {Element|null} Badges component, or null if there is nothing to show.
  */
-export function BlockStateBadges( {
-	name,
-	selectedBlockStyleState,
-	viewportState,
-	isResponsiveEditing,
-} ) {
+export function BlockStateBadges( { name, value, isResponsiveEditing } ) {
 	const pseudoStateOptions = getPseudoStateOptions( name );
 
 	if ( ! pseudoStateOptions.length && ! isResponsiveEditing ) {
@@ -112,10 +106,8 @@ export function BlockStateBadges( {
 		<StateControlBadges
 			viewportStates={ isResponsiveEditing ? DEVICE_STATE_OPTIONS : [] }
 			pseudoStates={ pseudoStateOptions }
-			viewportValue={ viewportState ?? DEFAULT_STATE_VALUE }
-			pseudoStateValue={
-				selectedBlockStyleState?.pseudo ?? DEFAULT_STATE_VALUE
-			}
+			viewportValue={ value?.viewport ?? DEFAULT_STATE_VALUE }
+			pseudoStateValue={ value?.pseudo ?? DEFAULT_STATE_VALUE }
 		/>
 	);
 }

@@ -123,7 +123,7 @@ function TypographyInspectorControl( { children, resetAllFilter } ) {
 }
 
 export function TypographyPanel( { clientId, name, setAttributes, settings } ) {
-	const { selectedState, viewportState } = useBlockStyleState();
+	const selectedState = useBlockStyleState();
 	const isEnabled = useHasTypographyPanel( settings );
 
 	const { style, fontFamily, fontSize, fitText } = useSelect(
@@ -148,34 +148,19 @@ export function TypographyPanel( { clientId, name, setAttributes, settings } ) {
 		[ clientId, isEnabled ]
 	);
 
-	const isStateSelected = ! isDefaultBlockStyleState(
-		selectedState,
-		viewportState
-	);
+	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
 
 	const value = useMemo( () => {
 		if ( isStateSelected ) {
-			return getStyleForState( style, selectedState, viewportState );
+			return getStyleForState( style, selectedState );
 		}
 		return attributesToStyle( { style, fontFamily, fontSize } );
-	}, [
-		isStateSelected,
-		selectedState,
-		viewportState,
-		style,
-		fontSize,
-		fontFamily,
-	] );
+	}, [ isStateSelected, selectedState, style, fontSize, fontFamily ] );
 
 	const onChange = isStateSelected
 		? ( newStyle ) => {
 				setAttributes( {
-					style: setStyleForState(
-						style,
-						selectedState,
-						newStyle,
-						viewportState
-					),
+					style: setStyleForState( style, selectedState, newStyle ),
 				} );
 		  }
 		: ( newStyle ) => {

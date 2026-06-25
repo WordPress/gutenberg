@@ -143,17 +143,11 @@ export default function PostFeaturedImageEdit( {
 		return imageId;
 	}, [ storedFeaturedImage, useFirstImageFromPost, postContent ] );
 
-	const {
-		media,
-		postType,
-		postPermalink,
-		selectedStyleState,
-		viewportState,
-	} = useSelect(
+	const { media, postType, postPermalink, selectedStyleState } = useSelect(
 		( select ) => {
 			const { getEntityRecord, getPostType, getEditedEntityRecord } =
 				select( coreStore );
-			const { getSelectedBlockStyleState, getViewportState } = unlock(
+			const { getSelectedBlockStyleState } = unlock(
 				select( blockEditorStore )
 			);
 			return {
@@ -169,15 +163,12 @@ export default function PostFeaturedImageEdit( {
 					postId
 				)?.link,
 				selectedStyleState: getSelectedBlockStyleState( clientId ),
-				viewportState: getViewportState(),
 			};
 		},
 		[ clientId, featuredImage, postTypeSlug, postId ]
 	);
-	const hasSelectedStyleState = ! isDefaultBlockStyleState(
-		selectedStyleState,
-		viewportState
-	);
+	const hasSelectedStyleState =
+		! isDefaultBlockStyleState( selectedStyleState );
 
 	const mediaUrl =
 		media?.media_details?.sizes?.[ sizeSlug ]?.source_url ||
@@ -268,7 +259,6 @@ export default function PostFeaturedImageEdit( {
 					return getDimensionResetAttributes( {
 						attributes: attrs,
 						selectedState: selectedStyleState,
-						viewportState,
 						hasSelectedStyleState,
 						keys: [ 'aspectRatio', 'height', 'objectFit', 'width' ],
 						defaultAttributes: {
@@ -286,7 +276,6 @@ export default function PostFeaturedImageEdit( {
 					setAttributes={ setAttributes }
 					media={ media }
 					selectedStyleState={ selectedStyleState }
-					viewportState={ viewportState }
 					hasSelectedStyleState={ hasSelectedStyleState }
 				/>
 			</InspectorControls>

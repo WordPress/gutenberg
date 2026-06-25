@@ -1147,22 +1147,21 @@ export function getRequestedInspectorTab( state ) {
 	return state.requestedInspectorTab;
 }
 
-const DEFAULT_VIEWPORT = 'default';
-
 const DEFAULT_BLOCK_STYLE_STATE = {
+	viewport: 'default',
 	pseudo: 'default',
 };
 
 /**
- * Returns the globally selected viewport state. When set to a value other
+ * Returns the globally selected viewport style state. When set to a value other
  * than 'default', block style edits in the inspector apply to that viewport.
  *
  * @param {Object} state Global application state.
  *
- * @return {string} The selected viewport state.
+ * @return {string} The selected viewport style state.
  */
-export function getViewportState( state ) {
-	return state.viewportState ?? DEFAULT_VIEWPORT;
+export function getStyleStateViewport( state ) {
+	return state.styleStateViewport ?? DEFAULT_BLOCK_STYLE_STATE.viewport;
 }
 
 /**
@@ -1173,13 +1172,21 @@ export function getViewportState( state ) {
  *
  * @return {Object} The selected block style state.
  */
-export function getSelectedBlockStyleState( state, clientId ) {
-	if ( state.selectedBlockStyleState?.clientId !== clientId ) {
-		return DEFAULT_BLOCK_STYLE_STATE;
-	}
+export const getSelectedBlockStyleState = createSelector(
+	( state, clientId ) => {
+		const perBlockState =
+			state.selectedBlockStyleState?.clientId === clientId
+				? state.selectedBlockStyleState.value ??
+				  DEFAULT_BLOCK_STYLE_STATE
+				: DEFAULT_BLOCK_STYLE_STATE;
 
-	return state.selectedBlockStyleState.value ?? DEFAULT_BLOCK_STYLE_STATE;
-}
+		return {
+			...perBlockState,
+			viewport: getStyleStateViewport( state ),
+		};
+	},
+	( state ) => [ state.styleStateViewport, state.selectedBlockStyleState ]
+);
 
 /**
  * Returns whether a non-default style state is selected for a block.
@@ -1193,7 +1200,7 @@ export function hasSelectedStyleState( state, clientId ) {
 	const selectedState = getSelectedBlockStyleState( state, clientId );
 
 	return (
-		getViewportState( state ) !== DEFAULT_VIEWPORT ||
+		selectedState.viewport !== DEFAULT_BLOCK_STYLE_STATE.viewport ||
 		selectedState.pseudo !== DEFAULT_BLOCK_STYLE_STATE.pseudo
 	);
 }

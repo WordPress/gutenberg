@@ -495,8 +495,7 @@ describe( 'getCanvasStateStyleValue', () => {
 						color: { text: 'red' },
 					},
 				},
-				{ pseudo: ':hover' },
-				'default'
+				{ viewport: 'default', pseudo: ':hover' }
 			)
 		).toEqual( {
 			color: { text: 'red' },
@@ -511,8 +510,7 @@ describe( 'getCanvasStateStyleValue', () => {
 						color: { text: 'red' },
 					},
 				},
-				{ pseudo: ':hover' },
-				'@mobile'
+				{ viewport: '@mobile', pseudo: ':hover' }
 			)
 		).toEqual( {
 			color: { text: 'red' },
@@ -532,8 +530,7 @@ describe( 'getCanvasStateStyleValue', () => {
 						},
 					},
 				},
-				{ pseudo: ':hover' },
-				'@mobile'
+				{ viewport: '@mobile', pseudo: ':hover' }
 			)
 		).toEqual( {
 			color: { background: 'blue', text: 'yellow' },
