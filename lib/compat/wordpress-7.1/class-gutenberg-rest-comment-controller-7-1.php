@@ -260,6 +260,17 @@ class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller 
 			}
 		}
 
+		// Notes and reactions require edit access to the post they belong to,
+		// regardless of whether a status is supplied. Mirrors core's note guard
+		// in WP_REST_Comments_Controller::create_item_permissions_check().
+		if ( $is_note && ! empty( $request['post'] ) && ! current_user_can( 'edit_post', (int) $request['post'] ) ) {
+			return new WP_Error(
+				'rest_cannot_create_note',
+				__( 'Sorry, you are not allowed to create notes for this post.', 'gutenberg' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+
 		$edit_cap = $is_note ? array( 'edit_post', (int) $request['post'] ) : array( 'moderate_comments' );
 		if ( isset( $request['status'] ) && ! current_user_can( ...$edit_cap ) ) {
 			return new WP_Error(
@@ -376,6 +387,15 @@ class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller 
 				return new WP_Error(
 					'rest_comment_invalid_parent',
 					__( 'A reaction must be attached to a note.', 'gutenberg' ),
+					array( 'status' => 400 )
+				);
+			}
+
+			// The parent note must belong to the post the reaction targets.
+			if ( ! empty( $request['post'] ) && (int) $parent_comment->comment_post_ID !== (int) $request['post'] ) {
+				return new WP_Error(
+					'rest_comment_invalid_parent',
+					__( 'A reaction must be attached to a note on the same post.', 'gutenberg' ),
 					array( 'status' => 400 )
 				);
 			}
