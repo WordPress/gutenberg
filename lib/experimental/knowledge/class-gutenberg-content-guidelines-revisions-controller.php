@@ -57,7 +57,7 @@ class Gutenberg_Content_Guidelines_Revisions_Controller extends WP_REST_Revision
 	 *
 	 * Mirrors the route shape of WP_REST_Revisions_Controller::register_routes()
 	 * but uses this controller's $parent_base so the same class can be mounted
-	 * under multiple parent bases (e.g. /content-guidelines and /guidelines).
+	 * under multiple parent bases (e.g. /content-guidelines and /knowledge).
 	 * The parent's $parent_base is private, so calling parent::register_routes()
 	 * would always register under the post type's rest_base regardless of any
 	 * override done here.

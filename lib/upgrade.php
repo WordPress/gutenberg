@@ -7,7 +7,7 @@
 
 if ( ! defined( '_GUTENBERG_VERSION_MIGRATION' ) ) {
 	// It's necessary to update this version every time a new migration is needed.
-	define( '_GUTENBERG_VERSION_MIGRATION', '23.5.0' );
+	define( '_GUTENBERG_VERSION_MIGRATION', '22.8.0' );
 }
 
 /**
@@ -27,10 +27,6 @@ function _gutenberg_migrate_database() {
 
 		if ( version_compare( $gutenberg_installed_version, '22.8.0', '<' ) ) {
 			_gutenberg_migrate_enable_real_time_collaboration();
-		}
-
-		if ( version_compare( $gutenberg_installed_version, '23.5.0', '<' ) ) {
-			_gutenberg_migrate_guidelines_to_knowledge();
 		}
 
 		update_option( 'gutenberg_version_migration', _GUTENBERG_VERSION_MIGRATION );
@@ -84,93 +80,6 @@ function _gutenberg_migrate_enable_real_time_collaboration() {
 
 	delete_option( 'enable_real_time_collaboration' );
 	delete_option( 'wp_enable_real_time_collaboration' );
-}
-
-/**
- * Rename the experimental Guidelines storage to Knowledge: `wp_guideline`
- * posts become `wp_knowledge`, `wp_guideline_type` terms move to the
- * `wp_knowledge_type` taxonomy, and the built-in type terms are re-slugged
- * (`content` becomes `guideline`, `artifact` becomes `note`).
- *
- * Runs regardless of whether the `gutenberg-guidelines` experiment is
- * currently enabled so rows created while it was previously on are migrated
- * too. Revisions and `_guideline_*` post meta keep their parent linkage and
- * names, so no further updates are needed.
- *
- * @since 23.5.0
- */
-function _gutenberg_migrate_guidelines_to_knowledge() {
-	global $wpdb;
-
-	$post_ids = $wpdb->get_col(
-		$wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_type = %s", 'wp_guideline' )
-	);
-	if ( $post_ids ) {
-		$wpdb->update(
-			$wpdb->posts,
-			array( 'post_type' => 'wp_knowledge' ),
-			array( 'post_type' => 'wp_guideline' )
-		);
-		foreach ( $post_ids as $post_id ) {
-			clean_post_cache( (int) $post_id );
-		}
-	}
-
-	$term_ids = $wpdb->get_col(
-		$wpdb->prepare( "SELECT term_id FROM {$wpdb->term_taxonomy} WHERE taxonomy = %s", 'wp_guideline_type' )
-	);
-	if ( $term_ids ) {
-		$wpdb->update(
-			$wpdb->term_taxonomy,
-			array( 'taxonomy' => 'wp_knowledge_type' ),
-			array( 'taxonomy' => 'wp_guideline_type' )
-		);
-	}
-
-	/*
-	 * Re-slug the renamed built-in types. Term names are only replaced when
-	 * they still match the previous default label (raw slug or its original
-	 * English title), so user-customized labels survive.
-	 */
-	$type_renames = array(
-		'content'  => array(
-			'slug'       => 'guideline',
-			'old_labels' => array( 'content', 'Content' ),
-			'new_label'  => _x( 'Guideline', 'knowledge type', 'gutenberg' ),
-		),
-		'artifact' => array(
-			'slug'       => 'note',
-			'old_labels' => array( 'artifact', 'Artifact' ),
-			'new_label'  => _x( 'Note', 'knowledge type', 'gutenberg' ),
-		),
-	);
-
-	foreach ( $type_renames as $old_slug => $rename ) {
-		$term = $wpdb->get_row(
-			$wpdb->prepare(
-				"SELECT t.term_id, t.name FROM {$wpdb->terms} t
-				INNER JOIN {$wpdb->term_taxonomy} tt ON tt.term_id = t.term_id
-				WHERE tt.taxonomy = %s AND t.slug = %s",
-				'wp_knowledge_type',
-				$old_slug
-			)
-		);
-		if ( ! $term ) {
-			continue;
-		}
-
-		$update = array( 'slug' => $rename['slug'] );
-		if ( in_array( $term->name, $rename['old_labels'], true ) ) {
-			$update['name'] = $rename['new_label'];
-		}
-
-		$wpdb->update( $wpdb->terms, $update, array( 'term_id' => (int) $term->term_id ) );
-		$term_ids[] = (int) $term->term_id;
-	}
-
-	if ( $term_ids ) {
-		clean_term_cache( array_unique( array_map( 'intval', $term_ids ) ), 'wp_knowledge_type' );
-	}
 }
 
 // Deletion of the `_wp_file_based` term (in _gutenberg_migrate_remove_fse_drafts) must happen

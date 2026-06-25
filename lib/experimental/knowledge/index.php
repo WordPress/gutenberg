@@ -17,7 +17,9 @@ require_once __DIR__ . '/class-gutenberg-content-guidelines-rest-controller.php'
 
 /*
  * Register the knowledge post type.
- * The standard /wp/v2/knowledge collection uses the default posts controller.
+ * The standard /wp/v2/knowledge collection is served by the custom
+ * Gutenberg_Knowledge_REST_Controller (set via the post type's
+ * `rest_controller_class`).
  */
 add_action( 'init', array( 'Gutenberg_Knowledge_Post_Type', 'register' ) );
 

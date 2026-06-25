@@ -103,7 +103,9 @@ class Gutenberg_Knowledge_REST_Controller extends WP_REST_Posts_Controller {
 	 * partial PATCH preserves the existing status.
 	 *
 	 * `wp_knowledge_type` is optional on create. When omitted, the post
-	 * falls back to the default knowledge taxonomy term `note`.
+	 * falls back to the default knowledge taxonomy term `note`. That fallback
+	 * is applied by `wp_knowledge_ensure_default_type_term()` on the
+	 * `save_post_wp_knowledge` hook (see knowledge.php), not here.
 	 *
 	 * @param WP_REST_Request $request Request object.
 	 * @return stdClass|WP_Error Prepared post object or error.
