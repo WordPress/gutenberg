@@ -57,6 +57,9 @@
 			"default": "./build-module/index.mjs"
 		},
 		"./design-tokens.css": "./src/prebuilt/css/design-tokens.css",
+		"./utils": {
+			"sass": "./utils.scss"
+		},
 		"./design-tokens.js": {
 			"types": "./build-types/prebuilt/js/design-tokens.d.mts",
 			"default": "./src/prebuilt/js/design-tokens.mjs"
@@ -151,6 +154,7 @@
 		"build:default-ramps": "node --import=esbuild-esm-loader/register bin/generate-default-ramps/index.ts",
 		"build:tokens": "node --import=esbuild-esm-loader/register bin/generate-primitive-tokens/index.ts && node --import=esbuild-esm-loader/register bin/build-design-tokens/index.ts",
 		"build": "npm run build:tokens && npm run build:default-ramps",
-		"postbuild": "prettier --write tokens/color.json tokens/modes src/prebuilt src/color-ramps/lib/default-ramps.ts docs ../base-styles/internal/_wpds-token-fallbacks.scss"
+		"postbuild": "prettier --write tokens/color.json tokens/modes src/prebuilt src/color-ramps/lib/default-ramps.ts docs ../base-styles/internal/_wpds-token-fallbacks.scss",
+		"validate:package-contents": "node bin/validate-package-contents/index.mjs"
 	}
 }
