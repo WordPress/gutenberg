@@ -79,26 +79,23 @@ export function useCollaboratorNotifications(
 			getCurrentPostAttribute,
 			isCollaborationEnabledForCurrentPost,
 		} = unlock( select( editorStore ) );
+		// Notification preferences default to enabled when unset.
+		const getNotificationPreference = ( name: string ) =>
+			select( preferencesStore ).get( 'core', name ) ?? true;
 		return {
 			postStatus: getCurrentPostAttribute( 'status' ) as
 				| string
 				| undefined,
 			isCollaborationEnabled: isCollaborationEnabledForCurrentPost(),
-			showJoinNotifications:
-				select( preferencesStore ).get(
-					'core',
-					'showCollaborationJoinNotifications'
-				) ?? true,
-			showLeaveNotifications:
-				select( preferencesStore ).get(
-					'core',
-					'showCollaborationLeaveNotifications'
-				) ?? true,
-			showPostSaveNotifications:
-				select( preferencesStore ).get(
-					'core',
-					'showCollaborationPostSaveNotifications'
-				) ?? true,
+			showJoinNotifications: getNotificationPreference(
+				'showCollaborationJoinNotifications'
+			),
+			showLeaveNotifications: getNotificationPreference(
+				'showCollaborationLeaveNotifications'
+			),
+			showPostSaveNotifications: getNotificationPreference(
+				'showCollaborationPostSaveNotifications'
+			),
 		};
 	}, [] );
 
