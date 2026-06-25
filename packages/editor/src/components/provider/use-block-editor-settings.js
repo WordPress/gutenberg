@@ -119,6 +119,7 @@ const {
 	isNavigationOverlayContextKey,
 	isNavigationPostEditorKey,
 	mediaUploadOnSuccessKey,
+	mediaSideloadFromUrlKey,
 	openMediaEditorModalKey,
 } = unlock( privateApis );
 
@@ -360,7 +361,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				? mediaUploadOnSuccess
 				: undefined,
 			mediaSideload: hasUploadPermissions ? mediaSideload : undefined,
-			mediaSideloadFromUrl: hasUploadPermissions
+			[ mediaSideloadFromUrlKey ]: hasUploadPermissions
 				? mediaSideloadFromUrl
 				: undefined,
 			mediaFinalize: hasUploadPermissions ? mediaFinalize : undefined,

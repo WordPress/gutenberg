@@ -10,8 +10,18 @@ import {
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
+
+const { mediaSideloadFromUrlKey } = unlock( blockEditorPrivateApis );
 
 function flattenBlocks( blocks ) {
 	const result = [];
@@ -111,7 +121,9 @@ export default function MaybeUploadMediaPanel() {
 		( select ) => ( {
 			editorBlocks: select( blockEditorStore ).getBlocks(),
 			mediaSideloadFromUrl:
-				select( blockEditorStore ).getSettings().mediaSideloadFromUrl,
+				select( blockEditorStore ).getSettings()[
+					mediaSideloadFromUrlKey
+				],
 		} ),
 		[]
 	);

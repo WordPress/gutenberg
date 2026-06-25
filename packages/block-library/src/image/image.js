@@ -83,6 +83,7 @@ const {
 	isDefaultBlockStyleState,
 	ResolutionTool,
 	mediaEditKey,
+	mediaSideloadFromUrlKey,
 } = unlock( blockEditorPrivateApis );
 
 const scaleOptions = [
@@ -471,7 +472,7 @@ export default function Image( {
 	const canUploadExternalImage =
 		isSingleSelected &&
 		isExternalImage( id, url ) &&
-		!! getSettings().mediaSideloadFromUrl;
+		!! getSettings()[ mediaSideloadFromUrlKey ];
 
 	// Get naturalWidth and naturalHeight from image, and fall back to loaded natural
 	// width and height. This resolves an issue in Safari where the loaded natural
@@ -588,7 +589,7 @@ export default function Image( {
 	}
 
 	function uploadExternal() {
-		const { mediaSideloadFromUrl } = getSettings();
+		const mediaSideloadFromUrl = getSettings()[ mediaSideloadFromUrlKey ];
 		if ( ! mediaSideloadFromUrl ) {
 			return;
 		}
