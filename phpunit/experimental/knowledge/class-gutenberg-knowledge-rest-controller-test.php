@@ -178,6 +178,58 @@ class Gutenberg_Knowledge_REST_Controller_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * With no `status` param the collection follows the WordPress default and
+	 * lists `publish` knowledge rows. This is the happy path for
+	 * `GET /wp/v2/knowledge`.
+	 */
+	public function test_get_items_default_status_returns_publish(): void {
+		$publish_post_id = $this->create_knowledge_post( 'administrator', 'publish' );
+
+		$this->switch_to_user_role( 'administrator' );
+
+		$request  = new WP_REST_Request( 'GET', self::REST_BASE );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 200, $response->get_status() );
+
+		$data = $response->get_data();
+
+		$this->assertContains( $publish_post_id, wp_list_pluck( $data, 'id' ), 'Publish row should be listed by default.' );
+		$this->assertSame( 1, (int) $response->get_headers()['X-WP-Total'] );
+		$this->assertSame( 'publish', $data[0]['status'] );
+	}
+
+	/**
+	 * A collection GET with no `status` param excludes `draft` and `private`
+	 * rows. Knowledge rows created through the normal flows are `draft` (the
+	 * content-guidelines singleton) or `private` (`POST /wp/v2/knowledge`), so a
+	 * bare `GET /wp/v2/knowledge` does not return them even though the caller can
+	 * read them. Callers must pass an explicit `?status` to see their own draft
+	 * or private rows.
+	 *
+	 * Characterization coverage for the report in
+	 * https://github.com/WordPress/gutenberg/pull/79149#issuecomment-4800953255.
+	 */
+	public function test_get_items_default_status_excludes_draft_and_private(): void {
+		$draft_post_id   = $this->create_knowledge_post( 'administrator', 'draft' );
+		$private_post_id = $this->create_knowledge_post( 'administrator', 'private' );
+
+		$this->switch_to_user_role( 'administrator' );
+
+		// No `status` param: the parent controller defaults to `publish`.
+		$default_request  = new WP_REST_Request( 'GET', self::REST_BASE );
+		$default_response = rest_get_server()->dispatch( $default_request );
+
+		$this->assertSame( 200, $default_response->get_status() );
+
+		$default_ids = wp_list_pluck( $default_response->get_data(), 'id' );
+
+		$this->assertNotContains( $draft_post_id, $default_ids, 'Draft row should be excluded without an explicit status.' );
+		$this->assertNotContains( $private_post_id, $default_ids, 'Private row should be excluded without an explicit status.' );
+		$this->assertSame( 0, (int) $default_response->get_headers()['X-WP-Total'] );
+	}
+
+	/**
 	 * Collection totals are scoped to the private rows readable by the caller.
 	 */
 	public function test_get_items_private_totals_are_scoped_to_current_user(): void {
