@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   `Surface`: Migrate styles from Emotion to SCSS Modules and use WPDS tokens for migrated visual values ([#79445](https://github.com/WordPress/gutenberg/pull/79445)).
+
 ## 36.0.0 (2026-06-24)
 
 ### Breaking Changes
