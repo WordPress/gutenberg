@@ -12,6 +12,10 @@
 
 -   Document the safe `clsx` pattern for conditional CSS Module classes ([#79490](https://github.com/WordPress/gutenberg/pull/79490)).
 
+### Bug Fixes
+
+-   `Divider`: Restore lower-specificity border styles so custom border colors can override the default divider color. ([#79534](https://github.com/WordPress/gutenberg/pull/79534))
+
 ### Internal
 
 -   `Surface`: Migrate styles from Emotion to SCSS Modules and use WPDS tokens for migrated visual values ([#79445](https://github.com/WordPress/gutenberg/pull/79445)).
