@@ -8,11 +8,17 @@ import userEvent from '@testing-library/user-event';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
+import { resetQueue } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
  */
 import _ComboboxControl from '..';
+
+afterEach( () => {
+	jest.clearAllTimers();
+	resetQueue();
+} );
 import type { ComboboxControlOption, ComboboxControlProps } from '../types';
 
 const timezones = [
@@ -271,7 +277,7 @@ describe.each( [
 		await user.keyboard( '{Enter}' );
 
 		expect(
-			screen.getByText( 'Item selected.', {
+			await screen.findByText( 'Item selected.', {
 				selector: '[aria-live]',
 			} )
 		).toBeInTheDocument();

@@ -18,11 +18,17 @@ import type { ComponentProps } from 'react';
  */
 import { useState } from '@wordpress/element';
 import { logged } from '@wordpress/deprecated';
+import { resetQueue } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
  */
 import _FormTokenField from '../';
+
+afterEach( () => {
+	jest.clearAllTimers();
+	resetQueue();
+} );
 
 const FormTokenField = ( props: ComponentProps< typeof _FormTokenField > ) => (
 	<_FormTokenField __next40pxDefaultSize { ...props } />

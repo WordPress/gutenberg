@@ -10,6 +10,7 @@ import addContainer from './script/add-container';
 import addIntroText from './script/add-intro-text';
 
 export { speak } from './shared/index';
+export { resetQueue } from './shared/queue';
 
 /**
  * Create the live regions.

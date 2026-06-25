@@ -5,9 +5,19 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
+ * WordPress dependencies
+ */
+import { resetQueue } from '@wordpress/a11y';
+
+/**
  * Internal dependencies
  */
 import { ToolsPanel, ToolsPanelContext, ToolsPanelItem } from '../';
+
+afterEach( () => {
+	jest.clearAllTimers();
+	resetQueue();
+} );
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 import type {
 	ToolsPanelContext as ToolsPanelContextType,
@@ -298,7 +308,7 @@ describe( 'ToolsPanel', () => {
 			expect( control ).toBeInTheDocument();
 
 			// Test the aria live announcement.
-			const announcement = screen.getByText( 'Alt is now visible' );
+			const announcement = await screen.findByText( 'Alt is now visible' );
 			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
 		} );
 
@@ -311,7 +321,7 @@ describe( 'ToolsPanel', () => {
 			expect( control ).not.toBeInTheDocument();
 
 			// Test the aria live announcement.
-			const announcement = screen.getByText(
+			const announcement = await screen.findByText(
 				'Example hidden and reset to default'
 			);
 			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
@@ -410,7 +420,9 @@ describe( 'ToolsPanel', () => {
 			expect( resetControl ).toBeInTheDocument();
 
 			// Test the aria live announcement.
-			const announcement = screen.getByText( 'Example reset to default' );
+			const announcement = await screen.findByText(
+				'Example reset to default'
+			);
 			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
 		} );
 
@@ -1271,7 +1283,7 @@ describe( 'ToolsPanel', () => {
 			await selectMenuItem( 'Reset all' );
 
 			// Test the aria live announcement.
-			const announcement = screen.getByText( 'All options reset' );
+			const announcement = await screen.findByText( 'All options reset' );
 			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
 
 			const disabledResetAllItem = await screen.findByRole( 'menuitem', {
