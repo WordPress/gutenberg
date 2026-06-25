@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   The `__next40pxDefaultSize` prop is now true by default on `__experimentalLetterSpacingControl`. The prop can be safely removed.
+
 ### Deprecations
 
 -   Soft-deprecate the `__experimentalImageEditor` component. The Media Editor modal is now the default crop experience for core blocks ([#78654](https://github.com/WordPress/gutenberg/pull/78654)).

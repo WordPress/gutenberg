@@ -174,6 +174,7 @@ const restrictedSyntax = [
 		'BoxControl',
 		'FocalPointPicker',
 		'FontSizePicker',
+		'LetterSpacingControl',
 		'QueryControls',
 		'TextControl',
 	].map( ( componentName ) => ( {
