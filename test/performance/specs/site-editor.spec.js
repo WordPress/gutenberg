@@ -13,20 +13,6 @@ import { PerfUtils } from '../fixtures';
 // See https://github.com/WordPress/gutenberg/issues/51383#issuecomment-1613460429
 const BROWSER_IDLE_WAIT = 1000;
 
-/**
- * Returns the major Chromium version, or 0 if the browser is not Chromium.
- *
- * @param {import('@playwright/test').Browser} browser Playwright browser object.
- * @return {number} Major Chromium version.
- */
-function getChromiumMajorVersion( browser ) {
-	if ( browser.browserType().name() !== 'chromium' ) {
-		return 0;
-	}
-	const match = browser.version().match( /^(\d+)/ );
-	return match ? parseInt( match[ 1 ], 10 ) : 0;
-}
-
 const results = {
 	serverResponse: [],
 	firstPaint: [],
@@ -290,21 +276,6 @@ test.describe( 'Site Editor Performance', () => {
 			await requestUtils.activateTheme( 'twentytwentyfour' );
 		} );
 
-		test.beforeEach( async ( { browser } ) => {
-			// This site-editor measurement times out in CI starting with the
-			// Playwright upgrade to Chrome for Testing 148/149 (#78632).
-			// Chrome >= 148 is the first CI browser to support
-			// Document-Isolation-Policy, so the editor now loads cross-origin
-			// isolated and the site editor never settles for the measurement.
-			// The exact reason isolation prevents settling is not yet
-			// root-caused. Skip on the affected browsers until the cause is
-			// found. See https://github.com/WordPress/gutenberg/pull/78632.
-			test.skip(
-				getChromiumMajorVersion( browser ) >= 148,
-				'Site editor never settles under cross-origin isolation on Chromium 148+'
-			);
-		} );
-
 		test.afterAll( async ( { requestUtils } ) => {
 			await requestUtils.activateTheme( 'twentytwentyfour' );
 		} );
@@ -398,13 +369,20 @@ test.describe( 'Site Editor Performance', () => {
 
 				await Promise.all(
 					patterns.map( async ( pattern ) => {
+						const option = page.getByRole( 'option', {
+							name: pattern,
+							exact: true,
+						} );
+
+						// The pattern previews are rendered lazily: each
+						// preview's `Editor canvas` iframe is only created once
+						// its list item is scrolled into view. Without this the
+						// off-screen previews never render and the wait below
+						// times out.
+						await option.scrollIntoViewIfNeeded();
+
 						const canvas = await perfUtils.getCanvas(
-							page
-								.getByRole( 'option', {
-									name: pattern,
-									exact: true,
-								} )
-								.getByTitle( 'Editor canvas' )
+							option.getByTitle( 'Editor canvas' )
 						);
 
 						// Wait until the first block is rendered AND all
