@@ -39,7 +39,7 @@
 		},
 		"./design-tokens.css": "./src/prebuilt/css/design-tokens.css",
 		"./design-tokens.js": {
-			"types": "./build-types/prebuilt/js/design-tokens.d.ts",
+			"types": "./build-types/prebuilt/js/design-tokens.d.mts",
 			"import": "./build-module/prebuilt/js/design-tokens.mjs",
 			"default": "./build/prebuilt/js/design-tokens.cjs"
 		},
@@ -59,17 +59,17 @@
 			"default": "./src/vite-plugins/vite-ds-token-fallbacks.mjs"
 		},
 		"./stylelint-plugins/no-unknown-ds-tokens": {
-			"types": "./build-types/stylelint-plugins/no-unknown-ds-tokens.d.ts",
+			"types": "./build-types/stylelint-plugins/no-unknown-ds-tokens.d.mts",
 			"import": "./src/stylelint-plugins/no-unknown-ds-tokens.mjs",
 			"default": "./build/stylelint-plugins/no-unknown-ds-tokens.cjs"
 		},
 		"./stylelint-plugins/no-setting-wpds-custom-properties": {
-			"types": "./build-types/stylelint-plugins/no-setting-wpds-custom-properties.d.ts",
+			"types": "./build-types/stylelint-plugins/no-setting-wpds-custom-properties.d.mts",
 			"import": "./src/stylelint-plugins/no-setting-wpds-custom-properties.mjs",
 			"default": "./build/stylelint-plugins/no-setting-wpds-custom-properties.cjs"
 		},
 		"./stylelint-plugins/no-token-fallback-values": {
-			"types": "./build-types/stylelint-plugins/no-token-fallback-values.d.ts",
+			"types": "./build-types/stylelint-plugins/no-token-fallback-values.d.mts",
 			"import": "./src/stylelint-plugins/no-token-fallback-values.mjs",
 			"default": "./build/stylelint-plugins/no-token-fallback-values.cjs"
 		},

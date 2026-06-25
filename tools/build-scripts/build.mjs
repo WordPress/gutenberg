@@ -159,6 +159,14 @@ async function build() {
 			env: { ...process.env, NODE_ENV: 'production' },
 		} );
 
+		if ( ! skipTypes ) {
+			console.log( '\n✅ Checking package export targets...' );
+			await exec( 'node', [
+				path.join( __dirname, 'packages/check-package-exports.cjs' ),
+				'packages/theme',
+			] );
+		}
+
 		console.log( '\n📦 Building blocks manifests...' );
 		const blocksDirs = [
 			{
