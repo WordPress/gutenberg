@@ -22,7 +22,7 @@ This section outlines the design principles and patterns of the editor interface
 
 <img width="200" src="https://developer.wordpress.org/files/2026/06/gutenberg-logo-black.png" alt="Gutenberg Logo" />
 
-The Gutenberg logo was made by [Cristel Rossignol](https://twitter.com/cristelrossi), and is released under the GPL license. [Download the PNG logo](https://developer.wordpress.org/files/2026/06/gutenberg-logo-black.png).
+The Gutenberg logo was made by [Cristel Rossignol](https://twitter.com/cristelrossi), and is released under the GPL license. [Download the SVG logo](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/contributors/assets/gutenberg-logo-black.svg).
 
 ### Goal of Gutenberg
 
