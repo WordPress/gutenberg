@@ -891,6 +891,15 @@ export default dedupePlugins( [
 		},
 	},
 
+	// Override: CRDT document version hashing intentionally uses bitwise
+	// operators to produce stable 32-bit hash components.
+	{
+		files: [ 'packages/sync/src/utils.ts' ],
+		rules: {
+			'no-bitwise': 'off',
+		},
+	},
+
 	// Override: typings — global type declarations require `var` and define
 	// the globals that wp-global-usage warns about.
 	{

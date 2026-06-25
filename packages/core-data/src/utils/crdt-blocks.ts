@@ -945,15 +945,10 @@ function mergeBlockIntoYBlock(
 					yblock.set( key, yInnerBlocks );
 				}
 
-				mergeCrdtBlocks(
-					yInnerBlocks,
-					value ?? [],
-					attributeCursor,
-					{
-						...options,
-						baseBlocks: baseBlock?.innerBlocks,
-					}
-				);
+				mergeCrdtBlocks( yInnerBlocks, value ?? [], attributeCursor, {
+					...options,
+					baseBlocks: baseBlock?.innerBlocks,
+				} );
 				break;
 			}
 
@@ -962,10 +957,7 @@ function mergeBlockIntoYBlock(
 					break;
 				}
 
-				if (
-					baseBlock &&
-					fastDeepEqual( baseBlock.clientId, value )
-				) {
+				if ( baseBlock && fastDeepEqual( baseBlock.clientId, value ) ) {
 					break;
 				}
 

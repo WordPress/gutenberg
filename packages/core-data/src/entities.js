@@ -1023,15 +1023,15 @@ async function loadPostTypeEntities() {
 					: DEFAULT_ENTITY_KEY,
 		};
 
-			/**
-			 * @type {import('@wordpress/sync').SyncConfig}
-			 */
-			entity.syncConfig = {
-				// Save a CRDT document with this entity.
-				supportsPersistence: true,
+		/**
+		 * @type {import('@wordpress/sync').SyncConfig}
+		 */
+		entity.syncConfig = {
+			// Save a CRDT document with this entity.
+			supportsPersistence: true,
 
-				shouldSync: () =>
-					! window._wpCollaborationDisabledPostTypes?.includes( name ),
+			shouldSync: () =>
+				! window._wpCollaborationDisabledPostTypes?.includes( name ),
 
 			/**
 			 * Apply changes from the local editor to the local CRDT document so

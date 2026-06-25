@@ -166,8 +166,7 @@ describe( 'utils', () => {
 
 		it( 'changes the version when the document changes', () => {
 			const firstSerialized = serializeCrdtDoc( testDoc );
-			const firstVersion =
-				getPersistedCrdtDocVersion( firstSerialized );
+			const firstVersion = getPersistedCrdtDocVersion( firstSerialized );
 
 			testDoc.getMap( 'testMap' ).set( 'title', 'Changed Title' );
 			const secondSerialized = serializeCrdtDoc( testDoc );
