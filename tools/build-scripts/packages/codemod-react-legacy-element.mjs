@@ -15,6 +15,12 @@
  *        - `a === TRANSITIONAL`        -> `( a === TRANSITIONAL || a === LEGACY )`
  *      Any other usage throws, since it is not known to be safe.
  *
+ * It also patches React DOM's boolean-attribute handling for `inert`. React 18
+ * treated `inert` as a string attribute, so legacy code commonly passes a string
+ * value (e.g. `inert="inert"`). React 19 treats it as a boolean, so the codemod
+ * coerces any string `inert` value to `true` in the `case 'inert'` of the
+ * attribute-setting switch.
+ *
  * Edits are applied to the original source with `magic-string`, so the output
  * is byte-for-byte identical except at the patched locations (handy for
  * diffing against the unpatched `-orig` files).
@@ -92,7 +98,7 @@ function patchTransitionalDeclarator( declPath, ms, filename ) {
 	const binding = scope.getBinding( transitionalName );
 	if ( ! binding ) {
 		throw new Error(
-			`[react-legacy-element] Could not resolve the binding for \`${ transitionalName }\` in ${ filename }.`
+			`[react-patch] Could not resolve the binding for \`${ transitionalName }\` in ${ filename }.`
 		);
 	}
 
@@ -168,7 +174,7 @@ function patchReference( refPath, legacyName, ms, filename ) {
 		? `:${ node.loc.start.line }:${ node.loc.start.column + 1 }`
 		: '';
 	throw new Error(
-		`[react-legacy-element] Unsupported use of the React element-type symbol in ${ filename }${ location }. ` +
+		`[react-patch] Unsupported use of the React element-type symbol in ${ filename }${ location }. ` +
 			'Only `case` labels and `===` comparisons are handled.'
 	);
 }
@@ -236,9 +242,9 @@ function getPropsRefAssignment( statement ) {
  * React runtimes keep the ref on the element itself instead of in props.
  *
  * `coerceRef` is identified structurally: its first body statement assigns
- * `<id>.props.ref` (e.g. `t = t.props.ref`). Bundles without such a function
- * (e.g. the `react` bundle) are left untouched, and more than one match is
- * treated as an error since the assumption no longer holds.
+ * `<id>.props.ref` (e.g. `t = t.props.ref`). This runs only on the React DOM
+ * bundle, where exactly one such function is expected, so anything other than a
+ * single match is treated as an error since the assumption no longer holds.
  *
  * @param {Object}      ast      Parsed AST (File node).
  * @param {MagicString} ms       Magic string for the source being edited.
@@ -264,12 +270,9 @@ function patchCoerceRef( ast, ms, filename ) {
 		},
 	} );
 
-	if ( matches.length === 0 ) {
-		return;
-	}
-	if ( matches.length > 1 ) {
+	if ( matches.length !== 1 ) {
 		throw new Error(
-			`[react-legacy-element] Expected exactly one \`coerceRef\`-like function (first statement \`x = y.props.ref\`) in ${ filename }, found ${ matches.length }.`
+			`[react-patch] Expected exactly one \`coerceRef\`-like function (first statement \`x = y.props.ref\`) in ${ filename }, found ${ matches.length }.`
 		);
 	}
 
@@ -304,7 +307,7 @@ function patchTransitionalSymbols( ast, ms, filename ) {
 
 	if ( declarators.length === 0 ) {
 		throw new Error(
-			`[react-legacy-element] No \`Symbol.for('${ TRANSITIONAL_SYMBOL }')\` assignment found in ${ filename }.`
+			`[react-patch] No \`Symbol.for('${ TRANSITIONAL_SYMBOL }')\` assignment found in ${ filename }.`
 		);
 	}
 
@@ -314,18 +317,151 @@ function patchTransitionalSymbols( ast, ms, filename ) {
 }
 
 /**
- * Applies the legacy-element codemod to a bundled React script.
+ * When `statement` is the shared boolean-attribute handler of React DOM's
+ * attribute-setting switch, returns the identifier holding the attribute value.
  *
- * @param {string} code     Source code to patch.
- * @param {string} filename Source name, for error messages.
- * @return {string} The patched source code.
+ * The handler has the shape:
+ *
+ *   value && "function" !== typeof value && "symbol" !== typeof value
+ *     ? domElement.setAttribute( key, "" )
+ *     : domElement.removeAttribute( key );
+ *
+ * @param {Object} statement AST statement node.
+ * @return {Object|undefined} The value Identifier node, if matched.
  */
-export function patchReactLegacyElement( code, filename = 'input.js' ) {
-	const ast = parse( code, { sourceType: 'unambiguous' } );
-	const ms = new MagicString( code );
+function getBooleanAttributeValueId( statement ) {
+	if ( ! statement || statement.type !== 'ExpressionStatement' ) {
+		return undefined;
+	}
+	const expression = statement.expression;
+	if ( expression.type !== 'ConditionalExpression' ) {
+		return undefined;
+	}
 
-	patchTransitionalSymbols( ast, ms, filename );
-	patchCoerceRef( ast, ms, filename );
+	const { consequent, alternate } = expression;
+	const isCallTo = ( node, method ) =>
+		node.type === 'CallExpression' &&
+		node.callee.type === 'MemberExpression' &&
+		! node.callee.computed &&
+		node.callee.property.type === 'Identifier' &&
+		node.callee.property.name === method;
 
-	return ms.toString();
+	const setsEmptyAttribute =
+		isCallTo( consequent, 'setAttribute' ) &&
+		consequent.arguments.length === 2 &&
+		consequent.arguments[ 1 ].type === 'StringLiteral' &&
+		consequent.arguments[ 1 ].value === '';
+	if ( ! setsEmptyAttribute || ! isCallTo( alternate, 'removeAttribute' ) ) {
+		return undefined;
+	}
+
+	// The value is the leftmost operand of the `value && …` test.
+	let test = expression.test;
+	while ( test.type === 'LogicalExpression' ) {
+		test = test.left;
+	}
+	return test.type === 'Identifier' ? test : undefined;
 }
+
+/**
+ * Patches the `case 'inert'` of React DOM's attribute-setting switch so any
+ * string value is coerced to `true` before the boolean-attribute handler runs.
+ *
+ * React 18 treated `inert` as a string attribute (e.g. `inert="inert"`), while
+ * React 19 treats it as a boolean. Without this patch a legacy string value
+ * would not behave like the boolean `true` it was meant to represent.
+ *
+ * The target switch is identified structurally: a `case 'inert'` that falls
+ * through to the boolean-attribute handler (`value ? setAttribute(key, "") :
+ * removeAttribute(key)`). Exactly one such switch is expected, so anything other
+ * than a single match is treated as an error.
+ *
+ * @param {Object}      ast      Parsed AST (File node).
+ * @param {MagicString} ms       Magic string for the source being edited.
+ * @param {string}      filename Source name, for error messages.
+ */
+function patchInertAttribute( ast, ms, filename ) {
+	const matches = [];
+
+	traverse( ast, {
+		SwitchStatement( path ) {
+			const cases = path.node.cases;
+			const inertIndex = cases.findIndex(
+				( switchCase ) =>
+					switchCase.test &&
+					switchCase.test.type === 'StringLiteral' &&
+					switchCase.test.value === 'inert'
+			);
+			if ( inertIndex === -1 ) {
+				return;
+			}
+
+			// Walk forward from `case 'inert'` (through the empty fall-through
+			// cases) to the shared boolean-attribute handler, and grab the
+			// variable holding the attribute value.
+			let valueName;
+			for ( let i = inertIndex; i < cases.length && ! valueName; i++ ) {
+				for ( const statement of cases[ i ].consequent ) {
+					const valueId = getBooleanAttributeValueId( statement );
+					if ( valueId ) {
+						valueName = valueId.name;
+						break;
+					}
+				}
+			}
+			if ( ! valueName ) {
+				return;
+			}
+
+			matches.push( { inertCase: cases[ inertIndex ], valueName } );
+		},
+	} );
+
+	if ( matches.length !== 1 ) {
+		throw new Error(
+			`[react-patch] Expected exactly one boolean-attribute \`case 'inert'\` switch in ${ filename }, found ${ matches.length }.`
+		);
+	}
+
+	const { inertCase, valueName } = matches[ 0 ];
+	// Append as the last statement of the `inert` case body (right before the
+	// fall-through), so the preceding empty-string warning still sees the
+	// original value. `SwitchCase.end` is the end of the last consequent
+	// statement, or just after the `case 'inert':` label when the body is empty.
+	ms.appendLeft(
+		inertCase.end,
+		` if ( "string" === typeof ${ valueName } ) ${ valueName } = true; `
+	);
+}
+
+/**
+ * A patch pass operates on a shared AST and `magic-string` for a single source.
+ *
+ * @typedef {( ast: Object, ms: MagicString, filename: string ) => void} PatchPass
+ */
+
+/**
+ * Composes patch passes into a single patcher that parses the source once,
+ * applies every pass to the shared AST/`magic-string`, and returns the result.
+ *
+ * Bundles select which passes apply: the `react` core bundle only needs
+ * {@link patchTransitionalSymbols}, while the `react-dom` bundle additionally
+ * needs the DOM-only {@link patchCoerceRef} and {@link patchInertAttribute}.
+ *
+ * @param {...PatchPass} passes Patch passes to apply, in order.
+ * @return {( code: string, filename?: string ) => string} The composed patcher.
+ */
+export function createPatcher( ...passes ) {
+	return ( code, filename = 'input.js' ) => {
+		const ast = parse( code, { sourceType: 'unambiguous' } );
+		const ms = new MagicString( code );
+
+		for ( const pass of passes ) {
+			pass( ast, ms, filename );
+		}
+
+		return ms.toString();
+	};
+}
+
+export { patchTransitionalSymbols, patchCoerceRef, patchInertAttribute };

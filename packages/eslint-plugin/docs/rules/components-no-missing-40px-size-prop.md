@@ -13,7 +13,6 @@ The following components are checked by this rule:
 -   CustomSelectControl
 -   FontAppearanceControl
 -   FontFamilyControl
--   FontSizePicker
 -   FormFileUpload (special case - see below)
 -   FormTokenField
 -   InputControl
