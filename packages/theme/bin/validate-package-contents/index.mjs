@@ -84,8 +84,9 @@ const env = {
 		process.env.WORDPRESS_THEME_NPM_CACHE ??
 		join( tmpdir(), 'wordpress-theme-npm-cache' ),
 };
+const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 
-const packResult = spawnSync( 'npm', [ 'pack', '--dry-run', '--json' ], {
+const packResult = spawnSync( npmCommand, [ 'pack', '--dry-run', '--json' ], {
 	cwd: packageRoot,
 	encoding: 'utf8',
 	env,
