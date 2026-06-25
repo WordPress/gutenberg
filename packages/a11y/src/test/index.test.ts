@@ -66,7 +66,9 @@ describe( 'speak', () => {
 			speak( 'assertive message', 'assertive' );
 			jest.advanceTimersByTime( 100 );
 			expect( containerPolite ).toBeEmptyDOMElement();
-			expect( containerAssertive ).toHaveTextContent( 'assertive message' );
+			expect( containerAssertive ).toHaveTextContent(
+				'assertive message'
+			);
 		} );
 	} );
 
@@ -122,7 +124,9 @@ describe( 'speak', () => {
 
 			speak( 'assertive message', 'assertive' );
 			jest.advanceTimersByTime( 100 );
-			expect( containerAssertive ).toHaveTextContent( 'assertive message' );
+			expect( containerAssertive ).toHaveTextContent(
+				'assertive message'
+			);
 			// Polite container is untouched by the assertive path.
 			expect( containerPolite ).toHaveTextContent( 'polite first' );
 

@@ -308,7 +308,8 @@ describe( 'ToolsPanel', () => {
 			expect( control ).toBeInTheDocument();
 
 			// Test the aria live announcement.
-			const announcement = await screen.findByText( 'Alt is now visible' );
+			const announcement =
+				await screen.findByText( 'Alt is now visible' );
 			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
 		} );
 
