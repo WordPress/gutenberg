@@ -51,10 +51,10 @@ class WP_Duotone_Gutenberg_Test extends WP_UnitTestCase {
 	public function test_gutenberg_restore_image_outer_container_moves_duotone_class_to_wrapper_in_classic_theme() {
 		switch_theme( 'default' );
 
-		$block_content = '<div class="wp-block-image"><figure class="alignright wp-duotone-blue-orange size-full"><img src="/my-image.jpg"/></figure></div>';
-		$expected      = '<div class="wp-block-image wp-duotone-blue-orange"><figure class="alignright size-full"><img src="/my-image.jpg"/></figure></div>';
+		$block_content = '<div class="wp-block-image"><figure class="alignright wp-duotone-blue-orange size-full"><img src="/my-image.jpg"></figure></div>';
+		$expected      = '<div class="wp-block-image wp-duotone-blue-orange"><figure class="alignright size-full"><img src="/my-image.jpg"></figure></div>';
 
-		$this->assertSame( $expected, WP_Duotone_Gutenberg::restore_image_outer_container( $block_content ) );
+		$this->assertEqualHTML( $expected, WP_Duotone_Gutenberg::restore_image_outer_container( $block_content ) );
 	}
 
 	/**
