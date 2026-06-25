@@ -1,12 +1,14 @@
 /**
  * External dependencies
  */
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import { v4 as uuid } from 'uuid';
 
 /**
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
+import { __unstableSerializeAndClean, parse } from '@wordpress/blocks';
 import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
 
@@ -27,6 +29,463 @@ import logEntityDeprecation from './utils/log-entity-deprecation';
 
 function addTitleToAutoDraft( record ) {
 	return record.status === 'auto-draft' ? { ...record, title: '' } : record;
+}
+
+function isStaleCRDTDocumentError( error ) {
+	return (
+		error?.code === 'rest_crdt_document_stale' &&
+		error?.data?.status === 409
+	);
+}
+
+function hasOwnProperty( object, key ) {
+	return Object.prototype.hasOwnProperty.call( object ?? {}, key );
+}
+
+const GUARDED_SAVE_RESPONSE_RAW_ATTRIBUTES = new Set( [
+	'title',
+	'excerpt',
+	'content',
+] );
+
+function getGuardedSaveResponseRawAttributes( entityConfig ) {
+	return ( entityConfig.rawAttributes ?? [] ).filter( ( key ) =>
+		GUARDED_SAVE_RESPONSE_RAW_ATTRIBUTES.has( key )
+	);
+}
+
+function getRawAttributeValue( entityConfig, key, value ) {
+	return entityConfig.rawAttributes?.includes( key ) &&
+		value &&
+		typeof value === 'object' &&
+		'raw' in value
+		? value.raw
+		: value;
+}
+
+function getRawAttributeFieldWithValue( value, rawValue ) {
+	if (
+		value &&
+		typeof value === 'object' &&
+		hasOwnProperty( value, 'raw' )
+	) {
+		return {
+			...value,
+			raw: rawValue,
+			...( hasOwnProperty( value, 'rendered' )
+				? { rendered: rawValue }
+				: {} ),
+		};
+	}
+
+	return rawValue;
+}
+
+function getSerializedCRDTBlockContent( crdtRecord ) {
+	return Array.isArray( crdtRecord?.blocks )
+		? __unstableSerializeAndClean( crdtRecord.blocks ).trim()
+		: undefined;
+}
+
+function hasCRDTRawAttributeValue( crdtRecord, key ) {
+	return key === 'content'
+		? hasOwnProperty( crdtRecord, key ) ||
+				Array.isArray( crdtRecord?.blocks )
+		: hasOwnProperty( crdtRecord, key );
+}
+
+function getCRDTRawAttributeValue( entityConfig, key, crdtRecord ) {
+	if ( key === 'content' ) {
+		return (
+			getSerializedCRDTBlockContent( crdtRecord ) ??
+			getRawAttributeValue( entityConfig, key, crdtRecord?.content )
+		);
+	}
+
+	return getRawAttributeValue( entityConfig, key, crdtRecord?.[ key ] );
+}
+
+function getPersistedCRDTDocument( record ) {
+	return record?.meta?._crdt_document;
+}
+
+function parsePersistedCRDTDocumentMetadata( serialized ) {
+	if ( typeof serialized !== 'string' ) {
+		return null;
+	}
+
+	try {
+		const parsed = JSON.parse( serialized );
+		const recordSnapshot =
+			'object' === typeof parsed?.recordSnapshot &&
+			null !== parsed.recordSnapshot &&
+			! Array.isArray( parsed.recordSnapshot )
+				? parsed.recordSnapshot
+				: null;
+
+		return {
+			baseVersion:
+				typeof parsed?.baseVersion === 'string'
+					? parsed.baseVersion
+					: null,
+			recordSnapshot,
+			version:
+				typeof parsed?.version === 'string' ? parsed.version : null,
+		};
+	} catch {
+		return null;
+	}
+}
+
+function isSaveResponseForPersistedCRDTDocument( edits, updatedRecord ) {
+	const editCRDTDocument = getPersistedCRDTDocument( edits );
+
+	if ( editCRDTDocument === undefined ) {
+		return false;
+	}
+
+	const responseCRDTDocument = getPersistedCRDTDocument( updatedRecord );
+
+	if ( fastDeepEqual( responseCRDTDocument, editCRDTDocument ) ) {
+		return true;
+	}
+
+	const editMetadata = parsePersistedCRDTDocumentMetadata( editCRDTDocument );
+	const responseMetadata =
+		parsePersistedCRDTDocumentMetadata( responseCRDTDocument );
+
+	return !! (
+		editMetadata?.version &&
+		responseMetadata?.baseVersion === editMetadata.version
+	);
+}
+
+function getRecordWithoutKey( record, key ) {
+	const nextRecord = { ...record };
+	delete nextRecord[ key ];
+	return nextRecord;
+}
+
+function getCanonicalSerializedBlockContent( value ) {
+	if ( typeof value !== 'string' ) {
+		return;
+	}
+
+	const blocks = parse( value );
+
+	if ( ! blocks.length ) {
+		return;
+	}
+
+	return __unstableSerializeAndClean( blocks ).trim();
+}
+
+function areRawAttributeValuesEqual( key, valueA, valueB ) {
+	if ( fastDeepEqual( valueA, valueB ) ) {
+		return true;
+	}
+
+	if ( key !== 'content' ) {
+		return false;
+	}
+
+	const canonicalA = getCanonicalSerializedBlockContent( valueA );
+	const canonicalB = getCanonicalSerializedBlockContent( valueB );
+	const comparableA =
+		canonicalA ??
+		( typeof valueA === 'string' ? valueA.trim() : undefined );
+	const comparableB =
+		canonicalB ??
+		( typeof valueB === 'string' ? valueB.trim() : undefined );
+
+	return (
+		comparableA !== undefined &&
+		comparableB !== undefined &&
+		comparableA === comparableB
+	);
+}
+
+function getComparableBlockTree( blocks ) {
+	return blocks.map( ( block ) => ( {
+		attributes: block.attributes ?? {},
+		innerBlocks: getComparableBlockTree( block.innerBlocks ?? [] ),
+		name: block.name,
+	} ) );
+}
+
+function doesCRDTBlockContentMatchValue( crdtRecord, value ) {
+	if ( ! Array.isArray( crdtRecord?.blocks ) || typeof value !== 'string' ) {
+		return false;
+	}
+
+	const valueBlocks = parse( value );
+
+	return (
+		valueBlocks.length > 0 &&
+		fastDeepEqual(
+			getComparableBlockTree( crdtRecord.blocks ),
+			getComparableBlockTree( valueBlocks )
+		)
+	);
+}
+
+function getRecordWithRawAttributeValue( record, key, value ) {
+	return {
+		...record,
+		[ key ]: getRawAttributeFieldWithValue( record[ key ], value ),
+	};
+}
+
+function getRecordWithPersistedCRDTDocument( record, crdtDocument ) {
+	if ( crdtDocument === undefined ) {
+		return record;
+	}
+
+	return {
+		...record,
+		meta: {
+			...record.meta,
+			_crdt_document: crdtDocument,
+		},
+	};
+}
+
+function getPersistedCRDTDocumentRecordSnapshot( record ) {
+	return parsePersistedCRDTDocumentMetadata(
+		getPersistedCRDTDocument( record )
+	)?.recordSnapshot;
+}
+
+function getRecordWithoutPersistedCRDTDocumentSnapshotRawAttributes(
+	entityConfig,
+	record
+) {
+	const recordSnapshot = getPersistedCRDTDocumentRecordSnapshot( record );
+
+	if ( ! recordSnapshot ) {
+		return record;
+	}
+
+	return getGuardedSaveResponseRawAttributes( entityConfig ).reduce(
+		( nextRecord, key ) =>
+			hasOwnProperty( recordSnapshot, key )
+				? getRecordWithoutKey( nextRecord, key )
+				: nextRecord,
+		record
+	);
+}
+
+function getGuardedSaveResponseRecords(
+	entityConfig,
+	baseRecord,
+	edits,
+	updatedRecord,
+	syncManager,
+	objectType,
+	objectId
+) {
+	const defaultRecords = {
+		receiveRecord: updatedRecord,
+		syncRecord: updatedRecord,
+		persistedEdits: edits,
+	};
+	const rawAttributes = getGuardedSaveResponseRawAttributes( entityConfig );
+	const crdtRecord = syncManager?.getCRDTRecordData?.( objectType, objectId );
+	const isPersistedCRDTDocumentSaveResponse =
+		isSaveResponseForPersistedCRDTDocument( edits, updatedRecord );
+	const responseRecordSnapshot = isPersistedCRDTDocumentSaveResponse
+		? getPersistedCRDTDocumentRecordSnapshot( updatedRecord )
+		: null;
+
+	if (
+		! rawAttributes.length ||
+		! updatedRecord ||
+		( ! crdtRecord && ! responseRecordSnapshot )
+	) {
+		return defaultRecords;
+	}
+
+	let receiveRecord = updatedRecord;
+	let syncRecord = updatedRecord;
+	let persistedEdits = edits;
+	const omitPersistedEdit = ( key ) => {
+		if ( hasOwnProperty( persistedEdits, key ) ) {
+			persistedEdits = getRecordWithoutKey( persistedEdits, key );
+		}
+	};
+
+	for ( const key of rawAttributes ) {
+		const responseSnapshotValue =
+			responseRecordSnapshot &&
+			hasOwnProperty( responseRecordSnapshot, key )
+				? getRawAttributeValue(
+						entityConfig,
+						key,
+						responseRecordSnapshot[ key ]
+				  )
+				: undefined;
+		const hasResponseSnapshotValue = responseSnapshotValue !== undefined;
+		const hasCRDTValue = hasCRDTRawAttributeValue( crdtRecord, key );
+
+		if (
+			! hasOwnProperty( updatedRecord, key ) ||
+			( ! hasCRDTValue && ! hasResponseSnapshotValue )
+		) {
+			continue;
+		}
+
+		const responseValue = getRawAttributeValue(
+			entityConfig,
+			key,
+			updatedRecord[ key ]
+		);
+		const baseValue = getRawAttributeValue(
+			entityConfig,
+			key,
+			baseRecord?.[ key ]
+		);
+		const hasSavedEdit = hasOwnProperty( edits, key );
+		const editValue = hasSavedEdit
+			? getRawAttributeValue( entityConfig, key, edits[ key ] )
+			: undefined;
+		const persistedValue = hasResponseSnapshotValue
+			? responseSnapshotValue
+			: editValue;
+		const hasPersistedValue = hasSavedEdit && persistedValue !== undefined;
+		const crdtValue = getCRDTRawAttributeValue(
+			entityConfig,
+			key,
+			crdtRecord
+		);
+
+		const responseIsStaleBaseValue =
+			areRawAttributeValuesEqual( key, responseValue, baseValue ) &&
+			( ! hasPersistedValue ||
+				! areRawAttributeValuesEqual(
+					key,
+					persistedValue,
+					baseValue
+				) );
+		const responseIsStaleSavedEditValue =
+			isPersistedCRDTDocumentSaveResponse &&
+			hasSavedEdit &&
+			! hasResponseSnapshotValue &&
+			areRawAttributeValuesEqual( key, responseValue, editValue ) &&
+			! areRawAttributeValuesEqual( key, crdtValue, responseValue );
+
+		if ( ! responseIsStaleBaseValue && ! responseIsStaleSavedEditValue ) {
+			continue;
+		}
+
+		if ( responseIsStaleSavedEditValue ) {
+			receiveRecord =
+				receiveRecord === updatedRecord
+					? getRecordWithoutKey( updatedRecord, key )
+					: getRecordWithoutKey( receiveRecord, key );
+			syncRecord =
+				syncRecord === updatedRecord
+					? getRecordWithoutKey( updatedRecord, key )
+					: getRecordWithoutKey( syncRecord, key );
+			omitPersistedEdit( key );
+			continue;
+		}
+
+		const crdtMatchesSavedEdit =
+			hasPersistedValue &&
+			hasCRDTValue &&
+			( ( key === 'content' &&
+				doesCRDTBlockContentMatchValue(
+					crdtRecord,
+					persistedValue
+				) ) ||
+				areRawAttributeValuesEqual( key, crdtValue, persistedValue ) );
+		const crdtMatchesStaleResponse =
+			hasCRDTValue &&
+			areRawAttributeValuesEqual( key, crdtValue, responseValue );
+		if ( isPersistedCRDTDocumentSaveResponse && hasPersistedValue ) {
+			if (
+				crdtMatchesSavedEdit ||
+				crdtMatchesStaleResponse ||
+				hasResponseSnapshotValue
+			) {
+				receiveRecord =
+					receiveRecord === updatedRecord
+						? getRecordWithRawAttributeValue(
+								updatedRecord,
+								key,
+								persistedValue
+						  )
+						: getRecordWithRawAttributeValue(
+								receiveRecord,
+								key,
+								persistedValue
+						  );
+				syncRecord =
+					syncRecord === updatedRecord
+						? getRecordWithRawAttributeValue(
+								updatedRecord,
+								key,
+								persistedValue
+						  )
+						: getRecordWithRawAttributeValue(
+								syncRecord,
+								key,
+								persistedValue
+						  );
+				if ( hasResponseSnapshotValue ) {
+					persistedEdits = getRecordWithRawAttributeValue(
+						persistedEdits,
+						key,
+						persistedValue
+					);
+				}
+			} else {
+				receiveRecord =
+					receiveRecord === updatedRecord
+						? getRecordWithoutKey( updatedRecord, key )
+						: getRecordWithoutKey( receiveRecord, key );
+				syncRecord =
+					syncRecord === updatedRecord
+						? getRecordWithoutKey( updatedRecord, key )
+						: getRecordWithoutKey( syncRecord, key );
+				omitPersistedEdit( key );
+			}
+			receiveRecord = getRecordWithPersistedCRDTDocument(
+				receiveRecord,
+				getPersistedCRDTDocument( edits )
+			);
+			syncRecord = getRecordWithPersistedCRDTDocument(
+				syncRecord,
+				getPersistedCRDTDocument( edits )
+			);
+		} else if ( isPersistedCRDTDocumentSaveResponse && ! hasSavedEdit ) {
+			receiveRecord =
+				receiveRecord === updatedRecord
+					? getRecordWithoutKey( updatedRecord, key )
+					: getRecordWithoutKey( receiveRecord, key );
+			syncRecord =
+				syncRecord === updatedRecord
+					? getRecordWithoutKey( updatedRecord, key )
+					: getRecordWithoutKey( syncRecord, key );
+			receiveRecord = getRecordWithPersistedCRDTDocument(
+				receiveRecord,
+				getPersistedCRDTDocument( edits )
+			);
+			syncRecord = getRecordWithPersistedCRDTDocument(
+				syncRecord,
+				getPersistedCRDTDocument( edits )
+			);
+		} else if (
+			! areRawAttributeValuesEqual( key, crdtValue, responseValue )
+		) {
+			syncRecord =
+				syncRecord === updatedRecord
+					? getRecordWithoutKey( updatedRecord, key )
+					: getRecordWithoutKey( syncRecord, key );
+		}
+	}
+
+	return { receiveRecord, syncRecord, persistedEdits };
 }
 
 /**
@@ -454,7 +913,7 @@ export const editEntityRecord =
 				objectId,
 				editsWithMerges,
 				origin,
-				{ isNewUndoLevel }
+				{ baseRecord: editedRecord, isNewUndoLevel }
 			);
 		}
 		if ( ! options.undoIgnore ) {
@@ -577,16 +1036,20 @@ export const __unstableCreateUndoLevel =
 /**
  * Action triggered to save an entity record.
  *
- * @param {string}   kind                         Kind of the received entity.
- * @param {string}   name                         Name of the received entity.
- * @param {Object}   record                       Record to be saved.
- * @param {Object}   options                      Saving options.
- * @param {boolean}  [options.isAutosave=false]   Whether this is an autosave.
- * @param {Function} [options.__unstableFetch]    Internal use only. Function to
- *                                                call instead of `apiFetch()`.
- *                                                Must return a promise.
- * @param {boolean}  [options.throwOnError=false] If false, this action suppresses all
- *                                                the exceptions. Defaults to false.
+ * @param {string}   kind                                     Kind of the received entity.
+ * @param {string}   name                                     Name of the received entity.
+ * @param {Object}   record                                   Record to be saved.
+ * @param {Object}   options                                  Saving options.
+ * @param {boolean}  [options.isAutosave=false]               Whether this is an autosave.
+ * @param {Function} [options.__unstableFetch]                Internal use only. Function to
+ *                                                            call instead of `apiFetch()`.
+ *                                                            Must return a promise.
+ * @param {boolean}  [options.__unstableSkipSyncUpdate=false] Whether to skip
+ *                                                            applying the full
+ *                                                            save response to
+ *                                                            synced entities.
+ * @param {boolean}  [options.throwOnError=false]             If false, this action suppresses all
+ *                                                            the exceptions. Defaults to false.
  */
 export const saveEntityRecord =
 	( kind, name, record, options = {} ) =>
@@ -759,36 +1222,164 @@ export const saveEntityRecord =
 						);
 					}
 				} else {
-					let edits = record;
-					if ( entityConfig.__unstablePrePersist ) {
-						edits = {
-							...edits,
-							...( await entityConfig.__unstablePrePersist(
-								persistedRecord,
-								edits
-							) ),
-						};
+					const prepareEdits = async (
+						baseRecord,
+						recordToPersist
+					) => {
+						let edits = recordToPersist;
+						if ( entityConfig.__unstablePrePersist ) {
+							edits = {
+								...edits,
+								...( await entityConfig.__unstablePrePersist(
+									baseRecord,
+									edits,
+									options
+								) ),
+							};
+						}
+						return edits;
+					};
+
+					let edits = await prepareEdits( persistedRecord, record );
+					let saveResponseBaseRecord = persistedRecord;
+					try {
+						updatedRecord = await __unstableFetch( {
+							path,
+							method: recordId ? 'PUT' : 'POST',
+							data: edits,
+						} );
+					} catch ( _error ) {
+						const syncManager = getSyncManager();
+						if (
+							! recordId ||
+							! entityConfig.syncConfig ||
+							! isStaleCRDTDocumentError( _error ) ||
+							! syncManager?.applyPersistedCRDTDoc
+						) {
+							throw _error;
+						}
+
+						const latestRecordPath = entityConfig.baseURLParams
+							? addQueryArgs( path, entityConfig.baseURLParams )
+							: path;
+						const latestRecord = await __unstableFetch( {
+							path: latestRecordPath,
+						} );
+						dispatch.receiveEntityRecords(
+							kind,
+							name,
+							latestRecord,
+							undefined,
+							true
+						);
+
+						await syncManager.applyPersistedCRDTDoc(
+							`${ kind }/${ name }`,
+							recordId,
+							latestRecord
+						);
+
+						const mergedRecord =
+							select.getEditedEntityRecord?.(
+								kind,
+								name,
+								recordId
+							) || record;
+						edits = await prepareEdits(
+							latestRecord,
+							mergedRecord
+						);
+						saveResponseBaseRecord = latestRecord;
+						updatedRecord = await __unstableFetch( {
+							path,
+							method: 'PUT',
+							data: edits,
+						} );
 					}
-					updatedRecord = await __unstableFetch( {
-						path,
-						method: recordId ? 'PUT' : 'POST',
-						data: edits,
-					} );
+					let receiveRecord = updatedRecord;
+					let syncRecord = updatedRecord;
+					let persistedEdits = edits;
+					let syncManager;
+					const objectType = `${ kind }/${ name }`;
+					if ( entityConfig.syncConfig ) {
+						syncManager = getSyncManager();
+						( { receiveRecord, syncRecord, persistedEdits } =
+							getGuardedSaveResponseRecords(
+								entityConfig,
+								saveResponseBaseRecord,
+								edits,
+								updatedRecord,
+								syncManager,
+								objectType,
+								recordId
+							) );
+					}
+					// CRDT meta persistence saves a partial record, but REST returns
+					// a full post that can carry stale title/content fields.
+					if ( __unstableSkipSyncUpdate ) {
+						receiveRecord = Object.keys( edits ).reduce(
+							( acc, key ) => {
+								if ( key in receiveRecord ) {
+									acc[ key ] = receiveRecord[ key ];
+								} else if (
+									receiveRecord === updatedRecord ||
+									! ( key in updatedRecord )
+								) {
+									acc[ key ] = edits[ key ];
+								}
+								return acc;
+							},
+							recordId ? { [ entityIdKey ]: recordId } : {}
+						);
+					}
+					const shouldHydrateFromSavedCRDTDocument =
+						entityConfig.syncConfig &&
+						! __unstableSkipSyncUpdate &&
+						recordId &&
+						syncManager?.hydrateRecordFromPersistedCRDTDoc &&
+						isSaveResponseForPersistedCRDTDocument(
+							edits,
+							receiveRecord
+						);
+
 					dispatch.receiveEntityRecords(
 						kind,
 						name,
-						updatedRecord,
+						receiveRecord,
 						undefined,
 						true,
-						edits
+						persistedEdits
 					);
-					if ( entityConfig.syncConfig ) {
+					if ( shouldHydrateFromSavedCRDTDocument ) {
+						try {
+							await syncManager.hydrateRecordFromPersistedCRDTDoc(
+								objectType,
+								recordId,
+								receiveRecord
+							);
+						} catch {
+							// The save already succeeded; a hydration failure should not
+							// turn it into an editor-visible save error.
+						}
+					}
+					if (
+						entityConfig.syncConfig &&
+						! __unstableSkipSyncUpdate
+					) {
+						const syncUpdateRecord =
+							shouldHydrateFromSavedCRDTDocument
+								? getRecordWithoutPersistedCRDTDocumentSnapshotRawAttributes(
+										entityConfig,
+										syncRecord
+								  )
+								: syncRecord;
+
 						// Use an untracked origin so that the save
 						// response does not create undo levels.
-						getSyncManager()?.update(
-							`${ kind }/${ name }`,
+						syncManager?.update(
+							objectType,
 							recordId,
-							__unstableSkipSyncUpdate ? {} : updatedRecord,
+							syncUpdateRecord,
 							LOCAL_UNDO_IGNORED_ORIGIN,
 							{ isSave: true }
 						);

@@ -331,6 +331,83 @@ describe( 'crdt-blocks', () => {
 			expect( innerBlock.get( 'name' ) ).toBe( 'core/paragraph' );
 		} );
 
+		it( 'does not duplicate unchanged innerBlocks when parsed clientIds change', () => {
+			const initialBlocks: Block[] = [
+				{
+					name: 'core/group',
+					attributes: {},
+					clientId: 'group-1',
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: 'Nested one' },
+							clientId: 'old-inner-1',
+							innerBlocks: [],
+						},
+						{
+							name: 'core/paragraph',
+							attributes: { content: 'Nested two' },
+							clientId: 'old-inner-2',
+							innerBlocks: [],
+						},
+					],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+
+			const reparsedBlocks: Block[] = [
+				{
+					name: 'core/group',
+					attributes: {},
+					clientId: 'group-1',
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: 'Nested one' },
+							clientId: 'new-inner-1',
+							innerBlocks: [],
+						},
+						{
+							name: 'core/paragraph',
+							attributes: { content: 'Nested two' },
+							clientId: 'new-inner-2',
+							innerBlocks: [],
+						},
+					],
+				},
+			];
+			const baseBlocksWithMissingInnerBlocks: Block[] = [
+				{
+					...reparsedBlocks[ 0 ],
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks(
+				yblocks,
+				reparsedBlocks,
+				null,
+				baseBlocksWithMissingInnerBlocks
+			);
+
+			const innerBlocks = yblocks
+				.get( 0 )
+				.get( 'innerBlocks' ) as YBlocks;
+			expect( innerBlocks.length ).toBe( 2 );
+			expect(
+				innerBlocks
+					.toArray()
+					.map( ( block ) =>
+						(
+							(
+								block.get( 'attributes' ) as YBlockAttributes
+							 ).get( 'content' ) as Y.Text
+						 ).toString()
+					)
+			).toEqual( [ 'Nested one', 'Nested two' ] );
+		} );
+
 		it( 'strips local attributes when syncing blocks', () => {
 			const imageWithBlob: Block[] = [
 				{
@@ -432,6 +509,293 @@ describe( 'crdt-blocks', () => {
 				block1.get( 'attributes' ) as YBlockAttributes
 			 ).get( 'content' ) as Y.Text;
 			expect( content1.toString() ).toBe( 'First' );
+		} );
+
+		it( 'preserves concurrent list item moves by client ID', () => {
+			const createListBlock = ( itemOrder: string[] ): Block[] => [
+				{
+					name: 'core/list',
+					attributes: {},
+					innerBlocks: itemOrder.map( ( item ) => ( {
+						name: 'core/list-item',
+						attributes: { content: `Item ${ item }` },
+						innerBlocks: [],
+						clientId: `item-${ item.toLowerCase() }`,
+					} ) ),
+					clientId: 'list-block',
+				},
+			];
+			const getListItems = ( checkBlocks: YBlocks ): string[] =>
+				( checkBlocks.get( 0 ).get( 'innerBlocks' ) as YBlocks )
+					.toArray()
+					.map( ( item ) =>
+						(
+							(
+								item.get( 'attributes' ) as YBlockAttributes
+							 ).get( 'content' ) as Y.Text
+						 ).toString()
+					);
+			const initialOrder = [
+				'Alpha',
+				'Beta',
+				'Gamma',
+				'Delta',
+				'Epsilon',
+				'Zeta',
+			];
+
+			mergeCrdtBlocks( yblocks, createListBlock( initialOrder ), null );
+
+			const doc2 = new Y.Doc();
+			const yblocks2 = doc2.getArray< YBlock >();
+			Y.applyUpdate( doc2, Y.encodeStateAsUpdate( doc ) );
+
+			mergeCrdtBlocks(
+				yblocks,
+				createListBlock( [
+					'Alpha',
+					'Gamma',
+					'Beta',
+					'Delta',
+					'Epsilon',
+					'Zeta',
+				] ),
+				null
+			);
+			mergeCrdtBlocks(
+				yblocks2,
+				createListBlock( [
+					'Alpha',
+					'Beta',
+					'Gamma',
+					'Epsilon',
+					'Delta',
+					'Zeta',
+				] ),
+				null
+			);
+
+			const updateA = Y.encodeStateAsUpdate( doc );
+			const updateB = Y.encodeStateAsUpdate( doc2 );
+			Y.applyUpdate( doc2, updateA );
+			Y.applyUpdate( doc, updateB );
+
+			for ( const checkBlocks of [ yblocks, yblocks2 ] ) {
+				expect( getListItems( checkBlocks ) ).toEqual( [
+					'Item Alpha',
+					'Item Gamma',
+					'Item Beta',
+					'Item Epsilon',
+					'Item Delta',
+					'Item Zeta',
+				] );
+			}
+
+			doc2.destroy();
+		} );
+
+		it( 'rebases a delayed list item move over a remote list item move', () => {
+			const createListBlock = ( itemOrder: string[] ): Block[] => [
+				{
+					name: 'core/list',
+					attributes: {},
+					innerBlocks: itemOrder.map( ( item ) => ( {
+						name: 'core/list-item',
+						attributes: { content: `Item ${ item }` },
+						innerBlocks: [],
+						clientId: `item-${ item.toLowerCase() }`,
+					} ) ),
+					clientId: 'list-block',
+				},
+			];
+			const getListItems = ( checkBlocks: YBlocks ): string[] =>
+				( checkBlocks.get( 0 ).get( 'innerBlocks' ) as YBlocks )
+					.toArray()
+					.map( ( item ) =>
+						(
+							(
+								item.get( 'attributes' ) as YBlockAttributes
+							 ).get( 'content' ) as Y.Text
+						 ).toString()
+					);
+			const initialBlocks = createListBlock( [
+				'Alpha',
+				'Beta',
+				'Gamma',
+				'Delta',
+				'Epsilon',
+				'Zeta',
+			] );
+
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+			mergeCrdtBlocks(
+				yblocks,
+				createListBlock( [
+					'Alpha',
+					'Beta',
+					'Gamma',
+					'Epsilon',
+					'Delta',
+					'Zeta',
+				] ),
+				null,
+				initialBlocks
+			);
+			mergeCrdtBlocks(
+				yblocks,
+				createListBlock( [
+					'Alpha',
+					'Gamma',
+					'Beta',
+					'Delta',
+					'Epsilon',
+					'Zeta',
+				] ),
+				null,
+				initialBlocks
+			);
+
+			expect( getListItems( yblocks ) ).toEqual( [
+				'Item Alpha',
+				'Item Gamma',
+				'Item Beta',
+				'Item Epsilon',
+				'Item Delta',
+				'Item Zeta',
+			] );
+		} );
+
+		it( 'rebases a delayed list item move when equivalent blocks have different client IDs', () => {
+			const createListBlock = (
+				itemOrder: string[],
+				clientIdPrefix: string
+			): Block[] => [
+				{
+					name: 'core/list',
+					attributes: {},
+					innerBlocks: itemOrder.map( ( item ) => ( {
+						name: 'core/list-item',
+						attributes: { content: `Item ${ item }` },
+						innerBlocks: [],
+						clientId: `${ clientIdPrefix }-${ item.toLowerCase() }`,
+					} ) ),
+					clientId: `${ clientIdPrefix }-list-block`,
+				},
+			];
+			const getListItems = ( checkBlocks: YBlocks ): string[] =>
+				( checkBlocks.get( 0 ).get( 'innerBlocks' ) as YBlocks )
+					.toArray()
+					.map( ( item ) =>
+						(
+							(
+								item.get( 'attributes' ) as YBlockAttributes
+							 ).get( 'content' ) as Y.Text
+						 ).toString()
+					);
+			const initialBlocks = createListBlock(
+				[ 'Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon', 'Zeta' ],
+				'local'
+			);
+
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+			mergeCrdtBlocks(
+				yblocks,
+				createListBlock(
+					[ 'Alpha', 'Gamma', 'Beta', 'Delta', 'Epsilon', 'Zeta' ],
+					'remote'
+				),
+				null
+			);
+			mergeCrdtBlocks(
+				yblocks,
+				createListBlock(
+					[ 'Alpha', 'Beta', 'Gamma', 'Epsilon', 'Delta', 'Zeta' ],
+					'local'
+				),
+				null,
+				initialBlocks
+			);
+
+			expect( getListItems( yblocks ) ).toEqual( [
+				'Item Alpha',
+				'Item Gamma',
+				'Item Beta',
+				'Item Epsilon',
+				'Item Delta',
+				'Item Zeta',
+			] );
+		} );
+
+		it( 'does not overwrite remote list item content while rebasing a delayed move', () => {
+			const createListBlock = (
+				itemOrder: string[],
+				contentByItem: Record< string, string > = {}
+			): Block[] => [
+				{
+					name: 'core/list',
+					attributes: {},
+					innerBlocks: itemOrder.map( ( item ) => ( {
+						name: 'core/list-item',
+						attributes: {
+							content: contentByItem[ item ] ?? `Item ${ item }`,
+						},
+						innerBlocks: [],
+						clientId: `item-${ item.toLowerCase() }`,
+					} ) ),
+					clientId: 'list-block',
+				},
+			];
+			const getListItems = ( checkBlocks: YBlocks ): string[] =>
+				( checkBlocks.get( 0 ).get( 'innerBlocks' ) as YBlocks )
+					.toArray()
+					.map( ( item ) =>
+						(
+							(
+								item.get( 'attributes' ) as YBlockAttributes
+							 ).get( 'content' ) as Y.Text
+						 ).toString()
+					);
+			const initialBlocks = createListBlock( [
+				'Alpha',
+				'Beta',
+				'Gamma',
+				'Delta',
+				'Epsilon',
+				'Zeta',
+			] );
+
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+			mergeCrdtBlocks(
+				yblocks,
+				createListBlock(
+					[ 'Alpha', 'Beta', 'Gamma', 'Epsilon', 'Delta', 'Zeta' ],
+					{ Epsilon: 'Item Epsilon remote edit' }
+				),
+				null,
+				initialBlocks
+			);
+			mergeCrdtBlocks(
+				yblocks,
+				createListBlock( [
+					'Alpha',
+					'Gamma',
+					'Beta',
+					'Delta',
+					'Epsilon',
+					'Zeta',
+				] ),
+				null,
+				initialBlocks
+			);
+
+			expect( getListItems( yblocks ) ).toEqual( [
+				'Item Alpha',
+				'Item Gamma',
+				'Item Beta',
+				'Item Epsilon remote edit',
+				'Item Delta',
+				'Item Zeta',
+			] );
 		} );
 
 		it( 'creates Y.Text for rich-text attributes', () => {
@@ -1899,6 +2263,212 @@ describe( 'crdt-blocks', () => {
 			}
 
 			doc2.destroy();
+		} );
+
+		it( 'preserves a remote-edited duplicate table row when a stale local snapshot deletes the earlier duplicate row', () => {
+			const createTableBlocks = (
+				body: {
+					cells: { content: string; tag: string }[];
+				}[]
+			): Block[] => [
+				{
+					name: 'core/table',
+					clientId: 'table-block',
+					attributes: { body },
+					innerBlocks: [],
+				},
+			];
+			const initialBody = [
+				{
+					cells: [ { content: 'anchor', tag: 'td' } ],
+				},
+				{
+					cells: [ { content: 'same', tag: 'td' } ],
+				},
+				{
+					cells: [ { content: 'same', tag: 'td' } ],
+				},
+			];
+			const initialBlocks = createTableBlocks( initialBody );
+
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+
+			mergeCrdtBlocks(
+				yblocks,
+				createTableBlocks( [
+					{
+						cells: [ { content: 'anchor', tag: 'td' } ],
+					},
+					{
+						cells: [ { content: 'same', tag: 'td' } ],
+					},
+					{
+						cells: [
+							{ content: 'edited-duplicate', tag: 'td' },
+							{ content: 'extra', tag: 'td' },
+						],
+					},
+				] ),
+				null,
+				initialBlocks
+			);
+
+			mergeCrdtBlocks(
+				yblocks,
+				createTableBlocks( [
+					{
+						cells: [ { content: 'anchor', tag: 'td' } ],
+					},
+					{
+						cells: [ { content: 'same', tag: 'td' } ],
+					},
+				] ),
+				null,
+				initialBlocks
+			);
+
+			const attrs = yblocks
+				.get( 0 )
+				.get( 'attributes' ) as YBlockAttributes;
+			const body = (
+				attrs.get( 'body' ) as Y.Array< unknown >
+			 ).toJSON() as { cells: { content: string }[] }[];
+
+			expect( body ).toHaveLength( 2 );
+			expect( body[ 0 ].cells[ 0 ].content ).toBe( 'anchor' );
+			expect( body[ 1 ].cells[ 0 ].content ).toBe( 'edited-duplicate' );
+			expect( body[ 1 ].cells[ 1 ].content ).toBe( 'extra' );
+		} );
+
+		it( 'preserves remote sibling fields when a stale local nested object changes another field', () => {
+			const createTableBlocks = ( cell: {
+				content: string;
+				tag: string;
+			} ): Block[] => [
+				{
+					name: 'core/table',
+					clientId: 'table-block',
+					attributes: {
+						body: [
+							{
+								cells: [ cell ],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+			const initialBlocks = createTableBlocks( {
+				content: 'same',
+				tag: 'td',
+			} );
+
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+
+			mergeCrdtBlocks(
+				yblocks,
+				createTableBlocks( {
+					content: 'edited-remotely',
+					tag: 'td',
+				} ),
+				null,
+				initialBlocks
+			);
+
+			mergeCrdtBlocks(
+				yblocks,
+				createTableBlocks( {
+					content: 'same',
+					tag: 'th',
+				} ),
+				null,
+				initialBlocks
+			);
+
+			const attrs = yblocks
+				.get( 0 )
+				.get( 'attributes' ) as YBlockAttributes;
+			const body = (
+				attrs.get( 'body' ) as Y.Array< unknown >
+			 ).toJSON() as { cells: { content: string; tag: string }[] }[];
+
+			expect( body[ 0 ].cells[ 0 ].content ).toBe( 'edited-remotely' );
+			expect( body[ 0 ].cells[ 0 ].tag ).toBe( 'th' );
+		} );
+
+		it( 'merges local edits made to a remotely inserted table row', () => {
+			const createTableBlocks = (
+				body: {
+					cells: { content: string; tag: string }[];
+				}[]
+			): Block[] => [
+				{
+					name: 'core/table',
+					clientId: 'table-block',
+					attributes: { body },
+					innerBlocks: [],
+				},
+			];
+			const baseBody = [
+				{
+					cells: [
+						{ content: 'base row 1', tag: 'td' },
+						{ content: 'base row 1 sibling', tag: 'td' },
+					],
+				},
+				{
+					cells: [
+						{ content: 'base row 2', tag: 'td' },
+						{ content: 'base row 2 sibling', tag: 'td' },
+					],
+				},
+			];
+			const baseBlocks = createTableBlocks( baseBody );
+
+			mergeCrdtBlocks( yblocks, baseBlocks, null );
+
+			mergeCrdtBlocks(
+				yblocks,
+				createTableBlocks( [
+					...baseBody,
+					{
+						cells: [
+							{ content: 'remote row', tag: 'td' },
+							{ content: 'remote row sibling', tag: 'td' },
+						],
+					},
+				] ),
+				null,
+				baseBlocks
+			);
+
+			mergeCrdtBlocks(
+				yblocks,
+				createTableBlocks( [
+					...baseBody,
+					{
+						cells: [
+							{ content: 'remote row', tag: 'td' },
+							{ content: 'local edit in remote row', tag: 'td' },
+						],
+					},
+				] ),
+				null,
+				baseBlocks
+			);
+
+			const attrs = yblocks
+				.get( 0 )
+				.get( 'attributes' ) as YBlockAttributes;
+			const body = (
+				attrs.get( 'body' ) as Y.Array< unknown >
+			 ).toJSON() as { cells: { content: string; tag: string }[] }[];
+
+			expect( body ).toHaveLength( 3 );
+			expect( body[ 2 ].cells[ 0 ].content ).toBe( 'remote row' );
+			expect( body[ 2 ].cells[ 1 ].content ).toBe(
+				'local edit in remote row'
+			);
 		} );
 
 		it( 'preserves Y.Map identity for untouched rows when a row is appended', () => {

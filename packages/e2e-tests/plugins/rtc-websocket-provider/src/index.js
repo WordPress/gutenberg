@@ -12,6 +12,7 @@ import { WebsocketProvider } from 'y-websocket';
 
 const TEST_PROVIDER_NAMESPACE = 'gutenberg-test/rtc-websocket-provider';
 const DEFAULT_URL = 'ws://127.0.0.1:18991';
+const HAS_PROVIDER_SYNCED_REMOTE_STATE_META = 'hasProviderSyncedRemoteState';
 
 const settings = window.gutenbergTestWebSocketSync || {};
 const globalState = ( window.__gutenbergTestWebSocketSync = {
@@ -37,9 +38,22 @@ function updateDebugState( room, patch ) {
 	globalState.tick += 1;
 }
 
+function areUint8ArraysEqual( a, b ) {
+	if ( a.length !== b.length ) {
+		return false;
+	}
+
+	return a.every( ( value, index ) => value === b[ index ] );
+}
+
 function createWebSocketProvider() {
 	return async ( { awareness, objectType, objectId, ydoc } ) => {
 		const room = objectId ? `${ objectType }:${ objectId }` : objectType;
+		const initialStateVector = window.wp.sync.Y.encodeStateVector( ydoc );
+		let resolveInitialSync;
+		const initialSync = new Promise( ( resolve ) => {
+			resolveInitialSync = resolve;
+		} );
 
 		updateDebugState( room, {
 			clientId: ydoc.clientID,
@@ -76,6 +90,24 @@ function createWebSocketProvider() {
 		// landed and the doc reflects the server state. Tests that need real
 		// convergence should wait on `synced`, not just `status`.
 		const onSync = ( isSynced ) => {
+			if ( isSynced ) {
+				const currentStateVector =
+					window.wp.sync.Y.encodeStateVector( ydoc );
+
+				if (
+					! areUint8ArraysEqual(
+						currentStateVector,
+						initialStateVector
+					)
+				) {
+					ydoc.meta.set(
+						HAS_PROVIDER_SYNCED_REMOTE_STATE_META,
+						true
+					);
+				}
+
+				resolveInitialSync();
+			}
 			updateDebugState( room, { synced: !! isSynced } );
 		};
 		provider.on( 'sync', onSync );
@@ -89,6 +121,8 @@ function createWebSocketProvider() {
 		const awarenessInstance = awareness || provider.awareness;
 		awarenessInstance.on( 'change', onAwarenessChange );
 		onAwarenessChange();
+
+		await initialSync;
 
 		return {
 			destroy: () => {
@@ -104,6 +138,9 @@ function createWebSocketProvider() {
 			on: ( event, callback ) => {
 				if ( event === 'status' ) {
 					statusListeners.add( callback );
+					callback( {
+						status: ensureRoomDebugState( room ).status,
+					} );
 				}
 			},
 		};

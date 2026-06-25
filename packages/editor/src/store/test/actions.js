@@ -3,6 +3,7 @@
  */
 import apiFetch from '@wordpress/api-fetch';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { parse } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 import { createRegistry } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
@@ -13,8 +14,11 @@ import { store as preferencesStore } from '@wordpress/preferences';
  */
 
 import * as actions from '../actions';
+import {
+	restoreRevision,
+	updateDeviceTypeForViewportState,
+} from '../private-actions';
 import { store as editorStore } from '..';
-import { unlock } from '../../lock-unlock';
 
 const postId = 44;
 
@@ -68,11 +72,12 @@ describe( 'Post actions', () => {
 		it( 'updates the editor device type for a viewport state', () => {
 			const registry = createRegistryWithStores();
 
-			unlock(
-				registry.dispatch( editorStore )
-			).updateDeviceTypeForViewportState( {
+			updateDeviceTypeForViewportState( {
 				viewport: '@mobile',
 				showStateOnCanvas: true,
+			} )( {
+				dispatch: registry.dispatch( editorStore ),
+				registry,
 			} );
 
 			expect( registry.select( editorStore ).getDeviceType() ).toBe(
@@ -84,16 +89,85 @@ describe( 'Post actions', () => {
 			const registry = createRegistryWithStores();
 			registry.dispatch( editorStore ).setDeviceType( 'Tablet' );
 
-			unlock(
-				registry.dispatch( editorStore )
-			).updateDeviceTypeForViewportState( {
+			updateDeviceTypeForViewportState( {
 				viewport: '@mobile',
 				showStateOnCanvas: false,
+			} )( {
+				dispatch: registry.dispatch( editorStore ),
+				registry,
 			} );
 
 			expect( registry.select( editorStore ).getDeviceType() ).toBe(
 				'Tablet'
 			);
+		} );
+	} );
+
+	describe( 'restoreRevision()', () => {
+		it( 'restores parsed blocks with the revision content before saving', async () => {
+			const revisionContent = [
+				'<!-- wp:paragraph -->',
+				'<p>Restored old revision.</p>',
+				'<!-- /wp:paragraph -->',
+			].join( '\n' );
+			const revision = {
+				id: 77,
+				date: '2026-05-22T20:15:00',
+				title: { raw: 'Restored title' },
+				excerpt: { raw: 'Restored excerpt' },
+				content: { raw: revisionContent },
+				meta: { key: 'value' },
+			};
+			const getRevision = jest.fn().mockResolvedValue( revision );
+			const createSuccessNotice = jest.fn();
+			const dispatch = {
+				editPost: jest.fn(),
+				savePost: jest.fn(),
+				setCurrentRevisionId: jest.fn(),
+			};
+			const registry = {
+				select: ( store ) => {
+					if ( store === coreStore ) {
+						return {
+							getEntityConfig: () => ( { revisionKey: 'id' } ),
+						};
+					}
+				},
+				resolveSelect: ( store ) => {
+					if ( store === coreStore ) {
+						return { getRevision };
+					}
+				},
+				dispatch: ( store ) => {
+					if ( store === noticesStore ) {
+						return { createSuccessNotice };
+					}
+				},
+			};
+			const select = {
+				getCurrentPostId: () => postId,
+				getCurrentPostType: () => 'post',
+			};
+
+			await restoreRevision( revision.id )( {
+				select,
+				dispatch,
+				registry,
+			} );
+
+			const edits = dispatch.editPost.mock.calls[ 0 ][ 0 ];
+			expect( edits ).toMatchObject( {
+				content: revisionContent,
+				excerpt: 'Restored excerpt',
+				meta: revision.meta,
+				title: 'Restored title',
+			} );
+			expect( Array.isArray( edits.blocks ) ).toBe( true );
+			expect( edits.blocks ).toEqual( parse( revisionContent ) );
+			expect( dispatch.savePost ).toHaveBeenCalledWith( {
+				__unstableIsRevisionRestore: true,
+				__unstableRevisionRestoreEdits: edits,
+			} );
 		} );
 	} );
 
@@ -175,6 +249,64 @@ describe( 'Post actions', () => {
 					content: 'Draft saved.',
 				},
 			] );
+		} );
+
+		it( 'saves explicit revision restore fields', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'newer title',
+				content: 'newer content',
+				excerpt: 'newer excerpt',
+				status: 'draft',
+			};
+			const revisionRestoreEdits = {
+				content: 'older content',
+				excerpt: 'older excerpt',
+				title: 'older title',
+			};
+			let savedData;
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path, data } = options;
+
+				if (
+					method === 'PUT' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` )
+				) {
+					savedData = data;
+					return { ...post, ...data };
+				} else if (
+					method === 'GET' &&
+					path.startsWith( '/wp/v2/types/post' )
+				) {
+					return {
+						json: () => Promise.resolve( {} ),
+					};
+				}
+
+				throw {
+					code: 'unknown_path',
+					message: `Unknown path: ${ method } ${ path }`,
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: 'local current content',
+			} );
+
+			await registry.dispatch( editorStore ).savePost( {
+				__unstableIsRevisionRestore: true,
+				__unstableRevisionRestoreEdits: revisionRestoreEdits,
+			} );
+
+			expect( savedData ).toMatchObject( revisionRestoreEdits );
 		} );
 	} );
 

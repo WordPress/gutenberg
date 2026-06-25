@@ -41,12 +41,7 @@ export function getContainingBlockYMap(
 	while ( current ) {
 		const parent = current.parent;
 
-		if (
-			parent instanceof Y.Map &&
-			parent.parent instanceof Y.Array &&
-			parent.get( 'clientId' ) !== undefined &&
-			parent.get( 'innerBlocks' ) instanceof Y.Array
-		) {
+		if ( parent instanceof Y.Map && getBlockPathInYdoc( parent ) ) {
 			return parent;
 		}
 
@@ -93,19 +88,27 @@ export function getBlockPathInYdoc(
 
 		path.unshift( index );
 
-		// Walk up: is the parent array's parent a block Y.Map or the root?
-		const grandparent = parentArray.parent;
-		if (
-			grandparent instanceof Y.Map &&
-			grandparent.get( 'clientId' ) !== undefined
-		) {
-			current = grandparent; // It's a block, keep going.
-		} else {
-			break; // It's the root map, done.
+		const owner = parentArray.parent;
+		if ( ! ( owner instanceof Y.Map ) ) {
+			return null;
 		}
+
+		if ( ! owner.parent && owner.get( 'blocks' ) === parentArray ) {
+			return path;
+		}
+
+		if (
+			owner.get( 'innerBlocks' ) === parentArray &&
+			owner.get( 'clientId' ) !== undefined
+		) {
+			current = owner;
+			continue;
+		}
+
+		return null;
 	}
 
-	return path;
+	return null;
 }
 
 /**

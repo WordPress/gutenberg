@@ -27,7 +27,8 @@ interface OverlayContext {
 /** Selection rects and the resolved block element for a single-block selection. */
 interface SingleBlockResult {
 	rects: SelectionRect[];
-	blockElement: HTMLElement | null;
+	startElement: HTMLElement | null;
+	endElement: HTMLElement | null;
 }
 
 /** Selection rects and the resolved block elements for a multi-block selection. */
@@ -51,8 +52,9 @@ export interface SelectionVisual {
  * matching `data-wp-block-attribute-key` inside the block. This is what makes
  * cursor placement work for blocks with multiple RichText fields (e.g.
  * `core/table` cells: `body.0.cells.0.content`, etc.). Falls back to the
- * block element when `attributeKey` is missing (WholeBlock selections,
- * older senders, or DOM lookup miss).
+ * block element only when `attributeKey` is missing (WholeBlock selections
+ * or older senders). Keyed selections must resolve to the exact RichText
+ * target because their offsets are local to that target.
  *
  * @param editorDocument    - The editor document.
  * @param resolvedSelection - The resolved selection.
@@ -66,19 +68,36 @@ function resolveTargetElement(
 		return null;
 	}
 
-	const blockElement = editorDocument.querySelector< HTMLElement >(
-		`[data-block="${ resolvedSelection.localClientId }"]`
+	const blockElement = Array.from(
+		editorDocument.querySelectorAll< HTMLElement >( '[data-block]' )
+	).find(
+		( element ) =>
+			element.getAttribute( 'data-block' ) ===
+			resolvedSelection.localClientId
 	);
 
 	if ( ! blockElement || ! resolvedSelection.attributeKey ) {
+		return blockElement ?? null;
+	}
+
+	if (
+		blockElement.getAttribute( 'data-wp-block-attribute-key' ) ===
+		resolvedSelection.attributeKey
+	) {
 		return blockElement;
 	}
 
-	const attrKey = CSS.escape( resolvedSelection.attributeKey );
 	return (
-		blockElement.querySelector< HTMLElement >(
-			`[data-wp-block-attribute-key="${ attrKey }"]`
-		) ?? blockElement
+		Array.from(
+			blockElement.querySelectorAll< HTMLElement >(
+				'[data-wp-block-attribute-key]'
+			)
+		).find(
+			( element ) =>
+				element.getAttribute( 'data-wp-block-attribute-key' ) ===
+					resolvedSelection.attributeKey &&
+				element.closest( '[data-block]' ) === blockElement
+		) ?? null
 	);
 }
 
@@ -126,13 +145,17 @@ function computeCursorOnly(
 	start: ResolvedSelection,
 	overlayContext: OverlayContext
 ): SelectionVisual {
-	if ( ! start.localClientId ) {
+	if ( ! start.localClientId || start.richTextOffset === null ) {
 		return {};
 	}
 	const targetElement = resolveTargetElement(
 		overlayContext.editorDocument,
 		start
 	);
+	if ( ! targetElement ) {
+		return {};
+	}
+
 	return {
 		coords: getCursorPosition(
 			start.richTextOffset,
@@ -178,8 +201,7 @@ function computeTextSelection(
 	if ( selection.type === SelectionType.SelectionInOneBlock ) {
 		const result = computeSingleBlockRects( start, end, overlayContext );
 		allRects = result.rects;
-		// Single block: start and end share the same block element.
-		activeEndBlock = result.blockElement;
+		activeEndBlock = isReverse ? result.startElement : result.endElement;
 	} else {
 		const result = computeMultiBlockRects( start, end, overlayContext );
 		allRects = result.rects;
@@ -207,6 +229,9 @@ function computeTextSelection(
 		overlayContext.editorDocument,
 		start
 	);
+	if ( ! startBlock ) {
+		return {};
+	}
 
 	return {
 		coords: getCursorPosition(
@@ -231,28 +256,117 @@ function computeSingleBlockRects(
 	end: ResolvedSelection,
 	overlayContext: OverlayContext
 ): SingleBlockResult {
-	const blockElement = resolveTargetElement(
+	const startElement = resolveTargetElement(
 		overlayContext.editorDocument,
 		start
 	);
+	const endElement = resolveTargetElement(
+		overlayContext.editorDocument,
+		end
+	);
 	if (
-		! blockElement ||
+		! startElement ||
+		! endElement ||
 		start.richTextOffset === null ||
 		end.richTextOffset === null
 	) {
-		return { rects: [], blockElement: null };
+		return { rects: [], startElement: null, endElement: null };
 	}
+
+	if ( startElement === endElement ) {
+		return {
+			rects:
+				getSelectionRects(
+					startElement,
+					start.richTextOffset,
+					end.richTextOffset,
+					overlayContext.editorDocument,
+					overlayContext.overlayRect
+				) ?? [],
+			startElement,
+			endElement,
+		};
+	}
+
+	const startIsAfterEnd = isNodeBefore( endElement, startElement );
+	const firstElement = startIsAfterEnd ? endElement : startElement;
+	const lastElement = startIsAfterEnd ? startElement : endElement;
+	const firstOffset = startIsAfterEnd
+		? end.richTextOffset
+		: start.richTextOffset;
+	const lastOffset = startIsAfterEnd
+		? start.richTextOffset
+		: end.richTextOffset;
+	const allRects: SelectionRect[] = [];
+	const firstRects = getSelectionRects(
+		firstElement,
+		firstOffset,
+		Number.MAX_SAFE_INTEGER,
+		overlayContext.editorDocument,
+		overlayContext.overlayRect
+	);
+	if ( firstRects ) {
+		allRects.push( ...firstRects );
+	}
+
+	for ( const intermediateElement of getRichTextElementsBetween(
+		firstElement,
+		lastElement
+	) ) {
+		const intermediateRects = getSelectionRects(
+			intermediateElement,
+			0,
+			Number.MAX_SAFE_INTEGER,
+			overlayContext.editorDocument,
+			overlayContext.overlayRect
+		);
+		if ( intermediateRects ) {
+			allRects.push( ...intermediateRects );
+		}
+	}
+
+	const lastRects = getSelectionRects(
+		lastElement,
+		0,
+		lastOffset,
+		overlayContext.editorDocument,
+		overlayContext.overlayRect
+	);
+	if ( lastRects ) {
+		allRects.push( ...lastRects );
+	}
+
 	return {
-		rects:
-			getSelectionRects(
-				blockElement,
-				start.richTextOffset,
-				end.richTextOffset,
-				overlayContext.editorDocument,
-				overlayContext.overlayRect
-			) ?? [],
-		blockElement,
+		rects: allRects,
+		startElement,
+		endElement,
 	};
+}
+
+function getRichTextElementsBetween(
+	firstElement: HTMLElement,
+	lastElement: HTMLElement
+): HTMLElement[] {
+	const blockElement = firstElement.closest( '[data-block]' );
+	if (
+		! blockElement ||
+		blockElement !== lastElement.closest( '[data-block]' )
+	) {
+		return [];
+	}
+
+	return Array.from(
+		blockElement.querySelectorAll< HTMLElement >(
+			'[data-wp-block-attribute-key]'
+		)
+	).filter(
+		( element ) =>
+			element !== firstElement &&
+			element !== lastElement &&
+			element.closest( '[data-block]' ) === blockElement &&
+			isNodeBefore( firstElement, element ) &&
+			isNodeBefore( element, lastElement )
+	);
 }
 
 /**

@@ -203,6 +203,23 @@ export const savePost =
 				),
 			content,
 		};
+		const revisionRestoreEdits = options.__unstableRevisionRestoreEdits;
+		if (
+			options.__unstableIsRevisionRestore &&
+			revisionRestoreEdits &&
+			typeof revisionRestoreEdits === 'object'
+		) {
+			for ( const key of [ 'content', 'title', 'excerpt', 'meta' ] ) {
+				if (
+					Object.prototype.hasOwnProperty.call(
+						revisionRestoreEdits,
+						key
+					)
+				) {
+					edits[ key ] = revisionRestoreEdits[ key ];
+				}
+			}
+		}
 		dispatch( { type: 'REQUEST_POST_UPDATE_START', options } );
 
 		let error = false;

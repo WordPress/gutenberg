@@ -22,6 +22,8 @@ import {
 import { STORE_NAME as coreStore } from '../name';
 import {
 	asHtmlStringIndex,
+	getAttributeKeyForYText,
+	getYTextByAttributeKey,
 	htmlIndexToRichTextOffset,
 } from '../utils/crdt-utils';
 import {
@@ -312,6 +314,36 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 		const localClientId = path
 			? resolveBlockClientIdByPath( path, blocks )
 			: null;
+		const attributes = yType?.get( 'attributes' );
+		let attributeKey: string | null = null;
+
+		if (
+			attributes instanceof Y.Map &&
+			absolutePosition.type instanceof Y.Text
+		) {
+			attributeKey = getAttributeKeyForYText(
+				attributes,
+				absolutePosition.type
+			);
+
+			const senderAttributeKey = cursorPos.attributeKey;
+			if (
+				! attributeKey &&
+				senderAttributeKey &&
+				getYTextByAttributeKey( attributes, senderAttributeKey ) ===
+					absolutePosition.type
+			) {
+				attributeKey = senderAttributeKey;
+			}
+		}
+
+		if ( ! localClientId || ! attributeKey ) {
+			return {
+				richTextOffset: null,
+				localClientId: null,
+				attributeKey: null,
+			};
+		}
 
 		return {
 			richTextOffset: htmlIndexToRichTextOffset(
@@ -319,7 +351,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 				asHtmlStringIndex( absolutePosition.index )
 			),
 			localClientId,
-			attributeKey: cursorPos.attributeKey ?? null,
+			attributeKey,
 		};
 	}
 

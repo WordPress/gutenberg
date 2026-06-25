@@ -15,11 +15,26 @@ import {
 	CRDT_STATE_MAP_SAVED_BY_KEY as SAVED_BY_KEY,
 	CRDT_STATE_MAP_VERSION_KEY as VERSION_KEY,
 } from './config';
-import type { CRDTDoc } from './types';
+import type { CRDTDoc, ObjectData } from './types';
 
 // An object representation of CRDT document metadata.
 type DocumentMeta = Record< string, DocumentMetaValue >;
 type DocumentMetaValue = boolean | number | string;
+
+interface SerializedCrdtDoc {
+	baseVersion?: string;
+	baseRecordSnapshot?: ObjectData;
+	document: string;
+	recordSnapshot?: ObjectData;
+	updateId?: number;
+	version?: string;
+}
+
+interface SerializeCrdtDocOptions {
+	baseVersion?: string | null;
+	baseRecordSnapshot?: ObjectData | null;
+	recordSnapshot?: ObjectData | null;
+}
 
 /**
  * Creates a new Y.Doc instance with the given document metadata.
@@ -67,18 +82,123 @@ function pseudoRandomID(): number {
 	return Math.floor( Math.random() * 1000000000 );
 }
 
-export function serializeCrdtDoc( crdtDoc: CRDTDoc ): string {
-	return JSON.stringify( {
-		document: buffer.toBase64( Y.encodeStateAsUpdateV2( crdtDoc ) ),
+function toUint32Hex( value: number ): string {
+	return ( value >>> 0 ).toString( 16 ).padStart( 8, '0' );
+}
+
+function getPersistedCrdtDocDocumentVersion( document: string ): string {
+	let hashA = 0x811c9dc5;
+	let hashB = 0x811c9dc5 ^ 0x9e3779b9;
+
+	for ( let i = 0; i < document.length; i++ ) {
+		const charCode = document.charCodeAt( i );
+		hashA = Math.imul( hashA ^ charCode, 0x01000193 );
+		hashB = Math.imul( hashB ^ charCode ^ ( i & 0xff ), 0x01000193 );
+	}
+
+	return `document:${ document.length }:${ toUint32Hex(
+		hashA
+	) }${ toUint32Hex( hashB ) }`;
+}
+
+function parseSerializedCrdtDoc(
+	serializedCrdtDoc: string
+): SerializedCrdtDoc | null {
+	try {
+		const parsed = JSON.parse( serializedCrdtDoc );
+
+		if ( typeof parsed?.document !== 'string' ) {
+			return null;
+		}
+
+		return parsed;
+	} catch {
+		return null;
+	}
+}
+
+function isObjectData( value: unknown ): value is ObjectData {
+	return (
+		'object' === typeof value && null !== value && ! Array.isArray( value )
+	);
+}
+
+export function getPersistedCrdtDocVersion(
+	serializedCrdtDoc: string | null | undefined
+): string | null {
+	if ( ! serializedCrdtDoc ) {
+		return null;
+	}
+
+	const parsed = parseSerializedCrdtDoc( serializedCrdtDoc );
+	return parsed
+		? getPersistedCrdtDocDocumentVersion( parsed.document )
+		: null;
+}
+
+export function getPersistedCrdtDocRecordSnapshot(
+	serializedCrdtDoc: string | null | undefined
+): ObjectData | null {
+	if ( ! serializedCrdtDoc ) {
+		return null;
+	}
+
+	const parsed = parseSerializedCrdtDoc( serializedCrdtDoc );
+	return parsed && isObjectData( parsed.recordSnapshot )
+		? parsed.recordSnapshot
+		: null;
+}
+
+export function getPersistedCrdtDocBaseRecordSnapshot(
+	serializedCrdtDoc: string | null | undefined
+): ObjectData | null {
+	if ( ! serializedCrdtDoc ) {
+		return null;
+	}
+
+	const parsed = parseSerializedCrdtDoc( serializedCrdtDoc );
+	return parsed && isObjectData( parsed.baseRecordSnapshot )
+		? parsed.baseRecordSnapshot
+		: null;
+}
+
+export function serializeCrdtDoc(
+	crdtDoc: CRDTDoc,
+	options: SerializeCrdtDocOptions = {}
+): string {
+	const document = buffer.toBase64( Y.encodeStateAsUpdateV2( crdtDoc ) );
+	const serialized: SerializedCrdtDoc = {
+		document,
 		updateId: pseudoRandomID(), // helps with debugging
-	} );
+		version: getPersistedCrdtDocDocumentVersion( document ),
+	};
+
+	if ( options.baseVersion ) {
+		serialized.baseVersion = options.baseVersion;
+	}
+
+	if ( options.baseRecordSnapshot ) {
+		serialized.baseRecordSnapshot = options.baseRecordSnapshot;
+	}
+
+	if ( options.recordSnapshot ) {
+		serialized.recordSnapshot = options.recordSnapshot;
+	}
+
+	return JSON.stringify( serialized );
 }
 
 export function deserializeCrdtDoc(
 	serializedCrdtDoc: string
 ): CRDTDoc | null {
 	try {
-		const { document } = JSON.parse( serializedCrdtDoc );
+		const parsed = parseSerializedCrdtDoc( serializedCrdtDoc );
+
+		if ( ! parsed ) {
+			return null;
+		}
+
+		const { document } = parsed;
 
 		// Mark this document as from persistence.
 		const docMeta: DocumentMeta = {

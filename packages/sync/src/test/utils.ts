@@ -10,6 +10,7 @@ import { describe, expect, it, beforeEach } from '@jest/globals';
  */
 import {
 	createYjsDoc,
+	getPersistedCrdtDocVersion,
 	initializeYjsDoc,
 	markEntityAsSaved,
 	serializeCrdtDoc,
@@ -142,8 +143,37 @@ describe( 'utils', () => {
 			const parsed = JSON.parse( serialized );
 
 			expect( parsed ).toHaveProperty( 'document' );
+			expect( parsed ).toHaveProperty( 'version' );
 			expect( typeof parsed.document ).toBe( 'string' );
+			expect( typeof parsed.version ).toBe( 'string' );
 			expect( parsed.document.length ).toBeGreaterThan( 0 );
+			expect( parsed.version ).toBe(
+				getPersistedCrdtDocVersion( serialized )
+			);
+		} );
+
+		it( 'serializes the base version of the known server document', () => {
+			const baseDoc = createYjsDoc();
+			baseDoc.getMap( 'testMap' ).set( 'title', 'Base Title' );
+			const baseSerialized = serializeCrdtDoc( baseDoc );
+			const baseVersion = getPersistedCrdtDocVersion( baseSerialized );
+
+			const serialized = serializeCrdtDoc( testDoc, { baseVersion } );
+			const parsed = JSON.parse( serialized );
+
+			expect( parsed.baseVersion ).toBe( baseVersion );
+		} );
+
+		it( 'changes the version when the document changes', () => {
+			const firstSerialized = serializeCrdtDoc( testDoc );
+			const firstVersion = getPersistedCrdtDocVersion( firstSerialized );
+
+			testDoc.getMap( 'testMap' ).set( 'title', 'Changed Title' );
+			const secondSerialized = serializeCrdtDoc( testDoc );
+			const secondVersion =
+				getPersistedCrdtDocVersion( secondSerialized );
+
+			expect( secondVersion ).not.toBe( firstVersion );
 		} );
 	} );
 

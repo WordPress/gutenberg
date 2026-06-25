@@ -14,6 +14,26 @@ import { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
  */
 import { setupRtcWebSocketProvider } from './rtc-websocket-setup';
 
+function isMissingPluginError( error: unknown, slug: string ) {
+	const message =
+		error instanceof Error ? error.message : String( error ?? '' );
+
+	return message.includes( `The plugin "${ slug }" isn't installed` );
+}
+
+async function deactivatePluginIfInstalled(
+	requestUtils: RequestUtils,
+	slug: string
+) {
+	try {
+		await requestUtils.deactivatePlugin( slug );
+	} catch ( error ) {
+		if ( ! isMissingPluginError( error, slug ) ) {
+			throw error;
+		}
+	}
+}
+
 async function globalSetup( config: FullConfig ) {
 	const { storageState, baseURL } = config.projects[ 0 ].use;
 	const storageStatePath =
@@ -35,7 +55,8 @@ async function globalSetup( config: FullConfig ) {
 		requestUtils.activateTheme( 'twentytwentyone' ),
 		// Disable this test plugin as it's conflicting with some of the tests.
 		// We already have reduced motion enabled and Playwright will wait for most of the animations anyway.
-		requestUtils.deactivatePlugin(
+		deactivatePluginIfInstalled(
+			requestUtils,
 			'gutenberg-test-plugin-disables-the-css-animations'
 		),
 		requestUtils.deleteAllPosts(),

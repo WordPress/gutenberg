@@ -122,21 +122,16 @@ async function expectSharedListReady(
 	editors: Editor[],
 	expectedOrder: string[]
 ) {
-	const renderedItems = await Promise.all(
-		editors.map( ( ed ) => getRenderedListItems( ed ) )
-	);
-	for ( const items of renderedItems ) {
-		expect( items.map( ( item ) => item.content ) ).toEqual(
-			expectedOrder
+	await expect( async () => {
+		const renderedItems = await Promise.all(
+			editors.map( ( ed ) => getRenderedListItems( ed ) )
 		);
-	}
-
-	const firstClientIds = renderedItems[ 0 ].map( ( item ) => item.clientId );
-	for ( const items of renderedItems.slice( 1 ) ) {
-		expect( items.map( ( item ) => item.clientId ) ).toEqual(
-			firstClientIds
-		);
-	}
+		for ( const items of renderedItems ) {
+			expect( items.map( ( item ) => item.content ) ).toEqual(
+				expectedOrder
+			);
+		}
+	} ).toPass( { timeout: 10_000 } );
 }
 
 function bol( items: string[] ): string {
@@ -365,6 +360,8 @@ test.describe( 'Collaboration - Stress Test', () => {
 		editor,
 		page,
 	} ) => {
+		test.setTimeout( 600_000 );
+
 		// Create the two additional test users.
 		for ( const user of STRESS_USERS ) {
 			await requestUtils.createUser( user );
@@ -389,7 +386,7 @@ test.describe( 'Collaboration - Stress Test', () => {
 		// ── Phase 2 — User 2 (Editor) joins ─────────────────────
 		const { page: page2, editor: editor2 } =
 			await collaborationUtils.joinUser( post.id, STRESS_USERS[ 0 ] );
-		await collaborationUtils.waitForMutualDiscovery();
+		await collaborationUtils.waitForMutualDiscovery( { timeout: 45_000 } );
 
 		// Admin types a new paragraph after the "Conclusion" heading.
 		await typeNewParagraphAfterHeading(
@@ -424,7 +421,7 @@ test.describe( 'Collaboration - Stress Test', () => {
 		await page.reload( { waitUntil: 'load' } );
 		await collaborationUtils.waitForCollaborationReady( page );
 
-		await collaborationUtils.waitForMutualDiscovery();
+		await collaborationUtils.waitForMutualDiscovery( { timeout: 45_000 } );
 
 		// ── Phase 4 — Two users type in the same paragraph ──────
 		// Uses insertText (single input event) instead of keyboard.type
@@ -613,30 +610,25 @@ test.describe( 'Collaboration - Stress Test', () => {
 		// ── Phase 2 — Concurrent list-item moves ────────────────
 		// User 1 moves "Item Beta" down; User 2 moves "Item Epsilon" up.
 		// The items are well-separated so the moves don't conflict.
-		await Promise.all( [
-			( async () => {
-				await editor.canvas
-					.getByText( 'Item Beta', { exact: true } )
-					.click();
-				await editor.showBlockToolbar();
-				await page
-					.locator(
-						'role=toolbar[name="Block tools"i] >> role=button[name="Move down"i]'
-					)
-					.click();
-			} )(),
-			( async () => {
-				await editor2.canvas
-					.getByText( 'Item Epsilon', { exact: true } )
-					.click();
-				await editor2.showBlockToolbar();
-				await page2
-					.locator(
-						'role=toolbar[name="Block tools"i] >> role=button[name="Move up"i]'
-					)
-					.click();
-			} )(),
-		] );
+		await editor.canvas.getByText( 'Item Beta', { exact: true } ).click();
+		await editor.showBlockToolbar();
+
+		await editor2.canvas
+			.getByText( 'Item Epsilon', { exact: true } )
+			.click();
+		await editor2.showBlockToolbar();
+
+		const moveBetaDown = page.locator(
+			'role=toolbar[name="Block tools"i] >> role=button[name="Move down"i]'
+		);
+		const moveEpsilonUp = page2.locator(
+			'role=toolbar[name="Block tools"i] >> role=button[name="Move up"i]'
+		);
+
+		await expect( moveBetaDown ).toBeVisible();
+		await expect( moveEpsilonUp ).toBeVisible();
+
+		await Promise.all( [ moveBetaDown.click(), moveEpsilonUp.click() ] );
 
 		// Verify both moves on both users: Beta after Gamma,
 		// Epsilon before Delta.

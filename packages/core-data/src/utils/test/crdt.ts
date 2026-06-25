@@ -2,17 +2,22 @@
  * WordPress dependencies
  */
 import { Y } from '@wordpress/sync';
+import type { Block as WPBlock } from '@wordpress/blocks';
 
 /**
  * External dependencies
  */
-import { describe, expect, it, jest, beforeEach } from '@jest/globals';
+import {
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	jest,
+} from '@jest/globals';
 
 /**
  * Mock getBlockTypes so CRDT merging can identify rich-text attributes.
- * Also stub __unstableSerializeAndClean so we can assert how it's invoked
- * (the real implementation returns "" without registered block types, which
- * isn't useful for asserting closure-capture behavior).
  */
 jest.mock( '@wordpress/blocks', () => {
 	const actual = jest.requireActual( '@wordpress/blocks' ) as Record<
@@ -24,6 +29,10 @@ jest.mock( '@wordpress/blocks', () => {
 		getBlockTypes: () => [
 			{
 				name: 'core/paragraph',
+				attributes: { content: { type: 'rich-text' } },
+			},
+			{
+				name: 'core/heading',
 				attributes: { content: { type: 'rich-text' } },
 			},
 			{
@@ -46,25 +55,30 @@ jest.mock( '@wordpress/blocks', () => {
 				},
 			},
 		],
-		// Mocked so tests can control what the Code Editor sync path "parses"
-		// from raw content without needing real block-type registration.
-		parse: jest.fn( () => [] ),
-		__unstableSerializeAndClean: jest.fn(
-			( blocks: unknown[] ) => `serialized:${ blocks?.length ?? 0 }`
-		),
 	};
 } );
 
-/**
- * WordPress dependencies
- */
-import { parse } from '@wordpress/blocks';
+jest.mock( '@wordpress/block-editor', () => ( {
+	store: { name: 'core/block-editor' },
+} ) );
+
+const {
+	__unstableSerializeAndClean,
+	getBlockType,
+	parse,
+	registerBlockType,
+	unregisterBlockType,
+} = jest.requireActual(
+	'@wordpress/blocks'
+) as typeof import('@wordpress/blocks');
+
+import { createElement, RawHTML } from '@wordpress/element';
 import { RichTextData } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
  */
-import { CRDT_RECORD_MAP_KEY } from '../../sync';
+import { CRDT_DOC_META_PERSISTENCE_KEY, CRDT_RECORD_MAP_KEY } from '../../sync';
 import {
 	applyPostChangesToCRDTDoc,
 	defaultCollectionSyncConfig,
@@ -77,6 +91,81 @@ import type { Block, YBlock, YBlockRecord, YBlocks } from '../crdt-blocks';
 import { updateSelectionHistory } from '../crdt-selection';
 import { createYMap, getRootMap, type YMapWrap } from '../crdt-utils';
 import type { Post } from '../../entity-types';
+
+type ConsoleMatcherExpect = ( actual: Console ) => {
+	toHaveErrored: () => void;
+	toHaveWarned: () => void;
+};
+
+const expectConsole = expect as unknown as ConsoleMatcherExpect;
+
+function serializeBlocksForTest( blocks: Block[] | WPBlock[] ): string {
+	return __unstableSerializeAndClean( blocks as unknown as WPBlock[] ).trim();
+}
+
+function renderRichTextValue( value?: string | RichTextData ): string {
+	return typeof value === 'string' ? value : value?.toHTMLString() ?? '';
+}
+
+function registerEntityReferenceBlocks() {
+	registerBlockType( 'core/paragraph', {
+		apiVersion: 3,
+		category: 'text',
+		title: 'Paragraph',
+		attributes: {
+			content: {
+				type: 'rich-text',
+				source: 'rich-text',
+				selector: 'p',
+			},
+		},
+		save: ( {
+			attributes,
+		}: {
+			attributes: { content?: string | RichTextData };
+		} ) =>
+			createElement(
+				'p',
+				null,
+				createElement(
+					RawHTML,
+					null,
+					renderRichTextValue( attributes.content )
+				)
+			),
+	} );
+
+	registerBlockType( 'core/heading', {
+		apiVersion: 3,
+		category: 'text',
+		title: 'Heading',
+		attributes: {
+			content: {
+				type: 'rich-text',
+				source: 'rich-text',
+				selector: 'h1,h2,h3,h4,h5,h6',
+			},
+			level: {
+				type: 'number',
+				default: 2,
+			},
+		},
+		save: ( {
+			attributes,
+		}: {
+			attributes: { content?: string | RichTextData; level?: number };
+		} ) =>
+			createElement(
+				`h${ attributes.level ?? 2 }`,
+				null,
+				createElement(
+					RawHTML,
+					null,
+					renderRichTextValue( attributes.content )
+				)
+			),
+	} );
+}
 
 // Default synced properties matching the base set built in entities.js,
 // plus 'categories' and 'tags' as example taxonomy rest_base values.
@@ -134,15 +223,17 @@ describe( 'crdt', () => {
 	let doc: Y.Doc;
 
 	beforeEach( () => {
-		doc = new Y.Doc();
+		doc = new Y.Doc( { meta: new Map() } );
 		jest.clearAllMocks();
-		jest.useFakeTimers();
 	} );
 
 	afterEach( () => {
-		jest.runAllTimers();
-		jest.useRealTimers();
 		doc.destroy();
+		for ( const blockName of [ 'core/paragraph', 'core/heading' ] ) {
+			if ( getBlockType( blockName ) ) {
+				unregisterBlockType( blockName );
+			}
+		}
 	} );
 
 	describe( 'applyPostChangesToCRDTDoc', () => {
@@ -288,6 +379,171 @@ describe( 'crdt', () => {
 			);
 		} );
 
+		it( 'rebases local block insertions when the CRDT has remote changes since the last local snapshot', () => {
+			const initialBlocks = [
+				{
+					name: 'core/paragraph',
+					clientId: 'existing-client-id',
+					attributes: { content: 'Initial content' },
+					innerBlocks: [],
+				},
+			];
+			applyPostChangesToCRDTDoc(
+				doc,
+				{ blocks: initialBlocks },
+				defaultSyncedProperties
+			);
+
+			const yblocks = map.get( 'blocks' ) as YBlocks;
+			const attributes = yblocks
+				.get( 0 )
+				.get( 'attributes' ) as Y.Map< unknown >;
+			const content = attributes.get( 'content' ) as Y.Text;
+			content.delete( 0, content.length );
+			content.insert( 0, 'Remote content' );
+
+			applyPostChangesToCRDTDoc(
+				doc,
+				{
+					blocks: [
+						{
+							...initialBlocks[ 0 ],
+							attributes: { content: 'Remote content' },
+						},
+						{
+							name: 'core/paragraph',
+							clientId: 'inserted-client-id',
+							attributes: {
+								content: 'rtc-save-paragraph-marker',
+							},
+							innerBlocks: [],
+						},
+					],
+				},
+				defaultSyncedProperties
+			);
+
+			expect( yblocks.toJSON() ).toEqual( [
+				{
+					...initialBlocks[ 0 ],
+					attributes: { content: 'Remote content' },
+				},
+				{
+					name: 'core/paragraph',
+					clientId: 'inserted-client-id',
+					attributes: {
+						content: 'rtc-save-paragraph-marker',
+					},
+					innerBlocks: [],
+				},
+			] );
+		} );
+
+		it( 'rebases local block deletions when the CRDT has remote changes since the last local snapshot', () => {
+			const initialBlocks = [
+				{
+					name: 'core/paragraph',
+					clientId: 'existing-client-id',
+					attributes: { content: 'Initial content' },
+					innerBlocks: [],
+				},
+				{
+					name: 'core/paragraph',
+					clientId: 'deleted-client-id',
+					attributes: {
+						content: 'rtc-save-paragraph-marker',
+					},
+					innerBlocks: [],
+				},
+			];
+			applyPostChangesToCRDTDoc(
+				doc,
+				{ blocks: initialBlocks },
+				defaultSyncedProperties
+			);
+
+			const yblocks = map.get( 'blocks' ) as YBlocks;
+			const attributes = yblocks
+				.get( 0 )
+				.get( 'attributes' ) as Y.Map< unknown >;
+			const content = attributes.get( 'content' ) as Y.Text;
+			content.delete( 0, content.length );
+			content.insert( 0, 'Remote content' );
+
+			applyPostChangesToCRDTDoc(
+				doc,
+				{
+					blocks: [
+						{
+							...initialBlocks[ 0 ],
+							attributes: { content: 'Remote content' },
+						},
+					],
+				},
+				defaultSyncedProperties
+			);
+
+			expect( yblocks.toJSON() ).toEqual( [
+				{
+					...initialBlocks[ 0 ],
+					attributes: { content: 'Remote content' },
+				},
+			] );
+		} );
+
+		it( 'converges duplicate table row edit/delete through the post changes wrapper', () => {
+			const docB = new Y.Doc();
+
+			try {
+				applyPostChangesToCRDTDoc(
+					doc,
+					{
+						blocks: [
+							createTableBlock( [ 'anchor', 'same', 'same' ] ),
+						],
+					},
+					defaultSyncedProperties
+				);
+				Y.applyUpdate( docB, Y.encodeStateAsUpdate( doc ) );
+
+				const stateVectorA = Y.encodeStateVector( doc );
+				const stateVectorB = Y.encodeStateVector( docB );
+				const runtimeBlocksA = getRuntimeBlocksFromDoc( doc );
+				const runtimeBlocksB = getRuntimeBlocksFromDoc( docB );
+
+				getRuntimeTableBody( runtimeBlocksA )[ 2 ].cells[ 0 ].content =
+					'edited-second-duplicate';
+				getRuntimeTableBody( runtimeBlocksB ).splice( 1, 1 );
+
+				applyPostChangesToCRDTDoc(
+					doc,
+					{ blocks: runtimeBlocksA },
+					defaultSyncedProperties
+				);
+				applyPostChangesToCRDTDoc(
+					docB,
+					{ blocks: runtimeBlocksB },
+					defaultSyncedProperties
+				);
+
+				const updateA = Y.encodeStateAsUpdate( doc, stateVectorB );
+				const updateB = Y.encodeStateAsUpdate( docB, stateVectorA );
+				Y.applyUpdate( doc, updateB );
+				Y.applyUpdate( docB, updateA );
+
+				expect( getTableBodyCellContentsFromDoc( doc ) ).toEqual( [
+					'anchor',
+					'edited-second-duplicate',
+				] );
+				expect( getTableBodyCellContentsFromDoc( docB ) ).toEqual( [
+					'anchor',
+					'edited-second-duplicate',
+				] );
+			} finally {
+				docB.destroy();
+			}
+		} );
+
 		it( 'initializes blocks as Y.Array when not present', () => {
 			const changes = {
 				blocks: [],
@@ -299,7 +555,7 @@ describe( 'crdt', () => {
 			expect( blocks ).toBeInstanceOf( Y.Array );
 		} );
 
-		it( 'sets blocks to undefined when blocks value is undefined and no content is provided', () => {
+		it( 'sets blocks to undefined when blocks value is undefined', () => {
 			// First, set some blocks.
 			map.set( 'blocks', new Y.Array< YBlock >() );
 
@@ -312,86 +568,6 @@ describe( 'crdt', () => {
 			// The key should still exist, but the value should be undefined.
 			expect( map.has( 'blocks' ) ).toBe( true );
 			expect( map.get( 'blocks' ) ).toBeUndefined();
-		} );
-
-		it( 'parses content into blocks when blocks=undefined is paired with new content', () => {
-			// Pre-populate the Y.Doc with two stable blocks. Simulates the
-			// state after the initial sync: peers share the same blocks Y.Array
-			// with stable clientIds on every YBlock.
-			applyPostChangesToCRDTDoc(
-				doc,
-				{
-					blocks: [
-						{
-							name: 'core/paragraph',
-							attributes: { content: 'Hello' },
-							innerBlocks: [],
-							clientId: 'stable-first',
-						},
-						{
-							name: 'core/paragraph',
-							attributes: { content: 'World' },
-							innerBlocks: [],
-							clientId: 'stable-second',
-						},
-					],
-				} as PostChanges,
-				defaultSyncedProperties
-			);
-
-			// The Code Editor flow: dispatch `{ content, blocks: undefined }`
-			// when the user types. The new HTML edits the second paragraph
-			// only. `parse()` is mocked to return blocks with freshly minted
-			// clientIds — the sync layer must not let those overwrite the
-			// stable clientIds already in the Y.Array.
-			( parse as jest.Mock ).mockReturnValueOnce( [
-				{
-					name: 'core/paragraph',
-					attributes: { content: 'Hello' },
-					innerBlocks: [],
-					clientId: 'fresh-first',
-				},
-				{
-					name: 'core/paragraph',
-					attributes: { content: 'World!' },
-					innerBlocks: [],
-					clientId: 'fresh-second',
-				},
-			] );
-
-			applyPostChangesToCRDTDoc(
-				doc,
-				{
-					content:
-						'<!-- wp:paragraph --><p>Hello</p><!-- /wp:paragraph -->' +
-						'<!-- wp:paragraph --><p>World!</p><!-- /wp:paragraph -->',
-					blocks: undefined,
-				} as PostChanges,
-				defaultSyncedProperties
-			);
-
-			const yblocks = map.get( 'blocks' );
-			expect( yblocks ).toBeInstanceOf( Y.Array );
-			const blocksArray = yblocks as YBlocks;
-			expect( blocksArray.length ).toBe( 2 );
-
-			// Both clientIds must be preserved: the unchanged first block via
-			// the left-right diff sweep, the edited second block via the
-			// explicit clientId-skip in the update loop.
-			expect( blocksArray.get( 0 ).get( 'clientId' ) ).toBe(
-				'stable-first'
-			);
-			expect( blocksArray.get( 1 ).get( 'clientId' ) ).toBe(
-				'stable-second'
-			);
-
-			// The second block's content reflects the edit.
-			const updatedContent = (
-				blocksArray
-					.get( 1 )
-					.get( 'attributes' ) as unknown as YMapWrap< YBlockRecord >
-			 ).get( 'content' ) as Y.Text;
-			expect( updatedContent.toString() ).toBe( 'World!' );
 		} );
 
 		it( 'syncs content as Y.Text', () => {
@@ -463,6 +639,30 @@ describe( 'crdt', () => {
 			expect( map.get( 'content' )?.toString() ).toBe( 'New content' );
 		} );
 
+		it( 'clears stale content text when syncing block changes', () => {
+			applyPostChangesToCRDTDoc(
+				doc,
+				{ content: 'Stale content' } as PostChanges,
+				defaultSyncedProperties
+			);
+
+			applyPostChangesToCRDTDoc(
+				doc,
+				{
+					blocks: parse(
+						[
+							'<!-- wp:paragraph -->',
+							'<p>Block content</p>',
+							'<!-- /wp:paragraph -->',
+						].join( '\n' )
+					),
+				} as PostChanges,
+				defaultSyncedProperties
+			);
+
+			expect( map.get( 'content' )?.toString() ?? '' ).toBe( '' );
+		} );
+
 		it( 'updates existing Y.Text excerpt in place via mergeRichTextUpdate', () => {
 			// First apply to create the Y.Text.
 			applyPostChangesToCRDTDoc(
@@ -530,23 +730,6 @@ describe( 'crdt', () => {
 			const metaMap = map.get( 'meta' );
 			expect( metaMap ).toBeInstanceOf( Y.Map );
 			expect( metaMap?.get( 'custom_field' ) ).toBe( 'value' );
-		} );
-
-		it( 'skips function-valued content in changes', () => {
-			const changes = {
-				content: ( {
-					blocks: blocksForSerialization = [],
-				}: {
-					blocks: Block[];
-				} ) =>
-					blocksForSerialization
-						.map( ( b ) => b.attributes.content )
-						.join( '' ),
-			} as unknown as PostChanges;
-
-			applyPostChangesToCRDTDoc( doc, changes, defaultSyncedProperties );
-
-			expect( map.has( 'content' ) ).toBe( false );
 		} );
 
 		it( 'syncs taxonomy rest_base values included in syncedProperties', () => {
@@ -791,6 +974,334 @@ describe( 'crdt', () => {
 			expect( changes.blocks ).toBeUndefined();
 		} );
 
+		it( 'does not invalidate persisted blocks when only entity-normalized originalContent differs from generated content', () => {
+			registerBlockType( 'core/paragraph', {
+				apiVersion: 3,
+				category: 'text',
+				title: 'Paragraph',
+				attributes: {
+					content: {
+						type: 'rich-text',
+						source: 'rich-text',
+						selector: 'p',
+					},
+				},
+				save: ( {
+					attributes,
+				}: {
+					attributes: { content?: string | RichTextData };
+				} ) =>
+					createElement(
+						'p',
+						null,
+						createElement(
+							RawHTML,
+							null,
+							renderRichTextValue( attributes.content )
+						)
+					),
+			} );
+
+			const originalContent = [
+				'<!-- wp:paragraph -->',
+				'<p>Entity refs: &notin; / &notin text, nbsp &nbsp gap, quote &quot;value&quot;, apos &apos;value&apos;, lt &lt and gt &gt.</p>',
+				'<!-- /wp:paragraph -->',
+			].join( '\n' );
+			const blocks = parse( originalContent );
+			const generatedBlocks = blocks.map( ( block ) => {
+				const generatedBlock = { ...block, isValid: true };
+				delete generatedBlock.__unstableBlockSource;
+				delete generatedBlock.originalContent;
+				delete generatedBlock.validationIssues;
+				return generatedBlock;
+			} );
+			const persistedContent =
+				__unstableSerializeAndClean( generatedBlocks ).trim();
+
+			expect( __unstableSerializeAndClean( blocks ).trim() ).not.toBe(
+				persistedContent
+			);
+			expectConsole( console ).toHaveWarned();
+			expectConsole( console ).toHaveErrored();
+
+			applyPostChangesToCRDTDoc(
+				doc,
+				{ blocks } as PostChanges,
+				defaultSyncedProperties
+			);
+			doc.meta?.set( CRDT_DOC_META_PERSISTENCE_KEY, true );
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				{
+					content: {
+						raw: persistedContent,
+						rendered: persistedContent,
+					},
+				} as unknown as Post,
+				defaultSyncedProperties
+			);
+
+			expect( changes ).not.toHaveProperty( 'blocks' );
+		} );
+
+		it( 'invalidates persisted blocks when generated content differs from persisted content', () => {
+			registerBlockType( 'core/paragraph', {
+				apiVersion: 3,
+				category: 'text',
+				title: 'Paragraph',
+				attributes: {
+					content: {
+						type: 'rich-text',
+						source: 'rich-text',
+						selector: 'p',
+					},
+				},
+				save: ( {
+					attributes,
+				}: {
+					attributes: { content?: string | RichTextData };
+				} ) =>
+					createElement(
+						'p',
+						null,
+						createElement(
+							RawHTML,
+							null,
+							renderRichTextValue( attributes.content )
+						)
+					),
+			} );
+
+			const originalContent = [
+				'<!-- wp:paragraph -->',
+				'<p>Entity refs: &notin; / &notin text, nbsp &nbsp gap.</p>',
+				'<!-- /wp:paragraph -->',
+			].join( '\n' );
+			const blocks = parse( originalContent );
+
+			expectConsole( console ).toHaveWarned();
+			expectConsole( console ).toHaveErrored();
+
+			applyPostChangesToCRDTDoc(
+				doc,
+				{ blocks } as PostChanges,
+				defaultSyncedProperties
+			);
+			doc.meta?.set( CRDT_DOC_META_PERSISTENCE_KEY, true );
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				{
+					content: {
+						raw: [
+							'<!-- wp:paragraph -->',
+							'<p>Changed server content.</p>',
+							'<!-- /wp:paragraph -->',
+						].join( '\n' ),
+					},
+				} as unknown as Post,
+				defaultSyncedProperties
+			);
+
+			expect( changes ).toHaveProperty( 'blocks' );
+		} );
+
+		it( 'hydrates stale transient blocks when persisted content already matches the CRDT blocks', () => {
+			registerBlockType( 'core/paragraph', {
+				apiVersion: 3,
+				category: 'text',
+				title: 'Paragraph',
+				attributes: {
+					content: {
+						type: 'rich-text',
+						source: 'rich-text',
+						selector: 'p',
+					},
+				},
+				save: ( {
+					attributes,
+				}: {
+					attributes: { content?: string | RichTextData };
+				} ) =>
+					createElement(
+						'p',
+						null,
+						createElement(
+							RawHTML,
+							null,
+							renderRichTextValue( attributes.content )
+						)
+					),
+			} );
+
+			const staleContent = [
+				'<!-- wp:paragraph -->',
+				'<p>Old editor blocks.</p>',
+				'<!-- /wp:paragraph -->',
+			].join( '\n' );
+			const persistedContent = [
+				'<!-- wp:paragraph -->',
+				'<p>Saved marker from persisted CRDT.</p>',
+				'<!-- /wp:paragraph -->',
+			].join( '\n' );
+
+			applyPostChangesToCRDTDoc(
+				doc,
+				{ blocks: parse( persistedContent ) } as PostChanges,
+				defaultSyncedProperties
+			);
+			doc.meta?.set( CRDT_DOC_META_PERSISTENCE_KEY, true );
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				{
+					blocks: parse( staleContent ),
+					content: {
+						raw: persistedContent,
+						rendered: persistedContent,
+					},
+				} as unknown as Post,
+				defaultSyncedProperties
+			);
+
+			expect( changes ).toHaveProperty( 'blocks' );
+			expect(
+				__unstableSerializeAndClean(
+					changes.blocks as unknown as WPBlock[]
+				).trim()
+			).toBe( persistedContent );
+		} );
+
+		it( 'does not invalidate persisted blocks for equivalent entity references and link attribute order', () => {
+			registerEntityReferenceBlocks();
+
+			const staleBlocks: WPBlock[] = [
+				{
+					name: 'core/paragraph',
+					clientId: 'paragraph-1',
+					attributes: {
+						content:
+							'D29 escaped <a href="https://example.test/search?q=alpha&#38;beta=2" title="A&amp;B">&lt;em&gt;paragraph&lt;/em&gt;</a> and &notin text.',
+					},
+					innerBlocks: [],
+					isValid: false,
+					originalContent:
+						'<p>D29 escaped <a href="https://example.test/search?q=alpha&#38;beta=2" title="A&amp;B">&lt;em&gt;paragraph&lt;/em&gt;</a> and &notin text.</p>',
+				},
+				{
+					name: 'core/heading',
+					clientId: 'heading-1',
+					attributes: {
+						content:
+							'D29 heading <a href="https://example.test/ref?one=1&#38;two=2" title="H&amp;B">&lt;em&gt;title&lt;/em&gt;</a>.',
+						level: 2,
+					},
+					innerBlocks: [],
+					isValid: false,
+					originalContent:
+						'<h2>D29 heading <a href="https://example.test/ref?one=1&#38;two=2" title="H&amp;B">&lt;em&gt;title&lt;/em&gt;</a>.</h2>',
+				},
+			];
+			const generatedBlocks = staleBlocks.map( ( block ) => {
+				const {
+					__unstableBlockSource,
+					originalContent,
+					validationIssues,
+					...generatedBlock
+				} = block;
+				void __unstableBlockSource;
+				void originalContent;
+				void validationIssues;
+				return {
+					...generatedBlock,
+					innerBlocks: generatedBlock.innerBlocks as Block[],
+					isValid: true,
+				};
+			} );
+			const persistedContent = [
+				'<!-- wp:paragraph -->',
+				'<p>D29 escaped <a title="A&amp;B" href="https://example.test/search?q=alpha&amp;beta=2">&lt;em>paragraph&lt;/em></a> and &not;in text.</p>',
+				'<!-- /wp:paragraph -->',
+				'',
+				'<!-- wp:heading -->',
+				'<h2>D29 heading <a title="H&amp;B" href="https://example.test/ref?one=1&amp;two=2">&lt;em>title&lt;/em></a>.</h2>',
+				'<!-- /wp:heading -->',
+			].join( '\n' );
+
+			expect( serializeBlocksForTest( staleBlocks ) ).not.toBe(
+				persistedContent
+			);
+			expect( serializeBlocksForTest( generatedBlocks ) ).not.toBe(
+				persistedContent
+			);
+
+			applyPostChangesToCRDTDoc(
+				doc,
+				{
+					blocks: staleBlocks,
+					content: persistedContent,
+				} as unknown as PostChanges,
+				defaultSyncedProperties
+			);
+			doc.meta?.set( CRDT_DOC_META_PERSISTENCE_KEY, true );
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				{
+					content: {
+						raw: persistedContent,
+						rendered: persistedContent,
+					},
+				} as unknown as Post,
+				defaultSyncedProperties
+			);
+
+			expect( changes ).not.toHaveProperty( 'blocks' );
+		} );
+
+		it( 'invalidates persisted entity blocks when the generated content really changed', () => {
+			registerEntityReferenceBlocks();
+
+			const staleBlocks = [
+				{
+					name: 'core/paragraph',
+					clientId: 'paragraph-1',
+					attributes: {
+						content:
+							'D29 escaped <a href="https://example.test/search?q=alpha&#38;beta=2" title="A&amp;B">&lt;em&gt;paragraph&lt;/em&gt;</a> and &notin text.',
+					},
+					innerBlocks: [],
+					isValid: false,
+					originalContent:
+						'<p>D29 escaped <a href="https://example.test/search?q=alpha&#38;beta=2" title="A&amp;B">&lt;em&gt;paragraph&lt;/em&gt;</a> and &notin text.</p>',
+				},
+			];
+
+			applyPostChangesToCRDTDoc(
+				doc,
+				{ blocks: staleBlocks } as unknown as PostChanges,
+				defaultSyncedProperties
+			);
+			doc.meta?.set( CRDT_DOC_META_PERSISTENCE_KEY, true );
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				{
+					content: {
+						raw: [
+							'<!-- wp:paragraph -->',
+							'<p>Changed server content.</p>',
+							'<!-- /wp:paragraph -->',
+						].join( '\n' ),
+					},
+				} as unknown as Post,
+				defaultSyncedProperties
+			);
+
+			expect( changes ).toHaveProperty( 'blocks' );
+		} );
+
 		it( 'detects content changes from string value', () => {
 			map.set( 'content', new Y.Text( 'New content' ) );
 
@@ -836,6 +1347,39 @@ describe( 'crdt', () => {
 				defaultSyncedProperties
 			);
 
+			expect( changes ).not.toHaveProperty( 'content' );
+		} );
+
+		it( 'ignores stale content text when persisted block data matches the edited record', () => {
+			const parsedBlocks = parse(
+				[
+					'<!-- wp:paragraph -->',
+					'<p>Block content</p>',
+					'<!-- /wp:paragraph -->',
+				].join( '\n' )
+			);
+			const persistedContent = serializeBlocksForTest( parsedBlocks );
+
+			applyPostChangesToCRDTDoc(
+				doc,
+				{ blocks: parsedBlocks } as PostChanges,
+				defaultSyncedProperties
+			);
+			map.set( 'content', new Y.Text( 'Stale content' ) );
+			doc.meta?.set( CRDT_DOC_META_PERSISTENCE_KEY, true );
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				{
+					content: {
+						raw: persistedContent,
+						rendered: persistedContent,
+					},
+				} as unknown as Post,
+				defaultSyncedProperties
+			);
+
+			expect( changes ).not.toHaveProperty( 'blocks' );
 			expect( changes ).not.toHaveProperty( 'content' );
 		} );
 
@@ -1068,102 +1612,6 @@ describe( 'crdt', () => {
 				expect( changes.selection ).toBeUndefined();
 			} );
 		} );
-
-		it( 'injects a closure-based content function when blocks changed but content did not', () => {
-			addBlockToDoc( map, 'block-1', 'Hello world' );
-
-			const editedRecord = {
-				title: 'CRDT Title',
-				status: 'draft',
-				content: { raw: 'Same content', rendered: 'Same content' },
-				blocks: [],
-			} as unknown as Post;
-
-			const changes = getPostChangesFromCRDTDoc(
-				doc,
-				editedRecord,
-				defaultSyncedProperties
-			);
-
-			// Blocks changed, content didn't, so a lazy content function is injected.
-			expect( changes.blocks ).toBeDefined();
-			expect( typeof changes.content ).toBe( 'function' );
-		} );
-
-		it( 'injected content function captures the synced blocks and ignores its caller-supplied argument', () => {
-			addBlockToDoc( map, 'block-1', 'Hello world' );
-
-			const editedRecord = {
-				title: 'CRDT Title',
-				status: 'draft',
-				content: { raw: 'Same content', rendered: 'Same content' },
-				blocks: [],
-			} as unknown as Post;
-
-			const changes = getPostChangesFromCRDTDoc(
-				doc,
-				editedRecord,
-				defaultSyncedProperties
-			);
-
-			// The injected function takes no parameters and serializes the
-			// captured (synced) blocks. This is what makes getEditedPostContent
-			// keep working after the Code Editor clears `record.blocks` to force
-			// a re-parse: the closure already has the right blocks on hand.
-			//
-			// The mocked __unstableSerializeAndClean returns "serialized:<n>"
-			// where n is the length of the blocks it was called with. The
-			// captured blocks have one entry, so both calls below should yield
-			// "serialized:1" (proving the closure ignores its argument and
-			// uses the captured blocks instead).
-			const contentFn = changes.content as ( args?: {
-				blocks: Block[];
-			} ) => string;
-			expect( contentFn() ).toBe( 'serialized:1' );
-			expect( contentFn( { blocks: [] } ) ).toBe( 'serialized:1' );
-		} );
-
-		it( 'does not inject a content function when content also changed in the doc', () => {
-			addBlockToDoc( map, 'block-1', 'Hello world' );
-			map.set( 'content', new Y.Text( 'New content' ) );
-
-			const editedRecord = {
-				title: 'CRDT Title',
-				status: 'draft',
-				content: { raw: 'Old content', rendered: 'Old content' },
-				blocks: [],
-			} as unknown as Post;
-
-			const changes = getPostChangesFromCRDTDoc(
-				doc,
-				editedRecord,
-				defaultSyncedProperties
-			);
-
-			// Content changed directly, so it should be a string, not a function.
-			expect( changes.blocks ).toBeDefined();
-			expect( typeof changes.content ).toBe( 'string' );
-			expect( changes.content ).toBe( 'New content' );
-		} );
-
-		it( 'does not inject a content function when blocks did not change', () => {
-			map.set( 'content', new Y.Text( 'Same content' ) );
-
-			const editedRecord = {
-				title: 'CRDT Title',
-				status: 'draft',
-				content: { raw: 'Same content', rendered: 'Same content' },
-			} as unknown as Post;
-
-			const changes = getPostChangesFromCRDTDoc(
-				doc,
-				editedRecord,
-				defaultSyncedProperties
-			);
-
-			expect( changes.blocks ).toBeUndefined();
-			expect( changes.content ).toBeUndefined();
-		} );
 	} );
 } );
 
@@ -1199,4 +1647,48 @@ function addBlockToDoc(
 	( blocks as YBlocks ).push( [ block ] );
 
 	return ytext;
+}
+
+function createTableBlock( values: string[] ): Block {
+	return {
+		name: 'core/table',
+		clientId: 'table',
+		attributes: {
+			body: values.map( ( value ) => ( {
+				cells: [
+					{
+						content: value,
+						tag: 'td',
+					},
+				],
+			} ) ),
+		},
+		innerBlocks: [],
+	};
+}
+
+function getRuntimeBlocksFromDoc( ydoc: Y.Doc ): Block[] {
+	return getPostChangesFromCRDTDoc(
+		ydoc,
+		{ blocks: [] } as unknown as Post,
+		defaultSyncedProperties
+	).blocks as Block[];
+}
+
+function getRuntimeTableBody( blocks: Block[] ) {
+	return blocks[ 0 ].attributes.body as Array< {
+		cells: Array< Record< string, unknown > >;
+	} >;
+}
+
+function getCellContentText( content: unknown ) {
+	return typeof content === 'object' && content && 'valueOf' in content
+		? String( content.valueOf() )
+		: content;
+}
+
+function getTableBodyCellContentsFromDoc( ydoc: Y.Doc ) {
+	return getRuntimeTableBody( getRuntimeBlocksFromDoc( ydoc ) ).map(
+		( row ) => getCellContentText( row.cells[ 0 ].content )
+	);
 }

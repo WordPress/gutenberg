@@ -298,6 +298,28 @@ describe( 'getContainingBlockYMap', () => {
 
 		expect( getContainingBlockYMap( text ) ).toBe( block );
 	} );
+
+	it( 'should skip block-shaped nested array items that look like blocks', () => {
+		const block = createTestYBlock( 'block' );
+		const attributes = new Y.Map< any >();
+		const cards = new Y.Array< Y.Map< any > >();
+		const blockLikeCard = new Y.Map< any >();
+		const text = new Y.Text( 'Nested card text' );
+		blockLikeCard.set( 'clientId', 'attribute-card-client-id' );
+		blockLikeCard.set( 'innerBlocks', new Y.Array() );
+		blockLikeCard.set( 'content', text );
+		cards.push( [ blockLikeCard ] );
+		attributes.set( 'cards', cards );
+		block.set( 'attributes', attributes );
+
+		const ydoc = new Y.Doc();
+		const rootMap = ydoc.getMap( 'test' );
+		const blocks = new Y.Array< Y.Map< any > >();
+		rootMap.set( 'blocks', blocks );
+		blocks.push( [ block ] );
+
+		expect( getContainingBlockYMap( text ) ).toBe( block );
+	} );
 } );
 
 describe( 'resolveBlockClientIdByPath', () => {

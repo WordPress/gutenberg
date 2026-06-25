@@ -722,7 +722,7 @@ describe( 'PostEditorAwareness', () => {
 			expect( result.attributeKey ).toBeNull();
 		} );
 
-		test( 'should pass through nested attributeKey for a cursor selection', () => {
+		test( 'should derive the current attributeKey for a cursor selection', () => {
 			const awareness = new PostEditorAwareness(
 				doc,
 				'postType',
@@ -757,7 +757,7 @@ describe( 'PostEditorAwareness', () => {
 				defaultEditorBlocks
 			);
 
-			expect( result.attributeKey ).toBe( 'body.0.cells.0.content' );
+			expect( result.attributeKey ).toBe( 'content' );
 		} );
 	} );
 
@@ -1294,6 +1294,85 @@ describe( 'PostEditorAwareness', () => {
 				nestedDoc.destroy();
 			}
 		);
+
+		test( 'resolves block-shaped nested array item rich text to the containing block', () => {
+			const paragraph = createYBlock( 'yjs-paragraph', 'core/paragraph', {
+				textContent: 'Root paragraph before card block',
+			} );
+			const cardBlock = new Y.Map();
+			cardBlock.set( 'clientId', 'yjs-card-list' );
+			cardBlock.set( 'name', 'test/card-list' );
+
+			const attrs = new Y.Map();
+			const cards = new Y.Array();
+			const card = new Y.Map();
+			const cardContent = new Y.Text( 'Nested card cursor target' );
+			card.set( 'clientId', 'attribute-card-0' );
+			card.set( 'innerBlocks', new Y.Array() );
+			card.set( 'content', cardContent );
+			cards.push( [ card ] );
+			attrs.set( 'cards', cards );
+			cardBlock.set( 'attributes', attrs );
+			cardBlock.set( 'innerBlocks', new Y.Array() );
+
+			const nestedDoc = createTestDocWithBlocks( [
+				paragraph,
+				cardBlock,
+			] );
+
+			mockBlockEditorStore( {
+				blocks: [
+					{
+						clientId: 'local-paragraph',
+						innerBlocks: [],
+					},
+					{
+						clientId: 'local-card-list',
+						innerBlocks: [],
+					},
+				],
+			} );
+
+			const initialOffset = 6;
+			const relativePosition = Y.createRelativePositionFromTypeIndex(
+				cardContent,
+				initialOffset
+			);
+			const awareness = new PostEditorAwareness(
+				nestedDoc,
+				'postType',
+				'post',
+				123
+			);
+			const selection: SelectionCursor = {
+				type: SelectionType.Cursor,
+				cursorPosition: {
+					relativePosition,
+					absoluteOffset: initialOffset,
+					attributeKey: 'cards.0.content',
+				},
+			};
+
+			const result = awareness.convertSelectionStateToAbsolute(
+				selection,
+				[
+					{
+						clientId: 'local-paragraph',
+						innerBlocks: [],
+					},
+					{
+						clientId: 'local-card-list',
+						innerBlocks: [],
+					},
+				]
+			);
+
+			expect( result.richTextOffset ).toBe( initialOffset );
+			expect( result.localClientId ).toBe( 'local-card-list' );
+			expect( result.attributeKey ).toBe( 'cards.0.content' );
+
+			nestedDoc.destroy();
+		} );
 	} );
 
 	describe( 'post content blocks resolution', () => {

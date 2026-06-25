@@ -21,6 +21,26 @@ import type { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 
 const PROVIDER_PLUGIN = 'gutenberg-test-plugin-rtc-websocket-provider';
 
+function isMissingPluginError( error: unknown, slug: string ) {
+	const message =
+		error instanceof Error ? error.message : String( error ?? '' );
+
+	return message.includes( `The plugin "${ slug }" isn't installed` );
+}
+
+async function deactivatePluginIfInstalled(
+	requestUtils: RequestUtils,
+	slug: string
+) {
+	try {
+		await requestUtils.deactivatePlugin( slug );
+	} catch ( error ) {
+		if ( ! isMissingPluginError( error, slug ) ) {
+			throw error;
+		}
+	}
+}
+
 function getProviderPluginDir() {
 	return path.resolve(
 		__dirname,
@@ -107,7 +127,7 @@ export async function setupRtcWebSocketProvider(
 	const enabled = process.env.GUTENBERG_RTC_TEST_WS_PROVIDER === '1';
 
 	if ( ! enabled ) {
-		await requestUtils.deactivatePlugin( PROVIDER_PLUGIN );
+		await deactivatePluginIfInstalled( requestUtils, PROVIDER_PLUGIN );
 		return;
 	}
 

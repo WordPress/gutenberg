@@ -58,11 +58,12 @@ if ( ! interface_exists( 'WP_Sync_Storage' ) ) {
 		 *
 		 * @since 7.0.0
 		 *
-		 * @param string $room   Room identifier.
-		 * @param int    $cursor Return updates after this cursor.
+		 * @param string   $room             Room identifier.
+		 * @param int      $cursor           Return updates after this cursor.
+		 * @param int|null $max_update_bytes Optional maximum serialized update bytes to return.
 		 * @return array<int, mixed> Sync updates.
 		 */
-		public function get_updates_after_cursor( string $room, int $cursor ): array;
+		public function get_updates_after_cursor( string $room, int $cursor, ?int $max_update_bytes = null ): array;
 
 		/**
 		 * Removes updates from a room that are older than the provided cursor.

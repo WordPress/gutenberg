@@ -164,6 +164,12 @@ export default function useBlockSync( {
 	const pendingChangesRef = useRef( { incoming: null, outgoing: [] } );
 	const subscribedRef = useRef( false );
 
+	const clearUnconsumedIncomingChange = ( incomingBlocks ) => {
+		if ( pendingChangesRef.current.incoming === incomingBlocks ) {
+			pendingChangesRef.current.incoming = null;
+		}
+	};
+
 	// Mapping between external (original) and internal (cloned) client IDs.
 	// This allows stable external IDs while using unique internal IDs.
 	const idMappingRef = useRef( {
@@ -260,6 +266,7 @@ export default function useBlockSync( {
 				}
 				__unstableMarkNextChangeAsNotPersistent();
 				replaceInnerBlocks( clientId, storeBlocks );
+				clearUnconsumedIncomingChange( storeBlocks );
 
 				// Invalidate the applied-selection ref so that
 				// restoreSelection() at the end of the
@@ -273,6 +280,7 @@ export default function useBlockSync( {
 			}
 			__unstableMarkNextChangeAsNotPersistent();
 			resetBlocks( controlledBlocks );
+			clearUnconsumedIncomingChange( controlledBlocks );
 		}
 	};
 

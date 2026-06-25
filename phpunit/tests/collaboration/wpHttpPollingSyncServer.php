@@ -1160,4 +1160,136 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 		// Room 2 should have no updates.
 		$this->assertEmpty( $data['rooms'][1]['updates'] );
 	}
+
+	public function test_sync_limits_bloated_secondary_room_response_without_blocking_primary_room() {
+		wp_set_current_user( self::$editor_id );
+
+		$primary_room   = $this->get_post_room();
+		$secondary_room = 'root/site';
+		$primary_update = array(
+			'client_id' => 2,
+			'type'      => 'update',
+			'data'      => base64_encode( 'primary update' ),
+		);
+
+		$large_update_data = str_repeat( 'x', 900 * 1024 );
+		$secondary_updates = array();
+		for ( $i = 0; $i < 20; $i++ ) {
+			$secondary_updates[] = array(
+				'client_id' => 2,
+				'type'      => 'update',
+				'data'      => $large_update_data,
+			);
+		}
+
+		$storage = new class( $primary_room, $primary_update, $secondary_room, $secondary_updates ) implements WP_Sync_Storage {
+			private array $cursors = array();
+			private array $rooms;
+			private array $update_counts = array();
+
+			public function __construct( string $primary_room, array $primary_update, string $secondary_room, array $secondary_updates ) {
+				$this->rooms = array(
+					$primary_room   => array( $primary_update ),
+					$secondary_room => $secondary_updates,
+				);
+			}
+
+			public function add_update( string $room, $update ): bool {
+				$this->rooms[ $room ][] = $update;
+				return true;
+			}
+
+			public function get_awareness_state( string $room ): array {
+				unset( $room );
+				return array();
+			}
+
+			public function get_cursor( string $room ): int {
+				return $this->cursors[ $room ] ?? 0;
+			}
+
+			public function get_update_count( string $room ): int {
+				return $this->update_counts[ $room ] ?? count( $this->rooms[ $room ] ?? array() );
+			}
+
+			public function get_updates_after_cursor( string $room, int $cursor, ?int $max_update_bytes = null ): array {
+				$updates                       = $this->rooms[ $room ] ?? array();
+				$this->update_counts[ $room ]  = count( $updates );
+				$this->cursors[ $room ]        = $cursor;
+				$selected                      = array();
+				$selected_update_storage_bytes = 0;
+				$last_selected_update_cursor   = $cursor;
+
+				foreach ( $updates as $index => $update ) {
+					$update_cursor = $index + 1;
+					if ( $update_cursor <= $cursor ) {
+						continue;
+					}
+
+					$update_storage_bytes = strlen( wp_json_encode( $update ) );
+					if ( null !== $max_update_bytes && $max_update_bytes <= 0 ) {
+						break;
+					}
+
+					if (
+						null !== $max_update_bytes &&
+						$selected_update_storage_bytes + $update_storage_bytes > $max_update_bytes
+					) {
+						break;
+					}
+
+					$selected[]                     = $update;
+					$selected_update_storage_bytes += $update_storage_bytes;
+					$last_selected_update_cursor    = $update_cursor;
+				}
+
+				$this->cursors[ $room ] = $last_selected_update_cursor;
+				return $selected;
+			}
+
+			public function remove_updates_before_cursor( string $room, int $cursor ): bool {
+				unset( $room, $cursor );
+				return true;
+			}
+
+			public function set_awareness_state( string $room, array $awareness ): bool {
+				unset( $room, $awareness );
+				return true;
+			}
+		};
+
+		$server  = new WP_HTTP_Polling_Sync_Server( $storage );
+		$request = new WP_REST_Request( 'POST', '/wp-sync/v1/updates' );
+		$request->set_param(
+			'rooms',
+			array(
+				$this->build_room( $primary_room, 1, 0 ),
+				$this->build_room( $secondary_room, 1, 0 ),
+			)
+		);
+
+		$response = $server->handle_request( $request );
+		$this->assertInstanceOf( WP_REST_Response::class, $response );
+		$this->assertSame( 200, $response->get_status() );
+
+		$data = $response->get_data();
+
+		$this->assertSame( $primary_room, $data['rooms'][0]['room'] );
+		$this->assertSame(
+			array(
+				'data' => $primary_update['data'],
+				'type' => 'update',
+			),
+			$data['rooms'][0]['updates'][0]
+		);
+		$this->assertSame( $secondary_room, $data['rooms'][1]['room'] );
+		$this->assertGreaterThan( 0, count( $data['rooms'][1]['updates'] ) );
+		$this->assertLessThan( count( $secondary_updates ), count( $data['rooms'][1]['updates'] ) );
+		$this->assertGreaterThan( 0, $data['rooms'][1]['end_cursor'] );
+		$this->assertLessThan( count( $secondary_updates ), $data['rooms'][1]['end_cursor'] );
+		$this->assertLessThanOrEqual(
+			WP_HTTP_Polling_Sync_Server::MAX_RESPONSE_BODY_SIZE,
+			strlen( wp_json_encode( $data ) )
+		);
+	}
 }
