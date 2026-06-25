@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
--   The `__next40pxDefaultSize` prop is now true by default on `__experimentalLetterSpacingControl`. The prop can be safely removed.
+-   The `__next40pxDefaultSize` prop is now true by default on `__experimentalLetterSpacingControl`. The prop can be safely removed ([#79533](https://github.com/WordPress/gutenberg/pull/79533)).
 
 ### Deprecations
 
