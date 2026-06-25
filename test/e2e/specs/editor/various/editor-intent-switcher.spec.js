@@ -22,15 +22,15 @@ test.describe( 'Editor intent switcher', () => {
 
 		// Use full accessible names (label + info) to disambiguate from the
 		// sibling Visual/Code editor menuitemradios which would otherwise
-		// match 'Edit' via Playwright's substring search.
+		// match 'Editing' via Playwright's substring search.
 		const editChoice = page.getByRole( 'menuitemradio', {
-			name: /^Edit\s+Edit content directly/,
+			name: /^Editing\s+Edit content directly/,
 		} );
 		const suggestChoice = page.getByRole( 'menuitemradio', {
-			name: /^Suggest/,
+			name: /^Suggesting/,
 		} );
 		const viewChoice = page.getByRole( 'menuitemradio', {
-			name: /^View\s+Read-only/,
+			name: /^Viewing\s+Read-only/,
 		} );
 
 		await expect( editChoice ).toBeVisible();
@@ -51,11 +51,11 @@ test.describe( 'Editor intent switcher', () => {
 		await openIntentSwitcher( page );
 		await expect(
 			page.getByRole( 'menuitemradio', {
-				name: /^Edit\s+Edit content directly/,
+				name: /^Editing\s+Edit content directly/,
 			} )
 		).toHaveAttribute( 'aria-checked', 'true' );
 		await expect(
-			page.getByRole( 'menuitemradio', { name: /^Suggest/ } )
+			page.getByRole( 'menuitemradio', { name: /^Suggesting/ } )
 		).toHaveAttribute( 'aria-checked', 'false' );
 	} );
 
@@ -67,7 +67,7 @@ test.describe( 'Editor intent switcher', () => {
 
 		await openIntentSwitcher( page );
 		await page
-			.getByRole( 'menuitemradio', { name: /^View\s+Read-only/ } )
+			.getByRole( 'menuitemradio', { name: /^Viewing\s+Read-only/ } )
 			.click();
 
 		// In preview mode, block content is not editable — the paragraph
@@ -85,7 +85,7 @@ test.describe( 'Editor intent switcher', () => {
 		await page.keyboard.press( 'Control+Alt+Shift+X' );
 		await openIntentSwitcher( page );
 		await expect(
-			page.getByRole( 'menuitemradio', { name: /^Suggest/ } )
+			page.getByRole( 'menuitemradio', { name: /^Suggesting/ } )
 		).toHaveAttribute( 'aria-checked', 'true' );
 
 		// Close menu and switch to View via shortcut.
@@ -93,7 +93,7 @@ test.describe( 'Editor intent switcher', () => {
 		await page.keyboard.press( 'Control+Alt+Shift+C' );
 		await openIntentSwitcher( page );
 		await expect(
-			page.getByRole( 'menuitemradio', { name: /^View\s+Read-only/ } )
+			page.getByRole( 'menuitemradio', { name: /^Viewing\s+Read-only/ } )
 		).toHaveAttribute( 'aria-checked', 'true' );
 
 		// Back to Edit.
@@ -102,7 +102,7 @@ test.describe( 'Editor intent switcher', () => {
 		await openIntentSwitcher( page );
 		await expect(
 			page.getByRole( 'menuitemradio', {
-				name: /^Edit\s+Edit content directly/,
+				name: /^Editing\s+Edit content directly/,
 			} )
 		).toHaveAttribute( 'aria-checked', 'true' );
 	} );
