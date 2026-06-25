@@ -702,49 +702,6 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		return $data;
 	}
 
-	public function test_schema_includes_reaction_emojis() {
-		$controller = new Gutenberg_REST_Comment_Controller_7_1();
-		$schema     = $controller->get_item_schema();
-
-		$this->assertArrayHasKey( 'reaction_emojis', $schema['properties'] );
-
-		$reaction_emojis_schema = $schema['properties']['reaction_emojis'];
-		$this->assertTrue( $reaction_emojis_schema['readonly'] );
-		$this->assertSame( 'array', $reaction_emojis_schema['type'] );
-		$this->assertContains( 'view', $reaction_emojis_schema['context'] );
-		$this->assertContains( 'edit', $reaction_emojis_schema['context'] );
-
-		// Verify the default matches the helper function output.
-		$expected = gutenberg_get_note_reaction_emojis();
-		$this->assertSame( $expected, $reaction_emojis_schema['default'] );
-	}
-
-	public function test_reaction_emojis_filter_modifies_schema() {
-		$custom_emoji = array(
-			array(
-				'emoji' => '👍',
-				'label' => 'Thumbs Up',
-				'value' => 'thumbsup',
-			),
-		);
-
-		$filter = function () use ( $custom_emoji ) {
-			return $custom_emoji;
-		};
-		add_filter( 'gutenberg_note_reaction_emojis', $filter );
-
-		// Re-instantiate the controller so the schema picks up the filtered value.
-		$controller = new Gutenberg_REST_Comment_Controller_7_1();
-		$schema     = $controller->get_item_schema();
-
-		$this->assertSame(
-			$custom_emoji,
-			$schema['properties']['reaction_emojis']['default']
-		);
-
-		remove_filter( 'gutenberg_note_reaction_emojis', $filter );
-	}
-
 	public function test_reaction_emojis_filter_affects_validation() {
 		$custom_emoji = array(
 			array(

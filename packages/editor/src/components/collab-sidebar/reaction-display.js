@@ -5,7 +5,7 @@ import { __, sprintf, _n } from '@wordpress/i18n';
 import { Button, Dropdown } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { SVG, Path } from '@wordpress/primitives';
-import { useMemo, useState, useCallback } from '@wordpress/element';
+import { useState, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -31,8 +31,10 @@ const smileyIcon = (
  */
 import ReactionEmojiPicker, {
 	buildEmojiBySlugMap,
-	useReactionEmojis,
 } from './reaction-emoji-picker';
+
+// The curated emoji set is static, so index it once at module load.
+const emojiBySlug = buildEmojiBySlugMap();
 
 // `Dropdown`'s popover is rendered in a portal anchored to <body>,
 // so it escapes the `overflow: hidden` chain on the collab sidebar
@@ -251,11 +253,6 @@ export default function ReactionDisplay( {
 	reactions,
 	onToggleReaction,
 } ) {
-	const emojis = useReactionEmojis();
-	const emojiBySlug = useMemo(
-		() => buildEmojiBySlugMap( emojis ),
-		[ emojis ]
-	);
 	const reactedSlugs = getReactedSlugs( reactions );
 
 	if ( reactedSlugs.length === 0 ) {
