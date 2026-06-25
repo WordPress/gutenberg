@@ -5,8 +5,9 @@
 	white-space: nowrap;
 }
 
-.lineClamp {
-	-webkit-box-orient: block-axis;
+.is-line-clamp {
+	/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- -webkit-line-clamp requires this legacy physical value. */
+	-webkit-box-orient: vertical;
 	-webkit-line-clamp: var(--wp-components-truncate-lines);
 	display: -webkit-box;
 	overflow: hidden;
@@ -14,7 +15,7 @@
 	// The `word-break: break-all` property first makes sure a text line
 	// breaks even when it contains 'unbreakable' content such as long URLs.
 	// See https://github.com/WordPress/gutenberg/issues/60860.
-	&.singleLineClamp {
+	&.is-single-line {
 		word-break: break-all;
 	}
 }

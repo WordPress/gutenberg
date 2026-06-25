@@ -49,8 +49,8 @@ export default function useTruncate(
 
 	const classes = clsx(
 		shouldTruncate && ! numberOfLines && styles.truncate,
-		shouldClampLines && styles.lineClamp,
-		shouldClampSingleLine && styles.singleLineClamp,
+		shouldClampLines && styles[ 'is-line-clamp' ],
+		shouldClampSingleLine && styles[ 'is-single-line' ],
 		className
 	);
 
