@@ -122,7 +122,7 @@ export default function QuickDraft() {
 				id: 'title',
 				type: 'text',
 				label: __( 'Title' ),
-				isValid: { required: true, minLength: 3 },
+				isValid: { required: false },
 				hideLabelFromVision: true,
 				help: __( 'Enter a title for your post.' ),
 			},
@@ -130,7 +130,7 @@ export default function QuickDraft() {
 				id: 'content',
 				type: 'text',
 				label: __( 'Content' ),
-				isValid: { required: true, minLength: 10 },
+				isValid: { required: false },
 				Edit: QuickDraftContentField,
 				help: __( 'Enter the content for your post.' ),
 			},
@@ -140,7 +140,10 @@ export default function QuickDraft() {
 
 	const { validity, isValid } = useFormValidity( data, fields, FORM );
 
-	const canSave = isValid && ! isSaving;
+	const hasMeaningfulInput =
+		data.title.trim().length > 0 || data.content.trim().length > 0;
+
+	const canSave = isValid && hasMeaningfulInput && ! isSaving;
 
 	const saveDraftPost = async () => {
 		if ( ! canSave ) {
@@ -149,15 +152,18 @@ export default function QuickDraft() {
 
 		setIsSaving( true );
 
+		const trimmedTitle = data.title.trim();
+		const trimmedContent = data.content.trim();
+
 		try {
 			const saved = await saveEntityRecord( 'postType', 'post', {
-				title: data.title,
-				content: textToParagraphBlocks( data.content ),
+				title: trimmedTitle,
+				content: textToParagraphBlocks( trimmedContent ),
 				status: 'draft',
 			} );
 			const newId = ( saved as { id?: number } | null )?.id;
 			if ( typeof newId === 'number' ) {
-				setCreatedPost( { id: newId, title: data.title } );
+				setCreatedPost( { id: newId, title: trimmedTitle } );
 			}
 			setData( INITIAL_DATA );
 		} finally {
