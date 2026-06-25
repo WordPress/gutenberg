@@ -1194,6 +1194,10 @@ export const getSelectedBlockStyleState = createSelector(
 
 		return {
 			...perBlockState,
+			// The viewport is tracked globally, so inject it here. This way
+			// consumers receive a single combined state object instead of
+			// merging the global viewport themselves, and selectors derived
+			// from this stay consistent.
 			viewport: getStyleStateViewport( state ),
 		};
 	},
