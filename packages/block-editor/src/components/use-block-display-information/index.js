@@ -91,7 +91,10 @@ export default function useBlockDisplayInformation( clientId ) {
 			const attributes = getBlockAttributes( clientId );
 			const { isWithinEditedContentOnlySection } =
 				unlock( blockEditorSelect );
-			const isIsolatedEditor = !! getSettings()?.[ isIsolatedEditorKey ];
+			const settings = getSettings();
+			const isIsolatedEditor = !! settings?.[ isIsolatedEditorKey ];
+			const disableContentOnlyForUnsyncedPatterns =
+				!! settings?.disableContentOnlyForUnsyncedPatterns;
 
 			// Check if this block is a pattern
 			const patternName = attributes?.metadata?.patternName;
@@ -101,7 +104,8 @@ export default function useBlockDisplayInformation( clientId ) {
 			if (
 				patternName &&
 				! isEditedContentOnlySection &&
-				! isIsolatedEditor
+				! isIsolatedEditor &&
+				! disableContentOnlyForUnsyncedPatterns
 			) {
 				const pattern = __experimentalGetParsedPattern( patternName );
 				const positionLabel = getPositionTypeLabel( attributes );

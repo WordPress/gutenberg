@@ -34,7 +34,10 @@ function getBlockIconVariant( { select, clientIds } ) {
 		getSettings,
 	} = unlock( select( blockEditorStore ) );
 	const { getBlockStyles } = select( blocksStore );
-	const isIsolatedEditor = !! getSettings()?.[ isIsolatedEditorKey ];
+	const settings = getSettings();
+	const isIsolatedEditor = !! settings?.[ isIsolatedEditorKey ];
+	const disableContentOnlyForUnsyncedPatterns =
+		!! settings?.disableContentOnlyForUnsyncedPatterns;
 
 	const hasTemplateLock = clientIds.some(
 		( id ) => getTemplateLock( id ) === 'contentOnly'
@@ -49,7 +52,8 @@ function getBlockIconVariant( { select, clientIds } ) {
 		( id ) =>
 			!! getBlockAttributes( id )?.metadata?.patternName &&
 			! isWithinEditedContentOnlySection( id ) &&
-			! isIsolatedEditor
+			! isIsolatedEditor &&
+			! disableContentOnlyForUnsyncedPatterns
 	);
 	const hasPatternOverrides = clientIds.every( ( clientId ) =>
 		hasPatternOverridesDefaultBinding(
@@ -99,7 +103,10 @@ function getBlockIcon( { select, clientIds } ) {
 		isWithinEditedContentOnlySection,
 		getSettings,
 	} = unlock( select( blockEditorStore ) );
-	const isIsolatedEditor = !! getSettings()?.[ isIsolatedEditorKey ];
+	const settings = getSettings();
+	const isIsolatedEditor = !! settings?.[ isIsolatedEditorKey ];
+	const disableContentOnlyForUnsyncedPatterns =
+		!! settings?.disableContentOnlyForUnsyncedPatterns;
 
 	const _isSingleBlock = clientIds.length === 1;
 	const firstClientId = clientIds[ 0 ];
@@ -109,7 +116,8 @@ function getBlockIcon( { select, clientIds } ) {
 		_isSingleBlock &&
 		blockAttributes?.metadata?.patternName &&
 		! isWithinEditedContentOnlySection( firstClientId ) &&
-		! isIsolatedEditor
+		! isIsolatedEditor &&
+		! disableContentOnlyForUnsyncedPatterns
 	) {
 		return symbol;
 	}

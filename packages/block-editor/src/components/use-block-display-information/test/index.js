@@ -137,4 +137,24 @@ describe( 'useBlockDisplayInformation', () => {
 			} )
 		);
 	} );
+
+	it( 'displays block information for a pattern wrapper when content-only editing is disabled', () => {
+		setupUseSelect( {
+			settings: {
+				disableContentOnlyForUnsyncedPatterns: true,
+			},
+		} );
+		const onChange = jest.fn();
+
+		render( <TestComponent onChange={ onChange } /> );
+
+		expect( onChange ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				title: 'Group',
+				icon: groupIcon,
+				description: 'Gather blocks in a layout container.',
+				name: 'Hero pattern',
+			} )
+		);
+	} );
 } );

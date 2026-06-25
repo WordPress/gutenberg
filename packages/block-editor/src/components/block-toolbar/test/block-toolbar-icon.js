@@ -241,6 +241,23 @@ describe( 'BlockToolbarIcon', () => {
 				'core/group-icon'
 			);
 		} );
+
+		it( 'should show the block switcher when content-only editing is disabled', () => {
+			setupToolbarSelectors( {
+				settings: {
+					disableContentOnlyForUnsyncedPatterns: true,
+				},
+			} );
+
+			render( <BlockToolbarIcon { ...defaultProps } /> );
+
+			expect(
+				screen.getByTestId( 'block-switcher' )
+			).toBeInTheDocument();
+			expect( screen.getByTestId( 'block-icon' ) ).toHaveTextContent(
+				'core/group-icon'
+			);
+		} );
 	} );
 
 	describe( 'label calculation', () => {

@@ -190,12 +190,8 @@ const getEditorCommandLoader = () =>
 		commands.push( {
 			name: 'core/toggle-pattern-editing',
 			label: disableContentOnlyForPatternsAndTemplateParts
-				? __(
-						'Enable content-only editing for patterns and template parts'
-				  )
-				: __(
-						'Disable content-only editing for patterns and template parts'
-				  ),
+				? __( 'Disable editing all patterns' )
+				: __( 'Enable editing all patterns' ),
 			icon: symbol,
 			category: 'command',
 			callback: ( { close } ) => {
