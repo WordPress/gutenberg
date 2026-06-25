@@ -241,7 +241,11 @@ export const saveDirtyEntities =
 				) {
 					registry
 						.dispatch( noticesStore )
-						.createErrorNotice( __( 'Saving failed.' ) );
+						.createErrorNotice(
+							__(
+								'Saving failed. Some records could not be saved. Please check your internet connection or try again.'
+							)
+						);
 				} else {
 					registry
 						.dispatch( noticesStore )
@@ -261,13 +265,17 @@ export const saveDirtyEntities =
 						);
 				}
 			} )
-			.catch( ( error ) =>
+			.catch( ( error ) => {
+				let errorMessage = __(
+					'Saving failed. An unexpected error occurred.'
+				);
+				if ( error?.message ) {
+					errorMessage += ` ${ error.message }`;
+				}
 				registry
 					.dispatch( noticesStore )
-					.createErrorNotice(
-						`${ __( 'Saving failed.' ) } ${ error }`
-					)
-			);
+					.createErrorNotice( errorMessage, { type: 'snackbar' } );
+			} );
 	};
 
 /**
