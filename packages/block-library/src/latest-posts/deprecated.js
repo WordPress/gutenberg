@@ -3,8 +3,58 @@
  */
 import metadata from './block.json';
 
-const attributes = {
-	...metadata.attributes,
+const currentSupports = {
+	anchor: true,
+	align: true,
+	color: {
+		gradients: true,
+		link: true,
+		__experimentalDefaultControls: {
+			background: true,
+			text: true,
+			link: true,
+		},
+	},
+	html: false,
+	layout: true,
+	spacing: {
+		margin: true,
+		padding: true,
+		blockGap: {
+			__experimentalDefault: '1.25em',
+		},
+		__experimentalDefaultControls: {
+			blockGap: true,
+		},
+	},
+	typography: {
+		fontSize: true,
+		lineHeight: true,
+		__experimentalFontFamily: true,
+		__experimentalFontWeight: true,
+		__experimentalFontStyle: true,
+		__experimentalTextTransform: true,
+		__experimentalTextDecoration: true,
+		__experimentalLetterSpacing: true,
+		__experimentalDefaultControls: {
+			fontSize: true,
+		},
+	},
+	__experimentalBorder: {
+		radius: true,
+		color: true,
+		width: true,
+		style: true,
+		__experimentalDefaultControls: {
+			radius: true,
+			color: true,
+			width: true,
+			style: true,
+		},
+	},
+	interactivity: {
+		clientNavigation: true,
+	},
 };
 
 const legacyLayoutAttributes = {
@@ -53,17 +103,13 @@ const migratePostLayout = ( oldAttributes ) => {
 export default [
 	{
 		attributes: {
-			...attributes,
+			...metadata.attributes,
 			...legacyLayoutAttributes,
 			categories: {
 				type: [ 'array', 'string' ],
 			},
 		},
-		supports: {
-			align: true,
-			html: false,
-			layout: true,
-		},
+		supports: currentSupports,
 		migrate: ( oldAttributes ) =>
 			migratePostLayout( migrateCategories( oldAttributes ) ),
 		isEligible: ( { postLayout } ) => postLayout,
@@ -71,7 +117,7 @@ export default [
 	},
 	{
 		attributes: {
-			...attributes,
+			...metadata.attributes,
 			categories: {
 				type: 'string',
 			},
