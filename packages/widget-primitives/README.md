@@ -4,9 +4,9 @@
 This package is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 
-The host-agnostic toolkit for dashboard widgets: the contract types that define
-what a widget is, plus the runtime to discover the registered widget types and
-resolve their render modules.
+The host-agnostic toolkit for widgets: the contract types that define what a
+widget is, plus the runtime to discover widget types and resolve their render
+modules.
 
 ## Installation
 
@@ -43,12 +43,13 @@ With no records, or an empty list, `useWidgetTypes()` returns an empty list.
 -   `<WidgetRender>`: canonical entry point for any host that mounts a widget.
     Resolves the widget's render module via a host-provided `resolveWidgetModule`
     and mounts the resulting component with the standard `attributes` plus
-    `setAttributes` render contract. Suspense, error handling, and chrome are
-    host concerns.
+    `setAttributes` render contract. Error handling and chrome are host
+    concerns; because the component is mounted lazily, the host must also
+    wrap it in a `Suspense` boundary.
 -   `useWidgetTypes( records )` → `[ widgetTypes, isResolvingWidgetTypes ]`:
     takes host-supplied records (`WidgetModuleRecord[]`, or `null` while
-    loading), imports each record's metadata, and returns the resolved
-    `WidgetType[]` plus a flag that is true while they are still resolving.
+    loading) and imports each record's metadata module;
+    `isResolvingWidgetTypes` stays `true` until they resolve.
 -   Contract types: `WidgetType`, `WidgetName`, `WidgetIcon`,
     `WidgetRenderProps`, `ResolveWidgetModule`, `WidgetModuleRecord`.
     `WidgetIcon` is a rendered SVG element; hosts pass it to their icon

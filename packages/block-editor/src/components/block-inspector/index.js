@@ -57,18 +57,18 @@ function StyleInspectorSlots( {
 		<>
 			<InspectorControls.Slot />
 			<InspectorControls.Slot
+				group="typography"
+				label={ __( 'Typography' ) }
+			/>
+			<InspectorControls.Slot
 				group="color"
 				label={ __( 'Color' ) }
 				className="color-block-support-panel__inner-wrapper"
 			/>
 			<InspectorControls.Slot
 				group="background"
-				label={ __( 'Background image' ) }
+				label={ __( 'Background' ) }
 				className="background-block-support-panel__inner-wrapper"
-			/>
-			<InspectorControls.Slot
-				group="typography"
-				label={ __( 'Typography' ) }
 			/>
 			<InspectorControls.Slot group="layout" label={ __( 'Layout' ) } />
 			<InspectorControls.Slot
@@ -76,6 +76,11 @@ function StyleInspectorSlots( {
 				label={ __( 'Dimensions' ) }
 			/>
 			<InspectorControls.Slot group="border" label={ borderPanelLabel } />
+			<InspectorControls.Slot
+				group="elements"
+				label={ __( 'Elements' ) }
+				className="elements-block-support-panel__inner-wrapper"
+			/>
 			{ showPositionControls && <PositionControls /> }
 			<InspectorControls.Slot group="styles" />
 			{ showBindingsControls && (
@@ -98,18 +103,18 @@ function StyleStateInspectorSlots( { blockName, selectedBlockStyleState } ) {
 	return (
 		<>
 			<InspectorControls.Slot
+				group="typography"
+				label={ __( 'Typography' ) }
+			/>
+			<InspectorControls.Slot
 				group="color"
 				label={ __( 'Color' ) }
 				className="color-block-support-panel__inner-wrapper"
 			/>
 			<InspectorControls.Slot
 				group="background"
-				label={ __( 'Background image' ) }
+				label={ __( 'Background' ) }
 				className="background-block-support-panel__inner-wrapper"
-			/>
-			<InspectorControls.Slot
-				group="typography"
-				label={ __( 'Typography' ) }
 			/>
 			{ showLayoutControls && (
 				<InspectorControls.Slot
@@ -122,6 +127,11 @@ function StyleStateInspectorSlots( { blockName, selectedBlockStyleState } ) {
 				label={ __( 'Dimensions' ) }
 			/>
 			<InspectorControls.Slot group="border" label={ borderPanelLabel } />
+			<InspectorControls.Slot
+				group="elements"
+				label={ __( 'Elements' ) }
+				className="elements-block-support-panel__inner-wrapper"
+			/>
 		</>
 	);
 }

@@ -59,7 +59,7 @@
 /packages/babel-plugin-makepot                  @ntwb @nerrad @ajitbohra
 /packages/babel-preset-default                  @ntwb @nerrad @ajitbohra
 /packages/browserslist-config                   @ntwb @nerrad @ajitbohra
-/packages/create-block                          @gziolo @ryanwelcher
+/packages/create-block                          @ryanwelcher
 /packages/create-block-tutorial-template        @ryanwelcher
 /packages/dependency-extraction-webpack-plugin
 /packages/docgen
@@ -72,7 +72,7 @@
 /packages/npm-package-json-lint-config          @ntwb @nerrad @ajitbohra
 /packages/postcss-themes                        @ntwb @nerrad @ajitbohra
 /packages/prettier-config                       @ntwb
-/packages/scripts                               @gziolo @ntwb @nerrad @ajitbohra @ryanwelcher
+/packages/scripts                               @ntwb @nerrad @ajitbohra @ryanwelcher
 /packages/stylelint-config                      @ntwb
 /test/php/gutenberg-coding-standards            @anton-vlasenko
 
