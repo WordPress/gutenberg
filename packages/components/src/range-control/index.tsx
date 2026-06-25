@@ -98,6 +98,7 @@ function UnforwardedRangeControl(
 		value: valueProp,
 		withInputField = true,
 		__shouldNotWarnDeprecated36pxSize,
+		size = 'default',
 		...otherProps
 	} = props;
 
@@ -235,9 +236,19 @@ function UnforwardedRangeControl(
 	maybeWarnDeprecated36pxSize( {
 		componentName: 'RangeControl',
 		__next40pxDefaultSize,
-		size: undefined,
+		size,
 		__shouldNotWarnDeprecated36pxSize,
 	} );
+
+	const translatedSize = ( () => {
+		if ( __next40pxDefaultSize && size === 'default' ) {
+			return 'default';
+		}
+		if ( ! __next40pxDefaultSize && size === 'default' ) {
+			return 'compact';
+		}
+		return size;
+	} )();
 
 	return (
 		<BaseControl
@@ -250,6 +261,7 @@ function UnforwardedRangeControl(
 			<Root
 				className="components-range-control__root"
 				__next40pxDefaultSize={ __next40pxDefaultSize }
+				size={ translatedSize }
 			>
 				{ beforeIcon && (
 					<BeforeIconWrapper>
@@ -336,11 +348,7 @@ function UnforwardedRangeControl(
 						onBlur={ handleOnInputNumberBlur }
 						onChange={ handleOnChange }
 						shiftStep={ shiftStep }
-						size={
-							__next40pxDefaultSize
-								? '__unstable-large'
-								: 'default'
-						}
+						size={ translatedSize }
 						__unstableInputWidth={
 							__next40pxDefaultSize ? space( 20 ) : space( 16 )
 						}

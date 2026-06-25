@@ -27,12 +27,21 @@ const rangeHeight = () =>
 	css( { height: rangeHeightValue, minHeight: rangeHeightValue } );
 const thumbSize = 12;
 
+type SizeType = 'compact' | 'default';
+const getSizeHeight = ( size: SizeType ) => {
+	const sizes = {
+		compact: 32,
+		default: 40,
+	};
+	return sizes[ size ];
+};
+
 const deprecatedHeight = ( {
 	__next40pxDefaultSize,
 }: Pick< RangeControlProps, '__next40pxDefaultSize' > ) =>
 	! __next40pxDefaultSize && css( { minHeight: rangeHeightValue } );
 
-type RootProps = Pick< RangeControlProps, '__next40pxDefaultSize' >;
+type RootProps = Pick< RangeControlProps, '__next40pxDefaultSize' | 'size' >;
 export const Root = styled.div< RootProps >`
 	-webkit-tap-highlight-color: transparent;
 	align-items: center;
@@ -42,7 +51,7 @@ export const Root = styled.div< RootProps >`
 	position: relative;
 	touch-action: none;
 	width: 100%;
-	min-height: 40px;
+	min-height: ${ ( { size = 'default' } ) => getSizeHeight( size ) }px;
 	/* TODO: remove after removing the __next40pxDefaultSize prop */
 	${ deprecatedHeight };
 `;

@@ -236,6 +236,12 @@ export type RangeControlProps = Pick<
 		 * @ignore
 		 */
 		__shouldNotWarnDeprecated36pxSize?: boolean;
+		/**
+		 * The size of the control.
+		 *
+		 * @default 'default'
+		 */
+		size?: 'default' | 'compact';
 	};
 
 export type RailProps = MarksProps & {
