@@ -249,7 +249,19 @@ const PlaylistTrackEdit = ( {
 							value={ title }
 							placeholder={ __( 'Add title' ) }
 							onChange={ ( value ) => {
-								setAttributes( { title: value } );
+								// Calling `stripHTML` here is WRONG. This is
+								// done so that HTML entities may be rendered
+								// literally ('&amp;' -> '&'). However, the
+								// fundamental problem is that attributes
+								// `title` and `artist` are defined as of type
+								// `string` when they most likely should be
+								// `rich-text`. But declaring their types as
+								// `rich-text` will set off PHP notices in both
+								// editor and frontend until this REST
+								// validation issue is fixed:
+								//
+								// https://github.com/WordPress/gutenberg/issues/72180
+								setAttributes( { title: stripHTML( value ) } );
 							} }
 							allowedFormats={ [] }
 							withoutInteractiveFormatting
@@ -261,7 +273,23 @@ const PlaylistTrackEdit = ( {
 								value={ artist }
 								placeholder={ __( 'Add artist' ) }
 								onChange={ ( value ) =>
-									setAttributes( { artist: value } )
+									setAttributes( {
+										// Calling `stripHTML` here is WRONG.
+										// This is done so that HTML entities
+										// may be rendered literally ('&amp;'
+										// -> '&'). However, the fundamental
+										// problem is that attributes `title`
+										// and `artist` are defined as of type
+										// `string` when they most likely
+										// should be `rich-text`. But declaring
+										// their types as `rich-text` will set
+										// off PHP notices in both editor and
+										// frontend until this REST validation
+										// issue is fixed:
+										//
+										// https://github.com/WordPress/gutenberg/issues/72180
+										artist: stripHTML( value ),
+									} )
 								}
 								allowedFormats={ [] }
 								withoutInteractiveFormatting
