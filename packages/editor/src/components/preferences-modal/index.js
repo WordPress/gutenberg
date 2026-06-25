@@ -126,50 +126,48 @@ function PreferencesModalContents( { extraSections = {} } ) {
 									label={ __( 'Show starter patterns' ) }
 								/>
 								{ showCollaborationOptions && (
-									<>
-										<PreferenceToggleControl
-											scope="core"
-											featureName="showCollaborationCursor"
-											help={ __(
-												'Show your own avatar inside blocks during collaborative editing sessions.'
-											) }
-											label={ __(
-												'Show avatar in blocks'
-											) }
-										/>
-										<PreferenceToggleControl
-											scope="core"
-											featureName="showCollaborationJoinNotifications"
-											help={ __(
-												'Show notifications when collaborators join the post.'
-											) }
-											label={ __(
-												'Show collaborator join notifications'
-											) }
-										/>
-										<PreferenceToggleControl
-											scope="core"
-											featureName="showCollaborationLeaveNotifications"
-											help={ __(
-												'Show notifications when collaborators leave the post.'
-											) }
-											label={ __(
-												'Show collaborator leave notifications'
-											) }
-										/>
-										<PreferenceToggleControl
-											scope="core"
-											featureName="showCollaborationPostSaveNotifications"
-											help={ __(
-												'Show notifications when collaborators save, update, or publish the post.'
-											) }
-											label={ __(
-												'Show post update notifications'
-											) }
-										/>
-									</>
+									<PreferenceToggleControl
+										scope="core"
+										featureName="showCollaborationCursor"
+										help={ __(
+											'Show your own avatar inside blocks during collaborative editing sessions.'
+										) }
+										label={ __( 'Show avatar in blocks' ) }
+									/>
 								) }
 							</PreferencesModalSection>
+							{ showCollaborationOptions && (
+								<PreferencesModalSection
+									title={ __(
+										'Collaboration notifications'
+									) }
+								>
+									<PreferenceToggleControl
+										scope="core"
+										featureName="showCollaborationJoinNotifications"
+										help={ __(
+											'Show notifications when collaborators join the post.'
+										) }
+										label={ __( 'Collaborator joined' ) }
+									/>
+									<PreferenceToggleControl
+										scope="core"
+										featureName="showCollaborationLeaveNotifications"
+										help={ __(
+											'Show notifications when collaborators leave the post.'
+										) }
+										label={ __( 'Collaborator left' ) }
+									/>
+									<PreferenceToggleControl
+										scope="core"
+										featureName="showCollaborationPostSaveNotifications"
+										help={ __(
+											'Show notifications when collaborators save, update, or publish the post.'
+										) }
+										label={ __( 'Post updated' ) }
+									/>
+								</PreferencesModalSection>
+							) }
 							<PreferencesModalSection
 								title={ __( 'Document settings' ) }
 								description={ __(
