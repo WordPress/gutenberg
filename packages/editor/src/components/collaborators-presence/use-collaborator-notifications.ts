@@ -109,23 +109,25 @@ export function useCollaboratorNotifications(
 		isCollaborationEnabled && showLeaveNotifications;
 	const shouldShowPostSaveNotifications =
 		isCollaborationEnabled && showPostSaveNotifications;
-	// Null post IDs unsubscribe hooks; callback guards handle events already queued then.
-	const effectiveJoinPostId = shouldShowJoinNotifications ? postId : null;
-	const effectiveJoinPostType = shouldShowJoinNotifications ? postType : null;
-	const effectiveLeavePostId = shouldShowLeaveNotifications ? postId : null;
-	const effectiveLeavePostType = shouldShowLeaveNotifications
-		? postType
-		: null;
-	const effectivePostSavePostId = shouldShowPostSaveNotifications
-		? postId
-		: null;
-	const effectivePostSavePostType = shouldShowPostSaveNotifications
-		? postType
-		: null;
+	// A disabled notification type passes null, which unsubscribes its hook;
+	// callback guards handle any events already queued before then.
+	const effectiveTarget = (
+		shouldShow: boolean
+	): [ number | null, string | null ] =>
+		shouldShow ? [ postId, postType ] : [ null, null ];
+	const [ joinPostId, joinPostType ] = effectiveTarget(
+		shouldShowJoinNotifications
+	);
+	const [ leavePostId, leavePostType ] = effectiveTarget(
+		shouldShowLeaveNotifications
+	);
+	const [ postSavePostId, postSavePostType ] = effectiveTarget(
+		shouldShowPostSaveNotifications
+	);
 
 	useOnCollaboratorJoin(
-		effectiveJoinPostId,
-		effectiveJoinPostType,
+		joinPostId,
+		joinPostType,
 		useCallback(
 			(
 				collaborator: PostEditorAwarenessState,
@@ -167,8 +169,8 @@ export function useCollaboratorNotifications(
 	);
 
 	useOnCollaboratorLeave(
-		effectiveLeavePostId,
-		effectiveLeavePostType,
+		leavePostId,
+		leavePostType,
 		useCallback(
 			( collaborator: PostEditorAwarenessState ) => {
 				if ( ! shouldShowLeaveNotifications ) {
@@ -194,8 +196,8 @@ export function useCollaboratorNotifications(
 	);
 
 	useOnPostSave(
-		effectivePostSavePostId,
-		effectivePostSavePostType,
+		postSavePostId,
+		postSavePostType,
 		useCallback(
 			(
 				saveEvent: PostSaveEvent,
