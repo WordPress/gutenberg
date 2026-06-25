@@ -201,8 +201,7 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 			const currentIndex = context.tracks.findIndex(
 				( trackId ) => trackId === context.currentId
 			);
-			const nextTrack =
-				context.tracks[ currentIndex + 1 ];
+			const nextTrack = context.tracks[ currentIndex + 1 ];
 			if ( nextTrack ) {
 				context.currentId = nextTrack;
 			}

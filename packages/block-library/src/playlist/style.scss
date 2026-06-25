@@ -100,7 +100,7 @@ $playlist-control-size: 24px;
 		justify-content: space-between;
 		margin-block-start: max(
 			0px,
-			calc((1.5em - $playlist-control-size) / 2 + 2px)
+			calc( ( 1.5em - $playlist-control-size ) / 2 + 2px )
 		);
 	}
 
