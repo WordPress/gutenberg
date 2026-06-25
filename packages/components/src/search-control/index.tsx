@@ -59,7 +59,8 @@ function SuffixItem( {
 function UnforwardedSearchControl(
 	{
 		__nextHasNoMarginBottom: _,
-		__next40pxDefaultSize: _next40pxDefaultSize, // Prevent passing legacy props to internal component
+		__next40pxDefaultSize: _next40pxDefaultSize,
+		// Prevent passing legacy props to internal component
 		className,
 		onChange,
 		value,
