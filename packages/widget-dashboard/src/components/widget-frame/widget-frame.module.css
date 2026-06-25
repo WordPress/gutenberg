@@ -3,7 +3,7 @@
 	color: var(--wpds-color-foreground-content-neutral);
 }
 
-/* Scroll container that keeps the header pinned; min:0 bounds tall content. */
+/* Scroll viewport that fills the tile height; min:0 bounds tall content. */
 .content {
 	flex: 1;
 	height: 100%;
@@ -12,16 +12,9 @@
 	min-height: 0;
 }
 
-/* Zero block padding so a bleeding body fills the card top to bottom. */
-.contentBleed {
-	padding-block: 0;
-}
-
-/* Re-establish the scroll container at the card edges; cancel Card.FullBleed's bottom margin. */
-.bleedScroll {
-	height: 100%;
-	overflow-y: auto;
-	margin-block-end: 0;
+/* Bleeding body reaches the card borders. Card exposes no padding-less section. */
+.bleedContent {
+	padding: 0;
 }
 
 .loading {

@@ -110,7 +110,6 @@ export function WidgetFrame( {
 	const isHeaderHidden = presentation === 'full-bleed';
 	const isBodyBleeding =
 		presentation === 'full-bleed' || presentation === 'content-bleed';
-	const header = <Header titleId={ titleId } widgetType={ widgetType } />;
 
 	const body = (
 		<WidgetErrorBoundary>
@@ -122,25 +121,22 @@ export function WidgetFrame( {
 
 	return (
 		<>
-			{ isHeaderHidden ? (
-				<VisuallyHidden>{ header }</VisuallyHidden>
-			) : (
-				header
+			{ ! isHeaderHidden && (
+				<Header titleId={ titleId } widgetType={ widgetType } />
 			) }
 
 			<Card.Content
 				className={ clsx(
 					styles.content,
-					isBodyBleeding && styles.contentBleed
+					isBodyBleeding && styles.bleedContent
 				) }
 			>
-				{ isBodyBleeding ? (
-					<Card.FullBleed className={ styles.bleedScroll }>
-						{ body }
-					</Card.FullBleed>
-				) : (
-					body
+				{ isHeaderHidden && widgetType.title && (
+					<VisuallyHidden render={ <h2 id={ titleId } /> }>
+						{ widgetType.title }
+					</VisuallyHidden>
 				) }
+				{ body }
 			</Card.Content>
 		</>
 	);
