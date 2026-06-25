@@ -64,7 +64,7 @@ export function useBorderControlDropdown(
 	}, [ cx ] );
 
 	const indicatorWrapperClassName = useMemo( () => {
-		return cx( styles.colorIndicatorWrapper( border, '__unstable-large' ) );
+		return cx( styles.colorIndicatorWrapper( border ) );
 	}, [ border, cx ] );
 
 	const popoverControlsClassName = useMemo( () => {

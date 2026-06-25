@@ -41,8 +41,6 @@ export function useBorderControl(
 		...otherProps
 	} = useContextSystem( props, 'BorderControl' );
 
-	const computedSize = '__unstable-large';
-
 	const [ widthValue, originalWidthUnit ] = parseQuantityAndUnitFromRawValue(
 		border?.width
 	);
@@ -133,10 +131,10 @@ export function useBorderControl(
 	}
 	const innerWrapperClassName = useMemo( () => {
 		const widthStyle = !! wrapperWidth && styles.wrapperWidth;
-		const heightStyle = styles.wrapperHeight( computedSize );
+		const heightStyle = styles.wrapperHeight;
 
 		return cx( styles.innerWrapper(), widthStyle, heightStyle );
-	}, [ wrapperWidth, cx, computedSize ] );
+	}, [ wrapperWidth, cx ] );
 
 	const sliderClassName = useMemo( () => {
 		return cx( styles.borderSlider() );
