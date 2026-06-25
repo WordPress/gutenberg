@@ -48,6 +48,40 @@ class WP_Duotone_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertMatchesRegularExpression( $expected, WP_Duotone_Gutenberg::render_duotone_support( $block_content, $block, $wp_block ) );
 	}
 
+	public function test_gutenberg_restore_image_outer_container_moves_duotone_class_to_wrapper() {
+		$theme_root                      = realpath( __DIR__ . '/data/themedir1' );
+		$original_theme_dirs             = $GLOBALS['wp_theme_directories'];
+		$original_stylesheet             = get_stylesheet();
+		$filter_set_theme_root           = static function () use ( $theme_root ) {
+			return $theme_root;
+		};
+		$GLOBALS['wp_theme_directories'] = array( WP_CONTENT_DIR . '/themes', $theme_root );
+
+		add_filter( 'theme_root', $filter_set_theme_root );
+		add_filter( 'stylesheet_root', $filter_set_theme_root );
+		add_filter( 'template_root', $filter_set_theme_root );
+		wp_clean_themes_cache();
+		unset( $GLOBALS['wp_themes'] );
+
+		try {
+			switch_theme( 'default' );
+
+			$block_content = '<div class="wp-block-image"><figure class="alignright wp-duotone-blue-orange size-full"><img src="/my-image.jpg"/></figure></div>';
+			$expected      = '<div class="wp-block-image wp-duotone-blue-orange"><figure class="alignright size-full"><img src="/my-image.jpg"/></figure></div>';
+
+			$this->assertSame( $expected, WP_Duotone_Gutenberg::restore_image_outer_container( $block_content ) );
+		} finally {
+			switch_theme( $original_stylesheet );
+			remove_filter( 'theme_root', $filter_set_theme_root );
+			remove_filter( 'stylesheet_root', $filter_set_theme_root );
+			remove_filter( 'template_root', $filter_set_theme_root );
+			$GLOBALS['wp_theme_directories'] = $original_theme_dirs;
+			wp_clean_themes_cache();
+			unset( $GLOBALS['wp_themes'] );
+			WP_Theme_JSON_Resolver::clean_cached_data();
+		}
+	}
+
 
 	/**
 	 * Tests whether the CSS declarations are generated even if the block content is
