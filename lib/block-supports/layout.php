@@ -521,8 +521,22 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$wide_size       = $layout_for_styles['wideSize'] ?? '';
 		$justify_content = $layout_for_styles['justifyContent'] ?? 'center';
 
-		$all_max_width_value  = $content_size ? $content_size : $wide_size;
-		$wide_max_width_value = $wide_size ? $wide_size : $content_size;
+		$has_justify_content_override    = null !== $viewport_overrides && $has_viewport_property_override( 'justifyContent' );
+		$has_content_size_override       = null !== $viewport_overrides && $has_viewport_property_override( 'contentSize' );
+		$has_wide_size_override          = null !== $viewport_overrides && $has_viewport_property_override( 'wideSize' );
+		$should_output_constrained_sizes = null === $viewport_overrides || $has_content_size_override || $has_wide_size_override;
+		$is_resetting_constrained_sizes  = null !== $viewport_overrides &&
+			(
+				( $has_content_size_override && ! $content_size ) ||
+				( $has_wide_size_override && ! $wide_size )
+			);
+
+		$all_max_width_value  = $content_size
+			? $content_size
+			: ( $wide_size && ! $has_content_size_override ? $wide_size : 'var(--wp--style--global--content-size, none)' );
+		$wide_max_width_value = $wide_size
+			? $wide_size
+			: ( $content_size && ! $has_wide_size_override ? $content_size : 'var(--wp--style--global--wide-size, none)' );
 
 		// Make sure there is a single CSS rule, and all tags are stripped for security.
 		$all_max_width_value  = safecss_filter_attr( explode( ';', $all_max_width_value )[0] );
@@ -531,9 +545,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$margin_left  = 'left' === $justify_content ? '0 !important' : 'auto !important';
 		$margin_right = 'right' === $justify_content ? '0 !important' : 'auto !important';
 
-		$has_justify_content_override    = null !== $viewport_overrides && $has_viewport_property_override( 'justifyContent' );
-		$should_output_constrained_sizes = null === $viewport_overrides || $has_viewport_property_override( 'contentSize' ) || $has_viewport_property_override( 'wideSize' );
-		if ( $should_output_constrained_sizes && ( $content_size || $wide_size ) ) {
+		if ( $should_output_constrained_sizes && ( $content_size || $wide_size || $is_resetting_constrained_sizes ) ) {
 			$content_size_declarations = array(
 				'max-width' => $all_max_width_value,
 			);
