@@ -2316,10 +2316,9 @@ describe( 'FormTokenField', () => {
 			// Add 'cat' token, check that the aria-live region has been updated.
 			await user.type( input, 'cat[Enter]' );
 
-			expect( screen.getByText( defaultMessages.added ) ).toHaveAttribute(
-				'aria-live',
-				'assertive'
-			);
+			expect(
+				await screen.findByText( defaultMessages.added )
+			).toHaveAttribute( 'aria-live', 'assertive' );
 		} );
 
 		it( 'should announce to assistive technology the addition of a new token with a custom message', async () => {
@@ -2332,10 +2331,9 @@ describe( 'FormTokenField', () => {
 			// Add 'dog' token, check that the aria-live region has been updated.
 			await user.type( input, 'dog[Enter]' );
 
-			expect( screen.getByText( customMessages.added ) ).toHaveAttribute(
-				'aria-live',
-				'assertive'
-			);
+			expect(
+				await screen.findByText( customMessages.added )
+			).toHaveAttribute( 'aria-live', 'assertive' );
 		} );
 
 		it( 'should announce to assistive technology the removal of a token', async () => {
@@ -2349,7 +2347,7 @@ describe( 'FormTokenField', () => {
 			await user.type( input, '[Backspace]' );
 
 			expect(
-				screen.getByText( defaultMessages.removed )
+				await screen.findByText( defaultMessages.removed )
 			).toHaveAttribute( 'aria-live', 'assertive' );
 		} );
 
@@ -2369,7 +2367,7 @@ describe( 'FormTokenField', () => {
 			await user.type( input, '[Backspace]' );
 
 			expect(
-				screen.getByText( customMessages.removed )
+				await screen.findByText( customMessages.removed )
 			).toHaveAttribute( 'aria-live', 'assertive' );
 		} );
 
@@ -2389,7 +2387,7 @@ describe( 'FormTokenField', () => {
 			await user.type( input, 'eagle[Enter]' );
 
 			expect(
-				screen.getByText( defaultMessages.__experimentalInvalid )
+				await screen.findByText( defaultMessages.__experimentalInvalid )
 			).toHaveAttribute( 'aria-live', 'assertive' );
 		} );
 
@@ -2410,7 +2408,7 @@ describe( 'FormTokenField', () => {
 			await user.type( input, 'crocodile[Enter]' );
 
 			expect(
-				screen.getByText( customMessages.__experimentalInvalid )
+				await screen.findByText( customMessages.__experimentalInvalid )
 			).toHaveAttribute( 'aria-live', 'assertive' );
 		} );
 
