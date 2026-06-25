@@ -17,7 +17,6 @@ The following components are checked by this rule:
 -   FormFileUpload (special case - see below)
 -   FormTokenField
 -   InputControl
--   LetterSpacingControl
 -   LineHeightControl
 -   NumberControl
 -   RangeControl
