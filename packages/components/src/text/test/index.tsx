@@ -106,6 +106,23 @@ describe( 'Text', () => {
 		} );
 	} );
 
+	test( 'should render variant color regardless of Emotion insertion order', () => {
+		render(
+			<>
+				<Text role="note" variant="muted">
+					Primer.
+				</Text>
+				<Text role="heading" color="orange" variant="muted">
+					Lorem ipsum.
+				</Text>
+			</>
+		);
+
+		expect( screen.getByRole( 'heading' ) ).toHaveStyle( {
+			color: COLORS.theme.gray[ 700 ],
+		} );
+	} );
+
 	test( 'should render display', () => {
 		render(
 			<Text role="heading" display="inline-flex">
