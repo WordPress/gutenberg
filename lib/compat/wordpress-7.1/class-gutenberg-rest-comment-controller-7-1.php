@@ -14,12 +14,10 @@
 class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller {
 
 	/**
-	 * Retrieves the comment schema, adding reaction_emojis.
+	 * Retrieves the comment schema, adding reaction_summary.
 	 *
-	 * Extends the parent schema with a read-only `reaction_emojis`
-	 * property whose default value exposes the filtered emoji list.
-	 * Clients can read this from the OPTIONS response to discover
-	 * which reaction emojis the server accepts.
+	 * Extends the parent schema with a read-only `reaction_summary`
+	 * property exposing aggregated reaction counts for each note.
 	 *
 	 * @since 7.1.0
 	 *
@@ -27,31 +25,6 @@ class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller 
 	 */
 	public function get_item_schema() {
 		$schema = parent::get_item_schema();
-
-		$schema['properties']['reaction_emojis'] = array(
-			'description' => __( 'Allowed emoji reactions for notes.', 'gutenberg' ),
-			'type'        => 'array',
-			'items'       => array(
-				'type'       => 'object',
-				'properties' => array(
-					'emoji' => array(
-						'description' => __( 'The emoji character.', 'gutenberg' ),
-						'type'        => 'string',
-					),
-					'label' => array(
-						'description' => __( 'A human-readable label for the emoji.', 'gutenberg' ),
-						'type'        => 'string',
-					),
-					'value' => array(
-						'description' => __( 'The slug used as the storage key.', 'gutenberg' ),
-						'type'        => 'string',
-					),
-				),
-			),
-			'default'     => gutenberg_get_note_reaction_emojis(),
-			'context'     => array( 'view', 'edit' ),
-			'readonly'    => true,
-		);
 
 		$schema['properties']['reaction_summary'] = array(
 			'description'          => __( 'Aggregated reaction counts for this note, keyed by emoji slug.', 'gutenberg' ),
