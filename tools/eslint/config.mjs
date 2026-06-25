@@ -169,12 +169,15 @@ const restrictedSyntax = [
 		selector: 'JSXAttribute[name.name="__nextHasNoMarginBottom"]',
 		message: 'The `__nextHasNoMarginBottom` prop is no longer needed.',
 	},
-	...[ 'BorderBoxControl', 'BoxControl', 'FontSizePicker', 'TextControl' ].map(
-		( componentName ) => ( {
-			selector: `JSXElement[openingElement.name.name="${ componentName }"] JSXAttribute[name.name="__next40pxDefaultSize"]`,
-			message: `The \`__next40pxDefaultSize\` prop is no longer needed on \`${ componentName }\`.`,
-		} )
-	),
+	...[
+		'BorderBoxControl',
+		'BoxControl',
+		'FontSizePicker',
+		'TextControl',
+	].map( ( componentName ) => ( {
+		selector: `JSXElement[openingElement.name.name="${ componentName }"] JSXAttribute[name.name="__next40pxDefaultSize"]`,
+		message: `The \`__next40pxDefaultSize\` prop is no longer needed on \`${ componentName }\`.`,
+	} ) ),
 	{
 		selector:
 			'CallExpression[callee.name="withDispatch"] > :function > BlockStatement > :not(VariableDeclaration,ReturnStatement)',
