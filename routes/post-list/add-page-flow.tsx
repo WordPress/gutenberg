@@ -92,7 +92,7 @@ function getPageLayoutTypes(): PageLayoutType[] {
 		{ slug: 'link-in-bio', label: __( 'Link in bio' ) },
 		{ slug: 'personal', label: __( 'Personal' ) },
 		{ slug: 'coming-soon', label: __( 'Coming soon' ) },
-		{ slug: OTHER_PAGE_LAYOUT_TYPE, label: __( 'Other layouts' ) },
+		{ slug: OTHER_PAGE_LAYOUT_TYPE, label: __( 'Other designs' ) },
 	];
 }
 
@@ -1040,7 +1040,7 @@ export function AddPageFlow( { onClose }: AddPageFlowProps ) {
 		<Modal
 			title={
 				isChoosingLayout
-					? __( 'Choose a layout' )
+					? __( 'Choose a page design' )
 					: __( 'Add a new page' )
 			}
 			onRequestClose={ onClose }
@@ -1068,7 +1068,7 @@ export function AddPageFlow( { onClose }: AddPageFlowProps ) {
 					>
 						{ createInterpolateElement(
 							__(
-								'Choose a page layout built with <patternsLink>patterns</patternsLink>, or start with a blank page.'
+								'Choose a page design built with <patternsLink>patterns</patternsLink> you can customize, or start with a blank page.'
 							),
 							{
 								patternsLink: <Link to="/patterns/list/all" />,
@@ -1098,14 +1098,14 @@ export function AddPageFlow( { onClose }: AddPageFlowProps ) {
 									variant="body-md"
 									className="apm-option-title"
 								>
-									{ __( 'Choose a layout' ) }
+									{ __( 'Choose a page design' ) }
 								</Text>
 								<Text
 									variant="body-sm"
 									className="apm-option-desc"
 								>
 									{ __(
-										'Start with a pre-designed page layout'
+										'Start with a page design you can customize'
 									) }
 								</Text>
 							</Button>
@@ -1198,7 +1198,7 @@ export function AddPageFlow( { onClose }: AddPageFlowProps ) {
 										<div className="apm-layout-empty">
 											<Text variant="body-md">
 												{ __(
-													'No layouts found for this page type.'
+													'No designs found for this page type.'
 												) }
 											</Text>
 											<Button
@@ -1218,14 +1218,14 @@ export function AddPageFlow( { onClose }: AddPageFlowProps ) {
 													className="apm-layout-pagination"
 													role="navigation"
 													aria-label={ __(
-														'Layout pages'
+														'Page design pagination'
 													) }
 												>
 													<Button
 														variant="tertiary"
 														icon={ chevronLeft }
 														label={ __(
-															'Previous layouts'
+															'Previous designs'
 														) }
 														onClick={
 															goToPreviousPageLayouts
@@ -1242,9 +1242,9 @@ export function AddPageFlow( { onClose }: AddPageFlowProps ) {
 														className="apm-layout-pagination-label"
 													>
 														{ sprintf(
-															/* translators: 1: First visible layout number. 2: Last visible layout number. 3: Total number of layouts. */
+															/* translators: 1: First visible design number. 2: Last visible design number. 3: Total number of designs. */
 															__(
-																'%1$d-%2$d of %3$d layouts'
+																'%1$d-%2$d of %3$d designs'
 															),
 															firstVisiblePageLayoutIndex,
 															lastVisiblePageLayoutIndex,
@@ -1255,7 +1255,7 @@ export function AddPageFlow( { onClose }: AddPageFlowProps ) {
 														variant="tertiary"
 														icon={ chevronRight }
 														label={ __(
-															'Next layouts'
+															'Next designs'
 														) }
 														onClick={
 															goToNextPageLayouts

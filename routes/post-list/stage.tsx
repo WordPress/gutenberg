@@ -856,7 +856,6 @@ function PostList() {
 				<ComponentsButton
 					variant="primary"
 					onClick={ openAddNewFlow }
-					size="compact"
 					__next40pxDefaultSize
 				>
 					{ labels.add_new_item }
