@@ -64,16 +64,13 @@ export default function WelcomeBanner() {
 		<Stack className={ styles.root } direction="column" gap="lg">
 			<Banner />
 
-			<Stack
-				direction="column"
-				style={ {
-					paddingInline: 'var(--wpds-dimension-padding-2xl)',
-				} }
+			<Text
+				className={ styles.sectionHeading }
+				variant="heading-lg"
+				render={ <h2 /> }
 			>
-				<Text variant="heading-lg" render={ <h2 /> }>
-					{ __( 'Get started with WordPress' ) }
-				</Text>
-			</Stack>
+				{ __( 'Get started with WordPress' ) }
+			</Text>
 
 			<Stack className={ styles.columns }>
 				<FeatureHighlight

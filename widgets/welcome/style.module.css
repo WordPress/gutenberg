@@ -25,3 +25,7 @@
 		margin: 0;
 	}
 }
+
+.sectionHeading {
+	padding-inline: var(--wpds-dimension-padding-2xl);
+}
