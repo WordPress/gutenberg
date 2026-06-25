@@ -76,6 +76,11 @@ function block_core_gallery_resolve_dynamic_source( $source, $block ) {
 
 	switch ( $source_name ) {
 		case 'core/attached-media':
+			// Prefer the post supplied via block context, falling back to the post
+			// being rendered. The fallback is what lets a post-bound template (e.g.
+			// `single`/`page`) resolve against the actual post at render time even
+			// though the editor has no concrete post to preview — the editor gates
+			// the dynamic-mode UI on that same context (see `use-dynamic-gallery.js`).
 			$post_id = $block->context['postId'] ?? get_the_ID();
 			if ( ! $post_id ) {
 				return array();

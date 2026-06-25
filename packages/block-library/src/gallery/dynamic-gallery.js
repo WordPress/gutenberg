@@ -99,6 +99,7 @@ export function GallerySourcePanel( {
 } ) {
 	const {
 		dynamicContent,
+		canUseDynamicSource,
 		sourceOrderby,
 		sourceOrder,
 		setSourceOrder,
@@ -164,6 +165,16 @@ export function GallerySourcePanel( {
 				</ToolsPanelItem>
 			</ToolsPanel>
 		);
+	}
+
+	// In static mode the panel only offers a way into dynamic mode, which is
+	// meaningful where the block can resolve against a post: a real post, or a
+	// post-bound template whose post is filled in at render time. Elsewhere
+	// (template part, pattern, generic template) the sole source can never
+	// resolve, leaving nothing to show — so hide the panel rather than present a
+	// dead control. Once other sources exist, render whenever ANY is available.
+	if ( ! canUseDynamicSource ) {
+		return null;
 	}
 
 	return (
@@ -271,6 +282,7 @@ export function GalleryDynamicView( {
 		galleryContext,
 		isResolvingDynamic,
 		convertToStatic,
+		hasCurrentPost,
 	} = dynamic;
 
 	// Converting to a static gallery materializes editable inner blocks, which
@@ -279,6 +291,21 @@ export function GalleryDynamicView( {
 	// is `'contentOnly'`/`'disabled'`, where structural toolbar controls are
 	// hidden and the conversion shouldn't be possible.
 	const blockEditingMode = useBlockEditingMode();
+
+	// Empty-state copy for the preview. With a concrete post, an empty result
+	// genuinely means the post has no attached images. While editing a post-bound
+	// template there's no post to preview yet, so frame the empty preview as
+	// resolving at render time rather than as a missing-images problem.
+	let emptyInstructions;
+	if ( isResolvingDynamic ) {
+		emptyInstructions = __( 'Loading attached images…' );
+	} else if ( hasCurrentPost ) {
+		emptyInstructions = __( 'No images are attached to the post yet.' );
+	} else {
+		emptyInstructions = __(
+			'Images attached to the post will appear here when this template is viewed.'
+		);
+	}
 
 	return (
 		<>
@@ -307,13 +334,7 @@ export function GalleryDynamicView( {
 					<Placeholder
 						icon={ sharedIcon }
 						label={ __( 'Gallery' ) }
-						instructions={
-							isResolvingDynamic
-								? __( 'Loading attached images…' )
-								: __(
-										'No images are attached to the post yet.'
-								  )
-						}
+						instructions={ emptyInstructions }
 					>
 						{ isResolvingDynamic && <Spinner /> }
 					</Placeholder>

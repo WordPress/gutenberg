@@ -90,6 +90,7 @@ function buildImageBlocks( media, galleryAttributes ) {
  * @param {Function} options.setAttributes The block's `setAttributes`.
  * @param {string}   options.clientId      The block client ID.
  * @param {?number}  options.postId        The current post ID (from block context).
+ * @param {?string}  options.postType      The current post type (from block context).
  * @return {Object} Dynamic-mode source data and actions.
  */
 export default function useDynamicGallery( {
@@ -97,8 +98,22 @@ export default function useDynamicGallery( {
 	setAttributes,
 	clientId,
 	postId,
+	postType,
 } ) {
 	const { dynamicContent } = attributes;
+
+	// Whether dynamic mode makes sense in the current editing context. A
+	// `postType` means the block will resolve against some post at render time —
+	// either a concrete post (post/page editor, Query Loop item) or a post-bound
+	// template (`single`, `page`) whose post is filled in by `get_the_ID()` on the
+	// frontend (see `index.php`). Without it (template part, pattern, generic
+	// template) there's no post to attach to, so the source can never resolve.
+	const canUseDynamicSource = !! postType;
+
+	// Whether there's a concrete post to preview against right now. False while
+	// editing a post-bound template, where images only resolve once the template
+	// renders a real post.
+	const hasCurrentPost = !! postId;
 
 	// Current source ordering, falling back to the shared defaults when unset.
 	const sourceOrderby = dynamicContent?.args?.orderBy ?? DEFAULT_ORDERBY;
@@ -220,6 +235,8 @@ export default function useDynamicGallery( {
 
 	return {
 		dynamicContent,
+		canUseDynamicSource,
+		hasCurrentPost,
 		sourceOrderby,
 		sourceOrder,
 		dynamicMedia,

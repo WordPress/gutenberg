@@ -134,6 +134,7 @@ export default function GalleryEdit( props ) {
 	} = props;
 
 	const postId = context?.postId;
+	const postType = context?.postType;
 
 	const [ lightboxSetting, defaultRatios, themeRatios, showDefaultRatios ] =
 		useSettings(
@@ -224,6 +225,7 @@ export default function GalleryEdit( props ) {
 		setAttributes,
 		clientId,
 		postId,
+		postType,
 	} );
 
 	// State that drives counts/size options should reflect the dynamic media
