@@ -40,7 +40,7 @@
 
 ### Code Quality
 
--   Clean the npm package publish surface and add a package contents validation check to exclude tests, stories, fixtures, snapshots, and test/story declaration output ([#79552](https://github.com/WordPress/gutenberg/pull/79552)).
+-   Clean the npm package publish surface and add a package contents validation check for package metadata targets, tests, stories, fixtures, snapshots, and test/story declaration output ([#79552](https://github.com/WordPress/gutenberg/pull/79552)).
 
 ## 0.17.0 (2026-06-30)
 

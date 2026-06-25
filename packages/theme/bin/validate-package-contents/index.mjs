@@ -1,5 +1,6 @@
 import { spawnSync } from 'node:child_process';
-import { dirname, join, resolve } from 'node:path';
+import { readFileSync } from 'node:fs';
+import { dirname, join, posix, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 
@@ -9,15 +10,72 @@ const packageRoot = resolve(
 );
 
 const disallowedPathPatterns = [
-	/(^|\/)__snapshots__(\/|$)/,
-	/(^|\/)fixtures(\/|$)/,
-	/(^|\/)stories(\/|$)/,
-	/(^|\/)test(\/|$)/,
+	/(^|\/)(__fixtures__|__snapshots__|__tests__|fixtures|stories|test|tests)(\/|$)/,
+	/(^|\/)[^/]+\.(spec|test)\.[^/]+$/,
+	/(^|\/)[^/]+\.stories?\.[^/]+$/,
 	/^build-types\/color-ramps\//,
 	/^build-types\/context\.d\.ts(\.map)?$/,
 	/^build-types\/postcss-plugins\//,
 	/^build-types\/use-theme-provider-styles\.d\.ts(\.map)?$/,
 	/^src\/style\.module\.css$/,
+];
+
+/** @typedef {{ exports?: unknown, main?: string, module?: string, types?: string }} PackageJson */
+
+/** @type {PackageJson} */
+const packageJson = JSON.parse(
+	readFileSync( join( packageRoot, 'package.json' ), 'utf8' )
+);
+
+/**
+ * @param {string} path Package-relative path.
+ * @return {string} Normalized package path.
+ */
+function normalizePackagePath( path ) {
+	return path.replace( /^\.\//, '' );
+}
+
+/**
+ * @param {string | undefined} path Package-relative type path.
+ * @return {string[]} Normalized type declaration paths.
+ */
+function getTypePaths( path ) {
+	if ( ! path ) {
+		return [];
+	}
+
+	const normalizedPath = normalizePackagePath( path );
+
+	if ( posix.extname( normalizedPath ) ) {
+		return [ normalizedPath ];
+	}
+
+	return [ posix.join( normalizedPath, 'index.d.ts' ) ];
+}
+
+/**
+ * @param {unknown} value Export map value.
+ * @return {string[]} Export target paths.
+ */
+function getExportTargetPaths( value ) {
+	if ( typeof value === 'string' ) {
+		return [ normalizePackagePath( value ) ];
+	}
+
+	if ( ! value || typeof value !== 'object' || Array.isArray( value ) ) {
+		return [];
+	}
+
+	return Object.values( value ).flatMap( getExportTargetPaths );
+}
+
+const packageTargetPaths = [
+	...( packageJson.main ? [ normalizePackagePath( packageJson.main ) ] : [] ),
+	...( packageJson.module
+		? [ normalizePackagePath( packageJson.module ) ]
+		: [] ),
+	...getTypePaths( packageJson.types ),
+	...getExportTargetPaths( packageJson.exports ),
 ];
 
 const env = {
@@ -49,7 +107,7 @@ const [ pack ] = packs;
 const packedPaths = pack.files.map( ( { path } ) => path );
 const packedPathSet = new Set( packedPaths );
 
-const missingMandatoryPaths = [ 'package.json' ].filter(
+const missingPackageTargetPaths = [ ...new Set( packageTargetPaths ) ].filter(
 	( path ) => ! packedPathSet.has( path )
 );
 const disallowedPaths = packedPaths.filter( ( path ) =>
@@ -58,18 +116,18 @@ const disallowedPaths = packedPaths.filter( ( path ) =>
 
 if (
 	packedPaths.length === 0 ||
-	missingMandatoryPaths.length ||
+	missingPackageTargetPaths.length ||
 	disallowedPaths.length
 ) {
 	if ( packedPaths.length === 0 ) {
 		console.error( 'The package tarball does not include any files.' );
 	}
 
-	if ( missingMandatoryPaths.length ) {
+	if ( missingPackageTargetPaths.length ) {
 		console.error(
 			[
-				'The package tarball is missing mandatory npm package files:',
-				...missingMandatoryPaths.map( ( path ) => `- ${ path }` ),
+				'The package tarball is missing package metadata targets:',
+				...missingPackageTargetPaths.map( ( path ) => `- ${ path }` ),
 			].join( '\n' )
 		);
 	}
