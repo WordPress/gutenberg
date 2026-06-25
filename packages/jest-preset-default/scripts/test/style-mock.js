@@ -8,6 +8,19 @@ describe( 'style mock', () => {
 		expect( styles[ 'already-kebab' ] ).toBe( 'already-kebab' );
 	} );
 
+	it( 'does not emit an undefined class when used as an object key', () => {
+		const classes = {
+			[ styles.conditionalClass ]: true,
+		};
+
+		expect(
+			Object.keys( classes ).filter(
+				( className ) => classes[ className ]
+			)
+		).toEqual( [ 'conditionalClass' ] );
+		expect( classes ).not.toHaveProperty( 'undefined' );
+	} );
+
 	it( 'does not mark the CommonJS mock as an ES module', () => {
 		expect( styles.__esModule ).toBe( false );
 	} );
