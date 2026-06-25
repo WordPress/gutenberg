@@ -699,29 +699,33 @@ function usePageTemplates() {
 		}
 	);
 
+	const pageTemplateRecords = useMemo(
+		() =>
+			( ( templates as TemplateRecord[] ) || [] ).filter(
+				( template ) =>
+					template.is_custom &&
+					!! template.content?.raw &&
+					isPageApplicableTemplate( template )
+			),
+		[ templates ]
+	);
 	const options = useMemo(
 		() => [
 			{
 				label: __( 'Default template' ),
 				value: '',
 			},
-			...( ( templates as TemplateRecord[] ) || [] )
-				.filter(
-					( template ) =>
-						template.is_custom &&
-						!! template.content?.raw &&
-						isPageApplicableTemplate( template )
-				)
-				.map( ( template ) => ( {
-					label: getRecordTitle( template ),
-					value: template.slug,
-				} ) ),
+			...pageTemplateRecords.map( ( template ) => ( {
+				label: getRecordTitle( template ),
+				value: template.slug,
+			} ) ),
 		],
-		[ templates ]
+		[ pageTemplateRecords ]
 	);
 
 	return {
 		options,
+		templates: pageTemplateRecords,
 		isResolving,
 	};
 }
@@ -777,7 +781,7 @@ export function AddPageFlow( { onClose }: AddPageFlowProps ) {
 		[ pageLayoutPatterns ]
 	);
 	const pageTemplates = usePageTemplates();
-	const pageTemplateContent = useSelect( ( select ) => {
+	const defaultPageTemplateContent = useSelect( ( select ) => {
 		const store = select( coreStore ) as any;
 		const templateId = store.getDefaultTemplateId( { slug: 'page' } );
 		const template = templateId
@@ -790,6 +794,21 @@ export function AddPageFlow( { onClose }: AddPageFlowProps ) {
 
 		return template?.content?.raw;
 	}, [] );
+	const pageTemplateContent = useMemo( () => {
+		if ( ! selectedTemplateSlug ) {
+			return defaultPageTemplateContent;
+		}
+
+		return (
+			pageTemplates.templates.find(
+				( template ) => template.slug === selectedTemplateSlug
+			)?.content?.raw || defaultPageTemplateContent
+		);
+	}, [
+		defaultPageTemplateContent,
+		pageTemplates.templates,
+		selectedTemplateSlug,
+	] );
 
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createSuccessNotice, createErrorNotice } =
@@ -1236,60 +1255,100 @@ export function AddPageFlow( { onClose }: AddPageFlowProps ) {
 								{ ! isLoadingPageLayouts &&
 									hasActivePageLayouts && (
 										<>
-											{ pageLayoutPageCount > 1 && (
-												<div
-													className="apm-layout-pagination"
-													role="navigation"
-													aria-label={ __(
-														'Page design pagination'
+											{ ( pageTemplates.options.length >
+												1 ||
+												pageLayoutPageCount > 1 ) && (
+												<div className="apm-layout-results-header">
+													{ pageTemplates.options
+														.length > 1 && (
+														<SelectControl
+															label={ __(
+																'Preview with'
+															) }
+															value={
+																selectedTemplateSlug
+															}
+															options={
+																pageTemplates.options
+															}
+															onChange={ (
+																value
+															) =>
+																setSelectedTemplateSlug(
+																	String(
+																		value
+																	)
+																)
+															}
+															disabled={
+																pageTemplates.isResolving
+															}
+															className="apm-layout-template-preview-select"
+															labelPosition="side"
+															size="compact"
+														/>
 													) }
-												>
-													<Button
-														variant="tertiary"
-														icon={ chevronLeft }
-														label={ __(
-															'Previous designs'
-														) }
-														onClick={
-															goToPreviousPageLayouts
-														}
-														disabled={
-															currentPageLayoutPage ===
-															1
-														}
-														accessibleWhenDisabled
-														__next40pxDefaultSize
-													/>
-													<Text
-														variant="body-sm"
-														className="apm-layout-pagination-label"
-													>
-														{ sprintf(
-															/* translators: 1: First visible design number. 2: Last visible design number. 3: Total number of designs. */
-															__(
-																'%1$d-%2$d of %3$d designs'
-															),
-															firstVisiblePageLayoutIndex,
-															lastVisiblePageLayoutIndex,
-															activePageLayouts.length
-														) }
-													</Text>
-													<Button
-														variant="tertiary"
-														icon={ chevronRight }
-														label={ __(
-															'Next designs'
-														) }
-														onClick={
-															goToNextPageLayouts
-														}
-														disabled={
-															currentPageLayoutPage ===
-															pageLayoutPageCount
-														}
-														accessibleWhenDisabled
-														__next40pxDefaultSize
-													/>
+													{ pageLayoutPageCount >
+														1 && (
+														<div
+															className="apm-layout-pagination"
+															role="navigation"
+															aria-label={ __(
+																'Page design pagination'
+															) }
+														>
+															<Button
+																variant="tertiary"
+																icon={
+																	chevronLeft
+																}
+																label={ __(
+																	'Previous designs'
+																) }
+																onClick={
+																	goToPreviousPageLayouts
+																}
+																disabled={
+																	currentPageLayoutPage ===
+																	1
+																}
+																accessibleWhenDisabled
+																__next40pxDefaultSize
+															/>
+															<Text
+																variant="body-sm"
+																className="apm-layout-pagination-label"
+															>
+																{ sprintf(
+																	/* translators: 1: First visible design number. 2: Last visible design number. 3: Total number of designs. */
+																	__(
+																		'%1$d-%2$d of %3$d designs'
+																	),
+																	firstVisiblePageLayoutIndex,
+																	lastVisiblePageLayoutIndex,
+																	activePageLayouts.length
+																) }
+															</Text>
+															<Button
+																variant="tertiary"
+																icon={
+																	chevronRight
+																}
+																label={ __(
+																	'Next designs'
+																) }
+																onClick={
+																	goToNextPageLayouts
+																}
+																disabled={
+																	currentPageLayoutPage ===
+																	pageLayoutPageCount
+																}
+																accessibleWhenDisabled
+																__next40pxDefaultSize
+															/>
+														</div>
+													) }
 												</div>
 											) }
 											<div className="apm-layouts-grid">
