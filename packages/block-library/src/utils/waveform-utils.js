@@ -265,7 +265,10 @@ export function setupSeekControlAccessibility(
 
 	const originalOnTimeUpdate = instance.options.onTimeUpdate;
 	const onTimeUpdate = ( currentTime, duration, player ) => {
-		updateSeekControl();
+		updateSeekControl( {
+			syncPlayhead: true,
+			currentTimeOverride: currentTime,
+		} );
 		originalOnTimeUpdate?.( currentTime, duration, player );
 	};
 	instance.options.onTimeUpdate = onTimeUpdate;

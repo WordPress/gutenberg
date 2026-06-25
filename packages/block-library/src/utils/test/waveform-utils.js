@@ -337,6 +337,28 @@ describe( 'Waveform utilities', () => {
 			expect( instance.seekTo ).toHaveBeenCalledWith( 15 );
 		} );
 
+		it( 'seeks from the latest reported media time after an external paused seek', () => {
+			const { audio, container, instance, seekControl } =
+				createSeekControlFixture( {
+					duration: 60,
+					currentTime: 10,
+				} );
+
+			setupSeekControlAccessibility( container, instance );
+
+			audio.currentTime = 30;
+			instance.options.onTimeUpdate( 30, 60, instance );
+			seekControl.dispatchEvent(
+				new window.KeyboardEvent( 'keydown', {
+					key: 'ArrowRight',
+					bubbles: true,
+					cancelable: true,
+				} )
+			);
+
+			expect( instance.seekTo ).toHaveBeenCalledWith( 35 );
+		} );
+
 		it( 'maps vertical arrows to seeking', () => {
 			const { container, instance, seekControl } =
 				createSeekControlFixture( {
