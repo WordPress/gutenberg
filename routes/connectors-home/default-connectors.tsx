@@ -152,6 +152,7 @@ function ApiKeyConnector( {
 		pluginStatus,
 		canInstallPlugins,
 		canActivatePlugins,
+		canDeactivatePlugins,
 		isExpanded,
 		setIsExpanded,
 		isBusy,
@@ -160,6 +161,7 @@ function ApiKeyConnector( {
 		keySource,
 		handleButtonClick,
 		getButtonLabel,
+		deactivatePlugin,
 		saveApiKey,
 		removeApiKey,
 	} = useConnectorPlugin( {
@@ -177,6 +179,10 @@ function ApiKeyConnector( {
 		( pluginStatus === 'not-installed' && canInstallPlugins === false ) ||
 		( pluginStatus === 'inactive' && canActivatePlugins === false );
 	const showActionButton = ! showUnavailableBadge;
+	const showDeactivateButton =
+		pluginStatus === 'active' &&
+		!! plugin?.file &&
+		canDeactivatePlugins !== false;
 
 	const actionButtonRef = useRef< HTMLButtonElement >( null );
 
@@ -197,6 +203,19 @@ function ApiKeyConnector( {
 						) : (
 							<UnavailableActionBadge />
 						) ) }
+					{ showDeactivateButton && (
+						<Button
+							variant="tertiary"
+							size="compact"
+							onClick={ deactivatePlugin }
+							disabled={ isBusy }
+							isBusy={ isBusy }
+							accessibleWhenDisabled
+							isDestructive
+						>
+							{ __( 'Deactivate' ) }
+						</Button>
+					) }
 					{ showActionButton && (
 						<Button
 							ref={ actionButtonRef }

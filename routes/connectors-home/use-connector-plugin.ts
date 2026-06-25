@@ -25,6 +25,7 @@ interface UseConnectorPluginReturn {
 	pluginStatus: PluginStatus;
 	canInstallPlugins: boolean | undefined;
 	canActivatePlugins: boolean | undefined;
+	canDeactivatePlugins: boolean | undefined;
 	isExpanded: boolean;
 	setIsExpanded: ( expanded: boolean ) => void;
 	isBusy: boolean;
@@ -33,6 +34,7 @@ interface UseConnectorPluginReturn {
 	keySource: ApiKeySource;
 	handleButtonClick: () => void;
 	getButtonLabel: () => string;
+	deactivatePlugin: () => Promise< void >;
 	saveApiKey: ( apiKey: string ) => Promise< void >;
 	removeApiKey: () => Promise< void >;
 }
@@ -48,6 +50,7 @@ export function useConnectorPlugin( {
 }: UseConnectorPluginOptions ): UseConnectorPluginReturn {
 	const [ isExpanded, setIsExpanded ] = useState( false );
 	const [ isBusy, setIsBusy ] = useState( false );
+	const [ isDeactivating, setIsDeactivating ] = useState( false );
 	const [ connectedState, setConnectedState ] =
 		useState( initialIsConnected );
 	// Local override for immediate UI feedback after install/activate.
@@ -151,6 +154,7 @@ export function useConnectorPlugin( {
 
 	// Use canManagePlugins (from plugin entity resolution) for activation capability.
 	const canActivatePlugins = canManagePlugins;
+	const canDeactivatePlugins = canManagePlugins;
 
 	const isConnected =
 		( pluginStatus === 'active' && connectedState ) ||
@@ -253,6 +257,51 @@ export function useConnectorPlugin( {
 		}
 	};
 
+	const deactivatePlugin = async () => {
+		if ( ! pluginFileFromServer ) {
+			return;
+		}
+		setIsDeactivating( true );
+		try {
+			await saveEntityRecord(
+				'root',
+				'plugin',
+				{
+					plugin: pluginBasename,
+					status: 'inactive',
+				},
+				{ throwOnError: true }
+			);
+			setPluginStatusOverride( 'inactive' );
+			setIsExpanded( false );
+			createSuccessNotice(
+				sprintf(
+					/* translators: %s: Name of the connector (e.g. "OpenAI"). */
+					__( 'Plugin for %s deactivated.' ),
+					connectorName
+				),
+				{
+					id: 'connector-plugin-deactivate-success',
+					type: 'snackbar',
+				}
+			);
+		} catch {
+			createErrorNotice(
+				sprintf(
+					/* translators: %s: Name of the connector (e.g. "OpenAI"). */
+					__( 'Failed to deactivate plugin for %s.' ),
+					connectorName
+				),
+				{
+					id: 'connector-plugin-deactivate-error',
+					type: 'snackbar',
+				}
+			);
+		} finally {
+			setIsDeactivating( false );
+		}
+	};
+
 	const handleButtonClick = () => {
 		if ( pluginStatus === 'not-installed' ) {
 			if ( canInstallPlugins === false ) {
@@ -274,6 +323,9 @@ export function useConnectorPlugin( {
 			return pluginStatus === 'not-installed'
 				? __( 'Installing…' )
 				: __( 'Activating…' );
+		}
+		if ( isDeactivating ) {
+			return __( 'Deactivating…' );
 		}
 		if ( isExpanded ) {
 			return __( 'Cancel' );
@@ -384,14 +436,16 @@ export function useConnectorPlugin( {
 		pluginStatus,
 		canInstallPlugins,
 		canActivatePlugins,
+		canDeactivatePlugins,
 		isExpanded,
 		setIsExpanded,
-		isBusy,
+		isBusy: isBusy || isDeactivating,
 		isConnected,
 		currentApiKey,
 		keySource,
 		handleButtonClick,
 		getButtonLabel,
+		deactivatePlugin,
 		saveApiKey,
 		removeApiKey,
 	};
