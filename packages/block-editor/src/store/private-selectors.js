@@ -215,26 +215,31 @@ function getListViewClientIdsTreeUnmemoized( state, rootClientId ) {
 		state,
 		rootClientId,
 		( _state, clientId ) => {
+			// Non-disabled blocks are always shown in List view.
 			if ( getBlockEditingMode( _state, clientId ) !== 'disabled' ) {
 				return true;
 			}
 
+			// When a contentOnly section is being edited, there's some special handling.
 			if ( _state.editedContentOnlySection ) {
+				// Blocks within the edited content only section generally have their block
+				// editing mode flipped from disabled to default for editing, any disabled
+				// blocks can still be excluded.
 				if ( isWithinEditedContentOnlySection( _state, clientId ) ) {
 					return false;
 				}
 
-				// Outside the edited section, keep disabled context visible. For other
-				// content-only sections, preserve their existing structure/content filtering.
+				// Blocks that are not in another section but are disabled are shown.
+				// These are blocks that would usually be visible.
 				const parentSectionBlock = getParentSectionBlock(
 					_state,
 					clientId
 				);
-
 				if ( ! parentSectionBlock ) {
 					return true;
 				}
 
+				// If a block is in another section, then it is only visible if its a content block.
 				if ( isContentBlock( getBlockName( _state, clientId ) ) ) {
 					return true;
 				}
