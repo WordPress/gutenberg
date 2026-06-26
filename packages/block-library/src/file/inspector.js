@@ -79,7 +79,6 @@ export default function FileBlockInspector( {
 								onDeselect={ () => changePreviewHeight( 600 ) }
 							>
 								<RangeControl
-									__next40pxDefaultSize
 									label={ __( 'Height in pixels' ) }
 									min={ MIN_PREVIEW_HEIGHT }
 									max={ Math.max(

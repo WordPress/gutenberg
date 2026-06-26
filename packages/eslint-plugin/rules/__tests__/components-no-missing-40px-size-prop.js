@@ -132,7 +132,7 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 					<InputControl __next40pxDefaultSize />
 					<LineHeightControl __next40pxDefaultSize />
 					<NumberControl __next40pxDefaultSize />
-					<RangeControl __next40pxDefaultSize />
+					<RangeControl />
 					<SelectControl __next40pxDefaultSize />
 					<ToggleGroupControl __next40pxDefaultSize />
 					<UnitControl __next40pxDefaultSize />

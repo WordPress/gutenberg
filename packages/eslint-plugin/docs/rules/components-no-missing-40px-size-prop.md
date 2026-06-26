@@ -18,7 +18,6 @@ The following components are checked by this rule:
 -   InputControl
 -   LineHeightControl
 -   NumberControl
--   RangeControl
 -   SelectControl
 -   ToggleGroupControl
 -   UnitControl

@@ -117,7 +117,6 @@ const UnconnectedBorderControl = (
 						step={ [ 'px', '%' ].includes( widthUnit ) ? 1 : 0.1 }
 						value={ widthValue || undefined }
 						withInputField={ false }
-						__next40pxDefaultSize
 					/>
 				) }
 			</HStack>

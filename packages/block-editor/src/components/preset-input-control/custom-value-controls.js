@@ -126,7 +126,6 @@ export default function CustomValueControls( {
 				step={ step }
 				value={ parsedQuantity }
 				withInputField={ false }
-				__next40pxDefaultSize
 			/>
 		</>
 	);
