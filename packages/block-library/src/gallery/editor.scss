@@ -143,3 +143,10 @@
 		width: 100%;
 	}
 }
+
+// The "showing the first N" notice is a plain (non-ToolsPanelItem) child of the
+// Source ToolsPanel, so span both grid columns rather than defaulting to one.
+.wp-block-gallery__source-notice {
+	grid-column: 1 / -1;
+	margin: 0;
+}

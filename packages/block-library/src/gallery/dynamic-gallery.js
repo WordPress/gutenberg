@@ -1,10 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import {
 	Button,
+	Notice,
 	PanelBody,
 	Placeholder,
 	SelectControl,
@@ -30,6 +31,7 @@ import {
 	getSourceDescription,
 	DEFAULT_ORDERBY,
 	DEFAULT_ORDER,
+	MAX_IMAGES,
 } from './dynamic-source';
 
 /**
@@ -107,6 +109,8 @@ export function GallerySourcePanel( {
 		enableDynamicMode,
 		resetSource,
 		isResolvingDynamic,
+		hasMoreImagesThanCap,
+		dynamicMediaTotal,
 	} = dynamic;
 	const isDynamic = !! dynamicContent;
 
@@ -146,6 +150,22 @@ export function GallerySourcePanel( {
 						{ __( 'Convert to individual images' ) }
 					</Button>
 				</div>
+				{ hasMoreImagesThanCap && (
+					<Notice
+						className="wp-block-gallery__source-notice"
+						status="warning"
+						isDismissible={ false }
+					>
+						{ sprintf(
+							/* translators: 1: number of images shown. 2: total number of attached images. */
+							__(
+								'Only the first %1$d of %2$d attached images will be displayed.'
+							),
+							MAX_IMAGES,
+							dynamicMediaTotal
+						) }
+					</Notice>
+				) }
 				<ToolsPanelItem
 					isShownByDefault
 					label={ __( 'Order by' ) }

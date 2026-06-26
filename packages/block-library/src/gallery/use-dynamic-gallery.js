@@ -17,6 +17,7 @@ import {
 	getSourceQuery,
 	DEFAULT_ORDERBY,
 	DEFAULT_ORDER,
+	MAX_IMAGES,
 } from './dynamic-source';
 
 const EMPTY_ARRAY = [];
@@ -131,16 +132,27 @@ export default function useDynamicGallery( {
 		[ dynamicContent, postId ]
 	);
 
-	const { dynamicMedia, isResolvingDynamic } = useSelect(
+	const { dynamicMedia, dynamicMediaTotal, isResolvingDynamic } = useSelect(
 		( select ) => {
 			if ( ! query ) {
-				return { dynamicMedia: EMPTY_ARRAY, isResolvingDynamic: false };
+				return {
+					dynamicMedia: EMPTY_ARRAY,
+					dynamicMediaTotal: 0,
+					isResolvingDynamic: false,
+				};
 			}
 			const selectorArgs = [ 'postType', 'attachment', query ];
 			return {
 				dynamicMedia:
 					select( coreStore ).getEntityRecords( ...selectorArgs ) ??
 					EMPTY_ARRAY,
+				// Total matching attachments (the `X-WP-Total` header), which the
+				// query's `per_page` cap doesn't bound — so it reveals when the
+				// post has more attached images than are shown.
+				dynamicMediaTotal:
+					select( coreStore ).getEntityRecordsTotalItems(
+						...selectorArgs
+					) ?? 0,
 				isResolvingDynamic: ! select( coreStore ).hasFinishedResolution(
 					'getEntityRecords',
 					selectorArgs
@@ -149,6 +161,10 @@ export default function useDynamicGallery( {
 		},
 		[ query ]
 	);
+
+	// The source caps results at `MAX_IMAGES` (matching the frontend), so flag
+	// when the post has more attached images than the gallery can show.
+	const hasMoreImagesThanCap = dynamicMediaTotal > MAX_IMAGES;
 
 	// The only gallery settings that affect how an image renders, and so the
 	// only ones `buildImageBlockAttributes` reads. Depending on this narrowed
@@ -237,6 +253,8 @@ export default function useDynamicGallery( {
 		dynamicContent,
 		canUseDynamicSource,
 		hasCurrentPost,
+		hasMoreImagesThanCap,
+		dynamicMediaTotal,
 		sourceOrderby,
 		sourceOrder,
 		dynamicMedia,

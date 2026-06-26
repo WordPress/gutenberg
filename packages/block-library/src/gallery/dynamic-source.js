@@ -18,7 +18,7 @@ export const DEFAULT_ORDER = 'desc';
  * query and the server render stay bounded. Kept in sync with the
  * `posts_per_page` cap in `block_core_gallery_resolve_dynamic_source()`.
  */
-const MAX_IMAGES = 100;
+export const MAX_IMAGES = 100;
 
 /**
  * Maps a gallery's `dynamicContent` attribute to a query for the `attachment`
