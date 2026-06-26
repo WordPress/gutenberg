@@ -447,6 +447,25 @@
 			box-shadow: 0 0 0 $radius-small var(--wp-admin-theme-color);
 		}
 	}
+
+	&.is-disabled {
+		opacity: 0.2;
+		@media not ( prefers-reduced-motion ) {
+			transition: opacity 0.1s linear;
+		}
+
+		&:hover {
+			opacity: 0.2;
+		}
+
+		.block-editor-list-view__expander {
+			cursor: default;
+		}
+
+		.block-editor-list-view-block-select-button:hover {
+			color: inherit;
+		}
+	}
 }
 
 // First level of indentation is aria-level 2, max indent is 8.

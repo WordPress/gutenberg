@@ -21,7 +21,6 @@
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	background: var(--wpds-color-background-surface-neutral-weak);
 	text-decoration: none;
 	padding: 0;
 	border-radius: 0;
@@ -47,17 +46,10 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background-color: hsla(0, 0%, 80%);
 	pointer-events: none;
 
 	svg {
 		fill: currentColor;
-	}
-
-	&.has-site-icon {
-		background-color: hsla(0, 0%, 100%, 0.6);
-		-webkit-backdrop-filter: saturate(180%) blur(15px);
-		backdrop-filter: saturate(180%) blur(15px);
 	}
 }
 

@@ -108,19 +108,6 @@ async function openStylesTabIfAvailable() {
 	}
 }
 
-async function selectViewportState( name ) {
-	await userEvent.click(
-		screen.getByRole( 'button', {
-			name: 'State: Default',
-		} )
-	);
-	await userEvent.click(
-		screen.getByRole( 'menuitem', {
-			name,
-		} )
-	);
-}
-
 describe( 'Cover block', () => {
 	describe( 'Editor canvas', () => {
 		test( 'shows placeholder if background image and color not set', async () => {
@@ -430,31 +417,6 @@ describe( 'Cover block', () => {
 
 					expect( opacityControl ).not.toBeInTheDocument();
 				} );
-			} );
-
-			test( 'does not render overlay controls when a viewport state is selected', async () => {
-				await setup();
-				await createAndSelectBlock();
-				await openStylesTabIfAvailable();
-
-				expect(
-					screen.getByRole( 'button', {
-						name: 'Overlay',
-					} )
-				).toBeInTheDocument();
-
-				await selectViewportState( 'Tablet' );
-
-				expect(
-					screen.queryByRole( 'button', {
-						name: 'Overlay',
-					} )
-				).not.toBeInTheDocument();
-				expect(
-					screen.queryByRole( 'slider', {
-						name: 'Overlay opacity',
-					} )
-				).not.toBeInTheDocument();
 			} );
 		} );
 

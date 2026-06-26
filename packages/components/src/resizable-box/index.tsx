@@ -132,6 +132,10 @@ function UnforwardedResizableBox(
 	);
 }
 
+/**
+ * `ResizableBox` wraps content in a container with draggable handles, letting
+ * users interactively resize it along one or more edges or corners.
+ */
 export const ResizableBox = forwardRef( UnforwardedResizableBox );
 ResizableBox.displayName = 'ResizableBox';
 

@@ -5318,7 +5318,7 @@ class WP_Theme_JSON_Gutenberg {
 		$prefix_len = strlen( $prefix );
 		$token_in   = '|';
 		$token_out  = '--';
-		if ( 0 === strpos( $value, $prefix ) ) {
+		if ( str_starts_with( $value, $prefix ) ) {
 			$unwrapped_name = str_replace(
 				$token_in,
 				$token_out,
@@ -5342,7 +5342,7 @@ class WP_Theme_JSON_Gutenberg {
 		$prefix = 'var:';
 
 		foreach ( $tree as $key => $data ) {
-			if ( is_string( $data ) && 0 === strpos( $data, $prefix ) ) {
+			if ( is_string( $data ) && str_starts_with( $data, $prefix ) ) {
 				$tree[ $key ] = self::convert_custom_properties( $data );
 			} elseif ( is_array( $data ) ) {
 				$tree[ $key ] = self::resolve_custom_css_format( $data );

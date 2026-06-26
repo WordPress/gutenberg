@@ -3,7 +3,7 @@
  */
 import { DataViewsPicker, filterSortAndPaginate } from '@wordpress/dataviews';
 import type { Field, View } from '@wordpress/dataviews';
-import { Suspense, useMemo, useState } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import type { WidgetType } from '@wordpress/widget-primitives';
 
@@ -12,8 +12,7 @@ import type { WidgetType } from '@wordpress/widget-primitives';
  */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { createDashboardWidget } from '../../utils/create-dashboard-widget';
-import { WidgetRender } from '../widget-render';
-import styles from './widget-picker.module.css';
+import { WidgetPreviewChrome } from '../widget-preview-chrome';
 
 const DEFAULT_VIEW: View = {
 	type: 'pickerGrid',
@@ -21,6 +20,8 @@ const DEFAULT_VIEW: View = {
 	search: '',
 	mediaField: 'preview',
 	titleField: 'title',
+	// Larger default tile than the built-in 230.
+	layout: { previewSize: 290 },
 };
 
 const getItemId = ( item: WidgetType ) => item.name;
@@ -31,13 +32,7 @@ function WidgetPreview( { item }: { item: WidgetType } ) {
 		[ item ]
 	);
 
-	return (
-		<div className={ styles.preview } { ...{ inert: '' } }>
-			<Suspense fallback={ null }>
-				<WidgetRender widget={ exampleWidget } widgetType={ item } />
-			</Suspense>
-		</div>
-	);
+	return <WidgetPreviewChrome widget={ exampleWidget } widgetType={ item } />;
 }
 
 const fields: Field< WidgetType >[] = [
