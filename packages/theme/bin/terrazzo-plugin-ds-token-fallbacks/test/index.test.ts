@@ -17,7 +17,7 @@ describe( 'computeBrandFallback', () => {
 } );
 
 describe( 'formatDesignTokenFallbacksScss', () => {
-	it( 'generates a Sass map and wpds-var function', () => {
+	it( 'generates a Sass map and var function', () => {
 		const scss = formatDesignTokenFallbacksScss( {
 			'--wpds-border-radius-sm': '2px',
 			'--wpds-border-width-focus':
@@ -27,7 +27,7 @@ describe( 'formatDesignTokenFallbacksScss', () => {
 		} );
 
 		expect( scss ).toContain( '@use "sass:map";' );
-		expect( scss ).toContain( '@function wpds-var($token)' );
+		expect( scss ).toContain( '@function var($token)' );
 		expect( scss ).toContain( "'--wpds-border-radius-sm': '2px'" );
 		expect( scss ).toContain(
 			"'--wpds-border-width-focus': 'var(--wp-admin-border-width-focus, 2px)'"

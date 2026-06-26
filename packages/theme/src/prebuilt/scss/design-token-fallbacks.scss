@@ -195,7 +195,7 @@ $fallbacks: (
 	'--wpds-typography-line-height-xs': '16px',
 );
 
-@function wpds-var( $token ) {
+@function var( $token ) {
 	@if not map.has-key( $fallbacks, $token ) {
 		@error "Unknown design token: #{$token}";
 	}

@@ -216,7 +216,7 @@ export function formatDesignTokenFallbacksScss(
 		mapEntries,
 		');',
 		'',
-		'@function wpds-var($token) {',
+		'@function var($token) {',
 		'\t@if not map.has-key($fallbacks, $token) {',
 		'\t\t@error "Unknown design token: #{$token}";',
 		'\t}',

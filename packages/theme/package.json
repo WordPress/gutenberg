@@ -27,7 +27,7 @@
 		"build",
 		"build-module",
 		"build-types",
-		"design-token-fallbacks.scss",
+		"utils.scss",
 		"*.md"
 	],
 	"main": "build/index.cjs",
@@ -39,8 +39,8 @@
 			"default": "./build/index.cjs"
 		},
 		"./design-tokens.css": "./src/prebuilt/css/design-tokens.css",
-		"./design-token-fallbacks": {
-			"sass": "./design-token-fallbacks.scss"
+		"./utils": {
+			"sass": "./utils.scss"
 		},
 		"./design-tokens.js": {
 			"types": "./build-types/prebuilt/js/design-tokens.d.ts",
