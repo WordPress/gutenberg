@@ -463,6 +463,157 @@ test.describe( 'Unsynced pattern', () => {
 		).toBeVisible();
 	} );
 
+	test( 'shows the source block in the inspector when editing a pattern', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.setContent( `<!-- wp:group {"metadata":{"patternName":"theme/header-wrapper","name":"Header"},"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:paragraph -->
+<p>Pattern content</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->` );
+
+		await pageUtils.pressKeys( 'access+o' );
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+		await listView
+			.getByRole( 'gridcell', { name: 'Header', exact: true } )
+			.click();
+
+		await editor.openDocumentSettingsSidebar();
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		const blockHeading = editorSettings
+			.getByRole( 'tabpanel', { name: 'Block' } )
+			.getByRole( 'heading' )
+			.first();
+
+		await expect( blockHeading ).toHaveAccessibleName( 'Header Pattern' );
+
+		await editorSettings
+			.getByRole( 'button', { name: 'Edit pattern' } )
+			.click();
+
+		await expect( blockHeading ).toHaveAccessibleName( 'Header Group' );
+	} );
+
+	test( 'shows the full pattern editing command suggestion when a pattern content block is selected', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.setContent( `<!-- wp:group {"metadata":{"patternName":"theme/header-wrapper","name":"Header"},"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:paragraph -->
+<p>Pattern content</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->
+<!-- wp:paragraph -->
+<p>Outside paragraph</p>
+<!-- /wp:paragraph -->` );
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Pattern content' } )
+			.click();
+
+		await pageUtils.pressKeys( 'primary+k' );
+		const commandSuggestions = page.getByRole( 'listbox', {
+			name: 'Command suggestions',
+		} );
+
+		await expect(
+			commandSuggestions.getByText( 'Suggestions' )
+		).toBeVisible();
+		await expect(
+			commandSuggestions.getByRole( 'option', {
+				name: 'Enable editing all patterns',
+			} )
+		).toBeVisible();
+
+		await commandSuggestions
+			.getByRole( 'option', {
+				name: 'Enable editing all patterns',
+			} )
+			.click();
+		await expect( commandSuggestions ).toBeHidden();
+		await page.evaluate( () => {
+			window.wp.data
+				.dispatch( 'core/preferences' )
+				.set( 'core/commands', 'recentlyUsed', [] );
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Outside paragraph' } )
+			.click();
+
+		await pageUtils.pressKeys( 'primary+k' );
+
+		await expect( commandSuggestions.getByText( 'Recent' ) ).toBeHidden();
+		await expect(
+			commandSuggestions.getByText( 'Suggestions' )
+		).toBeVisible();
+		await expect(
+			commandSuggestions.getByRole( 'option', {
+				name: 'Disable editing all patterns',
+			} )
+		).toBeVisible();
+	} );
+
+	test( 'shows the source block in the inspector when full pattern editing is enabled', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.setContent( `<!-- wp:group {"metadata":{"patternName":"theme/header-wrapper","name":"Header"},"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:paragraph -->
+<p>Pattern content</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->` );
+
+		await pageUtils.pressKeys( 'access+o' );
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+		await listView
+			.getByRole( 'gridcell', { name: 'Header', exact: true } )
+			.click();
+
+		await editor.openDocumentSettingsSidebar();
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		const blockHeading = editorSettings
+			.getByRole( 'tabpanel', { name: 'Block' } )
+			.getByRole( 'heading' )
+			.first();
+
+		await expect( blockHeading ).toHaveAccessibleName( 'Header Pattern' );
+
+		await editorSettings
+			.getByRole( 'button', { name: 'Edit pattern' } )
+			.click();
+		await expect( blockHeading ).toHaveAccessibleName( 'Header Group' );
+		await expect(
+			editorSettings.getByRole( 'button', { name: 'Exit pattern' } )
+		).toBeVisible();
+
+		await pageUtils.pressKeys( 'primary+k' );
+		await page
+			.getByRole( 'combobox', { name: 'Search commands and settings' } )
+			.fill( 'editing all patterns' );
+		await page
+			.getByRole( 'option', { name: 'Enable editing all patterns' } )
+			.click();
+
+		await expect(
+			editorSettings.getByRole( 'button', { name: 'Exit pattern' } )
+		).toBeHidden();
+		await expect( blockHeading ).toHaveAccessibleName( 'Header Group' );
+	} );
+
 	test( 'detaches an unsynced pattern via the block options menu', async ( {
 		editor,
 		page,

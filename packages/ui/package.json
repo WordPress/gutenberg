@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/ui",
-	"version": "0.15.1",
+	"version": "0.16.0",
 	"description": "Themeable React UI components for the WordPress Design System.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -43,7 +43,7 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@base-ui/react": "^1.5.0",
+		"@base-ui/react": "^1.6.0",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/element": "file:../element",
@@ -51,7 +51,6 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/primitives": "file:../primitives",
-		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/style-runtime": "file:../style-runtime",
 		"@wordpress/theme": "file:../theme",
 		"clsx": "^2.1.1",
