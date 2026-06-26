@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
  */
 import { createBlobURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import type { createRegistry } from '@wordpress/data';
+import { applyFilters } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 type WPDataRegistry = ReturnType< typeof createRegistry >;
 
@@ -1291,16 +1292,35 @@ export function generateThumbnails( id: QueueItemId ) {
 		const isHeifFamily =
 			sourceType === 'image/avif' || sourceType === 'image/heif';
 
-		let needsClientRotation = false;
 		if ( isHeifFamily ) {
 			exifOrientation = getUnappliedExifOrientation(
 				await item.sourceFile.arrayBuffer()
 			);
-			// libvips will not auto-rotate these sub-sizes, so they must be
-			// generated from an explicitly rotated source rather than the
-			// original file.
-			needsClientRotation = exifOrientation !== 1;
 		}
+
+		/**
+		 * Filters the EXIF orientation value before sub-sizes are rotated,
+		 * or to prevent the rotation entirely.
+		 *
+		 * Returning `1` (or any falsy value, which is normalized to `1`)
+		 * skips rotation. This mirrors the server-side
+		 * `wp_image_maybe_exif_rotate` PHP filter, letting developers
+		 * correct or opt out of client-side orientation handling.
+		 *
+		 * @param orientation EXIF orientation value (1-8).
+		 * @param file        The source image file being processed.
+		 */
+		exifOrientation =
+			( applyFilters(
+				'media.exifOrientation',
+				exifOrientation,
+				item.sourceFile
+			) as number ) || 1;
+
+		// libvips will not auto-rotate AVIF/HEIF sub-sizes, so they must be
+		// generated from an explicitly rotated source rather than the
+		// original file.
+		const needsClientRotation = isHeifFamily && exifOrientation !== 1;
 
 		// Rotate the source once and reuse it for the sideloaded "original"
 		// (original_image metadata) and, for the client-rotation case, as the

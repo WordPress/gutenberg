@@ -34,6 +34,30 @@ dispatch( uploadStore ).addItems( [
 
 Refer to the API reference below or the TypeScript types for further help.
 
+## Filters
+
+### `media.exifOrientation`
+
+Filters the EXIF orientation value before client-side sub-sizes are rotated, or to prevent the rotation entirely. This mirrors the server-side [`wp_image_maybe_exif_rotate`](https://developer.wordpress.org/reference/hooks/wp_image_maybe_exif_rotate/) PHP filter, letting developers correct or opt out of orientation handling.
+
+Return `1` (or any falsy value, which is normalized to `1`) to skip rotation.
+
+_Parameters_
+
+-   _orientation_ `number`: EXIF orientation value (1-8).
+-   _file_ `File`: The source image file being processed.
+
+```js
+import { addFilter } from '@wordpress/hooks';
+
+// Never rotate images on the client.
+addFilter(
+	'media.exifOrientation',
+	'my-plugin/disable-exif-rotation',
+	() => 1
+);
+```
+
 ## API Reference
 
 ### Actions

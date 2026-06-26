@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { createBlobURL, revokeBlobURL } from '@wordpress/blob';
+import { addFilter, removeFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -14,7 +15,11 @@ import {
 	removeItem,
 } from '../private-actions';
 import { OperationType } from '../types';
-import { vipsHasTransparency, vipsGetUltraHdrInfo } from '../utils';
+import {
+	vipsHasTransparency,
+	vipsGetUltraHdrInfo,
+	vipsRotateImage,
+} from '../utils';
 
 // Mock @wordpress/blob
 jest.mock( '@wordpress/blob', () => ( {
@@ -26,6 +31,7 @@ jest.mock( '@wordpress/blob', () => ( {
 jest.mock( '../utils', () => ( {
 	vipsHasTransparency: jest.fn(),
 	vipsGetUltraHdrInfo: jest.fn(),
+	vipsRotateImage: jest.fn(),
 	terminateVipsWorker: jest.fn(),
 	maybeRecycleVipsWorker: jest.fn(),
 } ) );
@@ -680,6 +686,129 @@ describe( 'private actions', () => {
 					)
 			);
 			expect( anyTranscode ).toBe( true );
+		} );
+	} );
+
+	describe( 'generateThumbnails media.exifOrientation filter', () => {
+		const NAMESPACE = 'test/exif-orientation';
+
+		// A plain JPEG whose server-read EXIF orientation can be overridden
+		// or suppressed by the filter. `image_size: 'original'` is only
+		// sideloaded when the source is actually rotated, so its presence is
+		// a reliable proxy for "rotation happened".
+		const makeItem = ( attachmentOverrides = {} ) => ( {
+			id: 'orient-parent',
+			file: new File( [ 'fake' ], 'photo.jpg', { type: 'image/jpeg' } ),
+			sourceFile: new File( [ 'fake' ], 'photo.jpg', {
+				type: 'image/jpeg',
+			} ),
+			attachment: {
+				id: 7,
+				filename: 'photo.jpg',
+				missing_image_sizes: [],
+				exif_orientation: 1,
+				...attachmentOverrides,
+			},
+		} );
+
+		const makeHarness = ( item ) => {
+			const addSideloadItem = jest.fn();
+			const dispatch = {
+				addSideloadItem,
+				finishOperation: jest.fn(),
+				addItem: jest.fn(),
+			};
+			const select = {
+				getItem: () => item,
+				getSettings: () => ( { allImageSizes: {} } ),
+			};
+			return { select, dispatch, addSideloadItem };
+		};
+
+		const sideloadedOriginal = ( addSideloadItem ) =>
+			addSideloadItem.mock.calls.find(
+				( [ args ] ) => args.additionalData.image_size === 'original'
+			);
+
+		beforeEach( () => {
+			jest.clearAllMocks();
+			vipsRotateImage.mockResolvedValue(
+				new File( [ 'rotated' ], 'photo-rotated.jpg', {
+					type: 'image/jpeg',
+				} )
+			);
+		} );
+
+		afterEach( () => {
+			removeFilter( 'media.exifOrientation', NAMESPACE );
+		} );
+
+		it( 'rotates using the server orientation when no filter is set', async () => {
+			const item = makeItem( { exif_orientation: 6 } );
+			const { select, dispatch, addSideloadItem } = makeHarness( item );
+
+			await generateThumbnails( item.id )( { select, dispatch } );
+
+			expect( vipsRotateImage ).toHaveBeenCalledWith(
+				item.id,
+				item.sourceFile,
+				6,
+				undefined
+			);
+			expect( sideloadedOriginal( addSideloadItem ) ).toBeDefined();
+		} );
+
+		it( 'skips rotation when the filter returns 1', async () => {
+			addFilter( 'media.exifOrientation', NAMESPACE, () => 1 );
+
+			const item = makeItem( { exif_orientation: 6 } );
+			const { select, dispatch, addSideloadItem } = makeHarness( item );
+
+			await generateThumbnails( item.id )( { select, dispatch } );
+
+			expect( vipsRotateImage ).not.toHaveBeenCalled();
+			expect( sideloadedOriginal( addSideloadItem ) ).toBeUndefined();
+		} );
+
+		it( 'skips rotation when the filter returns a falsy value', async () => {
+			addFilter( 'media.exifOrientation', NAMESPACE, () => 0 );
+
+			const item = makeItem( { exif_orientation: 6 } );
+			const { select, dispatch } = makeHarness( item );
+
+			await generateThumbnails( item.id )( { select, dispatch } );
+
+			expect( vipsRotateImage ).not.toHaveBeenCalled();
+		} );
+
+		it( 'applies a corrected orientation supplied by the filter', async () => {
+			addFilter( 'media.exifOrientation', NAMESPACE, () => 8 );
+
+			// Server reports no rotation needed; the filter forces one.
+			const item = makeItem( { exif_orientation: 1 } );
+			const { select, dispatch, addSideloadItem } = makeHarness( item );
+
+			await generateThumbnails( item.id )( { select, dispatch } );
+
+			expect( vipsRotateImage ).toHaveBeenCalledWith(
+				item.id,
+				item.sourceFile,
+				8,
+				undefined
+			);
+			expect( sideloadedOriginal( addSideloadItem ) ).toBeDefined();
+		} );
+
+		it( 'passes the source file to the filter callback', async () => {
+			const callback = jest.fn( ( orientation ) => orientation );
+			addFilter( 'media.exifOrientation', NAMESPACE, callback );
+
+			const item = makeItem( { exif_orientation: 6 } );
+			const { select, dispatch } = makeHarness( item );
+
+			await generateThumbnails( item.id )( { select, dispatch } );
+
+			expect( callback ).toHaveBeenCalledWith( 6, item.sourceFile );
 		} );
 	} );
 } );
