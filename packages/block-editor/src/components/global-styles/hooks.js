@@ -106,6 +106,7 @@ export function useSettingsForBlockElement(
 			'textTransform',
 			'textDecoration',
 			'textIndent',
+			'textShadow',
 			'writingMode',
 		].forEach( ( key ) => {
 			if ( ! supportedStyles.includes( key ) ) {

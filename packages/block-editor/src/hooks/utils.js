@@ -254,6 +254,7 @@ export function useBlockSettings( name, parentLayout ) {
 		textColumns,
 		textDecoration,
 		textIndent,
+		textShadow,
 		writingMode,
 		textTransform,
 		letterSpacing,
@@ -299,6 +300,10 @@ export function useBlockSettings( name, parentLayout ) {
 		isHeadingEnabled,
 		isButtonEnabled,
 		shadow,
+		defaultTextShadowPresetsEnabled,
+		customTextShadowPresets,
+		defaultTextShadowPresets,
+		themeTextShadowPresets,
 	] = useSettings(
 		'background.backgroundImage',
 		'background.backgroundSize',
@@ -318,6 +323,7 @@ export function useBlockSettings( name, parentLayout ) {
 		'typography.textColumns',
 		'typography.textDecoration',
 		'typography.textIndent',
+		'typography.textShadow',
 		'typography.writingMode',
 		'typography.textTransform',
 		'typography.letterSpacing',
@@ -362,7 +368,11 @@ export function useBlockSettings( name, parentLayout ) {
 		'color.text',
 		'color.heading',
 		'color.button',
-		'shadow'
+		'shadow',
+		'typography.defaultTextShadowPresets',
+		'typography.textShadowPresets.custom',
+		'typography.textShadowPresets.default',
+		'typography.textShadowPresets.theme'
 	);
 
 	const rawSettings = useMemo( () => {
@@ -420,6 +430,13 @@ export function useBlockSettings( name, parentLayout ) {
 				textColumns,
 				textDecoration,
 				textIndent,
+				textShadow,
+				textShadowPresets: {
+					custom: customTextShadowPresets,
+					default: defaultTextShadowPresets,
+					theme: themeTextShadowPresets,
+				},
+				defaultTextShadowPresets: defaultTextShadowPresetsEnabled,
 				textTransform,
 				letterSpacing,
 				writingMode,
@@ -475,6 +492,11 @@ export function useBlockSettings( name, parentLayout ) {
 		textColumns,
 		textDecoration,
 		textIndent,
+		textShadow,
+		customTextShadowPresets,
+		defaultTextShadowPresets,
+		themeTextShadowPresets,
+		defaultTextShadowPresetsEnabled,
 		textTransform,
 		letterSpacing,
 		writingMode,

@@ -34,6 +34,7 @@ const ROOT_BLOCK_SUPPORTS: string[] = [
 	'textDecoration',
 	'textIndent',
 	'textTransform',
+	'textShadow',
 	'letterSpacing',
 ];
 

@@ -24,6 +24,7 @@ import TextTransformControl from '../text-transform-control';
 import TextDecorationControl from '../text-decoration-control';
 import TextIndentControl from '../text-indent-control';
 import WritingModeControl from '../writing-mode-control';
+import { TextShadowPopover } from './text-shadow-panel';
 import ColorGradientDropdownItem from './color-gradient-dropdown-item';
 import { useHasTextPanel } from './color-panel';
 import { useColorGradientSettings } from './hooks';
@@ -55,6 +56,7 @@ export function useHasTypographyPanel( settings ) {
 	const hasTextColumns = useHasTextColumnsControl( settings );
 	const hasFontSize = useHasFontSizeControl( settings );
 	const hasTextColor = useHasTextPanel( settings );
+	const hasTextShadow = useHasTextShadowControl( settings );
 
 	return (
 		hasFontFamily ||
@@ -68,7 +70,8 @@ export function useHasTypographyPanel( settings ) {
 		hasTextIndent ||
 		hasWritingMode ||
 		hasTextColumns ||
-		hasTextColor
+		hasTextColor ||
+		hasTextShadow
 	);
 }
 
@@ -134,6 +137,10 @@ function useHasTextIndentControl( settings ) {
 	return settings?.typography?.textIndent;
 }
 
+export function useHasTextShadowControl( settings ) {
+	return settings?.typography?.textShadow;
+}
+
 /**
  * Concatenate all the font sizes into a single list for the font size picker.
  *
@@ -190,6 +197,7 @@ const DEFAULT_CONTROLS = {
 	textIndent: true,
 	writingMode: true,
 	textColumns: true,
+	textShadow: true,
 };
 
 export default function TypographyPanel( {
@@ -538,6 +546,21 @@ export default function TypographyPanel( {
 	const hasTextAlign = () => !! value?.typography?.textAlign;
 	const resetTextAlign = () => setTextAlign( undefined );
 
+	// Text Shadow
+	const hasTextShadowControl = useHasTextShadowControl( settings );
+	const textShadow = decodeValue( inheritedValue?.typography?.textShadow );
+	const setTextShadow = ( newValue ) => {
+		onChange(
+			setImmutably(
+				value,
+				[ 'typography', 'textShadow' ],
+				newValue || undefined
+			)
+		);
+	};
+	const hasTextShadow = () => !! value?.typography?.textShadow;
+	const resetTextShadow = () => setTextShadow( undefined );
+
 	const resetAllFilter = useCallback(
 		( previousValue ) => {
 			if ( ! hasTextColorEnabled ) {
@@ -776,6 +799,20 @@ export default function TypographyPanel( {
 						showNone
 						isBlock
 						size="__unstable-large"
+					/>
+				</ToolsPanelItem>
+			) }
+			{ hasTextShadowControl && (
+				<ToolsPanelItem
+					label={ __( 'Text shadow' ) }
+					hasValue={ hasTextShadow }
+					onDeselect={ resetTextShadow }
+					isShownByDefault={ defaultControls.textShadow }
+					panelId={ panelId }
+				>
+					<TextShadowPopover
+						textShadow={ textShadow }
+						onChange={ setTextShadow }
 					/>
 				</ToolsPanelItem>
 			) }

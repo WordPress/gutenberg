@@ -1080,6 +1080,7 @@ supports: {
     -   `fontSize`: type `boolean`, default value `false`
     -   `lineHeight`: type `boolean`, default value `false`
     -   `textAlign`: type `boolean` or `array`, default value `false`
+    -   `textShadow`: type `boolean`, default value `false`
 
 The presence of this object signals that a block supports some typography related properties. When it does, the block editor will show a typography UI allowing the user to control their values.
 
@@ -1211,6 +1212,37 @@ attributes: {
         default: {
             typography: {
                 textAlign: 'value'
+            }
+        }
+    }
+}
+```
+
+### typography.textShadow
+
+-   Type: `boolean`
+-   Default value: `false`
+
+This value signals that a block supports the text-shadow CSS style property. When it does, the block editor will show a UI control for the user to set its value if the theme declares support.
+
+```js
+supports: {
+    typography: {
+        // Enable support and UI control for text-shadow.
+        textShadow: true,
+    },
+}
+```
+
+When the block declares support for `textShadow`, the attributes definition is extended to include a new attribute `style` of `object` type with no default assigned. It stores the custom value set by the user. The block can apply a default style by specifying its own `style` attribute with a default. For example:
+
+```js
+attributes: {
+    style: {
+        type: 'object',
+        default: {
+            typography: {
+                textShadow: 'value'
             }
         }
     }

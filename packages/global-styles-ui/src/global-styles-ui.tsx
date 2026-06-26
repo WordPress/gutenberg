@@ -27,6 +27,8 @@ import ScreenColors from './screen-colors';
 import ScreenColorPalette from './screen-color-palette';
 import ScreenBackground from './screen-background';
 import { ScreenShadows, ScreenShadowsEdit } from './screen-shadows';
+import ScreenTextShadows from './screen-text-shadows';
+import ScreenTextShadowsEdit from './screen-text-shadows-edit';
 import ScreenLayout from './screen-layout';
 import ScreenStyleVariations from './screen-style-variations';
 import ScreenCSS from './screen-css';
@@ -202,6 +204,12 @@ export function GlobalStylesUI( {
 					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/shadows/edit/:category/:slug">
 						<ScreenShadowsEdit />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/typography/text-shadows">
+						<ScreenTextShadows />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/typography/text-shadows/edit/:category/:slug">
+						<ScreenTextShadowsEdit />
 					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/background">
 						<ScreenBackground />

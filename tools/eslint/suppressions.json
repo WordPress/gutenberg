@@ -1711,11 +1711,6 @@
 			"count": 2
 		}
 	},
-	"packages/global-styles-ui/src/screen-typography.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/global-styles-ui/src/shadows-edit-panel.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2

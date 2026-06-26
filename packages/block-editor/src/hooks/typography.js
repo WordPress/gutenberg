@@ -44,6 +44,7 @@ const TEXT_INDENT_SUPPORT_KEY = 'typography.textIndent';
 const TEXT_COLUMNS_SUPPORT_KEY = 'typography.textColumns';
 const FONT_STYLE_SUPPORT_KEY = 'typography.__experimentalFontStyle';
 const FONT_WEIGHT_SUPPORT_KEY = 'typography.__experimentalFontWeight';
+const TEXT_SHADOW_SUPPORT_KEY = 'typography.textShadow';
 const WRITING_MODE_SUPPORT_KEY = 'typography.__experimentalWritingMode';
 export const TYPOGRAPHY_SUPPORT_KEY = 'typography';
 export const TYPOGRAPHY_SUPPORT_KEYS = [
@@ -59,6 +60,7 @@ export const TYPOGRAPHY_SUPPORT_KEYS = [
 	WRITING_MODE_SUPPORT_KEY,
 	TEXT_TRANSFORM_SUPPORT_KEY,
 	LETTER_SPACING_SUPPORT_KEY,
+	TEXT_SHADOW_SUPPORT_KEY,
 	FIT_TEXT_SUPPORT_KEY,
 ];
 
@@ -67,6 +69,7 @@ function styleToAttributes( style ) {
 	const fontSizeValue = style?.typography?.fontSize;
 	const fontFamilyValue = style?.typography?.fontFamily;
 	const textColorValue = style?.color?.text;
+	const textShadowValue = style?.typography?.textShadow;
 	const fontSizeSlug =
 		typeof fontSizeValue === 'string' &&
 		fontSizeValue?.startsWith( 'var:preset|font-size|' )
@@ -78,9 +81,15 @@ function styleToAttributes( style ) {
 		? fontFamilyValue.substring( 'var:preset|font-family|'.length )
 		: undefined;
 	const textColorSlug = extractPresetSlug( textColorValue, 'color' );
+	const textShadowSlug =
+		typeof textShadowValue === 'string' &&
+		textShadowValue?.startsWith( 'var:preset|text-shadow|' )
+			? textShadowValue.substring( 'var:preset|text-shadow|'.length )
+			: undefined;
 	updatedStyle.typography = {
 		...omit( updatedStyle.typography, [ 'fontFamily' ] ),
 		fontSize: fontSizeSlug ? undefined : fontSizeValue,
+		textShadow: textShadowSlug ? undefined : textShadowValue,
 	};
 	updatedStyle.color = {
 		...updatedStyle.color,
@@ -91,6 +100,7 @@ function styleToAttributes( style ) {
 		fontFamily: fontFamilySlug,
 		fontSize: fontSizeSlug,
 		textColor: textColorSlug,
+		textShadow: textShadowSlug,
 	};
 }
 
@@ -105,6 +115,9 @@ function attributesToStyle( attributes ) {
 			fontSize: attributes.fontSize
 				? 'var:preset|font-size|' + attributes.fontSize
 				: attributes.style?.typography?.fontSize,
+			textShadow: attributes.textShadow
+				? 'var:preset|text-shadow|' + attributes.textShadow
+				: attributes.style?.typography?.textShadow,
 		},
 		color: {
 			...attributes.style?.color,
@@ -151,29 +164,33 @@ export function TypographyPanel( {
 	const selectedState = useBlockStyleState();
 	const isEnabled = useHasTypographyPanel( settings );
 
-	const { style, fontFamily, fontSize, fitText, textColor } = useSelect(
-		( select ) => {
-			// Early return to avoid subscription when disabled.
-			if ( ! isEnabled ) {
-				return {};
-			}
-			const {
-				style: _style,
-				fontFamily: _fontFamily,
-				fontSize: _fontSize,
-				fitText: _fitText,
-				textColor: _textColor,
-			} = select( blockEditorStore ).getBlockAttributes( clientId ) || {};
-			return {
-				style: _style,
-				fontFamily: _fontFamily,
-				fontSize: _fontSize,
-				fitText: _fitText,
-				textColor: _textColor,
-			};
-		},
-		[ clientId, isEnabled ]
-	);
+	const { style, fontFamily, fontSize, fitText, textColor, textShadow } =
+		useSelect(
+			( select ) => {
+				// Early return to avoid subscription when disabled.
+				if ( ! isEnabled ) {
+					return {};
+				}
+				const {
+					style: _style,
+					fontFamily: _fontFamily,
+					fontSize: _fontSize,
+					textShadow: _textShadow,
+					fitText: _fitText,
+					textColor: _textColor,
+				} = select( blockEditorStore ).getBlockAttributes( clientId ) ||
+				{};
+				return {
+					style: _style,
+					fontFamily: _fontFamily,
+					fontSize: _fontSize,
+					fitText: _fitText,
+					textColor: _textColor,
+					textShadow: _textShadow,
+				};
+			},
+			[ clientId, isEnabled ]
+		);
 
 	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
 
@@ -181,7 +198,13 @@ export function TypographyPanel( {
 		if ( isStateSelected ) {
 			return getStyleForState( style, selectedState );
 		}
-		return attributesToStyle( { style, fontFamily, fontSize, textColor } );
+		return attributesToStyle( {
+			style,
+			fontFamily,
+			fontSize,
+			textColor,
+			textShadow,
+		} );
 	}, [
 		isStateSelected,
 		selectedState,
@@ -189,6 +212,7 @@ export function TypographyPanel( {
 		fontSize,
 		fontFamily,
 		textColor,
+		textShadow,
 	] );
 
 	const onChange = isStateSelected

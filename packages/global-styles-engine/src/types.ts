@@ -156,11 +156,19 @@ export interface FluidTypographySettings {
 /**
  * Typography settings collection
  */
+export interface TextShadowPreset extends BasePreset {
+	textShadow: string;
+}
+
 export interface TypographySettings {
 	fluid?: boolean | FluidTypographySettings;
 	fontSizes?: TypographyPreset[] | Record< string, TypographyPreset[] >;
 	fontFamilies?: Record< string, FontFamilyPreset[] >;
 	defaultFontSizes?: boolean;
+	textShadowPresets?:
+		| TextShadowPreset[]
+		| Record< string, TextShadowPreset[] >;
+	defaultTextShadowPresets?: boolean;
 }
 
 // =============================================================================

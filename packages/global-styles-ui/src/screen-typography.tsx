@@ -2,8 +2,11 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { __experimentalVStack as VStack } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { useContext } from '@wordpress/element';
+// @ts-expect-error: Not typed yet.
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import type { GlobalStylesSettings } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
@@ -14,10 +17,21 @@ import TypographyElements from './typography-elements';
 import TypographyVariations from './variations/variations-typography';
 import FontFamilies from './font-families';
 import FontSizesCount from './font-sizes/font-sizes-count';
+import TextShadows from './text-shadows';
 import { GlobalStylesContext } from './context';
+import { useSetting } from './hooks';
+import { unlock } from './lock-unlock';
+
+const { useHasTextShadowControl, useSettingsForBlockElement } = unlock(
+	blockEditorPrivateApis
+);
 
 function ScreenTypography() {
 	const { fontLibraryEnabled } = useContext( GlobalStylesContext );
+
+	const [ rawSettings ] = useSetting< GlobalStylesSettings >( '' );
+	const settings = useSettingsForBlockElement( rawSettings );
+	const hasTextShadowControl = useHasTextShadowControl( settings );
 
 	return (
 		<>
@@ -28,12 +42,13 @@ function ScreenTypography() {
 				) }
 			/>
 			<ScreenBody>
-				<VStack spacing={ 7 }>
+				<Stack direction="column" gap="xl">
 					<TypographyVariations title={ __( 'Typesets' ) } />
 					{ fontLibraryEnabled && <FontFamilies /> }
 					<TypographyElements />
 					<FontSizesCount />
-				</VStack>
+					{ hasTextShadowControl && <TextShadows /> }
+				</Stack>
 			</ScreenBody>
 		</>
 	);

@@ -70,6 +70,9 @@ const VALID_SETTINGS = [
 	'typography.textColumns',
 	'typography.textDecoration',
 	'typography.textIndent',
+	'typography.textShadow',
+	'typography.defaultTextShadowPresets',
+	'typography.textShadowPresets',
 	'typography.textTransform',
 	'typography.writingMode',
 ];

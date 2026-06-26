@@ -676,6 +676,39 @@
 							"type": "boolean",
 							"default": true
 						},
+						"textShadow": {
+							"description": "Allow users to set custom text shadows.",
+							"type": "boolean",
+							"default": true
+						},
+						"defaultTextShadowPresets": {
+							"description": "Allow users to choose text shadows from the default text shadow presets.",
+							"type": "boolean",
+							"default": true
+						},
+						"textShadowPresets": {
+							"description": "Text shadow presets for the text shadow picker.\nGenerates a single custom property (`--wp--preset--text-shadow--{slug}`) per preset value.",
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"name": {
+										"description": "Name of the text shadow preset, translatable.",
+										"type": "string"
+									},
+									"slug": {
+										"description": "Kebab-case unique identifier for the text shadow preset.",
+										"type": "string"
+									},
+									"textShadow": {
+										"description": "CSS text-shadow value.",
+										"type": "string"
+									}
+								},
+								"required": [ "name", "slug", "textShadow" ],
+								"additionalProperties": false
+							}
+						},
 						"writingMode": {
 							"description": "Allow users to set the writing mode.",
 							"type": "boolean",
