@@ -538,6 +538,7 @@ test.describe( 'Unsynced pattern', () => {
 				name: 'Enable editing all patterns',
 			} )
 			.click();
+		await expect( commandSuggestions ).toBeHidden();
 		await page.evaluate( () => {
 			window.wp.data
 				.dispatch( 'core/preferences' )
