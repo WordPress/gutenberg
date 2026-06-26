@@ -133,18 +133,7 @@ test.describe( 'Post Summary', () => {
 			page,
 		} ) => {
 			const title = 'DataForm direct synced pattern';
-			await admin.createNewPost( { postType: 'wp_block' } );
-
-			const modal = page.getByRole( 'dialog', {
-				name: 'Create pattern',
-			} );
-			await expect( modal ).toBeVisible();
-			await modal.getByRole( 'textbox', { name: 'Name' } ).fill( title );
-			await expect(
-				modal.getByRole( 'checkbox', { name: /Synced/ } )
-			).toBeChecked();
-			await modal.getByRole( 'button', { name: 'Create' } ).click();
-			await expect( modal ).toBeHidden();
+			await createPatternFromModal( { admin, page, title } );
 
 			const summary = await openPatternSummary( { editor, page } );
 			const fields = getPatternSummaryFields( { page, summary } );
@@ -161,22 +150,12 @@ test.describe( 'Post Summary', () => {
 			page,
 		} ) => {
 			const title = 'DataForm direct unsynced pattern';
-			await admin.createNewPost( { postType: 'wp_block' } );
-
-			const modal = page.getByRole( 'dialog', {
-				name: 'Create pattern',
+			await createPatternFromModal( {
+				admin,
+				page,
+				title,
+				isSynced: false,
 			} );
-			await expect( modal ).toBeVisible();
-			await modal.getByRole( 'textbox', { name: 'Name' } ).fill( title );
-
-			const syncedToggle = modal.getByRole( 'checkbox', {
-				name: /Synced/,
-			} );
-			await expect( syncedToggle ).toBeChecked();
-			await syncedToggle.click();
-			await expect( syncedToggle ).not.toBeChecked();
-			await modal.getByRole( 'button', { name: 'Create' } ).click();
-			await expect( modal ).toBeHidden();
 
 			const summary = await openPatternSummary( { editor, page } );
 			const fields = getPatternSummaryFields( { page, summary } );
@@ -211,6 +190,33 @@ test.describe( 'Post Summary', () => {
 			} );
 
 			return pattern;
+		}
+
+		async function createPatternFromModal( {
+			admin,
+			page,
+			title,
+			isSynced = true,
+		} ) {
+			await admin.createNewPost( { postType: 'wp_block' } );
+
+			const modal = page.getByRole( 'dialog', {
+				name: 'Create pattern',
+			} );
+			await expect( modal ).toBeVisible();
+			await modal.getByRole( 'textbox', { name: 'Name' } ).fill( title );
+
+			const syncedToggle = modal.getByRole( 'checkbox', {
+				name: /Synced/,
+			} );
+			await expect( syncedToggle ).toBeChecked();
+			if ( ! isSynced ) {
+				await syncedToggle.click();
+				await expect( syncedToggle ).not.toBeChecked();
+			}
+
+			await modal.getByRole( 'button', { name: 'Create' } ).click();
+			await expect( modal ).toBeHidden();
 		}
 
 		async function openPatternSummary( { editor, page } ) {
