@@ -200,7 +200,7 @@ const invalidateAttachedImagesQueries = ( postId, query = {} ) => {
  * action in the same dropdown Openverse uses for "Report image".
  *
  * @param {number} postId The current post id.
- * @return {InserterMediaCategory} The attached images media category.
+ * @return {InserterMediaCategory} The Attachments media category.
  */
 const getAttachedImagesCategory = ( postId ) => ( {
 	name: 'attached-images',
@@ -322,7 +322,7 @@ const inserterMediaCategories = [
 ];
 
 /**
- * Returns the inserter media categories for a given post. The "Attached images"
+ * Returns the inserter media categories for a given post. The "Attachments"
  * category is prepended only when editing a real post (a numeric id), so it is
  * omitted in contexts such as template editing where there is no post to attach
  * media to.

@@ -17,6 +17,10 @@
 
 -   Soft-deprecate the `__experimentalImageEditor` component. The Media Editor modal is now the default crop experience for core blocks ([#78654](https://github.com/WordPress/gutenberg/pull/78654)).
 
+### Enhancements
+
+-   Inserter media categories support optional `description` help text and a `showIfEmpty` flag (to keep a source listed when it has no items). The media panel additionally renders attach/detach affordances for first-party current-post media sources ([#79336](https://github.com/WordPress/gutenberg/pull/79336)).
+
 ## 15.22.0 (2026-06-24)
 
 ### Enhancements

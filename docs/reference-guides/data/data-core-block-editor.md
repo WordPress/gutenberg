@@ -1514,6 +1514,11 @@ _Properties_
 -   _fetch_ `(InserterMediaRequest) => Promise<InserterMediaItem[]>`: The function to fetch media items for the category.
 -   _getReportUrl_ `[(InserterMediaItem) => string]`: If the media category supports reporting media items, this function should return the report url for the media item. It accepts the `InserterMediaItem` as an argument.
 -   _isExternalResource_ `[boolean]`: If the media category is an external resource, this should be set to true. This is used to avoid making a request to the external resource when the user
+-   _description_ `[string]`: Optional help text shown beneath the search field to describe the source.
+-   _showIfEmpty_ `[boolean]`: If true, the category stays in the tab list even when it has no items (like an external source).
+-   _attach_ `[Function]`: Internal (first-party only): attaches the selected media items to the current post. Not part of the supported public extension API.
+-   _detach_ `[Function]`: Internal (first-party only): detaches a media item from the current post. Not part of the supported public extension API.
+-   _invalidate_ `[Function]`: Internal (first-party only): invalidates cached results after an attach/detach so the grid refetches.
 
 ### removeBlock
 

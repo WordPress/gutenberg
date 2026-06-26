@@ -2051,6 +2051,11 @@ export function __unstableSetTemporarilyEditingAsBlocks( clientId ) {
  *                                                                                                   the report url for the media item. It accepts the `InserterMediaItem` as an argument.
  * @property {boolean}                                                [isExternalResource]           If the media category is an external resource, this should be set to true.
  *                                                                                                   This is used to avoid making a request to the external resource when the user
+ * @property {string}                                                 [description]                  Optional help text shown beneath the search field to describe the source.
+ * @property {boolean}                                                [showIfEmpty]                  If true, the category stays in the tab list even when it has no items (like an external source).
+ * @property {Function}                                               [attach]                       Internal (first-party only): attaches the selected media items to the current post. Not part of the supported public extension API.
+ * @property {Function}                                               [detach]                       Internal (first-party only): detaches a media item from the current post. Not part of the supported public extension API.
+ * @property {Function}                                               [invalidate]                   Internal (first-party only): invalidates cached results after an attach/detach so the grid refetches.
  */
 export const registerInserterMediaCategory =
 	( category ) =>

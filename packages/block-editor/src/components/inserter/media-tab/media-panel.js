@@ -8,13 +8,7 @@ import clsx from 'clsx';
  */
 import { Button, Modal, Spinner, SearchControl } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import {
-	useCallback,
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
-} from '@wordpress/element';
+import { useCallback, useMemo, useState } from '@wordpress/element';
 import { useDebouncedInput } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
@@ -30,27 +24,28 @@ import { useMediaResults, useDelayedLoading } from './hooks';
 import InserterNoResults from '../no-results';
 
 const INITIAL_MEDIA_ITEMS_PER_PAGE = 10;
-const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 /**
  * Opens the Media Library to attach images to the current post. Only rendered
- * for media categories that expose an `attach` capability (i.e. the "Attached
- * images" source); other sources render the panel exactly as before.
+ * for media categories that expose an `attach` capability (i.e. the
+ * "Attachments" source); other sources render the panel exactly as before.
  *
  * The picker opens fresh each time with no pre-selected value, so it is purely
  * additive: selecting images attaches them, and it does not imply that
  * deselecting would detach. Detaching is a separate, explicit per-item action.
  *
  * @param {Object}   props
- * @param {Function} props.onSelect Called with the selected media items.
+ * @param {string}   props.mediaType The category's media type, used to constrain the picker.
+ * @param {Function} props.onSelect  Called with the selected media items.
  */
-function AttachImagesButton( { onSelect } ) {
+function AttachImagesButton( { mediaType, onSelect } ) {
+	const allowedTypes = useMemo( () => [ mediaType ], [ mediaType ] );
 	return (
 		<MediaUploadCheck>
 			<MediaUpload
 				multiple="add"
 				onSelect={ onSelect }
-				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				allowedTypes={ allowedTypes }
 				title={ __( 'Attach images' ) }
 				render={ ( { open } ) => (
 					<Button
@@ -89,26 +84,10 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 	);
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
-
-	// Tracks an in-flight attach/detach (and the refetch that follows it) so the
-	// grid can stay visible and dimmed throughout, rather than blanking. Kept
-	// separate from the hook's `isLoading` so initial loads and searches still
-	// show the centered spinner as before.
-	const [ isUpdating, setIsUpdating ] = useState( false );
-	const wasLoadingRef = useRef( isLoading );
-	useEffect( () => {
-		// Clear the updating flag once the refetch we triggered has settled, so
-		// `isBusy` stays continuous from the click through to fresh results
-		// (no one-frame gap that would restart the spinner).
-		if ( wasLoadingRef.current && ! isLoading ) {
-			setIsUpdating( false );
-		}
-		wasLoadingRef.current = isLoading;
-	}, [ isLoading ] );
-	const isBusy = isLoading || isUpdating;
-	// Only dim the populated grid once a refetch has run long enough to be worth
-	// signalling; quick attach/detach saves resolve before this and show nothing.
-	const showRefreshing = useDelayedLoading( isBusy );
+	// Dim (rather than blank) the populated grid while a refetch is in flight,
+	// but only once it has run long enough to be worth signalling — quick
+	// attach/detach refetches resolve before this and show nothing.
+	const showRefreshing = useDelayedLoading( isLoading );
 
 	// Invalidate the cached results and force `useMediaResults` to refetch so
 	// the grid reflects images that were just attached or detached.
@@ -119,7 +98,6 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 
 	const handleAttach = useCallback(
 		async ( selectedMedia ) => {
-			setIsUpdating( true );
 			try {
 				const attachedCount = await category.attach( selectedMedia );
 				refresh();
@@ -139,8 +117,6 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 					);
 				}
 			} catch {
-				// The triggered refetch never runs, so clear the busy flag here.
-				setIsUpdating( false );
 				createErrorNotice( __( 'Could not attach images.' ), {
 					type: 'snackbar',
 					id: 'inserter-notice',
@@ -152,7 +128,6 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 
 	const handleDetach = useCallback(
 		async ( media ) => {
-			setIsUpdating( true );
 			try {
 				await category.detach( media );
 				refresh();
@@ -161,8 +136,6 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 					id: 'inserter-notice',
 				} );
 			} catch {
-				// The triggered refetch never runs, so clear the busy flag here.
-				setIsUpdating( false );
 				createErrorNotice( __( 'Could not detach image.' ), {
 					type: 'snackbar',
 					id: 'inserter-notice',
@@ -198,18 +171,21 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 				</p>
 			) }
 			{ category.attach && (
-				<AttachImagesButton onSelect={ handleAttach } />
+				<AttachImagesButton
+					mediaType={ category.mediaType }
+					onSelect={ handleAttach }
+				/>
 			) }
-			{ isBusy && ! mediaList?.length && (
+			{ isLoading && ! mediaList?.length && (
 				<div className={ `${ baseCssClass }-spinner` }>
 					<Spinner />
 				</div>
 			) }
-			{ ! isBusy && ! mediaList?.length && <InserterNoResults /> }
+			{ ! isLoading && ! mediaList?.length && <InserterNoResults /> }
 			{ !! mediaList?.length && (
-				// Keep the existing items visible while attaching/detaching
-				// refetches, dimming (and gently pulsing) them rather than
-				// clearing the grid, so it doesn't flicker or pop.
+				// Keep the existing items visible while a refetch is in flight,
+				// dimming (and gently pulsing) them rather than clearing the grid,
+				// so it doesn't flicker or pop.
 				<div
 					className={ clsx( `${ baseCssClass }-results`, {
 						'is-loading': showRefreshing,
@@ -228,6 +204,9 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 				</div>
 			) }
 			{ mediaPendingDetach && (
+				// A plain `Modal` (not `ConfirmDialog`) so we can pass
+				// `overlayClassName` and stack it above the options dropdown that
+				// opened it (see the z-index entry in `_z-index.scss`).
 				<Modal
 					title={ __( 'Detach image' ) }
 					onRequestClose={ () => setMediaPendingDetach( undefined ) }

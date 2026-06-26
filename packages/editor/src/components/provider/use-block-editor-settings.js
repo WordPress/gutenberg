@@ -321,7 +321,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 
 	const forceDisableFocusMode = settings.focusMode === false;
 
-	// The "Attached images" media category depends on the current post, so the
+	// The "Attachments" media category depends on the current post, so the
 	// categories are derived from `postId` rather than being a static list.
 	const inserterMediaCategories = useMemo(
 		() => getInserterMediaCategories( postId ),
