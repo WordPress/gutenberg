@@ -661,7 +661,6 @@ export default function TypographyPanel( {
 						__unstableInputWidth="auto"
 						value={ lineHeight }
 						onChange={ setLineHeight }
-						size="__unstable-large"
 					/>
 				</ToolsPanelItem>
 			) }
