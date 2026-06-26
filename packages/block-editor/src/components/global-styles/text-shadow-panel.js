@@ -119,7 +119,10 @@ function TextShadowControl( { textShadow, onChange } ) {
 						hideLabelFromVision
 						label={ __( 'Text shadow preset' ) }
 						value={ activeValue }
-						options={ choices }
+						options={ [
+							{ value: '', label: __( 'Default' ) },
+							...choices,
+						] }
 						onChange={ onChange }
 					/>
 				) : (
