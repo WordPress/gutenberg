@@ -2,19 +2,15 @@
 name: Publish Built Assets
 
 on:
-    push:
-        branches:
-            - trunk
-            - 'release/**'
-            - 'wp/**'
-    pull_request:
-    workflow_dispatch:
+    # Running after the plugin zip workflow completes ensures all version bumps are pushed and release branches exist.
+    workflow_run:
+        workflows: [' Build Gutenberg Plugin Zip']
+        types:
+            - completed
 
-# Cancels all previous workflow runs for pull requests that have not completed.
+# Cancels all previous workflow runs for the same source branch.
 concurrency:
-    # The concurrency group contains the workflow name and the branch name for pull requests
-    # or the commit hash for any other events.
-    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+    group: ${{ github.workflow }}-${{ github.event.workflow_run.head_branch }}
     cancel-in-progress: true
 
 # Disable permissions for all available scopes by default.
@@ -29,12 +25,14 @@ jobs:
             packages: write
         if: |
             github.repository == 'WordPress/gutenberg' &&
+            github.event.workflow_run.conclusion == 'success' &&
             (
-              github.event_name == 'push' ||
-              github.event_name == 'workflow_dispatch' ||
-              (
-                github.event_name == 'pull_request' &&
-                github.event.pull_request.head.repo.full_name == github.repository
-              )
+              github.event.workflow_run.event != 'pull_request' ||
+              github.event.workflow_run.head_repository.full_name == github.repository
             )
         uses: ./.github/workflows/reusable-publish-built-assets.yml
+        with:
+            source_sha: ${{ github.event.workflow_run.head_sha }}
+            source_event: ${{ github.event.workflow_run.event }}
+            head_branch: ${{ github.event.workflow_run.head_branch }}
+            pr_number: ${{ github.event.workflow_run.pull_requests[0].number }}
