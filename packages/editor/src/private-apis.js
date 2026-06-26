@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { CreateTemplatePartModal } from '@wordpress/fields';
+import {
+	CreateTemplatePartModal,
+	patternTitleField,
+	templateTitleField,
+} from '@wordpress/fields';
 import * as interfaceApis from '@wordpress/interface';
 
 /**
@@ -32,6 +36,8 @@ const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
 export const privateApis = {};
 lock( privateApis, {
 	CreateTemplatePartModal,
+	patternTitleField,
+	templateTitleField,
 	BackButton,
 	EntitiesSavedStatesExtensible,
 	Editor,
