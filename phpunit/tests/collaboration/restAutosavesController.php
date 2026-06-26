@@ -155,6 +155,31 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 		$this->assertSame( $content, $autosave->post_content );
 	}
 
+	public function test_draft_autosave_does_not_create_revision_when_content_is_unchanged() {
+		$title   = 'Unchanged RTC draft title';
+		$content = '<!-- wp:paragraph --><p>Unchanged RTC draft content</p><!-- /wp:paragraph -->';
+		$post_id = $this->create_draft( $title, $content );
+
+		// Autosave with the exact same title and content as the saved post, while
+		// still sending meta as the editor does (the CRDT document changes on
+		// every autosave). The unchanged revisioned fields must win: a no-op
+		// autosave should not leave behind a revision that would later be flagged
+		// as "a more recent autosave" purely by its timestamp.
+		$response = $this->dispatch_autosave(
+			$post_id,
+			$title,
+			$content,
+			array(
+				self::CRDT_DOC_META_KEY => 'changed-crdt-doc',
+			)
+		);
+
+		$this->assertSame( 200, $response->get_status() );
+
+		$autosave = wp_get_post_autosave( $post_id, self::$author_id );
+		$this->assertFalse( $autosave, 'Expected no autosave revision for an unchanged autosave.' );
+	}
+
 	public function test_draft_autosave_does_not_store_crdt_doc_meta_on_revision() {
 		$original_title   = 'Original RTC draft title with CRDT meta';
 		$original_content = '<!-- wp:paragraph --><p>Original RTC draft content with CRDT meta</p><!-- /wp:paragraph -->';
