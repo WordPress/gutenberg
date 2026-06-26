@@ -63,32 +63,59 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 				if ( ! document.hasFocus() ) {
 					return;
 				}
-				// Prevent blur from closing the form while the async submit
-				// is in progress. Clicking "Add note" moves focus away,
-				// triggering blur before onSubmit completes.
+				/*
+				 * Prevent blur from closing the form while the async submit
+				 * is in progress. Clicking "Add note" moves focus away,
+				 * triggering blur before onSubmit completes.
+				 */
 				if ( isSubmittingRef.current ) {
 					return;
 				}
-				// Rich-text re-renders briefly drop focus to the body during
-				// typing, producing a blur event with relatedTarget=null. Only
-				// dismiss the form when focus moves to a concrete element
-				// outside the form container.
-				if ( ! event.relatedTarget ) {
+				const container = event.currentTarget;
+				const dismiss = () => {
+					toggleBlockSpotlight( clientId, false );
+					selectNote( undefined );
+				};
+				/*
+				 * A known target outside the form closes it, except a format
+				 * popover (e.g. the Cmd+K link UI) which portals out of the
+				 * form container and so reports a related target inside
+				 * `.components-popover` rather than `currentTarget`.
+				 */
+				if ( event.relatedTarget ) {
+					if ( container.contains( event.relatedTarget ) ) {
+						return;
+					}
+					if (
+						event.relatedTarget.closest( '.components-popover' )
+					) {
+						return;
+					}
+					dismiss();
 					return;
 				}
-				if ( event.currentTarget.contains( event.relatedTarget ) ) {
-					return;
-				}
-				// Format-type popovers (e.g., the inline link UI opened with
-				// Cmd+K) portal out of the form container, so the related
-				// target sits in `.components-popover` rather than inside
-				// `currentTarget`. Keep the form open while one of these is
-				// active so the user can finish editing the popover.
-				if ( event.relatedTarget.closest( '.components-popover' ) ) {
-					return;
-				}
-				toggleBlockSpotlight( clientId, false );
-				selectNote( undefined );
+				/*
+				 * With no relatedTarget the blur is ambiguous: rich-text
+				 * re-renders briefly drop focus to the body while typing, but a
+				 * click on the empty document body also lands here. Re-check on
+				 * the next frame where focus actually settled and dismiss only
+				 * when it has truly left the form.
+				 */
+				container.ownerDocument.defaultView.requestAnimationFrame(
+					() => {
+						const active = container.ownerDocument.activeElement;
+						if ( active && container.contains( active ) ) {
+							return;
+						}
+						if (
+							active &&
+							active.closest( '.components-popover' )
+						) {
+							return;
+						}
+						dismiss();
+					}
+				);
 			} }
 		>
 			<NoteCard>
