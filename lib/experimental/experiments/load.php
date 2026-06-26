@@ -128,7 +128,7 @@ function gutenberg_initialize_experiments_settings() {
 				array(
 					'id'          => 'gutenberg-omnibar',
 					'label'       => __( 'Toolbar UI refresh', 'gutenberg' ),
-					'description' => __( 'Previews a redesigned toolbar UI that is visually consistent everywhere. For now, it includes replacing home/odometer dashicon with site icon if set.', 'gutenberg' ),
+					'description' => __( 'Previews a redesigned toolbar UI. Includes showing site icon, removing "Howdy, " prefix, and making user avatar circular.', 'gutenberg' ),
 				),
 				array(
 					'id'          => 'gutenberg-react-19',
