@@ -37,12 +37,14 @@ const ALLOWED_MEDIA_TYPES = [ 'image' ];
  * for media categories that expose an `attach` capability (i.e. the "Attached
  * images" source); other sources render the panel exactly as before.
  *
+ * The picker opens fresh each time with no pre-selected value, so it is purely
+ * additive: selecting images attaches them, and it does not imply that
+ * deselecting would detach. Detaching is a separate, explicit per-item action.
+ *
  * @param {Object}   props
- * @param {number[]} props.mediaIds The ids of the currently shown images, used
- *                                  to preselect them in the Media Library.
  * @param {Function} props.onSelect Called with the selected media items.
  */
-function AttachImagesButton( { mediaIds, onSelect } ) {
+function AttachImagesButton( { onSelect } ) {
 	return (
 		<MediaUploadCheck>
 			<MediaUpload
@@ -50,7 +52,6 @@ function AttachImagesButton( { mediaIds, onSelect } ) {
 				onSelect={ onSelect }
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				title={ __( 'Attach images' ) }
-				value={ mediaIds }
 				render={ ( { open } ) => (
 					<Button
 						__next40pxDefaultSize
@@ -180,12 +181,6 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 		handleDetach( media );
 	}, [ handleDetach, mediaPendingDetach ] );
 
-	const mediaIds = useMemo(
-		() =>
-			( mediaList || [] ).map( ( media ) => media.id ).filter( Boolean ),
-		[ mediaList ]
-	);
-
 	const baseCssClass = 'block-editor-inserter__media-panel';
 	const searchLabel = category.labels.search_items || __( 'Search' );
 	return (
@@ -203,10 +198,7 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 				</p>
 			) }
 			{ category.attach && (
-				<AttachImagesButton
-					mediaIds={ mediaIds }
-					onSelect={ handleAttach }
-				/>
+				<AttachImagesButton onSelect={ handleAttach } />
 			) }
 			{ isBusy && ! mediaList?.length && (
 				<div className={ `${ baseCssClass }-spinner` }>
