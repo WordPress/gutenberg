@@ -30,6 +30,8 @@ import {
 	slugField,
 	statusField,
 	authorField,
+	templateAuthorField,
+	templatePartAuthorField,
 	titleField,
 	templateField,
 	templateTitleField,
@@ -267,7 +269,12 @@ export const registerPostTypeSchema =
 				postTypeConfig.supports?.thumbnail &&
 					currentTheme?.theme_supports?.[ 'post-thumbnails' ] &&
 					featuredImageField,
-				postTypeConfig.supports?.author && authorField,
+				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
+					postTypeConfig.supports?.author &&
+					authorField,
+				postTypeConfig.slug === 'wp_template' && templateAuthorField,
+				postTypeConfig.slug === 'wp_template_part' &&
+					templatePartAuthorField,
 				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
 					statusField,
 				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&

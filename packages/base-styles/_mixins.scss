@@ -4,7 +4,7 @@
 
 @use "sass:color";
 @use "sass:math";
-@use "@wordpress/theme/src/prebuilt/scss/design-token-fallbacks" as wpds;
+@use "@wordpress/theme/utils" as wpds;
 @use "./variables";
 @use "./colors";
 @use "./breakpoints";
@@ -183,14 +183,14 @@
 
 /**
  * Standard focus rings for the WordPress Design System.
-
+ *
  * Apply `outset-ring__focus` inside the relevant pseudo-class at the call site,
  * e.g. `&:focus { @include outset-ring__focus(); }`.
  */
 
 @mixin outset-ring__focus() {
-	outline: wpds.wpds-var("--wpds-border-width-focus") solid wpds.wpds-var("--wpds-color-stroke-focus");
-	outline-offset: wpds.wpds-var("--wpds-border-width-focus");
+	outline: wpds.var("--wpds-border-width-focus") solid wpds.var("--wpds-color-stroke-focus");
+	outline-offset: wpds.var("--wpds-border-width-focus");
 }
 
 

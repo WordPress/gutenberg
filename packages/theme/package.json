@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/theme",
-	"version": "0.15.1",
+	"version": "0.16.0",
 	"description": "Theme and context provider for the WordPress Design System.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -27,6 +27,7 @@
 		"build",
 		"build-module",
 		"build-types",
+		"utils.scss",
 		"*.md"
 	],
 	"main": "build/index.cjs",
@@ -38,7 +39,9 @@
 			"default": "./build/index.cjs"
 		},
 		"./design-tokens.css": "./src/prebuilt/css/design-tokens.css",
-		"./design-token-fallbacks": "./src/prebuilt/scss/design-token-fallbacks.scss",
+		"./utils": {
+			"sass": "./utils.scss"
+		},
 		"./design-tokens.js": {
 			"types": "./build-types/prebuilt/js/design-tokens.d.ts",
 			"import": "./build-module/prebuilt/js/design-tokens.mjs",
@@ -78,10 +81,12 @@
 	},
 	"wpScript": true,
 	"types": "build-types",
-	"sideEffects": false,
+	"sideEffects": [
+		"src/prebuilt/css/design-tokens.css"
+	],
 	"dependencies": {
+		"@wordpress/compose": "file:../compose",
 		"@wordpress/element": "file:../element",
-		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/style-runtime": "file:../style-runtime",
 		"colorjs.io": "^0.6.0",
 		"memize": "^2.1.0"

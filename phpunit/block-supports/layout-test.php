@@ -147,6 +147,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		'should_skip_gap_serialization' => false,
 		'fallback_gap_value'            => '0.5em',
 		'block_spacing'                 => null,
+		'options'                       => array(),
 	);
 
 	/**
@@ -168,7 +169,8 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 			$args['gap_value'],
 			$args['should_skip_gap_serialization'],
 			$args['fallback_gap_value'],
-			$args['block_spacing']
+			$args['block_spacing'],
+			$args['options']
 		);
 
 		$this->assertSame( $expected_output, $layout_styles );
@@ -255,6 +257,21 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 					),
 				),
 				'expected_output' => '.wp-layout > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width:800px;margin-left:auto !important;margin-right:auto !important;}.wp-layout > .alignwide{max-width:1200px;}.wp-layout .alignfull{max-width:none;}.wp-layout > .alignfull{margin-right:calc(10px * -1);margin-left:calc(20px * -1);}',
+			),
+			'constrained layout with content size unset in viewport' => array(
+				'args'            => array(
+					'selector' => '.wp-layout',
+					'layout'   => array(
+						'type'        => 'constrained',
+						'contentSize' => '800px',
+					),
+					'options'  => array(
+						'viewport_overrides' => array(
+							'contentSize' => null,
+						),
+					),
+				),
+				'expected_output' => '.wp-layout > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width:var(--wp--style--global--content-size, none);}.wp-layout > .alignwide{max-width:var(--wp--style--global--wide-size, none);}.wp-layout .alignfull{max-width:none;}',
 			),
 			'constrained layout with block gap support'    => array(
 				'args'            => array(

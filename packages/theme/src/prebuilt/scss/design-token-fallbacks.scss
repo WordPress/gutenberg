@@ -129,7 +129,6 @@ $fallbacks: (
 	'--wpds-color-stroke-surface-warning': '#e1bc7c',
 	'--wpds-color-stroke-surface-warning-strong': '#926300',
 	'--wpds-cursor-control': 'pointer',
-	'--wpds-dimension-base': '4px',
 	'--wpds-dimension-gap-2xl': '32px',
 	'--wpds-dimension-gap-3xl': '40px',
 	'--wpds-dimension-gap-lg': '16px',
@@ -196,7 +195,7 @@ $fallbacks: (
 	'--wpds-typography-line-height-xs': '16px',
 );
 
-@function wpds-var( $token ) {
+@function var( $token ) {
 	@if not map.has-key( $fallbacks, $token ) {
 		@error "Unknown design token: #{$token}";
 	}
