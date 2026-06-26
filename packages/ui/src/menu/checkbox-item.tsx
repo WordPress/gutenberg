@@ -23,7 +23,7 @@ const CheckboxItem = forwardRef< HTMLDivElement, CheckboxItemProps >(
 					resetStyles[ 'box-sizing' ],
 					itemPopupStyles.item,
 					styles.item,
-					styles[ 'has-prefix' ],
+					styles[ 'has-indicator' ],
 					className
 				) }
 				{ ...props }
