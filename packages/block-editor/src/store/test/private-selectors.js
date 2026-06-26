@@ -223,11 +223,12 @@ describe( 'private selectors', () => {
 			} );
 		} );
 
-		it( 'returns the selected state for the block', () => {
+		it( 'returns the per-block pseudo with the global viewport', () => {
 			const state = {
+				styleStateViewport: '@mobile',
 				selectedBlockStyleState: {
 					clientId: 'client-1',
-					value: { viewport: '@mobile', pseudo: ':hover' },
+					value: { pseudo: ':hover' },
 				},
 			};
 
@@ -237,7 +238,7 @@ describe( 'private selectors', () => {
 			} );
 		} );
 
-		it( 'returns default when the selected state has no value', () => {
+		it( 'returns default pseudo when the selected state has no value', () => {
 			const state = {
 				selectedBlockStyleState: {
 					clientId: 'client-1',
@@ -250,16 +251,17 @@ describe( 'private selectors', () => {
 			} );
 		} );
 
-		it( 'returns default when another block has the selected state', () => {
+		it( 'returns the global viewport even when another block holds the per-block state', () => {
 			const state = {
+				styleStateViewport: '@mobile',
 				selectedBlockStyleState: {
 					clientId: 'client-2',
-					value: { viewport: 'default', pseudo: ':hover' },
+					value: { pseudo: ':hover' },
 				},
 			};
 
 			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
-				viewport: 'default',
+				viewport: '@mobile',
 				pseudo: 'default',
 			} );
 		} );
@@ -283,11 +285,12 @@ describe( 'private selectors', () => {
 			expect( hasSelectedStyleState( state, 'client-1' ) ).toBe( false );
 		} );
 
-		it( 'returns true when a viewport state is selected', () => {
+		it( 'returns true when a global viewport state is selected', () => {
 			const state = {
+				styleStateViewport: '@mobile',
 				selectedBlockStyleState: {
 					clientId: 'client-1',
-					value: { viewport: '@mobile', pseudo: 'default' },
+					value: { pseudo: 'default' },
 				},
 			};
 
@@ -305,11 +308,12 @@ describe( 'private selectors', () => {
 			expect( hasSelectedStyleState( state, 'client-1' ) ).toBe( true );
 		} );
 
-		it( 'returns true when viewport and pseudo states are selected', () => {
+		it( 'returns true when global viewport and per-block pseudo states are selected', () => {
 			const state = {
+				styleStateViewport: '@mobile',
 				selectedBlockStyleState: {
 					clientId: 'client-1',
-					value: { viewport: '@mobile', pseudo: ':hover' },
+					value: { pseudo: ':hover' },
 				},
 			};
 
@@ -1661,6 +1665,7 @@ describe( 'private selectors', () => {
 			blockName = 'core/group',
 			patternName,
 			disableContentOnlyForUnsyncedPatterns,
+			disableContentOnlyForTemplateParts,
 			templateLock,
 			rootTemplateLock,
 		} = {} ) => {
@@ -1685,10 +1690,14 @@ describe( 'private selectors', () => {
 							: {},
 					],
 				] ),
-				settings:
-					disableContentOnlyForUnsyncedPatterns !== undefined
+				settings: {
+					...( disableContentOnlyForUnsyncedPatterns !== undefined
 						? { disableContentOnlyForUnsyncedPatterns }
-						: {},
+						: {} ),
+					...( disableContentOnlyForTemplateParts !== undefined
+						? { disableContentOnlyForTemplateParts }
+						: {} ),
+				},
 				editedContentOnlySection: undefined,
 			};
 		};
@@ -1728,6 +1737,22 @@ describe( 'private selectors', () => {
 			const state = createState( {
 				patternName: 'my-pattern',
 				disableContentOnlyForUnsyncedPatterns: false,
+			} );
+			expect( isSectionBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'should return false for template parts when disableContentOnlyForTemplateParts is true', () => {
+			const state = createState( {
+				blockName: 'core/template-part',
+				disableContentOnlyForTemplateParts: true,
+			} );
+			expect( isSectionBlock( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'should return true for template parts when disableContentOnlyForTemplateParts is false', () => {
+			const state = createState( {
+				blockName: 'core/template-part',
+				disableContentOnlyForTemplateParts: false,
 			} );
 			expect( isSectionBlock( state, 'block-1' ) ).toBe( true );
 		} );

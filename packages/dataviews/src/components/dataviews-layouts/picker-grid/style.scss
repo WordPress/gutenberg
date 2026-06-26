@@ -110,7 +110,13 @@
 		.dataviews-view-picker-grid__field-value:not(:empty) {
 			min-height: var(--wpds-dimension-size-sm);
 			line-height: var(--wpds-typography-line-height-sm);
-			padding-top: calc(var(--wpds-dimension-base) / 2);
+			// Top half of the slack between the row height and the line box,
+			// optically centering a single line within the row.
+			padding-top:
+				calc((
+					var(--wpds-dimension-size-sm) -
+					var(--wpds-typography-line-height-sm)
+				) / 2);
 		}
 
 		.dataviews-view-picker-grid__field {
@@ -178,5 +184,5 @@
 	font-weight: var(--wpds-typography-font-weight-medium);
 	color: var(--wpds-color-foreground-content-neutral);
 	margin: 0 0 var(--wpds-dimension-gap-sm) 0;
-	padding: 0 calc(var(--wpds-dimension-base) * 12);
+	padding: 0 48px;
 }

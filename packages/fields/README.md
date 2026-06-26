@@ -224,9 +224,25 @@ Status field for BasePost.
 
 Sticky field for BasePost.
 
+### templateAuthorField
+
+Author field for templates.
+
+_Type_
+
+-   `Field< Template >`
+
 ### templateField
 
 Template field for BasePost.
+
+### templatePartAuthorField
+
+Author field for template parts.
+
+_Type_
+
+-   `Field< TemplatePart >`
 
 ### templateTitleField
 
