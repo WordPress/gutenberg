@@ -15,19 +15,12 @@ import {
 	isLineHeightDefined,
 } from './utils';
 
-/**
- * Control for line height.
- *
- * @param {Object}                  props                         Component props.
- * @param {boolean}                 [props.__next40pxDefaultSize] Start opting into the larger default height that will become the default size in a future version.
- * @param {string|number|undefined} props.value                   The value of the line height.
- * @param {Function}                props.onChange                A callback function that handles the application of the line height value.
- * @param {string|number|undefined} props.__unstableInputWidth    Input width to pass through to inner NumberControl. Should be a valid CSS value.
- *
- * @return {Element} Line height control.
- */
 const LineHeightControl = ( {
-	/** @deprecated Default behavior since WordPress 7.1. Prop can be safely removed. */
+	/**
+	 * Start opting into the larger default height that will become the default size in a future version.
+	 *
+	 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
+	 */
 	__next40pxDefaultSize: _next40pxDefaultSize,
 	value: lineHeight,
 	onChange,
@@ -104,7 +97,6 @@ const LineHeightControl = ( {
 		<div className="block-editor-line-height-control">
 			<NumberControl
 				{ ...otherProps }
-				__shouldNotWarnDeprecated36pxSize
 				__next40pxDefaultSize
 				__unstableInputWidth={ __unstableInputWidth }
 				__unstableStateReducer={ stateReducer }
