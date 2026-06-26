@@ -28,11 +28,13 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function MenuPopup(
 				{ ...props }
 			>
 				<div
-					className={ clsx(
-						itemPopupStyles.list,
-						itemPopupStyles[ 'list-scrollable-container' ],
-						styles.list
-					) }
+					/*
+					 * `styles.list` flattens this wrapper so menu items can
+					 * participate in the popup's shared grid. Keep
+					 * `itemPopupStyles.list` for inherited typography only;
+					 * scroll behavior lives on the popup.
+					 */
+					className={ clsx( itemPopupStyles.list, styles.list ) }
 				>
 					{ children }
 				</div>
