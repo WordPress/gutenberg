@@ -457,6 +457,10 @@
 		&:hover {
 			opacity: 0.2;
 		}
+
+		.block-editor-list-view__expander {
+			cursor: default;
+		}
 	}
 }
 
