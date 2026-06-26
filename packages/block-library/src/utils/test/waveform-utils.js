@@ -15,6 +15,7 @@ import {
 	logPlayError,
 	getNextShuffledTrack,
 	isShuffleCycleComplete,
+	getNextRepeatMode,
 	getPlaylistPlaybackAction,
 	refreshWaveformPlayerColors,
 	setupPlaylistControls,
@@ -632,10 +633,16 @@ describe( 'Waveform utilities', () => {
 			randomSpy.mockRestore();
 		} );
 
-		it( 'replays the current track when repeat is active and a track ends', () => {
+		it( 'cycles repeat modes from off to playlist to current track', () => {
+			expect( getNextRepeatMode( 'none' ) ).toBe( 'all' );
+			expect( getNextRepeatMode( 'all' ) ).toBe( 'one' );
+			expect( getNextRepeatMode( 'one' ) ).toBe( 'none' );
+		} );
+
+		it( 'replays the current track when repeat-one is active and a track ends', () => {
 			expect(
 				getPlaylistPlaybackAction( [ 'a', 'b', 'c' ], 'b', {
-					isRepeating: true,
+					repeatMode: 'one',
 				} )
 			).toEqual( {
 				action: 'repeat',
@@ -644,15 +651,27 @@ describe( 'Waveform utilities', () => {
 			} );
 		} );
 
-		it( 'loads the next track in order when repeat is active and skip is pressed', () => {
+		it( 'loads the next track in order when repeat-one is active and skip is pressed', () => {
 			expect(
 				getPlaylistPlaybackAction( [ 'a', 'b', 'c' ], 'b', {
-					isRepeating: true,
+					repeatMode: 'one',
 					isUserInitiated: true,
 				} )
 			).toEqual( {
 				action: 'advance',
 				nextId: 'c',
+				playedIds: [],
+			} );
+		} );
+
+		it( 'wraps to the first track when repeat-playlist is active and the last track ends', () => {
+			expect(
+				getPlaylistPlaybackAction( [ 'a', 'b', 'c' ], 'c', {
+					repeatMode: 'all',
+				} )
+			).toEqual( {
+				action: 'advance',
+				nextId: 'a',
 				playedIds: [],
 			} );
 		} );
@@ -682,10 +701,24 @@ describe( 'Waveform utilities', () => {
 			} );
 		} );
 
-		it( 'replays the current track when repeat and shuffle are active and a track ends', () => {
+		it( 'starts a new shuffle cycle when repeat-playlist and shuffle are active', () => {
+			expect(
+				getPlaylistPlaybackAction( [ 'a', 'b', 'c' ], 'c', {
+					repeatMode: 'all',
+					isShuffled: true,
+					playedTracks: [ 'a', 'b', 'c' ],
+				} )
+			).toEqual( {
+				action: 'advance',
+				nextId: 'a',
+				playedIds: [ 'a' ],
+			} );
+		} );
+
+		it( 'replays the current track when repeat-one and shuffle are active and a track ends', () => {
 			expect(
 				getPlaylistPlaybackAction( [ 'a', 'b', 'c' ], 'b', {
-					isRepeating: true,
+					repeatMode: 'one',
 					isShuffled: true,
 					playedTracks: [ 'a', 'b' ],
 				} )
@@ -696,10 +729,10 @@ describe( 'Waveform utilities', () => {
 			} );
 		} );
 
-		it( 'loads a shuffled track when repeat and shuffle are active and skip is pressed', () => {
+		it( 'loads a shuffled track when repeat-one and shuffle are active and skip is pressed', () => {
 			expect(
 				getPlaylistPlaybackAction( [ 'a', 'b', 'c' ], 'a', {
-					isRepeating: true,
+					repeatMode: 'one',
 					isShuffled: true,
 					isUserInitiated: true,
 				} )
@@ -724,14 +757,17 @@ describe( 'Waveform utilities', () => {
 
 		it( 'sets aria-pressed on shuffle and repeat to match initial state', () => {
 			const container = createContainer();
-			setupPlaylistControls( container, {}, true, false );
+			setupPlaylistControls( container, {}, true, 'none' );
 
 			expect(
 				container.querySelector( '[aria-label="Shuffle"]' )
 			).toHaveAttribute( 'aria-pressed', 'true' );
 			expect(
-				container.querySelector( '[aria-label="Repeat"]' )
+				container.querySelector( '[aria-label="Repeat off"]' )
 			).toHaveAttribute( 'aria-pressed', 'false' );
+			expect(
+				container.querySelector( '[aria-label="Repeat off"]' )
+			).toHaveAttribute( 'data-repeat-mode', 'none' );
 		} );
 
 		it( 'does not put aria-pressed on the prev/next action buttons', () => {
@@ -759,7 +795,7 @@ describe( 'Waveform utilities', () => {
 			).toEqual( [
 				'Previous track',
 				'Next track',
-				'Repeat',
+				'Repeat off',
 				'Shuffle',
 			] );
 			expect(
@@ -791,19 +827,41 @@ describe( 'Waveform utilities', () => {
 			expect( shuffleBtn ).not.toHaveClass( 'is-active' );
 		} );
 
-		it( 'toggles the repeat button aria-pressed independently', () => {
+		it( 'cycles the repeat button through playlist, current-track, and off states', () => {
 			const container = createContainer();
 			const onRepeatToggle = jest.fn();
-			setupPlaylistControls( container, { onRepeatToggle }, false, true );
+			setupPlaylistControls( container, { onRepeatToggle } );
 
 			const repeatBtn = container.querySelector(
-				'[aria-label="Repeat"]'
+				'[data-repeat-mode="none"]'
 			);
-			expect( repeatBtn ).toHaveAttribute( 'aria-pressed', 'true' );
+			expect( repeatBtn ).toHaveAttribute( 'aria-label', 'Repeat off' );
+			expect( repeatBtn ).toHaveAttribute( 'aria-pressed', 'false' );
 
 			repeatBtn.click();
+			expect( repeatBtn ).toHaveAttribute(
+				'aria-label',
+				'Repeat playlist'
+			);
+			expect( repeatBtn ).toHaveAttribute( 'aria-pressed', 'true' );
+			expect( repeatBtn ).toHaveAttribute( 'data-repeat-mode', 'all' );
+			expect( onRepeatToggle ).toHaveBeenLastCalledWith( 'all' );
+
+			repeatBtn.click();
+			expect( repeatBtn ).toHaveAttribute(
+				'aria-label',
+				'Repeat current track'
+			);
+			expect( repeatBtn ).toHaveAttribute( 'aria-pressed', 'true' );
+			expect( repeatBtn ).toHaveAttribute( 'data-repeat-mode', 'one' );
+			expect( onRepeatToggle ).toHaveBeenLastCalledWith( 'one' );
+
+			repeatBtn.click();
+			expect( repeatBtn ).toHaveAttribute( 'aria-label', 'Repeat off' );
 			expect( repeatBtn ).toHaveAttribute( 'aria-pressed', 'false' );
-			expect( onRepeatToggle ).toHaveBeenCalledTimes( 1 );
+			expect( repeatBtn ).toHaveAttribute( 'data-repeat-mode', 'none' );
+			expect( onRepeatToggle ).toHaveBeenLastCalledWith( 'none' );
+			expect( onRepeatToggle ).toHaveBeenCalledTimes( 3 );
 		} );
 	} );
 

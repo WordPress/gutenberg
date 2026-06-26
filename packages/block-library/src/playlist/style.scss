@@ -110,6 +110,7 @@ $playlist-control-size: 24px;
 	}
 
 	.wp-block-playlist__control-btn {
+		position: relative;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -151,6 +152,18 @@ $playlist-control-size: 24px;
 
 		svg path {
 			fill: currentColor;
+		}
+
+		&[data-repeat-mode='one']::after {
+			position: absolute;
+			inset-block-start: 50%;
+			inset-inline-start: 50%;
+			color: var( --wp-playlist-active-icon-color, #fff );
+			content: '1';
+			font-size: 8px;
+			font-weight: 600;
+			line-height: 1;
+			transform: translate( -50%, -50% );
 		}
 	}
 

@@ -102,7 +102,9 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 	$label_previous   = esc_attr__( 'Previous track' );
 	$label_next       = esc_attr__( 'Next track' );
 	$label_shuffle    = esc_attr__( 'Shuffle' );
-	$label_repeat     = esc_attr__( 'Repeat' );
+	$label_repeat_off = esc_attr__( 'Repeat off' );
+	$label_repeat_all = esc_attr__( 'Repeat playlist' );
+	$label_repeat_one = esc_attr__( 'Repeat current track' );
 	$html             = '<div class="wp-block-playlist__waveform-player"
 			data-wp-watch="callbacks.initWaveformPlayer"
 			data-label-play="' . $label_play . '"
@@ -112,7 +114,9 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 			data-label-previous="' . $label_previous . '"
 			data-label-next="' . $label_next . '"
 			data-label-shuffle="' . $label_shuffle . '"
-			data-label-repeat="' . $label_repeat . '"
+			data-label-repeat-off="' . $label_repeat_off . '"
+			data-label-repeat-all="' . $label_repeat_all . '"
+			data-label-repeat-one="' . $label_repeat_one . '"
 		></div>';
 
 	// Add the waveform player container inside the figure.
@@ -131,17 +135,17 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 		'data-wp-context',
 		wp_json_encode(
 			array(
-					'playlistId'        => $playlist_id,
-					'currentId'         => $playlist_tracks[0],
-					'isPlaying'         => false,
-					'tracks'            => $playlist_tracks,
-					'waveformStyle'     => $waveform_style,
-					'isShuffled'        => false,
-					'isRepeating'       => false,
-					'playedTracks'      => array(),
-					'labelPauseTrack'   => __( 'Pause' ),
-					'labelSelectTrack'  => __( 'Play' ),
-				)
+				'playlistId'       => $playlist_id,
+				'currentId'        => $playlist_tracks[0],
+				'isPlaying'        => false,
+				'tracks'           => $playlist_tracks,
+				'waveformStyle'    => $waveform_style,
+				'isShuffled'       => false,
+				'repeatMode'       => 'none',
+				'playedTracks'     => array(),
+				'labelPauseTrack'  => __( 'Pause' ),
+				'labelSelectTrack' => __( 'Play' ),
+			)
 		)
 	);
 
