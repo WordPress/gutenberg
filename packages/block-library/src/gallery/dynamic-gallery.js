@@ -167,12 +167,11 @@ export function GallerySourcePanel( {
 		);
 	}
 
-	// In static mode the panel only offers a way into dynamic mode, which is
-	// meaningful where the block can resolve against a post: a real post, or a
-	// post-bound template whose post is filled in at render time. Elsewhere
-	// (template part, pattern, generic template) the sole source can never
-	// resolve, leaving nothing to show — so hide the panel rather than present a
-	// dead control. Once other sources exist, render whenever ANY is available.
+	// In static mode the panel only offers a way into dynamic mode, so hide it
+	// where the context has no post type to resolve against. This is stricter
+	// than the placeholder's entry button (see `edit.js`) on purpose: the
+	// placeholder keeps dynamic mode *possible* anywhere editable, while the
+	// inspector keeps it *easy and obvious* where a concrete post is in context.
 	if ( ! canUseDynamicSource ) {
 		return null;
 	}
