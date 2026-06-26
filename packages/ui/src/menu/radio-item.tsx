@@ -4,6 +4,7 @@ import { forwardRef } from '@wordpress/element';
 import itemPopupStyles from '../utils/css/item-popup.module.css';
 import resetStyles from '../utils/css/resets.module.css';
 import styles from './style.module.css';
+import { ItemContent } from './item';
 import type { RadioItemProps } from './types';
 
 /**
@@ -26,25 +27,24 @@ const RadioItem = forwardRef< HTMLDivElement, RadioItemProps >(
 				) }
 				{ ...props }
 			>
-				<span className={ styles[ 'item-prefix' ] }>
-					<_Menu.RadioItemIndicator
-						keepMounted
-						className={ styles[ 'item-indicator' ] }
-					>
-						<span className={ styles[ 'radio-indicator' ] } />
-					</_Menu.RadioItemIndicator>
-					{ prefix }
-				</span>
-				<span className={ styles[ 'item-content' ] }>
-					<span className={ styles[ 'item-label' ] }>
-						{ children }
-					</span>
-					{ suffix && (
-						<span className={ styles[ 'item-suffix' ] }>
-							{ suffix }
-						</span>
-					) }
-				</span>
+				<ItemContent
+					prefix={
+						<>
+							<_Menu.RadioItemIndicator
+								keepMounted
+								className={ styles[ 'item-indicator' ] }
+							>
+								<span
+									className={ styles[ 'radio-indicator' ] }
+								/>
+							</_Menu.RadioItemIndicator>
+							{ prefix }
+						</>
+					}
+					suffix={ suffix }
+				>
+					{ children }
+				</ItemContent>
 			</_Menu.RadioItem>
 		);
 	}

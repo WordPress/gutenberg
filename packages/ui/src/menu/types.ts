@@ -67,6 +67,20 @@ export interface MenuItemLayoutProps {
 	suffix?: ReactNode;
 }
 
+export interface ItemLabelProps extends ComponentProps< 'span' > {
+	/**
+	 * The primary label for a menu item.
+	 */
+	children?: ReactNode;
+}
+
+export interface ItemDescriptionProps extends ComponentProps< 'span' > {
+	/**
+	 * Supplementary text displayed below a menu item label.
+	 */
+	children?: ReactNode;
+}
+
 type MenuItemComponentProps< T extends ElementType > = Omit<
 	ComponentProps< T >,
 	keyof MenuItemLayoutProps

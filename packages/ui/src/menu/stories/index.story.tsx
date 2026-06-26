@@ -13,6 +13,8 @@ const meta: Meta< typeof Menu.Root > = {
 		'Menu.Positioner': Menu.Positioner,
 		'Menu.Popup': Menu.Popup,
 		'Menu.Item': Menu.Item,
+		'Menu.ItemLabel': Menu.ItemLabel,
+		'Menu.ItemDescription': Menu.ItemDescription,
 		'Menu.CheckboxItem': Menu.CheckboxItem,
 		'Menu.RadioGroup': Menu.RadioGroup,
 		'Menu.RadioItem': Menu.RadioItem,
@@ -67,6 +69,49 @@ export const Default: Story = {
 	},
 };
 
+export const RichItems: Story = {
+	args: {
+		children: (
+			<>
+				<Menu.Trigger>Open menu</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.Item>
+						<Menu.ItemLabel>Label</Menu.ItemLabel>
+						<Menu.ItemDescription>Help text</Menu.ItemDescription>
+					</Menu.Item>
+					<Menu.Item>
+						<Menu.ItemLabel>
+							Label with a long description
+						</Menu.ItemLabel>
+						<Menu.ItemDescription>
+							The menu item description wraps within the popup
+							instead of creating extra grid columns.
+						</Menu.ItemDescription>
+					</Menu.Item>
+					<Menu.Item
+						prefix={
+							<Icon icon={ archive } size={ 24 } aria-hidden />
+						}
+						suffix="⌘S"
+					>
+						<Menu.ItemLabel>With prefix and suffix</Menu.ItemLabel>
+						<Menu.ItemDescription>
+							Description text keeps the same highlighted area.
+						</Menu.ItemDescription>
+					</Menu.Item>
+					<Menu.Item disabled suffix="⌘D">
+						<Menu.ItemLabel>Disabled item</Menu.ItemLabel>
+						<Menu.ItemDescription>
+							Disabled foreground treatment applies to all item
+							content.
+						</Menu.ItemDescription>
+					</Menu.Item>
+				</Menu.Popup>
+			</>
+		),
+	},
+};
+
 export const Submenu: Story = {
 	args: {
 		children: (
@@ -75,10 +120,25 @@ export const Submenu: Story = {
 				<Menu.Popup>
 					<Menu.Item>Rename</Menu.Item>
 					<Menu.SubmenuRoot>
-						<Menu.SubmenuTrigger>Move to</Menu.SubmenuTrigger>
+						<Menu.SubmenuTrigger suffix="⌘M">
+							<Menu.ItemLabel>
+								Move to another collection
+							</Menu.ItemLabel>
+						</Menu.SubmenuTrigger>
 						<Menu.Popup>
 							<Menu.Item>Archive</Menu.Item>
 							<Menu.Item>Favorites</Menu.Item>
+							<Menu.SubmenuRoot>
+								<Menu.SubmenuTrigger>
+									<Menu.ItemLabel>
+										More destinations
+									</Menu.ItemLabel>
+								</Menu.SubmenuTrigger>
+								<Menu.Popup>
+									<Menu.Item>Reviewed</Menu.Item>
+									<Menu.Item>Shared</Menu.Item>
+								</Menu.Popup>
+							</Menu.SubmenuRoot>
 						</Menu.Popup>
 					</Menu.SubmenuRoot>
 					<Menu.Item>Delete</Menu.Item>
@@ -97,18 +157,28 @@ export const CheckboxItems: Story = {
 			<Menu.Root>
 				<Menu.Trigger>Columns</Menu.Trigger>
 				<Menu.Popup>
-					<Menu.CheckboxItem
-						checked={ bookmarks }
-						onCheckedChange={ setBookmarks }
-					>
-						Bookmarks
-					</Menu.CheckboxItem>
-					<Menu.CheckboxItem
-						checked={ downloads }
-						onCheckedChange={ setDownloads }
-					>
-						Downloads
-					</Menu.CheckboxItem>
+					<Menu.Group>
+						<Menu.GroupLabel>Visible columns</Menu.GroupLabel>
+						<Menu.CheckboxItem
+							checked={ bookmarks }
+							onCheckedChange={ setBookmarks }
+						>
+							<Menu.ItemLabel>Bookmarks</Menu.ItemLabel>
+							<Menu.ItemDescription>
+								Show saved pages in the table.
+							</Menu.ItemDescription>
+						</Menu.CheckboxItem>
+						<Menu.CheckboxItem
+							checked={ downloads }
+							onCheckedChange={ setDownloads }
+							suffix="⌘D"
+						>
+							<Menu.ItemLabel>Downloads</Menu.ItemLabel>
+							<Menu.ItemDescription>
+								Show downloaded files in the table.
+							</Menu.ItemDescription>
+						</Menu.CheckboxItem>
+					</Menu.Group>
 				</Menu.Popup>
 			</Menu.Root>
 		);
@@ -124,9 +194,27 @@ export const RadioItems: Story = {
 				<Menu.Trigger>Sort</Menu.Trigger>
 				<Menu.Popup>
 					<Menu.RadioGroup value={ value } onValueChange={ setValue }>
-						<Menu.RadioItem value="name">Name</Menu.RadioItem>
-						<Menu.RadioItem value="date">Date</Menu.RadioItem>
-						<Menu.RadioItem value="manual">Manual</Menu.RadioItem>
+						<Menu.Group>
+							<Menu.GroupLabel>Sort by</Menu.GroupLabel>
+							<Menu.RadioItem value="name">
+								<Menu.ItemLabel>Name</Menu.ItemLabel>
+								<Menu.ItemDescription>
+									Sort alphabetically.
+								</Menu.ItemDescription>
+							</Menu.RadioItem>
+							<Menu.RadioItem value="date">
+								<Menu.ItemLabel>Date</Menu.ItemLabel>
+								<Menu.ItemDescription>
+									Sort by most recent activity.
+								</Menu.ItemDescription>
+							</Menu.RadioItem>
+							<Menu.RadioItem value="manual">
+								<Menu.ItemLabel>Manual</Menu.ItemLabel>
+								<Menu.ItemDescription>
+									Keep the current custom order.
+								</Menu.ItemDescription>
+							</Menu.RadioItem>
+						</Menu.Group>
 					</Menu.RadioGroup>
 				</Menu.Popup>
 			</Menu.Root>
