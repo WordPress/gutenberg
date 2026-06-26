@@ -261,6 +261,31 @@ describe( 'computeLockedResizeRect — driver-axis selection', () => {
 			5
 		);
 	} );
+
+	it( 'supports edge handles by resizing symmetrically on the perpendicular axis', () => {
+		const edgeImageSize: Size = { width: 1000, height: 500 };
+		const edgeNormalizedRatio = 0.5; // Produces a square in pixel space.
+		const drag: ResizeDragState = {
+			handle: 'e',
+			startX: 600,
+			startY: 250,
+			startRect: { x: 0.4, y: 0.3, width: 0.2, height: 0.4 },
+		};
+
+		const rect = computeLockedResizeRect(
+			drag,
+			700,
+			250,
+			edgeImageSize,
+			FULL_BOUNDS,
+			edgeNormalizedRatio
+		);
+
+		expect( rect.x ).toBeCloseTo( 0.4, 5 );
+		expect( rect.width ).toBeCloseTo( 0.3, 5 );
+		expect( rect.y ).toBeCloseTo( 0.2, 5 );
+		expect( rect.height ).toBeCloseTo( 0.6, 5 );
+	} );
 } );
 
 const IMAGE: Size = { width: 1000, height: 500 };

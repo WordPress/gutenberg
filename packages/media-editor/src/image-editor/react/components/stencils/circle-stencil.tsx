@@ -1,8 +1,11 @@
 /**
  * Internal dependencies
  */
+import type { HandlePosition } from '../../../core/stencil-math';
 import type { StencilProps } from '../../../core/types';
 import { RectangleStencil } from './rectangle-stencil';
+
+const CIRCLE_HANDLE_POSITIONS: HandlePosition[] = [ 'n', 'e', 's', 'w' ];
 
 /**
  * Circular crop stencil.
@@ -19,6 +22,7 @@ export function CircleStencil( props: StencilProps ) {
 			{ ...props }
 			aspectRatio={ 1 }
 			className="wp-media-editor-image-editor__stencil--circle"
+			lockedHandlePositions={ CIRCLE_HANDLE_POSITIONS }
 			stencilRectClassName="wp-media-editor-image-editor__stencil-rect--circle"
 		/>
 	);

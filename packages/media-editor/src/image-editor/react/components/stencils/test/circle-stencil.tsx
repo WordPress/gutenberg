@@ -19,7 +19,7 @@ const CONTAINER_SIZE: Size = { width: 600, height: 400 };
 const IMAGE_SIZE: Size = { width: 500, height: 300 };
 
 describe( 'CircleStencil', () => {
-	it( 'renders a circular stencil using corner resize handles', () => {
+	it( 'renders a circular stencil using edge resize handles', () => {
 		render(
 			<CircleStencil
 				cropRect={ CROP_RECT }
@@ -34,10 +34,19 @@ describe( 'CircleStencil', () => {
 			'wp-media-editor-image-editor__stencil--circle'
 		);
 		expect(
-			screen.getByRole( 'button', { name: 'Resize top-left corner' } )
+			screen.getByRole( 'button', { name: 'Resize top edge' } )
 		).toBeInTheDocument();
 		expect(
-			screen.queryByRole( 'button', { name: 'Resize top edge' } )
+			screen.getByRole( 'button', { name: 'Resize right edge' } )
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', { name: 'Resize bottom edge' } )
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', { name: 'Resize left edge' } )
+		).toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'button', { name: 'Resize top-left corner' } )
 		).not.toBeInTheDocument();
 	} );
 } );

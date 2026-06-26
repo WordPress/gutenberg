@@ -168,11 +168,28 @@ export function computeLockedResizeRect(
 		return { ...drag.startRect };
 	}
 
+	const handle = drag.handle;
+	if (
+		handle === 'n' ||
+		handle === 's' ||
+		handle === 'e' ||
+		handle === 'w'
+	) {
+		return computeLockedEdgeResizeRect(
+			drag,
+			clientX,
+			clientY,
+			imageSize,
+			bounds,
+			normalizedRatio,
+			minCropSize
+		);
+	}
+
 	const dx = ( clientX - drag.startX ) / imageSize.width;
 	const dy = ( clientY - drag.startY ) / imageSize.height;
 
 	const s = drag.startRect;
-	const handle = drag.handle;
 
 	// Determine the anchor corner (opposite to the dragged corner).
 	const anchorX = handle === 'nw' || handle === 'sw' ? s.x + s.width : s.x;
@@ -247,51 +264,47 @@ export function computeLockedResizeRect(
 }
 
 /**
- * Compute the new crop rect for a resize that temporarily locks the
- * aspect ratio to `drag.startRect`'s ratio (e.g. while Shift is held).
+ * Compute a locked-aspect-ratio resize from an edge handle.
  *
- * Corner handles delegate to {@link computeLockedResizeRect}. Edge
- * handles size the dragged axis freely, then expand the perpendicular
- * axis symmetrically around the rect's center to preserve the ratio,
- * clamping symmetrically so the rect stays within bounds.
+ * The dragged edge sizes its axis, while the perpendicular axis expands or
+ * contracts symmetrically around the crop rect center. This lets circular
+ * stencils use edge handles that feel like grabbing the circle edge while the
+ * stored rect remains a square bounding box.
  *
- * @param drag        The current drag state.
- * @param clientX     Current mouse/touch X position in pixels.
- * @param clientY     Current mouse/touch Y position in pixels.
- * @param imageSize   The rendered image dimensions in pixels.
- * @param bounds      The allowed crop area bounds.
- * @param minCropSize Minimum crop rect dimension in normalized space, per axis.
+ * @param drag            The current drag state.
+ * @param clientX         Current mouse/touch X position in pixels.
+ * @param clientY         Current mouse/touch Y position in pixels.
+ * @param imageSize       The rendered image dimensions in pixels.
+ * @param bounds          The allowed crop area bounds.
+ * @param normalizedRatio The locked aspect ratio (width / height in normalized space).
+ * @param minCropSize     Minimum crop rect dimension in normalized space, per axis.
  * @return The new crop rect in normalized coordinates.
  */
-export function computeShiftLockedResizeRect(
+export function computeLockedEdgeResizeRect(
 	drag: ResizeDragState,
 	clientX: number,
 	clientY: number,
 	imageSize: Size,
 	bounds: CropBounds,
+	normalizedRatio: number,
 	minCropSize: Size = DEFAULT_MIN_CROP_SIZE
 ): NormalizedRect {
 	const s = drag.startRect;
-	const pixelW = s.width * imageSize.width;
-	const pixelH = s.height * imageSize.height;
-	if ( pixelH <= 0 || pixelW <= 0 ) {
-		return computeFreeResizeRect(
-			drag,
-			clientX,
-			clientY,
-			imageSize,
-			bounds,
-			minCropSize
-		);
-	}
-	const normalizedRatio = s.width / s.height;
-
 	const handle = drag.handle;
+
 	if (
-		handle === 'nw' ||
-		handle === 'ne' ||
-		handle === 'sw' ||
-		handle === 'se'
+		normalizedRatio <= 0 ||
+		imageSize.width <= 0 ||
+		imageSize.height <= 0
+	) {
+		return { ...s };
+	}
+
+	if (
+		handle !== 'n' &&
+		handle !== 's' &&
+		handle !== 'e' &&
+		handle !== 'w'
 	) {
 		return computeLockedResizeRect(
 			drag,
@@ -376,4 +389,73 @@ export function computeShiftLockedResizeRect(
 		width: newWidth,
 		height: newHeight,
 	};
+}
+
+/**
+ * Compute the new crop rect for a resize that temporarily locks the
+ * aspect ratio to `drag.startRect`'s ratio (e.g. while Shift is held).
+ *
+ * Corner handles delegate to {@link computeLockedResizeRect}. Edge
+ * handles size the dragged axis freely, then expand the perpendicular
+ * axis symmetrically around the rect's center to preserve the ratio,
+ * clamping symmetrically so the rect stays within bounds.
+ *
+ * @param drag        The current drag state.
+ * @param clientX     Current mouse/touch X position in pixels.
+ * @param clientY     Current mouse/touch Y position in pixels.
+ * @param imageSize   The rendered image dimensions in pixels.
+ * @param bounds      The allowed crop area bounds.
+ * @param minCropSize Minimum crop rect dimension in normalized space, per axis.
+ * @return The new crop rect in normalized coordinates.
+ */
+export function computeShiftLockedResizeRect(
+	drag: ResizeDragState,
+	clientX: number,
+	clientY: number,
+	imageSize: Size,
+	bounds: CropBounds,
+	minCropSize: Size = DEFAULT_MIN_CROP_SIZE
+): NormalizedRect {
+	const s = drag.startRect;
+	const pixelW = s.width * imageSize.width;
+	const pixelH = s.height * imageSize.height;
+	if ( pixelH <= 0 || pixelW <= 0 ) {
+		return computeFreeResizeRect(
+			drag,
+			clientX,
+			clientY,
+			imageSize,
+			bounds,
+			minCropSize
+		);
+	}
+	const normalizedRatio = s.width / s.height;
+
+	const handle = drag.handle;
+	if (
+		handle === 'nw' ||
+		handle === 'ne' ||
+		handle === 'sw' ||
+		handle === 'se'
+	) {
+		return computeLockedResizeRect(
+			drag,
+			clientX,
+			clientY,
+			imageSize,
+			bounds,
+			normalizedRatio,
+			minCropSize
+		);
+	}
+
+	return computeLockedEdgeResizeRect(
+		drag,
+		clientX,
+		clientY,
+		imageSize,
+		bounds,
+		normalizedRatio,
+		minCropSize
+	);
 }
