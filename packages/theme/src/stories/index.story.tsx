@@ -22,6 +22,7 @@ const meta: Meta< typeof ThemeProvider > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},
+	tags: [ 'status-private' ],
 };
 export default meta;
 
