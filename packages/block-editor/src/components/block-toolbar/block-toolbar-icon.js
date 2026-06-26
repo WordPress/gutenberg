@@ -19,7 +19,6 @@ import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import { store as blockEditorStore } from '../../store';
 import { hasPatternOverridesDefaultBinding } from '../../utils/block-bindings';
 import { unlock } from '../../lock-unlock';
-import { isIsolatedEditorKey } from '../../store/private-keys';
 
 function getBlockIconVariant( { select, clientIds } ) {
 	const {
@@ -30,14 +29,9 @@ function getBlockIconVariant( { select, clientIds } ) {
 		getTemplateLock,
 		getBlockEditingMode,
 		canEditBlock,
-		isWithinEditedContentOnlySection,
-		getSettings,
+		isSectionBlock,
 	} = unlock( select( blockEditorStore ) );
 	const { getBlockStyles } = select( blocksStore );
-	const settings = getSettings();
-	const isIsolatedEditor = !! settings?.[ isIsolatedEditorKey ];
-	const disableContentOnlyForUnsyncedPatterns =
-		!! settings?.disableContentOnlyForUnsyncedPatterns;
 
 	const hasTemplateLock = clientIds.some(
 		( id ) => getTemplateLock( id ) === 'contentOnly'
@@ -51,9 +45,7 @@ function getBlockIconVariant( { select, clientIds } ) {
 	const hasPatternNameInSelection = clientIds.some(
 		( id ) =>
 			!! getBlockAttributes( id )?.metadata?.patternName &&
-			! isWithinEditedContentOnlySection( id ) &&
-			! isIsolatedEditor &&
-			! disableContentOnlyForUnsyncedPatterns
+			isSectionBlock( id )
 	);
 	const hasPatternOverrides = clientIds.every( ( clientId ) =>
 		hasPatternOverridesDefaultBinding(
@@ -97,16 +89,9 @@ function getBlockIconVariant( { select, clientIds } ) {
 }
 
 function getBlockIcon( { select, clientIds } ) {
-	const {
-		getBlockName,
-		getBlockAttributes,
-		isWithinEditedContentOnlySection,
-		getSettings,
-	} = unlock( select( blockEditorStore ) );
-	const settings = getSettings();
-	const isIsolatedEditor = !! settings?.[ isIsolatedEditorKey ];
-	const disableContentOnlyForUnsyncedPatterns =
-		!! settings?.disableContentOnlyForUnsyncedPatterns;
+	const { getBlockName, getBlockAttributes, isSectionBlock } = unlock(
+		select( blockEditorStore )
+	);
 
 	const _isSingleBlock = clientIds.length === 1;
 	const firstClientId = clientIds[ 0 ];
@@ -115,9 +100,7 @@ function getBlockIcon( { select, clientIds } ) {
 	if (
 		_isSingleBlock &&
 		blockAttributes?.metadata?.patternName &&
-		! isWithinEditedContentOnlySection( firstClientId ) &&
-		! isIsolatedEditor &&
-		! disableContentOnlyForUnsyncedPatterns
+		isSectionBlock( firstClientId )
 	) {
 		return symbol;
 	}

@@ -14,7 +14,6 @@ import { symbol } from '@wordpress/icons';
  * Internal dependencies
  */
 import useBlockDisplayInformation from '../';
-import { isIsolatedEditorKey } from '../../../store/private-keys';
 
 jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
 jest.mock( '../../../lock-unlock', () => ( {
@@ -26,6 +25,7 @@ jest.mock( '../../../lock-unlock', () => ( {
 } ) );
 
 const groupIcon = 'group-icon';
+const templatePartIcon = 'template-part-icon';
 
 function TestComponent( { onChange } ) {
 	const blockInformation = useBlockDisplayInformation( 'client-id' );
@@ -56,19 +56,17 @@ function setupUseSelect( {
 		description: 'Gather blocks in a layout container.',
 	},
 	getActiveBlockVariation = () => null,
-	settings = {},
-	isWithinEditedSection = false,
+	isSectionBlock = true,
 } = {} ) {
 	useSelect.mockImplementation( ( mapSelect ) =>
 		mapSelect( () => ( {
 			getBlockName: () => blockName,
 			getBlockAttributes: () => attributes,
-			getSettings: () => settings,
 			__experimentalGetParsedPattern: () => ( {
 				title: 'Hero pattern',
 				description: 'Pattern description.',
 			} ),
-			isWithinEditedContentOnlySection: () => isWithinEditedSection,
+			isSectionBlock: () => isSectionBlock,
 			getBlockType: () => blockType,
 			getActiveBlockVariation,
 		} ) )
@@ -97,7 +95,7 @@ describe( 'useBlockDisplayInformation', () => {
 	} );
 
 	it( 'displays block information for a pattern section that is being edited', () => {
-		setupUseSelect( { isWithinEditedSection: true } );
+		setupUseSelect( { isSectionBlock: false } );
 		const onChange = jest.fn();
 
 		render( <TestComponent onChange={ onChange } /> );
@@ -120,9 +118,7 @@ describe( 'useBlockDisplayInformation', () => {
 					patternName: 'theme/header-wrapper',
 				},
 			},
-			settings: {
-				[ isIsolatedEditorKey ]: true,
-			},
+			isSectionBlock: false,
 		} );
 		const onChange = jest.fn();
 
@@ -140,9 +136,7 @@ describe( 'useBlockDisplayInformation', () => {
 
 	it( 'displays block information for a pattern wrapper when content-only editing is disabled', () => {
 		setupUseSelect( {
-			settings: {
-				disableContentOnlyForUnsyncedPatterns: true,
-			},
+			isSectionBlock: false,
 		} );
 		const onChange = jest.fn();
 
@@ -154,6 +148,30 @@ describe( 'useBlockDisplayInformation', () => {
 				icon: groupIcon,
 				description: 'Gather blocks in a layout container.',
 				name: 'Hero pattern',
+			} )
+		);
+	} );
+
+	it( 'displays block information for section blocks without pattern metadata', () => {
+		setupUseSelect( {
+			attributes: {},
+			blockName: 'core/template-part',
+			blockType: {
+				name: 'core/template-part',
+				title: 'Template Part',
+				icon: templatePartIcon,
+				description: 'A template part.',
+			},
+		} );
+		const onChange = jest.fn();
+
+		render( <TestComponent onChange={ onChange } /> );
+
+		expect( onChange ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				title: 'Template Part',
+				icon: templatePartIcon,
+				description: 'A template part.',
 			} )
 		);
 	} );
