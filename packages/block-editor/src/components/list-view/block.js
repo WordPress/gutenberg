@@ -665,16 +665,13 @@ function ListViewBlock( {
 		? selectedClientIds
 		: [ clientId ];
 
-	// Detect if there is a block in the canvas currently being edited and multi-selection is not happening.
-	const currentlyEditingBlockInCanvas =
-		isSelected && selectedClientIds.length === 1;
-
 	const getListViewBlockTabIndex = ( rovingTabIndex ) => {
 		if ( shouldDisableInteractions ) {
 			return -1;
 		}
 
-		if ( currentlyEditingBlockInCanvas ) {
+		// Detect if there is a block in the canvas currently being edited and multi-selection is not happening.
+		if ( isSelected && selectedClientIds.length === 1 ) {
 			return 0;
 		}
 
