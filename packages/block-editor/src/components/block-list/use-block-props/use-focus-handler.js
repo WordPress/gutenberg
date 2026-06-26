@@ -24,26 +24,6 @@ const { subscribeDelegatedListener } = unlock( composePrivateApis );
 export function useFocusHandler( clientId ) {
 	const { isBlockSelected } = useSelect( blockEditorStore );
 	const { selectBlock, selectionChange } = useDispatch( blockEditorStore );
-	const { stopEditingContentOnlySection } = unlock(
-		useDispatch( blockEditorStore )
-	);
-	const { editedSection, isWithinEditedSection } = useSelect(
-		( select ) => {
-			const {
-				getEditedContentOnlySection,
-				isWithinEditedContentOnlySection,
-			} = unlock( select( blockEditorStore ) );
-			const editedContentOnlySection = getEditedContentOnlySection();
-
-			return {
-				editedSection: editedContentOnlySection,
-				isWithinEditedSection: editedContentOnlySection
-					? isWithinEditedContentOnlySection( clientId )
-					: false,
-			};
-		},
-		[ clientId ]
-	);
 
 	return useRefEffect(
 		( node ) => {
@@ -80,24 +60,11 @@ export function useFocusHandler( clientId ) {
 					return;
 				}
 
-				// If we're in spotlight mode and clicking outside the edited section,
-				// exit spotlight mode instead of selecting the block.
-				if ( editedSection && ! isWithinEditedSection ) {
-					stopEditingContentOnlySection();
-					return;
-				}
-
 				selectBlock( clientId );
 			}
 
 			return subscribeDelegatedListener( node, 'focusin', onFocus );
 		},
-		[
-			isBlockSelected,
-			selectBlock,
-			editedSection,
-			isWithinEditedSection,
-			stopEditingContentOnlySection,
-		]
+		[ isBlockSelected, selectBlock ]
 	);
 }
