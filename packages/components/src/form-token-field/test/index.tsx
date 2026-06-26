@@ -2323,7 +2323,7 @@ describe( 'FormTokenField', () => {
 			await user.type( input, 'cat[Enter]' );
 
 			expect(
-				await screen.findByText( defaultMessages.added )
+				screen.getByText( defaultMessages.added )
 			).toHaveAttribute( 'aria-live', 'assertive' );
 		} );
 
@@ -2338,7 +2338,7 @@ describe( 'FormTokenField', () => {
 			await user.type( input, 'dog[Enter]' );
 
 			expect(
-				await screen.findByText( customMessages.added )
+				screen.getByText( customMessages.added )
 			).toHaveAttribute( 'aria-live', 'assertive' );
 		} );
 
@@ -2353,7 +2353,7 @@ describe( 'FormTokenField', () => {
 			await user.type( input, '[Backspace]' );
 
 			expect(
-				await screen.findByText( defaultMessages.removed )
+				screen.getByText( defaultMessages.removed )
 			).toHaveAttribute( 'aria-live', 'assertive' );
 		} );
 
@@ -2373,7 +2373,7 @@ describe( 'FormTokenField', () => {
 			await user.type( input, '[Backspace]' );
 
 			expect(
-				await screen.findByText( customMessages.removed )
+				screen.getByText( customMessages.removed )
 			).toHaveAttribute( 'aria-live', 'assertive' );
 		} );
 
@@ -2393,7 +2393,7 @@ describe( 'FormTokenField', () => {
 			await user.type( input, 'eagle[Enter]' );
 
 			expect(
-				await screen.findByText( defaultMessages.__experimentalInvalid )
+				screen.getByText( defaultMessages.__experimentalInvalid )
 			).toHaveAttribute( 'aria-live', 'assertive' );
 		} );
 
@@ -2414,7 +2414,7 @@ describe( 'FormTokenField', () => {
 			await user.type( input, 'crocodile[Enter]' );
 
 			expect(
-				await screen.findByText( customMessages.__experimentalInvalid )
+				screen.getByText( customMessages.__experimentalInvalid )
 			).toHaveAttribute( 'aria-live', 'assertive' );
 		} );
 

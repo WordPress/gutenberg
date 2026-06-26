@@ -196,14 +196,14 @@ describe( 'Notice', () => {
 			).toBeInTheDocument();
 		} );
 
-		it( 'creates an assertive live region for error intent', async () => {
+		it( 'creates an assertive live region for error intent', () => {
 			render(
 				<Notice.Root intent="error">
 					<Notice.Description>Something failed.</Notice.Description>
 				</Notice.Root>
 			);
 			expect(
-				await screen.findByText( 'Something failed.', {
+				screen.getByText( 'Something failed.', {
 					selector: '[aria-live="assertive"]',
 				} )
 			).toBeInTheDocument();

@@ -308,8 +308,7 @@ describe( 'ToolsPanel', () => {
 			expect( control ).toBeInTheDocument();
 
 			// Test the aria live announcement.
-			const announcement =
-				await screen.findByText( 'Alt is now visible' );
+			const announcement = screen.getByText( 'Alt is now visible' );
 			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
 		} );
 
@@ -322,7 +321,7 @@ describe( 'ToolsPanel', () => {
 			expect( control ).not.toBeInTheDocument();
 
 			// Test the aria live announcement.
-			const announcement = await screen.findByText(
+			const announcement = screen.getByText(
 				'Example hidden and reset to default'
 			);
 			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
@@ -421,9 +420,7 @@ describe( 'ToolsPanel', () => {
 			expect( resetControl ).toBeInTheDocument();
 
 			// Test the aria live announcement.
-			const announcement = await screen.findByText(
-				'Example reset to default'
-			);
+			const announcement = screen.getByText( 'Example reset to default' );
 			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
 		} );
 
@@ -1284,7 +1281,7 @@ describe( 'ToolsPanel', () => {
 			await selectMenuItem( 'Reset all' );
 
 			// Test the aria live announcement.
-			const announcement = await screen.findByText( 'All options reset' );
+			const announcement = screen.getByText( 'All options reset' );
 			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
 
 			const disabledResetAllItem = await screen.findByRole( 'menuitem', {
