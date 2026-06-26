@@ -165,6 +165,7 @@ export interface TypographySettings {
 	fontSizes?: TypographyPreset[] | Record< string, TypographyPreset[] >;
 	fontFamilies?: Record< string, FontFamilyPreset[] >;
 	defaultFontSizes?: boolean;
+	textShadow?: boolean;
 	textShadowPresets?:
 		| TextShadowPreset[]
 		| Record< string, TextShadowPreset[] >;
