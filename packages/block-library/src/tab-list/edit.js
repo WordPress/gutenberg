@@ -16,7 +16,7 @@ import {
 	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useCallback, useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -61,32 +61,21 @@ function Edit( {
 	const { __unstableMarkNextChangeAsNotPersistent, updateBlockAttributes } =
 		useDispatch( blockEditorStore );
 
-	const handleTabClick = useCallback(
-		( tabIndex ) => {
-			if ( tabsClientId && tabIndex !== effectiveActiveIndex ) {
-				__unstableMarkNextChangeAsNotPersistent();
-				updateBlockAttributes( tabsClientId, {
-					editorActiveTabIndex: tabIndex,
-				} );
-			}
-		},
-		[
-			tabsClientId,
-			effectiveActiveIndex,
-			updateBlockAttributes,
-			__unstableMarkNextChangeAsNotPersistent,
-		]
-	);
+	function selectTabPanel( tabIndex ) {
+		if ( tabsClientId && tabIndex !== effectiveActiveIndex ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			updateBlockAttributes( tabsClientId, {
+				editorActiveTabIndex: tabIndex,
+			} );
+		}
+	}
 
-	const handleLabelChange = useCallback(
-		( tabIndex, newLabel ) => {
-			const tab = tabsList[ tabIndex ];
-			if ( tab?.clientId ) {
-				updateBlockAttributes( tab.clientId, { label: newLabel } );
-			}
-		},
-		[ tabsList, updateBlockAttributes ]
-	);
+	function handleLabelChange( tabIndex, newLabel ) {
+		const tab = tabsList[ tabIndex ];
+		if ( tab?.clientId ) {
+			updateBlockAttributes( tab.clientId, { label: newLabel } );
+		}
+	}
 
 	const menuRef = useRef();
 	const prevTabCountRef = useRef( tabsList.length );
@@ -150,9 +139,11 @@ function Edit( {
 							className={ buttonClassName || undefined }
 							style={ buttonStyle }
 							tabIndex={ -1 }
-							onClick={ ( event ) => {
-								event.preventDefault();
-								handleTabClick( index );
+							// Activate the matching panel whenever this tab
+							// receives focus — whether from a click or the caret
+							// moving into the label via the keyboard.
+							onFocus={ () => {
+								selectTabPanel( index );
 							} }
 						>
 							<RichText

@@ -1,0 +1,14 @@
+[
+	{
+		"blockName": "core/latest-posts",
+		"attrs": {
+			"postsToShow": 5,
+			"displayPostDate": true,
+			"postLayout": "list",
+			"columns": 3
+		},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	}
+]
