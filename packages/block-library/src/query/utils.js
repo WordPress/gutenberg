@@ -12,6 +12,7 @@ import {
 	getBlockSupport,
 	store as blocksStore,
 } from '@wordpress/blocks';
+import { applyFilters } from '@wordpress/hooks';
 
 /** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
 /** @typedef {import('@wordpress/components/build-types/query-controls/types').OrderByOption} OrderByOption */
@@ -270,8 +271,26 @@ export function useOrderByOptions( postType, metaKey = '', metaType = 'CHAR' ) {
 			}
 		}
 
-		return orderByOptions;
-	}, [ supportsCustomOrder, metaKey, metaType ] );
+		/**
+		 * Filters the list of order by options shown in the Query Loop inspector.
+		 * Lets plugins register custom sorting definitions (e.g. "Event proximity").
+		 * The corresponding server side resolution must be registered via the
+		 * `query_loop_meta_order_types`, `query_loop_pre_build_meta_clause`
+		 * & `query_loop_meta_clause` PHP filters.
+		 *
+		 * @param {Array}  options  Default order by options.
+		 * @param {string} postType The post type currently configured on the block.
+		 * @param {string} metaKey  The meta key currently configured on the block.
+		 * @param {string} metaType The data type of the meta field.
+		 */
+		return applyFilters(
+			'blockLibrary.query.orderByOptions',
+			orderByOptions,
+			postType,
+			metaKey,
+			metaType
+		);
+	}, [ supportsCustomOrder, metaKey, metaType, postType ] );
 }
 
 /**

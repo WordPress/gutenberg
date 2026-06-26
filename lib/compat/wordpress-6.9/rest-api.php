@@ -109,7 +109,10 @@ function gutenberg_add_meta_query_collection_params( $params ) {
 	$params['meta_compare'] = array(
 		'description'       => __( 'Operator to use for the meta field comparison.', 'gutenberg' ),
 		'type'              => 'string',
-		'enum'              => array( '=', '!=', '>', '<', 'LIKE' ),
+		'enum'              => apply_filters(
+			'query_loop_allowed_meta_compare_operators',
+			array( '=', '!=', '>', '<', 'LIKE' )
+		),
 		'default'           => '=',
 		'sanitize_callback' => 'sanitize_text_field',
 		'validate_callback' => 'rest_validate_request_arg',
@@ -159,15 +162,33 @@ function gutenberg_apply_meta_query_rest_args( $args, $request, $post_type = 'po
 
 	$meta_compare_raw = $request->get_param( 'meta_compare' ) ? $request->get_param( 'meta_compare' ) : '=';
 	$meta_compare     = html_entity_decode( $meta_compare_raw );
-	if ( ! in_array( $meta_compare, array( '=', '!=', '>', '<', 'LIKE' ), true ) ) {
+	$allowed_compare_operators = apply_filters(
+		'query_loop_allowed_meta_compare_operators',
+		array( '=', '!=', '>', '<', 'LIKE' )
+	);
+
+	if ( ! in_array( $meta_compare, $allowed_compare_operators, true ) ) {
 		$meta_compare = '=';
 	}
 
-	if ( empty( $meta_key ) || is_protected_meta( $meta_key, $post_type ) ) {
+	$is_meta_key_allowed = apply_filters(
+		'query_loop_is_meta_key_allowed',
+		! is_protected_meta( $meta_key, $post_type ),
+		$meta_key,
+		$post_type
+	);
+
+	if ( empty( $meta_key ) || ! $is_meta_key_allowed ) {
 		return $args;
 	}
 
-	$meta_order_types = array( 'meta_value', 'meta_value_num' );
+	$meta_order_types = apply_filters(
+		'query_loop_meta_order_types',
+		array( 'meta_value', 'meta_value_num' ),
+		$meta_key,
+		$meta_type
+	);
+
 	if ( in_array( $order_by, $meta_order_types, true ) ) {
 		/*
 		 * Using `meta_key` can result in slow queries on sites with large amounts of post meta.
@@ -181,60 +202,74 @@ function gutenberg_apply_meta_query_rest_args( $args, $request, $post_type = 'po
 		}
 	}
 
-	$meta_clause = null;
+	$meta_clause = apply_filters(
+		'query_loop_pre_build_meta_clause',
+		null,
+		$post_type,
+		$meta_key,
+		$meta_type,
+		$meta_compare,
+		$meta_value_filter,
+		$date_range,
+		$start_date,
+		$end_date
+	);
 
-	if ( ! empty( $date_range ) ) {
-		$today = current_time( 'Y-m-d' );
+	if ( null === $meta_clause ) {
+		if ( ! empty( $date_range ) ) {
+			$today = current_time( 'Y-m-d' );
 
-		if ( 'custom' === $date_range ) {
-			if ( $start_date && $end_date ) {
-				$meta_clause = array(
-					'key'     => $meta_key,
-					'value'   => array( $start_date, $end_date ),
-					'compare' => 'BETWEEN',
-					'type'    => $meta_type,
+			if ( 'custom' === $date_range ) {
+				if ( $start_date && $end_date ) {
+					$meta_clause = array(
+						'key'     => $meta_key,
+						'value'   => array( $start_date, $end_date ),
+						'compare' => 'BETWEEN',
+						'type'    => $meta_type,
+					);
+				} elseif ( $start_date ) {
+					$meta_clause = array(
+						'key'     => $meta_key,
+						'value'   => $start_date,
+						'compare' => '>=',
+						'type'    => $meta_type,
+					);
+				} elseif ( $end_date ) {
+					$meta_clause = array(
+						'key'     => $meta_key,
+						'value'   => $end_date,
+						'compare' => '<=',
+						'type'    => $meta_type,
+					);
+				}
+			} else {
+				$compare_map = array(
+					'future' => '>=',
+					'past'   => '<',
+					'today'  => '=',
 				);
-			} elseif ( $start_date ) {
-				$meta_clause = array(
-					'key'     => $meta_key,
-					'value'   => $start_date,
-					'compare' => '>=',
-					'type'    => $meta_type,
-				);
-			} elseif ( $end_date ) {
-				$meta_clause = array(
-					'key'     => $meta_key,
-					'value'   => $end_date,
-					'compare' => '<=',
-					'type'    => $meta_type,
-				);
+
+				if ( isset( $compare_map[ $date_range ] ) ) {
+					$meta_clause = array(
+						'key'     => $meta_key,
+						'value'   => $today,
+						'compare' => $compare_map[ $date_range ],
+						'type'    => $meta_type,
+					);
+				}
 			}
-		} else {
-			$compare_map = array(
-				'future' => '>=',
-				'past'   => '<',
-				'today'  => '=',
+		} elseif ( null !== $meta_value_filter && '' !== $meta_value_filter ) {
+			$meta_clause = array(
+				'key'     => $meta_key,
+				'value'   => $meta_value_filter,
+				'compare' => $meta_compare,
+				'type'    => $meta_type,
 			);
-
-			if ( isset( $compare_map[ $date_range ] ) ) {
-				$meta_clause = array(
-					'key'     => $meta_key,
-					'value'   => $today,
-					'compare' => $compare_map[ $date_range ],
-					'type'    => $meta_type,
-				);
-			}
 		}
-	} elseif ( null !== $meta_value_filter && '' !== $meta_value_filter ) {
-		$meta_clause = array(
-			'key'     => $meta_key,
-			'value'   => $meta_value_filter,
-			'compare' => $meta_compare,
-			'type'    => $meta_type,
-		);
 	}
+
 	if ( $meta_clause ) {
-		$meta_clause = apply_filters( 'query_loop_meta_clause', $meta_clause, $meta_key, $date_range, $meta_type, $start_date, $end_date );
+		$meta_clause = apply_filters( 'query_loop_meta_clause', $meta_clause, $post_type, $meta_key, $meta_type, $meta_compare, $meta_value_filter, $date_range, $start_date, $end_date );
 
 		if ( $meta_clause && is_array( $meta_clause ) ) {
 			/*
@@ -251,6 +286,7 @@ function gutenberg_apply_meta_query_rest_args( $args, $request, $post_type = 'po
 				$args['meta_query'] = array( $meta_clause ); // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 			}
 		}
+		do_action( 'query_loop_meta_query_resolved', $meta_clause, $meta_key, $post_type );
 	}
 
 	return $args;

@@ -4,6 +4,7 @@
 import { TextControl, SelectControl } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
+import { applyFilters } from '@wordpress/hooks';
 
 const META_TYPE_OPTIONS = [
 	{ label: __( 'Text' ), value: 'CHAR' },
@@ -35,9 +36,81 @@ export default function MetaQueryControls( {
 	metaDateEnd,
 	metaValue,
 	metaCompare,
+	postType,
 	onChange,
 } ) {
 	const isDateType = metaType === 'DATE';
+
+	/**
+	 * Filters the list of available meta field "type" options shown in the
+	 * Query Loop inspector. Lets plugins register additional types (e.g.
+	 * `DATETIME`) for specialized CPTs. The corresponding server side
+	 * resolution must be registered via the `query_loop_pre_build_meta_clause`
+	 *  & `query_loop_meta_clause` PHP filters.
+	 *
+	 * @param {Array}  options  Default meta type options.
+	 * @param {string} postType The post type currently configured on the block.
+	 */
+	const metaTypeOptions = applyFilters(
+		'blockLibrary.query.metaTypeOptions',
+		META_TYPE_OPTIONS,
+		postType
+	);
+
+	/**
+	 * Filters the list of date range presets shown in the Query Loop
+	 * inspector. Lets plugins register custom presets (e.g. "This week",
+	 * "Next 30 days") for event style CPTs. The corresponding server side
+	 * resolution must be registered via the `query_loop_pre_build_meta_clause`
+	 *  & `query_loop_meta_clause` PHP filters.
+	 *
+	 * @param {Array}  options  Default date range options.
+	 * @param {string} postType The post type currently configured on the block.
+	 */
+	const dateRangeOptions = applyFilters(
+		'blockLibrary.query.dateRangeOptions',
+		DATE_RANGE_OPTIONS,
+		postType
+	);
+
+	/**
+	 * Filters the list of comparison operators shown for generic meta value
+	 * filtering. The corresponding server side resolution must be registered
+	 * via the `query_loop_allowed_meta_compare_operators`,
+	 * `query_loop_pre_build_meta_clause` & `query_loop_meta_clause` PHP filters.
+	 *
+	 * @param {Array}  options  Default compare operators.
+	 * @param {string} postType The post type currently configured on the block.
+	 */
+	const compareOptions = applyFilters(
+		'blockLibrary.query.metaCompareOptions',
+		COMPARE_OPTIONS,
+		postType
+	);
+
+	/**
+	 * Filters the controls rendered for the Meta field panel, after the
+	 * built in controls. Lets plugins render entirely custom UI for specific
+	 * post types.
+	 *
+	 * @param {Element|null} controls Defaults to `null`.
+	 * @param {Object}       props    The full set of props passed to MetaQueryControls.
+	 */
+	const customControls = applyFilters(
+		'blockLibrary.query.metaQueryControlsAfter',
+		null,
+		{
+			metaKey,
+			metaType,
+			dateRange,
+			metaDateStart,
+			metaDateEnd,
+			metaValue,
+			metaCompare,
+			postType,
+			onChange,
+		}
+	);
 
 	return (
 		<Stack gap="lg" direction="column">
@@ -67,7 +140,7 @@ export default function MetaQueryControls( {
 						__next40pxDefaultSize
 						label={ __( 'Field type' ) }
 						value={ metaType }
-						options={ META_TYPE_OPTIONS }
+						options={ metaTypeOptions }
 						onChange={ ( value ) =>
 							onChange( {
 								metaType: value,
@@ -87,7 +160,7 @@ export default function MetaQueryControls( {
 								__next40pxDefaultSize
 								label={ __( 'Date filter' ) }
 								value={ dateRange }
-								options={ DATE_RANGE_OPTIONS }
+								options={ dateRangeOptions }
 								onChange={ ( value ) =>
 									onChange( { dateRange: value } )
 								}
@@ -122,7 +195,7 @@ export default function MetaQueryControls( {
 								__next40pxDefaultSize
 								label={ __( 'Filter operator' ) }
 								value={ metaCompare }
-								options={ COMPARE_OPTIONS }
+								options={ compareOptions }
 								onChange={ ( value ) =>
 									onChange( { metaCompare: value } )
 								}
@@ -142,6 +215,7 @@ export default function MetaQueryControls( {
 					) }
 				</>
 			) }
+			{ customControls }
 		</Stack>
 	);
 }

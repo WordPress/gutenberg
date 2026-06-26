@@ -179,17 +179,72 @@ function block_core_query_apply_meta_query_vars( $query, $block ) {
 
 	$meta_compare_raw = isset( $query_context['metaCompare'] ) ? sanitize_text_field( $query_context['metaCompare'] ) : '=';
 	$meta_compare     = html_entity_decode( $meta_compare_raw );
-	if ( ! in_array( $meta_compare, array( '=', '!=', '>', '<', 'LIKE' ), true ) ) {
+	
+	/**
+	 * Filters the list of operators allowed for generic meta value filtering.
+	 * This must stay in sync with any operators a plugin adds to the JS
+	 * `blockLibrary.query.metaCompareOptions` filter, or they'll be silently
+	 * rejected here.
+	 *
+	 * @since 23.4.0
+	 *
+	 * @param string[] $allowed_operators Default: '=', '!=', '>', '<', 'LIKE'.
+	 */
+	$allowed_compare_operators = apply_filters(
+		'query_loop_allowed_meta_compare_operators',
+		array( '=', '!=', '>', '<', 'LIKE' )
+	);
+	if ( ! in_array( $meta_compare, $allowed_compare_operators, true ) ) {
 		$meta_compare = '=';
 	}
 
 	$order_by = $query['orderby'] ?? '';
 
-	if ( empty( $meta_key ) || is_protected_meta( $meta_key, $post_type ) ) {
+	/**
+	 * Filters whether a given meta key is allowed to be used for Query Loop
+	 * sorting/filtering on a given post type. Defaults to the core protected meta
+	 * check, but lets plugins allow list keys for their own CPTs (e.g. event
+	 * meta) or explicitly block additional keys.
+	 *
+	 * @since 23.4.0
+	 *
+	 * @param bool   $is_allowed Whether the meta key is allowed. Default based on `is_protected_meta()`.
+	 * @param string $meta_key   The meta key being requested.
+	 * @param string $post_type  The post type the query is running against.
+	 */
+	$is_meta_key_allowed = apply_filters(
+		'query_loop_is_meta_key_allowed',
+		! is_protected_meta( $meta_key, $post_type ),
+		$meta_key,
+		$post_type
+	);
+
+	if ( empty( $meta_key ) || ! $is_meta_key_allowed ) {
 		return $query;
 	}
 
-	$meta_order_types = array( 'meta_value', 'meta_value_num' );
+	/**
+	 * Filters the list of `orderby` values that should be treated as meta key
+	 * sorting (i.e. that trigger `meta_key`/`meta_type` to be set on the query).
+	 * Lets plugins register custom orderby values (e.g. `event_proximity`) that
+	 * should resolve against a meta key.
+	 * This must stay in sync with any `orderby value` a plugin adds to the JS
+	 * `blockLibrary.query.orderByOptions` filter, or they'll be silently
+	 * rejected here.
+	 *
+	 * @since 23.4.0
+	 *
+	 * @param string[] $meta_order_types Default: array( 'meta_value', 'meta_value_num' ).
+	 * @param string   $meta_key         The meta key configured on the block.
+	 * @param string   $meta_type        The meta field's data type.
+	 */
+	$meta_order_types = apply_filters(
+		'query_loop_meta_order_types',
+		array( 'meta_value', 'meta_value_num' ),
+		$meta_key,
+		$meta_type
+	);
+
 	if ( in_array( $order_by, $meta_order_types, true ) ) {
 		/*
 		* Using `meta_key` can result in slow queries on sites with large amounts of post meta.
@@ -203,61 +258,109 @@ function block_core_query_apply_meta_query_vars( $query, $block ) {
 		}
 	}
 
-	$meta_clause = null;
+	/**
+	 * Filters the meta clause before core attempts to build one from the
+	 * `dateRange`/`metaValue` attributes. Return a non null array to fully
+	 * override clause construction, useful for registering brand new date
+	 * presets (e.g. "this_week", "next_30_days") or entirely custom filtering
+	 * UIs for specialized CPTs like events.
+	 *
+	 * @since 23.4.0
+	 *
+	 * @param array|null $meta_clause  Null by default; return an array to overwrite core's logic.
+	 * @param string     $post_type    The post type the query is running against.
+	 * @param string     $meta_key     The configured meta key.
+	 * @param string     $meta_type    The meta field's data type.
+	 * @param string     $meta_compare Generic filter compare operator.
+	 * @param string     $meta_value   Generic filter value (or '').
+	 * @param string     $date_range   The configured date range preset (or '').
+	 * @param string     $start_date   Custom range start date (or '').
+	 * @param string     $end_date     Custom range end date (or '').
+	 */
+	$meta_clause = apply_filters(
+		'query_loop_pre_build_meta_clause',
+		null,
+		$post_type,
+		$meta_key,
+		$meta_type,
+		$meta_compare,
+		$meta_value,
+		$date_range,
+		$start_date,
+		$end_date
+	);
 
-	if ( ! empty( $date_range ) ) {
-		$today = current_time( 'Y-m-d' );
+	if ( null === $meta_clause ) {
+		if ( ! empty( $date_range ) ) {
+			$today = current_time( 'Y-m-d' );
 
-		if ( 'custom' === $date_range ) {
-			if ( $start_date && $end_date ) {
-				$meta_clause = array(
-					'key'     => $meta_key,
-					'value'   => array( $start_date, $end_date ),
-					'compare' => 'BETWEEN',
-					'type'    => $meta_type,
+			if ( 'custom' === $date_range ) {
+				if ( $start_date && $end_date ) {
+					$meta_clause = array(
+						'key'     => $meta_key,
+						'value'   => array( $start_date, $end_date ),
+						'compare' => 'BETWEEN',
+						'type'    => $meta_type,
+					);
+				} elseif ( $start_date ) {
+					$meta_clause = array(
+						'key'     => $meta_key,
+						'value'   => $start_date,
+						'compare' => '>=',
+						'type'    => $meta_type,
+					);
+				} elseif ( $end_date ) {
+					$meta_clause = array(
+						'key'     => $meta_key,
+						'value'   => $end_date,
+						'compare' => '<=',
+						'type'    => $meta_type,
+					);
+				}
+			} else {
+				$compare_map = array(
+					'future' => '>=',
+					'past'   => '<',
+					'today'  => '=',
 				);
-			} elseif ( $start_date ) {
-				$meta_clause = array(
-					'key'     => $meta_key,
-					'value'   => $start_date,
-					'compare' => '>=',
-					'type'    => $meta_type,
-				);
-			} elseif ( $end_date ) {
-				$meta_clause = array(
-					'key'     => $meta_key,
-					'value'   => $end_date,
-					'compare' => '<=',
-					'type'    => $meta_type,
-				);
+
+				if ( isset( $compare_map[ $date_range ] ) ) {
+					$meta_clause = array(
+						'key'     => $meta_key,
+						'value'   => $today,
+						'compare' => $compare_map[ $date_range ],
+						'type'    => $meta_type,
+					);
+				}
 			}
-		} else {
-			$compare_map = array(
-				'future' => '>=',
-				'past'   => '<',
-				'today'  => '=',
+		} elseif ( '' !== $meta_value ) {
+			$meta_clause = array(
+				'key'     => $meta_key,
+				'value'   => $meta_value,
+				'compare' => $meta_compare,
+				'type'    => $meta_type,
 			);
-
-			if ( isset( $compare_map[ $date_range ] ) ) {
-				$meta_clause = array(
-					'key'     => $meta_key,
-					'value'   => $today,
-					'compare' => $compare_map[ $date_range ],
-					'type'    => $meta_type,
-				);
-			}
 		}
-	} elseif ( '' !== $meta_value ) {
-		$meta_clause = array(
-			'key'     => $meta_key,
-			'value'   => $meta_value,
-			'compare' => $meta_compare,
-			'type'    => $meta_type,
-		);
 	}
 
 	if ( $meta_clause ) {
-		$meta_clause = apply_filters( 'query_loop_meta_clause', $meta_clause, $meta_key, $date_range, $meta_type, $start_date, $end_date );
+		/**
+		 * Filters the final meta clause before it's merged into the query's
+		 * `meta_query`.
+		 *
+		 * @since 23.4.0
+		 *
+		 * @param array      $meta_clause  Return an array to overwrite core's logic. 
+		 * @param string     $post_type    The post type the query is running against.
+	 	 * @param string     $meta_key     The configured meta key.
+		 * @param string     $meta_type    The meta field's data type.
+		 * @param string     $meta_compare Generic filter compare operator.
+		 * @param string     $meta_value   Generic filter value (or '').
+		 * @param string     $date_range   The configured date-range preset (or '').
+		 * @param string     $start_date   Custom range start date (or '').
+		 * @param string     $end_date     Custom range end date (or '').
+		 */
+		$meta_clause = apply_filters( 'query_loop_meta_clause', $meta_clause, $post_type, $meta_key, $meta_type, $meta_compare, $meta_value, $date_range, $start_date, $end_date );
 
 		if ( $meta_clause && is_array( $meta_clause ) ) {
 			if ( ! empty( $query['meta_query'] ) ) {
@@ -278,6 +381,19 @@ function block_core_query_apply_meta_query_vars( $query, $block ) {
 				$query['meta_query'] = array( $meta_clause ); // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 			}
 		}
+
+		/**
+		 * Fires after a meta clause has been resolved and merged into the
+		 * Query Loop block's query. Useful for logging/debugging custom
+		 * sorting/filtering extensions.
+		 *
+		 * @since 23.4.0
+		 *
+		 * @param array    $meta_clause The resolved and filtered meta clause.
+		 * @param string   $meta_key    The configured meta key.
+		 * @param string   $post_type   The post type the query is running against.
+		 */
+		do_action( 'query_loop_meta_query_resolved', $meta_clause, $meta_key, $post_type );
 	}
 
 	return $query;

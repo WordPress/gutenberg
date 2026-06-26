@@ -516,6 +516,7 @@ export default function QueryInspectorControls( props ) {
 								dateRange={ dateRange }
 								metaValue={ metaValue }
 								metaCompare={ metaCompare }
+								postType={ postType }
 								onChange={ setQuery }
 							/>
 						</ToolsPanelItem>
