@@ -428,21 +428,13 @@ function ListViewBlock( {
 	}
 
 	const onMouseEnter = useCallback( () => {
-		// Disabled blocks are visible as context only.
-		if ( isDisabled ) {
-			return;
-		}
 		setIsHovered( true );
 		debouncedToggleBlockHighlight( clientId, true );
-	}, [ clientId, setIsHovered, debouncedToggleBlockHighlight, isDisabled ] );
+	}, [ clientId, setIsHovered, debouncedToggleBlockHighlight ] );
 	const onMouseLeave = useCallback( () => {
-		// Disabled blocks are visible as context only.
-		if ( isDisabled ) {
-			return;
-		}
 		setIsHovered( false );
 		debouncedToggleBlockHighlight( clientId, false );
-	}, [ clientId, setIsHovered, debouncedToggleBlockHighlight, isDisabled ] );
+	}, [ clientId, setIsHovered, debouncedToggleBlockHighlight ] );
 
 	const selectEditorBlock = useCallback(
 		( event ) => {
@@ -470,12 +462,6 @@ function ListViewBlock( {
 
 	const toggleExpanded = useCallback(
 		( event ) => {
-			// Disabled blocks are visible as context only.
-			if ( isDisabled ) {
-				event.preventDefault();
-				event.stopPropagation();
-				return;
-			}
 			// Prevent shift+click from opening link in a new window when toggling.
 			event.preventDefault();
 			event.stopPropagation();
@@ -485,17 +471,12 @@ function ListViewBlock( {
 				expand( clientId );
 			}
 		},
-		[ clientId, expand, collapse, isExpanded, isDisabled ]
+		[ clientId, expand, collapse, isExpanded ]
 	);
 
 	// Allow right-clicking an item in the List View to open up the block settings dropdown.
 	const onContextMenu = useCallback(
 		( event ) => {
-			if ( isDisabled ) {
-				event.preventDefault();
-				return;
-			}
-
 			const { ownerDocument } = settingsRef?.current || {};
 			if ( ! ownerDocument || ! ownerDocument.hasFocus() ) {
 				return;
@@ -510,7 +491,7 @@ function ListViewBlock( {
 				event.preventDefault();
 			}
 		},
-		[ allowRightClickOverrides, settingsRef, isDisabled, showBlockActions ]
+		[ allowRightClickOverrides, settingsRef, showBlockActions ]
 	);
 
 	const onMouseDown = useCallback(
@@ -644,10 +625,10 @@ function ListViewBlock( {
 			className={ classes }
 			isDragged={ isDragged }
 			onKeyDown={ onKeyDown }
-			onMouseEnter={ onMouseEnter }
-			onMouseLeave={ onMouseLeave }
-			onFocus={ onMouseEnter }
-			onBlur={ onMouseLeave }
+			onMouseEnter={ isDisabled ? undefined : onMouseEnter }
+			onMouseLeave={ isDisabled ? undefined : onMouseLeave }
+			onFocus={ isDisabled ? undefined : onMouseEnter }
+			onBlur={ isDisabled ? undefined : onMouseLeave }
 			level={ level }
 			position={ position }
 			rowCount={ rowCount }
@@ -668,9 +649,13 @@ function ListViewBlock( {
 						<ListViewBlockContents
 							block={ block }
 							onClick={ selectEditorBlock }
-							onContextMenu={ onContextMenu }
+							onContextMenu={
+								isDisabled ? undefined : onContextMenu
+							}
 							onMouseDown={ onMouseDown }
-							onToggleExpanded={ toggleExpanded }
+							onToggleExpanded={
+								isDisabled ? undefined : toggleExpanded
+							}
 							isSelected={ isSelected }
 							position={ position }
 							siblingBlockCount={ siblingBlockCount }
