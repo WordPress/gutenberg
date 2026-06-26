@@ -3,11 +3,9 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Button, Composite } from '@wordpress/components';
-import { useState, useEffect } from '@wordpress/element';
-import apiFetch from '@wordpress/api-fetch';
 
 /**
- * Curated emoji set for reactions (fallback).
+ * Curated emoji set for reactions.
  * The `value` slug is used as the storage key in the database to avoid
  * potential encoding issues with emoji characters.
  */
@@ -18,65 +16,6 @@ export const REACTION_EMOJIS = [
 	{ emoji: '👀', label: __( 'Eyes' ), value: 'eyes' },
 	{ emoji: '🚀', label: __( 'Rocket' ), value: 'rocket' },
 ];
-
-// Module-level cache so the OPTIONS request is made only once.
-let cachedEmojis = null;
-let fetchPromise = null;
-
-/**
- * Hook that returns the allowed reaction emojis from the REST API schema.
- *
- * Fetches the emoji list from the `OPTIONS /wp/v2/comments` response
- * and caches the result at module level. Falls back to the hardcoded
- * REACTION_EMOJIS if the request fails or the schema property is missing.
- *
- * @return {Array} The list of allowed reaction emoji objects.
- */
-export function useReactionEmojis() {
-	const [ emojis, setEmojis ] = useState( cachedEmojis || REACTION_EMOJIS );
-
-	useEffect( () => {
-		if ( cachedEmojis ) {
-			return;
-		}
-
-		let isMounted = true;
-
-		if ( ! fetchPromise ) {
-			fetchPromise = apiFetch( {
-				path: '/wp/v2/comments',
-				method: 'OPTIONS',
-			} )
-				.then( ( response ) => {
-					const schemaEmojis =
-						response?.schema?.properties?.reaction_emojis?.default;
-					if (
-						Array.isArray( schemaEmojis ) &&
-						schemaEmojis.length
-					) {
-						cachedEmojis = schemaEmojis;
-					} else {
-						cachedEmojis = REACTION_EMOJIS;
-					}
-				} )
-				.catch( () => {
-					cachedEmojis = REACTION_EMOJIS;
-				} );
-		}
-
-		fetchPromise.then( () => {
-			if ( isMounted ) {
-				setEmojis( cachedEmojis );
-			}
-		} );
-
-		return () => {
-			isMounted = false;
-		};
-	}, [] );
-
-	return emojis;
-}
 
 /**
  * Reactions storage format:
@@ -165,8 +104,6 @@ export function buildEmojiBySlugMap( emojis = REACTION_EMOJIS ) {
  *                                  user picks a curated emoji.
  */
 export default function ReactionEmojiPicker( { onSelect } ) {
-	const emojis = useReactionEmojis();
-
 	return (
 		<Composite
 			role="listbox"
@@ -174,7 +111,7 @@ export default function ReactionEmojiPicker( { onSelect } ) {
 			aria-label={ __( 'Select an emoji reaction' ) }
 			className="editor-collab-sidebar-panel__emoji-picker"
 		>
-			{ emojis.map( ( { emoji, label, value } ) => (
+			{ REACTION_EMOJIS.map( ( { emoji, label, value } ) => (
 				<Composite.Item
 					key={ value }
 					render={

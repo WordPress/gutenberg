@@ -509,6 +509,56 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * A reaction whose parent note belongs to a different post is rejected.
+	 */
+	public function test_cannot_create_reaction_on_note_from_different_post() {
+		wp_set_current_user( self::$editor_id );
+		$post_id       = self::factory()->post->create();
+		$other_post_id = self::factory()->post->create();
+		$note_id       = $this->create_note( $other_post_id, self::$editor_id );
+
+		// `create_note()` flips the current user; reset for the reaction request.
+		wp_set_current_user( self::$editor_id );
+
+		$params = array(
+			'post'    => $post_id,
+			'type'    => 'reaction',
+			'parent'  => $note_id,
+			'content' => 'heart',
+			'author'  => self::$editor_id,
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_comment_invalid_parent', $response, 400 );
+	}
+
+	/**
+	 * Creating a note requires edit access to the target post.
+	 */
+	public function test_cannot_create_note_without_edit_post_capability() {
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+
+		wp_set_current_user( self::$subscriber_id );
+
+		$params = array(
+			'post'    => $post_id,
+			'content' => 'Subscriber note attempt',
+			'type'    => 'note',
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_cannot_create_note', $response, rest_authorization_required_code() );
+	}
+
+	/**
 	 * @dataProvider data_invalid_reaction_inputs
 	 *
 	 * @param string $parent_kind  One of 'none', 'note', or 'comment' — what the
@@ -650,49 +700,6 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			$data[ $emoji['value'] ] = array( $emoji['value'] );
 		}
 		return $data;
-	}
-
-	public function test_schema_includes_reaction_emojis() {
-		$controller = new Gutenberg_REST_Comment_Controller_7_1();
-		$schema     = $controller->get_item_schema();
-
-		$this->assertArrayHasKey( 'reaction_emojis', $schema['properties'] );
-
-		$reaction_emojis_schema = $schema['properties']['reaction_emojis'];
-		$this->assertTrue( $reaction_emojis_schema['readonly'] );
-		$this->assertSame( 'array', $reaction_emojis_schema['type'] );
-		$this->assertContains( 'view', $reaction_emojis_schema['context'] );
-		$this->assertContains( 'edit', $reaction_emojis_schema['context'] );
-
-		// Verify the default matches the helper function output.
-		$expected = gutenberg_get_note_reaction_emojis();
-		$this->assertSame( $expected, $reaction_emojis_schema['default'] );
-	}
-
-	public function test_reaction_emojis_filter_modifies_schema() {
-		$custom_emoji = array(
-			array(
-				'emoji' => '👍',
-				'label' => 'Thumbs Up',
-				'value' => 'thumbsup',
-			),
-		);
-
-		$filter = function () use ( $custom_emoji ) {
-			return $custom_emoji;
-		};
-		add_filter( 'gutenberg_note_reaction_emojis', $filter );
-
-		// Re-instantiate the controller so the schema picks up the filtered value.
-		$controller = new Gutenberg_REST_Comment_Controller_7_1();
-		$schema     = $controller->get_item_schema();
-
-		$this->assertSame(
-			$custom_emoji,
-			$schema['properties']['reaction_emojis']['default']
-		);
-
-		remove_filter( 'gutenberg_note_reaction_emojis', $filter );
 	}
 
 	public function test_reaction_emojis_filter_affects_validation() {

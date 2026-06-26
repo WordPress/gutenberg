@@ -14,12 +14,10 @@
 class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller {
 
 	/**
-	 * Retrieves the comment schema, adding reaction_emojis.
+	 * Retrieves the comment schema, adding reaction_summary.
 	 *
-	 * Extends the parent schema with a read-only `reaction_emojis`
-	 * property whose default value exposes the filtered emoji list.
-	 * Clients can read this from the OPTIONS response to discover
-	 * which reaction emojis the server accepts.
+	 * Extends the parent schema with a read-only `reaction_summary`
+	 * property exposing aggregated reaction counts for each note.
 	 *
 	 * @since 7.1.0
 	 *
@@ -27,31 +25,6 @@ class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller 
 	 */
 	public function get_item_schema() {
 		$schema = parent::get_item_schema();
-
-		$schema['properties']['reaction_emojis'] = array(
-			'description' => __( 'Allowed emoji reactions for notes.', 'gutenberg' ),
-			'type'        => 'array',
-			'items'       => array(
-				'type'       => 'object',
-				'properties' => array(
-					'emoji' => array(
-						'description' => __( 'The emoji character.', 'gutenberg' ),
-						'type'        => 'string',
-					),
-					'label' => array(
-						'description' => __( 'A human-readable label for the emoji.', 'gutenberg' ),
-						'type'        => 'string',
-					),
-					'value' => array(
-						'description' => __( 'The slug used as the storage key.', 'gutenberg' ),
-						'type'        => 'string',
-					),
-				),
-			),
-			'default'     => gutenberg_get_note_reaction_emojis(),
-			'context'     => array( 'view', 'edit' ),
-			'readonly'    => true,
-		);
 
 		$schema['properties']['reaction_summary'] = array(
 			'description'          => __( 'Aggregated reaction counts for this note, keyed by emoji slug.', 'gutenberg' ),
@@ -260,6 +233,17 @@ class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller 
 			}
 		}
 
+		// Notes and reactions require edit access to the post they belong to,
+		// regardless of whether a status is supplied. Mirrors core's note guard
+		// in WP_REST_Comments_Controller::create_item_permissions_check().
+		if ( $is_note && ! empty( $request['post'] ) && ! current_user_can( 'edit_post', (int) $request['post'] ) ) {
+			return new WP_Error(
+				'rest_cannot_create_note',
+				__( 'Sorry, you are not allowed to create notes for this post.', 'gutenberg' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+
 		$edit_cap = $is_note ? array( 'edit_post', (int) $request['post'] ) : array( 'moderate_comments' );
 		if ( isset( $request['status'] ) && ! current_user_can( ...$edit_cap ) ) {
 			return new WP_Error(
@@ -376,6 +360,15 @@ class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller 
 				return new WP_Error(
 					'rest_comment_invalid_parent',
 					__( 'A reaction must be attached to a note.', 'gutenberg' ),
+					array( 'status' => 400 )
+				);
+			}
+
+			// The parent note must belong to the post the reaction targets.
+			if ( ! empty( $request['post'] ) && (int) $parent_comment->comment_post_ID !== (int) $request['post'] ) {
+				return new WP_Error(
+					'rest_comment_invalid_parent',
+					__( 'A reaction must be attached to a note on the same post.', 'gutenberg' ),
 					array( 'status' => 400 )
 				);
 			}
@@ -780,41 +773,6 @@ class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller 
 		}
 
 		return $response;
-	}
-
-	/**
-	 * Prepares links for the request.
-	 *
-	 * Extends the 6.9 implementation to also handle 'reaction' type
-	 * for children link embedding.
-	 *
-	 * @since 7.1.0
-	 *
-	 * @param WP_Comment $comment Comment object.
-	 * @return array Links for the given comment.
-	 */
-	protected function prepare_links( $comment ) {
-		$links = WP_REST_Comments_Controller::prepare_links( $comment );
-
-		// Embedding children for notes and reactions requires `type` and `status` inheritance.
-		if ( isset( $links['children'] ) && $this->is_note_or_reaction( $comment->comment_type ) ) {
-			// Notes have reaction children; reactions don't have children.
-			$child_type = 'note' === $comment->comment_type ? 'reaction' : $comment->comment_type;
-			$args       = array(
-				'parent' => $comment->comment_ID,
-				'type'   => $child_type,
-				'status' => 'all',
-			);
-
-			$rest_url = add_query_arg( $args, rest_url( $this->namespace . '/' . $this->rest_base ) );
-
-			$links['children'] = array(
-				'href'       => $rest_url,
-				'embeddable' => true,
-			);
-		}
-
-		return $links;
 	}
 
 	/**

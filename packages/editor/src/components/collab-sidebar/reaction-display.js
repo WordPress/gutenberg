@@ -6,13 +6,7 @@ import { Button, Dropdown } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { SVG, Path } from '@wordpress/primitives';
 import { plus as plusIcon } from '@wordpress/icons';
-import {
-	useMemo,
-	useState,
-	useCallback,
-	lazy,
-	Suspense,
-} from '@wordpress/element';
+import { useState, useCallback, lazy, Suspense } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -40,7 +34,6 @@ import ReactionEmojiPicker, {
 	emojiToStorageKey,
 	hexKeyToEmoji,
 	buildEmojiBySlugMap,
-	useReactionEmojis,
 } from './reaction-emoji-picker';
 
 /**
@@ -49,6 +42,9 @@ import ReactionEmojiPicker, {
  * the Emojibase JSON dataset is fetched separately on first open.
  */
 const FullEmojiPicker = lazy( () => import( './emoji-picker' ) );
+
+// The curated emoji set is static, so index it once at module load.
+const emojiBySlug = buildEmojiBySlugMap();
 
 // `Dropdown`'s popover is rendered in a portal anchored to <body>,
 // so it escapes the `overflow: hidden` chain on the collab sidebar
@@ -267,11 +263,6 @@ export default function ReactionDisplay( {
 	reactions,
 	onToggleReaction,
 } ) {
-	const emojis = useReactionEmojis();
-	const emojiBySlug = useMemo(
-		() => buildEmojiBySlugMap( emojis ),
-		[ emojis ]
-	);
 	const reactedSlugs = getReactedSlugs( reactions );
 
 	if ( reactedSlugs.length === 0 ) {
@@ -355,7 +346,6 @@ export function AddReactionButton( { disabled = false, onToggleReaction } ) {
  * @param {Function} props.onToggleReaction Callback to toggle a reaction.
  */
 export function MoreEmojiButton( { onToggleReaction } ) {
-	const emojis = useReactionEmojis();
 	if ( typeof window === 'undefined' || ! window.gutenbergEmojibaseUrl ) {
 		return null;
 	}
@@ -378,9 +368,7 @@ export function MoreEmojiButton( { onToggleReaction } ) {
 					<FullEmojiPicker
 						onSelect={ ( emoji ) => {
 							onClose();
-							onToggleReaction(
-								emojiToStorageKey( emoji, emojis )
-							);
+							onToggleReaction( emojiToStorageKey( emoji ) );
 						} }
 					/>
 				</Suspense>
