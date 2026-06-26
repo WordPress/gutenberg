@@ -58,6 +58,15 @@ function VideoEdit( {
 	const videoPlayer = useRef();
 	const { id, controls, poster, src, tracks, width, height } = attributes;
 	const isGif = isGifVariation( attributes );
+	// Give the <video> an explicit (non-`auto`) aspect ratio derived from the
+	// stored dimensions. The width/height attributes alone only yield
+	// `aspect-ratio: auto W/H`, whose `auto` keyword defers to the element's
+	// natural ratio while the poster/metadata load - during which Chrome briefly
+	// computes a runaway height (tens of thousands of pixels) before settling.
+	// That spike is what reads as a duplicated image during the GIF-to-video
+	// swap. A non-`auto` ratio governs the box height throughout the load.
+	const aspectRatio =
+		width && height ? `${ width } / ${ height }` : undefined;
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const blockEditingMode = useBlockEditingMode();
@@ -267,6 +276,7 @@ function VideoEdit( {
 					playsInline={ isGif }
 					width={ width }
 					height={ height }
+					style={ aspectRatio ? { aspectRatio } : undefined }
 				>
 					<Tracks tracks={ tracks } />
 				</video>

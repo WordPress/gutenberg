@@ -180,11 +180,8 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 		expect( videoBlock.attributes.playsInline ).toBe( true );
 		expect( videoBlock.attributes.src ).toMatch( /\.(mp4|webm)(\?.*)?$/i );
 
-		// The converted block carries the GIF's intrinsic dimensions. Without
-		// them the <video> has no aspect ratio until its poster/metadata load,
-		// so it collapses to the browser-default size and then jumps to the
-		// GIF's height - which briefly renders a duplicated image during the
-		// swap. The width/height keep the element stable from the first paint.
+		// The converted block carries the GIF's intrinsic dimensions so the
+		// <video> has a stable aspect ratio from the first paint.
 		expect( videoBlock.attributes.width ).toBeGreaterThan( 0 );
 		expect( videoBlock.attributes.height ).toBeGreaterThan( 0 );
 
@@ -200,6 +197,18 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 		await expect( renderedVideo ).toHaveAttribute(
 			'height',
 			String( videoBlock.attributes.height )
+		);
+
+		// The <video> also needs an explicit (non-`auto`) aspect-ratio derived
+		// from those dimensions. The width/height attributes alone only yield
+		// `aspect-ratio: auto W/H`, whose `auto` keyword defers to the element's
+		// natural ratio while the poster/metadata load - during which the box
+		// height briefly blows up to tens of thousands of pixels before
+		// settling, reading as a duplicated image during the swap. An explicit
+		// ratio governs the height throughout the load and prevents that spike.
+		await expect( renderedVideo ).toHaveCSS(
+			'aspect-ratio',
+			`${ videoBlock.attributes.width } / ${ videoBlock.attributes.height }`
 		);
 
 		// The underlying media is still the GIF image with a recorded
