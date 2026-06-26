@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { act, fireEvent, render, screen } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import RangeControl from '../';
 
 const getRangeInput = (): HTMLInputElement => screen.getByRole( 'slider' );
