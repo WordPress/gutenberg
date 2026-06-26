@@ -446,14 +446,6 @@ function ListViewBlock( {
 
 	const selectEditorBlock = useCallback(
 		( event ) => {
-			// If we're editing a section and clicking outside it, exit section editing.
-			if ( isDisabled ) {
-				stopEditingContentOnlySection();
-				selectBlock( event, clientId, null );
-				event.preventDefault();
-				return;
-			}
-
 			// For keyboard activation (Enter/Space on a link), transfer focus
 			// to the canvas with the caret at the end of the block.
 			// For mouse clicks, keep focus in the list view so that subsequent
@@ -462,7 +454,7 @@ function ListViewBlock( {
 			selectBlock( event, clientId, isKeyboardActivation ? -1 : null );
 			event.preventDefault();
 		},
-		[ clientId, selectBlock, isDisabled, stopEditingContentOnlySection ]
+		[ clientId, selectBlock ]
 	);
 
 	const updateFocusAndSelection = useCallback(
