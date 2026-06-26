@@ -51,7 +51,6 @@ export default function InitPatternModal() {
 						onChange={ setTitle }
 						placeholder={ __( 'My pattern' ) }
 						className="patterns-create-modal__name-input"
-						__next40pxDefaultSize
 					/>
 					<ToggleControl
 						label={ _x( 'Synced', 'pattern (singular)' ) }

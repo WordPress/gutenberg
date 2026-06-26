@@ -4,6 +4,7 @@
 
 @use "sass:color";
 @use "sass:math";
+@use "@wordpress/theme/utils" as wpds;
 @use "./variables";
 @use "./colors";
 @use "./breakpoints";
@@ -177,6 +178,19 @@
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;
 	outline-offset: 2px;
+}
+
+
+/**
+ * Standard focus rings for the WordPress Design System.
+ *
+ * Apply `outset-ring__focus` inside the relevant pseudo-class at the call site,
+ * e.g. `&:focus { @include outset-ring__focus(); }`.
+ */
+
+@mixin outset-ring__focus() {
+	outline: wpds.var("--wpds-border-width-focus") solid wpds.var("--wpds-color-stroke-focus");
+	outline-offset: wpds.var("--wpds-border-width-focus");
 }
 
 

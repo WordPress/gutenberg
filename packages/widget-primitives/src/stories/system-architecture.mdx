@@ -1,0 +1,14 @@
+import { Meta, Markdown } from '@storybook/addon-docs/blocks';
+import ArchitectureDoc from '../../../../docs/explanations/architecture/dashboard-widgets.md?raw';
+import pipelineDiagram from '../../../../docs/explanations/architecture/assets/dashboard-widgets-pipeline.svg';
+
+{/* Use the locally served diagram so Storybook renders it offline. */}
+
+<Meta title="Widget Primitives/System Architecture" />
+
+<Markdown>
+	{ ArchitectureDoc.replace(
+		'https://developer.wordpress.org/files/2026/06/dashboard-widgets-pipeline.png',
+		pipelineDiagram
+	) }
+</Markdown>

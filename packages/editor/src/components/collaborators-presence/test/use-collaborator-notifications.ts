@@ -25,7 +25,9 @@ let lastSavePostId: unknown;
 let mockEditorState = {
 	postStatus: 'draft',
 	isCollaborationEnabled: true,
-	showCollaborationNotifications: true,
+	showCollaborationJoinNotifications: true,
+	showCollaborationLeaveNotifications: true,
+	showCollaborationPostSaveNotifications: true,
 };
 
 jest.mock( '@wordpress/data', () => ( {
@@ -119,11 +121,17 @@ function buildMockSelect() {
 		if ( storeKey === 'core/preferences' ) {
 			return {
 				get: ( scope: string, name: string ) => {
-					if (
-						scope === 'core' &&
-						name === 'showCollaborationNotifications'
-					) {
-						return mockEditorState.showCollaborationNotifications;
+					const preferenceValues: Record< string, boolean > = {
+						showCollaborationJoinNotifications:
+							mockEditorState.showCollaborationJoinNotifications,
+						showCollaborationLeaveNotifications:
+							mockEditorState.showCollaborationLeaveNotifications,
+						showCollaborationPostSaveNotifications:
+							mockEditorState.showCollaborationPostSaveNotifications,
+					};
+
+					if ( scope === 'core' && name in preferenceValues ) {
+						return preferenceValues[ name ];
 					}
 					return undefined;
 				},
@@ -148,7 +156,9 @@ beforeEach( () => {
 	mockEditorState = {
 		postStatus: 'draft',
 		isCollaborationEnabled: true,
-		showCollaborationNotifications: true,
+		showCollaborationJoinNotifications: true,
+		showCollaborationLeaveNotifications: true,
+		showCollaborationPostSaveNotifications: true,
 	};
 	mockCreateNotice.mockClear();
 	( useSelect as jest.Mock ).mockImplementation( ( selector: Function ) =>
@@ -370,15 +380,84 @@ describe( 'useCollaboratorNotifications', () => {
 	} );
 
 	describe( 'when notifications are disabled', () => {
-		it( 'passes null postId to hooks when showCollaborationNotifications preference is false', () => {
+		it( 'passes null postId only to the join hook when join notifications are disabled', () => {
 			mockEditorState = {
 				...mockEditorState,
-				showCollaborationNotifications: false,
+				showCollaborationJoinNotifications: false,
 			};
 			renderHook( () => useCollaboratorNotifications( 123, 'post' ) );
 
 			expect( lastJoinPostId ).toBeNull();
+			expect( lastLeavePostId ).toBe( 123 );
+			expect( lastSavePostId ).toBe( 123 );
+		} );
+
+		it( 'passes null postId only to the leave hook when leave notifications are disabled', () => {
+			mockEditorState = {
+				...mockEditorState,
+				showCollaborationLeaveNotifications: false,
+			};
+			renderHook( () => useCollaboratorNotifications( 123, 'post' ) );
+
+			expect( lastJoinPostId ).toBe( 123 );
 			expect( lastLeavePostId ).toBeNull();
+			expect( lastSavePostId ).toBe( 123 );
+		} );
+
+		it( 'does not fire join notification after join notifications are disabled', () => {
+			const me = makeMe();
+			const bobJoinedAfter = makeCollaborator( {
+				clientId: 2,
+				collaboratorInfo: {
+					id: 200,
+					name: 'Bob',
+					slug: 'bob',
+					avatar_urls: {},
+					browserType: 'Firefox',
+					enteredAt: BASE_ENTERED_AT + 10000,
+				},
+			} );
+			const { rerender } = renderHook( () =>
+				useCollaboratorNotifications( 123, 'post' )
+			);
+
+			mockEditorState = {
+				...mockEditorState,
+				showCollaborationJoinNotifications: false,
+			};
+			rerender();
+
+			mockOnJoinCallback?.( bobJoinedAfter, me );
+
+			expect( mockCreateNotice ).not.toHaveBeenCalled();
+		} );
+
+		it( 'does not fire leave notification after leave notifications are disabled', () => {
+			const alice = makeCollaborator();
+			const { rerender } = renderHook( () =>
+				useCollaboratorNotifications( 123, 'post' )
+			);
+
+			mockEditorState = {
+				...mockEditorState,
+				showCollaborationLeaveNotifications: false,
+			};
+			rerender();
+
+			mockOnLeaveCallback?.( alice );
+
+			expect( mockCreateNotice ).not.toHaveBeenCalled();
+		} );
+
+		it( 'passes null postId only to the post save hook when post update notifications are disabled', () => {
+			mockEditorState = {
+				...mockEditorState,
+				showCollaborationPostSaveNotifications: false,
+			};
+			renderHook( () => useCollaboratorNotifications( 123, 'post' ) );
+
+			expect( lastJoinPostId ).toBe( 123 );
+			expect( lastLeavePostId ).toBe( 123 );
 			expect( lastSavePostId ).toBeNull();
 		} );
 
