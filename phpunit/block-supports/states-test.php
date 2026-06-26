@@ -139,7 +139,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 		$this->assertSame(
 			array(
 				'background-color' => '#ff0000 !important',
-				'background-image' => 'unset !important',
+				'background-image' => 'unset',
 			),
 			$actual
 		);

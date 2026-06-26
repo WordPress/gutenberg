@@ -113,12 +113,13 @@ function gutenberg_get_state_declarations_with_background_resets( $declarations 
 
 	/*
 	 * When the state sets a solid background-color but no gradient of its own,
-	 * emit `background-image: unset !important` to clear any gradient (whether
-	 * stored as the `background` shorthand or as `background-image`) that was
-	 * applied to the default / normal state via an inline style attribute.
+	 * emit `background-image: unset` to clear any gradient (whether stored as
+	 * the `background` shorthand or as `background-image`) that was applied to
+	 * the default / normal state via an inline style attribute. The declaration
+	 * is marked important when the state rule is registered with the style engine.
 	 */
 	if ( $has_background_color && ! $has_background && ! $has_background_image ) {
-		$declarations['background-image'] = 'unset !important';
+		$declarations['background-image'] = 'unset';
 	}
 
 	return $declarations;
@@ -645,21 +646,35 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 	 */
 	$style_rules = array();
 	foreach ( $css_rules as $rule ) {
-		$declarations = $rule['declarations'];
-		foreach ( $declarations as $property => $value ) {
-			$declarations[ $property ] = is_string( $value ) && str_contains( $value, '!important' )
-				? $value
-				: $value . ' !important';
+		$declarations           = $rule['declarations'];
+		$important_declarations = gutenberg_get_state_declarations_with_background_resets( $declarations );
+		$selector               = gutenberg_build_state_selector(
+			".$unique_class",
+			$rule['selector'],
+			$rule['state']
+		);
+		$style_rule             = array(
+			'selector'     => $selector,
+			'declarations' => $important_declarations,
+			'important'    => true,
+		);
+		if ( ! empty( $rule['rules_group'] ) ) {
+			$style_rule['rules_group'] = $rule['rules_group'];
 		}
-		$declarations = gutenberg_get_state_declarations_with_fallback_border_styles( $declarations );
-		$declarations = gutenberg_get_state_declarations_with_background_resets( $declarations );
-		$style_rule   = array(
-			'selector'     => gutenberg_build_state_selector(
-				".$unique_class",
-				$rule['selector'],
-				$rule['state']
-			),
-			'declarations' => $declarations,
+		$style_rules[] = $style_rule;
+
+		$fallback_declarations = gutenberg_get_state_declarations_with_fallback_border_styles( $declarations );
+		foreach ( array_keys( $declarations ) as $property ) {
+			unset( $fallback_declarations[ $property ] );
+		}
+
+		if ( empty( $fallback_declarations ) ) {
+			continue;
+		}
+
+		$style_rule = array(
+			'selector'     => $selector,
+			'declarations' => $fallback_declarations,
 		);
 		if ( ! empty( $rule['rules_group'] ) ) {
 			$style_rule['rules_group'] = $rule['rules_group'];

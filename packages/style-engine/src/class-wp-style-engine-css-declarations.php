@@ -23,6 +23,13 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 		protected $declarations = array();
 
 		/**
+		 * CSS properties whose declarations should be output with !important.
+		 *
+		 * @var array
+		 */
+		protected $important_declarations = array();
+
+		/**
 		 * Constructor for this object.
 		 *
 		 * If a `$declarations` array is passed, it will be used to populate
@@ -37,12 +44,13 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 		/**
 		 * Adds a single declaration.
 		 *
-		 * @param string $property The CSS property.
-		 * @param string $value    The CSS value.
+		 * @param string $property     The CSS property.
+		 * @param string $value        The CSS value.
+		 * @param bool   $is_important Optional. Whether to output the declaration with !important. Default false.
 		 *
 		 * @return WP_Style_Engine_CSS_Declarations Returns the object to allow chaining methods.
 		 */
-		public function add_declaration( $property, $value ) {
+		public function add_declaration( $property, $value, $is_important = false ) {
 			// Sanitizes the property.
 			$property = $this->sanitize_property( $property );
 			// Bails early if the property is empty.
@@ -61,6 +69,11 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 
 			// Adds the declaration property/value pair.
 			$this->declarations[ $property ] = $value;
+			if ( $is_important ) {
+				$this->important_declarations[ $property ] = true;
+			} else {
+				unset( $this->important_declarations[ $property ] );
+			}
 
 			return $this;
 		}
@@ -74,6 +87,7 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 		 */
 		public function remove_declaration( $property ) {
 			unset( $this->declarations[ $property ] );
+			unset( $this->important_declarations[ $property ] );
 			return $this;
 		}
 
@@ -81,12 +95,13 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 		 * Adds multiple declarations.
 		 *
 		 * @param array $declarations An array of declarations.
+		 * @param bool  $is_important Optional. Whether to output the declarations with !important. Default false.
 		 *
 		 * @return WP_Style_Engine_CSS_Declarations Returns the object to allow chaining methods.
 		 */
-		public function add_declarations( $declarations ) {
+		public function add_declarations( $declarations, $is_important = false ) {
 			foreach ( $declarations as $property => $value ) {
-				$this->add_declaration( $property, $value );
+				$this->add_declaration( $property, $value, $is_important );
 			}
 			return $this;
 		}
@@ -115,33 +130,31 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 		}
 
 		/**
+		 * Gets the important declarations array.
+		 *
+		 * @return array
+		 */
+		public function get_important_declarations() {
+			return $this->important_declarations;
+		}
+
+		/**
 		 * Filters a CSS property + value pair.
 		 *
-		 * @param string $property The CSS property.
-		 * @param string $value    The value to be filtered.
-		 * @param string $spacer   The spacer between the colon and the value. Defaults to an empty string.
+		 * @param string $property     The CSS property.
+		 * @param string $value        The value to be filtered.
+		 * @param string $spacer       The spacer between the colon and the value. Defaults to an empty string.
+		 * @param bool   $is_important Whether to output the declaration with !important.
 		 *
 		 * @return string The filtered declaration or an empty string.
 		 */
-		protected static function filter_declaration( $property, $value, $spacer = '' ) {
+		protected static function filter_declaration( $property, $value, $spacer = '', $is_important = false ) {
 			$filtered_value = wp_strip_all_tags( $value, true );
 
 			if ( '' !== $filtered_value ) {
-				$important_pattern = '/\s*!\s*important\s*$/i';
-				$has_important     = 1 === preg_match( $important_pattern, $filtered_value );
-
-				/*
-				 * Some safecss validators, such as gradients, expect the value to
-				 * end after the CSS function. Validate without !important and then
-				 * restore it when the result is still a single declaration.
-				 */
-				if ( $has_important ) {
-					$filtered_value = preg_replace( $important_pattern, '', $filtered_value );
-				}
-
 				$filtered_declaration = safecss_filter_attr( "{$property}:{$spacer}{$filtered_value}" );
 
-				if ( $has_important && '' !== $filtered_declaration && ! str_contains( $filtered_declaration, ';' ) ) {
+				if ( $is_important && '' !== $filtered_declaration && ! str_contains( $filtered_declaration, ';' ) ) {
 					return "$filtered_declaration !important";
 				}
 
@@ -167,7 +180,8 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 			$spacer              = $should_prettify ? ' ' : '';
 
 			foreach ( $declarations_array as $property => $value ) {
-				$filtered_declaration = static::filter_declaration( $property, $value, $spacer );
+				$is_important         = ! empty( $this->important_declarations[ $property ] );
+				$filtered_declaration = static::filter_declaration( $property, $value, $spacer, $is_important );
 				if ( $filtered_declaration ) {
 					$declarations_output .= "{$indent}{$filtered_declaration};$suffix";
 				}

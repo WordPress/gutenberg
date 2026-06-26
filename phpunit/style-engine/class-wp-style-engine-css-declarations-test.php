@@ -162,16 +162,18 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that trailing !important does not make otherwise safe gradient values fail CSS sanitization.
+	 * Tests that important declarations are added after CSS sanitization.
 	 *
 	 * @covers ::get_declarations_string
 	 * @covers ::filter_declaration
 	 */
-	public function test_should_allow_gradient_values_with_important() {
-		$input_declarations = array(
-			'background-image' => 'linear-gradient(135deg,rgb(119,255,112) 0%,rgb(253,254,215) 99%) !important',
+	public function test_should_add_important_after_sanitizing_declarations() {
+		$css_declarations = new WP_Style_Engine_CSS_Declarations_Gutenberg();
+		$css_declarations->add_declaration(
+			'background-image',
+			'linear-gradient(135deg,rgb(119,255,112) 0%,rgb(253,254,215) 99%)',
+			true
 		);
-		$css_declarations   = new WP_Style_Engine_CSS_Declarations_Gutenberg( $input_declarations );
 
 		$this->assertSame(
 			'background-image:linear-gradient(135deg,rgb(119,255,112) 0%,rgb(253,254,215) 99%) !important;',

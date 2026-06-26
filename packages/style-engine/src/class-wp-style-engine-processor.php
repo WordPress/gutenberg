@@ -142,9 +142,16 @@ if ( ! class_exists( 'WP_Style_Engine_Processor' ) ) {
 			// Build an array of selectors along with the JSON-ified styles to make comparisons easier.
 			$selectors_json = array();
 			foreach ( $this->css_rules as $rule ) {
-				$declarations = $rule->get_declarations()->get_declarations();
+				$declarations           = $rule->get_declarations()->get_declarations();
+				$important_declarations = $rule->get_declarations()->get_important_declarations();
 				ksort( $declarations );
-				$selectors_json[ $rule->get_selector() ] = wp_json_encode( $declarations );
+				ksort( $important_declarations );
+				$selectors_json[ $rule->get_selector() ] = wp_json_encode(
+					array(
+						'declarations'           => $declarations,
+						'important_declarations' => $important_declarations,
+					)
+				);
 			}
 
 			// Combine selectors that have the same styles.

@@ -46,11 +46,12 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rule' ) ) {
 		 * @param string[]|WP_Style_Engine_CSS_Declarations $declarations An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ),
 		 *                                                                or a WP_Style_Engine_CSS_Declarations object.
 		 * @param string                                    $rules_group  A parent CSS selector in the case of nested CSS, or a CSS nested @rule, such as `@media (min-width: 80rem)` or `@layer module`.
+		 * @param bool                                      $is_important Optional. Whether to output the declarations with !important. Default false.
 		 *
 		 */
-		public function __construct( $selector = '', $declarations = array(), $rules_group = '' ) {
+		public function __construct( $selector = '', $declarations = array(), $rules_group = '', $is_important = false ) {
 			$this->set_selector( $selector );
-			$this->add_declarations( $declarations );
+			$this->add_declarations( $declarations, $is_important );
 			$this->set_rules_group( $rules_group );
 		}
 
@@ -69,23 +70,32 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rule' ) ) {
 		/**
 		 * Sets the declarations.
 		 *
-		 * @param array|WP_Style_Engine_CSS_Declarations $declarations An array of declarations (property => value pairs),
-		 *                                                             or a WP_Style_Engine_CSS_Declarations object.
+		 * @param array|WP_Style_Engine_CSS_Declarations $declarations  An array of declarations (property => value pairs),
+		 *                                                              or a WP_Style_Engine_CSS_Declarations object.
+		 * @param bool                                    $is_important Optional. Whether to output the declarations with !important. Default false.
 		 *
 		 * @return WP_Style_Engine_CSS_Rule Returns the object to allow chaining of methods.
 		 */
-		public function add_declarations( $declarations ) {
+		public function add_declarations( $declarations, $is_important = false ) {
 			$is_declarations_object = ! is_array( $declarations );
 			$declarations_array     = $is_declarations_object ? $declarations->get_declarations() : $declarations;
+			$important_declarations = $is_declarations_object ? $declarations->get_important_declarations() : array();
 
 			if ( null === $this->declarations ) {
 				if ( $is_declarations_object ) {
 					$this->declarations = $declarations;
 					return $this;
 				}
-				$this->declarations = new WP_Style_Engine_CSS_Declarations( $declarations_array );
+				$this->declarations = new WP_Style_Engine_CSS_Declarations();
 			}
-			$this->declarations->add_declarations( $declarations_array );
+
+			foreach ( $declarations_array as $property => $value ) {
+				$this->declarations->add_declaration(
+					$property,
+					$value,
+					$is_important || ! empty( $important_declarations[ $property ] )
+				);
+			}
 
 			return $this;
 		}
