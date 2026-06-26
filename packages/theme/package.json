@@ -28,6 +28,8 @@
 		"build-types/index.d.ts.map",
 		"build-types/prebuilt/js/design-tokens.d.mts",
 		"build-types/prebuilt/js/design-tokens.d.mts.map",
+		"build-types/prebuilt/ts/token-types.d.ts",
+		"build-types/prebuilt/ts/token-types.d.ts.map",
 		"build-types/stylelint-plugins/no-setting-wpds-custom-properties.d.mts",
 		"build-types/stylelint-plugins/no-setting-wpds-custom-properties.d.mts.map",
 		"build-types/stylelint-plugins/no-token-fallback-values.d.mts",
@@ -158,6 +160,6 @@
 		"build:tokens": "node --import=esbuild-esm-loader/register bin/generate-primitive-tokens/index.ts && node --import=esbuild-esm-loader/register bin/build-design-tokens/index.ts",
 		"build": "npm run build:tokens && npm run build:default-ramps",
 		"postbuild": "prettier --write tokens/color.json tokens/modes src/prebuilt src/color-ramps/lib/default-ramps.ts docs ../base-styles/internal/_wpds-token-fallbacks.scss",
-		"validate:package-contents": "node ../../tools/validation/validate-package-contents.mjs ."
+		"validate:package-contents": "node ../../tools/validation/validate-package-contents.mjs . --attw-profile node16 --attw-exclude-entrypoint ./design-tokens.css --attw-exclude-entrypoint ./utils --attw-ignore-rule false-cjs --attw-ignore-rule false-esm --attw-ignore-rule cjs-resolves-to-esm"
 	}
 }
