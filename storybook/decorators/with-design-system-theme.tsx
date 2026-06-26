@@ -3,26 +3,6 @@ import { ThemeProvider } from '@wordpress/theme';
 import type { StoryContext } from 'storybook/internal/types';
 import { storyIdMatchesDesignSystemTheme } from './utils/design-system-theme-story-matchers';
 
-type DesignSystemThemeGlobals = StoryContext[ 'globals' ];
-
-function getDesignSystemThemeSettings( globals: DesignSystemThemeGlobals ) {
-	const colorTheme = globals.dsColorTheme;
-	const cursorControl = globals.dsCursorControl || undefined;
-	const cornerRadiusPreset =
-		( globals.dsCornerRadius as CornerRadiusPreset ) || undefined;
-
-	let color;
-	if ( colorTheme === 'dark' ) {
-		color = { background: '#1e1e1e', primary: '#3858e9' };
-	}
-
-	return {
-		color,
-		cursor: cursorControl ? { control: cursorControl } : undefined,
-		cornerRadius: cornerRadiusPreset,
-	};
-}
-
 /**
  * Decorator that applies Design System theme based on toolbar selections.
  *
@@ -41,15 +21,21 @@ export function WithDesignSystemTheme(
 		return <Story { ...context } />;
 	}
 
-	const { color, cursor, cornerRadius } = getDesignSystemThemeSettings(
-		context.globals
-	);
+	const colorTheme = context.globals.dsColorTheme;
+	const cursorControl = context.globals.dsCursorControl || undefined;
+	const cornerRadiusPreset =
+		( context.globals.dsCornerRadius as CornerRadiusPreset ) || undefined;
+
+	let color;
+	if ( colorTheme === 'dark' ) {
+		color = { background: '#1e1e1e', primary: '#3858e9' };
+	}
 
 	return (
 		<ThemeProvider
 			color={ color }
-			cursor={ cursor }
-			cornerRadius={ cornerRadius }
+			cursor={ cursorControl ? { control: cursorControl } : undefined }
+			cornerRadius={ cornerRadiusPreset }
 			isRoot={ context.viewMode !== 'docs' }
 		>
 			<div
