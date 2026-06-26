@@ -61,6 +61,7 @@
 			display: grid;
 			grid-column: 1 / -1;
 			grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
+			text-decoration: none;
 
 			@supports ( grid-template-columns: subgrid ) {
 				grid-template-columns: subgrid;

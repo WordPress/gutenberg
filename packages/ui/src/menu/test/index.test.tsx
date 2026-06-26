@@ -13,6 +13,9 @@ describe( 'Menu', () => {
 				<Menu.Popup>
 					<Menu.Item>Duplicate</Menu.Item>
 					<Menu.Separator />
+					<Menu.LinkItem href="https://wordpress.org">
+						WordPress.org
+					</Menu.LinkItem>
 					<Menu.Item>Delete</Menu.Item>
 				</Menu.Popup>
 			</Menu.Root>
@@ -29,6 +32,9 @@ describe( 'Menu', () => {
 		expect(
 			screen.getByRole( 'menuitem', { name: 'Duplicate' } )
 		).toBeVisible();
+		expect(
+			screen.getByRole( 'menuitem', { name: 'WordPress.org' } )
+		).toHaveAttribute( 'href', 'https://wordpress.org' );
 		expect( screen.getByRole( 'separator' ) ).toBeVisible();
 	} );
 
