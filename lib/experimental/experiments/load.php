@@ -135,6 +135,11 @@ function gutenberg_initialize_experiments_settings() {
 					'label'       => __( 'React 19', 'gutenberg' ),
 					'description' => __( 'Registers React 19 as the bundled React version, replacing the default React 18 scripts.', 'gutenberg' ),
 				),
+				array(
+					'id'          => 'gutenberg-pattern-blocks',
+					'label'       => __( 'Pattern-based PHP blocks', 'gutenberg' ),
+					'description' => __( 'Lets PHP-only blocks use a block pattern as editable canvas content, without requiring a render callback.', 'gutenberg' ),
+				),
 			),
 		),
 	);

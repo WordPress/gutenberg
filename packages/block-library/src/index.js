@@ -7,11 +7,18 @@ import {
 	setUnregisteredTypeHandlerName,
 	setGroupingBlockName,
 	registerBlockType,
+	parse,
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { useDisabled } from '@wordpress/compose';
-import { select } from '@wordpress/data';
-import { useBlockProps } from '@wordpress/block-editor';
+import { select, useDispatch, useRegistry } from '@wordpress/data';
+import {
+	useBlockProps,
+	useInnerBlocksProps,
+	InnerBlocks,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+import { useLayoutEffect } from '@wordpress/element';
 import { useServerSideRender } from '@wordpress/server-side-render';
 import { __, sprintf } from '@wordpress/i18n';
 
@@ -312,6 +319,76 @@ export const __experimentalGetCoreBlocks = () =>
 	);
 
 /**
+ * Builds `edit`/`save` for a PHP-only block that uses a `pattern` markup string.
+ * On first insert the pattern becomes real inner blocks (content blocks stay
+ * editable in the canvas) and the block saves as normal block markup.
+ *
+ * Gotchas:
+ * - `lock: 'contentOnly'` locks the structure but makes the block a content-only
+ *   section, whose UI hides the generated Inspector controls (#73845).
+ *   `lock: false` keeps the controls visible with a softer lock.
+ * - With a `render_callback`, `save` emits only the inner blocks; PHP renders
+ *   the wrapper, so saving one too would double-wrap.
+ *
+ * @param {string}       markup              Block-markup string from the `pattern` registration property.
+ * @param {string|false} [lock]              Locking mode: `'contentOnly'` (default) or `false`.
+ * @param {boolean}      [hasRenderCallback] Whether the PHP block has a render_callback.
+ * @return {{ edit: Function, save: Function }} The edit and save components.
+ */
+function createPatternBlockComponents(
+	markup,
+	lock = 'contentOnly',
+	hasRenderCallback = false
+) {
+	function Edit( { clientId } ) {
+		const registry = useRegistry();
+		const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
+			useDispatch( blockEditorStore );
+
+		// Seed inner blocks from the markup only when empty; on reload they come
+		// from the saved post, so reseeding would overwrite edits.
+		useLayoutEffect( () => {
+			const seeded = parse( markup );
+			if ( ! seeded.length ) {
+				return;
+			}
+			if (
+				registry.select( blockEditorStore ).getBlocks( clientId ).length
+			) {
+				return;
+			}
+			__unstableMarkNextChangeAsNotPersistent();
+			replaceInnerBlocks( clientId, seeded, false );
+		}, [
+			clientId,
+			registry,
+			replaceInnerBlocks,
+			__unstableMarkNextChangeAsNotPersistent,
+		] );
+
+		// No `template`, so template sync stays inert; `templateLock` only locks
+		// the structure.
+		const innerBlocksProps = useInnerBlocksProps( useBlockProps(), {
+			templateLock: lock === false ? false : 'contentOnly',
+			renderAppender: false,
+		} );
+
+		return <div { ...innerBlocksProps } />;
+	}
+
+	function save() {
+		// PHP renders the wrapper; save only the inner blocks to avoid double-
+		// wrapping. Without a callback the saved wrapper is the output.
+		if ( hasRenderCallback ) {
+			return <InnerBlocks.Content />;
+		}
+		return <div { ...useInnerBlocksProps.save( useBlockProps.save() ) } />;
+	}
+
+	return { edit: Edit, save };
+}
+
+/**
  * Function to register core blocks provided by the block editor.
  *
  * @param {Array} blocks An optional array of the core blocks being registered.
@@ -331,6 +408,12 @@ export const registerCoreBlocks = (
 	// Auto-register PHP-only blocks with ServerSideRender
 	if ( window.__unstableAutoRegisterBlocks ) {
 		window.__unstableAutoRegisterBlocks.forEach( ( blockName ) => {
+			// A block with both `pattern` and `render_callback` registers as a
+			// pattern block below; skip its SSR registration here.
+			if ( window.__unstableAutoRegisterBlockPatterns?.[ blockName ] ) {
+				return;
+			}
+
 			const bootstrappedBlockType = unlock(
 				select( blocksStore )
 			).getBootstrappedBlockType( blockName );
@@ -382,6 +465,30 @@ export const registerCoreBlocks = (
 				save: () => null,
 			} );
 		} );
+	}
+
+	// Auto-register PHP-only `pattern` blocks as real, locked inner blocks.
+	if ( window.__unstableAutoRegisterBlockPatterns ) {
+		Object.entries( window.__unstableAutoRegisterBlockPatterns ).forEach(
+			( [ blockName, { markup, lock, hasRenderCallback } ] ) => {
+				const bootstrappedBlockType = unlock(
+					select( blocksStore )
+				).getBootstrappedBlockType( blockName );
+
+				registerBlockType( blockName, {
+					...bootstrappedBlockType,
+					title: bootstrappedBlockType?.title || blockName,
+					...( ( bootstrappedBlockType?.apiVersion ?? 0 ) < 3 && {
+						apiVersion: 3,
+					} ),
+					...createPatternBlockComponents(
+						markup,
+						lock,
+						hasRenderCallback
+					),
+				} );
+			}
+		);
 	}
 
 	setDefaultBlockName( paragraph.name );
