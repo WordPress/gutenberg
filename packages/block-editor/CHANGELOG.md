@@ -2,10 +2,14 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `useTypingObserver`: Capture the window reference at mount and reuse it during cleanup so the ref cleanup no longer reads `node.ownerDocument.defaultView` (which is `null` once the iframe-hosted editor has been detached from its window) and throws, which was also leaking the `removeEventListener` calls that follow it ([#78772](https://github.com/WordPress/gutenberg/pull/78772)).
+
 ### Breaking Changes
 
 -   The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed from the following:
-    -   `LetterSpacingControl` ([#79533](https://github.com/WordPress/gutenberg/pull/79533)).
+-   `LetterSpacingControl` ([#79533](https://github.com/WordPress/gutenberg/pull/79533)).
 
 ### Deprecations
 

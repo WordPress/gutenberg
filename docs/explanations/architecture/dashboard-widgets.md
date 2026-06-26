@@ -10,7 +10,7 @@ This document explains how the pieces of the dashboard widget system relate to e
 
 A widget passes through several stages, each owned by a different part of the codebase:
 
-![The widget pipeline: from the widgets folder, through the build and the server registry, to the client package and hosts](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/explanations/architecture/assets/dashboard-widgets-pipeline.svg)
+![The widget pipeline: from the widgets folder, through the build and the server registry, to the client package and hosts](https://developer.wordpress.org/files/2026/06/dashboard-widgets-pipeline.png)
 
 Each stage hands the next a single artifact and nothing else: a folder convention, then the build manifest (`build/widgets/registry.php`), then the in-memory registry (`WP_Widget_Type_Registry`), then a REST record, then a `WidgetType`. No stage reaches into how another works.
 
