@@ -1,9 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import clsx from 'clsx';
+import { caution, error, page, plugins, published } from '@wordpress/icons';
 import { Badge } from '../index';
+import { Icon } from '../../icon';
 import { Stack } from '../../stack';
+import { Text } from '../../text';
+import styles from '../style.module.css';
 
 const meta: Meta< typeof Badge > = {
-	title: 'Design System/Components/Badge/Choosing intent',
+	title: 'Design System/Components/Badge/Usage Guidelines',
 	component: Badge,
 	decorators: [
 		( Story ) => (
@@ -124,6 +129,100 @@ export const PluginStatus: Story = {
 		<>
 			<Badge intent="stable">Active</Badge>
 			<Badge intent="none">Inactive</Badge>
+		</>
+	),
+};
+
+export const TextOnlyBadges: Story = {
+	decorators: [
+		( Story ) => (
+			<Stack direction="column" gap="sm">
+				<Story />
+			</Stack>
+		),
+	],
+	render: () => (
+		<>
+			<Badge intent="stable">Active</Badge>
+			<Badge intent="none">Inactive</Badge>
+			<Badge intent="draft">Draft</Badge>
+		</>
+	),
+};
+
+export const WithAdjacentContentIcon: Story = {
+	decorators: [
+		( Story ) => (
+			<Stack direction="column" gap="sm">
+				<Story />
+			</Stack>
+		),
+	],
+	render: () => (
+		<>
+			<Stack direction="row" gap="sm" align="center">
+				<Icon icon={ page } size={ 24 } />
+				<Text variant="body-md">About page</Text>
+				<Badge intent="none">Published</Badge>
+			</Stack>
+			<Stack direction="row" gap="sm" align="center">
+				<Icon icon={ plugins } size={ 24 } />
+				<Text variant="body-md">Akismet</Text>
+				<Badge intent="stable">Active</Badge>
+			</Stack>
+		</>
+	),
+};
+
+const innerBadgeStyle = {
+	background: 'none',
+	padding: 0,
+	border: 'none',
+} as const;
+
+export const IncorrectBadgeWithIcon: Story = {
+	decorators: [
+		( Story ) => (
+			<Stack direction="column" gap="sm">
+				<Story />
+			</Stack>
+		),
+	],
+	render: () => (
+		<>
+			<Stack
+				direction="row"
+				gap="xs"
+				align="center"
+				className={ clsx( styles.badge, styles[ 'is-stable-intent' ] ) }
+			>
+				<Icon icon={ published } size={ 16 } />
+				<Badge intent="stable" style={ innerBadgeStyle }>
+					Active
+				</Badge>
+			</Stack>
+			<Stack
+				direction="row"
+				gap="xs"
+				align="center"
+				className={ clsx( styles.badge, styles[ 'is-medium-intent' ] ) }
+			>
+				<Icon icon={ caution } size={ 16 } />
+				<Badge intent="medium" style={ innerBadgeStyle }>
+					Review needed
+				</Badge>
+			</Stack>
+			<Stack
+				direction="row"
+				gap="xs"
+				align="center"
+				className={ clsx( styles.badge, styles[ 'is-high-intent' ] ) }
+			>
+				<Icon icon={ error } size={ 16 } />
+				<Badge intent="high" style={ innerBadgeStyle }>
+					Payment declined
+				</Badge>
+			</Stack>
 		</>
 	),
 };
