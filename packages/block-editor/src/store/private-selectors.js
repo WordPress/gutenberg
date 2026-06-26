@@ -159,6 +159,16 @@ export const getClientIdsTree = createSelector(
 	( state ) => [ state.blocks.order ]
 );
 
+/**
+ * Returns a tree of block objects filtered by a block inclusion callback.
+ * Excluded blocks are replaced by any included descendants.
+ *
+ * @param {Object}   state              Global application state.
+ * @param {?string}  rootClientId       Optional root client ID of block list.
+ * @param {Function} shouldIncludeBlock Callback that returns whether to include a block.
+ *
+ * @return {Object[]} Tree of block objects with only clientID and innerBlocks set.
+ */
 function getFilteredClientIdsTreeUnmemoized(
 	state,
 	rootClientId,
@@ -192,24 +202,14 @@ function getEnabledClientIdsTreeUnmemoized( state, rootClientId ) {
 	);
 }
 
-function shouldShowDisabledBlockInListView( state, clientId ) {
-	if ( ! state.editedContentOnlySection ) {
-		return false;
-	}
-
-	if ( isWithinEditedContentOnlySection( state, clientId ) ) {
-		return false;
-	}
-
-	const parentSectionBlock = getParentSectionBlock( state, clientId );
-
-	if ( ! parentSectionBlock ) {
-		return true;
-	}
-
-	return isContentBlock( getBlockName( state, clientId ) );
-}
-
+/**
+ * Returns the block tree displayed by List View.
+ *
+ * @param {Object}  state        Global application state.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {Object[]} Tree of block objects with only clientID and innerBlocks set.
+ */
 function getListViewClientIdsTreeUnmemoized( state, rootClientId ) {
 	return getFilteredClientIdsTreeUnmemoized(
 		state,
@@ -219,7 +219,22 @@ function getListViewClientIdsTreeUnmemoized( state, rootClientId ) {
 				return true;
 			}
 
-			return shouldShowDisabledBlockInListView( _state, clientId );
+			if (
+				! _state.editedContentOnlySection ||
+				isWithinEditedContentOnlySection( _state, clientId )
+			) {
+				return false;
+			}
+
+			const parentSectionBlock = getParentSectionBlock(
+				_state,
+				clientId
+			);
+
+			return (
+				! parentSectionBlock ||
+				isContentBlock( getBlockName( _state, clientId ) )
+			);
 		}
 	);
 }
