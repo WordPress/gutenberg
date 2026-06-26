@@ -104,28 +104,9 @@ export default function DataviewsPatterns() {
 	} );
 
 	const postTypeFields = usePostFields( { postType } );
-	const titleField = postTypeFields.find( ( field ) => field.id === 'title' );
-	const syncStatusField = postTypeFields.find(
-		( field ) => field.id === 'sync-status'
-	);
-	const templatePartAuthorField = postTypeFields.find(
-		( field ) => field.id === 'author'
-	);
-
 	const fields = useMemo( () => {
-		const _fields = [ previewField, titleField ].filter( Boolean );
-
-		if ( postType === PATTERN_TYPES.user && syncStatusField ) {
-			_fields.push( syncStatusField );
-		} else if (
-			postType === TEMPLATE_PART_POST_TYPE &&
-			templatePartAuthorField
-		) {
-			_fields.push( templatePartAuthorField );
-		}
-
-		return _fields;
-	}, [ postType, syncStatusField, templatePartAuthorField, titleField ] );
+		return [ previewField, ...( postTypeFields || [] ) ];
+	}, [ postTypeFields ] );
 
 	const { data, paginationInfo } = useMemo( () => {
 		// Search is managed server-side as well as filters for patterns.

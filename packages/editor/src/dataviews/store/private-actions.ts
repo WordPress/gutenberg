@@ -327,7 +327,9 @@ export const registerPostTypeSchema =
 					_titleField = pageTitleField;
 				} else if ( postType === 'wp_template' ) {
 					_titleField = templateTitleField;
-				} else if ( postType === 'wp_block' ) {
+				} else if (
+					[ 'wp_block', 'wp_template_part' ].includes( postType )
+				) {
 					_titleField = patternTitleField;
 				} else {
 					_titleField = titleField;
