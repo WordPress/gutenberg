@@ -26,7 +26,7 @@ import { Icon, check } from '@wordpress/icons';
 | ------ | --------- | ------- | ----------------------- |
 | `size` | `integer` | `24`    | Size of icon in pixels. |
 
-## Docs & Examples
+## Docs & examples
 
 You can browse the icons docs and examples at [https://wordpress.github.io/gutenberg/?path=/docs/icons-icon--default](https://wordpress.github.io/gutenberg/?path=/docs/icons-icon--default)
 

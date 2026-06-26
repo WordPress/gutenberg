@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
 import { privateApis as preferencesPrivateApis } from '@wordpress/preferences';
 
@@ -16,11 +16,18 @@ import { unlock } from '../../lock-unlock';
 
 const { PreferencesModalSection } = unlock( preferencesPrivateApis );
 
-export function MetaBoxesSection( {
-	areCustomFieldsRegistered,
-	metaBoxes,
-	...sectionProps
-} ) {
+export function MetaBoxesSection( sectionProps ) {
+	const { areCustomFieldsRegistered, metaBoxes } = useSelect( ( select ) => {
+		const { getEditorSettings } = select( editorStore );
+		const { getAllMetaBoxes } = select( editPostStore );
+
+		return {
+			areCustomFieldsRegistered:
+				getEditorSettings().enableCustomFields !== undefined,
+			metaBoxes: getAllMetaBoxes(),
+		};
+	}, [] );
+
 	// The 'Custom Fields' meta box is a special case that we handle separately.
 	const thirdPartyMetaBoxes = metaBoxes.filter(
 		( { id } ) => id !== 'postcustom'
@@ -45,15 +52,3 @@ export function MetaBoxesSection( {
 		</PreferencesModalSection>
 	);
 }
-
-export default withSelect( ( select ) => {
-	const { getEditorSettings } = select( editorStore );
-	const { getAllMetaBoxes } = select( editPostStore );
-
-	return {
-		// This setting should not live in the block editor's store.
-		areCustomFieldsRegistered:
-			getEditorSettings().enableCustomFields !== undefined,
-		metaBoxes: getAllMetaBoxes(),
-	};
-} )( MetaBoxesSection );

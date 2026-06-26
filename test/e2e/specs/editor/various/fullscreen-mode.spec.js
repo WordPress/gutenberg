@@ -39,14 +39,10 @@ function getSiteEditorOpenNavigationButton( page ) {
 test.describe( 'Fullscreen Mode', () => {
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllPosts();
-		await requestUtils.setGutenbergExperiments( [] );
 		await requestUtils.resetPreferences();
 	} );
 
-	test( 'should open the fullscreen mode from the more menu', async ( {
-		page,
-		admin,
-	} ) => {
+	test( 'should show the admin bar', async ( { page, admin } ) => {
 		await admin.createNewPost();
 		await enableFullscreenMode( page );
 
@@ -55,34 +51,15 @@ test.describe( 'Fullscreen Mode', () => {
 			/is-fullscreen-mode/
 		);
 
-		await expect( page.locator( '#wpadminbar' ) ).toBeHidden();
-		await expect( getPostEditorBackLink( page ) ).toBeVisible();
-	} );
-
-	test( 'should show the admin bar when the experiment is enabled', async ( {
-		page,
-		admin,
-		requestUtils,
-	} ) => {
-		await requestUtils.setGutenbergExperiments( [ 'gutenberg-omnibar' ] );
-		await admin.createNewPost();
-		await enableFullscreenMode( page );
-
-		await expect( page.locator( 'body' ) ).toHaveClass(
-			/is-fullscreen-mode/
-		);
-
 		await expect( page.locator( '#wpadminbar' ) ).toBeVisible();
 		await expect( getPostEditorBackLink( page ) ).toBeVisible();
 	} );
 
-	test( 'should hide the admin bar in distraction free mode when the experiment is enabled', async ( {
+	test( 'should hide the admin bar in distraction free mode', async ( {
 		page,
 		admin,
-		requestUtils,
 		pageUtils,
 	} ) => {
-		await requestUtils.setGutenbergExperiments( [ 'gutenberg-omnibar' ] );
 		await admin.createNewPost();
 		await enableFullscreenMode( page );
 		await enableDistractionFreeMode( pageUtils );
@@ -93,13 +70,11 @@ test.describe( 'Fullscreen Mode', () => {
 		await expect( page.locator( '#wpadminbar' ) ).toBeHidden();
 	} );
 
-	test( 'should show the admin bar in distraction free mode on mobile when the experiment is enabled', async ( {
+	test( 'should show the admin bar in distraction free mode on mobile', async ( {
 		page,
 		admin,
-		requestUtils,
 		pageUtils,
 	} ) => {
-		await requestUtils.setGutenbergExperiments( [ 'gutenberg-omnibar' ] );
 		await pageUtils.setBrowserViewport( 'small' );
 		await admin.createNewPost();
 		await enableDistractionFreeMode( pageUtils );
@@ -119,14 +94,7 @@ test.describe( 'Fullscreen Mode', () => {
 			await requestUtils.activateTheme( 'twentytwentyone' );
 		} );
 
-		test( 'should show the admin bar when the experiment is enabled', async ( {
-			page,
-			admin,
-			requestUtils,
-		} ) => {
-			await requestUtils.setGutenbergExperiments( [
-				'gutenberg-omnibar',
-			] );
+		test( 'should show the admin bar', async ( { page, admin } ) => {
 			await admin.visitSiteEditor( { canvas: 'edit' } );
 
 			await expect( page.locator( '#wpadminbar' ) ).toBeVisible();

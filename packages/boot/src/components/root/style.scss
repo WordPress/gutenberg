@@ -1,3 +1,4 @@
+@use "@wordpress/base-styles/breakpoints";
 @use "@wordpress/base-styles/variables";
 @use "@wordpress/base-styles/mixins";
 
@@ -203,7 +204,7 @@
 
 .boot-layout.has-full-canvas .boot-layout__canvas {
 	position: fixed;
-	top: 0;
+	top: var(--wp-admin--admin-bar--height, 0);
 	left: 0;
 	right: 0;
 	bottom: 0;
@@ -221,5 +222,18 @@
 			top: variables.$admin-bar-height;
 
 		}
+	}
+}
+
+@media (max-width: #{breakpoints.$break-medium}) {
+	.boot-layout__stage,
+	.boot-layout__inspector,
+	.boot-layout__canvas:not(.has-mobile-drawer) {
+		top: var(--wp-admin--admin-bar--height, 0);
+		height: calc(100vh - var(--wp-admin--admin-bar--height, 0));
+	}
+
+	.boot-layout__mobile-sidebar-drawer {
+		top: var(--wp-admin--admin-bar--height, 0);
 	}
 }

@@ -15,7 +15,7 @@ import '@wordpress/dataviews/build-style/style.css';
 import { DataForm, useFormValidity } from '@wordpress/dataviews';
 import type { Field, Form } from '@wordpress/dataviews';
 import { Suspense, useId, useMemo, useState } from '@wordpress/element';
-import { wordpress } from '@wordpress/icons';
+import { globe } from '@wordpress/icons';
 import { Card, Icon, Stack } from '@wordpress/ui';
 
 /**
@@ -25,11 +25,8 @@ import { WidgetRender } from '..';
 import type { WidgetRenderProps, WidgetType } from '../../../types';
 
 /*
- * In WordPress, a widget's metadata and render component live in a
- * `widgets/<name>/` folder and reach the client through the build manifest,
- * the server registry, and `useWidgetTypes()`. Stories run without
- * WordPress, so both halves are declared inline and injected: the type
- * through the `widgetType` prop, the component through
+ * Stories run without WordPress, so both halves are declared inline: the
+ * type through the `widgetType` prop, the component through
  * `resolveWidgetModule`.
  */
 
@@ -114,16 +111,12 @@ function DemoWidget( {
 	);
 }
 
-/*
- * The authoring shape: `attributes` is a dataviews `Field[]`, so a host can
- * mount a settings form straight from the type with no per-widget wiring.
- */
 const demoWidgetType: WidgetType< DemoAttributes > = {
 	apiVersion: 1,
 	name: 'demo/hello-world',
 	title: 'Hello World',
 	description: 'Minimal widget that greets worlds near and far.',
-	icon: wordpress,
+	icon: globe,
 	renderModule: 'demo/widgets/hello-world/render',
 	attributes: [
 		{
@@ -147,7 +140,7 @@ const demoWidgetType: WidgetType< DemoAttributes > = {
 	},
 };
 
-// What `import( widget.renderModule )` resolves to on a WordPress page.
+// What `import( widget.renderModule )` resolves to in a real host.
 const resolveDemoModule = async () => ( {
 	default: DemoWidget as ComponentType< WidgetRenderProps< unknown > >,
 } );
@@ -165,15 +158,13 @@ const meta: Meta< typeof WidgetRender > = {
 		docs: {
 			description: {
 				component: `
-\`WidgetRender\` is the host-agnostic entry point that renders a widget type: it resolves the widget's render component and mounts it with the current attributes. Everything else stays in the hands of the host.
+\`WidgetRender\` is the host-agnostic entry point that renders a widget type: it resolves the widget's render component and mounts it with the current attributes.
 
 A host provides three things:
 
-- \`widgetType\`: the widget's metadata, as declared by its author. On a WordPress page it arrives through \`useWidgetTypes()\`.
+- \`widgetType\`: the widget's metadata, as declared by its author. In a host it arrives through \`useWidgetTypes()\`.
 - \`resolveWidgetModule\`: how the render component is loaded. Dynamic \`import()\` against an import map, eagerly enqueued script modules, or a custom resolver are all valid strategies.
 - \`setAttributes\` (optional): grants the widget write access to its own attributes. Omit it and the widget renders read-only.
-
-These stories run outside WordPress, so both halves (the type and the module resolution) are declared inline and injected.
 `,
 			},
 		},
@@ -210,7 +201,7 @@ export const Default: StoryObj = {
 The minimal contract between a host and a widget:
 
 - \`attributes\` flow into the widget as plain data.
-- The widget writes back through \`setAttributes\`. Here, the "Next world" button updates the \`world\` attribute from inside the widget.
+- The widget writes back through \`setAttributes\`, which the host provides. The "Next world" button calls it from inside the widget, and the host applies the change.
 
 The primitive resolves the render component with \`lazy()\`, so the surrounding \`Suspense\` boundary, and with it the loading UI, is a host decision.
 `,
@@ -280,7 +271,7 @@ export const WithSettings: StoryObj = {
 		docs: {
 			description: {
 				story: `
-A widget type declares its settings as a dataviews \`Field[]\` under \`attributes\`. That single declaration is enough for a host to build a settings UI:
+Where Default lets the widget ask for changes, here the host edits the values itself. A widget type declares its settings as a dataviews \`Field[]\` under \`attributes\`, and that single declaration is enough for a host to build a settings UI:
 
 - The \`DataForm\` on the right is mounted straight from the schema, with no per-widget form wiring.
 - Validation comes from the same source: the \`greeting\` field is marked as required, and \`useFormValidity\` surfaces the result in the form.
@@ -347,10 +338,6 @@ function WidgetInHostChrome() {
 	);
 }
 
-/*
- * Chrome belongs to the host: it reads the type's metadata and frames the
- * render however it wants. In this story, a Card header.
- */
 export const WithHostChrome: StoryObj = {
 	render: () => <WidgetInHostChrome />,
 	parameters: {
@@ -361,7 +348,7 @@ Chrome belongs to the host: the widget describes itself through metadata, and ea
 
 In this story the chrome is a \`Card\`: its header reads the type's metadata (\`icon\`, \`title\`) and the card body frames the widget render.
 
-The diagonal stripes mark the chrome's area. Everything striped is drawn by the host; the solid panel inside is the widget render. The widget doesn't render a header of its own; another host could place the same metadata elsewhere, or skip it entirely.
+The diagonal stripes mark the chrome's area; the solid panel inside is the widget render. The widget renders no header of its own; another host could place the same metadata elsewhere, or skip it.
 `,
 			},
 		},
