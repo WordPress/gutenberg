@@ -33,6 +33,9 @@ function CurrentState() {
 			<output data-testid="current-aspect-ratio">
 				{ cropOptions.aspectRatioValue }
 			</output>
+			<output data-testid="current-crop-shape">
+				{ cropOptions.cropShape }
+			</output>
 			<output data-testid="current-zoom">{ state.zoom }</output>
 		</>
 	);
@@ -138,6 +141,23 @@ describe( 'MediaEditorImageControls', () => {
 		);
 	} );
 
+	it( 'renders a crop shape dropdown in the flat toolbar when enabled', async () => {
+		setup( {
+			showCropShapeControl: true,
+		} );
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'Crop shape' } ) );
+		fireEvent.click(
+			screen.getByRole( 'menuitemradio', { name: 'Circle' } )
+		);
+
+		await waitFor( () =>
+			expect(
+				screen.getByTestId( 'current-crop-shape' )
+			).toHaveTextContent( 'circle' )
+		);
+	} );
+
 	it( 'omits the aspect ratio dropdown from the labelled panel layout', () => {
 		setup( {
 			withLabels: true,
@@ -146,6 +166,17 @@ describe( 'MediaEditorImageControls', () => {
 
 		expect(
 			screen.queryByRole( 'button', { name: 'Aspect ratio' } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'omits the crop shape dropdown from the labelled panel layout', () => {
+		setup( {
+			withLabels: true,
+			showCropShapeControl: true,
+		} );
+
+		expect(
+			screen.queryByRole( 'button', { name: 'Crop shape' } )
 		).not.toBeInTheDocument();
 	} );
 

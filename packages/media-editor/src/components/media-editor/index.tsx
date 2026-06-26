@@ -678,6 +678,7 @@ function MediaEditorContent( {
 		isImage && ! isWide ? (
 			<MediaEditorImageControls
 				showAspectRatioControl={ cropShape === 'rectangle' }
+				showCropShapeControl
 				aspectRatioPresets={ aspectRatioPresets }
 			/>
 		) : null;
