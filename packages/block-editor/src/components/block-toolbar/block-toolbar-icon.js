@@ -19,6 +19,7 @@ import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import { store as blockEditorStore } from '../../store';
 import { hasPatternOverridesDefaultBinding } from '../../utils/block-bindings';
 import { unlock } from '../../lock-unlock';
+import { isIsolatedEditorKey } from '../../store/private-keys';
 
 function getBlockIconVariant( { select, clientIds } ) {
 	const {
@@ -29,8 +30,14 @@ function getBlockIconVariant( { select, clientIds } ) {
 		getTemplateLock,
 		getBlockEditingMode,
 		canEditBlock,
+		isWithinEditedContentOnlySection,
+		getSettings,
 	} = unlock( select( blockEditorStore ) );
 	const { getBlockStyles } = select( blocksStore );
+	const settings = getSettings();
+	const isIsolatedEditor = !! settings?.[ isIsolatedEditorKey ];
+	const disableContentOnlyForUnsyncedPatterns =
+		!! settings?.disableContentOnlyForUnsyncedPatterns;
 
 	const hasTemplateLock = clientIds.some(
 		( id ) => getTemplateLock( id ) === 'contentOnly'
@@ -42,7 +49,11 @@ function getBlockIconVariant( { select, clientIds } ) {
 	const hasBlockStyles =
 		isSingleBlock && !! getBlockStyles( blockName )?.length;
 	const hasPatternNameInSelection = clientIds.some(
-		( id ) => !! getBlockAttributes( id )?.metadata?.patternName
+		( id ) =>
+			!! getBlockAttributes( id )?.metadata?.patternName &&
+			! isWithinEditedContentOnlySection( id ) &&
+			! isIsolatedEditor &&
+			! disableContentOnlyForUnsyncedPatterns
 	);
 	const hasPatternOverrides = clientIds.every( ( clientId ) =>
 		hasPatternOverridesDefaultBinding(
@@ -86,20 +97,33 @@ function getBlockIconVariant( { select, clientIds } ) {
 }
 
 function getBlockIcon( { select, clientIds } ) {
-	const { getBlockName, getBlockAttributes } = unlock(
-		select( blockEditorStore )
-	);
+	const {
+		getBlockName,
+		getBlockAttributes,
+		isWithinEditedContentOnlySection,
+		getSettings,
+	} = unlock( select( blockEditorStore ) );
+	const settings = getSettings();
+	const isIsolatedEditor = !! settings?.[ isIsolatedEditorKey ];
+	const disableContentOnlyForUnsyncedPatterns =
+		!! settings?.disableContentOnlyForUnsyncedPatterns;
 
 	const _isSingleBlock = clientIds.length === 1;
 	const firstClientId = clientIds[ 0 ];
+
 	const blockAttributes = getBlockAttributes( firstClientId );
-	if ( _isSingleBlock && blockAttributes?.metadata?.patternName ) {
+	if (
+		_isSingleBlock &&
+		blockAttributes?.metadata?.patternName &&
+		! isWithinEditedContentOnlySection( firstClientId ) &&
+		! isIsolatedEditor &&
+		! disableContentOnlyForUnsyncedPatterns
+	) {
 		return symbol;
 	}
 
 	const blockName = getBlockName( firstClientId );
 	const blockType = getBlockType( blockName );
-
 	if ( _isSingleBlock ) {
 		const { getActiveBlockVariation } = select( blocksStore );
 		const match = getActiveBlockVariation( blockName, blockAttributes );

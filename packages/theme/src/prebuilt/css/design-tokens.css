@@ -227,8 +227,6 @@
 	--wpds-color-stroke-focus: #3858e9;
 	/* Cursor style for interactive controls that are not links (e.g. buttons, checkboxes, and toggles). */
 	--wpds-cursor-control: pointer;
-	/* Base dimension unit */
-	--wpds-dimension-base: 4px;
 	/* Extra small padding */
 	--wpds-dimension-padding-xs: 4px;
 	/* Small padding */

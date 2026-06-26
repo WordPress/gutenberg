@@ -1153,6 +1153,30 @@ const DEFAULT_BLOCK_STYLE_STATE = {
 };
 
 /**
+ * Returns the globally selected viewport style state. When set to a value other
+ * than 'default', block style edits in the inspector apply to that viewport.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string} The selected viewport style state.
+ */
+export function getStyleStateViewport( state ) {
+	return state.styleStateViewport ?? DEFAULT_BLOCK_STYLE_STATE.viewport;
+}
+
+/**
+ * Returns whether Responsive editing is enabled. When enabled, the device
+ * preview also drives which viewport block style edits are applied to.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether Responsive editing is enabled.
+ */
+export function isResponsiveEditing( state ) {
+	return state.isResponsiveEditing;
+}
+
+/**
  * Returns the selected style state for a block's style controls.
  *
  * @param {Object} state    Global application state.
@@ -1160,13 +1184,25 @@ const DEFAULT_BLOCK_STYLE_STATE = {
  *
  * @return {Object} The selected block style state.
  */
-export function getSelectedBlockStyleState( state, clientId ) {
-	if ( state.selectedBlockStyleState?.clientId !== clientId ) {
-		return DEFAULT_BLOCK_STYLE_STATE;
-	}
+export const getSelectedBlockStyleState = createSelector(
+	( state, clientId ) => {
+		const perBlockState =
+			state.selectedBlockStyleState?.clientId === clientId
+				? state.selectedBlockStyleState.value ??
+				  DEFAULT_BLOCK_STYLE_STATE
+				: DEFAULT_BLOCK_STYLE_STATE;
 
-	return state.selectedBlockStyleState.value ?? DEFAULT_BLOCK_STYLE_STATE;
-}
+		return {
+			...perBlockState,
+			// The viewport is tracked globally, so inject it here. This way
+			// consumers receive a single combined state object instead of
+			// merging the global viewport themselves, and selectors derived
+			// from this stay consistent.
+			viewport: getStyleStateViewport( state ),
+		};
+	},
+	( state ) => [ state.styleStateViewport, state.selectedBlockStyleState ]
+);
 
 /**
  * Returns whether a non-default style state is selected for a block.

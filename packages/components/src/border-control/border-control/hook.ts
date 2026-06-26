@@ -12,7 +12,6 @@ import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import { useCx } from '../../utils/hooks/use-cx';
 import type { Border, BorderControlProps } from '../types';
-import { maybeWarnDeprecated36pxSize } from '../../utils/deprecated-36px-size';
 
 // If either width or color are defined, the border is considered valid
 // and a border style can be set as well.
@@ -33,24 +32,14 @@ export function useBorderControl(
 		enableAlpha = true,
 		enableStyle = true,
 		shouldSanitizeBorder = true,
-		size = 'default',
 		value: border,
 		width,
 		__experimentalIsRenderedInSidebar = false,
-		__next40pxDefaultSize,
-		__shouldNotWarnDeprecated36pxSize,
+		// Deprecated props, no longer used.
+		size: _size,
+		__next40pxDefaultSize: _next40pxDefaultSize,
 		...otherProps
 	} = useContextSystem( props, 'BorderControl' );
-
-	maybeWarnDeprecated36pxSize( {
-		componentName: 'BorderControl',
-		__next40pxDefaultSize,
-		size,
-		__shouldNotWarnDeprecated36pxSize,
-	} );
-
-	const computedSize =
-		size === 'default' && __next40pxDefaultSize ? '__unstable-large' : size;
 
 	const [ widthValue, originalWidthUnit ] = parseQuantityAndUnitFromRawValue(
 		border?.width
@@ -138,14 +127,14 @@ export function useBorderControl(
 	if ( isCompact ) {
 		// Widths below represent the minimum usable width for compact controls.
 		// Taller controls contain greater internal padding, thus greater width.
-		wrapperWidth = size === '__unstable-large' ? '116px' : '90px';
+		wrapperWidth = '116px';
 	}
 	const innerWrapperClassName = useMemo( () => {
 		const widthStyle = !! wrapperWidth && styles.wrapperWidth;
-		const heightStyle = styles.wrapperHeight( computedSize );
+		const heightStyle = styles.wrapperHeight;
 
 		return cx( styles.innerWrapper(), widthStyle, heightStyle );
-	}, [ wrapperWidth, cx, computedSize ] );
+	}, [ wrapperWidth, cx ] );
 
 	const sliderClassName = useMemo( () => {
 		return cx( styles.borderSlider() );
@@ -168,8 +157,6 @@ export function useBorderControl(
 		value: border,
 		widthUnit,
 		widthValue,
-		size: computedSize,
 		__experimentalIsRenderedInSidebar,
-		__next40pxDefaultSize,
 	};
 }

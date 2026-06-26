@@ -54,6 +54,8 @@ const getEditorCommandLoader = () =>
 			isCodeEditingEnabled,
 			isRichEditingEnabled,
 			isPublishSidebarEnabled,
+			disableContentOnlyForUnsyncedPatterns,
+			disableContentOnlyForTemplateParts,
 		} = useSelect( ( select ) => {
 			const { get } = select( preferencesStore );
 			const { isListViewOpened, getCurrentPostType, getEditorSettings } =
@@ -74,6 +76,11 @@ const getEditorCommandLoader = () =>
 				isRichEditingEnabled: getEditorSettings().richEditingEnabled,
 				isPublishSidebarEnabled:
 					select( editorStore ).isPublishSidebarEnabled(),
+				disableContentOnlyForUnsyncedPatterns:
+					!! getEditorSettings()
+						.disableContentOnlyForUnsyncedPatterns,
+				disableContentOnlyForTemplateParts:
+					!! getEditorSettings().disableContentOnlyForTemplateParts,
 			};
 		}, [] );
 		const { getActiveComplementaryArea } = useSelect( interfaceStore );
@@ -86,7 +93,12 @@ const getEditorCommandLoader = () =>
 			toggleDistractionFree,
 			toggleSpotlightMode,
 			toggleTopToolbar,
+			updateEditorSettings,
 		} = useDispatch( editorStore );
+		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+		const { stopEditingContentOnlySection } = unlock(
+			useDispatch( blockEditorStore )
+		);
 		const { openModal, enableComplementaryArea, disableComplementaryArea } =
 			useDispatch( interfaceStore );
 		const { getCurrentPostId } = useSelect( editorStore );
@@ -98,6 +110,9 @@ const getEditorCommandLoader = () =>
 		}
 
 		const commands = [];
+		const disableContentOnlyForPatternsAndTemplateParts =
+			disableContentOnlyForUnsyncedPatterns &&
+			disableContentOnlyForTemplateParts;
 
 		commands.push( {
 			name: 'core/open-shortcut-help',
@@ -172,6 +187,25 @@ const getEditorCommandLoader = () =>
 			category: 'command',
 			callback: ( { close } ) => {
 				toggleTopToolbar();
+				close();
+			},
+		} );
+
+		commands.push( {
+			name: 'core/toggle-pattern-editing',
+			label: disableContentOnlyForPatternsAndTemplateParts
+				? __( 'Disable editing all patterns' )
+				: __( 'Enable editing all patterns' ),
+			icon: symbol,
+			category: 'command',
+			callback: ( { close } ) => {
+				const disableContentOnly =
+					! disableContentOnlyForPatternsAndTemplateParts;
+				stopEditingContentOnlySection();
+				updateEditorSettings( {
+					disableContentOnlyForUnsyncedPatterns: disableContentOnly,
+					disableContentOnlyForTemplateParts: disableContentOnly,
+				} );
 				close();
 			},
 		} );

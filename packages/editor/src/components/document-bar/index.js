@@ -16,7 +16,6 @@ import {
 } from '@wordpress/components';
 import { BlockIcon, store as blockEditorStore } from '@wordpress/block-editor';
 import { chevronLeftSmall, chevronRightSmall, layout } from '@wordpress/icons';
-import { displayShortcut } from '@wordpress/keycodes';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as commandsStore } from '@wordpress/commands';
 import { useRef, useEffect } from '@wordpress/element';
@@ -141,8 +140,6 @@ export default function DocumentBar( props ) {
 	const { open: openCommandCenter } = useDispatch( commandsStore );
 	const isReducedMotion = useReducedMotion();
 
-	const hasShortcut = ! window.__experimentalAdminBarInEditor;
-
 	const isTemplate = TEMPLATE_POST_TYPES.includes( postType );
 	const hasBackButton =
 		!! onNavigateToPreviousEntityRecord || !! unlockedPatternInfo;
@@ -177,7 +174,6 @@ export default function DocumentBar( props ) {
 		<div
 			className={ clsx( 'editor-document-bar', {
 				'has-back-button': hasBackButton,
-				'has-shortcut': hasShortcut,
 			} ) }
 		>
 			<AnimatePresence>
@@ -270,11 +266,6 @@ export default function DocumentBar( props ) {
 								) }
 						</WCText>
 					</motion.div>
-					{ hasShortcut && (
-						<span className="editor-document-bar__shortcut">
-							{ displayShortcut.primary( 'k' ) }
-						</span>
-					) }
 				</Button>
 			) }
 		</div>
