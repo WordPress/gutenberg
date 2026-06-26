@@ -219,22 +219,28 @@ function getListViewClientIdsTreeUnmemoized( state, rootClientId ) {
 				return true;
 			}
 
-			if (
-				! _state.editedContentOnlySection ||
-				isWithinEditedContentOnlySection( _state, clientId )
-			) {
-				return false;
+			if ( _state.editedContentOnlySection ) {
+				if ( isWithinEditedContentOnlySection( _state, clientId ) ) {
+					return false;
+				}
+
+				// Outside the edited section, keep disabled context visible. For other
+				// content-only sections, preserve their existing structure/content filtering.
+				const parentSectionBlock = getParentSectionBlock(
+					_state,
+					clientId
+				);
+
+				if ( ! parentSectionBlock ) {
+					return true;
+				}
+
+				if ( isContentBlock( getBlockName( _state, clientId ) ) ) {
+					return true;
+				}
 			}
 
-			const parentSectionBlock = getParentSectionBlock(
-				_state,
-				clientId
-			);
-
-			return (
-				! parentSectionBlock ||
-				isContentBlock( getBlockName( _state, clientId ) )
-			);
+			return false;
 		}
 	);
 }
