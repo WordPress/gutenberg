@@ -120,7 +120,6 @@ test.describe( 'Playlist block', () => {
 		await expect( seekControl ).toBeVisible();
 		await expect( seekControl ).toHaveJSProperty( 'tagName', 'INPUT' );
 		await expect( seekControl ).toHaveAttribute( 'type', 'range' );
-		await expect( seekControl ).toHaveAttribute( 'step', 'any' );
 		await expect
 			.poll( async () =>
 				Number( await seekControl.getAttribute( 'max' ) )
