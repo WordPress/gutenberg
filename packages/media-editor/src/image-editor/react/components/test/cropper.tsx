@@ -345,7 +345,7 @@ describe( 'Cropper', () => {
 		);
 	} );
 
-	it( 'clears settling state when a new resize starts before the settle timer fires', async () => {
+	it( 'clears settling state when a new resize starts before the settle fallback fires', async () => {
 		jest.useFakeTimers();
 
 		render(
@@ -376,7 +376,7 @@ describe( 'Cropper', () => {
 		// The settle transition should now be active on the stage.
 		expect( stage ).toHaveStyle( 'transition: transform 200ms ease-out' );
 
-		// Start a new resize before the 200 ms settle timer fires.
+		// Start a new resize before the settle fallback fires.
 		fireEvent.pointerDown( handle, {
 			button: 0,
 			clientX: 100,
@@ -389,14 +389,143 @@ describe( 'Cropper', () => {
 			'transition: transform 200ms ease-out'
 		);
 
-		// Advance past the old settle timer; it was cancelled so the stage
+		// Advance past the old settle fallback; it was cancelled so the stage
 		// should still have no transition.
-		act( () => jest.advanceTimersByTime( 200 ) );
+		act( () => jest.advanceTimersByTime( 300 ) );
 		expect( stage ).not.toHaveStyle(
 			'transition: transform 200ms ease-out'
 		);
 
 		fireEvent.pointerUp( handle, { pointerId: 1 } );
+
+		jest.useRealTimers();
+	} );
+
+	it( 'keeps settling active until the settle transform transition ends', async () => {
+		jest.useFakeTimers();
+
+		render(
+			<Cropper
+				src="test.jpg"
+				controller={ createController() }
+				showDimming={ false }
+				freeformCrop
+			/>
+		);
+
+		const handle = await screen.findByRole( 'button', {
+			name: 'Resize top-left corner',
+		} );
+		const stage = screen.getByTestId( 'cropper-stage' );
+
+		fireEvent.pointerDown( handle, {
+			button: 0,
+			clientX: 100,
+			clientY: 100,
+			pointerId: 1,
+		} );
+		fireEvent.pointerUp( handle, { pointerId: 1 } );
+
+		expect( stage ).toHaveStyle( 'transition: transform 200ms ease-out' );
+
+		act( () => jest.advanceTimersByTime( 200 ) );
+		expect( stage ).toHaveStyle( 'transition: transform 200ms ease-out' );
+
+		// The transform transition runs on the image and bubbles up to the
+		// stage handler, so fire from the image to exercise the real path.
+		const image = screen.getByTestId( 'cropper-image' );
+		const transitionEndEvent = new Event( 'transitionend', {
+			bubbles: true,
+		} );
+		Object.defineProperty( transitionEndEvent, 'propertyName', {
+			value: 'transform',
+		} );
+		fireEvent( image, transitionEndEvent );
+
+		expect( stage ).not.toHaveStyle(
+			'transition: transform 200ms ease-out'
+		);
+
+		jest.useRealTimers();
+	} );
+
+	it( 'clears settling via the fallback timer when no transitionend fires', async () => {
+		jest.useFakeTimers();
+
+		render(
+			<Cropper
+				src="test.jpg"
+				controller={ createController() }
+				showDimming={ false }
+				freeformCrop
+			/>
+		);
+
+		const handle = await screen.findByRole( 'button', {
+			name: 'Resize top-left corner',
+		} );
+		const stage = screen.getByTestId( 'cropper-stage' );
+
+		fireEvent.pointerDown( handle, {
+			button: 0,
+			clientX: 100,
+			clientY: 100,
+			pointerId: 1,
+		} );
+		fireEvent.pointerUp( handle, { pointerId: 1 } );
+
+		expect( stage ).toHaveStyle( 'transition: transform 200ms ease-out' );
+
+		// Without a transitionend, settling persists past the CSS duration...
+		act( () => jest.advanceTimersByTime( 200 ) );
+		expect( stage ).toHaveStyle( 'transition: transform 200ms ease-out' );
+
+		// ...and is cleared by the fallback timer (CSS duration + 100ms).
+		act( () => jest.advanceTimersByTime( 100 ) );
+		expect( stage ).not.toHaveStyle(
+			'transition: transform 200ms ease-out'
+		);
+
+		jest.useRealTimers();
+	} );
+
+	it( 'ignores non-transform transitionend events while settling', async () => {
+		jest.useFakeTimers();
+
+		render(
+			<Cropper
+				src="test.jpg"
+				controller={ createController() }
+				showDimming={ false }
+				freeformCrop
+			/>
+		);
+
+		const handle = await screen.findByRole( 'button', {
+			name: 'Resize top-left corner',
+		} );
+		const stage = screen.getByTestId( 'cropper-stage' );
+
+		fireEvent.pointerDown( handle, {
+			button: 0,
+			clientX: 100,
+			clientY: 100,
+			pointerId: 1,
+		} );
+		fireEvent.pointerUp( handle, { pointerId: 1 } );
+
+		expect( stage ).toHaveStyle( 'transition: transform 200ms ease-out' );
+
+		// A stencil left/top/width/height transitionend must not clear settling.
+		const stencilTransitionEnd = new Event( 'transitionend', {
+			bubbles: true,
+		} );
+		Object.defineProperty( stencilTransitionEnd, 'propertyName', {
+			value: 'left',
+		} );
+		fireEvent( stage, stencilTransitionEnd );
+
+		expect( stage ).toHaveStyle( 'transition: transform 200ms ease-out' );
 
 		jest.useRealTimers();
 	} );

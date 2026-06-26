@@ -9,7 +9,7 @@ import { forwardRef } from '@wordpress/element';
 import clsx from 'clsx';
 import { Resizable } from 're-resizable';
 import type { ResizableProps } from 're-resizable';
-import type { ReactNode, ForwardedRef } from 'react';
+import type { ForwardedRef } from 'react';
 
 /**
  * Internal dependencies
@@ -88,7 +88,6 @@ const HANDLE_STYLES = {
 };
 
 type ResizableBoxProps = ResizableProps & {
-	children: ReactNode;
 	showHandle?: boolean;
 	__experimentalShowTooltip?: boolean;
 	__experimentalTooltipProps?: Parameters< typeof ResizeTooltip >[ 0 ];
@@ -133,6 +132,10 @@ function UnforwardedResizableBox(
 	);
 }
 
+/**
+ * `ResizableBox` wraps content in a container with draggable handles, letting
+ * users interactively resize it along one or more edges or corners.
+ */
 export const ResizableBox = forwardRef( UnforwardedResizableBox );
 ResizableBox.displayName = 'ResizableBox';
 

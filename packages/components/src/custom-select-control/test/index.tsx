@@ -483,7 +483,7 @@ describe.each( [
 			const customSelect = screen.getByRole( 'listbox', {
 				name: props.label,
 			} );
-			expect( customSelect ).toHaveFocus();
+			await waitFor( () => expect( customSelect ).toHaveFocus() );
 			await press.Enter();
 
 			expect( onKeyDown ).toHaveBeenCalledTimes( 0 );

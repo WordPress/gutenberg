@@ -58,6 +58,19 @@ import { VISUALLY_HIDDEN_STYLE } from '../visually-hidden-style';
 const CROP_RECT_EPSILON = 1e-6;
 /** Threshold for deciding whether rotation is at a 90-degree stop. */
 const CARDINAL_ROTATION_EPSILON = 1e-6;
+/** Duration of the settle transform transition after resize end. */
+const SETTLE_TRANSITION_DURATION_MS = 200;
+// Fallback timer for when the computed transform is unchanged and no
+// `transitionend` fires. Sits past the CSS duration so it only wins the race
+// when the transition genuinely never runs.
+const SETTLE_TRANSITION_FALLBACK_MS = SETTLE_TRANSITION_DURATION_MS + 100;
+const SETTLE_TRANSFORM_TRANSITION = `transform ${ SETTLE_TRANSITION_DURATION_MS }ms ease-out`;
+const SETTLE_STENCIL_TRANSITION = [
+	`left ${ SETTLE_TRANSITION_DURATION_MS }ms ease-out`,
+	`top ${ SETTLE_TRANSITION_DURATION_MS }ms ease-out`,
+	`width ${ SETTLE_TRANSITION_DURATION_MS }ms ease-out`,
+	`height ${ SETTLE_TRANSITION_DURATION_MS }ms ease-out`,
+].join( ', ' );
 
 /**
  * Props for the Cropper component.
@@ -745,9 +758,14 @@ function CropperInner(
 		[ setCropRect, setViewportPan, canvasSize, scaledVisualSize ]
 	);
 
-	// Settling animation: brief linear transition after resize end.
+	// Settling animation: brief transition after resize end.
 	const [ settling, setSettling ] = useState( false );
 	const settleTimerRef = useRef< ReturnType< typeof setTimeout > >();
+	const finishSettling = useCallback( () => {
+		clearTimeout( settleTimerRef.current );
+		isSettlingRef.current = false;
+		setSettling( false );
+	}, [] );
 
 	// Clear the pending settle timer on unmount so it can't fire a
 	// state update on an unmounted component.
@@ -801,13 +819,11 @@ function CropperInner(
 			// Clear any in-flight settle so transitions don't apply during the
 			// new drag (rapid successive resizes would otherwise inherit the
 			// previous settle animation).
-			clearTimeout( settleTimerRef.current );
-			isSettlingRef.current = false;
-			setSettling( false );
+			finishSettling();
 			resetViewport();
 			onGestureStart?.();
 		},
-		[ onGestureStart, resetViewport, viewScaleRest ]
+		[ finishSettling, onGestureStart, resetViewport, viewScaleRest ]
 	);
 
 	/**
@@ -828,8 +844,7 @@ function CropperInner(
 			// the pinch therefore collapse into a single undo step, since
 			// `beginGesture` is idempotent and the snapshot captured at resize
 			// start is flushed by the pinch's `endGesture`.
-			isSettlingRef.current = false;
-			setSettling( false );
+			finishSettling();
 			resetViewport();
 			return;
 		}
@@ -841,20 +856,44 @@ function CropperInner(
 		resetViewport();
 		settleCrop();
 		onGestureEnd?.();
-		settleTimerRef.current = setTimeout( () => {
-			isSettlingRef.current = false;
-			setSettling( false );
-		}, 200 );
-	}, [ settleCrop, onGestureEnd, resetViewport ] );
+		// Normal completion is driven by transitionend so settling cannot clear
+		// before the browser has actually finished animating. Keep a fallback for
+		// cases where the computed transform is unchanged and no event fires.
+		settleTimerRef.current = setTimeout(
+			finishSettling,
+			SETTLE_TRANSITION_FALLBACK_MS
+		);
+	}, [ finishSettling, settleCrop, onGestureEnd, resetViewport ] );
+
+	/**
+	 * Finish settling when the settle transform transition actually completes.
+	 * The handler lives on the stage, but in the common (un-panned) case the
+	 * transform transition runs on the image layer and its `transitionend`
+	 * bubbles up to here. Other transitionend events (stencil left/top/width/
+	 * height) also bubble up, so only the transform transition should clear the
+	 * settle state.
+	 */
+	const handleSettleTransitionEnd = useCallback(
+		( event: React.TransitionEvent< HTMLDivElement > ) => {
+			if (
+				! isSettlingRef.current ||
+				event.propertyName !== 'transform'
+			) {
+				return;
+			}
+			finishSettling();
+		},
+		[ finishSettling ]
+	);
 
 	let imageTransition: string | undefined;
 	if ( settling ) {
-		imageTransition = 'transform 200ms ease-out';
+		imageTransition = SETTLE_TRANSFORM_TRANSITION;
 	} else if ( isZooming ) {
 		imageTransition = 'transform 150ms linear';
 	}
 	const settleStencilTransition = settling
-		? 'left 200ms ease-out, top 200ms ease-out, width 200ms ease-out, height 200ms ease-out'
+		? SETTLE_STENCIL_TRANSITION
 		: undefined;
 
 	// Compute the image's CSS style. The element keeps its contain-fit box; the
@@ -903,7 +942,7 @@ function CropperInner(
 	// Transitions back to zero during the settle animation.
 	// will-change promotes the stage to its own compositor layer while the
 	// transform is active, keeping per-frame pan updates off the main thread.
-	const settleTransition = settling ? 'transform 200ms ease-out' : undefined;
+	const settleTransition = settling ? SETTLE_TRANSFORM_TRANSITION : undefined;
 	const willChange = isResizing || settling ? 'transform' : undefined;
 	let stageStyle: React.CSSProperties | undefined;
 	if ( viewportState.pan.x !== 0 || viewportState.pan.y !== 0 ) {
@@ -1005,6 +1044,7 @@ function CropperInner(
 					className="wp-media-editor-image-editor__stage"
 					data-testid="cropper-stage"
 					style={ stageStyle }
+					onTransitionEnd={ handleSettleTransitionEnd }
 				>
 					{ /* The image layer */ }
 					<img
