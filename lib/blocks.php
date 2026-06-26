@@ -546,7 +546,7 @@ function gutenberg_prepare_rich_text_attribute_types_for_render(
 		'block'      => $block,
 		'attributes' => $block->attributes,
 	);
-	$block->attributes                                  = $mapped_attributes;
+	$block->attributes                                        = $mapped_attributes;
 
 	return $context;
 }
