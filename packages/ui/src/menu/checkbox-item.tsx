@@ -36,7 +36,11 @@ const CheckboxItem = forwardRef< HTMLDivElement, CheckboxItemProps >(
 								keepMounted
 								className={ styles[ 'item-indicator' ] }
 							>
-								<Icon icon={ check } size={ 24 } />
+								<Icon
+									icon={ check }
+									size={ 24 }
+									aria-hidden="true"
+								/>
 							</_Menu.CheckboxItemIndicator>
 							{ prefix }
 						</>

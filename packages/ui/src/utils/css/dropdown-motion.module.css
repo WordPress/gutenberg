@@ -56,6 +56,26 @@
 			&[data-side="right"][data-ending-style] {
 				transform: translateX(calc(-1 * var(--wp-ui-dropdown-slide-distance)));
 			}
+
+			&[data-side="inline-start"][data-starting-style],
+			&[data-side="inline-start"][data-ending-style] {
+				transform: translateX(var(--wp-ui-dropdown-slide-distance));
+			}
+
+			&[data-side="inline-end"][data-starting-style],
+			&[data-side="inline-end"][data-ending-style] {
+				transform: translateX(calc(-1 * var(--wp-ui-dropdown-slide-distance)));
+			}
+
+			&:dir(rtl)[data-side="inline-start"][data-starting-style],
+			&:dir(rtl)[data-side="inline-start"][data-ending-style] {
+				transform: translateX(calc(-1 * var(--wp-ui-dropdown-slide-distance)));
+			}
+
+			&:dir(rtl)[data-side="inline-end"][data-starting-style],
+			&:dir(rtl)[data-side="inline-end"][data-ending-style] {
+				transform: translateX(var(--wp-ui-dropdown-slide-distance));
+			}
 		}
 	}
 }

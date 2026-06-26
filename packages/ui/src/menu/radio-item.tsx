@@ -36,6 +36,7 @@ const RadioItem = forwardRef< HTMLDivElement, RadioItemProps >(
 							>
 								<span
 									className={ styles[ 'radio-indicator' ] }
+									aria-hidden="true"
 								/>
 							</_Menu.RadioItemIndicator>
 							{ prefix }
