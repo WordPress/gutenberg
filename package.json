@@ -123,6 +123,7 @@
 		"lint:lockfile": "npm run --workspace @wordpress/validation-tools validate-package-lock --",
 		"lint:tsconfig": "npm run --workspace @wordpress/validation-tools validate-tsconfig --",
 		"lint:md:docs": "wp-scripts lint-md-docs",
+		"lint:docs:images": "npm run --workspace @wordpress/validation-tools check-doc-image-hosting --",
 		"prelint:php": "npm run other:update-packages:php",
 		"lint:php": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script lint",
 		"lint:pkg-json": "wp-scripts lint-pkg-json . 'packages/*/package.json'",
