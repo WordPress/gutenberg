@@ -10,11 +10,6 @@ import styles from './style.module.css';
 // would conflict). Keyed weakly so iframe documents don't leak.
 const rootProviderCountByDocument = new WeakMap< Document, number >();
 
-/**
- * Context provider that generates a theme from a set of seed color values and
- * configuration, producing a set of design token overrides as CSS custom
- * properties.
- */
 export const ThemeProvider = ( {
 	children,
 	color = {},
