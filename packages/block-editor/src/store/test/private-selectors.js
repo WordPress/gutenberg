@@ -965,6 +965,60 @@ describe( 'private selectors', () => {
 			] );
 		} );
 
+		it( 'keeps descendants of explicitly disabled blocks hidden', () => {
+			const baseState = createBaseState();
+			const state = {
+				...baseState,
+				blocks: {
+					...baseState.blocks,
+					byClientId: new Map( [
+						...baseState.blocks.byClientId,
+						[
+							'header-content',
+							{
+								name: TEST_CONTENT_BLOCK,
+							},
+						],
+					] ),
+					order: new Map( [
+						...baseState.blocks.order,
+						[ 'header', [ 'header-content' ] ],
+						[ 'header-content', [] ],
+					] ),
+					parents: new Map( [
+						...baseState.blocks.parents,
+						[ 'header-content', 'header' ],
+					] ),
+					blockEditingModes: new Map( [ [ 'header', 'disabled' ] ] ),
+				},
+				derivedBlockEditingModes: new Map( [
+					...baseState.derivedBlockEditingModes,
+					[ 'header-content', 'disabled' ],
+				] ),
+			};
+
+			expect( getListViewClientIdsTree( state ) ).toEqual( [
+				{
+					clientId: 'edited-pattern',
+					innerBlocks: [
+						{
+							clientId: 'edited-content',
+							innerBlocks: [],
+						},
+					],
+				},
+				{
+					clientId: 'other-pattern',
+					innerBlocks: [
+						{
+							clientId: 'other-content',
+							innerBlocks: [],
+						},
+					],
+				},
+			] );
+		} );
+
 		it( 'keeps structural blocks hidden inside other content-only sections', () => {
 			const state = createBaseState();
 

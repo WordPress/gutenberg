@@ -203,6 +203,33 @@ function getEnabledClientIdsTreeUnmemoized( state, rootClientId ) {
 }
 
 /**
+ * Returns whether the nearest explicit block editing mode in the block's
+ * ancestry is disabled.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId The block client ID.
+ *
+ * @return {boolean} Whether an explicit parent block editing mode disables this
+ *                   block.
+ */
+function hasExplicitDisabledParent( state, clientId ) {
+	let parent = state.blocks.parents.get( clientId );
+
+	while ( parent !== undefined ) {
+		const parentBlockEditingMode =
+			state.blocks.blockEditingModes.get( parent );
+
+		if ( parentBlockEditingMode ) {
+			return parentBlockEditingMode === 'disabled';
+		}
+
+		parent = state.blocks.parents.get( parent );
+	}
+
+	return false;
+}
+
+/**
  * Returns the block tree displayed by List View.
  *
  * @param {Object}  state        Global application state.
@@ -218,6 +245,14 @@ function getListViewClientIdsTreeUnmemoized( state, rootClientId ) {
 			// Non-disabled blocks are always shown in List view.
 			if ( getBlockEditingMode( _state, clientId ) !== 'disabled' ) {
 				return true;
+			}
+
+			if (
+				_state.blocks.blockEditingModes.get( clientId ) ===
+					'disabled' ||
+				hasExplicitDisabledParent( _state, clientId )
+			) {
+				return false;
 			}
 
 			// When a contentOnly section is being edited, there's some special handling.
