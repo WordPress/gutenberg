@@ -8,12 +8,14 @@
 
 		.popup {
 			--wp-ui-menu-min-width: calc(var(--wpds-dimension-size-lg) * 4);
+			--wp-ui-menu-max-width: calc(var(--wpds-dimension-size-lg) * 8);
 
 			display: grid;
 			grid-template-areas: none;
 			grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
 			grid-template-rows: auto;
 			min-width: max(var(--anchor-width, 0px), var(--wp-ui-menu-min-width));
+			max-width: min(var(--available-width), var(--wp-ui-menu-max-width));
 			overflow-block: auto;
 			overscroll-behavior: contain;
 			padding-block: var(--wp-ui-popup-padding);
@@ -94,11 +96,24 @@
 			pointer-events: none;
 		}
 
+		.item-children {
+			flex: 1 1 auto;
+			display: inline-flex;
+			flex-direction: column;
+			gap: var(--wpds-dimension-gap-xs);
+			min-width: 0;
+		}
+
 		.item-label {
 			min-width: 0;
 			overflow: hidden;
 			text-overflow: ellipsis;
 			white-space: nowrap;
+		}
+
+		.item-description {
+			color: var(--wpds-color-foreground-content-neutral-weak);
+			overflow-wrap: anywhere;
 		}
 
 		.item-suffix {
@@ -111,8 +126,10 @@
 
 		.item[data-highlighted]:not([aria-disabled="true"]) .item-prefix,
 		.item[data-highlighted]:not([aria-disabled="true"]) .item-suffix,
+		.item[data-highlighted]:not([aria-disabled="true"]) .item-description,
 		.item[aria-disabled="true"] .item-prefix,
-		.item[aria-disabled="true"] .item-suffix {
+		.item[aria-disabled="true"] .item-suffix,
+		.item[aria-disabled="true"] .item-description {
 			color: inherit;
 		}
 

@@ -179,12 +179,21 @@ describe( 'Menu', () => {
 		const triggerRef = createRef< HTMLButtonElement >();
 		const popupRef = createRef< HTMLDivElement >();
 		const itemRef = createRef< HTMLDivElement >();
+		const itemLabelRef = createRef< HTMLSpanElement >();
+		const itemDescriptionRef = createRef< HTMLSpanElement >();
 
 		render(
 			<Menu.Root>
 				<Menu.Trigger ref={ triggerRef }>Actions</Menu.Trigger>
 				<Menu.Popup ref={ popupRef }>
-					<Menu.Item ref={ itemRef }>Duplicate</Menu.Item>
+					<Menu.Item ref={ itemRef }>
+						<Menu.ItemLabel ref={ itemLabelRef }>
+							Duplicate
+						</Menu.ItemLabel>
+						<Menu.ItemDescription ref={ itemDescriptionRef }>
+							Create a copy.
+						</Menu.ItemDescription>
+					</Menu.Item>
 				</Menu.Popup>
 			</Menu.Root>
 		);
@@ -196,6 +205,10 @@ describe( 'Menu', () => {
 		await waitFor( () => {
 			expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
 			expect( itemRef.current ).toBeInstanceOf( HTMLDivElement );
+			expect( itemLabelRef.current ).toBeInstanceOf( HTMLSpanElement );
+			expect( itemDescriptionRef.current ).toBeInstanceOf(
+				HTMLSpanElement
+			);
 		} );
 	} );
 } );

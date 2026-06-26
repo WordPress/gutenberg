@@ -1,21 +1,39 @@
 import { Menu as _Menu } from '@base-ui/react/menu';
 import clsx from 'clsx';
-import { forwardRef } from '@wordpress/element';
+import { Children, forwardRef, isValidElement } from '@wordpress/element';
 import itemPopupStyles from '../utils/css/item-popup.module.css';
 import resetStyles from '../utils/css/resets.module.css';
 import styles from './style.module.css';
+import { ItemDescription } from './item-description';
+import { ItemLabel } from './item-label';
 import type { ItemProps } from './types';
+
+function hasStructuredItemContent( children: ItemProps[ 'children' ] ) {
+	return Children.toArray( children ).some(
+		( child ) =>
+			isValidElement( child ) &&
+			( child.type === ItemLabel || child.type === ItemDescription )
+	);
+}
 
 function ItemContent( {
 	children,
 	prefix,
 	suffix,
 }: Pick< ItemProps, 'children' | 'prefix' | 'suffix' > ) {
+	const itemChildren = hasStructuredItemContent( children ) ? (
+		children
+	) : (
+		<ItemLabel>{ children }</ItemLabel>
+	);
+
 	return (
 		<>
 			<span className={ styles[ 'item-prefix' ] }>{ prefix }</span>
 			<span className={ styles[ 'item-content' ] }>
-				<span className={ styles[ 'item-label' ] }>{ children }</span>
+				<span className={ styles[ 'item-children' ] }>
+					{ itemChildren }
+				</span>
 				{ suffix && (
 					<span className={ styles[ 'item-suffix' ] }>
 						{ suffix }

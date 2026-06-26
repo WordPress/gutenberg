@@ -2,6 +2,8 @@ import { CheckboxItem } from './checkbox-item';
 import { Group } from './group';
 import { GroupLabel } from './group-label';
 import { Item } from './item';
+import { ItemDescription } from './item-description';
+import { ItemLabel } from './item-label';
 import { Popup } from './popup';
 import { Portal } from './portal';
 import { Positioner } from './positioner';
@@ -18,6 +20,8 @@ export {
 	Group,
 	GroupLabel,
 	Item,
+	ItemDescription,
+	ItemLabel,
 	Popup,
 	Portal,
 	Positioner,

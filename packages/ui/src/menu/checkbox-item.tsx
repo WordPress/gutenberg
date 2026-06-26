@@ -6,6 +6,7 @@ import { Icon } from '../icon';
 import itemPopupStyles from '../utils/css/item-popup.module.css';
 import resetStyles from '../utils/css/resets.module.css';
 import styles from './style.module.css';
+import { ItemContent } from './item';
 import type { CheckboxItemProps } from './types';
 
 /**
@@ -28,25 +29,22 @@ const CheckboxItem = forwardRef< HTMLDivElement, CheckboxItemProps >(
 				) }
 				{ ...props }
 			>
-				<span className={ styles[ 'item-prefix' ] }>
-					<_Menu.CheckboxItemIndicator
-						keepMounted
-						className={ styles[ 'item-indicator' ] }
-					>
-						<Icon icon={ check } size={ 24 } />
-					</_Menu.CheckboxItemIndicator>
-					{ prefix }
-				</span>
-				<span className={ styles[ 'item-content' ] }>
-					<span className={ styles[ 'item-label' ] }>
-						{ children }
-					</span>
-					{ suffix && (
-						<span className={ styles[ 'item-suffix' ] }>
-							{ suffix }
-						</span>
-					) }
-				</span>
+				<ItemContent
+					prefix={
+						<>
+							<_Menu.CheckboxItemIndicator
+								keepMounted
+								className={ styles[ 'item-indicator' ] }
+							>
+								<Icon icon={ check } size={ 24 } />
+							</_Menu.CheckboxItemIndicator>
+							{ prefix }
+						</>
+					}
+					suffix={ suffix }
+				>
+					{ children }
+				</ItemContent>
 			</_Menu.CheckboxItem>
 		);
 	}
