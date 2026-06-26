@@ -32,6 +32,8 @@ export type WidgetIcon = ReactElement< ComponentProps< 'svg' > >;
  * whose `id` is narrowed to the keys of the widget's attribute object (`Item`).
  */
 export type WidgetAttributeField< Item > = Field< Item > & {
+	// `& string` drops the number/symbol keys `keyof` can yield; `Field.id`
+	// is a string.
 	id: keyof Item & string;
 };
 
