@@ -132,13 +132,6 @@ export const PluginStatus: Story = {
 };
 
 export const TextOnlyBadges: Story = {
-	decorators: [
-		( Story ) => (
-			<Stack direction="column" gap="sm">
-				<Story />
-			</Stack>
-		),
-	],
 	render: () => (
 		<>
 			<Badge intent="stable">Active</Badge>
@@ -149,15 +142,8 @@ export const TextOnlyBadges: Story = {
 };
 
 export const WithAdjacentContentIcon: Story = {
-	decorators: [
-		( Story ) => (
-			<Stack direction="column" gap="sm">
-				<Story />
-			</Stack>
-		),
-	],
 	render: () => (
-		<>
+		<Stack direction="column" gap="sm">
 			<Stack direction="row" gap="sm" align="center">
 				<Icon icon={ page } size={ 24 } />
 				<Text variant="body-md">About page</Text>
@@ -168,18 +154,11 @@ export const WithAdjacentContentIcon: Story = {
 				<Text variant="body-md">Akismet</Text>
 				<Badge intent="stable">Active</Badge>
 			</Stack>
-		</>
+		</Stack>
 	),
 };
 
 export const IncorrectBadgeWithIcon: Story = {
-	decorators: [
-		( Story ) => (
-			<Stack direction="column" gap="sm">
-				<Story />
-			</Stack>
-		),
-	],
 	render: () => (
 		<>
 			{ /* @ts-expect-error Demonstrating incorrect Badge usage with icon children. */ }
