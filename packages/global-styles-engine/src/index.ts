@@ -26,6 +26,7 @@ export { getDimensionPresetCssVar } from './utils/dimensions';
 export {
 	getResponsiveMediaQueries,
 	getViewportBreakpoints,
+	getViewportBreakpointValueInPixels,
 } from './utils/viewport';
 export {
 	getValueFromVariable,

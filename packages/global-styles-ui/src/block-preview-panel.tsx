@@ -8,6 +8,7 @@ import { __experimentalSpacer as Spacer } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import {
 	getViewportBreakpoints,
+	getViewportBreakpointValueInPixels,
 	__unstableGeneratePreviewStateStyles as generatePreviewStateStyles,
 } from '@wordpress/global-styles-engine';
 
@@ -34,33 +35,22 @@ const DEFAULT_PREVIEW_WIDTH_BY_VIEWPORT: Record< string, number > = {
 	'@mobile': 480,
 };
 
-// We assume a default font size of 16px when calculating preview widths.
-const DEFAULT_FONT_SIZE = 16;
-
-function getPixelValue( value: string ) {
-	const match = value.match( /^(\d+|\d*\.\d+)(px|em|rem)$/ );
-	if ( ! match ) {
-		return undefined;
-	}
-
-	const numericValue = Number.parseFloat( match[ 1 ] );
-	const unit = match[ 2 ];
-
-	return unit === 'px' ? numericValue : numericValue * DEFAULT_FONT_SIZE;
-}
-
 function getPreviewWidthByViewport(
 	selectedViewport: string,
 	viewportSettings: BlockPreviewPanelProps[ 'viewportSettings' ]
 ) {
 	const breakpoints = getViewportBreakpoints( viewportSettings );
-	const mobileWidth = getPixelValue( breakpoints.mobile );
+	const mobileWidth = getViewportBreakpointValueInPixels(
+		breakpoints.mobile
+	);
 
 	if ( selectedViewport === 'mobile' && mobileWidth ) {
 		return mobileWidth;
 	}
 
-	const tabletWidth = getPixelValue( breakpoints.tablet );
+	const tabletWidth = getViewportBreakpointValueInPixels(
+		breakpoints.tablet
+	);
 
 	if ( selectedViewport === 'tablet' && mobileWidth && tabletWidth ) {
 		if (
