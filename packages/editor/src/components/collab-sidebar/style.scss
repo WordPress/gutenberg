@@ -338,7 +338,7 @@
 		padding: 0;
 		border-radius: var(--wpds-border-radius-md);
 		box-shadow: var(--wpds-elevation-md);
-		background-color: var(--wpds-color-bg-surface-neutral-weak);
+		background-color: var(--wpds-color-background-surface-neutral-weak);
 	}
 }
 
@@ -356,7 +356,7 @@
 	height: 320px;
 	font-family: var(--wpds-typography-font-family-body);
 	font-size: var(--wpds-typography-font-size-sm);
-	color: var(--wpds-color-fg-content-neutral);
+	color: var(--wpds-color-foreground-content-neutral);
 	isolation: isolate;
 }
 
@@ -382,7 +382,7 @@
 	display: grid;
 	place-items: center;
 	height: 100%;
-	color: var(--wpds-color-fg-content-neutral-weak);
+	color: var(--wpds-color-foreground-content-neutral-weak);
 }
 
 .editor-collab-sidebar-panel__picker-list {
@@ -393,8 +393,8 @@
 	position: sticky;
 	top: 0;
 	padding: var(--wpds-dimension-padding-sm);
-	background-color: var(--wpds-color-bg-surface-neutral-weak);
-	color: var(--wpds-color-fg-content-neutral-weak);
+	background-color: var(--wpds-color-background-surface-neutral-weak);
+	color: var(--wpds-color-foreground-content-neutral-weak);
 	font-size: var(--wpds-typography-font-size-xs);
 	font-weight: var(--wpds-typography-font-weight-medium);
 	z-index: 1;
@@ -425,13 +425,13 @@
 	line-height: 1;
 
 	&[data-active-item] {
-		background-color: var(--wpds-color-bg-interactive-neutral-weak-active);
+		background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 	}
 
 	&:focus-visible {
 		outline:
 			var(--wpds-border-width-focus) solid
-			var(--wpds-color-stroke-focus-brand);
+			var(--wpds-color-stroke-focus);
 		outline-offset: -1px;
 	}
 }
