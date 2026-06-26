@@ -163,16 +163,16 @@ export const getClientIdsTree = createSelector(
  * Returns a tree of block objects filtered by a block inclusion callback.
  * Excluded blocks are replaced by any included descendants.
  *
- * @param {Object}   state              Global application state.
- * @param {?string}  rootClientId       Optional root client ID of block list.
- * @param {Function} shouldIncludeBlock Callback that returns whether to include a block.
+ * @param {Object}   state         Global application state.
+ * @param {?string}  rootClientId  Optional root client ID of block list.
+ * @param {Function} includesBlock Callback that returns whether to include a block.
  *
  * @return {Object[]} Tree of block objects with only clientID and innerBlocks set.
  */
 function getFilteredClientIdsTreeUnmemoized(
 	state,
 	rootClientId,
-	shouldIncludeBlock
+	includesBlock
 ) {
 	const blockOrder = getBlockOrder( state, rootClientId );
 	const result = [];
@@ -181,9 +181,9 @@ function getFilteredClientIdsTreeUnmemoized(
 		const innerBlocks = getFilteredClientIdsTreeUnmemoized(
 			state,
 			clientId,
-			shouldIncludeBlock
+			includesBlock
 		);
-		if ( shouldIncludeBlock( state, clientId ) ) {
+		if ( includesBlock( state, clientId ) ) {
 			result.push( { clientId, innerBlocks } );
 		} else {
 			result.push( ...innerBlocks );

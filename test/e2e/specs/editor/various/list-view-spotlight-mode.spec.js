@@ -145,7 +145,7 @@ test.describe( 'List View Spotlight Mode', () => {
 			listView.locator( '[role=row].is-disabled:has(:focus)' )
 		).toHaveCount( 0 );
 
-		// Keyboard navigation should be constrained to the pattern
+		// Keyboard navigation is constrained to the pattern.
 		await editor.canvas
 			.getByRole( 'document', {
 				name: 'Block: Paragraph',
@@ -162,7 +162,7 @@ test.describe( 'List View Spotlight Mode', () => {
 			.filter( { hasText: 'Pattern paragraph 2' } );
 		await expect( patternParagraph2 ).toBeFocused();
 
-		// Attempting to navigate beyond the pattern should be prevented
+		// Attempting to navigate beyond the pattern is prevented.
 		await page.keyboard.press( 'ArrowDown' );
 		await expect( patternParagraph2 ).toBeFocused();
 
