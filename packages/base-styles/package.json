@@ -41,6 +41,9 @@
 		"./z-index": "./_z-index.scss"
 	},
 	"wpScript": true,
+	"dependencies": {
+		"@wordpress/theme": "file:../theme"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

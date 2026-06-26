@@ -27,6 +27,7 @@
 		"build",
 		"build-module",
 		"build-types",
+		"utils.scss",
 		"*.md"
 	],
 	"main": "build/index.cjs",
@@ -38,6 +39,9 @@
 			"default": "./build/index.cjs"
 		},
 		"./design-tokens.css": "./src/prebuilt/css/design-tokens.css",
+		"./utils": {
+			"sass": "./utils.scss"
+		},
 		"./design-tokens.js": {
 			"types": "./build-types/prebuilt/js/design-tokens.d.ts",
 			"import": "./build-module/prebuilt/js/design-tokens.mjs",
@@ -77,7 +81,9 @@
 	},
 	"wpScript": true,
 	"types": "build-types",
-	"sideEffects": false,
+	"sideEffects": [
+		"src/prebuilt/css/design-tokens.css"
+	],
 	"dependencies": {
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/element": "file:../element",

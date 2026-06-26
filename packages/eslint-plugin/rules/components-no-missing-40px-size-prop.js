@@ -26,7 +26,6 @@ const COMPONENTS_REQUIRING_40PX = new Set( [
 	'Radio',
 	'RangeControl',
 	'SelectControl',
-	'TreeSelect',
 	'ToggleGroupControl',
 	'UnitControl',
 ] );
