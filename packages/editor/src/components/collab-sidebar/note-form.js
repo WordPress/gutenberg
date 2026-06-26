@@ -71,12 +71,14 @@ export function NoteForm( { onSubmit, onCancel, note, labels, focusOnMount } ) {
 				id={ inputId }
 				label={ labels?.input ?? __( 'Note' ) }
 				hideLabelFromVision
-				// Opt-in focus: the standalone control has no block-editor
-				// selection to inherit focus from. Callers that open the form
-				// as a primary action (e.g. a brand-new note) pass
-				// `focusOnMount` so the caret lands in the field immediately;
-				// the reply form deliberately omits it so selecting a thread
-				// doesn't yank focus away from thread keyboard navigation.
+				/*
+				 * Opt-in focus: the standalone control has no block-editor
+				 * selection to inherit focus from. Callers that open the form
+				 * as a primary action (e.g. a brand-new note) pass
+				 * `focusOnMount` so the caret lands in the field immediately;
+				 * the reply form deliberately omits it so selecting a thread
+				 * doesn't yank focus away from thread keyboard navigation.
+				 */
 				focusOnMount={ focusOnMount }
 				value={ inputComment }
 				onChange={ setInputComment }

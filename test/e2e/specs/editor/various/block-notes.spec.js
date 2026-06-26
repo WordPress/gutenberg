@@ -166,38 +166,37 @@ test.describe( 'Block Notes', () => {
 		} );
 	} );
 
-	// Deferred: the reply form intentionally does not focus on mount so
-	// selecting a thread doesn't pull focus away from thread keyboard
-	// navigation. Wiring focus into the reply/skip-link flow is
-	// follow-up work tracked separately from this rich-text change.
-	test.fixme(
-		'can reply to a block note',
-		async ( { page, blockNoteUtils } ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Testing block comments' },
-				comment: 'Test comment',
-			} );
-			const commentForm = page.getByRole( 'textbox', {
-				name: 'Reply to',
-			} );
-			const commentText = page
-				.locator( '.editor-collab-sidebar-panel__note-content' )
-				.last();
+	test( 'can reply to a block note', async ( { page, blockNoteUtils } ) => {
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Testing block comments' },
+			comment: 'Test comment',
+		} );
+		const commentForm = page.getByRole( 'textbox', {
+			name: 'Reply to',
+		} );
+		const commentText = page
+			.locator( '.editor-collab-sidebar-panel__note-content' )
+			.last();
 
-			await commentForm.pressSequentially( 'Test reply' );
-			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Reply', exact: true } )
-				.click();
-			await expect( commentText ).toHaveText( 'Test reply' );
-			await expect(
-				page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Reply added.' } )
-			).toBeVisible();
-		}
-	);
+		/*
+		 * The reply form intentionally does not focus on mount, so click into
+		 * it before typing the same way the edit flow does. This keeps the
+		 * test focused on reply behavior rather than auto-focus.
+		 */
+		await commentForm.click();
+		await commentForm.pressSequentially( 'Test reply' );
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Reply', exact: true } )
+			.click();
+		await expect( commentText ).toHaveText( 'Test reply' );
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Reply added.' } )
+		).toBeVisible();
+	} );
 
 	test( 'can edit a block note', async ( { page, blockNoteUtils } ) => {
 		await blockNoteUtils.addBlockWithNote( {

@@ -3,11 +3,13 @@
  */
 import { render, screen, fireEvent } from '@testing-library/react';
 
-// The note form pulls in @wordpress/components, @wordpress/ui, and
-// @wordpress/block-editor. Their import graphs reach styling libraries that
-// aren't relevant to the form's logic. Substitute minimal stand-ins so the
-// test stays focused on the form's behavior: keyboard handling, the empty-
-// state guard, and the format allowlist.
+/*
+ * The note form pulls in @wordpress/components, @wordpress/ui, and
+ * @wordpress/block-editor. Their import graphs reach styling libraries that
+ * aren't relevant to the form's logic. Substitute minimal stand-ins so the
+ * test stays focused on the form's behavior: keyboard handling, the empty-
+ * state guard, and the format allowlist.
+ */
 jest.mock( '@wordpress/components', () => ( {
 	__esModule: true,
 	__experimentalTruncate: ( { children } ) => <>{ children }</>,
@@ -154,6 +156,18 @@ describe( 'NoteForm', () => {
 		// navigator.platform is empty, so Ctrl is the primary modifier here.
 		fireEvent.keyDown( input, { key: 'Enter', ctrlKey: true } );
 		expect( onSubmit ).toHaveBeenCalledWith( 'Hello' );
+	} );
+
+	it( 'submits the entered content when the submit button is clicked', () => {
+		/*
+		 * The reply and reopen flows reuse NoteForm and submit via this
+		 * button, so this covers that replies work independently of the
+		 * browser focus behavior exercised by the e2e suite.
+		 */
+		const { onSubmit } = setup( { labels: { submit: 'Reply' } } );
+		setInputValue( 'A reply' );
+		fireEvent.click( screen.getByRole( 'button', { name: 'Reply' } ) );
+		expect( onSubmit ).toHaveBeenCalledWith( 'A reply' );
 	} );
 
 	it( 'does not submit on ⌘+Enter when the content is empty', () => {
