@@ -673,21 +673,49 @@ export const __experimentalAppendDistributedEditingActionTranscriptEvent =
  */
 export const __experimentalOpenDistributedEditingRiskyBlockReview =
 	() =>
-	( { select, dispatch } ) => {
+	async ( { select, dispatch, registry } ) => {
+		const initialReviewState =
+			select.getDistributedEditingRiskyBlockReviewState?.() || {};
+		const shouldRefreshReviewItems =
+			hasActionableRiskyBlockReviewItem( initialReviewState ) ||
+			initialReviewState.prePublishPanelRequired ||
+			( initialReviewState.pendingReviewItemCount ?? 0 ) > 0;
+		let refreshResult = null;
+
+		if ( shouldRefreshReviewItems ) {
+			refreshResult =
+				await refreshDistributedEditingRiskyBlockReviewItemsAfterServerUpdate(
+					{
+						dispatch,
+						options: {
+							applySafeServerContentWhenReviewItemsClear: false,
+							skipWhenLocalReviewPending: false,
+						},
+						registry,
+						select,
+						skipWhenLocalReviewPending: false,
+					}
+				);
+		}
+
 		const savePolicy =
 			select.getDistributedEditingSavePolicyState?.() || {};
 		const reviewState =
 			select.getDistributedEditingRiskyBlockReviewState?.() || {};
+		const hasActionableReviewItem =
+			hasActionableRiskyBlockReviewItem( reviewState );
 		const shouldOpenPrePublishReview =
-			savePolicy.opensPrePublishReview ||
-			savePolicy.clickAction ===
-				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW ||
-			reviewState.prePublishPanelRequired ||
-			reviewState.pendingReviewItemCount > 0;
+			hasActionableReviewItem &&
+			( savePolicy.opensPrePublishReview ||
+				savePolicy.clickAction ===
+					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW ||
+				reviewState.prePublishPanelRequired ||
+				reviewState.pendingReviewItemCount > 0 );
 
 		if ( ! shouldOpenPrePublishReview ) {
 			return {
 				status: 'pre_publish_review_not_required',
+				reviewItemsRefreshResult: refreshResult,
 				opensPublishSidebar: false,
 				focusesReviewPanel: false,
 				savesPost: false,
@@ -725,6 +753,7 @@ export const __experimentalOpenDistributedEditingRiskyBlockReview =
 
 		return {
 			status: 'pre_publish_review_opened',
+			reviewItemsRefreshResult: refreshResult,
 			opensPublishSidebar: true,
 			focusesReviewPanel: true,
 			reviewPanelFocusRequested: true,
@@ -750,6 +779,17 @@ export const __experimentalOpenDistributedEditingRiskyBlockReview =
 			claimsSaved: false,
 		};
 	};
+
+function hasActionableRiskyBlockReviewItem( reviewState = {} ) {
+	return (
+		Array.isArray( reviewState.reviewItems ) &&
+		reviewState.reviewItems.some(
+			( reviewItem ) =>
+				reviewItem?.reviewStatus ===
+				DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.PENDING_REVIEW
+		)
+	);
+}
 
 /**
  * Records and opens the visible same-block Compare action. This is an explicit
@@ -984,6 +1024,10 @@ function getDistributedEditingPendingReviewItemCountFromResponse(
 	response = {},
 	items = []
 ) {
+	if ( items.length === 0 ) {
+		return 0;
+	}
+
 	const responseData =
 		getDistributedEditingReviewItemsResponseData( response );
 	const rawCount =
@@ -1009,8 +1053,7 @@ function getDistributedEditingSessionStateForRemoteReviewItemsListResponse(
 			response,
 			items
 		);
-	const hasPendingReviewItems =
-		pendingReviewItemCount > 0 || items.length > 0;
+	const hasPendingReviewItems = items.length > 0;
 
 	return normalizeDistributedEditingSessionState( {
 		...currentSessionState,

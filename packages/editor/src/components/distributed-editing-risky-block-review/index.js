@@ -112,8 +112,19 @@ const EMPTY_ARRAY = [];
 export function shouldRenderDistributedEditingRiskyBlockReview(
 	reviewState = {}
 ) {
+	const reviewItems = Array.isArray( reviewState.reviewItems )
+		? reviewState.reviewItems
+		: EMPTY_ARRAY;
+	const hasPendingVisibleReviewItem = getVisibleRiskyBlockReviewItems(
+		reviewItems
+	).some(
+		( reviewItem ) =>
+			reviewItem.reviewStatus ===
+			DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.PENDING_REVIEW
+	);
+
 	return (
-		reviewState.reviewItemCount > 0 &&
+		hasPendingVisibleReviewItem &&
 		reviewState.status !==
 			DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.NONE &&
 		reviewState.status !==
@@ -1181,8 +1192,10 @@ export function DistributedEditingRiskyBlockReviewPanel( {
 	const reviewItems = getVisibleRiskyBlockReviewItems(
 		Array.isArray( reviewState.reviewItems ) ? reviewState.reviewItems : []
 	);
-	const saveVocabulary =
-		getDistributedEditingRiskyBlockReviewSaveVocabulary( savePolicy );
+	const saveVocabulary = getDistributedEditingRiskyBlockReviewSaveVocabulary(
+		savePolicy,
+		reviewState
+	);
 	const shouldRenderSaveVocabulary = Boolean(
 		saveVocabulary.localChangesText ||
 			saveVocabulary.reviewCheckpointText ||
@@ -1257,6 +1270,9 @@ export function DistributedEditingRiskyBlockReviewPanel( {
 			<ul className="editor-distributed-editing-risky-block-review__items">
 				{ reviewItems.map( ( reviewItem, index ) => (
 					<DistributedEditingRiskyBlockReviewItem
+						currentServerVersion={
+							reviewState.currentServerVersion
+						}
 						index={ index }
 						key={ reviewItem.id }
 						onFocusItem={ onFocusItem }
@@ -1349,13 +1365,19 @@ function isLocalKsesRiskyBlockReviewItem( reviewItem = {} ) {
 }
 
 function getDistributedEditingRiskyBlockReviewSaveVocabulary(
-	savePolicy = {}
+	savePolicy = {},
+	reviewState = {}
 ) {
 	const stateVocabulary =
 		savePolicy.saveButtonStateVocabulary ||
 		savePolicy.saveButton?.stateVocabulary ||
 		savePolicy.stateVocabulary ||
 		{};
+	const pendingReviewItemCount = Math.max(
+		0,
+		Number( reviewState.pendingReviewItemCount ) || 0
+	);
+	const hasPendingReviewItems = pendingReviewItemCount > 0;
 
 	return {
 		localChangesState:
@@ -1363,6 +1385,7 @@ function getDistributedEditingRiskyBlockReviewSaveVocabulary(
 			stateVocabulary.localChangesState ||
 			'',
 		reviewCheckpointState:
+			( hasPendingReviewItems && 'review_required' ) ||
 			savePolicy.saveButtonReviewCheckpointState ||
 			stateVocabulary.reviewCheckpointState ||
 			'',
@@ -1377,7 +1400,17 @@ function getDistributedEditingRiskyBlockReviewSaveVocabulary(
 			stateVocabulary.summaryText ||
 			'',
 		localChangesText: stateVocabulary.localChangesText || '',
-		reviewCheckpointText: stateVocabulary.reviewCheckpointText || '',
+		reviewCheckpointText: hasPendingReviewItems
+			? sprintf(
+					/* translators: %d: number of pending HTML review items. */
+					_n(
+						'%d highlighted block needs HTML review.',
+						'%d highlighted blocks need HTML review.',
+						pendingReviewItemCount
+					),
+					pendingReviewItemCount
+			  )
+			: stateVocabulary.reviewCheckpointText || '',
 		authoritativePostText:
 			stateVocabulary.authoritativePostText ||
 			savePolicy.saveButtonAuthorityStatusText ||
@@ -1387,6 +1420,7 @@ function getDistributedEditingRiskyBlockReviewSaveVocabulary(
 }
 
 function DistributedEditingRiskyBlockReviewItem( {
+	currentServerVersion,
 	index,
 	onFocusItem,
 	onLoadDetail,
@@ -1427,6 +1461,10 @@ function DistributedEditingRiskyBlockReviewItem( {
 					__( 'Reject HTML change for %s' ),
 					label
 			  );
+	const timelineLabels = getRiskyBlockReviewTimelineLabels(
+		reviewItem,
+		currentServerVersion
+	);
 
 	async function loadDetail() {
 		if ( hasReviewSource || ! onLoadDetail ) {
@@ -1565,6 +1603,16 @@ function DistributedEditingRiskyBlockReviewItem( {
 					{ getReviewItemStatusLabel( reviewItem.reviewStatus ) }
 				</span>
 			</div>
+			{ timelineLabels.length > 0 && (
+				<ul
+					aria-label={ __( 'Review timeline' ) }
+					className="editor-distributed-editing-risky-block-review__item-timeline"
+				>
+					{ timelineLabels.map( ( timelineLabel ) => (
+						<li key={ timelineLabel }>{ timelineLabel }</li>
+					) ) }
+				</ul>
+			) }
 			<div className="editor-distributed-editing-risky-block-review__item-evidence">
 				<code>
 					{ getHashSummaryLabel(
@@ -1863,6 +1911,211 @@ function getReviewItemStatusLabel( reviewStatus ) {
 	}
 
 	return __( 'Pending review' );
+}
+
+function getRiskyBlockReviewTimelineLabels(
+	reviewItem = {},
+	currentServerVersion = ''
+) {
+	const labels = [];
+	const proposerDisplayName = reviewItem.proposerDisplayName || '';
+	const proposedAt = getRiskyBlockReviewItemProposedAt( reviewItem );
+	const proposedTimeLabel = getRelativePastTimeLabel( proposedAt );
+
+	if ( proposerDisplayName && proposedTimeLabel ) {
+		labels.push(
+			sprintf(
+				/* translators: 1: proposer display name, 2: relative time. */
+				__( 'Proposed by %1$s %2$s.' ),
+				proposerDisplayName,
+				proposedTimeLabel
+			)
+		);
+	} else if ( proposerDisplayName ) {
+		labels.push(
+			sprintf(
+				/* translators: %s: proposer display name. */
+				__( 'Proposed by %s.' ),
+				proposerDisplayName
+			)
+		);
+	} else if ( proposedTimeLabel ) {
+		labels.push(
+			sprintf(
+				/* translators: %s: relative time. */
+				__( 'Proposed %s.' ),
+				proposedTimeLabel
+			)
+		);
+	}
+
+	const proposalVersion =
+		reviewItem.serverSyncVersion ||
+		reviewItem.serverVersion ||
+		reviewItem.baseSyncVersion ||
+		reviewItem.baseVersion ||
+		'';
+	const currentVersion = currentServerVersion || '';
+
+	if ( proposalVersion && currentVersion ) {
+		labels.push(
+			sprintf(
+				/* translators: 1: proposal sync version, 2: current sync version. */
+				__( 'Proposal version %1$s; current version %2$s.' ),
+				proposalVersion,
+				currentVersion
+			)
+		);
+
+		const changesSinceProposal = getNumericVersionDistance(
+			proposalVersion,
+			currentVersion
+		);
+
+		if ( changesSinceProposal > 0 ) {
+			labels.push(
+				sprintf(
+					/* translators: %d: number of saved document changes. */
+					_n(
+						'%d saved change since this was proposed.',
+						'%d saved changes since this was proposed.',
+						changesSinceProposal
+					),
+					changesSinceProposal
+				)
+			);
+		} else if ( changesSinceProposal === 0 ) {
+			labels.push( __( 'No saved changes since this was proposed.' ) );
+		}
+	}
+
+	const expiresAt = getValidDateTimestamp( reviewItem.expiresAtGmt );
+	const expiresLabel = getRelativeFutureTimeLabel( expiresAt );
+
+	if ( expiresLabel ) {
+		labels.push(
+			sprintf(
+				/* translators: %s: relative expiry time. */
+				__( 'Expires %s.' ),
+				expiresLabel
+			)
+		);
+	}
+
+	return labels;
+}
+
+function getRiskyBlockReviewItemProposedAt( reviewItem = {} ) {
+	return (
+		getValidDateTimestamp( reviewItem.createdAtGmt ) ||
+		getValidDateTimestamp( reviewItem.updatedAtGmt )
+	);
+}
+
+function getValidDateTimestamp( value ) {
+	if ( typeof value !== 'string' || value === '' ) {
+		return null;
+	}
+
+	if ( value.startsWith( '0000-00-00' ) ) {
+		return null;
+	}
+
+	const timestamp = Date.parse( value );
+
+	if ( ! Number.isFinite( timestamp ) ) {
+		return null;
+	}
+
+	return timestamp >= Date.UTC( 2000, 0, 1 ) ? timestamp : null;
+}
+
+function getRelativePastTimeLabel( timestamp ) {
+	if ( ! timestamp ) {
+		return '';
+	}
+
+	const elapsedSeconds = Math.max(
+		0,
+		Math.floor( ( Date.now() - timestamp ) / 1000 )
+	);
+
+	if ( elapsedSeconds < 60 ) {
+		return __( 'just now' );
+	}
+
+	if ( elapsedSeconds < 3600 ) {
+		const minutes = Math.floor( elapsedSeconds / 60 );
+		return sprintf(
+			/* translators: %d: number of minutes. */
+			_n( '%d minute ago', '%d minutes ago', minutes ),
+			minutes
+		);
+	}
+
+	if ( elapsedSeconds < 86400 ) {
+		const hours = Math.floor( elapsedSeconds / 3600 );
+		return sprintf(
+			/* translators: %d: number of hours. */
+			_n( '%d hour ago', '%d hours ago', hours ),
+			hours
+		);
+	}
+
+	const days = Math.floor( elapsedSeconds / 86400 );
+	return sprintf(
+		/* translators: %d: number of days. */
+		_n( '%d day ago', '%d days ago', days ),
+		days
+	);
+}
+
+function getRelativeFutureTimeLabel( timestamp ) {
+	if ( ! timestamp ) {
+		return '';
+	}
+
+	const remainingSeconds = Math.floor( ( timestamp - Date.now() ) / 1000 );
+
+	if ( remainingSeconds <= 0 ) {
+		return __( 'soon' );
+	}
+
+	if ( remainingSeconds < 3600 ) {
+		const minutes = Math.max( 1, Math.ceil( remainingSeconds / 60 ) );
+		return sprintf(
+			/* translators: %d: number of minutes. */
+			_n( 'in %d minute', 'in %d minutes', minutes ),
+			minutes
+		);
+	}
+
+	if ( remainingSeconds < 86400 ) {
+		const hours = Math.ceil( remainingSeconds / 3600 );
+		return sprintf(
+			/* translators: %d: number of hours. */
+			_n( 'in %d hour', 'in %d hours', hours ),
+			hours
+		);
+	}
+
+	const days = Math.ceil( remainingSeconds / 86400 );
+	return sprintf(
+		/* translators: %d: number of days. */
+		_n( 'in %d day', 'in %d days', days ),
+		days
+	);
+}
+
+function getNumericVersionDistance( fromVersion, toVersion ) {
+	const from = Number( fromVersion );
+	const to = Number( toVersion );
+
+	if ( ! Number.isInteger( from ) || ! Number.isInteger( to ) ) {
+		return null;
+	}
+
+	return Math.max( 0, to - from );
 }
 
 function getHashSummaryLabel( label, hash ) {

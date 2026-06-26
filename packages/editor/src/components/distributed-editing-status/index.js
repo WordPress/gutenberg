@@ -8810,6 +8810,10 @@ function getDistributedEditingStatusSurfaceItem( descriptor ) {
 				retrySaveReason: descriptor.retrySaveReason,
 				retrySaveConfirmedMergedEdits:
 					descriptor.retrySaveConfirmedMergedEdits,
+				retrySavePartialSafeMergeApplied:
+					descriptor.retrySavePartialSafeMergeApplied,
+				retrySavePartialSafeMergeStatus:
+					descriptor.retrySavePartialSafeMergeStatus,
 				retrySaveFreshReviewConsumed:
 					descriptor.retrySaveFreshReviewConsumed,
 				retrySaveFreshReviewRetrySaveAccepted:
@@ -9940,6 +9944,13 @@ function isRetrySaveReviewRequiredItem( item ) {
 	);
 }
 
+function isRetrySavePartialSafeMergeItem( item ) {
+	return Boolean(
+		isRetrySaveReviewRequiredItem( item ) &&
+			item?.retrySavePartialSafeMergeApplied
+	);
+}
+
 function isRetrySaveFreshReviewRequiredItem( item ) {
 	return (
 		item?.reviewTokenRecoveryRequiresFreshReview ||
@@ -10414,7 +10425,7 @@ function getRetrySaveStatusText( descriptor ) {
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED:
-			if ( isRetrySaveReviewRequiredItem( descriptor ) ) {
+			if ( isRetrySavePartialSafeMergeItem( descriptor ) ) {
 				return {
 					title: __( 'Safe parts saved' ),
 					message: __(

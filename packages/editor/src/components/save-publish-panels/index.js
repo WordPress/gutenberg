@@ -37,6 +37,7 @@ export default function SavePublishPanels( {
 	} = useSelect( ( select ) => {
 		const {
 			getDistributedEditingSavePolicyState,
+			getDistributedEditingRiskyBlockReviewState,
 			getDistributedEditingSessionState,
 			isPublishSidebarOpened,
 			isEditedPostPublishable,
@@ -47,8 +48,16 @@ export default function SavePublishPanels( {
 		const _hasOtherEntitiesChanges = hasNonPostEntityChanges();
 		const distributedEditingSavePolicy =
 			getDistributedEditingSavePolicyState?.() ?? {};
+		const distributedEditingRiskyBlockReviewState =
+			getDistributedEditingRiskyBlockReviewState?.() ?? {};
 		const distributedEditingSessionState =
 			getDistributedEditingSessionState?.() ?? {};
+		const hasPendingRiskyBlockReviewItems =
+			Boolean(
+				distributedEditingRiskyBlockReviewState.prePublishPanelRequired
+			) &&
+			( distributedEditingRiskyBlockReviewState.pendingReviewItemCount ??
+				0 ) > 0;
 
 		return {
 			publishSidebarOpened: isPublishSidebarOpened(),
@@ -60,6 +69,7 @@ export default function SavePublishPanels( {
 				distributedEditingSavePolicy.opensPrePublishReview ||
 				distributedEditingSavePolicy.clickAction ===
 					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW ||
+				hasPendingRiskyBlockReviewItems ||
 				Boolean(
 					distributedEditingSessionState.remoteChangesReviewPrePublishPanelRequired
 				),

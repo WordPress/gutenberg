@@ -8783,6 +8783,8 @@ describe( 'DistributedEditingStatus', () => {
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
 				retrySaveReason:
 					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
+				retrySavePartialSafeMergeApplied: true,
+				retrySavePartialSafeMergeStatus: 'safe_subset_persisted',
 			},
 		} );
 
@@ -8844,6 +8846,50 @@ describe( 'DistributedEditingStatus', () => {
 		).not.toHaveBeenCalled();
 	} );
 
+	it( 'does not show partial-save copy for observer review-required state', () => {
+		render(
+			<DistributedEditingStatusSurface
+				noticeDescriptors={ [
+					{
+						id: 'de-rtc-retry-save',
+						kind: DISTRIBUTED_EDITING_NOTICE_KINDS.RETRY_SAVE,
+						status: 'warning',
+						reasonCode:
+							DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
+						disposition:
+							DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
+						retrySaveStatus:
+							DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
+						retrySaveReason:
+							DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
+						retrySaveReviewRequired: true,
+						retrySavePartialSafeMergeApplied: false,
+						noticeOptions: {
+							isDismissible: true,
+						},
+					},
+				] }
+			/>
+		);
+
+		expect(
+			screen.queryByText( 'Safe parts saved' )
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByText(
+				'WordPress saved the safe parts, but one block was blocked.'
+			)
+		).not.toBeInTheDocument();
+		expect(
+			screen.getByText( 'HTML review required before Save' )
+		).toBeVisible();
+		expect(
+			screen.getByText(
+				'One block needs review from someone with HTML permission. Safe edits that WordPress accepted stay in the post, and the blocked block stays pending in this editor.'
+			)
+		).toBeVisible();
+	} );
+
 	it( 'auto-dismisses review-required retry-save chrome after the notice hold', () => {
 		const previousHoldMs =
 			globalThis.__experimentalDistributedEditingDismissibleStatusHoldMs;
@@ -8868,6 +8914,8 @@ describe( 'DistributedEditingStatus', () => {
 						DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
 					retrySaveReason:
 						DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
+					retrySavePartialSafeMergeApplied: true,
+					retrySavePartialSafeMergeStatus: 'safe_subset_persisted',
 				},
 			} );
 
@@ -8913,6 +8961,8 @@ describe( 'DistributedEditingStatus', () => {
 			retrySaveReason:
 				DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
 			retrySaveReviewRequired: true,
+			retrySavePartialSafeMergeApplied: true,
+			retrySavePartialSafeMergeStatus: 'safe_subset_persisted',
 			noticeOptions: {
 				isDismissible: true,
 			},
@@ -11616,6 +11666,8 @@ describe( 'DistributedEditingStatusSurface', () => {
 					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
 				retrySaveStatus:
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
+				retrySavePartialSafeMergeApplied: true,
+				retrySavePartialSafeMergeStatus: 'safe_subset_persisted',
 				title: 'Safe parts saved',
 				message:
 					'WordPress saved the safe parts, but one block was blocked.',
@@ -11634,6 +11686,11 @@ describe( 'DistributedEditingStatusSurface', () => {
 						retrySaveStatus: statusCase.retrySaveStatus,
 						retrySaveReason:
 							statusCase.retrySaveReason || statusCase.reasonCode,
+						retrySavePartialSafeMergeApplied: Boolean(
+							statusCase.retrySavePartialSafeMergeApplied
+						),
+						retrySavePartialSafeMergeStatus:
+							statusCase.retrySavePartialSafeMergeStatus || null,
 					}
 				) }
 				onAction={ onAction }

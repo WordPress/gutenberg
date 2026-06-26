@@ -2582,6 +2582,220 @@ describe( 'Post actions', () => {
 			).toBe( false );
 		} );
 
+		it( 'refreshes server-backed review items before opening the pre-publish sidebar', async () => {
+			const registry = createRegistryWithStores();
+			const dispatch = registry.dispatch( editorStore );
+			const select = registry.select( editorStore );
+			const originalBody = document.body.innerHTML;
+			const reviewPanel = document.createElement( 'div' );
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'Server review item opener post',
+				content:
+					'<!-- wp:paragraph --><p>Clean server content.</p><!-- /wp:paragraph -->',
+				status: 'publish',
+			};
+			let apiFetchCallCount = 0;
+
+			reviewPanel.setAttribute(
+				'data-distributed-editing-risky-block-review-panel',
+				''
+			);
+			reviewPanel.scrollIntoView = jest.fn();
+			document.body.appendChild( reviewPanel );
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				apiFetchCallCount++;
+
+				expect( getMethod( options ) ).toBe( 'GET' );
+				expect( options.path.split( '?' )[ 0 ] ).toBe(
+					`/wp/v2/posts/${ postId }/distributed-editing/review-items`
+				);
+
+				return {
+					result: 'review_items_loaded',
+					items: [
+						{
+							id: 'de-rtc-review-server',
+							status: 'pending',
+							effectiveStatus: 'pending',
+							blockName: 'core/html',
+							blockLabel: 'HTML',
+							blockPath: [ 3 ],
+							changeKind: 'added_block',
+							riskReason: 'kses_would_remove_script',
+							baseSyncVersion: '32',
+							serverSyncVersion: '32',
+							createdAtGmt: '2026-06-25T16:32:00',
+							updatedAtGmt: '2026-06-25T16:32:00',
+							expiresAtGmt: '2026-07-02T16:32:00',
+							proposedContentHash:
+								'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+							ksesFilteredContentHash:
+								'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+							canApprove: true,
+							canModifyAdopt: true,
+							canReject: true,
+							canDiscard: false,
+							rawContentIncluded: false,
+							exposesRawContent: false,
+						},
+					],
+					pendingReviewItemCount: 1,
+					postPendingReviewItemCount: 1,
+					rawContentIncluded: false,
+					exposesRawContent: false,
+					savesPost: false,
+				};
+			} );
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			dispatch.setupEditor( post, {
+				content: post.content,
+			} );
+			dispatch.setDistributedEditingSessionState( {
+				clientBaseVersion: '33',
+				serverVersion: '33',
+				clientBaseContent: post.content,
+				riskyBlockReviewStatus:
+					DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_REQUIRED,
+				riskyBlockReviewItems: [
+					{
+						id: 'de-rtc-review-stale-local',
+						reviewStatus:
+							DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.PENDING_REVIEW,
+					},
+				],
+				riskyBlockReviewPendingCount: 1,
+				riskyBlockReviewPrePublishPanelRequired: true,
+			} );
+
+			try {
+				const result =
+					await dispatch.__experimentalOpenDistributedEditingRiskyBlockReview();
+
+				expect( apiFetchCallCount ).toBe( 1 );
+				expect( result ).toMatchObject( {
+					status: 'pre_publish_review_opened',
+					opensPublishSidebar: true,
+					reviewItemsRefreshResult: {
+						status: 'review_items_refreshed',
+						callsReviewItemsEndpoint: true,
+						pendingReviewItemCount: 1,
+					},
+					savesPost: false,
+					callsNormalSavePost: false,
+					callsRetrySaveEndpoint: false,
+				} );
+				expect( select.isPublishSidebarOpened() ).toBe( true );
+				expect(
+					select.getDistributedEditingRiskyBlockReviewState()
+				).toMatchObject( {
+					status: DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_REQUIRED,
+					currentServerVersion: '33',
+					pendingReviewItemCount: 1,
+					reviewItems: [
+						expect.objectContaining( {
+							id: 'de-rtc-review-server',
+							reviewStatus:
+								DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.PENDING_REVIEW,
+							baseSyncVersion: '32',
+							serverSyncVersion: '32',
+							createdAtGmt: '2026-06-25T16:32:00',
+							updatedAtGmt: '2026-06-25T16:32:00',
+							expiresAtGmt: '2026-07-02T16:32:00',
+						} ),
+					],
+				} );
+			} finally {
+				document.body.innerHTML = originalBody;
+			}
+		} );
+
+		it( 'does not open an empty pre-publish sidebar when refresh clears stale review rows', async () => {
+			const registry = createRegistryWithStores();
+			const dispatch = registry.dispatch( editorStore );
+			const select = registry.select( editorStore );
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'Stale review opener post',
+				content:
+					'<!-- wp:paragraph --><p>Clean server content.</p><!-- /wp:paragraph -->',
+				status: 'publish',
+			};
+			let apiFetchCallCount = 0;
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				apiFetchCallCount++;
+
+				expect( getMethod( options ) ).toBe( 'GET' );
+				expect( options.path.split( '?' )[ 0 ] ).toBe(
+					`/wp/v2/posts/${ postId }/distributed-editing/review-items`
+				);
+
+				return {
+					result: 'review_items_loaded',
+					items: [],
+					pendingReviewItemCount: 1,
+					postPendingReviewItemCount: 1,
+					rawContentIncluded: false,
+					exposesRawContent: false,
+					savesPost: false,
+				};
+			} );
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			dispatch.setupEditor( post, {
+				content: post.content,
+			} );
+			dispatch.setDistributedEditingSessionState( {
+				clientBaseVersion: '33',
+				serverVersion: '33',
+				clientBaseContent: post.content,
+				riskyBlockReviewStatus:
+					DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_REQUIRED,
+				riskyBlockReviewItems: [
+					{
+						id: 'de-rtc-review-stale-local',
+						reviewStatus:
+							DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.PENDING_REVIEW,
+					},
+				],
+				riskyBlockReviewPendingCount: 1,
+				riskyBlockReviewPrePublishPanelRequired: true,
+			} );
+
+			const result =
+				await dispatch.__experimentalOpenDistributedEditingRiskyBlockReview();
+
+			expect( apiFetchCallCount ).toBe( 1 );
+			expect( result ).toMatchObject( {
+				status: 'pre_publish_review_not_required',
+				opensPublishSidebar: false,
+				reviewItemsRefreshResult: {
+					status: 'review_items_refreshed',
+					callsReviewItemsEndpoint: true,
+					pendingReviewItemCount: 0,
+				},
+				savesPost: false,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+			} );
+			expect( select.isPublishSidebarOpened() ).toBe( false );
+			expect(
+				select.getDistributedEditingRiskyBlockReviewState()
+			).toMatchObject( {
+				status: DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.NO_REVIEW_REQUIRED,
+				pendingReviewItemCount: 0,
+				reviewItems: [],
+				prePublishPanelRequired: false,
+			} );
+		} );
+
 		it( 'requests review-approval proof after risky-block review is resolved', async () => {
 			const proposedPostContentHash =
 				'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
@@ -5607,6 +5821,94 @@ describe( 'Post actions', () => {
 			} );
 		} );
 
+		it( 'clears review UI state when the server returns only stale count metadata', async () => {
+			const registry = createRegistryWithStores();
+			const dispatch = registry.dispatch( editorStore );
+			const select = registry.select( editorStore );
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'Stale review item count post',
+				content:
+					'<!-- wp:paragraph --><p>Clean server content.</p><!-- /wp:paragraph -->',
+				status: 'publish',
+			};
+			let apiFetchCallCount = 0;
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				apiFetchCallCount++;
+
+				expect( getMethod( options ) ).toBe( 'GET' );
+				expect( options.path.split( '?' )[ 0 ] ).toBe(
+					`/wp/v2/posts/${ postId }/distributed-editing/review-items`
+				);
+
+				return {
+					result: 'review_items_loaded',
+					items: [],
+					pendingReviewItemCount: 1,
+					postPendingReviewItemCount: 1,
+					rawContentIncluded: false,
+					exposesRawContent: false,
+					savesPost: false,
+				};
+			} );
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			dispatch.setupEditor( post, {
+				content: post.content,
+			} );
+			dispatch.setDistributedEditingSessionState( {
+				clientBaseVersion: '7',
+				serverVersion: '7',
+				clientBaseContent: post.content,
+				riskyBlockReviewStatus:
+					DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_REQUIRED,
+				riskyBlockReviewItemCount: 1,
+				riskyBlockReviewPendingCount: 1,
+				riskyBlockReviewPrePublishPanelRequired: true,
+				hasPendingChanges: false,
+				pendingChangeCount: 0,
+			} );
+
+			const result =
+				await dispatch.__experimentalRefreshDistributedEditingRiskyBlockReviewItems();
+
+			expect( result ).toMatchObject( {
+				status: 'review_items_refreshed',
+				reviewItemsUpdated: true,
+				callsReviewItemsEndpoint: true,
+				pendingReviewItemCount: 0,
+				savesPost: false,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			} );
+			expect( apiFetchCallCount ).toBe( 1 );
+			expect(
+				select.getDistributedEditingRiskyBlockReviewState()
+			).toMatchObject( {
+				status: DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.NO_REVIEW_REQUIRED,
+				pendingReviewItemCount: 0,
+				reviewItemCount: 0,
+				hasPendingReviewItems: false,
+				prePublishPanelRequired: false,
+				reviewItems: [],
+			} );
+			expect(
+				select.getDistributedEditingSavePolicyState()
+			).toMatchObject( {
+				status: DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.UPDATE_READY,
+				clickAction:
+					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_SAVE,
+				blocksNormalSavePost: false,
+			} );
+		} );
+
 		it( 'adopts the safe server copy when a server-backed pending review item has been resolved elsewhere', async () => {
 			const registry = createRegistryWithStores();
 			const dispatch = registry.dispatch( editorStore );
@@ -5855,6 +6157,8 @@ describe( 'Post actions', () => {
 				riskyBlockReviewPrePublishPanelRequired: true,
 				retrySaveStatus:
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
+				retrySavePartialSafeMergeApplied: true,
+				retrySavePartialSafeMergeStatus: 'safe_subset_persisted',
 			} );
 
 			const rejection =
@@ -6843,7 +7147,7 @@ describe( 'Post actions', () => {
 
 		it( 'keeps unsafe block review pending when server sync sees the safe body is current', async () => {
 			const safeServerContent =
-				'<!-- wp:paragraph --><p>Safe author edit.</p><!-- /wp:paragraph --><!-- wp:html -->\n<div>Original HTML.</div>\n<!-- /wp:html -->';
+				'<!-- wp:paragraph --><p>Safe author edit.</p><!-- /wp:paragraph --><!-- wp:html --><div>Original HTML.</div><!-- /wp:html -->';
 			const post = {
 				id: postId,
 				type: 'post',
@@ -11927,9 +12231,9 @@ describe( 'Post actions', () => {
 			const baseContent =
 				'<!-- wp:paragraph --><p>Safe base.</p><!-- /wp:paragraph --><!-- wp:html -->\n<div>Original HTML.</div>\n<!-- /wp:html -->';
 			const authorUnsafeContent =
-				'<!-- wp:paragraph --><p>Safe author edit.</p><!-- /wp:paragraph --><!-- wp:html -->\n<script>alert("unsafe")</script>\n<!-- /wp:html -->';
+				'<!-- wp:paragraph --><p>Safe author edit.</p><!-- /wp:paragraph --><!-- wp:html --><script>alert("unsafe")</script><!-- /wp:html -->';
 			const safeServerContent =
-				'<!-- wp:paragraph --><p>Safe author edit.</p><!-- /wp:paragraph --><!-- wp:html -->\n<div>Original HTML.</div>\n<!-- /wp:html -->';
+				'<!-- wp:paragraph --><p>Safe author edit.</p><!-- /wp:paragraph --><!-- wp:html --><div>Original HTML.</div><!-- /wp:html -->';
 			const safeServerRawContent = `<!-- wp:sync-meta {"format":"automerge"} -->\n<script type="application/json" data-wp-sync-meta="distributed-editing" data-sync-meta-format="automerge">{"schema":"de-rtc-automerge-v1","version":"302"}</script>\n<!-- /wp:sync-meta -->${ safeServerContent }`;
 			const post = {
 				id: postId,
@@ -12038,6 +12342,8 @@ describe( 'Post actions', () => {
 				riskyBlockReviewExposesRawContent: false,
 				retrySaveStatus:
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
+				retrySavePartialSafeMergeApplied: true,
+				retrySavePartialSafeMergeStatus: 'safe_subset_persisted',
 			} );
 			expect( JSON.stringify( sessionState ) ).not.toContain(
 				'<script>alert("unsafe")</script>'

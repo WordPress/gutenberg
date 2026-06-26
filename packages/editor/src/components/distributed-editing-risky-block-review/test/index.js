@@ -193,14 +193,31 @@ afterEach( () => {
 } );
 
 describe( 'shouldRenderDistributedEditingRiskyBlockReview', () => {
-	it( 'requires review items and a review status', () => {
+	it( 'requires visible pending review items and a review status', () => {
 		expect(
 			shouldRenderDistributedEditingRiskyBlockReview( REVIEW_STATE )
 		).toBe( true );
 		expect(
 			shouldRenderDistributedEditingRiskyBlockReview( {
 				...REVIEW_STATE,
-				reviewItemCount: 0,
+				reviewItems: [],
+				reviewItemCount: 1,
+				pendingReviewItemCount: 1,
+				hasPendingReviewItems: true,
+			} )
+		).toBe( false );
+		expect(
+			shouldRenderDistributedEditingRiskyBlockReview( {
+				...REVIEW_STATE,
+				reviewItems: [
+					{
+						...RISKY_REVIEW_ITEM,
+						reviewStatus:
+							DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.REJECTED,
+					},
+				],
+				pendingReviewItemCount: 0,
+				hasPendingReviewItems: false,
 			} )
 		).toBe( false );
 		expect(
@@ -798,6 +815,28 @@ describe( 'DistributedEditingRiskyBlockReviewStatusChrome', () => {
 		).toHaveBeenCalledTimes( 1 );
 		expect( actions.savePost ).not.toHaveBeenCalled();
 	} );
+
+	it( 'does not render when stale review metadata has no actionable row', () => {
+		setupDispatch();
+		setupSelect( {
+			reviewState: {
+				...REVIEW_STATE,
+				reviewItems: [],
+				reviewItemCount: 1,
+				pendingReviewItemCount: 1,
+				hasPendingReviewItems: true,
+			},
+		} );
+
+		render( <DistributedEditingRiskyBlockReviewStatusChrome /> );
+
+		expect(
+			screen.queryByText( 'HTML review required' )
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'button', { name: 'Review HTML' } )
+		).not.toBeInTheDocument();
+	} );
 } );
 
 describe( 'DistributedEditingRiskyBlockReviewListViewMarker', () => {
@@ -859,8 +898,9 @@ describe( 'DistributedEditingRiskyBlockReviewPrePublishPanel', () => {
 
 		expect( screen.getByText( 'HTML review' ) ).toBeVisible();
 		expect(
-			screen.getByText( '1 highlighted block needs HTML review.' )
-		).toBeVisible();
+			screen.getAllByText( '1 highlighted block needs HTML review.' )
+				.length
+		).toBeGreaterThanOrEqual( 1 );
 		expect(
 			screen.getByText(
 				'This highlighted block needs HTML review before it can be included.'
@@ -872,10 +912,14 @@ describe( 'DistributedEditingRiskyBlockReviewPrePublishPanel', () => {
 			)
 		).toBeVisible();
 		expect(
-			screen.getByText(
+			screen.getAllByText( '1 highlighted block needs HTML review.' )
+				.length
+		).toBeGreaterThanOrEqual( 2 );
+		expect(
+			screen.queryByText(
 				'Review is required before WordPress can update the post.'
 			)
-		).toBeVisible();
+		).not.toBeInTheDocument();
 		expect(
 			screen.getByText(
 				'WordPress cannot update the post until risky changes are approved or removed.'
@@ -966,6 +1010,33 @@ describe( 'DistributedEditingRiskyBlockReviewPrePublishPanel', () => {
 			decision: 'rejected',
 		} );
 		expect( actions.savePost ).not.toHaveBeenCalled();
+	} );
+
+	it( 'does not mount an empty pre-publish panel from stale review metadata', () => {
+		setupDispatch();
+		setupSelect( {
+			reviewState: {
+				...REVIEW_STATE,
+				reviewItems: [],
+				reviewItemCount: 1,
+				pendingReviewItemCount: 1,
+				hasPendingReviewItems: true,
+			},
+		} );
+
+		render(
+			<SlotFillProvider>
+				<DistributedEditingRiskyBlockReviewPrePublishPanel />
+				<PluginPrePublishPanel.Slot />
+			</SlotFillProvider>
+		);
+
+		expect( screen.queryByText( 'HTML review' ) ).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'region', {
+				name: 'HTML review state',
+			} )
+		).not.toBeInTheDocument();
 	} );
 } );
 
@@ -1086,6 +1157,38 @@ describe( 'DistributedEditingRiskyBlockReviewPanel', () => {
 				name: 'Reject HTML change for Custom HTML',
 			} )
 		).toBeVisible();
+	} );
+
+	it( 'renders proposal timeline and document movement for pending items', () => {
+		render(
+			<DistributedEditingRiskyBlockReviewPanel
+				reviewState={ {
+					...REVIEW_STATE,
+					currentServerVersion: '33',
+					reviewItems: [
+						{
+							...RISKY_REVIEW_ITEM,
+							baseSyncVersion: '32',
+							serverSyncVersion: '32',
+							createdAtGmt: '0000-00-00T00:00:00',
+							updatedAtGmt: '2026-06-25T16:32:00',
+							expiresAtGmt: '2099-07-02T16:32:00',
+							proposerDisplayName: 'author',
+						},
+					],
+				} }
+				savePolicy={ SAVE_POLICY }
+			/>
+		);
+
+		expect(
+			screen.getByText( 'Proposal version 32; current version 33.' )
+		).toBeVisible();
+		expect(
+			screen.getByText( '1 saved change since this was proposed.' )
+		).toBeVisible();
+		expect( screen.getByText( /Proposed by author/ ) ).toBeVisible();
+		expect( screen.getByText( /Expires in/ ) ).toBeVisible();
 	} );
 
 	it( 'collapses the local review item when a matching server item exists', () => {

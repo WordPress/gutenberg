@@ -1290,6 +1290,8 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	retrySaveRevisionCreated: false,
 	retrySaveCreatedRevisionIds: [],
 	retrySaveConfirmedMergedEdits: false,
+	retrySavePartialSafeMergeApplied: false,
+	retrySavePartialSafeMergeStatus: null,
 	retrySaveServerMerged: false,
 	retrySaveServerMergeApplied: false,
 	retrySaveServerMergeStatus: null,
@@ -1792,6 +1794,7 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 			DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT &&
 		sessionState.retrySaveStatus ===
 			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED &&
+		Boolean( sessionState.retrySavePartialSafeMergeApplied ) &&
 		Boolean( sessionState.refetchedServerState ) &&
 		! Boolean( sessionState.requiresServerStateRefetch );
 	const hasExplicitAwaitingServerConfirmation =
@@ -2259,6 +2262,12 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		),
 		retrySaveConfirmedMergedEdits: Boolean(
 			sessionState.retrySaveConfirmedMergedEdits
+		),
+		retrySavePartialSafeMergeApplied: Boolean(
+			sessionState.retrySavePartialSafeMergeApplied
+		),
+		retrySavePartialSafeMergeStatus: normalizeNullableString(
+			sessionState.retrySavePartialSafeMergeStatus
 		),
 		retrySaveServerMerged: Boolean( sessionState.retrySaveServerMerged ),
 		retrySaveServerMergeApplied: Boolean(
@@ -11241,7 +11250,9 @@ export function getDistributedEditingRiskyBlockReviewStateForSessionState(
 		requiresServerStateRefetch:
 			normalized.riskyBlockReviewRequiresServerStateRefetch,
 		reviewedServerVersion: normalized.riskyBlockReviewReviewedServerVersion,
-		currentServerVersion: normalized.riskyBlockReviewCurrentServerVersion,
+		currentServerVersion:
+			normalized.riskyBlockReviewCurrentServerVersion ||
+			normalized.serverVersion,
 		rawContentIncluded: normalized.riskyBlockReviewRawContentIncluded,
 		exposesRawContent: normalized.riskyBlockReviewExposesRawContent,
 		dispatchesNotice: normalized.riskyBlockReviewDispatchesNotice,
@@ -11263,6 +11274,7 @@ function isDistributedEditingPartialSafePendingReviewState(
 			DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT &&
 			normalized.retrySaveStatus ===
 				DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED &&
+			normalized.retrySavePartialSafeMergeApplied &&
 			normalized.refetchedServerState &&
 			! normalized.requiresServerStateRefetch &&
 			reviewState.hasPendingReviewItems
@@ -14406,6 +14418,8 @@ export function getDistributedEditingSessionStateForRetrySaveRequest(
 		retrySaveClaimsSaved: false,
 		retrySaveRevisionCreated: false,
 		retrySaveCreatedRevisionIds: [],
+		retrySavePartialSafeMergeApplied: false,
+		retrySavePartialSafeMergeStatus: null,
 		...normalizeRetrySaveReviewMetadataFields(),
 		...reviewApprovalProofFields,
 		...( hasAcceptedReviewApprovalProof
@@ -14636,12 +14650,22 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 			responseData.partial_safe_merge_applied
 		)
 	);
+	const partialSafeMergeStatus = normalizeNullableString(
+		getFirstDefined(
+			responseOrError.partialSafeMergeStatus,
+			responseOrError.partial_safe_merge_status,
+			responseData.partialSafeMergeStatus,
+			responseData.partial_safe_merge_status
+		)
+	);
 	const partialSafeMergeContent = partialSafeMergeApplied
 		? responsePostContent
 		: null;
 	const partialSafeMergeFields =
 		partialSafeMergeApplied && typeof partialSafeMergeContent === 'string'
 			? {
+					retrySavePartialSafeMergeApplied: true,
+					retrySavePartialSafeMergeStatus: partialSafeMergeStatus,
 					clientBaseVersion: serverVersion,
 					clientBaseContent: partialSafeMergeContent,
 					clientBaseSyncMeta:
@@ -14714,6 +14738,8 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 			retrySaveServerVersion: serverVersion,
 			retrySavePreviousServerVersion: previousServerVersion,
 			retrySaveConfirmedMergedEdits,
+			retrySavePartialSafeMergeApplied: false,
+			retrySavePartialSafeMergeStatus: null,
 			...retrySaveFlags,
 			...normalizeRetrySaveReviewMetadataFields(),
 			...normalizeRetrySaveReviewApprovalProofFields(),
@@ -15467,6 +15493,10 @@ function getDistributedEditingRetrySaveDescriptorFields( normalized ) {
 		retrySaveRevisionCreated: normalized.retrySaveRevisionCreated,
 		retrySaveCreatedRevisionIds: normalized.retrySaveCreatedRevisionIds,
 		retrySaveConfirmedMergedEdits: normalized.retrySaveConfirmedMergedEdits,
+		retrySavePartialSafeMergeApplied:
+			normalized.retrySavePartialSafeMergeApplied,
+		retrySavePartialSafeMergeStatus:
+			normalized.retrySavePartialSafeMergeStatus,
 		retrySaveFreshReviewConsumed,
 		retrySaveFreshReviewRetrySaveAccepted,
 		retrySaveFreshReviewRetrySaveRejected,
@@ -15878,6 +15908,10 @@ function getDistributedEditingRejectedRetrySaveState( {
 		retrySaveServerVersion: serverVersion,
 		retrySavePreviousServerVersion: previousServerVersion,
 		...retrySaveFlags,
+		retrySavePartialSafeMergeApplied: partialSafeMergeAcceptedServerState,
+		retrySavePartialSafeMergeStatus: partialSafeMergeAcceptedServerState
+			? partialSafeMergeFields.retrySavePartialSafeMergeStatus
+			: null,
 		...retrySaveReviewMetadata,
 		...retrySaveReviewApprovalProofFields,
 		...retrySaveFreshReviewConsumeValidationFields,
@@ -17282,22 +17316,44 @@ function normalizeRiskyBlockReviewMetadataFields( sessionState = {} ) {
 		reviewItems,
 		DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.REJECTED
 	);
-	const riskyBlockReviewItemCount = normalizeCountWithFallback(
-		sessionState.riskyBlockReviewItemCount,
-		reviewItems.length
-	);
-	const riskyBlockReviewPendingCount = normalizeCountWithFallback(
-		sessionState.riskyBlockReviewPendingCount,
-		calculatedPendingCount
-	);
-	const riskyBlockReviewApprovedCount = normalizeCountWithFallback(
-		sessionState.riskyBlockReviewApprovedCount,
-		calculatedApprovedCount
-	);
-	const riskyBlockReviewRejectedCount = normalizeCountWithFallback(
-		sessionState.riskyBlockReviewRejectedCount,
-		calculatedRejectedCount
-	);
+	const hasReviewItems = reviewItems.length > 0;
+	const hasPendingReviewItemsInList = calculatedPendingCount > 0;
+	const riskyBlockReviewItemCount = hasReviewItems
+		? Math.max(
+				normalizeCountWithFallback(
+					sessionState.riskyBlockReviewItemCount,
+					reviewItems.length
+				),
+				reviewItems.length
+		  )
+		: 0;
+	const riskyBlockReviewPendingCount = hasPendingReviewItemsInList
+		? Math.max(
+				normalizeCountWithFallback(
+					sessionState.riskyBlockReviewPendingCount,
+					calculatedPendingCount
+				),
+				calculatedPendingCount
+		  )
+		: 0;
+	const riskyBlockReviewApprovedCount = hasReviewItems
+		? Math.max(
+				normalizeCountWithFallback(
+					sessionState.riskyBlockReviewApprovedCount,
+					calculatedApprovedCount
+				),
+				calculatedApprovedCount
+		  )
+		: 0;
+	const riskyBlockReviewRejectedCount = hasReviewItems
+		? Math.max(
+				normalizeCountWithFallback(
+					sessionState.riskyBlockReviewRejectedCount,
+					calculatedRejectedCount
+				),
+				calculatedRejectedCount
+		  )
+		: 0;
 	const riskyBlockReviewHasPendingItems = riskyBlockReviewPendingCount > 0;
 	const requestedStatus = VALID_RISKY_BLOCK_REVIEW_STATUSES.has(
 		sessionState.riskyBlockReviewStatus
@@ -17307,18 +17363,23 @@ function normalizeRiskyBlockReviewMetadataFields( sessionState = {} ) {
 	let riskyBlockReviewStatus = requestedStatus;
 
 	if (
-		requestedStatus === DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.NONE
+		! riskyBlockReviewHasPendingItems &&
+		requestedStatus !==
+			DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REJECTED_RAW_CONTENT
 	) {
-		if ( riskyBlockReviewHasPendingItems ) {
-			riskyBlockReviewStatus =
-				DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_REQUIRED;
-		} else if (
+		riskyBlockReviewStatus =
 			riskyBlockReviewApprovedCount > 0 ||
 			riskyBlockReviewRejectedCount > 0
-		) {
-			riskyBlockReviewStatus =
-				DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_RESOLVED;
-		}
+				? DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_RESOLVED
+				: DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.NO_REVIEW_REQUIRED;
+	} else if (
+		requestedStatus ===
+			DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.NONE ||
+		requestedStatus ===
+			DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.NO_REVIEW_REQUIRED
+	) {
+		riskyBlockReviewStatus =
+			DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_REQUIRED;
 	}
 	const riskyBlockReviewRequiresServerStateRefetch =
 		Boolean( sessionState.riskyBlockReviewRequiresServerStateRefetch ) ||
@@ -17359,11 +17420,19 @@ function normalizeRiskyBlockReviewMetadataFields( sessionState = {} ) {
 		) || riskyBlockReviewSaveClickAction;
 	if (
 		riskyBlockReviewSaveClickAction ===
-			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW &&
-		riskyBlockReviewHasPendingItems
+		DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW
 	) {
+		riskyBlockReviewSaveClickAction = riskyBlockReviewHasPendingItems
+			? DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE
+			: DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_SAVE;
+	}
+	if (
+		! riskyBlockReviewHasPendingItems &&
+		! riskyBlockReviewRequiresServerStateRefetch
+	) {
+		riskyBlockReviewSaveButtonLabel = 'Update';
 		riskyBlockReviewSaveClickAction =
-			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE;
+			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_SAVE;
 	}
 
 	return {
@@ -17475,7 +17544,20 @@ function normalizeRiskyBlockReviewItem( item = {} ) {
 			getFirstDefined( item.authorId, item.author_id )
 		),
 		baseVersion: normalizeNullableString(
-			getFirstDefined( item.baseVersion, item.base_version )
+			getFirstDefined(
+				item.baseVersion,
+				item.base_version,
+				item.baseSyncVersion,
+				item.base_sync_version
+			)
+		),
+		baseSyncVersion: normalizeNullableString(
+			getFirstDefined(
+				item.baseSyncVersion,
+				item.base_sync_version,
+				item.baseVersion,
+				item.base_version
+			)
 		),
 		serverVersion: normalizeNullableString(
 			getFirstDefined(
@@ -17483,6 +17565,14 @@ function normalizeRiskyBlockReviewItem( item = {} ) {
 				item.server_version,
 				item.serverSyncVersion,
 				item.server_sync_version
+			)
+		),
+		serverSyncVersion: normalizeNullableString(
+			getFirstDefined(
+				item.serverSyncVersion,
+				item.server_sync_version,
+				item.serverVersion,
+				item.server_version
 			)
 		),
 		baseContentHash: normalizeNullableString(
@@ -17563,6 +17653,18 @@ function normalizeRiskyBlockReviewItem( item = {} ) {
 		),
 		rejectionReason: normalizeNullableString(
 			getFirstDefined( item.rejectionReason, item.rejection_reason )
+		),
+		createdAtGmt: normalizeNullableString(
+			getFirstDefined( item.createdAtGmt, item.created_at_gmt )
+		),
+		updatedAtGmt: normalizeNullableString(
+			getFirstDefined( item.updatedAtGmt, item.updated_at_gmt )
+		),
+		expiresAtGmt: normalizeNullableString(
+			getFirstDefined( item.expiresAtGmt, item.expires_at_gmt )
+		),
+		resolvedAtGmt: normalizeNullableString(
+			getFirstDefined( item.resolvedAtGmt, item.resolved_at_gmt )
 		),
 		rawContentIncluded: false,
 		exposesRawContent: false,
