@@ -90,6 +90,10 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 		 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
 		 */
 		public function get_items( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis
+			global $current_screen;
+
+			$this->load_admin_environment();
+
 			// Simplified context handling: mobile vs default.
 			// Only 'mobile' context is special; everything else uses the default editor context.
 			$context_param       = $request->get_param( 'context' );
@@ -108,8 +112,18 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 			wp_styles();
 			wp_scripts();
 
+			$previous_screen = $current_screen ?? null;
+			set_current_screen( 'post' );
+			$block_editor_screen = get_current_screen();
+			if ( $block_editor_screen ) {
+				$block_editor_screen->is_block_editor( true );
+			}
+
 			$editor_context = new WP_Block_Editor_Context( array( 'name' => $editor_context_name ) );
 			$settings       = get_block_editor_settings( array(), $editor_context );
+
+			// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+			$current_screen = $previous_screen;
 
 			if ( 'mobile' === $context_param ) {
 				remove_filter( 'block_editor_settings_all', 'gutenberg_get_block_editor_settings_mobile', PHP_INT_MAX );
@@ -358,6 +372,8 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 			if ( $block_editor_screen ) {
 				$block_editor_screen->is_block_editor( true );
 			}
+			wp_styles();
+			wp_scripts();
 
 			// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 			$hook_suffix = 'block-editor-assets';
