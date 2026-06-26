@@ -14,8 +14,11 @@ type ViewProps< T extends React.ElementType > = WordPressComponentProps<
 	T
 > & {
 	/**
-	 * Legacy Emotion prop accepted by `View`. It is intentionally consumed here
-	 * so it does not leak to the rendered element after Emotion is removed.
+	 * Legacy Emotion prop accepted by `View` so it does not leak to the
+	 * rendered element.
+	 *
+	 * @deprecated This prop no longer has any effect.
+	 * @ignore
 	 */
 	css?: unknown;
 };
@@ -24,6 +27,7 @@ function UnforwardedView< T extends React.ElementType = 'div' >(
 	{ css, ...restProps }: ViewProps< T >,
 	ref: React.ForwardedRef< any >
 ) {
+	void css;
 	return <PolymorphicElement ref={ ref } { ...restProps } />;
 }
 

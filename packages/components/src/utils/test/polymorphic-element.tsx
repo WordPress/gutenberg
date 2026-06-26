@@ -1,13 +1,7 @@
-/**
- * External dependencies
- */
 import styled from '@emotion/styled';
 import { render, screen } from '@testing-library/react';
 import { renderToString } from 'react-dom/server';
 
-/**
- * WordPress dependencies
- */
 import { createElement, createRef } from '@wordpress/element';
 
 /**
