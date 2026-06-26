@@ -67,6 +67,8 @@ function UnforwardedRangeControl(
 	const {
 		// Prevent passing legacy props to internal component.
 		__nextHasNoMarginBottom: _,
+		__next40pxDefaultSize: _next40pxDefaultSize,
+		__shouldNotWarnDeprecated36pxSize: _shouldNotWarnDeprecated36pxSize,
 		afterIcon,
 		allowReset = false,
 		beforeIcon,
@@ -90,14 +92,12 @@ function UnforwardedRangeControl(
 		railColor,
 		renderTooltipContent = ( v ) => v,
 		resetFallbackValue,
-		__next40pxDefaultSize: _next40pxDefaultSize,
 		shiftStep = 10,
 		showTooltip: showTooltipProp,
 		step = 1,
 		trackColor,
 		value: valueProp,
 		withInputField = true,
-		__shouldNotWarnDeprecated36pxSize: _shouldNotWarnDeprecated36pxSize,
 		...otherProps
 	} = props;
 
