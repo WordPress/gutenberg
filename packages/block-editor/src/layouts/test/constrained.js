@@ -92,6 +92,14 @@ describe( 'ConstrainedLayoutInspectorControls', () => {
 				onChange,
 			} );
 
+			await user.click(
+				screen.getByRole( 'button', { name: /Layout options/i } )
+			);
+			await user.click(
+				screen.getByRole( 'menuitemcheckbox', {
+					name: `Show ${ label }`,
+				} )
+			);
 			await user.clear(
 				screen.getByRole( 'spinbutton', { name: label } )
 			);
