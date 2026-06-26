@@ -489,18 +489,10 @@ export function setupSeekControlAccessibility(
 		}
 
 		seekInput.focus();
-		if ( event.target === seekInput ) {
-			shouldRedirectContainerFocus = false;
-			return;
-		}
 
 		const seconds = getPointedSeconds( event );
 		if ( seconds !== undefined ) {
-			playheadTime = seconds;
-			updateSeekControl( {
-				syncPlayhead: false,
-				currentTimeOverride: playheadTime,
-			} );
+			seekTo( seconds );
 		}
 		shouldRedirectContainerFocus = false;
 	};

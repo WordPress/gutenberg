@@ -861,6 +861,38 @@ describe( 'Waveform utilities', () => {
 			expect( playhead ).toHaveStyle( { left: '50%' } );
 			expect( playhead ).toHaveTextContent( '1:30' );
 			expect( getSeekInput( seekControl ).value ).toBe( '90' );
+			expect( instance.seekTo ).toHaveBeenCalledWith( 90 );
+		} );
+
+		it( 'seeks when clicking the transparent range input while stopped', () => {
+			const { container, instance, seekControl } =
+				createSeekControlFixture( { duration: 180, currentTime: 0 } );
+			seekControl.getBoundingClientRect = () => ( {
+				left: 0,
+				width: 200,
+				top: 0,
+				right: 200,
+				bottom: 100,
+				height: 100,
+			} );
+
+			setupSeekControlAccessibility( container, instance );
+			const seekInput = getSeekInput( seekControl );
+
+			seekInput.dispatchEvent(
+				new window.MouseEvent( 'click', {
+					bubbles: true,
+					clientX: 100,
+				} )
+			);
+
+			const playhead = seekControl.querySelector(
+				'.waveform-seek-playhead'
+			);
+			expect( instance.seekTo ).toHaveBeenCalledWith( 90 );
+			expect( seekInput.value ).toBe( '90' );
+			expect( playhead ).toHaveStyle( { left: '50%' } );
+			expect( playhead ).toHaveTextContent( '1:30' );
 		} );
 
 		it( 'shows a hover indicator and timestamp at the pointed position', () => {

@@ -21,14 +21,13 @@ $waveform-player-height: 100px;
 		position: relative;
 		cursor: default;
 
-		// The keyboard playhead (vertical bar + timestamp) is the focus
-		// indicator: it appears only on keyboard focus, so no separate outline
-		// is needed.
-		.waveform-seek-control:focus-visible {
+		// The playhead (vertical bar + timestamp) is the seek focus indicator,
+		// so no separate outline is needed.
+		.waveform-seek-control:focus {
 			outline: none;
 		}
 
-		.waveform-seek-control:focus-visible ~ .waveform-seek-playhead {
+		.waveform-seek-control:focus ~ .waveform-seek-playhead {
 			display: block;
 		}
 
