@@ -172,16 +172,6 @@ async function build() {
 			env: { ...process.env, NODE_ENV: 'production' },
 		} );
 
-		if ( ! skipTypes ) {
-			console.log( '\n✅ Validating package contents...' );
-			await exec( 'npm', [
-				'run',
-				'validate:package-contents',
-				'--workspace',
-				'@wordpress/theme',
-			] );
-		}
-
 		console.log( '\n📦 Building blocks manifests...' );
 		const blocksDirs = [
 			{

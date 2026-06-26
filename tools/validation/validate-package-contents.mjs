@@ -1,26 +1,28 @@
+#!/usr/bin/env node
+
 import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
-import { dirname, join, posix, resolve } from 'node:path';
+import { join, posix, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
-import { fileURLToPath } from 'node:url';
 
-const packageRoot = resolve(
-	dirname( fileURLToPath( import.meta.url ) ),
-	'../..'
-);
+const [ packagePath ] = process.argv.slice( 2 );
+
+if ( ! packagePath ) {
+	console.error(
+		'Usage: node tools/validation/validate-package-contents.mjs <package-directory>'
+	);
+	process.exit( 1 );
+}
+
+const packageRoot = resolve( process.cwd(), packagePath );
 
 const disallowedPathPatterns = [
 	/(^|\/)(__fixtures__|__snapshots__|__tests__|fixtures|stories|test|tests)(\/|$)/,
 	/(^|\/)[^/]+\.(spec|test)\.[^/]+$/,
 	/(^|\/)[^/]+\.stories?\.[^/]+$/,
-	/^build-types\/color-ramps\//,
-	/^build-types\/context\.d\.ts(\.map)?$/,
-	/^build-types\/postcss-plugins\//,
-	/^build-types\/use-theme-provider-styles\.d\.ts(\.map)?$/,
-	/^src\/style\.module\.css$/,
 ];
 
-/** @typedef {{ exports?: unknown, main?: string, module?: string, types?: string }} PackageJson */
+/** @typedef {{ bin?: string | Record<string, string>, exports?: unknown, main?: string, module?: string, name?: string, types?: string }} PackageJson */
 
 /** @type {PackageJson} */
 const packageJson = JSON.parse(
@@ -62,11 +64,31 @@ function getExportTargetPaths( value ) {
 		return [ normalizePackagePath( value ) ];
 	}
 
-	if ( ! value || typeof value !== 'object' || Array.isArray( value ) ) {
+	if ( Array.isArray( value ) ) {
+		return value.flatMap( getExportTargetPaths );
+	}
+
+	if ( ! value || typeof value !== 'object' ) {
 		return [];
 	}
 
 	return Object.values( value ).flatMap( getExportTargetPaths );
+}
+
+/**
+ * @param {PackageJson['bin']} bin Package bin metadata.
+ * @return {string[]} Bin target paths.
+ */
+function getBinTargetPaths( bin ) {
+	if ( typeof bin === 'string' ) {
+		return [ normalizePackagePath( bin ) ];
+	}
+
+	if ( ! bin || typeof bin !== 'object' ) {
+		return [];
+	}
+
+	return Object.values( bin ).map( normalizePackagePath );
 }
 
 const packageTargetPaths = [
@@ -75,21 +97,32 @@ const packageTargetPaths = [
 		? [ normalizePackagePath( packageJson.module ) ]
 		: [] ),
 	...getTypePaths( packageJson.types ),
+	...getBinTargetPaths( packageJson.bin ),
 	...getExportTargetPaths( packageJson.exports ),
 ];
 
 const env = {
 	...process.env,
 	npm_config_cache:
+		process.env.WORDPRESS_PACKAGE_NPM_CACHE ??
 		process.env.WORDPRESS_THEME_NPM_CACHE ??
-		join( tmpdir(), 'wordpress-theme-npm-cache' ),
+		join( tmpdir(), 'wordpress-package-npm-cache' ),
 };
-const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 
-const packResult = spawnSync( npmCommand, [ 'pack', '--dry-run', '--json' ], {
+const npmExecPath = process.env.npm_execpath;
+const packCommand = npmExecPath ? process.execPath : 'npm';
+const packArgs = [
+	...( npmExecPath ? [ npmExecPath ] : [] ),
+	'pack',
+	'--dry-run',
+	'--json',
+];
+
+const packResult = spawnSync( packCommand, packArgs, {
 	cwd: packageRoot,
 	encoding: 'utf8',
 	env,
+	shell: ! npmExecPath && process.platform === 'win32',
 } );
 
 if ( packResult.error ) {
@@ -146,5 +179,7 @@ if (
 }
 
 console.log(
-	`Validated ${ packedPaths.length } packed files for @wordpress/theme.`
+	`Validated ${ packedPaths.length } packed files for ${
+		packageJson.name ?? packageRoot
+	}.`
 );

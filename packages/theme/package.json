@@ -28,9 +28,12 @@
 		"build-types/index.d.ts.map",
 		"build-types/prebuilt/js/design-tokens.d.mts",
 		"build-types/prebuilt/js/design-tokens.d.mts.map",
-		"build-types/prebuilt/ts/token-types.d.ts",
-		"build-types/prebuilt/ts/token-types.d.ts.map",
-		"build-types/stylelint-plugins",
+		"build-types/stylelint-plugins/no-setting-wpds-custom-properties.d.mts",
+		"build-types/stylelint-plugins/no-setting-wpds-custom-properties.d.mts.map",
+		"build-types/stylelint-plugins/no-token-fallback-values.d.mts",
+		"build-types/stylelint-plugins/no-token-fallback-values.d.mts.map",
+		"build-types/stylelint-plugins/no-unknown-ds-tokens.d.mts",
+		"build-types/stylelint-plugins/no-unknown-ds-tokens.d.mts.map",
 		"build-types/theme-provider.d.ts",
 		"build-types/theme-provider.d.ts.map",
 		"build-types/types.d.ts",
@@ -155,6 +158,6 @@
 		"build:tokens": "node --import=esbuild-esm-loader/register bin/generate-primitive-tokens/index.ts && node --import=esbuild-esm-loader/register bin/build-design-tokens/index.ts",
 		"build": "npm run build:tokens && npm run build:default-ramps",
 		"postbuild": "prettier --write tokens/color.json tokens/modes src/prebuilt src/color-ramps/lib/default-ramps.ts docs ../base-styles/internal/_wpds-token-fallbacks.scss",
-		"validate:package-contents": "node bin/validate-package-contents/index.mjs"
+		"validate:package-contents": "node ../../tools/validation/validate-package-contents.mjs ."
 	}
 }
