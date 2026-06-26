@@ -24,7 +24,6 @@ export default function TabToolbarControls( { tabsClientId } ) {
 		insertBlock,
 		removeBlock,
 		updateBlockAttributes,
-		selectBlock,
 		__unstableMarkNextChangeAsNotPersistent,
 	} = useDispatch( blockEditorStore );
 
@@ -33,7 +32,6 @@ export default function TabToolbarControls( { tabsClientId } ) {
 		activeTabPanelClientId,
 		tabCount,
 		editorActiveTabIndex,
-		tabListClientId,
 	} = useSelect(
 		( select ) => {
 			if ( ! tabsClientId ) {
@@ -42,7 +40,6 @@ export default function TabToolbarControls( { tabsClientId } ) {
 					activeTabPanelClientId: null,
 					tabCount: 0,
 					editorActiveTabIndex: 0,
-					tabListClientId: null,
 				};
 			}
 			const { getBlocks, getBlockAttributes } =
@@ -56,9 +53,6 @@ export default function TabToolbarControls( { tabsClientId } ) {
 			const tabPanels = innerBlocks.find(
 				( block ) => block.name === 'core/tab-panels'
 			);
-			const tabList = innerBlocks.find(
-				( block ) => block.name === 'core/tab-list'
-			);
 			const tabPanelBlocks = tabPanels?.innerBlocks || [];
 			const activeTabPanel = tabPanelBlocks[ activeIndex ];
 
@@ -67,7 +61,6 @@ export default function TabToolbarControls( { tabsClientId } ) {
 				activeTabPanelClientId: activeTabPanel?.clientId || null,
 				tabCount: tabPanelBlocks.length,
 				editorActiveTabIndex: activeIndex,
-				tabListClientId: tabList?.clientId || null,
 			};
 		},
 		[ tabsClientId ]
@@ -78,10 +71,14 @@ export default function TabToolbarControls( { tabsClientId } ) {
 			return;
 		}
 
-		const newTabPanelBlock = createBlock( 'core/tab-panel', {
-			label: __( 'Tab' ),
-		} );
-		insertBlock( newTabPanelBlock, undefined, tabPanelsClientId, false );
+		insertBlock(
+			createBlock( 'core/tab-panel', {
+				label: __( 'Tab' ),
+			} ),
+			undefined,
+			tabPanelsClientId,
+			false
+		);
 
 		// Switch editor active tab to the new tab.
 		const newIndex = tabCount;
@@ -89,11 +86,6 @@ export default function TabToolbarControls( { tabsClientId } ) {
 		updateBlockAttributes( tabsClientId, {
 			editorActiveTabIndex: newIndex,
 		} );
-
-		// Select the tab-list block so focus stays in the menu area.
-		if ( tabListClientId ) {
-			selectBlock( tabListClientId );
-		}
 	};
 
 	const removeTab = () => {
@@ -107,18 +99,12 @@ export default function TabToolbarControls( { tabsClientId } ) {
 				? tabCount - 2
 				: editorActiveTabIndex;
 
+		// Switch editor to next active tab and remove the current one.
 		__unstableMarkNextChangeAsNotPersistent();
 		updateBlockAttributes( tabsClientId, {
 			editorActiveTabIndex: newActiveIndex,
 		} );
-
-		// Remove the tab panel.
 		removeBlock( activeTabPanelClientId, false );
-
-		// Select the tab-list so focus moves to the new active tab button.
-		if ( tabListClientId ) {
-			selectBlock( tabListClientId );
-		}
 	};
 
 	const isRemoveDisabled = tabCount <= 1 || ! activeTabPanelClientId;
