@@ -876,12 +876,31 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			$sub_size_data['file'] = wp_basename( $path );
 		} elseif ( 'scaled' === $image_size ) {
 			// Record the current attached file as the original.
-			$current_file                    = get_attached_file( $attachment_id, true );
+			$current_file = get_attached_file( $attachment_id, true );
+
+			if ( ! $current_file ) {
+				return new WP_Error(
+					'rest_sideload_no_attached_file',
+					__( 'Unable to retrieve the attached file for this attachment.', 'gutenberg' ),
+					array( 'status' => 404 )
+				);
+			}
+
 			$sub_size_data['original_image'] = wp_basename( $current_file );
 
 			// Update the attached file to point to the scaled version.
 			// This writes to _wp_attached_file meta, not _wp_attachment_metadata.
-			update_attached_file( $attachment_id, $path );
+			// Guard against a failed update so a stale original is not recorded.
+			if (
+				get_attached_file( $attachment_id, true ) !== $path &&
+				! update_attached_file( $attachment_id, $path )
+			) {
+				return new WP_Error(
+					'rest_sideload_update_attached_file_failed',
+					__( 'Unable to update the attached file for this attachment.', 'gutenberg' ),
+					array( 'status' => 500 )
+				);
+			}
 
 			$sub_size_data['width']    = $size[0];
 			$sub_size_data['height']   = $size[1];
