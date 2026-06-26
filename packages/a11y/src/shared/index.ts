@@ -4,8 +4,6 @@
 import filterMessage from './filter-message';
 import { enqueuePolite } from './queue';
 
-const CLEAR_FILL_DELAY = 100;
-
 /**
  * Allows you to easily announce dynamic interface updates to screen readers using ARIA live regions.
  * This module is inspired by the `speak` function in `wp-a11y.js`.
@@ -32,37 +30,22 @@ export function speak(
 
 	if ( ariaLive === 'assertive' ) {
 		/*
-		 * Clear only the assertive container so the polite queue is not
-		 * disturbed. A 100ms gap between the clear and the fill gives
-		 * VoiceOver time to observe the blank state as a distinct DOM
-		 * mutation before new content arrives.
+		 * Assertive announcements are written synchronously so screen readers
+		 * interrupt immediately. The polite queue is deliberately left
+		 * untouched so queued polite messages are not lost.
 		 */
-		const containerAssertive = document.getElementById(
-			'a11y-speak-assertive'
-		);
-		const containerPolite = document.getElementById( 'a11y-speak-polite' );
-		const target = containerAssertive ?? containerPolite;
+		const assertive = document.getElementById( 'a11y-speak-assertive' );
+		const polite = document.getElementById( 'a11y-speak-polite' );
+		const introText = document.getElementById( 'a11y-speak-intro-text' );
+		const dest = assertive ?? polite;
 
-		if ( target ) {
-			target.textContent = '';
+		if ( dest ) {
+			dest.textContent = message;
 		}
 
-		setTimeout( () => {
-			const assertive = document.getElementById( 'a11y-speak-assertive' );
-			const polite = document.getElementById( 'a11y-speak-polite' );
-			const introText = document.getElementById(
-				'a11y-speak-intro-text'
-			);
-			const dest = assertive ?? polite;
-
-			if ( dest ) {
-				dest.textContent = message;
-			}
-
-			if ( introText ) {
-				introText.removeAttribute( 'hidden' );
-			}
-		}, CLEAR_FILL_DELAY );
+		if ( introText ) {
+			introText.removeAttribute( 'hidden' );
+		}
 	} else {
 		/*
 		 * Polite messages are serialised through a queue. The queue owns

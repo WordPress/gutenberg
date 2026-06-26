@@ -57,14 +57,8 @@ describe( 'speak', () => {
 	} );
 
 	describe( 'in assertive mode', () => {
-		it( 'should not fill the live region before the delay elapses', () => {
+		it( 'should immediately fill the assertive live region', () => {
 			speak( 'assertive message', 'assertive' );
-			expect( containerAssertive ).toBeEmptyDOMElement();
-		} );
-
-		it( 'should set the textcontent of the assertive aria-live region after the delay', () => {
-			speak( 'assertive message', 'assertive' );
-			jest.advanceTimersByTime( 100 );
 			expect( containerPolite ).toBeEmptyDOMElement();
 			expect( containerAssertive ).toHaveTextContent(
 				'assertive message'
@@ -123,7 +117,6 @@ describe( 'speak', () => {
 			expect( containerPolite ).toHaveTextContent( 'polite first' );
 
 			speak( 'assertive message', 'assertive' );
-			jest.advanceTimersByTime( 100 );
 			expect( containerAssertive ).toHaveTextContent(
 				'assertive message'
 			);
@@ -131,7 +124,7 @@ describe( 'speak', () => {
 			expect( containerPolite ).toHaveTextContent( 'polite first' );
 
 			// Polite queue continues draining normally.
-			jest.advanceTimersByTime( 400 );
+			jest.advanceTimersByTime( 500 );
 			expect( containerPolite ).toBeEmptyDOMElement();
 			jest.advanceTimersByTime( 100 );
 			expect( containerPolite ).toHaveTextContent( 'polite second' );
