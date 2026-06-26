@@ -448,18 +448,12 @@
 		}
 	}
 
-	/*
-	 * Spotlight mode. Fade out blocks unless they contain a selected block.
-	 * This matches the visual behavior in the canvas when editing patterns.
-	 * See: packages/block-editor/src/components/block-list/content.scss
-	 */
-	&.is-faded-in-spotlight {
+	&[aria-disabled="true"] {
 		opacity: 0.2;
 		@media not ( prefers-reduced-motion ) {
 			transition: opacity 0.1s linear;
 		}
 
-		// Disable hover effects for faded blocks.
 		&:hover {
 			opacity: 0.2;
 		}

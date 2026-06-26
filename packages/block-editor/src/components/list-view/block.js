@@ -131,9 +131,7 @@ function ListViewBlock( {
 		blockName,
 		blockEditingMode,
 		allowRightClickOverrides,
-		isSpotlightActive,
 		editedSection,
-		isWithinEditedSection,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -141,11 +139,8 @@ function ListViewBlock( {
 				getBlockName,
 				getBlockEditingMode: getBlockEditingModeForClientId,
 				getSettings,
-				hasBlockSpotlight,
 				getEditedContentOnlySection,
-				isWithinEditedContentOnlySection,
 			} = unlock( select( blockEditorStore ) );
-			const editedContentOnlySection = getEditedContentOnlySection();
 
 			return {
 				block: getBlock( clientId ),
@@ -153,19 +148,12 @@ function ListViewBlock( {
 				blockEditingMode: getBlockEditingModeForClientId( clientId ),
 				allowRightClickOverrides:
 					getSettings().allowRightClickOverrides,
-				isSpotlightActive: hasBlockSpotlight(),
-				editedSection: editedContentOnlySection,
-				isWithinEditedSection: editedContentOnlySection
-					? isWithinEditedContentOnlySection( clientId )
-					: false,
+				editedSection: getEditedContentOnlySection(),
 			};
 		},
 		[ clientId ]
 	);
 
-	const shouldFadeInSpotlight = editedSection
-		? ! isWithinEditedSection
-		: isSpotlightActive && ! ( isSelected || isBranchSelected );
 	const isDisabled = blockEditingMode === 'disabled';
 
 	const { canRename } = useBlockRename( blockName );
@@ -635,7 +623,6 @@ function ListViewBlock( {
 		'is-displacement-down': displacement === 'down',
 		'is-after-dragged-blocks': isAfterDraggedBlocks,
 		'is-nesting': isNesting,
-		'is-faded-in-spotlight': shouldFadeInSpotlight,
 	} );
 
 	// Only include all selected blocks if the currently clicked on block
