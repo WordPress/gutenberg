@@ -469,7 +469,7 @@ function GridLayoutColumnsAndRowsControl( {
 									columnCount: newColumnCount,
 								} );
 							} }
-							value={ columnCount }
+							value={ columnCount ?? '' }
 							min={ 1 }
 							label={ __( 'Columns' ) }
 							hideLabelFromVision={ ! isManualPlacement }

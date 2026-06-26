@@ -159,16 +159,31 @@ export const getClientIdsTree = createSelector(
 	( state ) => [ state.blocks.order ]
 );
 
-function getEnabledClientIdsTreeUnmemoized( state, rootClientId ) {
+/**
+ * Returns a tree of block objects filtered by a block inclusion callback.
+ * Excluded blocks are replaced by any included descendants.
+ *
+ * @param {Object}   state         Global application state.
+ * @param {?string}  rootClientId  Optional root client ID of block list.
+ * @param {Function} includesBlock Callback that returns whether to include a block.
+ *
+ * @return {Object[]} Tree of block objects with only clientID and innerBlocks set.
+ */
+function getFilteredClientIdsTreeUnmemoized(
+	state,
+	rootClientId,
+	includesBlock
+) {
 	const blockOrder = getBlockOrder( state, rootClientId );
 	const result = [];
 
 	for ( const clientId of blockOrder ) {
-		const innerBlocks = getEnabledClientIdsTreeUnmemoized(
+		const innerBlocks = getFilteredClientIdsTreeUnmemoized(
 			state,
-			clientId
+			clientId,
+			includesBlock
 		);
-		if ( getBlockEditingMode( state, clientId ) !== 'disabled' ) {
+		if ( includesBlock( state, clientId ) ) {
 			result.push( { clientId, innerBlocks } );
 		} else {
 			result.push( ...innerBlocks );
@@ -176,6 +191,100 @@ function getEnabledClientIdsTreeUnmemoized( state, rootClientId ) {
 	}
 
 	return result;
+}
+
+function getEnabledClientIdsTreeUnmemoized( state, rootClientId ) {
+	return getFilteredClientIdsTreeUnmemoized(
+		state,
+		rootClientId,
+		( _state, clientId ) =>
+			getBlockEditingMode( _state, clientId ) !== 'disabled'
+	);
+}
+
+/**
+ * Returns whether the nearest explicit block editing mode in the block's
+ * ancestry is disabled.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId The block client ID.
+ *
+ * @return {boolean} Whether an explicit parent block editing mode disables this
+ *                   block.
+ */
+function hasExplicitDisabledParent( state, clientId ) {
+	let parent = state.blocks.parents.get( clientId );
+
+	while ( parent !== undefined ) {
+		const parentBlockEditingMode =
+			state.blocks.blockEditingModes.get( parent );
+
+		if ( parentBlockEditingMode ) {
+			return parentBlockEditingMode === 'disabled';
+		}
+
+		parent = state.blocks.parents.get( parent );
+	}
+
+	return false;
+}
+
+/**
+ * Returns the block tree displayed by List View.
+ *
+ * @param {Object}  state        Global application state.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {Object[]} Tree of block objects with only clientID and innerBlocks set.
+ */
+function getListViewClientIdsTreeUnmemoized( state, rootClientId ) {
+	return getFilteredClientIdsTreeUnmemoized(
+		state,
+		rootClientId,
+		( _state, clientId ) => {
+			// Non-disabled blocks are always shown in List view.
+			if ( getBlockEditingMode( _state, clientId ) !== 'disabled' ) {
+				return true;
+			}
+
+			const explicitBlockEditingMode =
+				_state.blocks.blockEditingModes.get( clientId );
+			if ( explicitBlockEditingMode ) {
+				return explicitBlockEditingMode !== 'disabled';
+			}
+
+			if ( hasExplicitDisabledParent( _state, clientId ) ) {
+				return false;
+			}
+
+			// When a contentOnly section is being edited, there's some special handling.
+			if ( _state.editedContentOnlySection ) {
+				// Blocks within the edited content only section generally have their block
+				// editing mode flipped from disabled to default for editing, any disabled
+				// blocks can still be excluded.
+				if ( isWithinEditedContentOnlySection( _state, clientId ) ) {
+					return false;
+				}
+
+				// Blocks that are not in another section but are disabled are shown.
+				// These are blocks that would usually be visible.
+				const parentSectionBlock = getParentSectionBlock(
+					_state,
+					clientId
+				);
+				if ( ! parentSectionBlock ) {
+					return true;
+				}
+
+				// If a block is in another section, then it is only visible if its a content block.
+				if ( isContentBlock( getBlockName( _state, clientId ) ) ) {
+					return true;
+				}
+			}
+
+			return false;
+		}
+	);
 }
 
 /**
@@ -192,6 +301,34 @@ export const getEnabledClientIdsTree = createRegistrySelector( () =>
 		state.blocks.order,
 		state.derivedBlockEditingModes,
 		state.blocks.blockEditingModes,
+	] )
+);
+
+/**
+ * Returns the block tree displayed by List View.
+ *
+ * Blocks with a 'disabled' editing mode are usually not included. When a
+ * content-only section is being edited, List View keeps visible outside-section
+ * context blocks in the tree so they can be faded. Blocks that were already
+ * hidden because they are non-content blocks inside another content-only section
+ * remain hidden.
+ *
+ * @param {Object}  state        Global application state.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {Object[]} Tree of block objects with only clientID and innerBlocks set.
+ */
+export const getListViewClientIdsTree = createRegistrySelector( () =>
+	createSelector( getListViewClientIdsTreeUnmemoized, ( state ) => [
+		state.blocks.order,
+		state.derivedBlockEditingModes,
+		state.blocks.blockEditingModes,
+		state.blocks.parents,
+		state.blocks.byClientId,
+		state.blocks.attributes,
+		state.blockListSettings,
+		state.editedContentOnlySection,
+		state.settings,
 	] )
 );
 
@@ -1153,6 +1290,30 @@ const DEFAULT_BLOCK_STYLE_STATE = {
 };
 
 /**
+ * Returns the globally selected viewport style state. When set to a value other
+ * than 'default', block style edits in the inspector apply to that viewport.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string} The selected viewport style state.
+ */
+export function getStyleStateViewport( state ) {
+	return state.styleStateViewport ?? DEFAULT_BLOCK_STYLE_STATE.viewport;
+}
+
+/**
+ * Returns whether Responsive editing is enabled. When enabled, the device
+ * preview also drives which viewport block style edits are applied to.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether Responsive editing is enabled.
+ */
+export function isResponsiveEditing( state ) {
+	return state.isResponsiveEditing;
+}
+
+/**
  * Returns the selected style state for a block's style controls.
  *
  * @param {Object} state    Global application state.
@@ -1160,13 +1321,25 @@ const DEFAULT_BLOCK_STYLE_STATE = {
  *
  * @return {Object} The selected block style state.
  */
-export function getSelectedBlockStyleState( state, clientId ) {
-	if ( state.selectedBlockStyleState?.clientId !== clientId ) {
-		return DEFAULT_BLOCK_STYLE_STATE;
-	}
+export const getSelectedBlockStyleState = createSelector(
+	( state, clientId ) => {
+		const perBlockState =
+			state.selectedBlockStyleState?.clientId === clientId
+				? state.selectedBlockStyleState.value ??
+				  DEFAULT_BLOCK_STYLE_STATE
+				: DEFAULT_BLOCK_STYLE_STATE;
 
-	return state.selectedBlockStyleState.value ?? DEFAULT_BLOCK_STYLE_STATE;
-}
+		return {
+			...perBlockState,
+			// The viewport is tracked globally, so inject it here. This way
+			// consumers receive a single combined state object instead of
+			// merging the global viewport themselves, and selectors derived
+			// from this stay consistent.
+			viewport: getStyleStateViewport( state ),
+		};
+	},
+	( state ) => [ state.styleStateViewport, state.selectedBlockStyleState ]
+);
 
 /**
  * Returns whether a non-default style state is selected for a block.

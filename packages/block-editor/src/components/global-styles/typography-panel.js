@@ -678,7 +678,6 @@ export default function TypographyPanel( {
 					<LetterSpacingControl
 						value={ letterSpacing }
 						onChange={ setLetterSpacing }
-						size="__unstable-large"
 						__unstableInputWidth="auto"
 					/>
 				</ToolsPanelItem>

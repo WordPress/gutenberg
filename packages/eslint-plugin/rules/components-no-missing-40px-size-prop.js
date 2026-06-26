@@ -21,7 +21,6 @@ const COMPONENTS_REQUIRING_40PX = new Set( [
 	'FormTokenField',
 	'IconButton',
 	'InputControl',
-	'LetterSpacingControl',
 	'LineHeightControl',
 	'NumberControl',
 	'Radio',

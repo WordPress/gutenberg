@@ -417,7 +417,6 @@ export function HierarchicalTermSelector( { slug } ) {
 		<Flex direction="column" gap="4">
 			{ showFilter && ! loading && (
 				<SearchControl
-					__next40pxDefaultSize
 					label={ filterLabel }
 					placeholder={ filterLabel }
 					value={ filterValue }

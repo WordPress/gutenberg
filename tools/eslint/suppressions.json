@@ -581,24 +581,6 @@
 			"count": 1
 		}
 	},
-	"packages/boot/src/components/site-hub/index.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		},
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
-	"packages/boot/src/components/site-icon-link/index.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
-	"packages/boot/src/components/site-icon/index.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
 	"packages/boot/src/index.tsx": {
 		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 2

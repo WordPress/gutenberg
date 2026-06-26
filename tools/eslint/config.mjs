@@ -175,7 +175,9 @@ const restrictedSyntax = [
 		'BoxControl',
 		'FocalPointPicker',
 		'FontSizePicker',
+		'LetterSpacingControl',
 		'QueryControls',
+		'SearchControl',
 		'TextControl',
 	].map( ( componentName ) => ( {
 		selector: `JSXElement[openingElement.name.name="${ componentName }"] JSXAttribute[name.name="__next40pxDefaultSize"]`,
@@ -573,12 +575,7 @@ export default dedupePlugins( [
 	// component always receives props and returns a React element, and its
 	// props should be documented through its TypeScript props types.
 	{
-		files: [
-			'**/@(storybook|stories)/**',
-			'packages/components/src/**/*.tsx',
-			'packages/theme/src/**/*.tsx',
-			'packages/ui/src/**/*.tsx',
-		],
+		files: [ '**/@(storybook|stories)/**', '**/*.tsx' ],
 		rules: {
 			'jsdoc/require-param': 'off',
 		},

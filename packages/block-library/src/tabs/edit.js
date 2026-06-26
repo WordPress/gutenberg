@@ -13,7 +13,7 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import Controls from './controls';
+import TabToolbarControls from '../tab-panel/tab-toolbar-controls';
 import useTabListItemsSync from './use-tab-list-items-sync';
 
 const EMPTY_ARRAY = [];
@@ -93,7 +93,7 @@ function Edit( { clientId, attributes } ) {
 	return (
 		<BlockContextProvider value={ contextValue }>
 			<div { ...innerBlockProps }>
-				<Controls clientId={ clientId } />
+				<TabToolbarControls tabsClientId={ clientId } />
 				{ innerBlockProps.children }
 			</div>
 		</BlockContextProvider>
