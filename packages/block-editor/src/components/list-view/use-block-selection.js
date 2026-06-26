@@ -17,7 +17,6 @@ import { getCommonDepthClientIds } from './utils';
 export default function useBlockSelection() {
 	const { clearSelectedBlock, multiSelect, selectBlock } =
 		useDispatch( blockEditorStore );
-
 	const {
 		getBlockName,
 		getBlockParents,
