@@ -3,11 +3,14 @@
  * Server-side kses allowlist for note (block comment) content.
  *
  * The note form ships rich text — bold, italic, link, and code — via the
- * REST API. Regular comment sanitization (`wp_filter_kses`) would strip
- * those tags for users without `unfiltered_html`. This file installs a
- * narrower, note-specific kses allowlist on the `pre_comment_content`
- * filter for the duration of any REST request that targets a note,
- * leaving non-note comments on their existing filter chain.
+ * REST API. The default comment filter chain is wrong for notes in both
+ * directions: `wp_filter_kses` strips the allowed tags for users without
+ * `unfiltered_html`, while users with `unfiltered_html` are not filtered at
+ * all and could store arbitrary HTML. This file installs a narrow,
+ * note-specific kses allowlist on `pre_comment_content` for the duration of
+ * any REST request that targets a note, so note content is held to exactly
+ * the supported tags for every user, leaving non-note comments on their
+ * existing filter chain.
  *
  * @package gutenberg
  * @since   7.1.0
@@ -43,9 +46,11 @@ if ( ! function_exists( 'gutenberg_note_content_pre_filter' ) ) {
 	 * Sanitizes note content through wp_kses with the note allowlist.
 	 *
 	 * Replaces `wp_filter_kses` on `pre_comment_content` while a note is being
-	 * saved. Forces `rel="noopener nofollow"` on outbound links so a hostile
-	 * client cannot use saved notes as a vector for SEO manipulation or
-	 * window.opener-based attacks.
+	 * saved. Applies to every user, including those with `unfiltered_html`, so
+	 * note content is always limited to the small note allowlist. Forces
+	 * `rel="noopener noreferrer nofollow"` on outbound links so a hostile
+	 * client cannot use saved notes as a vector for SEO manipulation,
+	 * referrer leakage, or window.opener-based attacks.
 	 *
 	 * @param string $content Slashed comment content.
 	 * @return string Sanitized, re-slashed content.
@@ -57,11 +62,11 @@ if ( ! function_exists( 'gutenberg_note_content_pre_filter' ) ) {
 		// Normalize link rels via the HTML API.
 		$processor = new WP_HTML_Tag_Processor( $filtered );
 		while ( $processor->next_tag( 'A' ) ) {
-			$processor->set_attribute( 'rel', 'noopener nofollow' );
+			$processor->set_attribute( 'rel', 'noopener noreferrer nofollow' );
 		}
 		$filtered = $processor->get_updated_html();
 
-		return addslashes( $filtered );
+		return wp_slash( $filtered );
 	}
 }
 
@@ -93,14 +98,17 @@ if ( ! function_exists( 'gutenberg_maybe_install_note_kses' ) ) {
 
 		$is_note = ( 'note' === $request->get_param( 'type' ) );
 
-		// On update, the request may omit `type`. Look up the existing comment.
-		if ( ! $is_note ) {
-			$url_params = $request->get_url_params();
-			if ( ! empty( $url_params['id'] ) ) {
-				$existing = get_comment( (int) $url_params['id'] );
-				if ( $existing && 'note' === $existing->comment_type ) {
-					$is_note = true;
-				}
+		/*
+		 * On update the request often omits `type`. Route params are not yet
+		 * populated at `rest_pre_dispatch` (the route is matched during
+		 * dispatch), so `get_url_params()` is empty here. Parse the comment ID
+		 * straight from the route and look up the existing comment's type so
+		 * the note allowlist is installed for updates as well as creates.
+		 */
+		if ( ! $is_note && preg_match( '#^/wp/v2/comments/(\d+)$#', $route, $matches ) ) {
+			$existing = get_comment( (int) $matches[1] );
+			if ( $existing && 'note' === $existing->comment_type ) {
+				$is_note = true;
 			}
 		}
 
