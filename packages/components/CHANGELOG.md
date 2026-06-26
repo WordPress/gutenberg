@@ -1079,7 +1079,7 @@
     -   `ComboboxControl`
     -   `DimensionControl`
     -   `FocalPointPicker`
-    -   `RangeControl` ([#79590](https://github.com/WordPress/gutenberg/pull/79590))
+    -   `RangeControl`
     -   `SearchControl`
     -   `SelectControl`
     -   `TextControl`
