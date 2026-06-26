@@ -67,7 +67,6 @@ export default function TextIndentControl( {
 		return (
 			<UnitControl
 				__next40pxDefaultSize
-				__shouldNotWarnDeprecated36pxSize
 				{ ...otherProps }
 				label={ __( 'Line indent' ) }
 				value={ value }
@@ -88,13 +87,11 @@ export default function TextIndentControl( {
 				<FlexItem isBlock>
 					<UnitControl
 						__next40pxDefaultSize
-						__shouldNotWarnDeprecated36pxSize
 						label={ __( 'Line indent' ) }
 						labelPosition="top"
 						hideLabelFromVision
 						value={ value }
 						onChange={ onChange }
-						size={ otherProps.size }
 						units={ units }
 						__unstableInputWidth={ __unstableInputWidth }
 						min={ 0 }
@@ -105,7 +102,6 @@ export default function TextIndentControl( {
 						<Spacer marginX={ 2 } marginBottom={ 0 }>
 							<RangeControl
 								__next40pxDefaultSize
-								__shouldNotWarnDeprecated36pxSize
 								label={ __( 'Line indent' ) }
 								hideLabelFromVision
 								value={ valueQuantity }

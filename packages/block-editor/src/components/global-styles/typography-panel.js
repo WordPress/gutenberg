@@ -693,7 +693,6 @@ export default function TypographyPanel( {
 					<TextIndentControl
 						value={ textIndent }
 						onChange={ setTextIndentValue }
-						size="__unstable-large"
 						__unstableInputWidth="auto"
 						withSlider
 						hasBottomMargin={ isGlobalStyles }
