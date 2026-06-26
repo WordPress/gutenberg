@@ -262,9 +262,18 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_render_page() {
 
 		#wpwrap {
 			overflow-y: auto;
+			background: #fff;
 		}
 		body {
-			background: #fff;
+			/*
+			 * Match the body background to the boot layout's dark neutral colour.
+			 * macOS elastic scroll bounce reveals the body background behind the
+			 * rounded surfaces, so this prevents a jarring white flash when
+			 * bouncing. Falls back to the equivalent literal value for browsers
+			 * that don't support custom properties.
+			 * See https://github.com/WordPress/gutenberg/issues/78564
+			 */
+			background: var(--wpds-color-foreground-content-neutral, #1e1e1e);
 		}
 
 		/* Reset wp-admin padding */
