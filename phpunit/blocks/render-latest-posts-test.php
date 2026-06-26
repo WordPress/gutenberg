@@ -112,4 +112,50 @@ class Tests_Blocks_RenderLastPosts extends WP_UnitTestCase {
 		$this->assertContains( self::$posts[0]->ID, $last_args[1], 'Ensure that post is in array of post ids that are primed' );
 		$this->assertNotContains( self::$sticky_post->ID, $last_args[1], 'Ensure that sticky post is not in array of post ids that are primed' );
 	}
+
+	/**
+	 * @covers ::render_block_core_latest_posts
+	 */
+	public function test_render_block_core_latest_posts_adds_layout_grid_compatibility_classes() {
+		$attributes = array(
+			'displayFeaturedImage' => false,
+			'postsToShow'          => 5,
+			'orderBy'              => 'date',
+			'order'                => 'DESC',
+			'excerptLength'        => 0,
+			'layout'               => array(
+				'type'               => 'grid',
+				'columnCount'        => 4,
+				'minimumColumnWidth' => '12rem',
+			),
+		);
+
+		$markup = gutenberg_render_block_core_latest_posts( $attributes );
+
+		$this->assertStringContainsString( 'wp-block-latest-posts__list', $markup );
+		$this->assertStringContainsString( 'is-grid', $markup );
+		$this->assertStringContainsString( 'columns-4', $markup );
+		$this->assertStringContainsString( 'has-native-responsive-grid', $markup );
+	}
+
+	/**
+	 * @covers ::render_block_core_latest_posts
+	 */
+	public function test_render_block_core_latest_posts_supports_legacy_grid_attributes() {
+		$attributes = array(
+			'displayFeaturedImage' => false,
+			'postsToShow'          => 5,
+			'orderBy'              => 'date',
+			'order'                => 'DESC',
+			'excerptLength'        => 0,
+			'postLayout'           => 'grid',
+			'columns'              => 5,
+		);
+
+		$markup = gutenberg_render_block_core_latest_posts( $attributes );
+
+		$this->assertStringContainsString( 'is-grid', $markup );
+		$this->assertStringContainsString( 'columns-5', $markup );
+		$this->assertStringNotContainsString( 'has-native-responsive-grid', $markup );
+	}
 }

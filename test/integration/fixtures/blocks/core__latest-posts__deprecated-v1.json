@@ -15,7 +15,10 @@
 			"featuredImageSizeSlug": "thumbnail",
 			"featuredImageSizeWidth": null,
 			"featuredImageSizeHeight": null,
-			"addLinkToFeaturedImage": false
+			"addLinkToFeaturedImage": false,
+			"layout": {
+				"type": "default"
+			}
 		},
 		"innerBlocks": []
 	}

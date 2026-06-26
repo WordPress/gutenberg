@@ -61,7 +61,7 @@ function Edit( {
 	const { __unstableMarkNextChangeAsNotPersistent, updateBlockAttributes } =
 		useDispatch( blockEditorStore );
 
-	const handleTabClick = useCallback(
+	const selectTabPanel = useCallback(
 		( tabIndex ) => {
 			if ( tabsClientId && tabIndex !== effectiveActiveIndex ) {
 				__unstableMarkNextChangeAsNotPersistent();
@@ -150,9 +150,11 @@ function Edit( {
 							className={ buttonClassName || undefined }
 							style={ buttonStyle }
 							tabIndex={ -1 }
-							onClick={ ( event ) => {
-								event.preventDefault();
-								handleTabClick( index );
+							// Activate the matching panel whenever this tab
+							// receives focus — whether from a click or the caret
+							// moving into the label via the keyboard.
+							onFocus={ () => {
+								selectTabPanel( index );
 							} }
 						>
 							<RichText
