@@ -92,9 +92,19 @@ export function Editor( {
 		() => ( {
 			...editorSettings,
 			...settings,
+			styles: [
+				...( editorSettings.styles ?? [] ),
+				...( settings?.styles ?? [] ),
+			],
 		} ),
 		[ editorSettings, settings ]
 	);
+	const editorKey = [
+		resolvedPostType,
+		resolvedPostId,
+		templateId,
+		finalSettings.isPreviewMode ? 'preview' : 'edit',
+	].join( ':' );
 
 	// Show loading spinner while assets or settings are loading
 	if ( ! settingsReady || ! assetsReady ) {
@@ -115,6 +125,7 @@ export function Editor( {
 	// Render the editor when ready
 	return (
 		<PrivateEditor
+			key={ editorKey }
 			postType={ resolvedPostType }
 			postId={ resolvedPostId }
 			templateId={ templateId }
