@@ -231,7 +231,16 @@ describe( 'Waveform utilities', () => {
 				audio,
 				container,
 				options: {},
-				seekTo: jest.fn(),
+				seekTo: jest.fn( ( seconds ) => {
+					audio.currentTime = seconds;
+				} ),
+				seekToPercent: jest.fn( ( percent ) => {
+					audio.currentTime = audio.duration * percent;
+				} ),
+				setVolume: jest.fn( ( volume ) => {
+					audio.volume = volume;
+				} ),
+				togglePlay: jest.fn(),
 			};
 
 			return { audio, container, instance, seekControl };
@@ -356,7 +365,7 @@ describe( 'Waveform utilities', () => {
 			expect( seekControl ).toHaveAttribute( 'aria-valuenow', '30' );
 		} );
 
-		it( 'seeks exactly once on arrow keydown', () => {
+		it( 'keeps the bundled arrow seek shortcut available on the seek control', () => {
 			const { container, instance, seekControl } =
 				createSeekControlFixture( {
 					duration: 60,
@@ -366,6 +375,9 @@ describe( 'Waveform utilities', () => {
 			setupSeekControlAccessibility( container, instance );
 
 			container.addEventListener( 'keydown', () => {
+				if ( document.activeElement !== container ) {
+					return;
+				}
 				instance.seekTo( 20 );
 			} );
 			seekControl.focus();
@@ -378,7 +390,7 @@ describe( 'Waveform utilities', () => {
 			);
 
 			expect( instance.seekTo ).toHaveBeenCalledTimes( 1 );
-			expect( instance.seekTo ).toHaveBeenCalledWith( 5 );
+			expect( instance.seekTo ).toHaveBeenCalledWith( 15 );
 		} );
 
 		it( 'seeks from the current media time while playing', () => {
@@ -424,12 +436,13 @@ describe( 'Waveform utilities', () => {
 			expect( instance.seekTo ).toHaveBeenCalledWith( 35 );
 		} );
 
-		it( 'maps vertical arrows to seeking', () => {
-			const { container, instance, seekControl } =
+		it( 'keeps the bundled vertical arrow volume shortcuts', () => {
+			const { audio, container, instance, seekControl } =
 				createSeekControlFixture( {
 					duration: 60,
 					currentTime: 10,
 				} );
+			audio.volume = 0.5;
 
 			setupSeekControlAccessibility( container, instance );
 
@@ -440,7 +453,7 @@ describe( 'Waveform utilities', () => {
 					cancelable: true,
 				} )
 			);
-			expect( instance.seekTo ).toHaveBeenLastCalledWith( 5 );
+			expect( instance.setVolume ).toHaveBeenLastCalledWith( 0.6 );
 
 			seekControl.dispatchEvent(
 				new window.KeyboardEvent( 'keydown', {
@@ -449,15 +462,16 @@ describe( 'Waveform utilities', () => {
 					cancelable: true,
 				} )
 			);
-			expect( instance.seekTo ).toHaveBeenLastCalledWith( 0 );
+			expect( instance.setVolume ).toHaveBeenLastCalledWith( 0.5 );
 		} );
 
-		it( 'uses the larger seek step when shift is pressed', () => {
-			const { container, instance, seekControl } =
+		it( 'uses larger steps for shift arrow shortcuts', () => {
+			const { audio, container, instance, seekControl } =
 				createSeekControlFixture( {
 					duration: 60,
 					currentTime: 10,
 				} );
+			audio.volume = 0.5;
 
 			setupSeekControlAccessibility( container, instance );
 
@@ -469,8 +483,120 @@ describe( 'Waveform utilities', () => {
 					cancelable: true,
 				} )
 			);
+			expect( instance.seekTo ).toHaveBeenLastCalledWith( 20 );
 
-			expect( instance.seekTo ).toHaveBeenCalledWith( 10 );
+			seekControl.dispatchEvent(
+				new window.KeyboardEvent( 'keydown', {
+					key: 'ArrowLeft',
+					shiftKey: true,
+					bubbles: true,
+					cancelable: true,
+				} )
+			);
+			expect( instance.seekTo ).toHaveBeenLastCalledWith( 10 );
+
+			seekControl.dispatchEvent(
+				new window.KeyboardEvent( 'keydown', {
+					key: 'ArrowUp',
+					shiftKey: true,
+					bubbles: true,
+					cancelable: true,
+				} )
+			);
+			expect( instance.setVolume ).toHaveBeenLastCalledWith( 0.7 );
+
+			seekControl.dispatchEvent(
+				new window.KeyboardEvent( 'keydown', {
+					key: 'ArrowDown',
+					shiftKey: true,
+					bubbles: true,
+					cancelable: true,
+				} )
+			);
+			expect( instance.setVolume.mock.lastCall[ 0 ] ).toBeCloseTo( 0.5 );
+		} );
+
+		it( 'keeps the bundled mute, playback, and number key shortcuts', () => {
+			const { audio, container, instance, seekControl } =
+				createSeekControlFixture( {
+					duration: 60,
+					currentTime: 10,
+				} );
+
+			setupSeekControlAccessibility( container, instance );
+
+			seekControl.dispatchEvent(
+				new window.KeyboardEvent( 'keydown', {
+					key: ' ',
+					bubbles: true,
+					cancelable: true,
+				} )
+			);
+			expect( instance.togglePlay ).toHaveBeenCalledTimes( 1 );
+
+			seekControl.dispatchEvent(
+				new window.KeyboardEvent( 'keydown', {
+					key: 'm',
+					bubbles: true,
+					cancelable: true,
+				} )
+			);
+			expect( audio.muted ).toBe( true );
+
+			seekControl.dispatchEvent(
+				new window.KeyboardEvent( 'keydown', {
+					key: '3',
+					bubbles: true,
+					cancelable: true,
+				} )
+			);
+			expect( instance.seekToPercent ).toHaveBeenLastCalledWith( 0.3 );
+		} );
+
+		it( 'adds page, home, and end slider shortcuts', () => {
+			const { container, instance, seekControl } =
+				createSeekControlFixture( {
+					duration: 60,
+					currentTime: 10,
+				} );
+
+			setupSeekControlAccessibility( container, instance );
+
+			seekControl.dispatchEvent(
+				new window.KeyboardEvent( 'keydown', {
+					key: 'PageUp',
+					bubbles: true,
+					cancelable: true,
+				} )
+			);
+			expect( instance.seekTo ).toHaveBeenLastCalledWith( 20 );
+
+			seekControl.dispatchEvent(
+				new window.KeyboardEvent( 'keydown', {
+					key: 'PageDown',
+					bubbles: true,
+					cancelable: true,
+				} )
+			);
+			expect( instance.seekTo ).toHaveBeenLastCalledWith( 10 );
+
+			seekControl.dispatchEvent(
+				new window.KeyboardEvent( 'keydown', {
+					key: 'End',
+					bubbles: true,
+					cancelable: true,
+				} )
+			);
+			expect( instance.seekTo ).toHaveBeenLastCalledWith( 60 );
+
+			seekControl.dispatchEvent(
+				new window.KeyboardEvent( 'keydown', {
+					key: 'Home',
+					bubbles: true,
+					cancelable: true,
+				} )
+			);
+			expect( instance.seekTo ).toHaveBeenLastCalledWith( 0 );
 		} );
 
 		it( 'updates the seek control label', () => {

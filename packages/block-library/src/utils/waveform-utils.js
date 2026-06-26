@@ -18,6 +18,8 @@ const DEFAULT_SEEK_LABEL = 'Seek';
 const DEFAULT_SEEK_VALUE_TEXT = '%1$s of %2$s';
 const SEEK_STEP_SECONDS = 5;
 const SEEK_LARGE_STEP_SECONDS = 10;
+const VOLUME_STEP = 0.1;
+const VOLUME_LARGE_STEP = 0.2;
 
 /**
  * Get computed style for an element, using ownerDocument for iframe compatibility.
@@ -215,10 +217,10 @@ function formatSeekValueText( template, currentTime, duration ) {
  *
  * This is a shim over `@arraypress/waveform-player`, which does not expose the
  * waveform as a keyboard-operable slider with ARIA semantics. We add the
- * `slider` role and value attributes, make it focusable, and handle the seek
- * keys ourselves, suppressing the library's own keydown handler so seeking
- * doesn't fire twice. Once the library exposes this natively, this can be
- * reduced to just localizing the accessible name.
+ * `slider` role and value attributes, make it focusable, mirror the bundled
+ * keyboard shortcuts while focus is on the slider, and add common slider
+ * shortcuts. Once the library exposes this natively, this can be reduced to
+ * just localizing the accessible name.
  * See https://github.com/arraypress/waveform-player/issues/8.
  *
  * @param {Element} container         - The waveform player container element.
@@ -342,31 +344,61 @@ export function setupSeekControlAccessibility(
 		} );
 	};
 
+	const seekToPercent = ( percent ) => {
+		const normalizedPercent = Math.min( 1, Math.max( 0, percent ) );
+		playheadTime = getFiniteTime( audio.duration ) * normalizedPercent;
+		instance.seekToPercent?.( normalizedPercent );
+		updateSeekControl( {
+			syncPlayhead: false,
+			currentTimeOverride: playheadTime,
+		} );
+	};
+
 	const onKeyDown = ( event ) => {
-		const currentTime = isPlaying
-			? getFiniteTime( audio.currentTime )
-			: playheadTime;
+		const currentTime = getFiniteTime( audio.currentTime );
 		const duration = getFiniteTime( audio.duration );
-		const step = event.shiftKey
+		const seekStep = event.shiftKey
 			? SEEK_LARGE_STEP_SECONDS
 			: SEEK_STEP_SECONDS;
+		const volumeStep = event.shiftKey ? VOLUME_LARGE_STEP : VOLUME_STEP;
 		const actions = {
-			ArrowLeft: () => seekTo( currentTime - step ),
-			ArrowDown: () => seekTo( currentTime - step ),
-			ArrowRight: () => seekTo( currentTime + step ),
-			ArrowUp: () => seekTo( currentTime + step ),
+			// Mirror the bundled WaveformPlayer keyboard shortcuts when focus is
+			// on our slider instead of the wrapper the library listens to.
+			' ': () => instance.togglePlay?.(),
+			ArrowLeft: () => seekTo( currentTime - seekStep ),
+			ArrowRight: () => seekTo( currentTime + seekStep ),
+			ArrowUp: () =>
+				instance.setVolume?.(
+					Math.min( 1, audio.volume + volumeStep )
+				),
+			ArrowDown: () =>
+				instance.setVolume?.(
+					Math.max( 0, audio.volume - volumeStep )
+				),
+			m: () => {
+				audio.muted = ! audio.muted;
+			},
+			M: () => {
+				audio.muted = ! audio.muted;
+			},
+			// Add standard slider shortcuts that the bundled player lacks.
 			PageDown: () => seekTo( currentTime - SEEK_LARGE_STEP_SECONDS ),
 			PageUp: () => seekTo( currentTime + SEEK_LARGE_STEP_SECONDS ),
 			Home: () => seekTo( 0 ),
 			End: () => seekTo( duration ),
 		};
 
+		if ( event.key >= '0' && event.key <= '9' ) {
+			event.preventDefault();
+			seekToPercent( parseInt( event.key, 10 ) / 10 );
+			return;
+		}
+
 		if ( ! actions[ event.key ] ) {
 			return;
 		}
 
 		event.preventDefault();
-		event.stopImmediatePropagation();
 		actions[ event.key ]();
 	};
 
@@ -450,8 +482,8 @@ export function setupSeekControlAccessibility(
 		} );
 	};
 
-	seekControl.addEventListener( 'keydown', onKeyDown, true );
 	seekControl.addEventListener( 'focus', onSeekFocus );
+	seekControl.addEventListener( 'keydown', onKeyDown );
 	container.addEventListener( 'click', onContainerClickCapture, true );
 	container.addEventListener( 'click', onContainerClick );
 	container.addEventListener( 'focusin', onContainerFocusIn );
@@ -464,8 +496,8 @@ export function setupSeekControlAccessibility(
 	audio.addEventListener( 'loadedmetadata', updateSeekControl );
 
 	return () => {
-		seekControl.removeEventListener( 'keydown', onKeyDown, true );
 		seekControl.removeEventListener( 'focus', onSeekFocus );
+		seekControl.removeEventListener( 'keydown', onKeyDown );
 		container.removeEventListener( 'click', onContainerClickCapture, true );
 		container.removeEventListener( 'click', onContainerClick );
 		container.removeEventListener( 'focusin', onContainerFocusIn );
