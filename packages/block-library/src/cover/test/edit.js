@@ -39,6 +39,50 @@ const disabledColorSettings = {
 	disableCustomGradients: true,
 };
 
+/**
+ * Runs `callback` with `requestAnimationFrame` callbacks flushed on a microtask
+ * ahead of any pending `setTimeout( 0 )` timers, then restores the original.
+ *
+ * In a browser, Ariakit normalizes the matrix's roving tabindex in a
+ * `requestAnimationFrame` before `useFocusOnMount`'s `setTimeout( 0 )` focuses
+ * the active (center) cell, so opening the dropdown leaves the content position
+ * untouched. JSDOM implements `requestAnimationFrame` as a ~16ms timer, which
+ * inverts the ordering and would otherwise focus and select the first DOM cell.
+ *
+ * @param {() => ( Promise< unknown > | unknown )} callback
+ * @return {Promise< unknown >} Resolves with the callback's return value.
+ */
+async function withAnimationFramesBeforeTimers( callback ) {
+	const originalRequestAnimationFrame = global.requestAnimationFrame;
+
+	let flushing = false;
+	global.requestAnimationFrame = ( frameCallback ) => {
+		// Frames scheduled while flushing fall back to the real implementation
+		// so self-rescheduling loops (e.g. Popover's Floating UI `autoUpdate`)
+		// don't spin forever on the microtask queue.
+		if ( flushing ) {
+			return originalRequestAnimationFrame( frameCallback );
+		}
+
+		queueMicrotask( () => {
+			flushing = true;
+			try {
+				frameCallback( performance.now() );
+			} finally {
+				flushing = false;
+			}
+		} );
+
+		return 0;
+	};
+
+	try {
+		return await callback();
+	} finally {
+		global.requestAnimationFrame = originalRequestAnimationFrame;
+	}
+}
+
 async function setup( attributes, useCoreBlocks, customSettings ) {
 	const testBlock = { name: 'core/cover', attributes };
 	const settings = customSettings || defaultSettings;
@@ -62,19 +106,6 @@ async function openStylesTabIfAvailable() {
 	if ( stylesTab ) {
 		await userEvent.click( stylesTab );
 	}
-}
-
-async function selectViewportState( name ) {
-	await userEvent.click(
-		screen.getByRole( 'button', {
-			name: 'State: Default',
-		} )
-	);
-	await userEvent.click(
-		screen.getByRole( 'menuitem', {
-			name,
-		} )
-	);
 }
 
 describe( 'Cover block', () => {
@@ -149,8 +180,13 @@ describe( 'Cover block', () => {
 			await setup();
 			await createAndSelectBlock();
 
-			await userEvent.click(
-				screen.getByLabelText( 'Change content position' )
+			// Open the matrix dropdown with browser-like frame ordering so
+			// focus-on-mount lands on the active cell instead of dirtying the
+			// content position.
+			await withAnimationFramesBeforeTimers( () =>
+				userEvent.click(
+					screen.getByLabelText( 'Change content position' )
+				)
 			);
 
 			expect( screen.getByLabelText( 'Block: Cover' ) ).not.toHaveClass(
@@ -381,31 +417,6 @@ describe( 'Cover block', () => {
 
 					expect( opacityControl ).not.toBeInTheDocument();
 				} );
-			} );
-
-			test( 'does not render overlay controls when a viewport state is selected', async () => {
-				await setup();
-				await createAndSelectBlock();
-				await openStylesTabIfAvailable();
-
-				expect(
-					screen.getByRole( 'button', {
-						name: 'Overlay',
-					} )
-				).toBeInTheDocument();
-
-				await selectViewportState( 'Tablet' );
-
-				expect(
-					screen.queryByRole( 'button', {
-						name: 'Overlay',
-					} )
-				).not.toBeInTheDocument();
-				expect(
-					screen.queryByRole( 'slider', {
-						name: 'Overlay opacity',
-					} )
-				).not.toBeInTheDocument();
 			} );
 		} );
 

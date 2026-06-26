@@ -7,11 +7,6 @@
  */
 import { getTrackAttributes } from '../utils';
 
-// Mock uuid to return predictable values.
-jest.mock( 'uuid', () => ( {
-	v4: jest.fn( () => 'mock-uuid-1234' ),
-} ) );
-
 describe( 'Playlist block edit utilities', () => {
 	describe( 'getTrackAttributes', () => {
 		it( 'should transform media object to track attributes', () => {
@@ -29,7 +24,6 @@ describe( 'Playlist block edit utilities', () => {
 
 			expect( result ).toEqual( {
 				id: 123,
-				uniqueId: 'mock-uuid-1234',
 				src: 'https://example.com/song.mp3',
 				title: 'My Song',
 				artist: 'The Artist',

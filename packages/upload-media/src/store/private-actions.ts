@@ -16,15 +16,21 @@ type WPDataRegistry = ReturnType< typeof createRegistry >;
  */
 import { cloneFile, convertBlobToFile, renameFile } from '../utils';
 import { canvasConvertToJpeg } from '../canvas-utils';
-import { isClientSideMediaSupported } from '../feature-detection';
+import {
+	isClientSideMediaSupported,
+	exceedsClientProcessingMemory,
+} from '../feature-detection';
+import { getImageDimensions } from '../get-image-dimensions';
 import { CLIENT_SIDE_SUPPORTED_MIME_TYPES, HEIC_MIME_TYPES } from './constants';
 import { StubFile } from '../stub-file';
-import { UploadError } from '../upload-error';
+import { ErrorCode, UploadError } from '../upload-error';
+import { measure } from './utils/debug-logger';
 import {
 	vipsResizeImage,
 	vipsRotateImage,
 	vipsConvertImageFormat,
 	vipsHasTransparency,
+	vipsGetUltraHdrInfo,
 	terminateVipsWorker,
 	maybeRecycleVipsWorker,
 } from './utils';
@@ -33,6 +39,7 @@ import type {
 	AddAction,
 	AdditionalData,
 	AddOperationsAction,
+	Attachment,
 	BatchId,
 	CacheBlobUrlAction,
 	ImageFormat,
@@ -63,6 +70,15 @@ import { clearRetryTimer } from './utils/retry';
 
 const DEFAULT_OUTPUT_QUALITY = 0.82;
 
+/**
+ * Tracks parent item IDs whose source file is an UltraHDR JPEG so that
+ * sub-size resize operations can route through libvips's uhdrload/uhdrsave
+ * to preserve the gain map. Entries are cleared in `removeItem` when the
+ * parent item leaves the queue, covering both successful completion and
+ * cancellation.
+ */
+const ultraHdrItems = new Set< QueueItemId >();
+
 type ActionCreators = {
 	cancelItem: typeof cancelItem;
 	executeRetry: typeof executeRetry;
@@ -82,6 +98,7 @@ type ActionCreators = {
 	finalizeItem: typeof finalizeItem;
 	updateItemProgress: typeof updateItemProgress;
 	revokeBlobUrls: typeof revokeBlobUrls;
+	detectUltraHdr: typeof detectUltraHdr;
 	< T = Record< string, unknown > >( args: T ): void;
 };
 
@@ -443,6 +460,10 @@ export function processItem( id: QueueItemId ) {
 			case OperationType.Finalize:
 				dispatch.finalizeItem( id );
 				break;
+
+			case OperationType.DetectUltraHdr:
+				dispatch.detectUltraHdr( id );
+				break;
 		}
 	};
 }
@@ -510,6 +531,11 @@ export function removeItem( id: QueueItemId ) {
 		if ( ! item ) {
 			return;
 		}
+
+		// Clear any UltraHDR tracking for this item. removeItem runs on both
+		// successful completion and cancellation, so this prevents the set
+		// from growing unbounded over a long editing session.
+		ultraHdrItems.delete( id );
 
 		// Clear any pending retry timer for this item.
 		clearRetryTimer( id );
@@ -670,6 +696,9 @@ export async function getTranscodeImageOperation(
  * Or videos need to be compressed, and then need poster generation
  * before upload.
  *
+ * UltraHDR JPEG images are detected and uploaded unmodified — they are
+ * already backwards compatible (SDR displays use the embedded base image).
+ *
  * @param id Item ID.
  */
 export function prepareItem( id: QueueItemId ) {
@@ -690,6 +719,28 @@ export function prepareItem( id: QueueItemId ) {
 		);
 		const isHeic = HEIC_MIME_TYPES.includes( file.type );
 
+		// Gate very large images out of client-side processing. wasm-vips is
+		// capped at 1 GiB of memory, so high-megapixel images, especially
+		// interlaced/progressive ones, which can't be decoded with
+		// shrink-on-load, can exhaust it and fail. These are routed to the
+		// server, which has no comparable per-image ceiling. If dimensions
+		// can't be determined, the image stays on the client-side path.
+		let tooLargeForClient = false;
+		if ( isImage && isVipsSupported ) {
+			const dimensions = await getImageDimensions( file );
+			if ( dimensions && exceedsClientProcessingMemory( dimensions ) ) {
+				tooLargeForClient = true;
+			}
+		}
+
+		// Check for UltraHDR in JPEG files before other operations. Skipped for
+		// images routed to the server: the gain map is only preserved by the
+		// client-side resize path, and the probe runs wasm-vips, which the
+		// large-image gate above is specifically meant to avoid.
+		if ( file.type === 'image/jpeg' && ! tooLargeForClient ) {
+			operations.push( OperationType.DetectUltraHdr );
+		}
+
 		// For images that can be processed by vips, upload the original and
 		// let generateThumbnails() handle threshold scaling as a sideload.
 		//
@@ -704,7 +755,7 @@ export function prepareItem( id: QueueItemId ) {
 		// image_editor_output_format filter during create_item.
 		// The response carries image_output_format so generateThumbnails
 		// can transcode sub-sizes to the same target format.
-		if ( isImage && isVipsSupported ) {
+		if ( isImage && isVipsSupported && ! tooLargeForClient ) {
 			operations.push(
 				OperationType.Upload,
 				OperationType.ThumbnailGeneration,
@@ -726,7 +777,7 @@ export function prepareItem( id: QueueItemId ) {
 				dispatch.cancelItem(
 					id,
 					new UploadError( {
-						code: 'HEIC_DECODE_ERROR',
+						code: ErrorCode.HEIC_DECODE_ERROR,
 						message:
 							'This browser cannot decode HEIC images and the server does not support them either. Please convert to JPEG before uploading.',
 						file,
@@ -773,7 +824,10 @@ export function prepareItem( id: QueueItemId ) {
 					convert_format: true,
 				},
 			};
-		} else if ( ! isVipsSupported || ! isImage ) {
+		} else if ( ! isVipsSupported || ! isImage || tooLargeForClient ) {
+			// Either the format isn't vips-processable, it isn't an image, or
+			// it's too large for client-side processing. Let the server
+			// generate sub-sizes and handle format conversion.
 			updates = {
 				additionalData: {
 					...item.additionalData,
@@ -795,6 +849,40 @@ export function prepareItem( id: QueueItemId ) {
 }
 
 /**
+ * Detects whether a JPEG is an UltraHDR image and records the parent item
+ * ID so that downstream resize operations route through libvips's
+ * uhdrload/uhdrsave pipeline (which preserves the gain map).
+ *
+ * @param id Item ID.
+ */
+export function detectUltraHdr( id: QueueItemId ) {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItem( id );
+		if ( ! item ) {
+			return;
+		}
+
+		let info;
+		try {
+			const buffer = await item.file.arrayBuffer();
+			info = await vipsGetUltraHdrInfo( buffer );
+		} catch {
+			// If UltraHDR detection fails, continue with regular upload.
+		}
+
+		// Track the item so downstream resize operations preserve the gain
+		// map and skip format transcoding. The original file is uploaded
+		// unmodified — UltraHDR JPEGs are already backwards compatible (SDR
+		// displays use the embedded base image).
+		if ( info ) {
+			ultraHdrItems.add( id );
+		}
+
+		dispatch.finishOperation( id, {} );
+	};
+}
+
+/**
  * Uploads an item to the server.
  *
  * @param id Item ID.
@@ -806,21 +894,39 @@ export function uploadItem( id: QueueItemId ) {
 			return;
 		}
 
+		const startTime = performance.now();
+		let finished = false;
+
+		const finishUpload = ( attachment: Partial< Attachment > ) => {
+			if ( finished ) {
+				return;
+			}
+			finished = true;
+
+			measure( {
+				measureName: `Upload ${ item.file.name }`,
+				startTime,
+				tooltipText: item.file.name,
+				properties: [
+					[ 'Item ID', item.id ],
+					[ 'File name', item.file.name ],
+				],
+			} );
+
+			dispatch.finishOperation( id, { attachment } );
+		};
+
 		select.getSettings().mediaUpload( {
 			filesList: [ item.file ],
 			additionalData: item.additionalData,
 			signal: item.abortController?.signal,
 			onFileChange: ( [ attachment ] ) => {
 				if ( attachment && ! isBlobURL( attachment.url ) ) {
-					dispatch.finishOperation( id, {
-						attachment,
-					} );
+					finishUpload( attachment );
 				}
 			},
 			onSuccess: ( [ attachment ] ) => {
-				dispatch.finishOperation( id, {
-					attachment,
-				} );
+				finishUpload( attachment );
 			},
 			onError: ( error ) => {
 				dispatch.cancelItem( id, error );
@@ -851,12 +957,24 @@ export function sideloadItem( id: QueueItemId ) {
 			return;
 		}
 
+		const startTime = performance.now();
+
 		mediaSideload( {
 			file: item.file,
 			attachmentId: post as number,
 			additionalData,
 			signal: item.abortController?.signal,
 			onSuccess: ( subSize: SubSizeData ) => {
+				measure( {
+					measureName: `Sideload ${ item.file.name }`,
+					startTime,
+					tooltipText: item.file.name,
+					properties: [
+						[ 'Item ID', item.id ],
+						[ 'File name', item.file.name ],
+					],
+				} );
+
 				// Accumulate sub-size data on the parent item for finalize.
 				if ( item.parentId ) {
 					dispatch< AccumulateSubSizeAction >( {
@@ -896,6 +1014,8 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 			return;
 		}
 
+		const startTime = performance.now();
+
 		// Add dimension suffix for sub-sizes (thumbnails).
 		const addSuffix = Boolean( item.parentId );
 		// Add '-scaled' suffix for big image threshold resizing.
@@ -911,6 +1031,16 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 				item.abortController?.signal,
 				scaledSuffix
 			);
+
+			measure( {
+				measureName: `ResizeCrop ${ item.file.name }`,
+				startTime,
+				tooltipText: item.file.name,
+				properties: [
+					[ 'Item ID', item.id ],
+					[ 'File name', item.file.name ],
+				],
+			} );
 
 			const blobUrl = createBlobURL( file );
 			dispatch< CacheBlobUrlAction >( {
@@ -929,7 +1059,7 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 			dispatch.cancelItem(
 				id,
 				new UploadError( {
-					code: 'IMAGE_TRANSCODING_ERROR',
+					code: ErrorCode.IMAGE_TRANSCODING_ERROR,
 					message: __(
 						'The web server cannot generate responsive image sizes for this image. Convert it to JPEG or PNG before uploading.'
 					),
@@ -968,6 +1098,8 @@ export function rotateItem( id: QueueItemId, args?: RotateItemArgs ) {
 			return;
 		}
 
+		const startTime = performance.now();
+
 		try {
 			const file = await vipsRotateImage(
 				item.id,
@@ -975,6 +1107,16 @@ export function rotateItem( id: QueueItemId, args?: RotateItemArgs ) {
 				args.orientation,
 				item.abortController?.signal
 			);
+
+			measure( {
+				measureName: `Rotate ${ item.file.name }`,
+				startTime,
+				tooltipText: item.file.name,
+				properties: [
+					[ 'Item ID', item.id ],
+					[ 'File name', item.file.name ],
+				],
+			} );
 
 			const blobUrl = createBlobURL( file );
 			dispatch< CacheBlobUrlAction >( {
@@ -993,7 +1135,7 @@ export function rotateItem( id: QueueItemId, args?: RotateItemArgs ) {
 			dispatch.cancelItem(
 				id,
 				new UploadError( {
-					code: 'IMAGE_ROTATION_ERROR',
+					code: ErrorCode.IMAGE_ROTATION_ERROR,
 					message: __(
 						'The web server cannot generate responsive image sizes for this image. Convert it to JPEG or PNG before uploading.'
 					),
@@ -1034,6 +1176,8 @@ export function transcodeImageItem(
 			return;
 		}
 
+		const startTime = performance.now();
+
 		const outputMimeType = `image/${ args.outputFormat }` as
 			| 'image/jpeg'
 			| 'image/png'
@@ -1052,6 +1196,16 @@ export function transcodeImageItem(
 				interlaced
 			);
 
+			measure( {
+				measureName: `Transcode ${ item.file.name }`,
+				startTime,
+				tooltipText: item.file.name,
+				properties: [
+					[ 'Item ID', item.id ],
+					[ 'File name', item.file.name ],
+				],
+			} );
+
 			const blobUrl = createBlobURL( file );
 			dispatch< CacheBlobUrlAction >( {
 				type: Type.CacheBlobUrl,
@@ -1069,7 +1223,7 @@ export function transcodeImageItem(
 			dispatch.cancelItem(
 				id,
 				new UploadError( {
-					code: 'MEDIA_TRANSCODING_ERROR',
+					code: ErrorCode.MEDIA_TRANSCODING_ERROR,
 					message:
 						'Image could not be transcoded to the target format',
 					file: item.file,
@@ -1182,6 +1336,13 @@ export function generateThumbnails( id: QueueItemId ) {
 				: thumbnailSource;
 			const batchId = uuidv4();
 
+			// Sub-sizes inherit the parent's UltraHDR status so that the
+			// resize step routes through libvips's uhdrload/uhdrsave pipeline
+			// (which preserves the gain map). Format transcoding is skipped
+			// for UltraHDR sources because converting to a different codec
+			// would strip the ISO 21496-1 gain map data.
+			const isUltraHdr = ultraHdrItems.has( item.id );
+
 			// Read per-file format conversion data from the attachment response.
 			const outputMimeType = attachment.image_output_format;
 			const interlaced = attachment.image_save_progressive ?? false;
@@ -1196,7 +1357,7 @@ export function generateThumbnails( id: QueueItemId ) {
 				  ]
 				| null = null;
 
-			if ( outputMimeType ) {
+			if ( ! isUltraHdr && outputMimeType ) {
 				thumbnailTranscodeOperation = await getTranscodeImageOperation(
 					thumbnailSource,
 					outputMimeType,
@@ -1230,14 +1391,15 @@ export function generateThumbnails( id: QueueItemId ) {
 			for ( const [ , names ] of dimensionGroups ) {
 				const imageSize = allImageSizes[ names[ 0 ] ];
 
-				// Build operations list for this thumbnail.
+				// Build operations list for this thumbnail. The resize step
+				// is UltraHDR-aware and will preserve the gain map automatically.
 				const thumbnailOperations: Operation[] = [
 					[ OperationType.ResizeCrop, { resize: imageSize } ],
 				];
 
-				// Add transcoding if format conversion is configured and
-				// the transparency check passed.
-				if ( thumbnailTranscodeOperation ) {
+				if ( ! isUltraHdr && thumbnailTranscodeOperation ) {
+					// Add transcoding if format conversion is configured and
+					// the transparency check passed.
 					thumbnailOperations.push( thumbnailTranscodeOperation );
 				}
 
@@ -1281,7 +1443,8 @@ export function generateThumbnails( id: QueueItemId ) {
 							? renameFile( thumbnailSource, attachment.filename )
 							: thumbnailSource;
 
-						// Add scaling to queue.
+						// Add scaling to queue. The resize step is UltraHDR-aware
+						// and will preserve the gain map automatically.
 						const scaledOperations: Operation[] = [
 							[
 								OperationType.ResizeCrop,
@@ -1295,8 +1458,8 @@ export function generateThumbnails( id: QueueItemId ) {
 							],
 						];
 
-						// Add transcoding if format conversion is configured.
-						if ( thumbnailTranscodeOperation ) {
+						if ( ! isUltraHdr && thumbnailTranscodeOperation ) {
+							// Add transcoding if format conversion is configured.
 							scaledOperations.push(
 								thumbnailTranscodeOperation
 							);
