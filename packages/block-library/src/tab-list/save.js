@@ -7,12 +7,12 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import {
+	RichText,
 	useBlockProps,
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
 	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
 } from '@wordpress/block-editor';
-import { safeHTML } from '@wordpress/dom';
 
 export default function save( { attributes } ) {
 	const { tabs } = attributes;
@@ -35,15 +35,14 @@ export default function save( { attributes } ) {
 	return (
 		<div { ...blockProps }>
 			{ tabs.map( ( tab, index ) => (
-				<button
+				<RichText.Content
 					key={ index }
 					className={ buttonClassName || undefined }
 					style={ buttonStyle }
+					tagName="button"
+					value={ tab.label }
 					type="button"
 					role="tab"
-					dangerouslySetInnerHTML={ {
-						__html: safeHTML( tab.label ) || '',
-					} }
 				/>
 			) ) }
 		</div>
