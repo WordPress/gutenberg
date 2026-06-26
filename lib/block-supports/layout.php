@@ -472,13 +472,16 @@ function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $pare
  * @return string CSS styles, or empty string.
  */
 function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support = false, $gap_value = null, $should_skip_gap_serialization = false, $fallback_gap_value = '0.5em', $block_spacing = null, $options = array() ) {
-	$base_layout                    = is_array( $layout ) ? $layout : array();
-	$viewport_overrides             = $options['viewport_overrides'] ?? null;
-	$layout_for_styles              = null === $viewport_overrides ? $base_layout : array_replace( $base_layout, $viewport_overrides );
-	$layout_type                    = $base_layout['type'] ?? 'default';
-	$rules_group                    = $options['rules_group'] ?? null;
-	$has_block_gap_override         = ! empty( $options['has_block_gap_override'] );
-	$should_output_block_gap        = null === $viewport_overrides || $has_block_gap_override;
+	$base_layout             = is_array( $layout ) ? $layout : array();
+	$viewport_overrides      = $options['viewport_overrides'] ?? null;
+	$layout_for_styles       = null === $viewport_overrides ? $base_layout : array_replace( $base_layout, $viewport_overrides );
+	$layout_type             = $base_layout['type'] ?? 'default';
+	$rules_group             = $options['rules_group'] ?? null;
+	$has_block_gap_override  = ! empty( $options['has_block_gap_override'] );
+	$should_output_block_gap = null === $viewport_overrides || $has_block_gap_override;
+	// Viewport styles only store changed fields. If a field is present with null,
+	// the user cleared a value inherited from the default viewport, so check
+	// whether the key exists rather than whether the value is truthy.
 	$has_viewport_property_override = static function ( $property ) use ( $viewport_overrides ) {
 		return array_key_exists( $property, $viewport_overrides );
 	};
@@ -521,9 +524,14 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$wide_size       = $layout_for_styles['wideSize'] ?? '';
 		$justify_content = $layout_for_styles['justifyContent'] ?? 'center';
 
-		$has_justify_content_override    = null !== $viewport_overrides && $has_viewport_property_override( 'justifyContent' );
-		$has_content_size_override       = null !== $viewport_overrides && $has_viewport_property_override( 'contentSize' );
-		$has_wide_size_override          = null !== $viewport_overrides && $has_viewport_property_override( 'wideSize' );
+		// Check if viewport-specific ("override") values exist. Null values are valid and mean the user cleared a value inherited from the default viewport.
+		$has_justify_content_override = null !== $viewport_overrides && $has_viewport_property_override( 'justifyContent' );
+		$has_content_size_override    = null !== $viewport_overrides && $has_viewport_property_override( 'contentSize' );
+		$has_wide_size_override       = null !== $viewport_overrides && $has_viewport_property_override( 'wideSize' );
+
+		/* Styles should be output either if there are no viewport overrides (this is the default case), or if the user has set a new viewport-specific
+		 * value for contentSize or wideSize. If a viewport clears a custom constrained size, reset to the global layout variable.
+		 */
 		$should_output_constrained_sizes = null === $viewport_overrides || $has_content_size_override || $has_wide_size_override;
 		$is_resetting_constrained_sizes  = null !== $viewport_overrides &&
 			(
@@ -531,6 +539,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 				( $has_wide_size_override && ! $wide_size )
 			);
 
+		// If a viewport clears a custom constrained size, reset to the global layout variable.
 		$all_max_width_value  = $content_size
 			? $content_size
 			: ( $wide_size && ! $has_content_size_override ? $wide_size : 'var(--wp--style--global--content-size, none)' );
@@ -685,6 +694,9 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$vertical_alignment_options += array( 'space-between' => 'space-between' );
 		}
 
+		/* Styles should be output either if there are no viewport overrides (this is the default case), or if the user has set a new viewport-specific
+		 * value for any of the flex properties.
+		 */
 		$should_output_flex_wrap          = null === $viewport_overrides || $has_viewport_property_override( 'flexWrap' );
 		$should_output_flex_orientation   = null === $viewport_overrides || $has_viewport_property_override( 'orientation' );
 		$should_output_flex_justification = null === $viewport_overrides || $has_viewport_property_override( 'justifyContent' ) || $has_viewport_property_override( 'orientation' );
@@ -815,6 +827,9 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$responsive_gap_value = '0px';
 		}
 
+		/* Styles should be output either if there are no viewport overrides (this is the default case), or if the user has set a new viewport-specific
+		 * value for any of the grid properties.
+		 */
 		$should_output_grid_columns = null === $viewport_overrides || $has_viewport_property_override( 'minimumColumnWidth' ) || $has_viewport_property_override( 'columnCount' ) || $has_viewport_property_override( 'autoFit' );
 		$uses_gap_in_grid_columns   = ! empty( $layout_for_styles['columnCount'] ) && ! empty( $layout_for_styles['minimumColumnWidth'] );
 		if ( $has_block_gap_override && $uses_gap_in_grid_columns ) {
@@ -824,8 +839,9 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$should_output_grid_rows = ( null === $viewport_overrides || $has_viewport_property_override( 'rowCount' ) ) && ! empty( $layout_for_styles['columnCount'] ) && ! empty( $layout_for_styles['rowCount'] );
 		$grid_declarations       = array();
 
-		// When enabled, columns stretch to fill the available space using
-		// `auto-fit`; otherwise empty tracks are preserved with `auto-fill`.
+		/* When enabled, columns stretch to fill the available space using
+		 * `auto-fit`; otherwise empty tracks are preserved with `auto-fill`.
+		 */
 		$auto_placement = ! empty( $layout_for_styles['autoFit'] ) ? 'auto-fit' : 'auto-fill';
 
 		if ( $should_output_grid_columns && ! empty( $layout_for_styles['columnCount'] ) && ! empty( $layout_for_styles['minimumColumnWidth'] ) ) {
