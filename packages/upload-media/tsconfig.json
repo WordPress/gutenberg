@@ -10,6 +10,7 @@
 		{ "path": "../compose" },
 		{ "path": "../data" },
 		{ "path": "../element" },
+		{ "path": "../hooks" },
 		{ "path": "../i18n" },
 		{ "path": "../preferences" },
 		{ "path": "../private-apis" },
