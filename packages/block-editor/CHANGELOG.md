@@ -10,7 +10,7 @@
 
 -   The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed from the following:
 -   `LetterSpacingControl` ([#79533](https://github.com/WordPress/gutenberg/pull/79533)).
--   `TextIndentControl` ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
+-   `TextIndentControl` ([#79597](https://github.com/WordPress/gutenberg/pull/79597)).
 
 ### Deprecations
 
