@@ -1,8 +1,6 @@
 /**
  * External dependencies
  */
-const fs = require( 'fs/promises' );
-const os = require( 'os' );
 const path = require( 'path' );
 
 /**
@@ -10,44 +8,17 @@ const path = require( 'path' );
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-function createWavBuffer( { duration = 12, sampleRate = 8000 } = {} ) {
-	const channels = 1;
-	const bytesPerSample = 2;
-	const samples = duration * sampleRate;
-	const dataSize = samples * channels * bytesPerSample;
-	const buffer = Buffer.alloc( 44 + dataSize );
-
-	buffer.write( 'RIFF', 0 );
-	buffer.writeUInt32LE( 36 + dataSize, 4 );
-	buffer.write( 'WAVE', 8 );
-	buffer.write( 'fmt ', 12 );
-	buffer.writeUInt32LE( 16, 16 );
-	buffer.writeUInt16LE( 1, 20 );
-	buffer.writeUInt16LE( channels, 22 );
-	buffer.writeUInt32LE( sampleRate, 24 );
-	buffer.writeUInt32LE( sampleRate * channels * bytesPerSample, 28 );
-	buffer.writeUInt16LE( channels * bytesPerSample, 32 );
-	buffer.writeUInt16LE( bytesPerSample * 8, 34 );
-	buffer.write( 'data', 36 );
-	buffer.writeUInt32LE( dataSize, 40 );
-
-	return buffer;
-}
+const audioPath = path.join(
+	__dirname,
+	'../../../assets/playlist-e2e-test.wav'
+);
 
 test.describe( 'Playlist block', () => {
-	let audioPath;
 	let uploadedMedia;
 
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
 
-		// Unique per worker process so parallel runs don't collide on the
-		// same temp file during upload/cleanup.
-		audioPath = path.join(
-			os.tmpdir(),
-			`playlist-e2e-test-${ process.pid }-${ Date.now() }.wav`
-		);
-		await fs.writeFile( audioPath, createWavBuffer() );
 		uploadedMedia = await requestUtils.uploadMedia( audioPath );
 	} );
 
@@ -57,9 +28,6 @@ test.describe( 'Playlist block', () => {
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
-		if ( audioPath ) {
-			await fs.rm( audioPath, { force: true } );
-		}
 	} );
 
 	test( 'waveform seek control can be reached and operated with the keyboard on the frontend', async ( {
