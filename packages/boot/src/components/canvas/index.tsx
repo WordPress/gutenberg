@@ -27,10 +27,10 @@ import {
 	MenuItem,
 	Notice,
 	Spinner,
-	Tooltip as WCTooltip,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 } from '@wordpress/components';
+import { Tooltip } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	archive,
@@ -430,24 +430,33 @@ function PreviewDocumentInfo( {
 					</DropdownMenu>
 				) }
 				{ showPreviewStatus && (
-					<WCTooltip text={ statusTooltipLabel } placement="bottom">
-						<span
-							className="boot-preview-canvas__document-status"
-							role="status"
-							aria-label={ statusTooltipLabel }
-							title={ statusTooltipLabel }
+					<Tooltip.Root>
+						<Tooltip.Trigger
+							render={
+								<span
+									className="boot-preview-canvas__document-status"
+									role="status"
+									aria-label={ statusTooltipLabel }
+									title={ statusTooltipLabel }
+								>
+									<span
+										className={ clsx(
+											'boot-preview-canvas__document-status-dot',
+											getPreviewStatusClass(
+												canvas.previewStatus
+											)
+										) }
+										aria-hidden="true"
+									/>
+								</span>
+							}
+						/>
+						<Tooltip.Popup
+							positioner={ <Tooltip.Positioner side="bottom" /> }
 						>
-							<span
-								className={ clsx(
-									'boot-preview-canvas__document-status-dot',
-									getPreviewStatusClass(
-										canvas.previewStatus
-									)
-								) }
-								aria-hidden="true"
-							/>
-						</span>
-					</WCTooltip>
+							{ statusTooltipLabel }
+						</Tooltip.Popup>
+					</Tooltip.Root>
 				) }
 			</div>
 			{ isConfiguringHomepage && (
@@ -1253,6 +1262,37 @@ export default function Canvas( { canvas }: CanvasProps ) {
 				<BootBackButton length={ length } />
 		  )
 		: undefined;
+	const editorSettings: Record< string, unknown > = {
+		isPreviewMode: canvas.isPreview,
+		...( shouldUseUniversalCanvas( canvas )
+			? {
+					// Prototype-only universal canvas mode: content
+					// entities should open with their full template
+					// visible so the user can edit content in
+					// context, while direct design entity routes
+					// continue to use their normal dedicated canvas.
+					defaultRenderingMode: 'template-locked',
+					__experimentalUniversalCanvas: true,
+					__experimentalForceTemplateVisibleOnMount: true,
+			  }
+			: {} ),
+		// The Extensible Site Editor has its own "Choose a
+		// layout" page-creation flow. Core's existing
+		// "Choose a pattern" starter modal is a separate
+		// editor affordance and competes with that flow, so
+		// suppress it by default for canvases rendered here.
+		// Routes can still explicitly opt back in by setting
+		// `skipStartPageOptions` to false.
+		disableStartPageOptions: canvas.skipStartPageOptions ?? true,
+	};
+	if ( canvas.isPreview ) {
+		editorSettings.styles = [ { css: 'body{min-height:100vh;}' } ];
+	}
+	const editorKey = [
+		canvas.postType ?? 'site',
+		canvas.postId ?? 'site',
+		canvas.isPreview ? 'preview' : 'edit',
+	].join( ':' );
 
 	const editor = (
 		<div style={ { height: '100%', position: 'relative' } }>
@@ -1262,44 +1302,10 @@ export default function Canvas( { canvas }: CanvasProps ) {
 				inert={ canvas.isPreview ? 'true' : undefined }
 			>
 				<Editor
+					key={ editorKey }
 					postType={ canvas.postType }
 					postId={ canvas.postId }
-					settings={ {
-						isPreviewMode: canvas.isPreview,
-						...( shouldUseUniversalCanvas( canvas )
-							? {
-									// Prototype-only universal canvas mode: content
-									// entities should open with their full template
-									// visible so the user can edit content in
-									// context, while direct design entity routes
-									// continue to use their normal dedicated canvas.
-									defaultRenderingMode: 'template-locked',
-									__experimentalUniversalCanvas: true,
-									__experimentalForceTemplateVisibleOnMount:
-										true,
-							  }
-							: {} ),
-						// The Extensible Site Editor has its own "Choose a
-						// layout" page-creation flow. Core's existing
-						// "Choose a pattern" starter modal is a separate
-						// editor affordance and competes with that flow, so
-						// suppress it by default for canvases rendered here.
-						// Routes can still explicitly opt back in by setting
-						// `skipStartPageOptions` to false.
-						disableStartPageOptions:
-							canvas.skipStartPageOptions ?? true,
-						// Only preview mode needs a local style override. In edit
-						// mode, passing an empty `styles` array here replaces the
-						// lazy editor's resolved theme/global styles, which can
-						// leave the editor iframe rendering with browser defaults.
-						...( canvas.isPreview
-							? {
-									styles: [
-										{ css: 'body{min-height:100vh;}' },
-									],
-							  }
-							: {} ),
-					} }
+					settings={ editorSettings }
 					backButton={ backButton }
 				/>
 			</div>

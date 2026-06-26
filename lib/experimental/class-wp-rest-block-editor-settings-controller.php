@@ -456,13 +456,12 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 				'after'  => array(),
 			);
 
-			/*
-			 * Keep script dependencies in the payload even when the boot shell
-			 * already loaded them in the parent document. The same payload is
-			 * used to build editor iframe assets, where parent document globals
-			 * such as wp.element, wp.blocks, and wp.data do not exist.
-			 */
-			$excluded_scripts = array();
+			// Get boot module asset file for dependencies.
+			$boot_asset_file   = include __DIR__ . '/../../build/modules/boot/index.min.asset.php';
+			$boot_dependencies = $boot_asset_file['dependencies'] ?? array();
+
+			// Get all dependencies that should be excluded (boot dependencies + their deep dependencies).
+			$excluded_scripts = $this->get_all_dependencies( $boot_dependencies, $wp_scripts );
 			$excluded_styles  = $this->get_all_dependencies( array( 'wp-components', 'wp-commands', 'dashicons' ), $wp_styles );
 
 			// Process styles - include all dependencies of queued styles.

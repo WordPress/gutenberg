@@ -350,4 +350,50 @@ describe( 'useEntityBlockEditor', () => {
 			firstClientIds
 		);
 	} );
+
+	it( 'uses edit context content when the default context record lacks raw content', () => {
+		registry
+			.dispatch( coreDataStore )
+			.receiveEntityRecords( 'postType', 'post', {
+				id: 2,
+				type: 'post',
+				content: {
+					rendered: '<p>Rendered only</p>',
+				},
+				meta: { footnotes: '[]' },
+			} );
+		registry.dispatch( coreDataStore ).receiveEntityRecords(
+			'postType',
+			'post',
+			{
+				id: 2,
+				type: 'post',
+				content: {
+					raw: '<!-- wp:test-block --><p>Edit context content</p><!-- /wp:test-block -->',
+					rendered: '<p>Edit context content</p>',
+				},
+				meta: { footnotes: '[]' },
+			},
+			{ context: 'edit' }
+		);
+
+		let blocks;
+		const TestComponent = () => {
+			[ blocks ] = useEntityBlockEditor( 'postType', 'post', {
+				id: 2,
+			} );
+			return <div />;
+		};
+
+		render(
+			<RegistryProvider value={ registry }>
+				<TestComponent />
+			</RegistryProvider>
+		);
+
+		expect( blocks ).toHaveLength( 1 );
+		expect( blocks[ 0 ].attributes.content ).toEqual(
+			'Edit context content'
+		);
+	} );
 } );

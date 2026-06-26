@@ -1,9 +1,9 @@
 /**
  * WordPress dependencies
  */
-import loadAssets, { getResolvedAssetsHtml } from '@wordpress/asset-loader';
+import loadAssets from '@wordpress/asset-loader';
 import { store as coreDataStore } from '@wordpress/core-data';
-import { useState, useEffect, useMemo } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { resolveSelect, useSelect } from '@wordpress/data';
 
 /**
@@ -12,19 +12,6 @@ import { resolveSelect, useSelect } from '@wordpress/data';
 import { unlock } from '../lock-unlock';
 
 let loadAssetsPromise: Promise< void >;
-
-function getResolvedAssets( editorAssets: Record< string, any > | null ) {
-	if ( ! editorAssets ) {
-		return undefined;
-	}
-
-	return getResolvedAssetsHtml(
-		editorAssets.scripts || {},
-		editorAssets.inline_scripts || { before: {}, after: {} },
-		editorAssets.styles || {},
-		editorAssets.inline_styles || { before: {}, after: {} }
-	);
-}
 
 export async function loadEditorAssets() {
 	const load = async () => {
@@ -59,10 +46,6 @@ export function useEditorAssets() {
 	}, [] );
 
 	const [ assetsLoaded, setAssetsLoaded ] = useState( false );
-	const resolvedAssets = useMemo(
-		() => getResolvedAssets( editorAssets ),
-		[ editorAssets ]
-	);
 
 	useEffect( () => {
 		if ( editorAssets && ! assetsLoaded ) {
@@ -80,6 +63,5 @@ export function useEditorAssets() {
 	return {
 		isReady: !! editorAssets && assetsLoaded,
 		assetsLoaded,
-		resolvedAssets,
 	};
 }

@@ -98,6 +98,7 @@ function VisualEditor( {
 	contentRef,
 	className,
 	isGlobalEditorColorScheme = false,
+	editorSettings: currentEditorSettings,
 } ) {
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const {
@@ -110,8 +111,8 @@ function VisualEditor( {
 		isFocusedEntity,
 		isDesignPostType,
 		postType,
-		isPreview,
-		styles,
+		isPreview: storeIsPreview,
+		styles: storeStyles,
 		hasCanvasWidth,
 	} = useSelect( ( select ) => {
 		const {
@@ -166,6 +167,8 @@ function VisualEditor( {
 			hasCanvasWidth: getCanvasWidth() !== undefined,
 		};
 	}, [] );
+	const isPreview = currentEditorSettings?.isPreviewMode ?? storeIsPreview;
+	const styles = currentEditorSettings?.styles ?? storeStyles;
 	const { isCleanNewPost } = useSelect( editorStore );
 	const {
 		hasRootPaddingAwareAlignments,

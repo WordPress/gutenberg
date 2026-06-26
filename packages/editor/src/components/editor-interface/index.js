@@ -78,6 +78,7 @@ export default function EditorInterface( {
 	customSavePanel,
 	forceDisableBlockTools,
 	iframeProps,
+	editorSettings: currentEditorSettings,
 } ) {
 	const {
 		mode,
@@ -276,6 +277,7 @@ export default function EditorInterface( {
 									// eslint-disable-next-line jsx-a11y/no-autofocus
 									autoFocus={ autoFocus }
 									iframeProps={ iframeProps }
+									editorSettings={ currentEditorSettings }
 								/>
 							) }
 							{ children }

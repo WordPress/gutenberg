@@ -95,15 +95,13 @@ export function Preview( {
 	const { isReady: settingsReady, editorSettings } = useEditorSettings( {
 		stylesId,
 	} );
-	const { isReady: assetsReady, resolvedAssets } = useEditorAssets();
+	const { isReady: assetsReady } = useEditorAssets();
 	const finalSettings = useMemo(
 		() => ( {
 			...editorSettings,
-			__unstableResolvedAssets:
-				resolvedAssets ?? editorSettings?.__unstableResolvedAssets,
 			isPreviewMode: true,
 		} ),
-		[ editorSettings, resolvedAssets ]
+		[ editorSettings ]
 	);
 	if ( ! settingsReady || ! assetsReady ) {
 		return placeholder ?? null;
