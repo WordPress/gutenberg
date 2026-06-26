@@ -1,7 +1,15 @@
 import type { CornerRadiusPreset } from '@wordpress/theme';
-import { ThemeProvider } from '@wordpress/theme';
+import { privateApis as themeApis } from '@wordpress/theme';
+import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
 import type { StoryContext } from 'storybook/internal/types';
 import { storyIdMatchesDesignSystemTheme } from './utils/design-system-theme-story-matchers';
+
+const { unlock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
+	'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
+	'@wordpress/theme'
+);
+
+const { ThemeProvider } = unlock( themeApis );
 
 /**
  * Decorator that applies Design System theme based on toolbar selections.

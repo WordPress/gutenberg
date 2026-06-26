@@ -44,6 +44,9 @@
 	"dependencies": {
 		"@wordpress/theme": "file:../theme"
 	},
+	"devDependencies": {
+		"@wordpress/stylelint-tools": "file:../../tools/stylelint"
+	},
 	"publishConfig": {
 		"access": "public"
 	}
