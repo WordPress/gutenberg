@@ -179,7 +179,7 @@ function block_core_query_apply_meta_query_vars( $query, $block ) {
 
 	$meta_compare_raw = isset( $query_context['metaCompare'] ) ? sanitize_text_field( $query_context['metaCompare'] ) : '=';
 	$meta_compare     = html_entity_decode( $meta_compare_raw );
-	
+
 	/**
 	 * Filters the list of operators allowed for generic meta value filtering.
 	 * This must stay in sync with any operators a plugin adds to the JS
@@ -350,9 +350,9 @@ function block_core_query_apply_meta_query_vars( $query, $block ) {
 		 *
 		 * @since 23.4.0
 		 *
-		 * @param array      $meta_clause  Return an array to overwrite core's logic. 
+		 * @param array      $meta_clause  Return an array to overwrite core's logic.
 		 * @param string     $post_type    The post type the query is running against.
-	 	 * @param string     $meta_key     The configured meta key.
+		 * @param string     $meta_key     The configured meta key.
 		 * @param string     $meta_type    The meta field's data type.
 		 * @param string     $meta_compare Generic filter compare operator.
 		 * @param string     $meta_value   Generic filter value (or '').

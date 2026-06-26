@@ -160,8 +160,8 @@ function gutenberg_apply_meta_query_rest_args( $args, $request, $post_type = 'po
 		$meta_type = 'CHAR';
 	}
 
-	$meta_compare_raw = $request->get_param( 'meta_compare' ) ? $request->get_param( 'meta_compare' ) : '=';
-	$meta_compare     = html_entity_decode( $meta_compare_raw );
+	$meta_compare_raw          = $request->get_param( 'meta_compare' ) ? $request->get_param( 'meta_compare' ) : '=';
+	$meta_compare              = html_entity_decode( $meta_compare_raw );
 	$allowed_compare_operators = apply_filters(
 		'query_loop_allowed_meta_compare_operators',
 		array( '=', '!=', '>', '<', 'LIKE' )
