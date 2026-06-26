@@ -21,9 +21,14 @@ test.describe( 'Nonce', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'test' );
 
-		/**
-		 * Mock network and manually expire the API nonce until refreshed.
-		 */
+		const isDraftSaveRequest = ( request ) => {
+			return (
+				request.method() === 'POST' &&
+				request.postDataJSON()?.status === 'draft'
+			);
+		};
+
+		// Mock network and manually expire the API nonce until refreshed.
 		{
 			let refreshed = false;
 
@@ -47,7 +52,10 @@ test.describe( 'Nonce', () => {
 						requestUtils.storageState.rootURL.slice( 0, -1 )
 					),
 				async ( route ) => {
-					if ( refreshed ) {
+					if (
+						refreshed ||
+						! isDraftSaveRequest( route.request() )
+					) {
 						await route.continue();
 					} else {
 						await route.fulfill( {
@@ -66,11 +74,7 @@ test.describe( 'Nonce', () => {
 
 		const saveDraftResponses = [];
 		page.on( 'response', ( response ) => {
-			const request = response.request();
-			if (
-				request.method() === 'POST' &&
-				request.postDataJSON()?.status === 'draft'
-			) {
+			if ( isDraftSaveRequest( response.request() ) ) {
 				saveDraftResponses.push( response.status() );
 			}
 		} );
