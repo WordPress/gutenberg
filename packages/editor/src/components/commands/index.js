@@ -41,6 +41,17 @@ import { modalName as patternRenameModalName } from '../pattern-rename-modal';
 import { modalName as patternDuplicateModalName } from '../pattern-duplicate-modal';
 import isTemplateRevertable from '../../store/utils/is-template-revertable';
 
+/**
+ * Returns the command that toggles content-only editing for patterns and template parts.
+ * The command is registered both globally for search and contextually for block
+ * selection, so keeping it in one place ensures the label and callback stay aligned.
+ *
+ * @param {Object}   options                                               Command options.
+ * @param {boolean}  options.disableContentOnlyForPatternsAndTemplateParts Whether content-only editing is disabled for patterns and template parts.
+ * @param {Function} options.stopEditingContentOnlySection                 Stops editing the current content-only section before changing the setting.
+ * @param {Function} options.updateEditorSettings                          Updates the editor settings.
+ * @return {Object} The command configuration.
+ */
 function getTogglePatternEditingCommand( {
 	disableContentOnlyForPatternsAndTemplateParts,
 	stopEditingContentOnlySection,
@@ -392,6 +403,8 @@ const getPatternEditingContextualCommands = () =>
 			useDispatch( blockEditorStore )
 		);
 
+		// Keep the disable command available after full pattern editing is enabled,
+		// even when the current selection is no longer inside a pattern or template part.
 		if (
 			search ||
 			( ! hasPatternOrTemplatePartSelection &&
