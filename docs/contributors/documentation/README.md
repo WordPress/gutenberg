@@ -107,6 +107,24 @@ An example, the link to this page is: `/docs/contributors/documentation/README.m
 <b>Note:</b> The usual link transformation is not applied to links in callouts. See below.
 </div>
 
+### Using images
+
+Images used in documentation must be hosted in the [developer.wordpress.org Media Library](https://developer.wordpress.org/wp-admin/upload.php), **not** on GitHub (e.g. `raw.githubusercontent.com`). Images hosted on GitHub are subject to rate limiting and may fail to load when the documentation is rendered in the [Block Editor Handbook](https://developer.wordpress.org/block-editor/).
+
+To add an image to the documentation:
+
+1. Upload the image to the developer.wordpress.org Media Library. If you don't have the required permissions, reach out in the `#docs` channel in [Make WordPress Slack](https://make.wordpress.org/chat) for assistance.
+2. Copy the URL of the uploaded image. It will follow this format: `https://developer.wordpress.org/files/YYYY/MM/image-name.png`
+3. Use the URL in the markdown document:
+
+```md
+![Alt text describing the image](https://developer.wordpress.org/files/YYYY/MM/image-name.png)
+```
+
+<div class="callout callout-warning">
+Do <b>not</b> reference images using <code>raw.githubusercontent.com</code> URLs. A CI check will flag any documentation contributions that use GitHub-hosted images.
+</div>
+
 ### Code examples
 
 The code example in markdown should be wrapped in three tick marks \`\`\` and should additionally include a language specifier. See this [GitHub documentation around fenced code blocks](https://help.github.com/en/github/writing-on-github/creating-and-highlighting-code-blocks).

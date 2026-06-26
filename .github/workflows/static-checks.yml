@@ -111,5 +111,9 @@ jobs:
             - name: Check local changes
               run: npm run other:check-local-changes
 
+            - name: Check documentation image sources
+              if: ${{ matrix.annotations }}
+              run: npm run lint:md:images
+
             - name: License compatibility
               run: npm run other:check-licenses

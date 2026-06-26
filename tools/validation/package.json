@@ -40,6 +40,7 @@
 		"check-root-dependencies": "node ./check-root-dependencies.mjs",
 		"test-create-block": "node ./test-create-block.mjs",
 		"validate-package-lock": "node ./validate-package-lock.cjs",
-		"validate-tsconfig": "node ./validate-tsconfig.mjs"
+		"validate-tsconfig": "node ./validate-tsconfig.mjs",
+		"check-doc-image-sources": "node ./check-doc-image-sources.mjs"
 	}
 }
