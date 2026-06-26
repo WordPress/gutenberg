@@ -7,6 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { createBlock } from '@wordpress/blocks';
 import {
 	useBlockProps,
 	store as blockEditorStore,
@@ -37,29 +38,42 @@ function Edit( {
 	const borderProps = useBorderProps( attributes );
 	const spacingProps = getSpacingClassesAndStyles( attributes );
 
-	const { tabsClientId, editorActiveTabIndex, activeTabIndex } = useSelect(
+	const {
+		tabsClientId,
+		tabPanelsClientId,
+		editorActiveTabIndex,
+		activeTabIndex,
+	} = useSelect(
 		( select ) => {
-			const { getBlockRootClientId, getBlockAttributes } =
+			const { getBlockRootClientId, getBlockAttributes, getBlocks } =
 				select( blockEditorStore );
 
 			const _tabsClientId = getBlockRootClientId( clientId );
 			const tabsAttributes = _tabsClientId
 				? getBlockAttributes( _tabsClientId )
 				: {};
+			const tabPanels = _tabsClientId
+				? getBlocks( _tabsClientId ).find(
+						( block ) => block.name === 'core/tab-panels'
+				  )
+				: undefined;
 
 			return {
 				tabsClientId: _tabsClientId,
+				tabPanelsClientId: tabPanels?.clientId ?? null,
 				editorActiveTabIndex: tabsAttributes?.editorActiveTabIndex,
 				activeTabIndex: tabsAttributes?.activeTabIndex ?? 0,
 			};
 		},
 		[ clientId ]
 	);
+	const {
+		insertBlock,
+		updateBlockAttributes,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
 
 	const effectiveActiveIndex = editorActiveTabIndex ?? activeTabIndex;
-
-	const { __unstableMarkNextChangeAsNotPersistent, updateBlockAttributes } =
-		useDispatch( blockEditorStore );
 
 	function selectTabPanel( tabIndex ) {
 		if ( tabsClientId && tabIndex !== effectiveActiveIndex ) {
@@ -75,6 +89,26 @@ function Edit( {
 		if ( tab?.clientId ) {
 			updateBlockAttributes( tab.clientId, { label: newLabel } );
 		}
+	}
+
+	function insertTabAfter( tabIndex ) {
+		if ( ! tabPanelsClientId ) {
+			return;
+		}
+
+		const newIndex = tabIndex + 1;
+		insertBlock(
+			createBlock( 'core/tab-panel', { label: __( 'Tab' ) } ),
+			newIndex,
+			tabPanelsClientId,
+			false
+		);
+
+		// Switch editor active tab to the new tab.
+		__unstableMarkNextChangeAsNotPersistent();
+		updateBlockAttributes( tabsClientId, {
+			editorActiveTabIndex: newIndex,
+		} );
 	}
 
 	const menuRef = useRef();
@@ -153,6 +187,9 @@ function Edit( {
 								value={ tab.label }
 								onChange={ ( newLabel ) =>
 									handleLabelChange( index, newLabel )
+								}
+								__unstableOnSplitAtEnd={ () =>
+									insertTabAfter( index )
 								}
 							/>
 						</button>
