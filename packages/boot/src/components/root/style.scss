@@ -1,6 +1,5 @@
 @use "@wordpress/base-styles/variables";
 @use "@wordpress/base-styles/mixins";
-@use "@wordpress/base-styles/colors";
 
 .boot-layout {
 	height: 100%;
@@ -81,16 +80,6 @@
 			margin-inline-start: 0;
 		}
 	}
-}
-
-// The macOS elastic scroll bounce reveals whatever is behind the viewport
-// (i.e. the body background). On boot-layout pages the body defaults to
-// white, which creates a jarring flash against the dark rounded surfaces.
-// Match the body background to the layout's dark neutral colour so the
-// bounce is visually seamless on the connectors page.
-// See https://github.com/WordPress/gutenberg/issues/78564
-.settings_page_options-connectors-wp-admin {
-	background-color: colors.$gray-900;
 }
 
 .boot-layout__stage,
