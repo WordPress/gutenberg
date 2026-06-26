@@ -490,6 +490,37 @@ describe( 'Waveform utilities', () => {
 			expect( instance.seekTo ).toHaveBeenCalledWith( 15 );
 		} );
 
+		it( 'seeks from the paused media time after focused playback stops', () => {
+			const { audio, container, instance, seekControl } =
+				createSeekControlFixture( {
+					duration: 60,
+					currentTime: 10,
+				} );
+
+			setupSeekControlAccessibility( container, instance );
+			const seekInput = getSeekInput( seekControl );
+
+			seekInput.focus();
+			container.dispatchEvent( new CustomEvent( 'waveformplayer:play' ) );
+			audio.currentTime = 30;
+			instance.options.onTimeUpdate( 30, 60, instance );
+
+			expect( seekInput.value ).toBe( '10' );
+
+			container.dispatchEvent(
+				new CustomEvent( 'waveformplayer:pause' )
+			);
+			seekInput.dispatchEvent(
+				new window.KeyboardEvent( 'keydown', {
+					key: 'ArrowRight',
+					bubbles: true,
+					cancelable: true,
+				} )
+			);
+
+			expect( instance.seekTo ).toHaveBeenCalledWith( 35 );
+		} );
+
 		it( 'seeks from the latest reported media time after an external paused seek', () => {
 			const { audio, container, instance, seekControl } =
 				createSeekControlFixture( {

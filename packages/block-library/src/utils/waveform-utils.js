@@ -549,6 +549,12 @@ export function setupSeekControlAccessibility(
 	};
 	const onPause = () => {
 		isPlaying = false;
+		// Playback is no longer advancing, so refresh even a focused slider.
+		// This keeps the next keyboard seek anchored to the paused media time.
+		updateSeekControl( {
+			syncPlayhead: true,
+			currentTimeOverride: audio.currentTime,
+		} );
 	};
 	const onEnded = () => {
 		isPlaying = false;
