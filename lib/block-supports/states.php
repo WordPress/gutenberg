@@ -646,17 +646,20 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 	 */
 	$style_rules = array();
 	foreach ( $css_rules as $rule ) {
-		$declarations           = $rule['declarations'];
-		$important_declarations = gutenberg_get_state_declarations_with_background_resets( $declarations );
-		$selector               = gutenberg_build_state_selector(
+		$declarations                 = $rule['declarations'];
+		$important_declaration_values = gutenberg_get_state_declarations_with_background_resets( $declarations );
+		$important_declarations       = new WP_Style_Engine_CSS_Declarations_Gutenberg();
+		foreach ( $important_declaration_values as $property => $value ) {
+			$important_declarations->add_declaration( $property, $value, true );
+		}
+		$selector   = gutenberg_build_state_selector(
 			".$unique_class",
 			$rule['selector'],
 			$rule['state']
 		);
-		$style_rule             = array(
+		$style_rule = array(
 			'selector'     => $selector,
 			'declarations' => $important_declarations,
-			'important'    => true,
 		);
 		if ( ! empty( $rule['rules_group'] ) ) {
 			$style_rule['rules_group'] = $rule['rules_group'];

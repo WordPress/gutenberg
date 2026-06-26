@@ -95,13 +95,12 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 		 * Adds multiple declarations.
 		 *
 		 * @param array $declarations An array of declarations.
-		 * @param bool  $is_important Optional. Whether to output the declarations with !important. Default false.
 		 *
 		 * @return WP_Style_Engine_CSS_Declarations Returns the object to allow chaining methods.
 		 */
-		public function add_declarations( $declarations, $is_important = false ) {
+		public function add_declarations( $declarations ) {
 			foreach ( $declarations as $property => $value ) {
-				$this->add_declaration( $property, $value, $is_important );
+				$this->add_declaration( $property, $value );
 			}
 			return $this;
 		}

@@ -826,14 +826,17 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	 * @covers ::wp_style_engine_get_stylesheet_from_css_rules
 	 * @covers WP_Style_Engine_Gutenberg::compile_stylesheet_from_css_rules
 	 */
-	public function test_should_return_stylesheet_with_important_css_rules() {
+	public function test_should_return_stylesheet_with_important_declarations() {
+		$declarations = new WP_Style_Engine_CSS_Declarations_Gutenberg();
+		$declarations->add_declaration(
+			'background-image',
+			'linear-gradient(135deg,rgb(119,255,112) 0%,rgb(253,254,215) 99%)',
+			true
+		);
 		$css_rules = array(
 			array(
 				'selector'     => '.responsive-state',
-				'declarations' => array(
-					'background-image' => 'linear-gradient(135deg,rgb(119,255,112) 0%,rgb(253,254,215) 99%)',
-				),
-				'important'    => true,
+				'declarations' => $declarations,
 			),
 		);
 
