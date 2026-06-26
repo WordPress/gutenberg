@@ -358,4 +358,4 @@ const v3 = {
 	},
 };
 
-export default [ v3, v1, v2 ];
+export default [ v3, v2, v1 ];
