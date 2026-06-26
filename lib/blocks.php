@@ -405,12 +405,16 @@ function gutenberg_map_rich_text_attribute_type_for_json_schema( $schema ) {
 	if ( isset( $schema['type'] ) ) {
 		if ( 'rich-text' === $schema['type'] ) {
 			$schema['type'] = 'string';
-		} elseif ( is_array( $schema['type'] ) ) {
-			foreach ( $schema['type'] as $index => $type ) {
-				if ( 'rich-text' === $type ) {
-					$schema['type'][ $index ] = 'string';
-				}
-			}
+		} elseif (
+			is_array( $schema['type'] ) &&
+			in_array( 'rich-text', $schema['type'], true )
+		) {
+			$schema['type'] = array_map(
+				static function ( $type ) {
+					return 'rich-text' === $type ? 'string' : $type;
+				},
+				$schema['type']
+			);
 		}
 	}
 
@@ -613,6 +617,7 @@ add_filter(
  * @return array Modified REST API endpoints.
  */
 function gutenberg_replace_block_renderer_attributes_rest_callbacks( $endpoints ) {
+	// WP_REST_Block_Renderer_Controller registers one route with GET/POST endpoints.
 	$route = '/wp/v2/block-renderer/(?P<name>[a-z0-9-]+/[a-z0-9-]+)';
 	if ( empty( $endpoints[ $route ] ) || ! is_array( $endpoints[ $route ] ) ) {
 		return $endpoints;
