@@ -125,6 +125,9 @@ require __DIR__ . '/compat/wordpress-7.1/icons.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/omnibar/load.php';
+require __DIR__ . '/experimental/admin-wp-icons/load.php';
+require __DIR__ . '/experimental/admin-wp-icons/admin-bar.php';
+require __DIR__ . '/experimental/admin-wp-icons/admin-menu.php';
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';

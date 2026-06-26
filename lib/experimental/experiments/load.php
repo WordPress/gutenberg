@@ -131,6 +131,11 @@ function gutenberg_initialize_experiments_settings() {
 					'description' => __( 'Previews a redesigned toolbar UI that is visually consistent everywhere. For now, it includes replacing home/odometer dashicon with site icon if set.', 'gutenberg' ),
 				),
 				array(
+					'id'          => 'gutenberg-admin-wp-icons',
+					'label'       => __( '@wordpress/icons in WP Admin', 'gutenberg' ),
+					'description' => __( 'Replaces the dashicons in the admin bar and the admin menu with SVG icons from the @wordpress/icons library.', 'gutenberg' ),
+				),
+				array(
 					'id'          => 'gutenberg-react-19',
 					'label'       => __( 'React 19', 'gutenberg' ),
 					'description' => __( 'Registers React 19 as the bundled React version, replacing the default React 18 scripts.', 'gutenberg' ),
