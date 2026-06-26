@@ -386,3 +386,252 @@ function _gutenberg_footnotes_force_filtered_html_on_import_filter( $arg ) {
 add_action( 'init', '_gutenberg_footnotes_kses_init' );
 add_action( 'set_current_user', '_gutenberg_footnotes_kses_init' );
 add_filter( 'force_filtered_html_on_import', '_gutenberg_footnotes_force_filtered_html_on_import_filter', 999 );
+
+/**
+ * Maps the 'rich-text' attribute type to 'string' in JSON Schemas.
+ *
+ * The 'rich-text' type is editor metadata, not a JSON Schema type. Keep it in
+ * the registered block type so the editor can identify rich text attributes,
+ * but use 'string' when validating server-side render requests.
+ *
+ * @param array $schema Attribute schema.
+ * @return array Modified attribute schema.
+ */
+function gutenberg_map_rich_text_attribute_type_for_json_schema( $schema ) {
+	if ( ! is_array( $schema ) ) {
+		return $schema;
+	}
+
+	if ( isset( $schema['type'] ) ) {
+		if ( 'rich-text' === $schema['type'] ) {
+			$schema['type'] = 'string';
+		} elseif ( is_array( $schema['type'] ) ) {
+			foreach ( $schema['type'] as $index => $type ) {
+				if ( 'rich-text' === $type ) {
+					$schema['type'][ $index ] = 'string';
+				}
+			}
+		}
+	}
+
+	foreach ( $schema as $key => $value ) {
+		if ( in_array( $key, array( 'type', 'default', 'enum', 'example' ), true ) ) {
+			continue;
+		}
+
+		if ( in_array( $key, array( 'properties', 'query' ), true ) ) {
+			$schema[ $key ] = gutenberg_map_rich_text_attribute_map_for_json_schema( $value );
+			continue;
+		}
+
+		if ( is_array( $value ) ) {
+			$schema[ $key ] = gutenberg_map_rich_text_attribute_type_for_json_schema( $value );
+		}
+	}
+
+	return $schema;
+}
+
+/**
+ * Maps rich-text attribute types in a map of block attribute schemas.
+ *
+ * Attribute names may overlap with JSON Schema keywords such as 'default',
+ * 'enum', 'example', or 'type', so map each attribute schema individually.
+ *
+ * @param array $attributes Attribute schemas keyed by attribute name.
+ * @return array Modified attribute schemas.
+ */
+function gutenberg_map_rich_text_attribute_map_for_json_schema( $attributes ) {
+	if ( ! is_array( $attributes ) ) {
+		return $attributes;
+	}
+
+	foreach ( $attributes as $attribute_name => $attribute_schema ) {
+		$attributes[ $attribute_name ] = gutenberg_map_rich_text_attribute_type_for_json_schema(
+			$attribute_schema
+		);
+	}
+
+	return $attributes;
+}
+
+/**
+ * Returns a JSON Schema-compatible block attributes schema for REST requests.
+ *
+ * @param string $block_name Block name.
+ * @return array|null REST-compatible attributes schema, or null when the block
+ *                    is not registered.
+ */
+function gutenberg_get_block_renderer_attributes_rest_schema( $block_name ) {
+	$block = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
+	if ( ! $block ) {
+		return null;
+	}
+
+	return array(
+		'type'                 => 'object',
+		'properties'           => gutenberg_map_rich_text_attribute_map_for_json_schema(
+			$block->get_attributes()
+		),
+		'additionalProperties' => false,
+	);
+}
+
+/**
+ * Validates block renderer attributes with a JSON Schema-compatible rich-text type.
+ *
+ * @param mixed           $value   Request value.
+ * @param WP_REST_Request $request Request object.
+ * @return true|WP_Error True if the value is valid, otherwise WP_Error.
+ */
+function gutenberg_validate_block_renderer_attributes( $value, $request ) {
+	$schema = gutenberg_get_block_renderer_attributes_rest_schema( $request['name'] );
+	if ( ! $schema ) {
+		// This will get rejected by WP_REST_Block_Renderer_Controller::get_item().
+		return true;
+	}
+
+	return rest_validate_value_from_schema( $value, $schema );
+}
+
+/**
+ * Sanitizes block renderer attributes with a JSON Schema-compatible rich-text type.
+ *
+ * @param mixed           $value   Request value.
+ * @param WP_REST_Request $request Request object.
+ * @return mixed Sanitized value.
+ */
+function gutenberg_sanitize_block_renderer_attributes( $value, $request ) {
+	$schema = gutenberg_get_block_renderer_attributes_rest_schema( $request['name'] );
+	if ( ! $schema ) {
+		// This will get rejected by WP_REST_Block_Renderer_Controller::get_item().
+		return true;
+	}
+
+	return rest_sanitize_value_from_schema( $value, $schema );
+}
+
+/**
+ * Temporarily maps rich-text attribute types before a block is rendered.
+ *
+ * WP_Block validates attributes when a WP_Block instance is created or rendered.
+ * Keep the registered block metadata unchanged outside the current render stack,
+ * but make render-time validation use JSON Schema-compatible attribute types.
+ *
+ * @param array $context      Default context.
+ * @param array $parsed_block Block being rendered.
+ * @return array Unmodified context.
+ */
+function gutenberg_prepare_rich_text_attribute_types_for_render(
+	$context,
+	$parsed_block
+) {
+	if ( empty( $parsed_block['blockName'] ) ) {
+		return $context;
+	}
+
+	$block = WP_Block_Type_Registry::get_instance()->get_registered( $parsed_block['blockName'] );
+	if ( ! $block ) {
+		return $context;
+	}
+
+	$attributes        = $block->get_attributes();
+	$mapped_attributes = gutenberg_map_rich_text_attribute_map_for_json_schema( $attributes );
+	if ( $mapped_attributes === $attributes ) {
+		return $context;
+	}
+
+	$GLOBALS['_gutenberg_block_render_original_attributes'][] = array(
+		'block_name' => $parsed_block['blockName'],
+		'block'      => $block,
+		'attributes' => $block->attributes,
+	);
+	$block->attributes                                  = $mapped_attributes;
+
+	return $context;
+}
+add_filter(
+	'render_block_context',
+	'gutenberg_prepare_rich_text_attribute_types_for_render',
+	PHP_INT_MAX,
+	2
+);
+
+/**
+ * Restores block attributes after a block is rendered.
+ *
+ * @param string   $block_content Rendered block content.
+ * @param array    $block         Block being rendered.
+ * @return string Unmodified rendered block content.
+ */
+function gutenberg_restore_rich_text_attribute_types_after_render(
+	$block_content,
+	$block
+) {
+	if (
+		empty( $block['blockName'] ) ||
+		empty( $GLOBALS['_gutenberg_block_render_original_attributes'] )
+	) {
+		return $block_content;
+	}
+
+	$restore         = null;
+	$attribute_stack = &$GLOBALS['_gutenberg_block_render_original_attributes'];
+	for (
+		$index = count( $attribute_stack ) - 1;
+		$index >= 0;
+		--$index
+	) {
+		if ( $attribute_stack[ $index ]['block_name'] === $block['blockName'] ) {
+			$restore = $attribute_stack[ $index ];
+			array_splice( $attribute_stack, $index, 1 );
+			break;
+		}
+	}
+
+	if ( ! $restore ) {
+		return $block_content;
+	}
+
+	if ( $restore['block'] instanceof WP_Block_Type ) {
+		$restore['block']->attributes = $restore['attributes'];
+	}
+
+	return $block_content;
+}
+add_filter(
+	'render_block',
+	'gutenberg_restore_rich_text_attribute_types_after_render',
+	0,
+	2
+);
+
+/**
+ * Replaces block renderer attribute validation with a rich-text-aware callback.
+ *
+ * @param array $endpoints REST API endpoints.
+ * @return array Modified REST API endpoints.
+ */
+function gutenberg_replace_block_renderer_attributes_rest_callbacks( $endpoints ) {
+	$route = '/wp/v2/block-renderer/(?P<name>[a-z0-9-]+/[a-z0-9-]+)';
+	if ( empty( $endpoints[ $route ] ) || ! is_array( $endpoints[ $route ] ) ) {
+		return $endpoints;
+	}
+
+	foreach ( $endpoints[ $route ] as $index => $endpoint ) {
+		if (
+			empty( $endpoint['args']['attributes'] ) ||
+			! is_array( $endpoint['args']['attributes'] )
+		) {
+			continue;
+		}
+
+		$attributes_args                      = &$endpoints[ $route ][ $index ]['args']['attributes'];
+		$attributes_args['validate_callback'] = 'gutenberg_validate_block_renderer_attributes';
+		$attributes_args['sanitize_callback'] = 'gutenberg_sanitize_block_renderer_attributes';
+		unset( $attributes_args );
+	}
+
+	return $endpoints;
+}
+add_filter( 'rest_endpoints', 'gutenberg_replace_block_renderer_attributes_rest_callbacks' );
