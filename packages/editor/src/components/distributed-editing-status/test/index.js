@@ -3265,7 +3265,7 @@ describe( 'DistributedEditingStatus', () => {
 		}
 	} );
 
-	it( 'shows a latency-tolerant presence roster in the toolbar', () => {
+	it( 'shows a latency-tolerant presence roster in the toolbar', async () => {
 		const actions = setupDistributedEditingStatusDispatch();
 		setupDistributedEditingStatusSelect( {
 			editorSettings: {
@@ -3546,10 +3546,12 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-presence-row-tooltip-open',
 			'false'
 		);
-		fireEvent.mouseEnter( rows[ 0 ] );
+		fireEvent.pointerEnter( rows[ 0 ] );
 		expect( screen.getByRole( 'tooltip' ) ).toHaveTextContent( 'Mira' );
-		fireEvent.mouseLeave( rows[ 0 ] );
-		expect( screen.queryByRole( 'tooltip' ) ).not.toBeInTheDocument();
+		fireEvent.pointerLeave( rows[ 0 ] );
+		await waitFor( () =>
+			expect( screen.queryByRole( 'tooltip' ) ).not.toBeInTheDocument()
+		);
 		fireEvent.focus( miraPresenceButton );
 		expect( screen.getByRole( 'tooltip' ) ).toHaveTextContent( 'Mira' );
 		fireEvent.blur( miraPresenceButton );
@@ -3563,7 +3565,7 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-presence-row-tooltip-pinned',
 			'true'
 		);
-		fireEvent.mouseLeave( rows[ 0 ] );
+		fireEvent.pointerLeave( rows[ 0 ] );
 		expect( screen.getByRole( 'tooltip' ) ).toHaveTextContent( 'Mira' );
 		expect(
 			within( rows[ 0 ] ).getByRole( 'button', {
@@ -3603,6 +3605,337 @@ describe( 'DistributedEditingStatus', () => {
 		expect(
 			actions.__experimentalSaveDistributedEditingRetryAfterProof
 		).not.toHaveBeenCalled();
+	} );
+
+	it( 'renders non-linear activity rings around presence avatars', () => {
+		jest.useFakeTimers().setSystemTime(
+			new Date( '2026-05-20T12:00:00Z' )
+		);
+
+		try {
+			setupDistributedEditingStatusDispatch();
+			setupDistributedEditingStatusSelect( {
+				editorSettings: {
+					distributedEditing: {
+						enabled: true,
+					},
+				},
+				sessionState: {
+					presenceRepeatedRefreshSelectedHeartbeatIntervalSeconds: 30,
+					presenceRosterEntries: [
+						{
+							key: 'presence-fresh',
+							displayName: 'Fresh',
+							freshness: 'current',
+							presenceUpdatedAtGmt: '2026-05-20 11:59:30',
+						},
+						{
+							key: 'presence-uncertain',
+							displayName: 'Uncertain',
+							freshness: 'recent',
+							presenceUpdatedAtGmt: '2026-05-20 11:57:00',
+						},
+						{
+							key: 'presence-abandoned',
+							displayName: 'Abandoned',
+							freshness: 'stale',
+							presenceUpdatedAtGmt: '2026-05-20 10:59:00',
+						},
+						{
+							key: 'presence-unknown',
+							displayName: 'Unknown',
+							freshness: 'recent',
+						},
+					],
+					presenceRosterTotalKnownCount: 4,
+				},
+			} );
+
+			render( <DistributedEditingPresenceToolbar /> );
+
+			const rowList = screen.getByRole( 'list', {
+				name: 'Active editors',
+			} );
+			const rows = within( rowList ).getAllByRole( 'listitem' );
+
+			expect( rows ).toHaveLength( 4 );
+			expect( rows[ 0 ] ).toHaveAttribute(
+				'data-distributed-editing-presence-row-activity-band',
+				'active'
+			);
+			expect( rows[ 0 ] ).toHaveAttribute(
+				'data-distributed-editing-presence-row-activity-age-seconds',
+				'30'
+			);
+			expect( rows[ 0 ] ).toHaveAttribute(
+				'data-distributed-editing-presence-row-activity-score',
+				'0.98'
+			);
+			expect( rows[ 0 ] ).toHaveAttribute(
+				'data-distributed-editing-presence-row-activity-visual-color-only',
+				'false'
+			);
+			expect(
+				within( rows[ 0 ] ).getByTestId(
+					'distributed-editing-presence-activity-ring'
+				)
+			).toHaveClass(
+				'editor-distributed-editing-status__presence-caterpillar-activity-ring--active'
+			);
+			expect(
+				within( rows[ 0 ] ).getByRole( 'button', {
+					name: 'Fresh, Active now. Show editing details',
+				} )
+			).toHaveAttribute(
+				'data-distributed-editing-presence-avatar-activity-score',
+				'0.98'
+			);
+			expect( rows[ 1 ] ).toHaveAttribute(
+				'data-distributed-editing-presence-row-activity-band',
+				'uncertain'
+			);
+			expect( rows[ 1 ] ).toHaveAttribute(
+				'data-distributed-editing-presence-row-activity-age-seconds',
+				'180'
+			);
+			expect( rows[ 1 ] ).toHaveAttribute(
+				'data-distributed-editing-presence-row-activity-score',
+				'0.71'
+			);
+			expect( rows[ 2 ] ).toHaveAttribute(
+				'data-distributed-editing-presence-row-activity-band',
+				'abandoned'
+			);
+			expect( rows[ 2 ] ).toHaveAttribute(
+				'data-distributed-editing-presence-row-activity-age-seconds',
+				'3660'
+			);
+			expect( rows[ 2 ] ).toHaveAttribute(
+				'data-distributed-editing-presence-row-activity-score',
+				'0.00'
+			);
+			expect( rows[ 3 ] ).toHaveAttribute(
+				'data-distributed-editing-presence-row-activity-band',
+				'unknown'
+			);
+			expect( rows[ 3 ] ).toHaveAttribute(
+				'data-distributed-editing-presence-row-activity-age-seconds',
+				''
+			);
+			expect( rows[ 3 ] ).toHaveAttribute(
+				'data-distributed-editing-presence-row-activity-score',
+				'0.50'
+			);
+		} finally {
+			jest.useRealTimers();
+		}
+	} );
+
+	it( 'renders activity rings for author-level presence rows', () => {
+		jest.useFakeTimers().setSystemTime(
+			new Date( '2026-05-20T12:00:00Z' )
+		);
+
+		try {
+			setupDistributedEditingStatusDispatch();
+			setupDistributedEditingStatusSelect( {
+				editorSettings: {
+					distributedEditing: {
+						enabled: true,
+					},
+				},
+				sessionState: {
+					presenceRepeatedRefreshSelectedHeartbeatIntervalSeconds: 30,
+					presenceRosterEntries: [
+						{
+							key: 'presence-author',
+							displayName: 'Author',
+							freshness: 'current',
+							presenceUpdatedAtGmt: '2026-05-20 11:59:45',
+							permissionsAvailable: true,
+							permissions: {
+								canEdit: true,
+								canPublish: false,
+								canSaveDangerousHtml: false,
+							},
+						},
+					],
+					presenceRosterTotalKnownCount: 1,
+				},
+			} );
+
+			render( <DistributedEditingPresenceToolbar /> );
+
+			const row = within(
+				screen.getByRole( 'list', { name: 'Active editors' } )
+			).getByRole( 'listitem' );
+			const button = within( row ).getByRole( 'button', {
+				name: 'Author, Active now. Show editing details',
+			} );
+			const ring = within( button ).getByTestId(
+				'distributed-editing-presence-activity-ring'
+			);
+
+			expect( row ).toHaveAttribute(
+				'data-distributed-editing-presence-row-permissions-visible',
+				'true'
+			);
+			expect( row ).toHaveAttribute(
+				'data-distributed-editing-presence-row-activity-band',
+				'active'
+			);
+			expect( row ).toHaveAttribute(
+				'data-distributed-editing-presence-row-activity-visual-color-only',
+				'false'
+			);
+			expect( button ).toHaveAttribute(
+				'data-distributed-editing-presence-avatar-activity-score',
+				'0.99'
+			);
+			expect( button ).toContainElement( ring );
+			expect( ring ).toHaveClass(
+				'editor-distributed-editing-status__presence-caterpillar-activity-ring--active'
+			);
+
+			fireEvent.pointerEnter( row );
+			expect( screen.getByRole( 'tooltip' ) ).toHaveTextContent(
+				'Can edit'
+			);
+			expect(
+				screen.queryByText( 'Can publish' )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByText( 'Can save custom HTML' )
+			).not.toBeInTheDocument();
+		} finally {
+			jest.useRealTimers();
+		}
+	} );
+
+	it( 'adjusts a lagging presence ring when other sessions are fresh', () => {
+		jest.useFakeTimers().setSystemTime(
+			new Date( '2026-05-20T12:00:00Z' )
+		);
+
+		try {
+			setupDistributedEditingStatusDispatch();
+			setupDistributedEditingStatusSelect( {
+				editorSettings: {
+					distributedEditing: {
+						enabled: true,
+					},
+				},
+				sessionState: {
+					presenceRepeatedRefreshSelectedHeartbeatIntervalSeconds: 30,
+					presenceRosterEntries: [
+						{
+							key: 'presence-fresh-a',
+							displayName: 'Fresh A',
+							freshness: 'current',
+							presenceUpdatedAtGmt: '2026-05-20 11:59:50',
+						},
+						{
+							key: 'presence-fresh-b',
+							displayName: 'Fresh B',
+							freshness: 'current',
+							presenceUpdatedAtGmt: '2026-05-20 11:59:45',
+						},
+						{
+							key: 'presence-lagging',
+							displayName: 'Lagging',
+							freshness: 'recent',
+							presenceUpdatedAtGmt: '2026-05-20 11:58:20',
+						},
+					],
+					presenceRosterTotalKnownCount: 3,
+				},
+			} );
+
+			render( <DistributedEditingPresenceToolbar /> );
+
+			const rows = within(
+				screen.getByRole( 'list', { name: 'Active editors' } )
+			).getAllByRole( 'listitem' );
+
+			expect( rows[ 2 ] ).toHaveAttribute(
+				'data-distributed-editing-presence-row-activity-age-seconds',
+				'100'
+			);
+			expect( rows[ 2 ] ).toHaveAttribute(
+				'data-distributed-editing-presence-row-activity-relative-adjusted',
+				'true'
+			);
+			expect( rows[ 2 ] ).toHaveAttribute(
+				'data-distributed-editing-presence-row-activity-score',
+				'0.55'
+			);
+			expect( rows[ 2 ] ).toHaveAttribute(
+				'data-distributed-editing-presence-row-activity-band',
+				'uncertain'
+			);
+		} finally {
+			jest.useRealTimers();
+		}
+	} );
+
+	it( 'updates presence activity rings on a local timer without refreshing presence', () => {
+		jest.useFakeTimers().setSystemTime(
+			new Date( '2026-05-20T12:00:00Z' )
+		);
+
+		try {
+			const actions = setupDistributedEditingStatusDispatch();
+			setupDistributedEditingStatusSelect( {
+				editorSettings: {
+					distributedEditing: {
+						enabled: true,
+					},
+				},
+				sessionState: {
+					presenceRepeatedRefreshSelectedHeartbeatIntervalSeconds: 30,
+					presenceRosterEntries: [
+						{
+							key: 'presence-local-tick',
+							displayName: 'Tick',
+							freshness: 'current',
+							presenceUpdatedAtGmt: '2026-05-20 11:59:10',
+						},
+					],
+					presenceRosterTotalKnownCount: 1,
+				},
+			} );
+
+			render( <DistributedEditingPresenceToolbar /> );
+
+			const row = screen.getByRole( 'listitem', {
+				name: 'Tick, Active now',
+			} );
+
+			expect( row ).toHaveAttribute(
+				'data-distributed-editing-presence-row-activity-age-seconds',
+				'50'
+			);
+
+			act( () => {
+				jest.advanceTimersByTime( 15000 );
+			} );
+
+			expect( row ).toHaveAttribute(
+				'data-distributed-editing-presence-row-activity-age-seconds',
+				'65'
+			);
+			expect(
+				actions.__experimentalRefreshDistributedEditingPresenceSnapshot
+			).not.toHaveBeenCalled();
+			expect(
+				actions.__experimentalSendDistributedEditingPresenceHeartbeat
+			).not.toHaveBeenCalled();
+			expect(
+				actions.__experimentalSaveDistributedEditingRetryAfterProof
+			).not.toHaveBeenCalled();
+		} finally {
+			jest.useRealTimers();
+		}
 	} );
 
 	it( 'shows advisory document-copy state in the presence caterpillar without save authority', () => {

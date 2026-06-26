@@ -117,7 +117,7 @@
 
 .editor-distributed-editing-status__presence-caterpillar--toolbar {
 	margin: 0;
-	min-height: 32px;
+	min-height: 36px;
 	padding: 0;
 }
 
@@ -126,7 +126,7 @@
 	border: 0;
 	display: block;
 	margin: 0 0 0 -8px;
-	min-height: 32px;
+	min-height: 36px;
 	padding: 0;
 	position: relative;
 	transition: transform 120ms ease;
@@ -145,17 +145,28 @@
 }
 
 .editor-distributed-editing-status__presence-caterpillar-button {
+	--de-rtc-presence-avatar-opacity: 1;
+	--de-rtc-presence-ring-angle: 360deg;
+	--de-rtc-presence-ring-color: var(--wp-admin-theme-color, #2271b1);
+	--de-rtc-presence-ring-track: rgba(0, 0, 0, 0.18);
+
 	align-items: center;
-	background: transparent;
+	background-color: var(--de-rtc-presence-ring-track);
+	background-image: conic-gradient(var(--de-rtc-presence-ring-color) var(--de-rtc-presence-ring-angle), var(--de-rtc-presence-ring-track) 0);
 	border: 0;
 	border-radius: 50%;
+	box-sizing: border-box;
+	box-shadow:
+		inset 0 0 0 1px rgba(255, 255, 255, 0.72),
+		0 0 0 1px rgba(0, 0, 0, 0.18);
 	cursor: var(--wpds-cursor-control);
 	display: inline-flex;
-	height: 32px;
+	height: 36px;
 	justify-content: center;
+	overflow: visible;
 	padding: 0;
 	position: relative;
-	width: 32px;
+	width: 36px;
 }
 
 .editor-distributed-editing-status__presence-caterpillar-button:focus-visible {
@@ -167,12 +178,76 @@
 
 .editor-distributed-editing-status__presence-caterpillar-avatar {
 	border: 2px solid $white;
+	box-sizing: border-box;
 	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.14);
 	flex-basis: 32px;
 	font-size: 12px;
 	height: 32px;
+	opacity: var(--de-rtc-presence-avatar-opacity);
 	overflow: hidden;
+	position: relative;
+	transition: opacity 180ms ease;
 	width: 32px;
+	z-index: 2;
+}
+
+.editor-distributed-editing-status__presence-caterpillar-activity-ring {
+	background-color: var(--de-rtc-presence-ring-track);
+	background-image: conic-gradient(var(--de-rtc-presence-ring-color) var(--de-rtc-presence-ring-angle), var(--de-rtc-presence-ring-track) 0);
+	border-radius: 50%;
+	inset: 0;
+	-webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
+	mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
+	opacity: var(--de-rtc-presence-avatar-opacity);
+	pointer-events: none;
+	position: absolute;
+	transition:
+		background 180ms ease,
+		opacity 180ms ease;
+	z-index: 4;
+}
+
+.editor-distributed-editing-status__presence-caterpillar-activity-ring--active {
+	animation:
+		editor-distributed-editing-presence-ring-pulse 2400ms ease-in-out
+		infinite;
+}
+
+.editor-distributed-editing-status__presence-caterpillar-item--activity-uncertain
+.editor-distributed-editing-status__presence-caterpillar-button,
+.editor-distributed-editing-status__presence-caterpillar-activity-ring--uncertain {
+	--de-rtc-presence-ring-color: #996800;
+	--de-rtc-presence-ring-track: rgba(153, 104, 0, 0.18);
+}
+
+.editor-distributed-editing-status__presence-caterpillar-item--activity-idle
+.editor-distributed-editing-status__presence-caterpillar-button,
+.editor-distributed-editing-status__presence-caterpillar-item--activity-abandoned
+.editor-distributed-editing-status__presence-caterpillar-button,
+.editor-distributed-editing-status__presence-caterpillar-item--activity-unknown
+.editor-distributed-editing-status__presence-caterpillar-button,
+.editor-distributed-editing-status__presence-caterpillar-activity-ring--idle,
+.editor-distributed-editing-status__presence-caterpillar-activity-ring--abandoned,
+.editor-distributed-editing-status__presence-caterpillar-activity-ring--unknown {
+	--de-rtc-presence-ring-color: #50575e;
+	--de-rtc-presence-ring-track: rgba(80, 87, 94, 0.18);
+}
+
+@keyframes editor-distributed-editing-presence-ring-pulse {
+	0%,
+	100% {
+		filter: saturate(1);
+	}
+
+	50% {
+		filter: saturate(1.25) brightness(1.08);
+	}
+}
+
+@media ( prefers-reduced-motion: reduce ) {
+	.editor-distributed-editing-status__presence-caterpillar-activity-ring--active {
+		animation: none;
+	}
 }
 
 .editor-distributed-editing-status__presence-caterpillar-avatar-image {
@@ -186,11 +261,15 @@
 	background: var(--wp-admin-theme-color, #2271b1);
 	border: 2px solid $white;
 	border-radius: 50%;
-	bottom: 1px;
+	bottom: 3px;
+	box-sizing: border-box;
 	height: 10px;
+	opacity: var(--de-rtc-presence-avatar-opacity);
 	position: absolute;
-	right: 1px;
+	right: 3px;
+	transition: opacity 180ms ease;
 	width: 10px;
+	z-index: 5;
 }
 
 .editor-distributed-editing-status__presence-caterpillar-document-cue {
@@ -198,13 +277,17 @@
 	background: $gray-700;
 	border: 2px solid $white;
 	border-radius: 50%;
+	box-sizing: border-box;
 	display: inline-flex;
 	height: 12px;
 	justify-content: center;
-	left: 0;
+	left: 2px;
+	opacity: var(--de-rtc-presence-avatar-opacity);
 	position: absolute;
-	top: 0;
+	top: 2px;
+	transition: opacity 180ms ease;
 	width: 12px;
+	z-index: 5;
 }
 
 .editor-distributed-editing-status__presence-caterpillar-document-cue::before {
@@ -451,7 +534,7 @@
 	display: block;
 	gap: 0;
 	margin: 0 0 0 -8px;
-	min-height: 32px;
+	min-height: 36px;
 	padding: 0;
 }
 

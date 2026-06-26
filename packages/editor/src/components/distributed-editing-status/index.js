@@ -87,6 +87,8 @@ const DISTRIBUTED_EDITING_DOCUMENT_STATE_HEARTBEAT_DEBOUNCE_MS = 500;
 const DISTRIBUTED_EDITING_CONFIRMED_SAVE_SHELL_HOLD_MS = 4000;
 const DISTRIBUTED_EDITING_CONFIRMED_SAVE_STATUS_HOLD_MS = 7000;
 const DISTRIBUTED_EDITING_DISMISSIBLE_STATUS_HOLD_MS = 8000;
+const DISTRIBUTED_EDITING_PRESENCE_ACTIVITY_TICK_MS = 15000;
+const DISTRIBUTED_EDITING_PRESENCE_ACTIVITY_DEFAULT_INTERVAL_SECONDS = 30;
 const DISTRIBUTED_EDITING_SAME_BLOCK_CONFLICT_REASONS = new Set( [
 	'same_block_changed',
 	'same_serialized_block_changed',
@@ -5650,6 +5652,9 @@ export function DistributedEditingPresenceRoster( {
 		useState( null );
 	const [ hoveredPresenceEntryKey, setHoveredPresenceEntryKey ] =
 		useState( null );
+	const [ presenceActivityNowMs, setPresenceActivityNowMs ] = useState( () =>
+		Date.now()
+	);
 	const expandedPresenceEntryKey =
 		pinnedPresenceEntryKey || hoveredPresenceEntryKey;
 	const presenceDetailsBaseId = useId();
@@ -6051,6 +6056,20 @@ export function DistributedEditingPresenceRoster( {
 	useEffect( () => cancelPresenceHoverClose, [ cancelPresenceHoverClose ] );
 
 	useEffect( () => {
+		if ( rosterDisplayEntries.length === 0 ) {
+			return undefined;
+		}
+
+		const intervalId = globalThis.setInterval( () => {
+			setPresenceActivityNowMs( Date.now() );
+		}, DISTRIBUTED_EDITING_PRESENCE_ACTIVITY_TICK_MS );
+
+		return () => {
+			globalThis.clearInterval( intervalId );
+		};
+	}, [ rosterDisplayEntries.length ] );
+
+	useEffect( () => {
 		if ( ! expandedPresenceEntryKey ) {
 			return undefined;
 		}
@@ -6439,6 +6458,11 @@ export function DistributedEditingPresenceRoster( {
 		return null;
 	}
 
+	const presenceActivityExpectedIntervalSeconds =
+		getPresenceActivityExpectedIntervalSeconds( repeatedRefreshState );
+	const presenceActivityAgeSeconds = rosterDisplayEntries.map( ( entry ) =>
+		getPresenceRosterEntryActivityAgeSeconds( entry, presenceActivityNowMs )
+	);
 	const hasOtherEditorActivityCue = Boolean(
 		rosterState.copy.otherEditorActivityCue
 	);
@@ -7195,11 +7219,28 @@ export function DistributedEditingPresenceRoster( {
 							);
 						const selectionLabel =
 							getPresenceRosterEntrySelectionLabel( entry );
+						const activityState =
+							getPresenceRosterEntryActivityState( {
+								ageSeconds: presenceActivityAgeSeconds[ index ],
+								expectedIntervalSeconds:
+									presenceActivityExpectedIntervalSeconds,
+								peerAgeSeconds:
+									presenceActivityAgeSeconds.filter(
+										( _ageSeconds, peerIndex ) =>
+											peerIndex !== index
+									),
+							} );
+						const activityRingStyle = {
+							'--de-rtc-presence-ring-angle': `${ activityState.ringAngleDegrees }deg`,
+							'--de-rtc-presence-avatar-opacity':
+								activityState.avatarOpacity,
+						};
 						const rowClassName = [
 							'editor-distributed-editing-status__presence-roster-item',
 							'editor-distributed-editing-status__presence-caterpillar-item',
 							`editor-distributed-editing-status__presence-roster-item--${ statusTone }`,
 							`editor-distributed-editing-status__presence-caterpillar-item--document-${ documentState.status }`,
+							`editor-distributed-editing-status__presence-caterpillar-item--activity-${ activityState.band }`,
 							isExpanded &&
 								'editor-distributed-editing-status__presence-caterpillar-item--expanded',
 						]
@@ -7272,6 +7313,19 @@ export function DistributedEditingPresenceRoster( {
 								data-distributed-editing-presence-row-authorship-focus-available={ formatDataBoolean(
 									Boolean( entry.authorshipFocusAvailable )
 								) }
+								data-distributed-editing-presence-row-activity-age-seconds={
+									activityState.ageSeconds ?? ''
+								}
+								data-distributed-editing-presence-row-activity-band={
+									activityState.band
+								}
+								data-distributed-editing-presence-row-activity-relative-adjusted={ formatDataBoolean(
+									activityState.relativeAdjusted
+								) }
+								data-distributed-editing-presence-row-activity-score={
+									activityState.scoreLabel
+								}
+								data-distributed-editing-presence-row-activity-visual-color-only="false"
 								data-distributed-editing-presence-row-treatment="compact-status-badge"
 								data-distributed-editing-presence-row-visual-treatment="subtle-status-stripe"
 								data-distributed-editing-presence-row-visual-treatment-color-only="false"
@@ -7315,6 +7369,12 @@ export function DistributedEditingPresenceRoster( {
 										accessibleStatusLabel
 									) }
 									className="editor-distributed-editing-status__presence-caterpillar-button"
+									data-distributed-editing-presence-avatar-activity-band={
+										activityState.band
+									}
+									data-distributed-editing-presence-avatar-activity-score={
+										activityState.scoreLabel
+									}
 									data-distributed-editing-presence-avatar-button="true"
 									onClick={ ( event ) => {
 										event.preventDefault();
@@ -7362,8 +7422,15 @@ export function DistributedEditingPresenceRoster( {
 											);
 										}
 									} }
+									style={ activityRingStyle }
 									type="button"
 								>
+									<span
+										aria-hidden="true"
+										className={ `editor-distributed-editing-status__presence-caterpillar-activity-ring editor-distributed-editing-status__presence-caterpillar-activity-ring--${ activityState.band }` }
+										data-distributed-editing-presence-activity-ring="true"
+										data-testid="distributed-editing-presence-activity-ring"
+									/>
 									<span
 										aria-hidden="true"
 										className={ avatarClassName }
@@ -7540,6 +7607,214 @@ function getPresenceRosterEntryRelationshipPriority( entry ) {
 
 function getPresenceRosterEntryFreshnessPriority( entry ) {
 	return isPresenceRosterEntryCurrent( entry ) ? 0 : 1;
+}
+
+function getPresenceActivityExpectedIntervalSeconds( repeatedRefreshState ) {
+	const intervalSeconds = [
+		repeatedRefreshState?.selectedHeartbeatIntervalSeconds,
+		repeatedRefreshState?.selectedIntervalSeconds,
+	].find( ( candidate ) => Number.isInteger( candidate ) && candidate > 0 );
+
+	return (
+		intervalSeconds ||
+		DISTRIBUTED_EDITING_PRESENCE_ACTIVITY_DEFAULT_INTERVAL_SECONDS
+	);
+}
+
+function getPresenceRosterEntryActivityAgeSeconds( entry, nowMs ) {
+	const timestamp = normalizeDisplayValue( entry?.presenceUpdatedAtGmt );
+	const timestampMs = getPresenceTimestampMs( timestamp );
+
+	if ( timestampMs === null ) {
+		return null;
+	}
+
+	return Math.max( 0, Math.floor( ( nowMs - timestampMs ) / 1000 ) );
+}
+
+function getPresenceTimestampMs( timestamp ) {
+	const normalizedTimestamp = normalizeDisplayValue( timestamp );
+
+	if ( ! normalizedTimestamp ) {
+		return null;
+	}
+
+	const parsedTime = Date.parse(
+		normalizedTimestamp.includes( 'T' )
+			? normalizedTimestamp
+			: `${ normalizedTimestamp } UTC`
+	);
+
+	return Number.isNaN( parsedTime ) ? null : parsedTime;
+}
+
+function getPresenceRosterEntryActivityState( {
+	ageSeconds,
+	expectedIntervalSeconds,
+	peerAgeSeconds = [],
+} = {} ) {
+	if ( ageSeconds === null || ageSeconds === undefined ) {
+		return getPresenceRosterEntryActivityOutput( {
+			ageSeconds: null,
+			band: 'unknown',
+			relativeAdjusted: false,
+			score: 0.5,
+		} );
+	}
+
+	const normalizedExpectedIntervalSeconds =
+		Number.isInteger( expectedIntervalSeconds ) &&
+		expectedIntervalSeconds > 0
+			? expectedIntervalSeconds
+			: DISTRIBUTED_EDITING_PRESENCE_ACTIVITY_DEFAULT_INTERVAL_SECONDS;
+	const warmWindowSeconds = Math.max(
+		60,
+		normalizedExpectedIntervalSeconds * 2
+	);
+	const uncertainWindowSeconds = Math.max(
+		300,
+		normalizedExpectedIntervalSeconds * 5
+	);
+	const abandonedWindowSeconds = Math.max(
+		3600,
+		normalizedExpectedIntervalSeconds * 30
+	);
+	let score;
+
+	// The visual model favors human perception over a linear timer: a session
+	// still looks active shortly after its expected heartbeat, then decays
+	// quickly once it is plausibly abandoned.
+	if ( ageSeconds <= warmWindowSeconds ) {
+		score =
+			1 -
+			0.08 *
+				Math.pow(
+					clampNumber( ageSeconds / warmWindowSeconds, 0, 1 ),
+					2
+				);
+	} else if ( ageSeconds <= uncertainWindowSeconds ) {
+		const intervalProgress = clampNumber(
+			( ageSeconds - warmWindowSeconds ) /
+				( uncertainWindowSeconds - warmWindowSeconds ),
+			0,
+			1
+		);
+
+		score = 0.92 - 0.42 * smoothstep( intervalProgress );
+	} else if ( ageSeconds <= abandonedWindowSeconds ) {
+		const intervalProgress = clampNumber(
+			( ageSeconds - uncertainWindowSeconds ) /
+				( abandonedWindowSeconds - uncertainWindowSeconds ),
+			0,
+			1
+		);
+
+		score = 0.5 * Math.pow( 1 - intervalProgress, 2.2 );
+	} else {
+		score = 0;
+	}
+
+	const relativeAdjustment = getPresenceRosterEntryRelativeActivityAdjustment(
+		{
+			ageSeconds,
+			expectedIntervalSeconds: normalizedExpectedIntervalSeconds,
+			peerAgeSeconds,
+			warmWindowSeconds,
+		}
+	);
+
+	if ( relativeAdjustment !== null ) {
+		score = Math.min( score, relativeAdjustment );
+	}
+
+	return getPresenceRosterEntryActivityOutput( {
+		ageSeconds,
+		band: getPresenceRosterEntryActivityBand( score ),
+		relativeAdjusted: relativeAdjustment !== null,
+		score,
+	} );
+}
+
+function getPresenceRosterEntryRelativeActivityAdjustment( {
+	ageSeconds,
+	expectedIntervalSeconds,
+	peerAgeSeconds,
+	warmWindowSeconds,
+} ) {
+	const freshPeerCount = peerAgeSeconds.filter(
+		( peerAgeSecondsValue ) =>
+			Number.isInteger( peerAgeSecondsValue ) &&
+			peerAgeSecondsValue <= warmWindowSeconds
+	).length;
+
+	if ( freshPeerCount < 2 ) {
+		return null;
+	}
+
+	if ( ageSeconds >= expectedIntervalSeconds * 6 ) {
+		return 0.25;
+	}
+
+	if ( ageSeconds >= expectedIntervalSeconds * 3 ) {
+		return 0.55;
+	}
+
+	return null;
+}
+
+function getPresenceRosterEntryActivityOutput( {
+	ageSeconds,
+	band,
+	relativeAdjusted,
+	score,
+} ) {
+	const normalizedScore = clampNumber( score, 0, 1 );
+
+	return {
+		ageSeconds,
+		avatarOpacity:
+			normalizedScore < 0.2
+				? String(
+						Number(
+							Math.max(
+								0.38,
+								0.38 + normalizedScore * 2.1
+							).toFixed( 2 )
+						)
+				  )
+				: '1',
+		band,
+		relativeAdjusted,
+		ringAngleDegrees: Math.round( normalizedScore * 360 ),
+		score: normalizedScore,
+		scoreLabel: normalizedScore.toFixed( 2 ),
+	};
+}
+
+function getPresenceRosterEntryActivityBand( score ) {
+	if ( score >= 0.72 ) {
+		return 'active';
+	}
+
+	if ( score >= 0.42 ) {
+		return 'uncertain';
+	}
+
+	if ( score > 0.05 ) {
+		return 'idle';
+	}
+
+	return 'abandoned';
+}
+
+function clampNumber( value, min, max ) {
+	return Math.min( max, Math.max( min, value ) );
+}
+
+function smoothstep( value ) {
+	const t = clampNumber( value, 0, 1 );
+
+	return t * t * ( 3 - 2 * t );
 }
 
 function getPresenceStorageReadinessState( readiness = {} ) {
