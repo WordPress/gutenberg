@@ -33,6 +33,7 @@ const patternDescriptionField: Field< Pattern > = {
 		rows: 4,
 	},
 	enableSorting: false,
+	enableHiding: false,
 	filterBy: false,
 	enableGlobalSearch: true,
 };

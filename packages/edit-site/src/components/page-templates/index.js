@@ -43,7 +43,8 @@ import {
 	getActiveViewOverridesForTab,
 } from './view-utils';
 
-const { usePostActions, usePostFields } = unlock( editorPrivateApis );
+const { usePostActions, usePostFields, templateTitleField } =
+	unlock( editorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );
 
@@ -220,17 +221,16 @@ export default function PageTemplates() {
 	const postTypeFields = usePostFields( {
 		postType: TEMPLATE_POST_TYPE,
 	} );
-	const titleField = postTypeFields.find( ( field ) => field.id === 'title' );
 	const dateField = postTypeFields.find( ( field ) => field.id === 'date' );
 	const themeField = useThemeField();
 	const fields = useMemo( () => {
 		const _fields = [
 			previewField,
-			titleField,
+			templateTitleField,
 			descriptionField,
 			activeField,
 			slugField,
-		].filter( Boolean );
+		];
 		if ( activeView === 'user' ) {
 			_fields.push( themeField );
 			if ( dateField ) {
@@ -249,7 +249,7 @@ export default function PageTemplates() {
 			elements,
 		} );
 		return _fields;
-	}, [ users, activeView, themeField, dateField, titleField ] );
+	}, [ users, activeView, themeField, dateField ] );
 
 	const { data, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( records, view, fields );

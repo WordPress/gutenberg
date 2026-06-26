@@ -42,12 +42,6 @@ function getPatternSyncStatus( item: Pattern ) {
 	return item.wp_pattern_sync_status || PATTERN_SYNC_TYPES.full;
 }
 
-function getPatternSyncStatusLabel( syncStatus: string ) {
-	return syncStatus === PATTERN_SYNC_TYPES.unsynced
-		? _x( 'Not synced', 'pattern (singular)' )
-		: _x( 'Synced', 'pattern (singular)' );
-}
-
 const patternSyncStatusField: Field< Pattern > = {
 	id: 'sync-status',
 	type: 'text',
@@ -60,14 +54,17 @@ const patternSyncStatusField: Field< Pattern > = {
 		operators: [ 'is' ],
 		isPrimary: true,
 	},
-	getValue: ( { item } ) => getPatternSyncStatus( item ),
 	render: ( { item } ) => {
 		const syncStatus = getPatternSyncStatus( item );
 		return (
 			<span
 				className={ `fields-field__pattern-sync-status fields-field__pattern-sync-status-${ syncStatus }` }
 			>
-				{ getPatternSyncStatusLabel( syncStatus ) }
+				{
+					SYNC_STATUS_FILTERS.find(
+						( { value } ) => value === syncStatus
+					)?.label
+				}
 			</span>
 		);
 	},
