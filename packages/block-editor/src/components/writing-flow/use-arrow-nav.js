@@ -315,7 +315,6 @@ export default function useArrowNav() {
 					isReverseDir,
 					node
 				);
-
 				placeCaretAtHorizontalEdge( closestTabbable, isReverse );
 				event.preventDefault();
 			}
