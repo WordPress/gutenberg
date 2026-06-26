@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Export `@wordpress/theme/utils` with a generated `var()` Sass function for compile-time design token fallback injection ([#78698](https://github.com/WordPress/gutenberg/pull/78698)).
+-   Export `@wordpress/theme/utils` with a generated `var()` Sass function for compile-time design token fallback injection ([#79470](https://github.com/WordPress/gutenberg/pull/79470)).
 
 ## 0.16.0 (2026-06-24)
 
