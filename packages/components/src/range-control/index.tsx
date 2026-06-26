@@ -65,7 +65,8 @@ function UnforwardedRangeControl(
 	forwardedRef: ForwardedRef< HTMLInputElement >
 ) {
 	const {
-		__nextHasNoMarginBottom: _, // Prevent passing to internal component
+		// Prevent passing legacy props to internal component.
+		__nextHasNoMarginBottom: _,
 		afterIcon,
 		allowReset = false,
 		beforeIcon,
