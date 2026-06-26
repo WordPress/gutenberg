@@ -1,11 +1,16 @@
 .divider {
-	border: 0;
+	// Keep style/color on the base selector so legacy border color overrides win.
+	// Use explicit width longhands to avoid optimizer issues with border shorthands.
+	border-block-start-width: 0;
+	border-block-end-width: 0;
+	border-inline-start-width: 0;
+	border-inline-end-width: 0;
+	border-style: solid;
+	border-color: currentColor;
 	margin: 0;
 
-	// Keep the horizontal selector at the pre-#79444 specificity so existing custom
-	// border color overrides continue to win.
-	&:where([aria-orientation="horizontal"]) {
-		border-block-end: 1px solid currentColor;
+	&[aria-orientation="horizontal"] {
+		border-block-end-width: 1px;
 		block-size: 0;
 		inline-size: auto;
 		margin-block-start: var(--wp-components-divider-margin-start, 0);
@@ -14,7 +19,7 @@
 
 	&[aria-orientation="vertical"] {
 		display: inline;
-		border-inline-end: 1px solid currentColor;
+		border-inline-end-width: 1px;
 		block-size: auto;
 		inline-size: 0;
 		margin-inline-start: var(--wp-components-divider-margin-start, 0);
