@@ -24,6 +24,8 @@ export default function save( { attributes } ) {
 		src,
 		playsInline,
 		tracks,
+		width,
+		height,
 	} = attributes;
 	return (
 		<figure { ...useBlockProps.save() }>
@@ -37,6 +39,8 @@ export default function save( { attributes } ) {
 					preload={ preload !== 'metadata' ? preload : undefined }
 					src={ src }
 					playsInline={ playsInline }
+					width={ width }
+					height={ height }
 				>
 					<Tracks tracks={ tracks } />
 				</video>

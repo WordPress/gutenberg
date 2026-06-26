@@ -56,7 +56,7 @@ function VideoEdit( {
 	clientId,
 } ) {
 	const videoPlayer = useRef();
-	const { id, controls, poster, src, tracks } = attributes;
+	const { id, controls, poster, src, tracks, width, height } = attributes;
 	const isGif = isGifVariation( attributes );
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -265,6 +265,8 @@ function VideoEdit( {
 					loop={ isGif }
 					muted={ isGif }
 					playsInline={ isGif }
+					width={ width }
+					height={ height }
 				>
 					<Tracks tracks={ tracks } />
 				</video>

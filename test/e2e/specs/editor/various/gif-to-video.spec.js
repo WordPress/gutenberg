@@ -180,6 +180,28 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 		expect( videoBlock.attributes.playsInline ).toBe( true );
 		expect( videoBlock.attributes.src ).toMatch( /\.(mp4|webm)(\?.*)?$/i );
 
+		// The converted block carries the GIF's intrinsic dimensions. Without
+		// them the <video> has no aspect ratio until its poster/metadata load,
+		// so it collapses to the browser-default size and then jumps to the
+		// GIF's height - which briefly renders a duplicated image during the
+		// swap. The width/height keep the element stable from the first paint.
+		expect( videoBlock.attributes.width ).toBeGreaterThan( 0 );
+		expect( videoBlock.attributes.height ).toBeGreaterThan( 0 );
+
+		// Those dimensions must reach the rendered <video> as the width/height
+		// attributes that give it a stable intrinsic size.
+		const renderedVideo = editor.canvas.locator(
+			'figure.wp-block-video video'
+		);
+		await expect( renderedVideo ).toHaveAttribute(
+			'width',
+			String( videoBlock.attributes.width )
+		);
+		await expect( renderedVideo ).toHaveAttribute(
+			'height',
+			String( videoBlock.attributes.height )
+		);
+
 		// The underlying media is still the GIF image with a recorded
 		// companion video (basename only) in its metadata.
 		const attachmentId = videoBlock.attributes.id;
@@ -195,6 +217,12 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 		expect( typeof media.media_details.animated_video ).toBe( 'string' );
 		expect( media.media_details.animated_video ).toMatch(
 			/\.(mp4|webm)$/i
+		);
+
+		// The block's dimensions come straight from the source GIF.
+		expect( videoBlock.attributes.width ).toBe( media.media_details.width );
+		expect( videoBlock.attributes.height ).toBe(
+			media.media_details.height
 		);
 	} );
 } );

@@ -64,6 +64,8 @@ export default function AnimatedGifConvertControl( { attributes, clientId } ) {
 				sourceUrl: record.source_url,
 				video: details.animated_video,
 				poster: details.animated_video_poster,
+				width: details.width,
+				height: details.height,
 			};
 		},
 		[ id, clientId ]
@@ -93,6 +95,13 @@ export default function AnimatedGifConvertControl( { attributes, clientId } ) {
 				autoplay: true,
 				muted: true,
 				playsInline: true,
+				// Carry the GIF's intrinsic dimensions so the <video> keeps its
+				// aspect ratio from the first paint. Without them the element
+				// collapses to the browser-default size and then jumps once the
+				// poster/metadata load, which shows up as a brief duplicated
+				// image during the swap.
+				width: companion.width,
+				height: companion.height,
 			} )
 		);
 	}

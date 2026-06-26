@@ -272,6 +272,13 @@ export function ImageEdit( {
 					autoplay: true,
 					muted: true,
 					playsInline: true,
+					// Carry the GIF's intrinsic dimensions so the <video> keeps
+					// its aspect ratio from the first paint. Without them the
+					// element collapses to the browser-default size and then
+					// jumps once the poster/metadata load, which shows up as a
+					// brief duplicated image during the swap.
+					width: media.media_details.width,
+					height: media.media_details.height,
 				} )
 			);
 			setTemporaryURL();
