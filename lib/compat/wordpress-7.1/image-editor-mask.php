@@ -12,7 +12,7 @@
  * @return string[] Filtered image editor class names.
  */
 function gutenberg_register_mask_image_editors( $editors ) {
-	require_once __DIR__ . '/class-gutenberg-image-editor-mask.php';
+	require_once __DIR__ . '/image-editor-mask-validation.php';
 
 	$mask_editors = array();
 

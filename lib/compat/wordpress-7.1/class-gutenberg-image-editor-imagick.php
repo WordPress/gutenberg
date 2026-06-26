@@ -46,7 +46,7 @@ class Gutenberg_Image_Editor_Imagick extends WP_Image_Editor_Imagick {
 	 * @return true|WP_Error True on success, WP_Error on failure.
 	 */
 	public function mask( $args ) {
-		$args = Gutenberg_Image_Editor_Mask::validate_args( $args );
+		$args = _gutenberg_validate_image_mask_args( $args );
 		if ( is_wp_error( $args ) ) {
 			return $args;
 		}
