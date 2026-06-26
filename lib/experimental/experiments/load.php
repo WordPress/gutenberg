@@ -104,6 +104,7 @@ function gutenberg_initialize_experiments_settings() {
 					'id'          => 'gutenberg-workflow-palette',
 					'label'       => __( 'Workflow Palette', 'gutenberg' ),
 					'description' => __( 'Enables the Workflow Palette for running workflows composed of abilities, from a unified interface.', 'gutenberg' ),
+					'link'        => 'https://github.com/WordPress/gutenberg/issues/75616',
 				),
 				array(
 					'id'          => 'gutenberg-extensible-site-editor',
@@ -114,7 +115,7 @@ function gutenberg_initialize_experiments_settings() {
 					'id'          => 'gutenberg-guidelines',
 					'label'       => __( 'Guidelines', 'gutenberg' ),
 					'description' => __( 'Enables the Guidelines page under Settings and the experimental knowledge storage (wp_knowledge).', 'gutenberg' ),
-				),
+					'link'        => 'https://github.com/WordPress/gutenberg/issues/75171',				),
 				array(
 					'id'          => 'gutenberg-content-types',
 					'label'       => __( 'Content types', 'gutenberg' ),
@@ -129,11 +130,13 @@ function gutenberg_initialize_experiments_settings() {
 					'id'          => 'gutenberg-omnibar',
 					'label'       => __( 'Toolbar UI refresh', 'gutenberg' ),
 					'description' => __( 'Previews a redesigned toolbar UI that is visually consistent everywhere. For now, it includes replacing home/odometer dashicon with site icon if set.', 'gutenberg' ),
+					'link'        => 'https://github.com/WordPress/gutenberg/issues/79036',
 				),
 				array(
 					'id'          => 'gutenberg-react-19',
 					'label'       => __( 'React 19', 'gutenberg' ),
 					'description' => __( 'Registers React 19 as the bundled React version, replacing the default React 18 scripts.', 'gutenberg' ),
+					'link'        => 'https://make.wordpress.org/core/2026/05/27/react-19-upgrade-in-wordpress/',
 				),
 			),
 		),
@@ -157,6 +160,10 @@ function gutenberg_initialize_experiments_settings() {
 			if ( ! empty( $experiment['separateOption'] ) ) {
 				$property['separate_option'] = true;
 				$property['option_name']     = $experiment['id'];
+			}
+
+			if ( ! empty( $experiment['link'] ) ) {
+				$property['link'] = $experiment['link'];
 			}
 
 			$properties[ $experiment['id'] ] = $property;

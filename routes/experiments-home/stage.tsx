@@ -121,7 +121,17 @@ function ExperimentsPage() {
 			Edit: 'toggle' as const,
 			id: experiment.id,
 			label: experiment.label,
-			description: experiment.description,
+			description: experiment.link ? (
+				<>
+					{ experiment.description }
+					<br />
+					<Link href={ experiment.link } openInNewTab>
+						{ __( 'Read more' ) }
+					</Link>
+				</>
+			) : (
+				experiment.description
+			),
 			type: 'boolean' as const,
 		} ) );
 	}, [ experiments ] );
