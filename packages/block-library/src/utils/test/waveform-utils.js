@@ -64,6 +64,8 @@ describe( 'Waveform utilities', () => {
 			expect( container ).toHaveStyle( {
 				'--wp--playlist--waveform-bar-color': 'rgba(0, 0, 0, 0.3)',
 				'--wp--playlist--waveform-background-color': '#ffffff',
+				'--wp--playlist--waveform-button-background-color': '#000000',
+				'--wp--playlist--waveform-button-icon-color': '#ffffff',
 			} );
 		} );
 

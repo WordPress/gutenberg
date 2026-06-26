@@ -33,6 +33,16 @@ function getComputedStyle( element ) {
 }
 
 /**
+ * Get the icon color that contrasts with the play button background.
+ *
+ * @param {string} buttonColor - The play button background color.
+ * @return {string} The icon color.
+ */
+function getButtonIconColor( buttonColor ) {
+	return colord( buttonColor ).isDark() ? '#ffffff' : '#000000';
+}
+
+/**
  * Get all colors needed for the waveform player based on the element's styles.
  *
  * @param {Element} element - The element to derive colors from.
@@ -107,6 +117,14 @@ export function createWaveformContainer( {
 		'--wp--playlist--waveform-background-color',
 		backgroundColor
 	);
+	container.style.setProperty(
+		'--wp--playlist--waveform-button-background-color',
+		buttonColor
+	);
+	container.style.setProperty(
+		'--wp--playlist--waveform-button-icon-color',
+		getButtonIconColor( buttonColor )
+	);
 	if ( title ) {
 		container.setAttribute( 'data-title', title );
 	}
@@ -128,8 +146,7 @@ export function createWaveformContainer( {
  */
 export function styleSvgIcons( container, buttonColor ) {
 	// Compute a contrasting color for the icons based on button brightness.
-	const isButtonDark = colord( buttonColor ).isDark();
-	const iconColor = isButtonDark ? '#ffffff' : '#000000';
+	const iconColor = getButtonIconColor( buttonColor );
 
 	const svgPaths = container.querySelectorAll( 'svg path' );
 	svgPaths.forEach( ( path ) => {
