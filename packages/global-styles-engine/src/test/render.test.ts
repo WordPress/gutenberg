@@ -924,6 +924,73 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
+		it( 'should use a compound (not descendant) selector for variation element styles on multi-token block roots', () => {
+			// Regression test for https://github.com/WordPress/gutenberg/issues/79318.
+			// core/button root selector is '.wp-block-button .wp-block-button__link'.
+			// Both .wp-block-button__link and .wp-element-button are on the same <a>.
+			// Scoping the button element to the variation selector must NOT produce
+			// the descendant '.wp-block-button.is-style-tonal .wp-block-button__link .wp-element-button'
+			// — it must scope to just the block wrapper so elements stay adjacent.
+			const tree = {
+				styles: {
+					blocks: {
+						'core/button': {
+							variations: {
+								tonal: {
+									elements: {
+										button: {
+											color: {
+												background: '#f0f0f0',
+												text: '#111111',
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button .wp-block-button__link',
+					styleVariationSelectors: {
+						tonal: '.wp-block-button.is-style-tonal .wp-block-button__link',
+					},
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				{
+					blockGap: false,
+					blockStyles: true,
+					layoutStyles: false,
+					marginReset: false,
+					presets: false,
+					rootPadding: false,
+					variationStyles: true,
+				}
+			);
+
+			// Selector must scope element to the block wrapper (.wp-block-button.is-style-tonal),
+			// not to the full variation selector, so the element is a direct descendant of the
+			// wrapper — not a descendant of .wp-block-button__link (which IS the same <a>).
+			expect( result ).toContain(
+				':root :where(.wp-block-button.is-style-tonal .wp-element-button)'
+			);
+			// The wrong form would have an extra .wp-block-button__link in the middle.
+			expect( result ).not.toContain(
+				'.wp-block-button.is-style-tonal .wp-block-button__link .wp-element-button'
+			);
+		} );
+
 		it( 'outputs variation responsive pseudo styles after default pseudo styles', () => {
 			const tree = {
 				styles: {

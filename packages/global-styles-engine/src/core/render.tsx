@@ -1146,8 +1146,15 @@ export const getNodesWithStyles = (
 							) {
 								variationNodesToAdd.push( {
 									styles: elementStyles,
+									// Scope the element to only the block wrapper
+									// token (the first space-separated part of the
+									// variation selector). Using the full variation
+									// selector would produce a wrong descendant
+									// combinator for blocks like core/button whose
+									// root selector already ends in the element
+									// class (e.g. .wp-block-button__link).
 									selector: scopeSelector(
-										variationSelector,
+										variationSelector.split( ' ' )[ 0 ],
 										ELEMENTS[ element as ElementName ]
 									),
 									elementName: element,
@@ -1238,10 +1245,30 @@ export const getNodesWithStyles = (
 												variationBlockElement as ElementName
 											]
 										) {
+											// Scope the element to the inner block's
+											// wrapper token (first space-separated
+											// part of its selector) to avoid a wrong
+											// descendant combinator for multi-token
+											// block roots like core/button.
+											const innerBlockWrapper =
+												typeof blockSelectors !==
+													'string' &&
+												blockSelectors[
+													variationBlockName
+												]?.selector
+													? scopeSelector(
+															variationSelector,
+															blockSelectors[
+																variationBlockName
+															].selector.split(
+																' '
+															)[ 0 ]
+													  )
+													: variationBlockSelector;
 											variationNodesToAdd.push( {
 												styles: variationBlockElementStyles,
 												selector: scopeSelector(
-													variationBlockSelector,
+													innerBlockWrapper,
 													ELEMENTS[
 														variationBlockElement as ElementName
 													]
