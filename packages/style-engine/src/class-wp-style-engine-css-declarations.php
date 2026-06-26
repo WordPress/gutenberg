@@ -44,13 +44,17 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 		/**
 		 * Adds a single declaration.
 		 *
-		 * @param string $property     The CSS property.
-		 * @param string $value        The CSS value.
-		 * @param bool   $is_important Optional. Whether to output the declaration with !important. Default false.
+		 * @param string $property The CSS property.
+		 * @param string $value    The CSS value.
+		 * @param array  $options  {
+		 *     Optional. An array of options. Default empty array.
+		 *
+		 *     @type bool $important Whether to output the declaration with !important. Default false.
+		 * }
 		 *
 		 * @return WP_Style_Engine_CSS_Declarations Returns the object to allow chaining methods.
 		 */
-		public function add_declaration( $property, $value, $is_important = false ) {
+		public function add_declaration( $property, $value, $options = array() ) {
 			// Sanitizes the property.
 			$property = $this->sanitize_property( $property );
 			// Bails early if the property is empty.
@@ -67,9 +71,16 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 				return $this;
 			}
 
+			$options = wp_parse_args(
+				$options,
+				array(
+					'important' => false,
+				)
+			);
+
 			// Adds the declaration property/value pair.
 			$this->declarations[ $property ] = $value;
-			if ( $is_important ) {
+			if ( ! empty( $options['important'] ) ) {
 				$this->important_declarations[ $property ] = true;
 			} else {
 				unset( $this->important_declarations[ $property ] );
@@ -140,20 +151,31 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 		/**
 		 * Filters a CSS property + value pair.
 		 *
-		 * @param string $property     The CSS property.
-		 * @param string $value        The value to be filtered.
-		 * @param string $spacer       The spacer between the colon and the value. Defaults to an empty string.
-		 * @param bool   $is_important Whether to output the declaration with !important.
+		 * @param string $property The CSS property.
+		 * @param string $value    The value to be filtered.
+		 * @param string $spacer   The spacer between the colon and the value. Defaults to an empty string.
+		 * @param array  $options  {
+		 *     Optional. An array of options. Default empty array.
+		 *
+		 *     @type bool $important Whether to output the declaration with !important. Default false.
+		 * }
 		 *
 		 * @return string The filtered declaration or an empty string.
 		 */
-		protected static function filter_declaration( $property, $value, $spacer = '', $is_important = false ) {
+		protected static function filter_declaration( $property, $value, $spacer = '', $options = array() ) {
 			$filtered_value = wp_strip_all_tags( $value, true );
 
 			if ( '' !== $filtered_value ) {
+				$options = wp_parse_args(
+					$options,
+					array(
+						'important' => false,
+					)
+				);
+
 				$filtered_declaration = safecss_filter_attr( "{$property}:{$spacer}{$filtered_value}" );
 
-				if ( $is_important && '' !== $filtered_declaration && ! str_contains( $filtered_declaration, ';' ) ) {
+				if ( ! empty( $options['important'] ) && '' !== $filtered_declaration && ! str_contains( $filtered_declaration, ';' ) ) {
 					return "$filtered_declaration !important";
 				}
 
@@ -179,8 +201,14 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 			$spacer              = $should_prettify ? ' ' : '';
 
 			foreach ( $declarations_array as $property => $value ) {
-				$is_important         = ! empty( $this->important_declarations[ $property ] );
-				$filtered_declaration = static::filter_declaration( $property, $value, $spacer, $is_important );
+				$filtered_declaration = static::filter_declaration(
+					$property,
+					$value,
+					$spacer,
+					array(
+						'important' => ! empty( $this->important_declarations[ $property ] ),
+					)
+				);
 				if ( $filtered_declaration ) {
 					$declarations_output .= "{$indent}{$filtered_declaration};$suffix";
 				}

@@ -91,7 +91,9 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rule' ) ) {
 				$this->declarations->add_declaration(
 					$property,
 					$value,
-					! empty( $important_declarations[ $property ] )
+					array(
+						'important' => ! empty( $important_declarations[ $property ] ),
+					)
 				);
 			}
 

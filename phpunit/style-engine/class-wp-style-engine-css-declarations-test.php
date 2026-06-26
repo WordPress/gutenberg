@@ -172,7 +172,9 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 		$css_declarations->add_declaration(
 			'background-image',
 			'linear-gradient(135deg,rgb(119,255,112) 0%,rgb(253,254,215) 99%)',
-			true
+			array(
+				'important' => true,
+			)
 		);
 
 		$this->assertSame(

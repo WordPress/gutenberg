@@ -650,7 +650,13 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 		$important_declaration_values = gutenberg_get_state_declarations_with_background_resets( $declarations );
 		$important_declarations       = new WP_Style_Engine_CSS_Declarations_Gutenberg();
 		foreach ( $important_declaration_values as $property => $value ) {
-			$important_declarations->add_declaration( $property, $value, true );
+			$important_declarations->add_declaration(
+				$property,
+				$value,
+				array(
+					'important' => true,
+				)
+			);
 		}
 		$selector   = gutenberg_build_state_selector(
 			".$unique_class",
