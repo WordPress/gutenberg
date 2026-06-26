@@ -17,7 +17,6 @@ const COMPONENTS_REQUIRING_40PX = new Set( [
 	'ComboboxControl',
 	'CustomSelectControl',
 	'FontAppearanceControl',
-	'FontFamilyControl',
 	'FormTokenField',
 	'IconButton',
 	'InputControl',

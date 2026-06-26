@@ -12,7 +12,6 @@ The following components are checked by this rule:
 -   ComboboxControl
 -   CustomSelectControl
 -   FontAppearanceControl
--   FontFamilyControl
 -   FormFileUpload (special case - see below)
 -   FormTokenField
 -   InputControl

@@ -9,6 +9,7 @@
 ### Breaking Changes
 
 -   The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed from the following:
+    -   `FontFamilyControl` ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
     -   `LetterSpacingControl` ([#79533](https://github.com/WordPress/gutenberg/pull/79533)).
     -   `LineHeightControl` ([#79589](https://github.com/WordPress/gutenberg/pull/79589)).
 
