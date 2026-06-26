@@ -95,6 +95,10 @@ const getEditorCommandLoader = () =>
 			toggleTopToolbar,
 			updateEditorSettings,
 		} = useDispatch( editorStore );
+		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+		const { stopEditingContentOnlySection } = unlock(
+			useDispatch( blockEditorStore )
+		);
 		const { openModal, enableComplementaryArea, disableComplementaryArea } =
 			useDispatch( interfaceStore );
 		const { getCurrentPostId } = useSelect( editorStore );
@@ -197,6 +201,7 @@ const getEditorCommandLoader = () =>
 			callback: ( { close } ) => {
 				const disableContentOnly =
 					! disableContentOnlyForPatternsAndTemplateParts;
+				stopEditingContentOnlySection();
 				updateEditorSettings( {
 					disableContentOnlyForUnsyncedPatterns: disableContentOnly,
 					disableContentOnlyForTemplateParts: disableContentOnly,

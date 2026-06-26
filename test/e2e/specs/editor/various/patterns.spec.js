@@ -530,6 +530,14 @@ test.describe( 'Unsynced pattern', () => {
 
 		await expect( blockHeading ).toHaveAccessibleName( 'Header Pattern' );
 
+		await editorSettings
+			.getByRole( 'button', { name: 'Edit pattern' } )
+			.click();
+		await expect( blockHeading ).toHaveAccessibleName( 'Header Group' );
+		await expect(
+			editorSettings.getByRole( 'button', { name: 'Exit pattern' } )
+		).toBeVisible();
+
 		await pageUtils.pressKeys( 'primary+k' );
 		await page
 			.getByRole( 'combobox', { name: 'Search commands and settings' } )
@@ -538,6 +546,9 @@ test.describe( 'Unsynced pattern', () => {
 			.getByRole( 'option', { name: 'Enable editing all patterns' } )
 			.click();
 
+		await expect(
+			editorSettings.getByRole( 'button', { name: 'Exit pattern' } )
+		).toBeHidden();
 		await expect( blockHeading ).toHaveAccessibleName( 'Header Group' );
 	} );
 
