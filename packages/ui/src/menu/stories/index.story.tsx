@@ -15,6 +15,7 @@ const meta: Meta< typeof Menu.Root > = {
 		'Menu.Item': Menu.Item,
 		'Menu.ItemLabel': Menu.ItemLabel,
 		'Menu.ItemDescription': Menu.ItemDescription,
+		'Menu.LinkItem': Menu.LinkItem,
 		'Menu.CheckboxItem': Menu.CheckboxItem,
 		'Menu.RadioGroup': Menu.RadioGroup,
 		'Menu.RadioItem': Menu.RadioItem,
@@ -62,6 +63,9 @@ export const Default: Story = {
 						<Menu.Item>Play last</Menu.Item>
 					</Menu.Group>
 					<Menu.Separator />
+					<Menu.LinkItem href="https://wordpress.org">
+						WordPress.org
+					</Menu.LinkItem>
 					<Menu.Item disabled>Unavailable action</Menu.Item>
 				</Menu.Popup>
 			</>

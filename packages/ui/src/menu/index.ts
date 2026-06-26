@@ -4,6 +4,7 @@ import { GroupLabel } from './group-label';
 import { Item } from './item';
 import { ItemDescription } from './item-description';
 import { ItemLabel } from './item-label';
+import { LinkItem } from './link-item';
 import { Popup } from './popup';
 import { Portal } from './portal';
 import { Positioner } from './positioner';
@@ -22,6 +23,7 @@ export {
 	Item,
 	ItemDescription,
 	ItemLabel,
+	LinkItem,
 	Popup,
 	Portal,
 	Positioner,

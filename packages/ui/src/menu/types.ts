@@ -94,6 +94,14 @@ export type ItemProps = MenuItemComponentProps< typeof _Menu.Item > &
 		children?: ReactNode;
 	};
 
+export type LinkItemProps = MenuItemComponentProps< typeof _Menu.LinkItem > &
+	MenuItemLayoutProps & {
+		/**
+		 * The content to be rendered inside the link menu item.
+		 */
+		children?: ReactNode;
+	};
+
 export type CheckboxItemProps = MenuItemComponentProps<
 	typeof _Menu.CheckboxItem
 > &
