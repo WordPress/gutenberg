@@ -361,3 +361,7 @@ Determines if the `input` number field will render next to the RangeControl. Thi
 -   Required: No
 -   Platform: Web
 
+## Related components
+
+-   To collect a numerical input in a text field, use the `TextControl` component.
+
