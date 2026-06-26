@@ -500,6 +500,36 @@ test.describe( 'Unsynced pattern', () => {
 		await expect( blockHeading ).toHaveAccessibleName( 'Header Group' );
 	} );
 
+	test( 'shows the full pattern editing command suggestion when a pattern content block is selected', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.setContent( `<!-- wp:group {"metadata":{"patternName":"theme/header-wrapper","name":"Header"},"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:paragraph -->
+<p>Pattern content</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->` );
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click();
+
+		await pageUtils.pressKeys( 'primary+k' );
+		const commandSuggestions = page.getByRole( 'listbox', {
+			name: 'Command suggestions',
+		} );
+
+		await expect(
+			commandSuggestions.getByText( 'Suggestions' )
+		).toBeVisible();
+		await expect(
+			commandSuggestions.getByRole( 'option', {
+				name: 'Enable editing all patterns',
+			} )
+		).toBeVisible();
+	} );
+
 	test( 'shows the source block in the inspector when full pattern editing is enabled', async ( {
 		editor,
 		page,

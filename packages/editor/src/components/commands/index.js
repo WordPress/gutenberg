@@ -41,6 +41,38 @@ import { modalName as patternRenameModalName } from '../pattern-rename-modal';
 import { modalName as patternDuplicateModalName } from '../pattern-duplicate-modal';
 import isTemplateRevertable from '../../store/utils/is-template-revertable';
 
+function getTogglePatternEditingCommand( {
+	disableContentOnlyForPatternsAndTemplateParts,
+	stopEditingContentOnlySection,
+	updateEditorSettings,
+} ) {
+	return {
+		name: 'core/toggle-pattern-editing',
+		label: disableContentOnlyForPatternsAndTemplateParts
+			? __( 'Disable editing all patterns' )
+			: __( 'Enable editing all patterns' ),
+		icon: symbol,
+		category: 'command',
+		callback: ( { close } ) => {
+			const disableContentOnly =
+				! disableContentOnlyForPatternsAndTemplateParts;
+			stopEditingContentOnlySection();
+			updateEditorSettings( {
+				disableContentOnlyForUnsyncedPatterns: disableContentOnly,
+				disableContentOnlyForTemplateParts: disableContentOnly,
+			} );
+			close();
+		},
+	};
+}
+
+function isPatternOrTemplatePartBlock( blockName, attributes ) {
+	return (
+		!! attributes?.metadata?.patternName ||
+		blockName === 'core/template-part'
+	);
+}
+
 const getEditorCommandLoader = () =>
 	function useEditorCommandLoader() {
 		const {
@@ -191,24 +223,13 @@ const getEditorCommandLoader = () =>
 			},
 		} );
 
-		commands.push( {
-			name: 'core/toggle-pattern-editing',
-			label: disableContentOnlyForPatternsAndTemplateParts
-				? __( 'Disable editing all patterns' )
-				: __( 'Enable editing all patterns' ),
-			icon: symbol,
-			category: 'command',
-			callback: ( { close } ) => {
-				const disableContentOnly =
-					! disableContentOnlyForPatternsAndTemplateParts;
-				stopEditingContentOnlySection();
-				updateEditorSettings( {
-					disableContentOnlyForUnsyncedPatterns: disableContentOnly,
-					disableContentOnlyForTemplateParts: disableContentOnly,
-				} );
-				close();
-			},
-		} );
+		commands.push(
+			getTogglePatternEditingCommand( {
+				disableContentOnlyForPatternsAndTemplateParts,
+				stopEditingContentOnlySection,
+				updateEditorSettings,
+			} )
+		);
 
 		if ( allowSwitchEditorMode ) {
 			commands.push( {
@@ -321,6 +342,69 @@ const getEditorCommandLoader = () =>
 		return {
 			commands,
 			isLoading: false,
+		};
+	};
+
+const getPatternEditingContextualCommands = () =>
+	function usePatternEditingContextualCommands( { search } ) {
+		const {
+			disableContentOnlyForPatternsAndTemplateParts,
+			hasPatternOrTemplatePartSelection,
+			isPreviewMode,
+		} = useSelect( ( select ) => {
+			const {
+				getBlockAttributes,
+				getBlockName,
+				getBlockParents,
+				getSelectedBlockClientId,
+				getSelectedBlockClientIds,
+				getSettings,
+			} = select( blockEditorStore );
+			const { getEditorSettings } = select( editorStore );
+			const editorSettings = getEditorSettings();
+			const selectedBlockClientId = getSelectedBlockClientId();
+			const selectedBlockClientIds = getSelectedBlockClientIds();
+			const clientIdsToCheck =
+				selectedBlockClientId && selectedBlockClientIds.length === 1
+					? [
+							selectedBlockClientId,
+							...getBlockParents( selectedBlockClientId, true ),
+					  ]
+					: [];
+
+			return {
+				disableContentOnlyForPatternsAndTemplateParts:
+					!! editorSettings.disableContentOnlyForUnsyncedPatterns &&
+					!! editorSettings.disableContentOnlyForTemplateParts,
+				hasPatternOrTemplatePartSelection: clientIdsToCheck.some(
+					( clientId ) =>
+						isPatternOrTemplatePartBlock(
+							getBlockName( clientId ),
+							getBlockAttributes( clientId )
+						)
+				),
+				isPreviewMode: getSettings().isPreviewMode,
+			};
+		}, [] );
+		const { updateEditorSettings } = useDispatch( editorStore );
+		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+		const { stopEditingContentOnlySection } = unlock(
+			useDispatch( blockEditorStore )
+		);
+
+		if ( search || ! hasPatternOrTemplatePartSelection || isPreviewMode ) {
+			return { isLoading: false, commands: [] };
+		}
+
+		return {
+			isLoading: false,
+			commands: [
+				getTogglePatternEditingCommand( {
+					disableContentOnlyForPatternsAndTemplateParts,
+					stopEditingContentOnlySection,
+					updateEditorSettings,
+				} ),
+			],
 		};
 	};
 
@@ -512,6 +596,12 @@ export default function useCommands() {
 		name: 'core/editor/contextual-commands',
 		hook: getEditedEntityContextualCommands(),
 		context: 'entity-edit',
+	} );
+
+	useCommandLoader( {
+		name: 'core/editor/pattern-editing-contextual-commands',
+		hook: getPatternEditingContextualCommands(),
+		context: 'block-selection-edit',
 	} );
 
 	useCommandLoader( {
