@@ -392,7 +392,12 @@ const getPatternEditingContextualCommands = () =>
 			useDispatch( blockEditorStore )
 		);
 
-		if ( search || ! hasPatternOrTemplatePartSelection || isPreviewMode ) {
+		if (
+			search ||
+			( ! hasPatternOrTemplatePartSelection &&
+				! disableContentOnlyForPatternsAndTemplateParts ) ||
+			isPreviewMode
+		) {
 			return { isLoading: false, commands: [] };
 		}
 

@@ -509,10 +509,14 @@ test.describe( 'Unsynced pattern', () => {
 <div class="wp-block-group"><!-- wp:paragraph -->
 <p>Pattern content</p>
 <!-- /wp:paragraph --></div>
-<!-- /wp:group -->` );
+<!-- /wp:group -->
+<!-- wp:paragraph -->
+<p>Outside paragraph</p>
+<!-- /wp:paragraph -->` );
 
 		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Pattern content' } )
 			.click();
 
 		await pageUtils.pressKeys( 'primary+k' );
@@ -526,6 +530,33 @@ test.describe( 'Unsynced pattern', () => {
 		await expect(
 			commandSuggestions.getByRole( 'option', {
 				name: 'Enable editing all patterns',
+			} )
+		).toBeVisible();
+
+		await commandSuggestions
+			.getByRole( 'option', {
+				name: 'Enable editing all patterns',
+			} )
+			.click();
+		await page.evaluate( () => {
+			window.wp.data
+				.dispatch( 'core/preferences' )
+				.set( 'core/commands', 'recentlyUsed', [] );
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Outside paragraph' } )
+			.click();
+
+		await pageUtils.pressKeys( 'primary+k' );
+
+		await expect( commandSuggestions.getByText( 'Recent' ) ).toBeHidden();
+		await expect(
+			commandSuggestions.getByText( 'Suggestions' )
+		).toBeVisible();
+		await expect(
+			commandSuggestions.getByRole( 'option', {
+				name: 'Disable editing all patterns',
 			} )
 		).toBeVisible();
 	} );
