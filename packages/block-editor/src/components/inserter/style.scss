@@ -511,6 +511,58 @@ $block-inserter-tabs-height: 44px;
 			margin: 0 $grid-unit-30 $grid-unit-20;
 		}
 	}
+
+	.block-editor-inserter__media-panel-results {
+		// Take over the scroll host role the media list had when it was a direct
+		// flex child of the panel: grow to fill and constrain height
+		// (`min-height: 0` lets the inner list's `overflow-y: auto` engage).
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;
+		min-height: 0;
+
+		// While an attach/detach refetch is in flight, dim the existing grid (and
+		// gently pulse it) rather than clearing it or blocking it with a spinner.
+		// Mirrors the DataViews "refreshing" treatment; the delayed `is-loading`
+		// class (see `useDelayedLoading`) means quick refetches show nothing.
+		&.is-loading .block-editor-inserter__media-list {
+			opacity: 0.5;
+			pointer-events: none;
+
+			@media not ( prefers-reduced-motion ) {
+				opacity: 1;
+				animation: inserter-media-panel-pulse 1s ease-in-out infinite;
+			}
+		}
+	}
+}
+
+@keyframes inserter-media-panel-pulse {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.5;
+	}
+}
+
+.block-editor-inserter__media-panel-detach-modal {
+	// Render above the ellipsis dropdown (a `.components-popover`) it opens from,
+	// which otherwise stacks over the modal. Matches other dropdown-triggered
+	// modals (e.g. block rename).
+	z-index: z-index(".block-editor-inserter__media-panel-detach-modal");
+
+	p {
+		margin-top: 0;
+	}
+}
+
+.block-editor-inserter__media-panel-detach-actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: $grid-unit-10;
+	margin-top: $grid-unit-20;
 }
 
 .block-editor-inserter__media-list__list-item {

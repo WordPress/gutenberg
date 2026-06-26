@@ -1,9 +1,20 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
-import { Button, Spinner, SearchControl } from '@wordpress/components';
+import { Button, Modal, Spinner, SearchControl } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { useCallback, useMemo, useState } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { useDebouncedInput } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
@@ -15,7 +26,7 @@ import { plus } from '@wordpress/icons';
 import MediaList from './media-list';
 import MediaUpload from '../../media-upload';
 import MediaUploadCheck from '../../media-upload/check';
-import { useMediaResults } from './hooks';
+import { useMediaResults, useDelayedLoading } from './hooks';
 import InserterNoResults from '../no-results';
 
 const INITIAL_MEDIA_ITEMS_PER_PAGE = 10;
@@ -78,6 +89,26 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
 
+	// Tracks an in-flight attach/detach (and the refetch that follows it) so the
+	// grid can stay visible and dimmed throughout, rather than blanking. Kept
+	// separate from the hook's `isLoading` so initial loads and searches still
+	// show the centered spinner as before.
+	const [ isUpdating, setIsUpdating ] = useState( false );
+	const wasLoadingRef = useRef( isLoading );
+	useEffect( () => {
+		// Clear the updating flag once the refetch we triggered has settled, so
+		// `isBusy` stays continuous from the click through to fresh results
+		// (no one-frame gap that would restart the spinner).
+		if ( wasLoadingRef.current && ! isLoading ) {
+			setIsUpdating( false );
+		}
+		wasLoadingRef.current = isLoading;
+	}, [ isLoading ] );
+	const isBusy = isLoading || isUpdating;
+	// Only dim the populated grid once a refetch has run long enough to be worth
+	// signalling; quick attach/detach saves resolve before this and show nothing.
+	const showRefreshing = useDelayedLoading( isBusy );
+
 	// Invalidate the cached results and force `useMediaResults` to refetch so
 	// the grid reflects images that were just attached or detached.
 	const refresh = useCallback( () => {
@@ -87,6 +118,7 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 
 	const handleAttach = useCallback(
 		async ( selectedMedia ) => {
+			setIsUpdating( true );
 			try {
 				const attachedCount = await category.attach( selectedMedia );
 				refresh();
@@ -106,6 +138,8 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 					);
 				}
 			} catch {
+				// The triggered refetch never runs, so clear the busy flag here.
+				setIsUpdating( false );
 				createErrorNotice( __( 'Could not attach images.' ), {
 					type: 'snackbar',
 					id: 'inserter-notice',
@@ -117,6 +151,7 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 
 	const handleDetach = useCallback(
 		async ( media ) => {
+			setIsUpdating( true );
 			try {
 				await category.detach( media );
 				refresh();
@@ -125,6 +160,8 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 					id: 'inserter-notice',
 				} );
 			} catch {
+				// The triggered refetch never runs, so clear the busy flag here.
+				setIsUpdating( false );
 				createErrorNotice( __( 'Could not detach image.' ), {
 					type: 'snackbar',
 					id: 'inserter-notice',
@@ -133,6 +170,15 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 		},
 		[ category, refresh, createErrorNotice, createSuccessNotice ]
 	);
+
+	// Detaching is confirmed first: the dropdown sets the pending item, which
+	// opens a modal, and only `confirmDetach` performs the detach.
+	const [ mediaPendingDetach, setMediaPendingDetach ] = useState();
+	const confirmDetach = useCallback( () => {
+		const media = mediaPendingDetach;
+		setMediaPendingDetach( undefined );
+		handleDetach( media );
+	}, [ handleDetach, mediaPendingDetach ] );
 
 	const mediaIds = useMemo(
 		() =>
@@ -162,20 +208,61 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 					onSelect={ handleAttach }
 				/>
 			) }
-			{ isLoading && (
+			{ isBusy && ! mediaList?.length && (
 				<div className={ `${ baseCssClass }-spinner` }>
 					<Spinner />
 				</div>
 			) }
-			{ ! isLoading && ! mediaList?.length && <InserterNoResults /> }
-			{ ! isLoading && !! mediaList?.length && (
-				<MediaList
-					rootClientId={ rootClientId }
-					onClick={ onInsert }
-					onDetach={ category.detach ? handleDetach : undefined }
-					mediaList={ mediaList }
-					category={ category }
-				/>
+			{ ! isBusy && ! mediaList?.length && <InserterNoResults /> }
+			{ !! mediaList?.length && (
+				// Keep the existing items visible while attaching/detaching
+				// refetches, dimming (and gently pulsing) them rather than
+				// clearing the grid, so it doesn't flicker or pop.
+				<div
+					className={ clsx( `${ baseCssClass }-results`, {
+						'is-loading': showRefreshing,
+					} ) }
+					aria-busy={ showRefreshing }
+				>
+					<MediaList
+						rootClientId={ rootClientId }
+						onClick={ onInsert }
+						onDetach={
+							category.detach ? setMediaPendingDetach : undefined
+						}
+						mediaList={ mediaList }
+						category={ category }
+					/>
+				</div>
+			) }
+			{ mediaPendingDetach && (
+				<Modal
+					title={ __( 'Detach image' ) }
+					onRequestClose={ () => setMediaPendingDetach( undefined ) }
+					overlayClassName={ `${ baseCssClass }-detach-modal` }
+				>
+					<p>
+						{ __(
+							'Detach this image from the current post? The image will remain in the Media Library.'
+						) }
+					</p>
+					<div className={ `${ baseCssClass }-detach-actions` }>
+						<Button
+							__next40pxDefaultSize
+							variant="tertiary"
+							onClick={ () => setMediaPendingDetach( undefined ) }
+						>
+							{ __( 'Cancel' ) }
+						</Button>
+						<Button
+							__next40pxDefaultSize
+							variant="primary"
+							onClick={ confirmDetach }
+						>
+							{ __( 'Detach' ) }
+						</Button>
+					</div>
+				</Modal>
 			) }
 		</div>
 	);

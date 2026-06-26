@@ -34,6 +34,7 @@ export function useMediaResults( category, query = {}, refreshKey ) {
 	// requests, but we don't for now as it involves adding support
 	// for this to `core-data` package.
 	const lastRequestRef = useRef();
+	const lastQueryKeyRef = useRef();
 	useEffect( () => {
 		( async () => {
 			const key = JSON.stringify( {
@@ -42,7 +43,14 @@ export function useMediaResults( category, query = {}, refreshKey ) {
 			} );
 			lastRequestRef.current = key;
 			setIsLoading( true );
-			setMediaList( [] ); // Empty the previous results.
+			// Only clear the previous results when the category or query changes,
+			// not on a manual refresh (a `refreshKey` bump after attach/detach).
+			// Keeping them lets the panel dim the existing grid during the
+			// refetch instead of blanking it.
+			if ( lastQueryKeyRef.current !== key ) {
+				setMediaList( [] );
+			}
+			lastQueryKeyRef.current = key;
 			const _media = await category.fetch?.( query );
 			if ( key === lastRequestRef.current ) {
 				setMediaList( _media );
@@ -51,6 +59,31 @@ export function useMediaResults( category, query = {}, refreshKey ) {
 		} )();
 	}, [ category.name, ...Object.values( query ), refreshKey ] );
 	return { mediaList, isLoading };
+}
+
+/**
+ * Delays surfacing a loading state until a request has been in flight for
+ * `delay` ms, so brief operations (e.g. a quick attach/detach refetch) don't
+ * flash a loading indicator at all. Mirrors the DataViews `useDelayedLoading`
+ * hook.
+ *
+ * @param {boolean} isLoading Whether a request is currently in flight.
+ * @param {number}  delay     Milliseconds to wait before showing the loader.
+ * @return {boolean} Whether the loading state should be shown yet.
+ */
+export function useDelayedLoading( isLoading, delay = 400 ) {
+	const [ showLoading, setShowLoading ] = useState( false );
+	useEffect( () => {
+		if ( ! isLoading ) {
+			return undefined;
+		}
+		const timeout = setTimeout( () => setShowLoading( true ), delay );
+		return () => {
+			clearTimeout( timeout );
+			setShowLoading( false );
+		};
+	}, [ isLoading, delay ] );
+	return showLoading;
 }
 
 export function useMediaCategories( rootClientId ) {
