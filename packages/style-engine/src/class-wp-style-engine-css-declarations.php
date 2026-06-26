@@ -127,7 +127,25 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 			$filtered_value = wp_strip_all_tags( $value, true );
 
 			if ( '' !== $filtered_value ) {
-				return safecss_filter_attr( "{$property}:{$spacer}{$filtered_value}" );
+				$important_pattern = '/\s*!\s*important\s*$/i';
+				$has_important     = 1 === preg_match( $important_pattern, $filtered_value );
+
+				/*
+				 * Some safecss validators, such as gradients, expect the value to
+				 * end after the CSS function. Validate without !important and then
+				 * restore it when the result is still a single declaration.
+				 */
+				if ( $has_important ) {
+					$filtered_value = preg_replace( $important_pattern, '', $filtered_value );
+				}
+
+				$filtered_declaration = safecss_filter_attr( "{$property}:{$spacer}{$filtered_value}" );
+
+				if ( $has_important && '' !== $filtered_declaration && ! str_contains( $filtered_declaration, ';' ) ) {
+					return "$filtered_declaration !important";
+				}
+
+				return $filtered_declaration;
 			}
 			return '';
 		}
