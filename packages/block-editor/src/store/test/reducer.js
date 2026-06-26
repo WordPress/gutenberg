@@ -43,6 +43,7 @@ import {
 	withDerivedBlockEditingModes,
 	viewportModalClientIds,
 	selectedBlockStyleState,
+	styleStateViewport,
 } from '../reducer';
 import { getBlockOrder, getBlocks } from '../selectors';
 import { unlock } from '../../lock-unlock';
@@ -5948,7 +5949,6 @@ describe( 'state', () => {
 				clientId: 'client-1',
 				showStateOnCanvas: true,
 				value: {
-					viewport: 'default',
 					pseudo: ':hover',
 				},
 			} );
@@ -5994,7 +5994,6 @@ describe( 'state', () => {
 				clientId: 'client-2',
 				showStateOnCanvas: true,
 				value: {
-					viewport: 'default',
 					pseudo: ':focus',
 				},
 			} );
@@ -6272,6 +6271,35 @@ describe( 'state', () => {
 				showStateOnCanvas: false,
 				value: { viewport: '@mobile', pseudo: ':hover' },
 			} );
+		} );
+	} );
+
+	describe( 'styleStateViewport', () => {
+		it( 'defaults to "default"', () => {
+			expect( styleStateViewport( undefined, {} ) ).toBe( 'default' );
+		} );
+
+		it( 'stores the selected viewport', () => {
+			expect(
+				styleStateViewport( 'default', {
+					type: 'SET_STYLE_STATE_VIEWPORT',
+					viewport: '@tablet',
+				} )
+			).toBe( '@tablet' );
+		} );
+
+		it( 'falls back to "default" when no viewport is provided', () => {
+			expect(
+				styleStateViewport( '@tablet', {
+					type: 'SET_STYLE_STATE_VIEWPORT',
+				} )
+			).toBe( 'default' );
+		} );
+
+		it( 'ignores unrelated actions', () => {
+			expect(
+				styleStateViewport( '@mobile', { type: 'SOME_OTHER_ACTION' } )
+			).toBe( '@mobile' );
 		} );
 	} );
 

@@ -1,5 +1,22 @@
 == Changelog ==
 
+= 23.5.0-rc.2 =
+
+
+## Changelog
+
+### Enhancements
+
+#### Post Editor
+- Integrate Resizable Editor with Device Preview and add Responsive editing. ([75121](https://github.com/WordPress/gutenberg/pull/75121))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@t-hamano
+
+
 = 23.5.0-rc.1 =
 
 ## Changelog
