@@ -162,7 +162,7 @@ function ExperimentsPage() {
 
 	return (
 		<Page
-			title={ __( 'Experiments' ) }
+			title={ __( 'Gutenberg Experiments' ) }
 			subTitle={ __(
 				'The latest block and full site editing features before they ship in a WordPress release.'
 			) }

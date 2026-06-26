@@ -18,8 +18,8 @@
 function gutenberg_menu() {
 	add_submenu_page(
 		'options-general.php',
-		__( 'Experiments', 'gutenberg' ),
-		__( 'Experiments', 'gutenberg' ),
+		'Gutenberg',
+		'Gutenberg',
 		'manage_options',
 		'experiments-wp-admin',
 		'gutenberg_experiments_wp_admin_render_page'
