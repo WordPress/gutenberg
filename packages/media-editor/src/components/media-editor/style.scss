@@ -30,15 +30,14 @@
 	}
 
 	// The skeleton must always sit in the modal's flow (`top: auto`). The reset
-	// above sets that, but external rules can outrank its low specificity — e.g.
-	// the "Toolbar in editor" experiment (`gutenberg-admin-bar-in-editor`)
-	// offsets every `.interface-interface-skeleton` below the admin bar via a
-	// `body.has-admin-bar-in-editor.is-fullscreen-mode` rule, which would push
-	// the editor (and the fine-rotation ruler under the canvas) down inside our
-	// full-screen modal that already overlays the admin bar. Re-assert `top` at a
-	// specificity that beats such rules, anchored on the modal frame
-	// (`.media-editor` only ever renders inside `.media-editor-modal`) rather
-	// than on the experiment's class, which may change if it ever graduates.
+	// above sets that, but `@wordpress/interface` offsets every
+	// `.interface-interface-skeleton` below the admin bar in fullscreen mode via
+	// `.is-fullscreen-mode .interface-interface-skeleton { top: ... }`. That
+	// selector ties the reset's specificity, so source order lets it win and
+	// pushes the editor (and the fine-rotation ruler under the canvas) down
+	// inside our full-screen modal that already overlays the admin bar.
+	// Re-assert `top` at a specificity that beats it, anchored on the modal
+	// frame (`.media-editor` only ever renders inside `.media-editor-modal`).
 	.media-editor-modal & .interface-interface-skeleton.interface-interface-skeleton {
 		top: auto;
 	}
@@ -62,11 +61,6 @@
 		margin: 0 $grid-unit-30;
 		border-radius: $radius-large;
 		overflow: hidden;
-		@include break-small() {
-			// Compensate for the left gutter in the sidebar panel
-			// so the modal padding is uniform (24px).
-			margin-right: $grid-unit-30 - $grid-unit-10;
-		}
 	}
 
 	.media-editor__canvas-toolbar {
@@ -109,11 +103,9 @@
 		@include reset;
 
 		// Small left gutter so the tabs and panel content (and the zoom
-		// slider's thumb at its minimum) sit off the sidebar edge. Only in the
-		// column layout; below `small` the sidebar is a full-width overlay and
-		// uses the panel's own gutter instead.
+		// slider's thumb at its minimum) sit off the sidebar edge.
 		@include break-small() {
-			padding-left: $grid-unit-10;
+			padding-left: 1px;
 		}
 	}
 
@@ -151,7 +143,12 @@
 		padding-left: 0;
 		padding-right: $grid-unit-10;
 		margin-right: $grid-unit-30;
+		margin-right: 0;
 
+		// When the sidebar is not a full page column, we offset the header to match the overall gutter.
+		@include break-small() {
+			margin-right: $grid-unit-30;
+		}
 		.components-button.has-icon {
 			padding: 0;
 

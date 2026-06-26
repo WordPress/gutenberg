@@ -110,42 +110,30 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 		{
 			code: `
 				import {
-					BorderBoxControl,
-					BorderControl,
-					BoxControl,
 					ComboboxControl,
 					CustomSelectControl,
 					FontAppearanceControl,
 					FontFamilyControl,
-					FontSizePicker,
 					FormTokenField,
 					InputControl,
-					LetterSpacingControl,
 					LineHeightControl,
 					NumberControl,
 					RangeControl,
 					SelectControl,
-					TextControl,
 					ToggleGroupControl,
 					UnitControl,
 				} from '@wordpress/components';
 				<>
-					<BorderBoxControl __next40pxDefaultSize />
-					<BorderControl __next40pxDefaultSize />
-					<BoxControl __next40pxDefaultSize />
 					<ComboboxControl __next40pxDefaultSize />
 					<CustomSelectControl __next40pxDefaultSize />
 					<FontAppearanceControl __next40pxDefaultSize />
 					<FontFamilyControl __next40pxDefaultSize />
-					<FontSizePicker __next40pxDefaultSize />
 					<FormTokenField __next40pxDefaultSize />
 					<InputControl __next40pxDefaultSize />
-					<LetterSpacingControl __next40pxDefaultSize />
 					<LineHeightControl __next40pxDefaultSize />
 					<NumberControl __next40pxDefaultSize />
 					<RangeControl __next40pxDefaultSize />
 					<SelectControl __next40pxDefaultSize />
-					<TextControl __next40pxDefaultSize />
 					<ToggleGroupControl __next40pxDefaultSize />
 					<UnitControl __next40pxDefaultSize />
 				</>
@@ -208,13 +196,13 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 		// Aliased import without __next40pxDefaultSize
 		{
 			code: `
-				import { TextControl as MyTextControl } from '@wordpress/components';
-				<MyTextControl />
+				import { InputControl as MyInputControl } from '@wordpress/components';
+				<MyInputControl />
 			`,
 			errors: [
 				{
 					messageId: 'missingProp',
-					data: { component: 'TextControl' },
+					data: { component: 'InputControl' },
 				},
 			],
 		},

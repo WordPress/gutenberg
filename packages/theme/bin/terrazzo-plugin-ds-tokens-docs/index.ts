@@ -5,14 +5,14 @@ function titleCase( str: string ) {
 	return str[ 0 ].toUpperCase() + str.slice( 1 );
 }
 
-const STATIC_PREAMBLE = `Design tokens are named values. They encode design decisions which describe the visual purpose of a value. Rather than referencing a raw value like \`#3858e9\`, a token like \`--wpds-color-bg-interactive-brand-strong\` describes what the value is for. Tokens are delivered as CSS custom properties and consumed with \`var( --wpds-* )\`.
+const STATIC_PREAMBLE = `Design tokens are named values. They encode design decisions which describe the visual purpose of a value. Rather than referencing a raw value like \`#3858e9\`, a token like \`--wpds-color-background-interactive-brand-strong\` describes what the value is for. Tokens are delivered as CSS custom properties and consumed with \`var( --wpds-* )\`.
 
 ## How to pick a token
 
 Each segment of a token name answers one question about the value being applied:
 
 -   **Type** identifies the kind of value, like \`color\` or \`dimension\`. It is usually determined by the CSS property being set.
--   **Property** describes which aspect of the element the token applies to, such as \`bg\`, \`fg\`, \`stroke\`, \`padding\`, or \`gap\`.
+-   **Property** describes which aspect of the element the token applies to, such as \`background\`, \`foreground\`, \`stroke\`, \`padding\`, or \`gap\`.
 -   **Target** describes the kind of element the token applies to, such as a \`surface\`, an \`interactive\` control, static \`content\`, a \`track\` or \`thumb\`, or a \`focus\` indicator.
 -   **Tone** describes the semantic intent of a color, such as \`neutral\`, \`brand\`, \`success\`, or \`error\`.
 -   **Emphasis** and **state** are modifiers that adjust strength and reflect interactive states.
@@ -44,8 +44,8 @@ The specific design property being defined.
 
 | Value         | Description                        |
 | ------------- | ---------------------------------- |
-| \`bg\`          | Background color                   |
-| \`fg\`          | Foreground color (text and icons)  |
+| \`background\`  | Background color                   |
+| \`foreground\`  | Foreground color (text and icons)  |
 | \`stroke\`      | Border and outline color           |
 | \`padding\`     | Internal spacing within an element |
 | \`gap\`         | Spacing between elements           |

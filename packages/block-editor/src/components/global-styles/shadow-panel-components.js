@@ -20,7 +20,6 @@ import { shadow as shadowIcon, Icon, check, reset } from '@wordpress/icons';
  */
 import clsx from 'clsx';
 
-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
 import { Tooltip } from '@wordpress/ui';
 
 /**

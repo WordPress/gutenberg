@@ -1,19 +1,12 @@
 import { Select as _Select } from '@base-ui/react/select';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
-import {
-	type ThemeProvider as ThemeProviderType,
-	privateApis as themePrivateApis,
-} from '@wordpress/theme';
-import { unlock } from '../../../lock-unlock';
+import { ThemeProvider } from '@wordpress/theme';
 import { Portal } from './portal';
 import { Positioner } from './positioner';
 import { renderSlotWithChildren } from '../../../utils/render-slot-with-children';
 import itemPopupStyles from '../../../utils/css/item-popup.module.css';
 import type { SelectPopupProps } from './types';
-
-const ThemeProvider: typeof ThemeProviderType =
-	unlock( themePrivateApis ).ThemeProvider;
 
 export const Popup = forwardRef< HTMLDivElement, SelectPopupProps >(
 	function Popup(

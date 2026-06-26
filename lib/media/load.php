@@ -190,33 +190,44 @@ function gutenberg_set_heic_upload_support_flag() {
 add_action( 'admin_init', 'gutenberg_set_heic_upload_support_flag' );
 
 /**
- * Deletes the HEIC companion file when its attachment is deleted.
+ * Deletes the source-format companion file when its attachment is deleted.
  *
- * The HEIC is sideloaded alongside a JPEG derivative and recorded in
- * $metadata['original']. WordPress core's wp_delete_attachment_files()
- * only knows about 'original_image', so without this hook the HEIC
- * would linger on disk after the attachment is deleted.
+ * When the client-side media flow sideloads a source-format original (such as
+ * a HEIC file) alongside a web-viewable derivative, the original's filename is
+ * recorded in the 'source_image' metadata key. WordPress only tracks
+ * 'original_image' in wp_delete_attachment_files(), so without this hook the
+ * companion file would linger on disk after the attachment is deleted.
  *
  * @param int $post_id Attachment ID being deleted.
+ * @return bool Whether a companion file was deleted.
  */
-function gutenberg_delete_heic_companion_file( int $post_id ): void {
+function gutenberg_delete_heic_companion_file( int $post_id ): bool {
 	$metadata = wp_get_attachment_metadata( $post_id, true );
 
-	if ( empty( $metadata['original'] ) || ! is_string( $metadata['original'] ) ) {
-		return;
+	$source_image = $metadata['source_image'] ?? null;
+	if ( ! is_string( $source_image ) || '' === $source_image ) {
+		return false;
 	}
 
 	$attached_file = get_attached_file( $post_id, true );
 
 	if ( ! $attached_file ) {
-		return;
+		return false;
 	}
 
-	$heic_path = path_join( dirname( $attached_file ), $metadata['original'] );
+	$uploads = wp_get_upload_dir();
 
-	if ( file_exists( $heic_path ) ) {
-		wp_delete_file( $heic_path );
+	if ( empty( $uploads['basedir'] ) ) {
+		return false;
 	}
+
+	$companion_path = path_join( dirname( $attached_file ), wp_basename( $source_image ) );
+
+	if ( ! file_exists( $companion_path ) ) {
+		return false;
+	}
+
+	return wp_delete_file_from_directory( $companion_path, $uploads['basedir'] );
 }
 
 add_action( 'delete_attachment', 'gutenberg_delete_heic_companion_file' );

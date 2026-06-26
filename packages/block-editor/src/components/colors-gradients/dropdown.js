@@ -51,7 +51,10 @@ const WithToolsPanelItem = ( { setting, children, panelId, ...props } ) => {
 					: true
 			}
 			{ ...props }
-			className="block-editor-tools-panel-color-gradient-settings__item"
+			className={ clsx(
+				'block-editor-color-gradient-item',
+				'block-editor-tools-panel-color-gradient-settings__item'
+			) }
 			panelId={ panelId }
 			// Pass resetAllFilter if supplied due to rendering via SlotFill
 			// into parent ToolsPanel.

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/image-cropper",
-	"version": "1.12.0",
+	"version": "1.13.0",
 	"description": "A basic image cropper component.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -43,7 +43,6 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@types/react": "^18.3.27",
 		"@wordpress/components": "file:../components",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
@@ -52,8 +51,14 @@
 		"react-easy-crop": "^5.4.2"
 	},
 	"peerDependencies": {
+		"@types/react": "^18.3.27",
 		"react": "^18.0.0",
 		"react-dom": "^18.0.0"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

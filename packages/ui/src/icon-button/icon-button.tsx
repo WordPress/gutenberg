@@ -9,6 +9,9 @@ import { type IconButtonProps } from './types';
 /**
  * An icon-only button with automatic tooltip and optimized styling.
  * Inherits all Button props while providing icon-specific enhancements.
+ *
+ * When rendering a group of `IconButton`s, wrap them in a `Tooltip.Provider`
+ * to coordinate tooltip delays across the group.
  */
 export const IconButton = forwardRef< HTMLButtonElement, IconButtonProps >(
 	function IconButton(
@@ -30,42 +33,36 @@ export const IconButton = forwardRef< HTMLButtonElement, IconButtonProps >(
 		const classes = clsx( styles[ 'icon-button' ], className );
 
 		return (
-			<Tooltip.Provider delay={ 0 }>
-				<Tooltip.Root>
-					<Tooltip.Trigger
-						ref={ ref }
-						disabled={ disabled && ! focusableWhenDisabled }
-						render={
-							<Button
-								{ ...restProps }
-								size={ size }
-								aria-label={ label }
-								aria-keyshortcuts={ shortcut?.ariaKeyShortcut }
-								disabled={ disabled }
-								focusableWhenDisabled={ focusableWhenDisabled }
-							/>
-						}
-						className={ classes }
-					>
-						<Icon
-							icon={ icon }
-							size={ 24 }
-							className={ styles.icon }
+			<Tooltip.Root>
+				<Tooltip.Trigger
+					ref={ ref }
+					disabled={ disabled && ! focusableWhenDisabled }
+					render={
+						<Button
+							{ ...restProps }
+							size={ size }
+							aria-label={ label }
+							aria-keyshortcuts={ shortcut?.ariaKeyShortcut }
+							disabled={ disabled }
+							focusableWhenDisabled={ focusableWhenDisabled }
 						/>
-					</Tooltip.Trigger>
-					<Tooltip.Popup positioner={ positioner }>
-						{ label }
-						{ shortcut && (
-							<>
-								{ ' ' }
-								<span aria-hidden="true">
-									{ shortcut.displayShortcut }
-								</span>
-							</>
-						) }
-					</Tooltip.Popup>
-				</Tooltip.Root>
-			</Tooltip.Provider>
+					}
+					className={ classes }
+				>
+					<Icon icon={ icon } size={ 24 } className={ styles.icon } />
+				</Tooltip.Trigger>
+				<Tooltip.Popup positioner={ positioner }>
+					{ label }
+					{ shortcut && (
+						<>
+							{ ' ' }
+							<span aria-hidden="true">
+								{ shortcut.displayShortcut }
+							</span>
+						</>
+					) }
+				</Tooltip.Popup>
+			</Tooltip.Root>
 		);
 	}
 );
