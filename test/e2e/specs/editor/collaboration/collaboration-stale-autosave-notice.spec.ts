@@ -64,7 +64,7 @@ test.describe( 'Collaboration - stale autosave notice', () => {
 	//    revisioned fields. So a content-identical autosave still triggers the
 	//    notice, and "View the autosave" opens a revision screen with no Content
 	//    diff (just the title), because the content matches the saved post.
-	test( 'does not show a spurious notice in RTC after a no-op autosave', async ( {
+	test( 'does not show an unnecessary notice in RTC after a no-op autosave', async ( {
 		collaborationUtils,
 		editor,
 		page,
@@ -118,9 +118,9 @@ test.describe( 'Collaboration - stale autosave notice', () => {
 			{ timeout: 30_000 }
 		);
 
-		// The autosave was stored as a revision (RTC does not update the parent
-		// draft) and its content is identical to the post: a no-op that produces
-		// a blank Content diff in the revision UI.
+		// The autosave was a no-op (identical content), so the server must not
+		// persist a redundant autosave revision. A lingering revision is exactly
+		// what would later out-date the post and surface the spurious notice.
 		const savedPost = await requestUtils.rest< RestPost >( {
 			path: `/wp/v2/posts/${ postId }`,
 			params: { context: 'edit' },
@@ -129,18 +129,13 @@ test.describe( 'Collaboration - stale autosave notice', () => {
 			path: `/wp/v2/posts/${ postId }/autosaves`,
 			params: { context: 'edit' },
 		} );
-		expect( autosaves.length ).toBeGreaterThanOrEqual( 1 );
-
-		const latestAutosave = autosaves[ autosaves.length - 1 ];
-		expect( rawField( latestAutosave.content ).trim() ).toBe(
-			rawField( savedPost.content ).trim()
-		);
 		expect( rawField( savedPost.content ).trim() ).toBe( content.trim() );
+		expect( autosaves ).toHaveLength( 0 );
 
-		// Reload. The autosave was a no-op, so the editor should NOT warn that a
-		// more recent autosave exists. Today this fails: the server computes
-		// `settings.autosave` by comparing only timestamps and surfaces the
-		// spurious notice. The fix should make this assertion pass.
+		// Reload. The autosave was a no-op, so no autosave revision exists to
+		// out-date the post, and the editor must not warn about "a more recent
+		// autosave". Without the controller fix, WordPress would have stored a
+		// redundant revision and surfaced the spurious notice here.
 		await page.reload();
 		await collaborationUtils.waitForCollaborationReady( page, {
 			timeout: 30_000,
