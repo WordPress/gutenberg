@@ -124,14 +124,14 @@ test.describe( 'List View Spotlight Mode', () => {
 
 		// The block beneath the pattern is the only disabled row (outside the edited section).
 		const disabledBlockRow = listView
-			.locator( '[role=row][aria-disabled="true"]' )
+			.locator( '[role=row].is-disabled' )
 			.first();
 		await expect( disabledBlockRow ).toBeVisible();
-		const blockBeneathPattern = disabledBlockRow
-			.getByRole( 'gridcell' )
-			.first();
+		const blockBeneathPattern = disabledBlockRow.locator(
+			'.block-editor-list-view-block-contents'
+		);
 		await expect( blockBeneathPattern ).toBeVisible();
-		await expect( disabledBlockRow ).toHaveAttribute(
+		await expect( blockBeneathPattern ).toHaveAttribute(
 			'aria-disabled',
 			'true'
 		);
@@ -140,11 +140,9 @@ test.describe( 'List View Spotlight Mode', () => {
 			.locator( '.block-editor-list-view-block-contents' )
 			.focus();
 		await page.keyboard.press( 'End' );
+		await expect( blockBeneathPattern ).not.toBeFocused();
 		await expect(
-			disabledBlockRow.locator( '.block-editor-list-view-block-contents' )
-		).not.toBeFocused();
-		await expect(
-			listView.locator( '[role=row][aria-disabled="true"]:has(:focus)' )
+			listView.locator( '[role=row].is-disabled:has(:focus)' )
 		).toHaveCount( 0 );
 
 		// Keyboard navigation should be constrained to the pattern
@@ -192,21 +190,21 @@ test.describe( 'List View Spotlight Mode', () => {
 			name: 'Block navigation structure',
 		} );
 		const disabledBlockRow = listView
-			.locator( '[role=row][aria-disabled="true"]' )
+			.locator( '[role=row].is-disabled' )
 			.first();
 		await expect( disabledBlockRow ).toBeVisible();
-		const blockBeneathPattern = disabledBlockRow
-			.getByRole( 'gridcell' )
-			.first();
-
-		const disabledBlockButton = blockBeneathPattern.locator(
+		const disabledBlockButton = disabledBlockRow.locator(
 			'.block-editor-list-view-block-contents'
+		);
+		await expect( disabledBlockButton ).toHaveAttribute(
+			'aria-disabled',
+			'true'
 		);
 		await disabledBlockButton.click();
 
 		// Spotlight exited: no rows remain disabled.
 		await expect(
-			listView.locator( '[role=row][aria-disabled="true"]' )
+			listView.locator( '[role=row].is-disabled' )
 		).toHaveCount( 0 );
 
 		const blockBeneath = editor.canvas
@@ -234,9 +232,12 @@ test.describe( 'List View Spotlight Mode', () => {
 			name: 'Block navigation structure',
 		} );
 		const disabledBlockRow = listView
-			.locator( '[role=row][aria-disabled="true"]' )
+			.locator( '[role=row].is-disabled' )
 			.first();
 		await expect( disabledBlockRow ).toBeVisible();
+		await expect(
+			disabledBlockRow.locator( '.block-editor-list-view-block-contents' )
+		).toHaveAttribute( 'aria-disabled', 'true' );
 
 		await editor.canvas
 			.getByRole( 'document', {
@@ -249,7 +250,7 @@ test.describe( 'List View Spotlight Mode', () => {
 
 		// Spotlight exited: no rows remain disabled.
 		await expect(
-			listView.locator( '[role=row][aria-disabled="true"]' )
+			listView.locator( '[role=row].is-disabled' )
 		).toHaveCount( 0 );
 
 		const blockBeneath = editor.canvas
@@ -278,9 +279,12 @@ test.describe( 'List View Spotlight Mode', () => {
 			name: 'Block navigation structure',
 		} );
 		const disabledBlockRow = listView
-			.locator( '[role=row][aria-disabled="true"]' )
+			.locator( '[role=row].is-disabled' )
 			.first();
 		await expect( disabledBlockRow ).toBeVisible();
+		await expect(
+			disabledBlockRow.locator( '.block-editor-list-view-block-contents' )
+		).toHaveAttribute( 'aria-disabled', 'true' );
 
 		const groupBlock = listView.getByRole( 'gridcell', {
 			name: 'Test Pattern for Spotlight',
@@ -293,7 +297,7 @@ test.describe( 'List View Spotlight Mode', () => {
 		await page.keyboard.press( 'Escape' );
 
 		await expect(
-			listView.locator( '[role=row][aria-disabled="true"]' )
+			listView.locator( '[role=row].is-disabled' )
 		).toHaveCount( 0 );
 	} );
 } );

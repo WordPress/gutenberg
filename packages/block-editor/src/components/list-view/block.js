@@ -623,6 +623,7 @@ function ListViewBlock( {
 		'is-displacement-down': displacement === 'down',
 		'is-after-dragged-blocks': isAfterDraggedBlocks,
 		'is-nesting': isNesting,
+		'is-disabled': isDisabled,
 	} );
 
 	// Only include all selected blocks if the currently clicked on block
@@ -662,7 +663,6 @@ function ListViewBlock( {
 			id={ `list-view-${ listViewInstanceId }-block-${ clientId }` }
 			data-block={ clientId }
 			data-expanded={ canEditBlock ? isExpanded : undefined }
-			aria-disabled={ isDisabled ? true : undefined }
 			ref={ rowRef }
 		>
 			<TreeGridCell
@@ -690,7 +690,7 @@ function ListViewBlock( {
 							selectedClientIds={ selectedClientIds }
 							ariaDescribedBy={ descriptionId }
 							visibilityLabel={ blockVisibilityDescription }
-							isFocusable={ ! isDisabled }
+							isDisabled={ isDisabled }
 						/>
 						<AriaReferencedText id={ descriptionId }>
 							{ [

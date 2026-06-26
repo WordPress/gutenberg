@@ -448,7 +448,7 @@
 		}
 	}
 
-	&[aria-disabled="true"] {
+	&.is-disabled {
 		opacity: 0.2;
 		@media not ( prefers-reduced-motion ) {
 			transition: opacity 0.1s linear;
