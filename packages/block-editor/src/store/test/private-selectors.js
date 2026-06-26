@@ -759,7 +759,7 @@ describe( 'private selectors', () => {
 			] );
 		} );
 
-		it( 'should filter out disabled blocks when a content-only section is being edited', () => {
+		it( 'filters out disabled blocks when a content-only section is being edited', () => {
 			const state = {
 				...baseState,
 				blocks: {

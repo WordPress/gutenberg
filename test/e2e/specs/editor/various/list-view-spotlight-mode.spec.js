@@ -100,7 +100,7 @@ test.describe( 'List View Spotlight Mode', () => {
 		await expect( listView ).toBeVisible();
 	}
 
-	test( 'should show disabled blocks in list view and constrain keyboard navigation', async ( {
+	test( 'shows disabled blocks in list view and constrains keyboard navigation', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -122,16 +122,16 @@ test.describe( 'List View Spotlight Mode', () => {
 		} );
 		await expect( groupBlock ).toBeVisible();
 
-		// The block beneath the pattern is the only faded row (outside the edited section).
-		const fadedBlockRow = listView
-			.locator( '[role=row].is-faded-in-spotlight' )
+		// The block beneath the pattern is the only disabled row (outside the edited section).
+		const disabledBlockRow = listView
+			.locator( '[role=row][aria-disabled="true"]' )
 			.first();
-		await expect( fadedBlockRow ).toBeVisible();
-		const blockBeneathPattern = fadedBlockRow
+		await expect( disabledBlockRow ).toBeVisible();
+		const blockBeneathPattern = disabledBlockRow
 			.getByRole( 'gridcell' )
 			.first();
 		await expect( blockBeneathPattern ).toBeVisible();
-		await expect( blockBeneathPattern ).not.toHaveAttribute(
+		await expect( disabledBlockRow ).toHaveAttribute(
 			'aria-disabled',
 			'true'
 		);
@@ -141,10 +141,10 @@ test.describe( 'List View Spotlight Mode', () => {
 			.focus();
 		await page.keyboard.press( 'End' );
 		await expect(
-			fadedBlockRow.locator( '.block-editor-list-view-block-contents' )
+			disabledBlockRow.locator( '.block-editor-list-view-block-contents' )
 		).not.toBeFocused();
 		await expect(
-			listView.locator( '[role=row].is-faded-in-spotlight:has(:focus)' )
+			listView.locator( '[role=row][aria-disabled="true"]:has(:focus)' )
 		).toHaveCount( 0 );
 
 		// Keyboard navigation should be constrained to the pattern
@@ -176,7 +176,7 @@ test.describe( 'List View Spotlight Mode', () => {
 		await expect( blockBeneath ).not.toBeFocused();
 	} );
 
-	test( 'should exit spotlight mode when clicking faded block in list view', async ( {
+	test( 'exits spotlight mode when clicking disabled block in list view', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -191,22 +191,22 @@ test.describe( 'List View Spotlight Mode', () => {
 		const listView = page.getByRole( 'treegrid', {
 			name: 'Block navigation structure',
 		} );
-		const fadedBlockRow = listView
-			.locator( '[role=row].is-faded-in-spotlight' )
+		const disabledBlockRow = listView
+			.locator( '[role=row][aria-disabled="true"]' )
 			.first();
-		await expect( fadedBlockRow ).toBeVisible();
-		const blockBeneathPattern = fadedBlockRow
+		await expect( disabledBlockRow ).toBeVisible();
+		const blockBeneathPattern = disabledBlockRow
 			.getByRole( 'gridcell' )
 			.first();
 
-		const fadedBlockButton = blockBeneathPattern.locator(
+		const disabledBlockButton = blockBeneathPattern.locator(
 			'.block-editor-list-view-block-contents'
 		);
-		await fadedBlockButton.click();
+		await disabledBlockButton.click();
 
-		// Spotlight exited: no rows should be faded.
+		// Spotlight exited: no rows remain disabled.
 		await expect(
-			listView.locator( '[role=row].is-faded-in-spotlight' )
+			listView.locator( '[role=row][aria-disabled="true"]' )
 		).toHaveCount( 0 );
 
 		const blockBeneath = editor.canvas
@@ -218,7 +218,7 @@ test.describe( 'List View Spotlight Mode', () => {
 		await expect( blockBeneath ).toHaveClass( /is-selected/ );
 	} );
 
-	test( 'should exit spotlight mode when pressing Escape key', async ( {
+	test( 'exits spotlight mode when pressing Escape key', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -233,10 +233,10 @@ test.describe( 'List View Spotlight Mode', () => {
 		const listView = page.getByRole( 'treegrid', {
 			name: 'Block navigation structure',
 		} );
-		const fadedBlockRow = listView
-			.locator( '[role=row].is-faded-in-spotlight' )
+		const disabledBlockRow = listView
+			.locator( '[role=row][aria-disabled="true"]' )
 			.first();
-		await expect( fadedBlockRow ).toBeVisible();
+		await expect( disabledBlockRow ).toBeVisible();
 
 		await editor.canvas
 			.getByRole( 'document', {
@@ -247,9 +247,9 @@ test.describe( 'List View Spotlight Mode', () => {
 
 		await page.keyboard.press( 'Escape' );
 
-		// Spotlight exited: no rows should be faded.
+		// Spotlight exited: no rows remain disabled.
 		await expect(
-			listView.locator( '[role=row].is-faded-in-spotlight' )
+			listView.locator( '[role=row][aria-disabled="true"]' )
 		).toHaveCount( 0 );
 
 		const blockBeneath = editor.canvas
@@ -262,7 +262,7 @@ test.describe( 'List View Spotlight Mode', () => {
 		await expect( blockBeneath ).toBeFocused();
 	} );
 
-	test( 'should exit spotlight mode when pressing Escape key in list view', async ( {
+	test( 'exits spotlight mode when pressing Escape key in list view', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -277,10 +277,10 @@ test.describe( 'List View Spotlight Mode', () => {
 		const listView = page.getByRole( 'treegrid', {
 			name: 'Block navigation structure',
 		} );
-		const fadedBlockRow = listView
-			.locator( '[role=row].is-faded-in-spotlight' )
+		const disabledBlockRow = listView
+			.locator( '[role=row][aria-disabled="true"]' )
 			.first();
-		await expect( fadedBlockRow ).toBeVisible();
+		await expect( disabledBlockRow ).toBeVisible();
 
 		const groupBlock = listView.getByRole( 'gridcell', {
 			name: 'Test Pattern for Spotlight',
@@ -293,7 +293,7 @@ test.describe( 'List View Spotlight Mode', () => {
 		await page.keyboard.press( 'Escape' );
 
 		await expect(
-			listView.locator( '[role=row].is-faded-in-spotlight' )
+			listView.locator( '[role=row][aria-disabled="true"]' )
 		).toHaveCount( 0 );
 	} );
 } );
