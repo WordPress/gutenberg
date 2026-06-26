@@ -43,6 +43,7 @@ describe( 'private selectors', () => {
 				'wideSize',
 				'blockGap',
 				'textAlign',
+				'textShadow',
 			] );
 		} );
 
@@ -68,6 +69,7 @@ describe( 'private selectors', () => {
 				'blockGap',
 				'textAlign',
 				'textDecoration',
+				'textShadow',
 			] );
 		} );
 
@@ -96,6 +98,7 @@ describe( 'private selectors', () => {
 				'blockGap',
 				'textAlign',
 				'textTransform',
+				'textShadow',
 				'letterSpacing',
 			] );
 		} );
@@ -145,6 +148,7 @@ describe( 'private selectors', () => {
 				'blockGap',
 				'textAlign',
 				'textTransform',
+				'textShadow',
 				'letterSpacing',
 			] );
 		} );
