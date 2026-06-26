@@ -213,35 +213,9 @@ function BlockInspector() {
 				return [];
 			}
 
-			const {
-				getClientIdsOfDescendants,
-				getBlockEditingMode,
-				shouldRenderBlockListView,
-			} = unlock( select( blockEditorStore ) );
-
-			const descendants = getClientIdsOfDescendants(
-				renderedBlockClientId
-			);
-
-			// Exclude items from the content tab that are already present in the
-			// List View tab.
-			const listViewDescendants = new Set();
-			descendants.forEach( ( clientId ) => {
-				if ( shouldRenderBlockListView( clientId ) ) {
-					const listViewChildren =
-						getClientIdsOfDescendants( clientId );
-					listViewChildren.forEach( ( childId ) =>
-						listViewDescendants.add( childId )
-					);
-				}
-			} );
-
-			return descendants.filter( ( current ) => {
-				return (
-					! listViewDescendants.has( current ) &&
-					getBlockEditingMode( current ) === 'contentOnly'
-				);
-			} );
+			return unlock(
+				select( blockEditorStore )
+			).getContentClientIdsForSection( renderedBlockClientId );
 		},
 		[ isSectionBlock, renderedBlockClientId ]
 	);

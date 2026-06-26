@@ -27,6 +27,7 @@ export default function BlockQuickNavigation( {
 	onSelect,
 	onSwitchToListView,
 	hasListViewTab,
+	showGroupHeadings = false,
 } ) {
 	if ( ! clientIds.length ) {
 		return null;
@@ -34,15 +35,54 @@ export default function BlockQuickNavigation( {
 	return (
 		<VStack spacing={ 1 }>
 			{ clientIds.map( ( clientId ) => (
-				<BlockQuickNavigationItem
-					onSelect={ onSelect }
-					onSwitchToListView={ onSwitchToListView }
-					hasListViewTab={ hasListViewTab }
+				<BlockQuickNavigationGroup
 					key={ clientId }
 					clientId={ clientId }
-				/>
+					showGroupHeadings={ showGroupHeadings }
+				>
+					<BlockQuickNavigationItem
+						onSelect={ onSelect }
+						onSwitchToListView={ onSwitchToListView }
+						hasListViewTab={ hasListViewTab }
+						clientId={ clientId }
+					/>
+				</BlockQuickNavigationGroup>
 			) ) }
 		</VStack>
+	);
+}
+
+function BlockQuickNavigationGroup( {
+	children,
+	clientId,
+	showGroupHeadings,
+} ) {
+	const groupHeaderClientId = useSelect(
+		( select ) => {
+			if ( ! showGroupHeadings ) {
+				return null;
+			}
+
+			return unlock(
+				select( blockEditorStore )
+			).getContentGroupHeaderClientId( clientId );
+		},
+		[ clientId, showGroupHeadings ]
+	);
+	const groupHeaderTitle = useBlockDisplayTitle( {
+		clientId: groupHeaderClientId,
+		context: 'list-view',
+	} );
+
+	return (
+		<>
+			{ groupHeaderTitle && (
+				<h2 className="block-editor-block-quick-navigation__group-heading">
+					{ groupHeaderTitle }
+				</h2>
+			) }
+			{ children }
+		</>
 	);
 }
 

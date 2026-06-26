@@ -46,6 +46,7 @@ function ListViewBlockSelectButton(
 		isExpanded,
 		ariaDescribedBy,
 		visibilityLabel,
+		isDisabled,
 	},
 	ref
 ) {
@@ -74,8 +75,20 @@ function ListViewBlockSelectButton(
 	 */
 	function onKeyDown( event ) {
 		if ( event.keyCode === ENTER || event.keyCode === SPACE ) {
+			if ( isDisabled ) {
+				event.preventDefault();
+				return;
+			}
 			onClick( event );
 		}
+	}
+
+	function onClickHandler( event ) {
+		if ( isDisabled ) {
+			event.preventDefault();
+			return;
+		}
+		onClick( event );
 	}
 
 	return (
@@ -84,7 +97,7 @@ function ListViewBlockSelectButton(
 				'block-editor-list-view-block-select-button',
 				className
 			) }
-			onClick={ onClick }
+			onClick={ onClickHandler }
 			onContextMenu={ onContextMenu }
 			onKeyDown={ onKeyDown }
 			onMouseDown={ onMouseDown }
@@ -95,6 +108,7 @@ function ListViewBlockSelectButton(
 			onDragEnd={ onDragEnd }
 			draggable={ draggable }
 			href={ `#block-${ clientId }` }
+			aria-disabled={ isDisabled ? true : undefined }
 			aria-describedby={ ariaDescribedBy }
 			aria-expanded={ isExpanded }
 		>

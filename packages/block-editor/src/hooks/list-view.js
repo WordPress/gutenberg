@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { PanelBody } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { hasBlockSupport, getBlockType } from '@wordpress/blocks';
@@ -15,6 +15,7 @@ import { PrivateListView } from '../components/list-view';
 import InspectorControls from '../components/inspector-controls/fill';
 import { PrivateBlockContext } from '../components/block-list/private-block-context';
 import useListViewPanelState from '../components/use-list-view-panel-state';
+import useBlockDisplayTitle from '../components/block-title/use-block-display-title';
 
 import { unlock } from '../lock-unlock';
 
@@ -78,17 +79,41 @@ export function ListViewPanel( { clientId, name } ) {
 
 	const blockType = getBlockType( name );
 	const title = blockType?.title || name;
+	const groupClientId = useSelect(
+		( select ) => {
+			if ( ! isSelectionWithinCurrentSection ) {
+				return null;
+			}
+
+			return unlock(
+				select( blockEditorStore )
+			).getTopMostNamedContentGroupForBlock( clientId );
+		},
+		[ clientId, isSelectionWithinCurrentSection ]
+	);
+	const groupTitle = useBlockDisplayTitle( {
+		clientId: groupClientId,
+		context: 'list-view',
+	} );
 
 	if ( ! isEnabled || isNestedListView ) {
 		return null;
 	}
 
 	const showBlockTitle = isSelectionWithinCurrentSection;
+	const panelTitle = groupTitle
+		? sprintf(
+				/* translators: 1: content group name, 2: block name. */
+				__( '%1$s - %2$s' ),
+				groupTitle,
+				title
+		  )
+		: title;
 
 	return (
 		<InspectorControls group="list">
 			<PanelBody
-				title={ showBlockTitle ? title : undefined }
+				title={ showBlockTitle ? panelTitle : undefined }
 				opened={ isOpened }
 				onToggle={ handleToggle }
 			>

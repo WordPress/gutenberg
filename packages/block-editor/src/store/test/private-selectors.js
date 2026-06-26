@@ -11,6 +11,10 @@ import {
 	getLastInsertedBlocksClientIds,
 	isBlockSubtreeDisabled,
 	getEnabledClientIdsTree,
+	getListViewClientIdsTree,
+	getContentClientIdsForSection,
+	getTopMostNamedContentGroupForBlock,
+	getContentGroupHeaderClientId,
 	getEnabledBlockParents,
 	getExpandedBlock,
 	isDragging,
@@ -586,6 +590,14 @@ describe( 'private selectors', () => {
 					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', {} ], // | |  Paragraph
 					[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', {} ], // | |  Paragraph
 				] ),
+				attributes: new Map( [
+					[ '6cf70164-9097-4460-bcbf-200560546988', {} ],
+					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', {} ],
+					[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', {} ],
+					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', {} ],
+					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', {} ],
+					[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', {} ],
+				] ),
 				order: new Map( [
 					[
 						'',
@@ -760,6 +772,373 @@ describe( 'private selectors', () => {
 					],
 				},
 			] );
+		} );
+
+		it( 'filters out named disabled parents with visible children', () => {
+			const state = {
+				...baseState,
+				blocks: {
+					...baseState.blocks,
+					attributes: new Map( [
+						...baseState.blocks.attributes,
+						[
+							'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
+							{ metadata: { patternName: 'test/pattern' } },
+						],
+						[
+							'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+							{ metadata: { name: 'Card' } },
+						],
+					] ),
+					blockEditingModes: new Map( [
+						[ '', 'disabled' ],
+						[
+							'b3247f75-fd94-4fef-97f9-5bfd162cc416',
+							'contentOnly',
+						],
+						[
+							'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
+							'contentOnly',
+						],
+					] ),
+				},
+				derivedBlockEditingModes: new Map( [
+					[ '6cf70164-9097-4460-bcbf-200560546988', 'disabled' ],
+					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
+					[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', 'disabled' ],
+					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
+				] ),
+			};
+
+			expect( getEnabledClientIdsTree( state ) ).toEqual( [
+				{
+					clientId: 'b3247f75-fd94-4fef-97f9-5bfd162cc416',
+					innerBlocks: [],
+				},
+				{
+					clientId: 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
+					innerBlocks: [],
+				},
+			] );
+		} );
+	} );
+
+	describe( 'getListViewClientIdsTree', () => {
+		const baseState = {
+			settings: {},
+			blocks: {
+				byClientId: new Map( [
+					[ '6cf70164-9097-4460-bcbf-200560546988', {} ], // Header
+					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', {} ], // Group
+					[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', {} ], // |  Post Title
+					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', {} ], // |  Post Content
+					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', {} ], // | |  Paragraph
+					[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', {} ], // | |  Paragraph
+				] ),
+				attributes: new Map( [
+					[ '6cf70164-9097-4460-bcbf-200560546988', {} ],
+					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', {} ],
+					[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', {} ],
+					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', {} ],
+					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', {} ],
+					[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', {} ],
+				] ),
+				order: new Map( [
+					[
+						'',
+						[
+							'6cf70164-9097-4460-bcbf-200560546988',
+							'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
+						],
+					],
+					[ '6cf70164-9097-4460-bcbf-200560546988', [] ],
+					[
+						'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
+						[
+							'b26fc763-417d-4f01-b81c-2ec61e14a972',
+							'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+						],
+					],
+					[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', [] ],
+					[
+						'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+						[
+							'b3247f75-fd94-4fef-97f9-5bfd162cc416',
+							'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
+						],
+					],
+					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', [] ],
+					[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', [] ],
+				] ),
+			},
+		};
+		getListViewClientIdsTree.registry = {
+			select: jest.fn( () => ( {} ) ),
+		};
+
+		it( 'returns named disabled parents with visible children in content-only sections', () => {
+			const state = {
+				...baseState,
+				blocks: {
+					...baseState.blocks,
+					attributes: new Map( [
+						...baseState.blocks.attributes,
+						[
+							'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
+							{ metadata: { patternName: 'test/pattern' } },
+						],
+						[
+							'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+							{ metadata: { name: 'Card' } },
+						],
+					] ),
+					blockEditingModes: new Map( [
+						[ '', 'disabled' ],
+						[
+							'b3247f75-fd94-4fef-97f9-5bfd162cc416',
+							'contentOnly',
+						],
+						[
+							'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
+							'contentOnly',
+						],
+					] ),
+				},
+				derivedBlockEditingModes: new Map( [
+					[ '6cf70164-9097-4460-bcbf-200560546988', 'disabled' ],
+					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
+					[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', 'disabled' ],
+					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
+				] ),
+			};
+
+			expect( getListViewClientIdsTree( state ) ).toEqual( [
+				{
+					clientId: '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+					innerBlocks: [
+						{
+							clientId: 'b3247f75-fd94-4fef-97f9-5bfd162cc416',
+							innerBlocks: [],
+						},
+						{
+							clientId: 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
+							innerBlocks: [],
+						},
+					],
+				},
+			] );
+		} );
+
+		it( 'filters out nested named disabled parents', () => {
+			const state = {
+				...baseState,
+				blocks: {
+					...baseState.blocks,
+					attributes: new Map( [
+						...baseState.blocks.attributes,
+						[
+							'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
+							{ metadata: { name: 'Pricing grid' } },
+						],
+						[
+							'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+							{ metadata: { name: 'Free card' } },
+						],
+					] ),
+					blockEditingModes: new Map( [
+						[ '', 'disabled' ],
+						[
+							'b3247f75-fd94-4fef-97f9-5bfd162cc416',
+							'contentOnly',
+						],
+						[
+							'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
+							'contentOnly',
+						],
+					] ),
+				},
+				derivedBlockEditingModes: new Map( [
+					[ '6cf70164-9097-4460-bcbf-200560546988', 'disabled' ],
+					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
+					[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', 'disabled' ],
+					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
+				] ),
+			};
+
+			expect( getListViewClientIdsTree( state ) ).toEqual( [
+				{
+					clientId: 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
+					innerBlocks: [
+						{
+							clientId: 'b3247f75-fd94-4fef-97f9-5bfd162cc416',
+							innerBlocks: [],
+						},
+						{
+							clientId: 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
+							innerBlocks: [],
+						},
+					],
+				},
+			] );
+		} );
+
+		it( 'filters out named disabled leaves in content-only sections', () => {
+			const state = {
+				...baseState,
+				blocks: {
+					...baseState.blocks,
+					attributes: new Map( [
+						...baseState.blocks.attributes,
+						[
+							'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
+							{ metadata: { patternName: 'test/pattern' } },
+						],
+						[
+							'b26fc763-417d-4f01-b81c-2ec61e14a972',
+							{ metadata: { name: 'Named leaf' } },
+						],
+					] ),
+					blockEditingModes: new Map( [ [ '', 'disabled' ] ] ),
+				},
+				derivedBlockEditingModes: new Map( [
+					[ '6cf70164-9097-4460-bcbf-200560546988', 'disabled' ],
+					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
+					[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', 'disabled' ],
+					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
+					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'disabled' ],
+					[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', 'disabled' ],
+				] ),
+			};
+
+			expect( getListViewClientIdsTree( state ) ).toEqual( [] );
+		} );
+	} );
+
+	describe( 'content panel grouping selectors', () => {
+		const baseState = {
+			settings: {},
+			blocks: {
+				byClientId: new Map( [
+					[ 'section', {} ],
+					[ 'ungrouped', {} ],
+					[ 'group', {} ],
+					[ 'first-content', {} ],
+					[ 'second-content', {} ],
+				] ),
+				attributes: new Map( [
+					[
+						'section',
+						{ metadata: { patternName: 'test/pattern' } },
+					],
+					[ 'ungrouped', {} ],
+					[ 'group', { metadata: { name: 'Group' } } ],
+					[ 'first-content', {} ],
+					[ 'second-content', {} ],
+				] ),
+				order: new Map( [
+					[ '', [ 'section' ] ],
+					[ 'section', [ 'ungrouped', 'group' ] ],
+					[ 'ungrouped', [] ],
+					[ 'group', [ 'first-content', 'second-content' ] ],
+					[ 'first-content', [] ],
+					[ 'second-content', [] ],
+				] ),
+				parents: new Map( [
+					[ 'section', '' ],
+					[ 'ungrouped', 'section' ],
+					[ 'group', 'section' ],
+					[ 'first-content', 'group' ],
+					[ 'second-content', 'group' ],
+				] ),
+				blockEditingModes: new Map(),
+			},
+			blockListSettings: new Map( [
+				[ 'section', {} ],
+				[ 'group', {} ],
+			] ),
+			derivedBlockEditingModes: new Map( [
+				[ 'section', 'disabled' ],
+				[ 'ungrouped', 'contentOnly' ],
+				[ 'group', 'disabled' ],
+				[ 'first-content', 'contentOnly' ],
+				[ 'second-content', 'contentOnly' ],
+			] ),
+		};
+
+		it( 'returns content-only descendants for a section', () => {
+			expect(
+				getContentClientIdsForSection( baseState, 'section' )
+			).toEqual( [ 'ungrouped', 'first-content', 'second-content' ] );
+		} );
+
+		it( 'returns the top-most named content group for a block', () => {
+			expect(
+				getTopMostNamedContentGroupForBlock(
+					baseState,
+					'first-content'
+				)
+			).toBe( 'group' );
+			expect(
+				getTopMostNamedContentGroupForBlock( baseState, 'ungrouped' )
+			).toBe( null );
+		} );
+
+		it( 'returns a group heading for only the first content row in a group', () => {
+			expect(
+				getContentGroupHeaderClientId( baseState, 'first-content' )
+			).toBe( 'group' );
+			expect(
+				getContentGroupHeaderClientId( baseState, 'second-content' )
+			).toBe( null );
+		} );
+
+		it( 'uses the top-most named group when named groups are nested', () => {
+			const state = {
+				...baseState,
+				blocks: {
+					...baseState.blocks,
+					byClientId: new Map( [
+						...baseState.blocks.byClientId,
+						[ 'nested-group', {} ],
+					] ),
+					attributes: new Map( [
+						...baseState.blocks.attributes,
+						[
+							'nested-group',
+							{ metadata: { name: 'Nested group' } },
+						],
+					] ),
+					order: new Map( [
+						...baseState.blocks.order,
+						[ 'group', [ 'nested-group' ] ],
+						[
+							'nested-group',
+							[ 'first-content', 'second-content' ],
+						],
+					] ),
+					parents: new Map( [
+						...baseState.blocks.parents,
+						[ 'nested-group', 'group' ],
+						[ 'first-content', 'nested-group' ],
+						[ 'second-content', 'nested-group' ],
+					] ),
+				},
+				blockListSettings: new Map( [
+					...baseState.blockListSettings,
+					[ 'nested-group', {} ],
+				] ),
+				derivedBlockEditingModes: new Map( [
+					...baseState.derivedBlockEditingModes,
+					[ 'nested-group', 'disabled' ],
+				] ),
+			};
+
+			expect(
+				getTopMostNamedContentGroupForBlock( state, 'first-content' )
+			).toBe( 'group' );
+			expect(
+				getContentGroupHeaderClientId( state, 'first-content' )
+			).toBe( 'group' );
 		} );
 	} );
 
