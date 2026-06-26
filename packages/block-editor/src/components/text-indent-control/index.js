@@ -66,8 +66,8 @@ export default function TextIndentControl( {
 	if ( ! withSlider ) {
 		return (
 			<UnitControl
-				__next40pxDefaultSize
 				{ ...otherProps }
+				__next40pxDefaultSize
 				label={ __( 'Line indent' ) }
 				value={ value }
 				__unstableInputWidth={ __unstableInputWidth }
