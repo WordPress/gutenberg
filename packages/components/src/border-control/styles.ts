@@ -49,11 +49,9 @@ export const wrapperWidth = css`
 	}
 `;
 
-export const wrapperHeight = ( size?: 'default' | '__unstable-large' ) => {
-	return css`
-		height: ${ size === '__unstable-large' ? '40px' : '30px' };
-	`;
-};
+export const wrapperHeight = css`
+	height: 40px;
+`;
 
 export const borderControlDropdown = css`
 	background: #fff;
@@ -84,6 +82,7 @@ export const colorIndicatorBorder = ( border?: Border ) => {
 	const { color, style } = border || {};
 
 	const fallbackColor =
+		// TODO: should use the `stroke-interactive-neutral` WPDS token when refactored to SCSS modules
 		!! style && style !== 'none' ? COLORS.gray[ 300 ] : undefined;
 
 	return css`
@@ -92,19 +91,16 @@ export const colorIndicatorBorder = ( border?: Border ) => {
 	`;
 };
 
-export const colorIndicatorWrapper = (
-	border?: Border,
-	size?: 'default' | '__unstable-large'
-) => {
+export const colorIndicatorWrapper = ( border?: Border ) => {
 	const { style } = border || {};
 
 	return css`
 		border-radius: ${ CONFIG.radiusFull };
 		border: 2px solid transparent;
 		${ style ? colorIndicatorBorder( border ) : undefined }
-		width: ${ size === '__unstable-large' ? '24px' : '22px' };
-		height: ${ size === '__unstable-large' ? '24px' : '22px' };
-		padding: ${ size === '__unstable-large' ? '2px' : '1px' };
+		width: 24px;
+		height: 24px;
+		padding: 2px;
 
 		/*
 		 * ColorIndicator

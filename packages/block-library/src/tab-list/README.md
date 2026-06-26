@@ -15,42 +15,33 @@ Display the tab buttons for a tabbed interface.
 **[Parent](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#parent) blocks (direct):**
 - [`core/tabs`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tabs/)
 
-**[Allowed](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#allowed-blocks) inner blocks:**
-- [`core/tab`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tab/)
-
 ## Attributes
 
 _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/) property in block.json._
 
-_This block has no custom attributes._
+| Attribute | [Type](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
+|-----------|------|---------|-------------|
+| `tabs` | `array` | `[]` | [Source](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#value-source): `query`. [Selector](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#value-source): `button` |
 
 ## Supports
 
 _Defined via the [`supports`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/) property in block.json._
 
 - [`html`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#html): `false`
-- [`reusable`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
 - [`visibility`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#visibility): `false`
 - [`lock`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#lock): `false`
-- [`dimensions`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#dimensions):
-  - `aspectRatio`: `false`
-  - `height`: `false`
-  - `minHeight`: `false`
-  - `width`: `false`
 - [`color`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color):
   - [`background`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-background): `true`
   - [`text`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-text): `true`
 - [`typography`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography):
   - [`fontSize`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
 - [`layout`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout):
-  - [`default`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-default): `{"type":"flex","flexWrap":"nowrap","orientation":"horizontal"}`
-  - [`allowSwitching`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowswitching): `false`
-  - [`allowVerticalAlignment`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowverticalalignment): `true`
-  - [`allowJustification`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowjustification): `true`
-  - [`allowOrientation`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-alloworientation): `true`
+  - [`default`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-default): `{"type":"flex","flexWrap":"nowrap"}`
+  - [`allowVerticalAlignment`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowverticalalignment): `false`
+  - [`allowOrientation`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-alloworientation): `false`
+  - [`allowWrap`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowwrap): `false`
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
   - `padding`: `true`
-  - `margin`: `true`
   - `blockGap`: `true`
 
 ## Context
@@ -61,12 +52,23 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 
 - `core/tabs-list`
 
+## CSS Selectors
+
+_Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
+
+- **border**: `.wp-block-tab-list button`
+- **color**:
+  - background: `.wp-block-tab-list button`
+  - text: `.wp-block-tab-list button`
+- **spacing**:
+  - padding: `.wp-block-tab-list button`
+
 ## Block Markup
 
 This is a [**hybrid block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). It saves static markup that the server may enhance during rendering.
 
 ```html
-<!-- wp:tab-list -->
+<!-- wp:tab-list {"tabs":[]} -->
 <!-- Content... -->
 <!-- /wp:tab-list -->
 ```

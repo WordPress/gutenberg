@@ -1797,6 +1797,13 @@
 								{ "$ref": "#/definitions/refComplete" }
 							]
 						},
+						"textShadow": {
+							"description": "Sets the `text-shadow` CSS property.",
+							"oneOf": [
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
+							]
+						},
 						"writingMode": {
 							"description": "Sets the `writing-mode` CSS property.",
 							"oneOf": [
@@ -1867,16 +1874,16 @@
 			"description": "Responsive block states keyed by breakpoint name. Each breakpoint supports the same style properties as the default block state.",
 			"type": "object",
 			"properties": {
-				"mobile": {
+				"@mobile": {
 					"$ref": "#/definitions/stylesPropertiesComplete"
 				},
-				"tablet": {
+				"@tablet": {
 					"$ref": "#/definitions/stylesPropertiesComplete"
 				}
 			}
 		},
 		"stylesBlocksResponsiveSelectorsPropertyNames": {
-			"enum": [ "mobile", "tablet" ]
+			"enum": [ "@mobile", "@tablet" ]
 		},
 		"stylesElementsPseudoSelectorsProperties": {
 			"type": "object",
@@ -1905,10 +1912,10 @@
 			}
 		},
 		"stylesBlocksCustomStatesProperties": {
-			"description": "Custom class-based block states using the '@' prefix. Each state supports style properties as well as the same pseudo-selectors available to the block.",
+			"description": "Custom class-based block states using the '-' prefix. Each state supports style properties as well as the same pseudo-selectors available to the block.",
 			"type": "object",
 			"properties": {
-				"@current": {
+				"-current": {
 					"description": "Styles applied to the current/active item (e.g. .current-menu-item in navigation).",
 					"allOf": [
 						{
@@ -1936,16 +1943,16 @@
 			"description": "Responsive element states keyed by breakpoint name. Each breakpoint supports the same style properties as the default element state.",
 			"type": "object",
 			"properties": {
-				"mobile": {
+				"@mobile": {
 					"$ref": "#/definitions/stylesPropertiesComplete"
 				},
-				"tablet": {
+				"@tablet": {
 					"$ref": "#/definitions/stylesPropertiesComplete"
 				}
 			}
 		},
 		"stylesElementsResponsiveSelectorsPropertyNames": {
-			"enum": [ "mobile", "tablet" ]
+			"enum": [ "@mobile", "@tablet" ]
 		},
 		"stylesElementsPropertiesComplete": {
 			"description": "Styles defined on a per-element basis using the element's selector.",

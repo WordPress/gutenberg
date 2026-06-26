@@ -34,11 +34,6 @@ function gutenberg_initialize_experiments_settings() {
 					'label'       => __( 'Grid interactivity', 'gutenberg' ),
 					'description' => __( 'Enables enhancements to the Grid block that let you move and resize items in the editor canvas.', 'gutenberg' ),
 				),
-				array(
-					'id'          => 'gutenberg-classic-block-deprecation',
-					'label'       => __( 'Classic block deprecation', 'gutenberg' ),
-					'description' => __( 'Enables UI changes aimed at deprecating the Classic block, including prompts on existing Classic blocks to migrate their content to blocks or to a Custom HTML block.', 'gutenberg' ),
-				),
 			),
 		),
 		array(
@@ -131,9 +126,14 @@ function gutenberg_initialize_experiments_settings() {
 					'description' => __( 'Enables a new dashboard experience with resizable, reorderable widgets that plugins can register and users can personalize.', 'gutenberg' ),
 				),
 				array(
-					'id'          => 'gutenberg-admin-bar-in-editor',
-					'label'       => __( 'Toolbar in editor', 'gutenberg' ),
-					'description' => __( 'Shows the Toolbar in the fullscreen Post and Site Editor.', 'gutenberg' ),
+					'id'          => 'gutenberg-omnibar',
+					'label'       => __( 'Toolbar UI refresh', 'gutenberg' ),
+					'description' => __( 'Previews a redesigned toolbar UI that is visually consistent everywhere. For now, it includes replacing home/odometer dashicon with site icon if set.', 'gutenberg' ),
+				),
+				array(
+					'id'          => 'gutenberg-react-19',
+					'label'       => __( 'React 19', 'gutenberg' ),
+					'description' => __( 'Registers React 19 as the bundled React version, replacing the default React 18 scripts.', 'gutenberg' ),
 				),
 			),
 		),
@@ -182,21 +182,6 @@ function gutenberg_initialize_experiments_settings() {
 add_action( 'rest_api_init', 'gutenberg_initialize_experiments_settings' );
 
 /**
- * Registers the Experiments submenu page under the Gutenberg menu.
- */
-function gutenberg_experiments_menu() {
-	add_submenu_page(
-		'gutenberg',
-		__( 'Experiments Settings', 'gutenberg' ),
-		__( 'Experiments', 'gutenberg' ),
-		'manage_options',
-		'experiments-wp-admin',
-		'gutenberg_experiments_wp_admin_render_page'
-	);
-}
-add_action( 'admin_menu', 'gutenberg_experiments_menu' );
-
-/**
  * Allows the legacy `gutenberg-experiments` route. Without this, accessing
  * `?page=gutenberg-experiments` results in an HTTP 403 error.
  *
@@ -212,9 +197,7 @@ add_action( 'admin_menu', 'gutenberg_experiments_legacy_menu', 9 );
  * `?page=experiments-wp-admin` URL.
  */
 function gutenberg_redirect_legacy_experiments_page() {
-	wp_safe_redirect( admin_url( 'admin.php?page=experiments-wp-admin' ) );
+	wp_safe_redirect( admin_url( 'options-general.php?page=experiments-wp-admin' ) );
 	exit;
 }
 add_action( 'load-admin_page_gutenberg-experiments', 'gutenberg_redirect_legacy_experiments_page' );
-add_action( 'load-toplevel_page_gutenberg-experiments', 'gutenberg_redirect_legacy_experiments_page' );
-add_action( 'load-gutenberg_page_gutenberg-experiments', 'gutenberg_redirect_legacy_experiments_page' );

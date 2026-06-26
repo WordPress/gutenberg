@@ -8,7 +8,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useMemo, useRef, useEffect } from '@wordpress/element';
+import { useMemo, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -24,24 +24,11 @@ const TEMPLATE = [
 	],
 ];
 
-const { cancelAnimationFrame } = window;
-
 export default function Edit( { clientId, context, isSelected } ) {
-	const focusRef = useRef();
-
 	// Consume tab indices from context
 	const activeTabIndex = context[ 'core/tabs-activeTabIndex' ];
 	const editorActiveTabIndex = context[ 'core/tabs-editorActiveTabIndex' ];
 	const effectiveActiveIndex = editorActiveTabIndex ?? activeTabIndex;
-
-	// Clean up animation frames on unmount.
-	useEffect( () => {
-		return () => {
-			if ( focusRef.current ) {
-				cancelAnimationFrame( focusRef.current );
-			}
-		};
-	}, [] );
 
 	const { blockIndex, hasInnerBlocksSelected, tabsClientId } = useSelect(
 		( select ) => {

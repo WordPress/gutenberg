@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
-import { Platform } from '@wordpress/element';
 
 const ALIGN_SUPPORT_KEY = 'align';
 const ALIGN_WIDE_SUPPORT_KEY = 'alignWide';
@@ -120,10 +119,6 @@ export const getAlignWideSupport = ( nameOrType ) =>
  * @return {boolean} Whether there is support.
  */
 export function hasBorderSupport( nameOrType, feature = 'any' ) {
-	if ( Platform.OS !== 'web' ) {
-		return false;
-	}
-
 	const support = getBlockSupport( nameOrType, BORDER_SUPPORT_KEY );
 
 	if ( support === true ) {
@@ -177,10 +172,6 @@ export const hasColorSupport = ( nameOrType ) => {
  * @return {boolean} Whether the block supports the feature.
  */
 export const hasLinkColorSupport = ( nameOrType ) => {
-	if ( Platform.OS !== 'web' ) {
-		return false;
-	}
-
 	const colorSupport = getBlockSupport( nameOrType, COLOR_SUPPORT_KEY );
 
 	return (

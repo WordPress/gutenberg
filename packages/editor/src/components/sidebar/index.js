@@ -6,13 +6,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	Platform,
-	useCallback,
-	useContext,
-	useEffect,
-	useRef,
-} from '@wordpress/element';
+import { useCallback, useContext, useEffect, useRef } from '@wordpress/element';
 import { isRTL, __, _x } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
@@ -33,7 +27,6 @@ import SidebarHeader from './header';
 import TemplateActionsPanel from '../template-actions-panel';
 import TemplateContentPanel from '../template-content-panel';
 import TemplatePartContentPanel from '../template-part-content-panel';
-import PostRevisionsPanel from '../post-revisions-panel';
 import RevisionBlockDiffPanel from '../revision-block-diff';
 import useAutoSwitchEditorSidebars from '../provider/use-auto-switch-editor-sidebars';
 import { sidebars } from './constants';
@@ -47,10 +40,7 @@ import {
 
 const { Tabs } = unlock( componentsPrivateApis );
 
-const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
-	web: true,
-	native: false,
-} );
+const SIDEBAR_ACTIVE_BY_DEFAULT = true;
 
 const SidebarContent = ( {
 	tabName,
@@ -105,17 +95,8 @@ const SidebarContent = ( {
 				<PluginDocumentSettingPanel.Slot />
 				<TemplateContentPanel />
 				{ window?.__experimentalDataFormInspector &&
-					[
-						'post',
-						'page',
-						'wp_template',
-						'wp_template_part',
-						'wp_block',
-					].includes( postType ) && (
-						<>
-							<TemplateActionsPanel />
-							<PostRevisionsPanel />
-						</>
+					[ 'page', 'post' ].includes( postType ) && (
+						<TemplateActionsPanel />
 					) }
 				<TemplatePartContentPanel />
 				<PostTransformPanel />

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 10.1.0 (2026-06-24)
+
+## 10.0.1 (2026-06-16)
+
+## 10.0.0 (2026-06-10)
+
 ### Breaking Changes
 
 -   Remove the following entries from the `z-index()` helper ([#77773](https://github.com/WordPress/gutenberg/pull/77773)):

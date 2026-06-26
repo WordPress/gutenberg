@@ -16,17 +16,6 @@ import SidebarGlobalStyles from '../sidebar-global-styles';
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 const { StyleBookPreview } = unlock( editorPrivateApis );
 
-function MobileGlobalStylesUI() {
-	const { query = {} } = useLocation();
-	const { canvas } = query;
-
-	if ( canvas === 'edit' ) {
-		return <Editor />;
-	}
-
-	return <SidebarGlobalStyles />;
-}
-
 function StylesPreviewArea() {
 	const { path, query } = useLocation();
 	const history = useHistory();
@@ -61,7 +50,7 @@ export const stylesRoute = {
 		content: <SidebarGlobalStyles />,
 		sidebar: <SidebarNavigationScreenGlobalStyles backPath="/" />,
 		preview: <StylesPreviewArea />,
-		mobile: <MobileGlobalStylesUI />,
+		mobileContent: <SidebarGlobalStyles />,
 	},
 	widths: {
 		content: 380,

@@ -11,7 +11,6 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo } from '@wordpress/element';
-import { getValueFromVariable } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
@@ -25,8 +24,15 @@ import TextTransformControl from '../text-transform-control';
 import TextDecorationControl from '../text-decoration-control';
 import TextIndentControl from '../text-indent-control';
 import WritingModeControl from '../writing-mode-control';
+import ColorGradientDropdownItem from './color-gradient-dropdown-item';
+import { useHasTextPanel } from './color-panel';
+import { useColorGradientSettings } from './hooks';
 import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
+import {
+	extractPresetSlug,
+	encodeColorValueWithPalette,
+} from '../../utils/color-values';
 import {
 	getMergedFontFamiliesAndFontFamilyFaces,
 	findNearestStyleAndWeight,
@@ -48,6 +54,7 @@ export function useHasTypographyPanel( settings ) {
 	const hasWritingMode = useHasWritingModeControl( settings );
 	const hasTextColumns = useHasTextColumnsControl( settings );
 	const hasFontSize = useHasFontSizeControl( settings );
+	const hasTextColor = useHasTextPanel( settings );
 
 	return (
 		hasFontFamily ||
@@ -60,7 +67,8 @@ export function useHasTypographyPanel( settings ) {
 		hasTextDecoration ||
 		hasTextIndent ||
 		hasWritingMode ||
-		hasTextColumns
+		hasTextColumns ||
+		hasTextColor
 	);
 }
 
@@ -143,7 +151,7 @@ function getMergedFontSizes( settings ) {
 	];
 }
 
-function TypographyToolsPanel( {
+export function TypographyToolsPanel( {
 	resetAllFilter,
 	onChange,
 	value,
@@ -161,6 +169,7 @@ function TypographyToolsPanel( {
 			label={ __( 'Typography' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
+			__experimentalFirstVisibleItemClass="first"
 			dropdownMenuProps={ dropdownMenuProps }
 		>
 			{ children }
@@ -169,6 +178,7 @@ function TypographyToolsPanel( {
 }
 
 const DEFAULT_CONTROLS = {
+	textColor: true,
 	fontFamily: true,
 	fontSize: true,
 	fontAppearance: true,
@@ -191,9 +201,47 @@ export default function TypographyPanel( {
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
 	isGlobalStyles = false,
+	contrastWarning,
 } ) {
-	const decodeValue = ( rawValue ) =>
-		getValueFromVariable( { settings }, '', rawValue );
+	const { colors, allColors, areCustomSolidsEnabled, decodeValue } =
+		useColorGradientSettings( settings );
+
+	// Text color. Writes to `color.text` (unchanged storage path). The
+	// control is rendered here instead of the Color panel because text
+	// color is a typographic concern.
+	const hasTextColorEnabled = useHasTextPanel( settings );
+	const textColor = decodeValue( inheritedValue?.color?.text );
+	const userTextColor = decodeValue( value?.color?.text );
+	const hasTextColorValue = () => !! value?.color?.text;
+	const setTextColor = ( newColor, newSlug ) => {
+		const encoded = encodeColorValueWithPalette(
+			allColors,
+			newColor,
+			newSlug
+		);
+		let changedObject = setImmutably( value, [ 'color', 'text' ], encoded );
+		// Keep an in-sync link color following the text color (e.g. a
+		// Button's link color tracks its text color). Compare raw encoded
+		// references (e.g. `var:preset|color|slug`), not decoded hex values.
+		// Two palette entries can share the same hex but carry different
+		// slugs (e.g. `var:preset|color|dark-background` and
+		// `var:preset|color|dark-text` both resolving to `#000`); comparing
+		// decoded values would conflate them and incorrectly force the link
+		// color to follow the text color even when the user deliberately
+		// chose a different palette slot.
+		if (
+			inheritedValue?.color?.text ===
+			inheritedValue?.elements?.link?.color?.text
+		) {
+			changedObject = setImmutably(
+				changedObject,
+				[ 'elements', 'link', 'color', 'text' ],
+				encoded
+			);
+		}
+		onChange( changedObject );
+	};
+	const resetTextColor = () => setTextColor( undefined );
 
 	// Font Family
 	const hasFontFamilyEnabled = useHasFontFamilyControl( settings );
@@ -490,12 +538,25 @@ export default function TypographyPanel( {
 	const hasTextAlign = () => !! value?.typography?.textAlign;
 	const resetTextAlign = () => setTextAlign( undefined );
 
-	const resetAllFilter = useCallback( ( previousValue ) => {
-		return {
-			...previousValue,
-			typography: {},
-		};
-	}, [] );
+	const resetAllFilter = useCallback(
+		( previousValue ) => {
+			if ( ! hasTextColorEnabled ) {
+				return {
+					...previousValue,
+					typography: {},
+				};
+			}
+			return {
+				...previousValue,
+				typography: {},
+				color: {
+					...previousValue?.color,
+					text: undefined,
+				},
+			};
+		},
+		[ hasTextColorEnabled ]
+	);
 
 	return (
 		<Wrapper
@@ -504,6 +565,34 @@ export default function TypographyPanel( {
 			onChange={ onChange }
 			panelId={ panelId }
 		>
+			{ hasTextColorEnabled && (
+				<ColorGradientDropdownItem
+					label={ __( 'Color' ) }
+					hasValue={ hasTextColorValue }
+					resetValue={ resetTextColor }
+					isShownByDefault={ defaultControls.textColor }
+					indicators={ [ textColor ] }
+					contrastWarning={ contrastWarning }
+					tabs={ [
+						{
+							key: 'text',
+							label: __( 'Color' ),
+							inheritedValue: textColor,
+							inheritedSlug: extractPresetSlug(
+								inheritedValue?.color?.text,
+								'color'
+							),
+							setValue: setTextColor,
+							userValue: userTextColor,
+						},
+					] }
+					colorGradientControlSettings={ {
+						colors,
+						disableCustomColors: ! areCustomSolidsEnabled,
+					} }
+					panelId={ panelId }
+				/>
+			) }
 			{ hasFontFamilyEnabled && (
 				<ToolsPanelItem
 					label={ __( 'Font' ) }
@@ -536,7 +625,6 @@ export default function TypographyPanel( {
 						disableCustomFontSizes={ disableCustomFontSizes }
 						withReset={ false }
 						withSlider
-						size="__unstable-large"
 					/>
 				</ToolsPanelItem>
 			) }
@@ -590,7 +678,6 @@ export default function TypographyPanel( {
 					<LetterSpacingControl
 						value={ letterSpacing }
 						onChange={ setLetterSpacing }
-						size="__unstable-large"
 						__unstableInputWidth="auto"
 					/>
 				</ToolsPanelItem>

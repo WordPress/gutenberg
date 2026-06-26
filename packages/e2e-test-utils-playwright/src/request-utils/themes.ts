@@ -85,6 +85,33 @@ async function getCurrentThemeGlobalStylesPostId( this: RequestUtils ) {
 }
 
 /**
+ * Resets the current theme's user global styles to an empty config.
+ *
+ * Useful for ensuring test isolation when a prior spec has saved global
+ * styles for the same theme, which would otherwise leak into later specs
+ * sharing the database.
+ *
+ * @param this Request utils.
+ */
+async function resetThemeGlobalStyles( this: RequestUtils ) {
+	const stylesPostId = await getCurrentThemeGlobalStylesPostId.call( this );
+
+	if ( ! stylesPostId ) {
+		return;
+	}
+
+	await this.rest( {
+		method: 'POST',
+		path: `/wp/v2/global-styles/${ stylesPostId }`,
+		data: {
+			id: stylesPostId,
+			settings: {},
+			styles: {},
+		},
+	} );
+}
+
+/**
  * Deletes all post revisions using the REST API.
  *
  * @param {}              this     RequestUtils.
@@ -107,4 +134,5 @@ export {
 	activateTheme,
 	getCurrentThemeGlobalStylesPostId,
 	getThemeGlobalStylesRevisions,
+	resetThemeGlobalStyles,
 };
