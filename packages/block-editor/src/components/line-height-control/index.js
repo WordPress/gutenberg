@@ -3,7 +3,6 @@
  */
 import { __ } from '@wordpress/i18n';
 import { __experimentalNumberControl as NumberControl } from '@wordpress/components';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -16,9 +15,20 @@ import {
 	isLineHeightDefined,
 } from './utils';
 
+/**
+ * Control for line height.
+ *
+ * @param {Object}                  props                         Component props.
+ * @param {boolean}                 [props.__next40pxDefaultSize] Start opting into the larger default height that will become the default size in a future version.
+ * @param {string|number|undefined} props.value                   The value of the line height.
+ * @param {Function}                props.onChange                A callback function that handles the application of the line height value.
+ * @param {string|number|undefined} props.__unstableInputWidth    Input width to pass through to inner NumberControl. Should be a valid CSS value.
+ *
+ * @return {Element} Line height control.
+ */
 const LineHeightControl = ( {
-	/** Start opting into the larger default height that will become the default size in a future version. */
-	__next40pxDefaultSize = false,
+	/** @deprecated Default behavior since WordPress 7.1. Prop can be safely removed. */
+	__next40pxDefaultSize: _next40pxDefaultSize,
 	value: lineHeight,
 	onChange,
 	__unstableInputWidth = '60px',
@@ -90,23 +100,12 @@ const LineHeightControl = ( {
 		onChange( `${ nextValue }` );
 	};
 
-	if (
-		! __next40pxDefaultSize &&
-		( otherProps.size === undefined || otherProps.size === 'default' )
-	) {
-		deprecated( `36px default size for wp.blockEditor.LineHeightControl`, {
-			since: '6.8',
-			version: '7.1',
-			hint: 'Set the `__next40pxDefaultSize` prop to true to start opting into the new default size, which will become the default in a future version.',
-		} );
-	}
-
 	return (
 		<div className="block-editor-line-height-control">
 			<NumberControl
 				{ ...otherProps }
 				__shouldNotWarnDeprecated36pxSize
-				__next40pxDefaultSize={ __next40pxDefaultSize }
+				__next40pxDefaultSize
 				__unstableInputWidth={ __unstableInputWidth }
 				__unstableStateReducer={ stateReducer }
 				onChange={ handleOnChange }
