@@ -103,6 +103,14 @@ function render_block_core_search( $attributes ) {
 		}
 	}
 
+	if ( ! $show_button ) {
+		$button_label = empty( $attributes['buttonText'] ) ? __( 'Search' ) : wp_strip_all_tags( $attributes['buttonText'] );
+		$button       = sprintf(
+			'<button type="submit" class="wp-block-search__button screen-reader-text">%s</button>',
+			esc_html( $button_label )
+		);
+	}
+
 	if ( $show_button ) {
 		$button_classes         = array( 'wp-block-search__button' );
 		$button_internal_markup = '';

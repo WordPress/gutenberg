@@ -665,7 +665,26 @@ export default function SearchEdit( {
 						</>
 					) }
 
-					{ hasNoButton && renderTextField() }
+					{ hasNoButton && (
+						<>
+							{ renderTextField() }
+							{ /*
+							 * When 'No button' is chosen, a visually hidden submit
+							 * button is still rendered so assistive technologies and
+							 * keyboard-only users can submit the search form.
+							 * screen-reader-text hides it visually but keeps it in
+							 * the accessibility tree.
+							 */ }
+							<button
+								type="submit"
+								className="wp-block-search__button screen-reader-text"
+							>
+								{ buttonText
+									? stripHTML( buttonText )
+									: __( 'Search' ) }
+							</button>
+						</>
+					) }
 				</ResizableBox>
 			</Wrapper>
 		</>
