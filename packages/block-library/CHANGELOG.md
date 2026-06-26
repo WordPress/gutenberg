@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Synced Pattern (`core/block`): Cap the number of pattern expansions per top-level render to prevent memory exhaustion when a pattern references others in a dense, repeated, or "diamond" graph that expands exponentially. A new `block_core_block_render_budget` filter controls the limit (default 10000; return -1 to remove it).
+
 ## 10.0.0 (2026-06-24)
 
 ### Breaking Changes
