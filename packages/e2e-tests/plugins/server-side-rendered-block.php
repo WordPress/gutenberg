@@ -174,5 +174,125 @@ add_action(
 				),
 			)
 		);
+
+		// The three pattern blocks below share content/attributes/render_callback
+		// and differ only in how the editor locks and previews the structure.
+		$pattern_markup = '<!-- wp:group {"layout":{"type":"constrained"}} --><div class="wp-block-group">'
+			. '<!-- wp:heading --><h2 class="wp-block-heading">Title</h2><!-- /wp:heading -->'
+			. '<!-- wp:paragraph --><p>Body text.</p><!-- /wp:paragraph -->'
+			. '</div><!-- /wp:group -->';
+
+		$pattern_attributes = array(
+			'variant'  => array(
+				'type'    => 'string',
+				'enum'    => array( 'default', 'highlight' ),
+				'default' => 'default',
+				'label'   => 'Variant',
+			),
+			'featured' => array(
+				'type'    => 'boolean',
+				'default' => false,
+				'label'   => 'Featured',
+			),
+		);
+
+		// $content is the rendered inner blocks (empty for the SSR preview, which
+		// falls back to the pattern). `variant` sets a class, `featured` a ribbon.
+		$render_pattern_block = static function ( $attributes, $content ) use ( $pattern_markup ) {
+			$body     = ( '' !== trim( (string) $content ) ) ? $content : do_blocks( $pattern_markup );
+			$variant  = isset( $attributes['variant'] ) ? sanitize_html_class( $attributes['variant'] ) : 'default';
+			$featured = ! empty( $attributes['featured'] );
+			$classes  = 'pattern-block-demo is-variant-' . $variant . ( $featured ? ' is-featured' : '' );
+			$wrapper  = get_block_wrapper_attributes( array( 'class' => $classes ) );
+			$ribbon   = $featured ? '<p class="pattern-block-demo__ribbon"><strong>Featured</strong></p>' : '';
+
+			return sprintf( '<div %1$s>%2$s%3$s</div>', $wrapper, $ribbon, $body );
+		};
+
+		// Block 1 - content-only: structure locked tight, but the content-only
+		// section UI hides the generated controls.
+		register_block_type(
+			'test/php-only-pattern-content-only',
+			array(
+				'title'           => 'PHP-only pattern: content-only (controls hidden)',
+				'icon'            => 'layout',
+				'category'        => 'widgets',
+				'description'     => 'Uses a canvas-editable pattern with contentOnly locking. The structure is tightly locked, but the content-only section UI hides the generated Inspector controls.',
+				'keywords'        => array( 'pattern', 'autotest' ),
+				'attributes'      => $pattern_attributes,
+				'supports'        => array(
+					'autoRegister' => true,
+					'color'        => array(
+						'background' => true,
+						'text'       => true,
+					),
+				),
+				'pattern'         => $pattern_markup,
+				'render_callback' => $render_pattern_block,
+			)
+		);
+
+		// Block 2 - no content-only (`patternLock => false`): the controls stay
+		// visible, at the cost of a softer structural lock (#73845).
+		register_block_type(
+			'test/php-only-pattern-no-content-only',
+			array(
+				'title'           => 'PHP-only pattern: no content-only (controls shown)',
+				'icon'            => 'layout',
+				'category'        => 'widgets',
+				'description'     => 'Uses a canvas-editable pattern without contentOnly locking. Inspector controls stay visible, but the structure is less strictly locked.',
+				'keywords'        => array( 'pattern', 'autotest' ),
+				'attributes'      => $pattern_attributes,
+				'supports'        => array(
+					'autoRegister' => true,
+					'color'        => array(
+						'background' => true,
+						'text'       => true,
+					),
+				),
+				'pattern'         => $pattern_markup,
+				'patternLock'     => false,
+				'render_callback' => $render_pattern_block,
+			)
+		);
+
+		// Block 3 - SSR (`patternEditorPreview => 'ssr'`): control changes preview
+		// live in the editor, but the content is not editable in the canvas.
+		register_block_type(
+			'test/php-only-pattern-ssr',
+			array(
+				'title'                => 'PHP-only pattern: SSR (controls live, no inline edit)',
+				'icon'                 => 'layout',
+				'category'             => 'widgets',
+				'description'          => 'Pattern content previewed with ServerSideRender. Controls update the rendered output in the editor, but there is no in-canvas editing.',
+				'keywords'             => array( 'pattern', 'autotest' ),
+				'attributes'           => $pattern_attributes,
+				'supports'             => array(
+					'autoRegister' => true,
+					'color'        => array(
+						'background' => true,
+						'text'       => true,
+					),
+				),
+				'pattern'              => $pattern_markup,
+				'patternEditorPreview' => 'ssr',
+				'render_callback'      => $render_pattern_block,
+			)
+		);
+
+		// Demo styles for the `variant`/`featured` output, in editor and frontend.
+		add_action(
+			'enqueue_block_assets',
+			static function () {
+				wp_register_style( 'pattern-block-demo', false );
+				wp_enqueue_style( 'pattern-block-demo' );
+				wp_add_inline_style(
+					'pattern-block-demo',
+					'.pattern-block-demo.is-variant-highlight{background:#fffbe6;border:2px solid #f0b849;padding:1em;}'
+					. '.pattern-block-demo.is-featured{box-shadow:0 0 0 3px #3858e9;}'
+					. '.pattern-block-demo__ribbon{margin:0 0 .5em;color:#3858e9;}'
+				);
+			}
+		);
 	}
 );
