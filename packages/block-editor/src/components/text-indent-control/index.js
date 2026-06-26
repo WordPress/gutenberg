@@ -34,7 +34,8 @@ import { useSettings } from '../../components/use-settings';
  * @return {Element} Text indent control.
  */
 export default function TextIndentControl( {
-	__next40pxDefaultSize = false,
+	/** @deprecated Default behavior since WordPress 7.1. Prop can be safely removed. */
+	__next40pxDefaultSize: _next40pxDefaultSize,
 	value,
 	onChange,
 	__unstableInputWidth = '60px',
@@ -68,7 +69,7 @@ export default function TextIndentControl( {
 	if ( ! withSlider ) {
 		return (
 			<UnitControl
-				__next40pxDefaultSize={ __next40pxDefaultSize }
+				__next40pxDefaultSize
 				__shouldNotWarnDeprecated36pxSize
 				{ ...otherProps }
 				label={ __( 'Line indent' ) }
@@ -89,7 +90,7 @@ export default function TextIndentControl( {
 			<Flex>
 				<FlexItem isBlock>
 					<UnitControl
-						__next40pxDefaultSize={ __next40pxDefaultSize }
+						__next40pxDefaultSize
 						__shouldNotWarnDeprecated36pxSize
 						label={ __( 'Line indent' ) }
 						labelPosition="top"
@@ -106,7 +107,7 @@ export default function TextIndentControl( {
 					<FlexItem isBlock>
 						<Spacer marginX={ 2 } marginBottom={ 0 }>
 							<RangeControl
-								__next40pxDefaultSize={ __next40pxDefaultSize }
+								__next40pxDefaultSize
 								__shouldNotWarnDeprecated36pxSize
 								label={ __( 'Line indent' ) }
 								hideLabelFromVision
