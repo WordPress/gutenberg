@@ -129,6 +129,7 @@ function ListViewBlock( {
 	const {
 		block,
 		blockName,
+		blockEditingMode,
 		allowRightClickOverrides,
 		isSpotlightActive,
 		editedSection,
@@ -138,6 +139,7 @@ function ListViewBlock( {
 			const {
 				getBlock,
 				getBlockName,
+				getBlockEditingMode: getBlockEditingModeForClientId,
 				getSettings,
 				hasBlockSpotlight,
 				getEditedContentOnlySection,
@@ -148,6 +150,7 @@ function ListViewBlock( {
 			return {
 				block: getBlock( clientId ),
 				blockName: getBlockName( clientId ),
+				blockEditingMode: getBlockEditingModeForClientId( clientId ),
 				allowRightClickOverrides:
 					getSettings().allowRightClickOverrides,
 				isSpotlightActive: hasBlockSpotlight(),
@@ -163,8 +166,7 @@ function ListViewBlock( {
 	const shouldFadeInSpotlight = editedSection
 		? ! isWithinEditedSection
 		: isSpotlightActive && ! ( isSelected || isBranchSelected );
-	const shouldDisableInteractions =
-		!! editedSection && ! isWithinEditedSection;
+	const isDisabled = blockEditingMode === 'disabled';
 
 	const { canRename } = useBlockRename( blockName );
 
@@ -438,36 +440,26 @@ function ListViewBlock( {
 	}
 
 	const onMouseEnter = useCallback( () => {
-		// Disable hover when section editing excludes this block.
-		if ( shouldDisableInteractions ) {
+		// Disabled blocks are visible as context only.
+		if ( isDisabled ) {
 			return;
 		}
 		setIsHovered( true );
 		debouncedToggleBlockHighlight( clientId, true );
-	}, [
-		clientId,
-		setIsHovered,
-		debouncedToggleBlockHighlight,
-		shouldDisableInteractions,
-	] );
+	}, [ clientId, setIsHovered, debouncedToggleBlockHighlight, isDisabled ] );
 	const onMouseLeave = useCallback( () => {
-		// Disable hover when section editing excludes this block.
-		if ( shouldDisableInteractions ) {
+		// Disabled blocks are visible as context only.
+		if ( isDisabled ) {
 			return;
 		}
 		setIsHovered( false );
 		debouncedToggleBlockHighlight( clientId, false );
-	}, [
-		clientId,
-		setIsHovered,
-		debouncedToggleBlockHighlight,
-		shouldDisableInteractions,
-	] );
+	}, [ clientId, setIsHovered, debouncedToggleBlockHighlight, isDisabled ] );
 
 	const selectEditorBlock = useCallback(
 		( event ) => {
 			// If we're editing a section and clicking outside it, exit section editing.
-			if ( shouldDisableInteractions ) {
+			if ( isDisabled ) {
 				stopEditingContentOnlySection();
 				selectBlock( event, clientId, null );
 				event.preventDefault();
@@ -482,12 +474,7 @@ function ListViewBlock( {
 			selectBlock( event, clientId, isKeyboardActivation ? -1 : null );
 			event.preventDefault();
 		},
-		[
-			clientId,
-			selectBlock,
-			shouldDisableInteractions,
-			stopEditingContentOnlySection,
-		]
+		[ clientId, selectBlock, isDisabled, stopEditingContentOnlySection ]
 	);
 
 	const updateFocusAndSelection = useCallback(
@@ -503,8 +490,8 @@ function ListViewBlock( {
 
 	const toggleExpanded = useCallback(
 		( event ) => {
-			// Prevent expanding/collapsing blocks outside the edited section.
-			if ( shouldDisableInteractions ) {
+			// Disabled blocks are visible as context only.
+			if ( isDisabled ) {
 				event.preventDefault();
 				event.stopPropagation();
 				return;
@@ -518,13 +505,13 @@ function ListViewBlock( {
 				expand( clientId );
 			}
 		},
-		[ clientId, expand, collapse, isExpanded, shouldDisableInteractions ]
+		[ clientId, expand, collapse, isExpanded, isDisabled ]
 	);
 
 	// Allow right-clicking an item in the List View to open up the block settings dropdown.
 	const onContextMenu = useCallback(
 		( event ) => {
-			if ( shouldDisableInteractions ) {
+			if ( isDisabled ) {
 				event.preventDefault();
 				return;
 			}
@@ -543,12 +530,7 @@ function ListViewBlock( {
 				event.preventDefault();
 			}
 		},
-		[
-			allowRightClickOverrides,
-			settingsRef,
-			shouldDisableInteractions,
-			showBlockActions,
-		]
+		[ allowRightClickOverrides, settingsRef, isDisabled, showBlockActions ]
 	);
 
 	const onMouseDown = useCallback(
@@ -619,9 +601,8 @@ function ListViewBlock( {
 	);
 
 	const hasSiblings = siblingBlockCount > 0;
-	const canShowBlockActions = showBlockActions && ! shouldDisableInteractions;
-	const hasRenderedMovers =
-		showBlockMovers && hasSiblings && ! shouldDisableInteractions;
+	const canShowBlockActions = showBlockActions && ! isDisabled;
+	const hasRenderedMovers = showBlockMovers && hasSiblings && ! isDisabled;
 	const moverCellClassName = clsx(
 		'block-editor-list-view-block__mover-cell',
 		{ 'is-visible': isHovered || isSelected }
@@ -666,7 +647,7 @@ function ListViewBlock( {
 		: [ clientId ];
 
 	const getListViewBlockTabIndex = ( rovingTabIndex ) => {
-		if ( shouldDisableInteractions ) {
+		if ( isDisabled ) {
 			return -1;
 		}
 
@@ -694,6 +675,7 @@ function ListViewBlock( {
 			id={ `list-view-${ listViewInstanceId }-block-${ clientId }` }
 			data-block={ clientId }
 			data-expanded={ canEditBlock ? isExpanded : undefined }
+			aria-disabled={ isDisabled ? true : undefined }
 			ref={ rowRef }
 		>
 			<TreeGridCell
@@ -721,7 +703,7 @@ function ListViewBlock( {
 							selectedClientIds={ selectedClientIds }
 							ariaDescribedBy={ descriptionId }
 							visibilityLabel={ blockVisibilityDescription }
-							isFocusable={ ! shouldDisableInteractions }
+							isFocusable={ ! isDisabled }
 						/>
 						<AriaReferencedText id={ descriptionId }>
 							{ [
