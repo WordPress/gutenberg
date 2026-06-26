@@ -1019,6 +1019,67 @@ describe( 'private selectors', () => {
 			] );
 		} );
 
+		it( 'includes blocks with explicit modes inside explicitly disabled parents', () => {
+			const baseState = createBaseState();
+			const state = {
+				...baseState,
+				blocks: {
+					...baseState.blocks,
+					byClientId: new Map( [
+						...baseState.blocks.byClientId,
+						[
+							'header-content',
+							{
+								name: TEST_CONTENT_BLOCK,
+							},
+						],
+					] ),
+					order: new Map( [
+						...baseState.blocks.order,
+						[ 'header', [ 'header-content' ] ],
+						[ 'header-content', [] ],
+					] ),
+					parents: new Map( [
+						...baseState.blocks.parents,
+						[ 'header-content', 'header' ],
+					] ),
+					blockEditingModes: new Map( [
+						[ 'header', 'disabled' ],
+						[ 'header-content', 'contentOnly' ],
+					] ),
+				},
+				derivedBlockEditingModes: new Map( [
+					...baseState.derivedBlockEditingModes,
+					[ 'header-content', 'disabled' ],
+				] ),
+			};
+
+			expect( getListViewClientIdsTree( state ) ).toEqual( [
+				{
+					clientId: 'header-content',
+					innerBlocks: [],
+				},
+				{
+					clientId: 'edited-pattern',
+					innerBlocks: [
+						{
+							clientId: 'edited-content',
+							innerBlocks: [],
+						},
+					],
+				},
+				{
+					clientId: 'other-pattern',
+					innerBlocks: [
+						{
+							clientId: 'other-content',
+							innerBlocks: [],
+						},
+					],
+				},
+			] );
+		} );
+
 		it( 'keeps structural blocks hidden inside other content-only sections', () => {
 			const state = createBaseState();
 

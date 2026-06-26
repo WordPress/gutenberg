@@ -247,11 +247,13 @@ function getListViewClientIdsTreeUnmemoized( state, rootClientId ) {
 				return true;
 			}
 
-			if (
-				_state.blocks.blockEditingModes.get( clientId ) ===
-					'disabled' ||
-				hasExplicitDisabledParent( _state, clientId )
-			) {
+			const explicitBlockEditingMode =
+				_state.blocks.blockEditingModes.get( clientId );
+			if ( explicitBlockEditingMode ) {
+				return explicitBlockEditingMode !== 'disabled';
+			}
+
+			if ( hasExplicitDisabledParent( _state, clientId ) ) {
 				return false;
 			}
 
