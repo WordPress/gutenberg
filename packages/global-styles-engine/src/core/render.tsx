@@ -1142,7 +1142,8 @@ export const getNodesWithStyles = (
 						).forEach( ( [ element, elementStyles ] ) => {
 							if (
 								elementStyles &&
-								ELEMENTS[ element as ElementName ]
+								ELEMENTS[ element as ElementName ] &&
+								variationSelector
 							) {
 								variationNodesToAdd.push( {
 									styles: elementStyles,
