@@ -325,13 +325,11 @@ function UnforwardedRangeControl(
 						onBlur={ handleOnInputNumberBlur }
 						onChange={ handleOnChange }
 						shiftStep={ shiftStep }
-						size="__unstable-large"
 						__unstableInputWidth={ space( 20 ) }
 						__next40pxDefaultSize
 						step={ step }
 						// @ts-expect-error TODO: Investigate if the `null` value is necessary
 						value={ inputSliderValue }
-						__shouldNotWarnDeprecated36pxSize
 					/>
 				) }
 				{ allowReset && (

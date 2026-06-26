@@ -364,4 +364,3 @@ Determines if the `input` number field will render next to the RangeControl. Thi
 ## Related components
 
 -   To collect a numerical input in a text field, use the `TextControl` component.
-
