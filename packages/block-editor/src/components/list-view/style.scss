@@ -461,6 +461,10 @@
 		.block-editor-list-view__expander {
 			cursor: default;
 		}
+
+		.block-editor-list-view-block-select-button:hover {
+			color: inherit;
+		}
 	}
 }
 
