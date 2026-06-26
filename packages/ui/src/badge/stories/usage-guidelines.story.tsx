@@ -1,11 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import clsx from 'clsx';
 import { caution, error, page, plugins, published } from '@wordpress/icons';
 import { Badge } from '../index';
 import { Icon } from '../../icon';
 import { Stack } from '../../stack';
 import { Text } from '../../text';
-import styles from '../style.module.css';
 
 const meta: Meta< typeof Badge > = {
 	title: 'Design System/Components/Badge/Usage Guidelines',
@@ -174,12 +172,6 @@ export const WithAdjacentContentIcon: Story = {
 	),
 };
 
-const innerBadgeStyle = {
-	background: 'none',
-	padding: 0,
-	border: 'none',
-} as const;
-
 export const IncorrectBadgeWithIcon: Story = {
 	decorators: [
 		( Story ) => (
@@ -190,39 +182,27 @@ export const IncorrectBadgeWithIcon: Story = {
 	],
 	render: () => (
 		<>
-			<Stack
-				direction="row"
-				gap="xs"
-				align="center"
-				className={ clsx( styles.badge, styles[ 'is-stable-intent' ] ) }
-			>
-				<Icon icon={ published } size={ 16 } />
-				<Badge intent="stable" style={ innerBadgeStyle }>
+			{ /* @ts-expect-error Demonstrating incorrect Badge usage with icon children. */ }
+			<Badge intent="stable">
+				<Stack direction="row" gap="xs" align="center">
+					<Icon icon={ published } size={ 16 } />
 					Active
-				</Badge>
-			</Stack>
-			<Stack
-				direction="row"
-				gap="xs"
-				align="center"
-				className={ clsx( styles.badge, styles[ 'is-medium-intent' ] ) }
-			>
-				<Icon icon={ caution } size={ 16 } />
-				<Badge intent="medium" style={ innerBadgeStyle }>
+				</Stack>
+			</Badge>
+			{ /* @ts-expect-error Demonstrating incorrect Badge usage with icon children. */ }
+			<Badge intent="medium">
+				<Stack direction="row" gap="xs" align="center">
+					<Icon icon={ caution } size={ 16 } />
 					Review needed
-				</Badge>
-			</Stack>
-			<Stack
-				direction="row"
-				gap="xs"
-				align="center"
-				className={ clsx( styles.badge, styles[ 'is-high-intent' ] ) }
-			>
-				<Icon icon={ error } size={ 16 } />
-				<Badge intent="high" style={ innerBadgeStyle }>
+				</Stack>
+			</Badge>
+			{ /* @ts-expect-error Demonstrating incorrect Badge usage with icon children. */ }
+			<Badge intent="high">
+				<Stack direction="row" gap="xs" align="center">
+					<Icon icon={ error } size={ 16 } />
 					Payment declined
-				</Badge>
-			</Stack>
+				</Stack>
+			</Badge>
 		</>
 	),
 };
