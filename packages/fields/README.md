@@ -152,6 +152,14 @@ Password field for BasePost.
 
 Undocumented declaration.
 
+### patternDescriptionField
+
+Description field for patterns.
+
+### patternSyncStatusField
+
+Sync status field for patterns.
+
 ### patternTitleField
 
 Title for the pattern entity.

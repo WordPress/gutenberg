@@ -59,7 +59,7 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 				) {
 					_doing_it_wrong(
 						__METHOD__,
-						__( 'Core icon collection manifest must provide valid a "filePath" for each icon.', 'gutenberg' ),
+						__( 'Core icon collection manifest must provide a valid "filePath" for each icon.', 'gutenberg' ),
 						'7.0.0'
 					);
 					return;
@@ -214,10 +214,24 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 		 */
 		protected function get_content( $icon_name ) {
 			if ( ! isset( $this->registered_icons[ $icon_name ]['content'] ) ) {
-				$content = file_get_contents(
-					$this->registered_icons[ $icon_name ]['file_path']
-				);
-				$content = $this->sanitize_icon_content( $content );
+				$file_path  = $this->registered_icons[ $icon_name ]['file_path'] ?? '';
+				$is_stringy = is_string( $file_path ) || ( is_object( $file_path ) && method_exists( $file_path, '__toString' ) );
+				$icon_path  = $is_stringy ? realpath( (string) $file_path ) : false;
+
+				if (
+					! is_string( $icon_path ) ||
+					! str_ends_with( $icon_path, '.svg' ) ||
+					! is_file( $icon_path ) ||
+					! is_readable( $icon_path )
+				) {
+					wp_trigger_error(
+						__METHOD__,
+						__( 'Icon file is missing or unreadable.', 'gutenberg' )
+					);
+					return null;
+				}
+
+				$content = $this->sanitize_icon_content( file_get_contents( $icon_path ) );
 
 				if ( empty( $content ) ) {
 					wp_trigger_error(
