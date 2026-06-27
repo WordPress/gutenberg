@@ -43,6 +43,17 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		const SYNC_UPDATE_META_KEY = 'wp_sync_update_data';
 
 		/**
+		 * Meta key for storing the originating site URL.
+		 *
+		 * Stored alongside sync updates so that a site URL mismatch
+		 * (indicating a database migration) can be detected on read.
+		 *
+		 * @since 7.1.0
+		 * @var string
+		 */
+		const ORIGIN_URL_META_KEY = '_wp_sync_origin_url';
+
+		/**
 		 * Cache of cursors by room.
 		 *
 		 * @since 7.0.0
@@ -267,6 +278,11 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 				if ( null === $canonical_post_id ) {
 					return null;
 				}
+
+				// Record the site URL at creation time. Using add_post_meta with
+				// $unique = true means a concurrent winner that already wrote this
+				// meta will not be overwritten.
+				add_post_meta( $canonical_post_id, self::ORIGIN_URL_META_KEY, site_url(), true );
 
 				self::$storage_post_ids[ $room_hash ] = $canonical_post_id;
 				return $canonical_post_id;
@@ -496,6 +512,88 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 			if ( false === $deleted_rows ) {
 				return false;
 			}
+
+			return true;
+		}
+
+		/**
+		 * Gets the site URL recorded when this room's storage was first created.
+		 *
+		 * Returns null when the room does not exist or was created before origin
+		 * tracking was introduced (legacy data).
+		 *
+		 * @since 7.1.0
+		 *
+		 * @param string $room Room identifier.
+		 * @return string|null Stored origin URL, or null if not recorded.
+		 */
+		public function get_origin_url( string $room ): ?string {
+			$room_hash = md5( $room );
+
+			// Use the static cache to avoid a DB query when the post was already
+			// looked up during this request.
+			$post_id = self::$storage_post_ids[ $room_hash ] ?? $this->find_canonical_storage_post_id( $room_hash );
+			if ( null === $post_id ) {
+				return null;
+			}
+
+			$origin = get_post_meta( $post_id, self::ORIGIN_URL_META_KEY, true );
+			return ( is_string( $origin ) && '' !== $origin ) ? $origin : null;
+		}
+
+		/**
+		 * Destroys all sync state for a room so the editor can start fresh from
+		 * canonical post content.
+		 *
+		 * Deletes all sync updates, awareness state, and the storage post itself.
+		 * The post is recreated on the next polling request with the current site
+		 * URL recorded as the new origin.
+		 *
+		 * @since 7.1.0
+		 *
+		 * @global wpdb $wpdb WordPress database abstraction object.
+		 *
+		 * @param string $room Room identifier.
+		 * @return bool True on success, false on failure.
+		 */
+		public function purge_room( string $room ): bool {
+			global $wpdb;
+
+			// Use cache + find (not get_storage_post_id) to avoid creating a new
+			// storage post just to immediately delete it.
+			$room_hash = md5( $room );
+			$post_id   = self::$storage_post_ids[ $room_hash ] ?? $this->find_canonical_storage_post_id( $room_hash );
+			if ( null === $post_id ) {
+				return true; // Nothing to purge.
+			}
+
+			// Delete all sync update meta rows.
+			$wpdb->delete(
+				$wpdb->postmeta,
+				array(
+					'post_id'  => $post_id,
+					'meta_key' => self::SYNC_UPDATE_META_KEY,
+				),
+				array( '%d', '%s' )
+			);
+
+			// Delete awareness meta rows.
+			$wpdb->delete(
+				$wpdb->postmeta,
+				array(
+					'post_id'  => $post_id,
+					'meta_key' => self::AWARENESS_META_KEY,
+				),
+				array( '%d', '%s' )
+			);
+
+			// Delete the storage post itself.
+			wp_delete_post( $post_id, true );
+
+			// Clear caches.
+			unset( self::$storage_post_ids[ $room_hash ] );
+			unset( $this->room_cursors[ $room ] );
+			unset( $this->room_update_counts[ $room ] );
 
 			return true;
 		}
