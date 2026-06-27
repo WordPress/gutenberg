@@ -584,5 +584,89 @@ describe( 'page list convert to links', () => {
 				},
 			] );
 		} );
+
+		it( 'Falls back to "(no title)" for empty or missing titles', () => {
+			const pages = [
+				// Empty rendered title (an untitled page).
+				{
+					title: { raw: '', rendered: '' },
+					id: 2,
+					parent: 0,
+					link: 'http://wordpress.local/?page_id=2',
+					type: 'page',
+				},
+				// Title field absent (a partial record); previously threw.
+				{
+					id: 34,
+					parent: 0,
+					link: 'http://wordpress.local/?page_id=34',
+					type: 'page',
+				},
+			];
+
+			const convertLinks = convertToNavigationLinks( pages );
+			const labels = convertLinks.map(
+				( link ) => link.attributes.label
+			);
+
+			// A non-empty label is required or navigation-link drops the item.
+			expect( labels ).toEqual( [ '(no title)', '(no title)' ] );
+		} );
+
+		it( 'Keeps a missing-title parent (and its children) as a submenu', () => {
+			const pages = [
+				// Parent page with no title field (a partial record).
+				{
+					id: 34,
+					parent: 0,
+					link: 'http://wordpress.local/?page_id=34',
+					type: 'page',
+				},
+				// Child of the untitled parent.
+				{
+					title: { raw: 'Child', rendered: 'Child' },
+					id: 738,
+					parent: 34,
+					link: 'http://wordpress.local/?page_id=738',
+					type: 'page',
+				},
+			];
+
+			const convertLinks = convertToNavigationLinks( pages );
+
+			// The untitled parent must render as a "(no title)" submenu so the
+			// front end does not drop it (and its children) for an empty label.
+			expect( convertLinks ).toEqual( [
+				{
+					attributes: {
+						id: 34,
+						kind: 'post-type',
+						label: '(no title)',
+						type: 'page',
+						url: 'http://wordpress.local/?page_id=34',
+						metadata: {
+							bindings: EXPECTED_ENTITY_BINDING,
+						},
+					},
+					innerBlocks: [
+						{
+							attributes: {
+								id: 738,
+								kind: 'post-type',
+								label: 'Child',
+								type: 'page',
+								url: 'http://wordpress.local/?page_id=738',
+								metadata: {
+									bindings: EXPECTED_ENTITY_BINDING,
+								},
+							},
+							innerBlocks: [],
+							name: 'core/navigation-link',
+						},
+					],
+					name: 'core/navigation-submenu',
+				},
+			] );
+		} );
 	} );
 } );

@@ -4,6 +4,7 @@
 import { createBlock } from '@wordpress/blocks';
 import { useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -24,11 +25,16 @@ function createNavigationLinks( pages = [] ) {
 	pages.forEach( ( { id, title, link: url, type, parent } ) => {
 		// See if a placeholder exists. This is created if children appear before parents in list.
 		const innerBlocks = linkMap[ id ]?.innerBlocks ?? [];
+		const renderedTitle = title?.rendered ?? '';
+		// Empty labels are dropped by the navigation-link/submenu renderers, so
+		// fall back to "(no title)", matching the Page List preview.
+		const label =
+			renderedTitle.trim() !== '' ? renderedTitle : __( '(no title)' );
 		linkMap[ id ] = createBlock(
 			'core/navigation-link',
 			{
 				id,
-				label: title.rendered,
+				label,
 				url,
 				type,
 				kind: POST_TYPE_KIND,

@@ -156,7 +156,9 @@ export default function PageListEdit( {
 		// https://core.trac.wordpress.org/ticket/39037
 		const sortedPages = pages.sort( ( a, b ) => {
 			if ( a.menu_order === b.menu_order ) {
-				return a.title.rendered.localeCompare( b.title.rendered );
+				return ( a.title?.rendered ?? '' ).localeCompare(
+					b.title?.rendered ?? ''
+				);
 			}
 			return a.menu_order - b.menu_order;
 		} );
@@ -198,10 +200,11 @@ export default function PageListEdit( {
 
 			return childPages.reduce( ( tree, page ) => {
 				const hasChildren = pagesByParentId.has( page.id );
+				const name = page.title?.rendered ?? '';
 				const item = {
 					value: page.id,
-					label: '— '.repeat( level ) + page.title.rendered,
-					rawName: page.title.rendered,
+					label: '— '.repeat( level ) + name,
+					rawName: name,
 				};
 				tree.push( item );
 				if ( hasChildren ) {
@@ -223,18 +226,17 @@ export default function PageListEdit( {
 
 			return childPages.reduce( ( template, page ) => {
 				const hasChildren = pagesByParentId.has( page.id );
+				const renderedTitle = page.title?.rendered ?? '';
+				// Match the front end's "(no title)" fallback (index.php).
+				// translators: displayed when a page has an empty title.
+				const displayTitle =
+					renderedTitle.trim() !== ''
+						? renderedTitle
+						: __( '(no title)' );
 				const pageProps = {
 					id: page.id,
-					label:
-						// translators: displayed when a page has an empty title.
-						page.title?.rendered?.trim() !== ''
-							? page.title?.rendered
-							: __( '(no title)' ),
-					title:
-						// translators: displayed when a page has an empty title.
-						page.title?.rendered?.trim() !== ''
-							? page.title?.rendered
-							: __( '(no title)' ),
+					label: displayTitle,
+					title: displayTitle,
 					link: page.url,
 					hasChildren,
 				};

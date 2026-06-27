@@ -87,4 +87,54 @@ test.describe( 'Page List block', () => {
 		expect( innerHTML ).not.toContain( '&lt;strong&gt;' );
 		expect( innerHTML ).not.toContain( '&lt;/strong&gt;' );
 	} );
+
+	test( 'does not crash when a page record has no title', async ( {
+		editor,
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		// Two published pages so the alphabetical title tie-break runs (pages
+		// default to menu_order 0).
+		const { id: pageId } = await requestUtils.createPage( {
+			title: 'Alpha',
+			status: 'publish',
+		} );
+		await requestUtils.createPage( { title: 'Beta', status: 'publish' } );
+
+		await admin.createNewPost();
+		await editor.insertBlock( { name: 'core/page-list' } );
+
+		const pageListBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Page List',
+		} );
+		const alphaItem = pageListBlock.getByText( 'Alpha', { exact: true } );
+		await expect( alphaItem ).toBeVisible( { timeout: 10000 } );
+
+		// Drop the title from a page record, reproducing a partial record that
+		// reached the store without its title field. An empty title renders fine;
+		// an undefined title is what trips the sort comparator.
+		await page.evaluate( ( id ) => {
+			window.wp.data
+				.dispatch( 'core' )
+				.receiveEntityRecords( 'postType', 'page', [
+					{ id, title: undefined },
+				] );
+		}, pageId );
+
+		// The mutation re-renders the block: the affected item falls back to the
+		// localized "(no title)" label (matching the front end) — proving the
+		// partial record reached it without leaking the literal string
+		// "undefined" or falling into the error boundary.
+		await expect( alphaItem ).toBeHidden();
+		await expect(
+			pageListBlock.getByText( '(no title)', { exact: true } )
+		).toBeVisible();
+		await expect( pageListBlock.getByText( 'undefined' ) ).toHaveCount( 0 );
+		await expect(
+			editor.canvas.getByText(
+				'This block has encountered an error and cannot be previewed.'
+			)
+		).toBeHidden();
+	} );
 } );
