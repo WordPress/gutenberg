@@ -82,6 +82,11 @@ const DESIGN_POST_TYPES = [
 	'wp_navigation',
 ];
 
+// The minimum height (in pixels) always reserved for the editor canvas so the
+// resizable meta boxes pane can never grow to fully cover it.
+// See https://github.com/WordPress/gutenberg/issues/79127.
+const MIN_EDITOR_HEIGHT = 200;
+
 function useEditorStyles( settings ) {
 	const { hasThemeStyleSupport } = useSelect( ( select ) => {
 		return {
@@ -170,11 +175,17 @@ function MetaBoxesMain( { isLegacy } ) {
 		);
 		const deriveConstraints = () => {
 			const fullHeight = container.offsetHeight;
+			const nextMin = resizeHandle?.offsetHeight ?? 0;
 			let nextMax = fullHeight;
 			if ( noticeContainer ) {
 				nextMax -= noticeContainer.offsetHeight;
 			}
-			const nextMin = resizeHandle?.offsetHeight ?? 0;
+			// Always leave room for the editor canvas so the meta boxes pane
+			// can never grow to fully cover it. Without this, a height saved
+			// while the pane was dragged over the whole editor would restore to
+			// that state and hide the canvas.
+			// See https://github.com/WordPress/gutenberg/issues/79127.
+			nextMax = Math.max( nextMin, nextMax - MIN_EDITOR_HEIGHT );
 			setHeightConstraints( { min: nextMin, max: nextMax } );
 		};
 		const observer = new window.ResizeObserver( deriveConstraints );
@@ -296,7 +307,14 @@ function MetaBoxesMain( { isLegacy } ) {
 	}
 
 	const isAutoHeight = openHeight === undefined;
-	const usedOpenHeight = isShort ? 'auto' : openHeight;
+	let usedOpenHeight = isShort ? 'auto' : openHeight;
+	// Clamp a persisted height to the current size constraints. A height saved
+	// while more space was available (e.g. a taller viewport) must not overflow
+	// the now-smaller area and cover the editor canvas.
+	// See https://github.com/WordPress/gutenberg/issues/79127.
+	if ( typeof usedOpenHeight === 'number' && max !== undefined ) {
+		usedOpenHeight = Math.min( max, Math.max( min, usedOpenHeight ) );
+	}
 	const usedHeight = isOpen ? usedOpenHeight : min;
 
 	const usedAriaValueNow =
