@@ -318,9 +318,13 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 			)
 		);
 
-		add_filter( 'wp_trigger_error_trigger_error', '__return_false' );
+		// Suppress the `wp_trigger_error()` notice. A local error handler is used
+		// instead of the `wp_trigger_error_trigger_error` filter, which is WP 7.0+.
+		// TODO: Replace with `add_filter( 'wp_trigger_error_trigger_error', '__return_false' )`
+		// once the minimum supported WordPress version is 7.0 or later.
+		set_error_handler( '__return_true' );
 		$icon = $this->registry->get_registered_icon( 'test-collection/invalid-file' );
-		remove_filter( 'wp_trigger_error_trigger_error', '__return_false' );
+		restore_error_handler();
 
 		$this->assertNull( $icon['content'] );
 	}
