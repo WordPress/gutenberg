@@ -2,13 +2,20 @@
 
 .wp-block-calendar {
 	text-align: center;
-	// This block has customizable border-box makes that more predictable.
+	// This block has customizable borders. Border-box sizing makes that more predictable.
 	box-sizing: border-box;
+
+	border: none !important;
+
+	table {
+		width: 100%;
+		border-collapse: collapse;
+	}
 
 	th,
 	td {
 		padding: 0.25em;
-		border: 1px solid;
+		border: 1px solid $gray-300;
 	}
 
 	th {
@@ -17,29 +24,6 @@
 
 	caption {
 		background-color: inherit;
-	}
-
-	table {
-		width: 100%;
-		border-collapse: collapse;
-
-		&.has-background th {
-			background-color: inherit;
-		}
-
-		&.has-text-color th {
-			color: inherit;
-		}
-	}
-
-	:where(table:not(.has-text-color)) {
-		color: #40464d;
-
-		// Keep the hard-coded border color for backward compatibility.
-		th,
-		td {
-			border-color: $gray-300;
-		}
 	}
 }
 

@@ -90,7 +90,10 @@ export default function CalendarEdit( { attributes, name } ) {
 	} );
 
 	const disabledRef = useDisabled();
-	const blockProps = useBlockProps( { ref: disabledRef } );
+	const blockProps = useBlockProps({
+	    ref: disabledRef,
+	    __experimentalSkipSerialization: true
+	});
 
 	if ( ! hasPosts ) {
 		return (

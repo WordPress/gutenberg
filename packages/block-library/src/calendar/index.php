@@ -55,16 +55,78 @@ function render_block_core_calendar( $attributes ) {
 	$custom_background_color          = $attributes['style']['color']['background'] ?? null;
 	$color_block_styles['background'] = $preset_background_color ? $preset_background_color : $custom_background_color;
 
+	$border_block_styles = $attributes['style']['border'] ?? array();
+
+	if ( isset( $attributes['borderColor'] ) ) {
+		$border_block_styles['color'] = "var:preset|color|{$attributes['borderColor']}";
+	}
+
 	// Generate color styles and classes.
 	$styles        = wp_style_engine_get_styles( array( 'color' => $color_block_styles ), array( 'convert_vars_to_classnames' => true ) );
-	$inline_styles = empty( $styles['css'] ) ? '' : sprintf( ' style="%s"', esc_attr( $styles['css'] ) );
-	$classnames    = empty( $styles['classnames'] ) ? '' : ' ' . esc_attr( $styles['classnames'] );
+	$inline_styles = $styles['css'] ?? ''; 
+	$classnames    = $styles['classnames'] ?? '';
 	if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
 		$classnames .= ' has-link-color';
 	}
-	// Apply color classes and styles to the calendar.
-	$calendar = str_replace( '<table', '<table' . $inline_styles, get_calendar( true, false ) );
-	$calendar = str_replace( 'class="wp-calendar-table', 'class="wp-calendar-table' . $classnames, $calendar );
+	
+	// Generate border styles and classes
+	$border_engine  = wp_style_engine_get_styles( array( 'border' => $border_block_styles ), array( 'convert_vars_to_classnames' => true ) );
+	$border_styles  = $border_engine['css'] ?? '';
+	$border_classes = $border_engine['classnames'] ?? '';
+	$calendar = get_calendar( true, false );
+
+	// Fallback to ensure the calendar renders if get_calendar returns false or empty.
+	if ( empty( $calendar ) ) {
+		$calendar = '<table class="wp-calendar-table"><caption>&nbsp;</caption></table>';
+	}
+
+	$processor = new WP_HTML_Tag_Processor( $calendar );
+
+	while ( $processor->next_tag() ) {
+		$tag_name = $processor->get_tag();
+
+		// Modify the main table attributes.
+		if ( 'TABLE' === $tag_name ) {
+			if ( ! empty( $inline_styles ) ) {
+				$processor->set_attribute( 'style', $inline_styles );
+			}
+			
+			if ( ! empty( $classnames ) ) {
+				$processor->add_class( $classnames );
+			}
+
+			if ( isset( $border_block_styles['radius'] ) ) {
+				$radius_value   = is_array( $border_block_styles['radius'] ) ? implode( ' ', $border_block_styles['radius'] ) : $border_block_styles['radius'];
+				$existing_style = $processor->get_attribute( 'style' ) ?: '';
+				$radius_css     = sprintf( 'border-radius: %s; overflow: hidden; border-collapse: separate;', esc_attr( $radius_value ) );
+				$processor->set_attribute( 'style', trim( $existing_style . ';' . $radius_css, ';' ) );
+			}
+		}
+
+		// Add border classes and inline styles to all table header th and data td cells.
+		if ( 'TH' === $tag_name || 'TD' === $tag_name ) {
+			if ( ! empty( $border_classes ) ) {
+				$processor->add_class( $border_classes );
+			}
+
+			$current_style = $processor->get_attribute( 'style' ) ?: '';
+			$combined_style = trim( $current_style, ';' );
+
+			if ( ! empty( $border_styles ) ) {
+				$combined_style .= ';' . trim( $border_styles, ';' );
+			}
+
+			if ( str_contains( $combined_style, 'border-' ) && ! str_contains( $combined_style, 'border-style' ) ) {
+				$combined_style .= ';border-style:solid';
+			}
+
+			if ( ! empty( $combined_style ) ) {
+				$processor->set_attribute( 'style', trim( $combined_style, ';' ) );
+			}
+		}
+	}
+
+	$calendar = $processor->get_updated_html();
 
 	$wrapper_attributes = get_block_wrapper_attributes();
 	$output             = sprintf(
