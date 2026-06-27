@@ -2,14 +2,21 @@
 
 ## Unreleased
 
+## 10.0.0 (2026-06-24)
+
 ### Breaking Changes
 
 -   Removed the `@wordpress/block-library/babel-plugin` export. It was an internal transform for stripping experimental blocks from WordPress core builds and is no longer used by Gutenberg's build process ([#79162](https://github.com/WordPress/gutenberg/pull/79162)).
 
 ### Enhancements
 
+-   Image and Site Logo blocks: the Crop toolbar button now opens the Media Editor modal instead of an inline cropper. The previous inline experience is removed ([#78654](https://github.com/WordPress/gutenberg/pull/78654)).
 -   Search: Expose an HTML element selector in the Advanced inspector panel that can render the block in the semantic HTML `<search>` landmark element instead of `<form role="search">`. Defers to `add_theme_support( 'html5', array( 'search-element' ) )` when the per-block value is left at "Default".
 -   Icon Block: Insert with a default icon instead of an empty placeholder ([#79111](https://github.com/WordPress/gutenberg/pull/79111)).
+
+### Bug Fixes
+
+-   Image: external images inserted by URL are now sideloaded on the server when uploaded to the media library, so the upload works when the editor is cross-origin isolated ([#79409](https://github.com/WordPress/gutenberg/pull/79409)).
 
 ## 9.48.1 (2026-06-16)
 

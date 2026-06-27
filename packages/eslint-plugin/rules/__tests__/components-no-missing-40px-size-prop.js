@@ -110,17 +110,12 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 		{
 			code: `
 				import {
-					BorderBoxControl,
-					BorderControl,
-					BoxControl,
 					ComboboxControl,
 					CustomSelectControl,
 					FontAppearanceControl,
 					FontFamilyControl,
-					FontSizePicker,
 					FormTokenField,
 					InputControl,
-					LetterSpacingControl,
 					LineHeightControl,
 					NumberControl,
 					RangeControl,
@@ -129,17 +124,12 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 					UnitControl,
 				} from '@wordpress/components';
 				<>
-					<BorderBoxControl __next40pxDefaultSize />
-					<BorderControl __next40pxDefaultSize />
-					<BoxControl __next40pxDefaultSize />
 					<ComboboxControl __next40pxDefaultSize />
 					<CustomSelectControl __next40pxDefaultSize />
 					<FontAppearanceControl __next40pxDefaultSize />
 					<FontFamilyControl __next40pxDefaultSize />
-					<FontSizePicker __next40pxDefaultSize />
 					<FormTokenField __next40pxDefaultSize />
 					<InputControl __next40pxDefaultSize />
-					<LetterSpacingControl __next40pxDefaultSize />
 					<LineHeightControl __next40pxDefaultSize />
 					<NumberControl __next40pxDefaultSize />
 					<RangeControl __next40pxDefaultSize />

@@ -306,6 +306,7 @@ class WP_Theme_JSON_Gutenberg {
 		'--wp--style--root--padding-bottom' => array( 'spacing', 'padding', 'bottom' ),
 		'--wp--style--root--padding-left'   => array( 'spacing', 'padding', 'left' ),
 		'text-decoration'                   => array( 'typography', 'textDecoration' ),
+		'text-shadow'                       => array( 'typography', 'textShadow' ),
 		'text-transform'                    => array( 'typography', 'textTransform' ),
 		'text-indent'                       => array( 'typography', 'textIndent' ),
 		'filter'                            => array( 'filter', 'duotone' ),
@@ -583,6 +584,7 @@ class WP_Theme_JSON_Gutenberg {
 			'textColumns'    => null,
 			'textDecoration' => null,
 			'textIndent'     => null,
+			'textShadow'     => null,
 			'textTransform'  => null,
 			'writingMode'    => null,
 		),
@@ -1301,11 +1303,18 @@ class WP_Theme_JSON_Gutenberg {
 		if ( ! str_contains( $selector, ',' ) ) {
 			return $to_prepend . $selector;
 		}
+
+		// Gate fast path, won't work for all selectors
+		if ( ! str_contains( $selector, '(' ) ) {
+			return $to_prepend . str_replace( ',', ',' . $to_prepend, $selector );
+		}
+
 		$new_selectors = array();
 		$selectors     = static::split_selector_list( $selector );
 		foreach ( $selectors as $sel ) {
 			$new_selectors[] = $to_prepend . $sel;
 		}
+
 		return implode( ',', $new_selectors );
 	}
 
@@ -5309,7 +5318,7 @@ class WP_Theme_JSON_Gutenberg {
 		$prefix_len = strlen( $prefix );
 		$token_in   = '|';
 		$token_out  = '--';
-		if ( 0 === strpos( $value, $prefix ) ) {
+		if ( str_starts_with( $value, $prefix ) ) {
 			$unwrapped_name = str_replace(
 				$token_in,
 				$token_out,
@@ -5333,7 +5342,7 @@ class WP_Theme_JSON_Gutenberg {
 		$prefix = 'var:';
 
 		foreach ( $tree as $key => $data ) {
-			if ( is_string( $data ) && 0 === strpos( $data, $prefix ) ) {
+			if ( is_string( $data ) && str_starts_with( $data, $prefix ) ) {
 				$tree[ $key ] = self::convert_custom_properties( $data );
 			} elseif ( is_array( $data ) ) {
 				$tree[ $key ] = self::resolve_custom_css_format( $data );

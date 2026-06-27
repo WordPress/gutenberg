@@ -1606,4 +1606,222 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		// Default is false.
 		$this->assertFalse( $data['image_save_progressive'] );
 	}
+
+	/**
+	 * The URL requested by the most recent mocked HTTP download.
+	 *
+	 * @var string|null
+	 */
+	protected $last_download_url = null;
+
+	/**
+	 * Short-circuits download_url()'s HTTP request, writing a local fixture into
+	 * the streamed temp file so media_handle_sideload() has a real image to process.
+	 *
+	 * Mirrors the approach core's media_sideload_image() tests use: returning a
+	 * non-false value from `pre_http_request` skips the network, so the mock must
+	 * copy the fixture into the `filename` the request would have streamed to.
+	 *
+	 * @param false|array|WP_Error $response A preempted response, or false to continue.
+	 * @param array                $args     HTTP request arguments.
+	 * @param string               $url      The request URL.
+	 * @return array A faked 200 response.
+	 */
+	public function mock_image_download( $response, $args, $url ) {
+		$this->last_download_url = $url;
+
+		if ( ! empty( $args['filename'] ) ) {
+			copy( DIR_TESTDATA . '/images/canola.jpg', $args['filename'] );
+		}
+
+		return array(
+			'response' => array(
+				'code'    => 200,
+				'message' => 'OK',
+			),
+			'headers'  => array(),
+			'cookies'  => array(),
+			'body'     => '',
+		);
+	}
+
+	/**
+	 * Verifies that supplying a `url` to the create endpoint sideloads the remote
+	 * image on the server and, with generate_sub_sizes=false, creates no sub-sizes.
+	 *
+	 * This is the cross-origin-isolation fallback path: the server fetches the
+	 * remote image so the browser does not have to, and only the original is kept.
+	 *
+	 * @covers ::create_item
+	 * @covers ::create_item_from_url
+	 */
+	public function test_create_item_from_url_sideloads_without_subsizes() {
+		wp_set_current_user( self::$admin_id );
+
+		add_filter( 'pre_http_request', array( $this, 'mock_image_download' ), 10, 3 );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_param( 'url', 'https://example.com/photo.jpg' );
+		$request->set_param( 'generate_sub_sizes', false );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		remove_filter( 'pre_http_request', array( $this, 'mock_image_download' ), 10 );
+
+		$data = $response->get_data();
+
+		$this->assertSame( 201, $response->get_status() );
+		$this->assertSame( 'image', $data['media_type'] );
+		$this->assertSame( 'https://example.com/photo.jpg', $this->last_download_url );
+
+		// No sub-sizes should have been generated; only the original is stored.
+		$metadata = wp_get_attachment_metadata( $data['id'], true );
+		$this->assertEmpty( $metadata['sizes'] ?? array(), 'Sideloaded external image should have no sub-sizes.' );
+	}
+
+	/**
+	 * Verifies that a sideloaded external image is attached to the post passed in
+	 * the `post` parameter.
+	 *
+	 * @covers ::create_item
+	 * @covers ::create_item_from_url
+	 */
+	public function test_create_item_from_url_attaches_to_post() {
+		wp_set_current_user( self::$admin_id );
+
+		$parent_post = self::factory()->post->create();
+
+		add_filter( 'pre_http_request', array( $this, 'mock_image_download' ), 10, 3 );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_param( 'url', 'https://example.com/attached.jpg' );
+		$request->set_param( 'generate_sub_sizes', false );
+		$request->set_param( 'post', $parent_post );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		remove_filter( 'pre_http_request', array( $this, 'mock_image_download' ), 10 );
+
+		$data = $response->get_data();
+
+		$this->assertSame( 201, $response->get_status() );
+		$this->assertSame( $parent_post, get_post( $data['id'] )->post_parent );
+	}
+
+	/**
+	 * Verifies that a failed download propagates the WP_Error from download_url()
+	 * rather than creating an attachment.
+	 *
+	 * @covers ::create_item
+	 * @covers ::create_item_from_url
+	 */
+	public function test_create_item_from_url_returns_error_on_download_failure() {
+		wp_set_current_user( self::$admin_id );
+
+		$fail_download = static function () {
+			return new WP_Error( 'http_request_failed', 'Could not resolve host.' );
+		};
+		add_filter( 'pre_http_request', $fail_download );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_param( 'url', 'https://example.com/missing.jpg' );
+		$request->set_param( 'generate_sub_sizes', false );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		remove_filter( 'pre_http_request', $fail_download );
+
+		$this->assertSame( 'http_request_failed', $response->get_data()['code'] );
+		$this->assertSame( 500, $response->get_status() );
+	}
+
+	/**
+	 * Verifies that a URL with no usable path bails with a 400 before any
+	 * download is attempted, rather than handing an empty filename to the
+	 * sideload handler.
+	 *
+	 * @covers ::create_item_from_url
+	 */
+	public function test_create_item_from_url_rejects_url_without_filename() {
+		wp_set_current_user( self::$admin_id );
+
+		// Fail loudly if the guard does not bail and a download is attempted.
+		$downloaded = false;
+		$track      = static function () use ( &$downloaded ) {
+			$downloaded = true;
+			return new WP_Error( 'http_request_failed', 'Should not be reached.' );
+		};
+		add_filter( 'pre_http_request', $track );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_param( 'url', 'https://example.com/?img=123' );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		remove_filter( 'pre_http_request', $track );
+
+		$this->assertSame( 'rest_invalid_url', $response->get_data()['code'] );
+		$this->assertSame( 400, $response->get_status() );
+		$this->assertFalse( $downloaded, 'No download should be attempted for a URL without a filename.' );
+	}
+
+	/**
+	 * Verifies that a user without the `upload_files` capability cannot sideload
+	 * an external image and that the request bails before any download happens.
+	 *
+	 * @covers ::create_item_from_url
+	 */
+	public function test_create_item_from_url_requires_upload_capability() {
+		$subscriber_id = self::factory()->user->create( array( 'role' => 'subscriber' ) );
+		wp_set_current_user( $subscriber_id );
+
+		// Fail loudly if the guard does not bail and a download is attempted.
+		$downloaded = false;
+		$track      = static function () use ( &$downloaded ) {
+			$downloaded = true;
+			return new WP_Error( 'http_request_failed', 'Should not be reached.' );
+		};
+		add_filter( 'pre_http_request', $track );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_param( 'url', 'https://example.com/denied.jpg' );
+
+		$controller = new Gutenberg_REST_Attachments_Controller( 'attachment' );
+		$method     = new ReflectionMethod( $controller, 'create_item_from_url' );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
+		$result = $method->invoke( $controller, $request );
+
+		remove_filter( 'pre_http_request', $track );
+
+		$this->assertWPError( $result );
+		$this->assertSame( 'rest_cannot_create', $result->get_error_code() );
+		$this->assertSame( 403, $result->get_error_data()['status'] );
+		$this->assertFalse( $downloaded, 'No download should be attempted without upload_files.' );
+	}
+
+	/**
+	 * Verifies that the `url` argument is registered on the creatable media route
+	 * so requests can supply an external image URL to sideload.
+	 *
+	 * @covers ::get_endpoint_args_for_item_schema
+	 */
+	public function test_url_registered_as_creatable_arg() {
+		$routes = rest_get_server()->get_routes();
+		$this->assertArrayHasKey( '/wp/v2/media', $routes );
+
+		$creatable = null;
+		foreach ( $routes['/wp/v2/media'] as $route ) {
+			if ( ! empty( $route['methods'][ WP_REST_Server::CREATABLE ] ) ) {
+				$creatable = $route;
+				break;
+			}
+		}
+
+		$this->assertNotNull( $creatable, 'The media route should register a CREATABLE handler.' );
+		$this->assertArrayHasKey( 'url', $creatable['args'] );
+		$this->assertSame( 'string', $creatable['args']['url']['type'] );
+		$this->assertSame( 'uri', $creatable['args']['url']['format'] );
+	}
 }
