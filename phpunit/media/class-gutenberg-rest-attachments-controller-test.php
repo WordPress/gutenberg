@@ -1508,6 +1508,35 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	}
 
 	/**
+	 * Verifies that the image_output_format and image_save_progressive fields are
+	 * omitted entirely for non-image attachments, matching the core backport.
+	 *
+	 * @covers ::prepare_item_for_response
+	 */
+	public function test_image_output_format_skipped_for_non_image() {
+		wp_set_current_user( self::$admin_id );
+
+		$attachment_id = self::factory()->attachment->create_object(
+			DIR_TESTDATA . '/uploads/dashicons.woff',
+			0,
+			array(
+				'post_mime_type' => 'application/font-woff',
+				'post_type'      => 'attachment',
+			)
+		);
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/media/' . $attachment_id );
+		$request->set_param( 'context', 'edit' );
+
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertArrayNotHasKey( 'image_output_format', $data );
+		$this->assertArrayNotHasKey( 'image_save_progressive', $data );
+	}
+
+	/**
 	 * Verifies that image_output_format reflects a custom filter converting JPEG to WebP.
 	 *
 	 * @covers ::create_item
