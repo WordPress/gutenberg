@@ -1458,10 +1458,12 @@ export default function Image( {
 
 	return (
 		<>
-			<AnimatedGifConvertControl
-				attributes={ attributes }
-				clientId={ clientId }
-			/>
+			{ isSingleSelected && (
+				<AnimatedGifConvertControl
+					attributes={ attributes }
+					clientId={ clientId }
+				/>
+			) }
 			{ mediaReplaceFlow }
 			{ controls }
 			{ featuredImageControl }

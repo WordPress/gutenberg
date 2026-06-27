@@ -29,12 +29,18 @@ import { __ } from '@wordpress/i18n';
  * @return {Component|null} The control, or null when conversion does not apply.
  */
 export default function AnimatedGifConvertControl( { attributes, clientId } ) {
-	const { id, caption } = attributes;
+	const { id, url, caption } = attributes;
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 
 	const companion = useSelect(
 		( select ) => {
 			if ( ! id ) {
+				return null;
+			}
+			// Only animated GIFs have a video companion. Gate on the `.gif`
+			// extension so an ordinary image never triggers an attachment
+			// REST fetch just to discover it has no companion.
+			if ( ! url || ! url.toLowerCase().endsWith( '.gif' ) ) {
 				return null;
 			}
 			// A gallery only accepts `core/image` children, so swapping the
@@ -68,7 +74,7 @@ export default function AnimatedGifConvertControl( { attributes, clientId } ) {
 				height: details.height,
 			};
 		},
-		[ id, clientId ]
+		[ id, url, clientId ]
 	);
 
 	if ( ! companion ) {
