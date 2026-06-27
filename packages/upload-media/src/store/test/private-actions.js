@@ -16,8 +16,15 @@ import {
 	removeItem,
 } from '../private-actions';
 import { OperationType, Type } from '../types';
-import { vipsHasTransparency, vipsGetUltraHdrInfo } from '../utils';
-import { convertGifToVideo } from '../utils/video-conversion';
+import {
+	vipsHasTransparency,
+	vipsGetUltraHdrInfo,
+	terminateVipsWorker,
+} from '../utils';
+import {
+	convertGifToVideo,
+	terminateVideoConversionWorker,
+} from '../utils/video-conversion';
 
 // Mock @wordpress/blob
 jest.mock( '@wordpress/blob', () => ( {
@@ -1177,6 +1184,35 @@ describe( 'private actions', () => {
 					)
 			);
 			expect( anyTranscode ).toBe( true );
+		} );
+	} );
+
+	describe( 'removeItem worker teardown', () => {
+		beforeEach( () => {
+			jest.clearAllMocks();
+		} );
+
+		const runRemove = async ( remaining ) =>
+			removeItem( 'item-1' )( {
+				select: {
+					getItem: () => ( {} ),
+					getAllItems: () => remaining,
+				},
+				dispatch: jest.fn(),
+			} );
+
+		it( 'terminates both background workers once the queue empties', async () => {
+			await runRemove( [] );
+
+			expect( terminateVipsWorker ).toHaveBeenCalledTimes( 1 );
+			expect( terminateVideoConversionWorker ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'leaves the workers running while items remain in the queue', async () => {
+			await runRemove( [ { id: 'item-2' } ] );
+
+			expect( terminateVipsWorker ).not.toHaveBeenCalled();
+			expect( terminateVideoConversionWorker ).not.toHaveBeenCalled();
 		} );
 	} );
 } );

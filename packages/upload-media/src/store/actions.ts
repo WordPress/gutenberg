@@ -40,6 +40,7 @@ import type {
 	revokeBlobUrls,
 } from './private-actions';
 import { maybeRecycleVipsWorker, vipsCancelOperations } from './utils';
+import { cancelGifToVideoOperations } from './utils/video-conversion';
 import { debug } from './utils/debug-logger';
 import { ErrorCode, UploadError } from '../upload-error';
 import { validateMimeType } from '../validate-mime-type';
@@ -203,6 +204,10 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 		// Cancel any ongoing vips operations for this item.
 		await vipsCancelOperations( id );
 
+		// Cancel any ongoing GIF-to-video conversion for this item so a
+		// cancelled upload does not leave the encoder running off-thread.
+		await cancelGifToVideoOperations( id );
+
 		if ( ! silent ) {
 			const { onError } = item;
 			onError?.( error ?? new Error( 'Upload cancelled' ) );
@@ -306,8 +311,11 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 					// underlying error's code and message — vips
 					// processing failures already carry an actionable
 					// hint at their source; network/server failures
-					// surface their real cause.
-					dispatch.cancelItem(
+					// surface their real cause. Awaited so the cascade
+					// fully settles (parent removed, onError fired) before
+					// this thunk resolves and the batch-completion check
+					// below runs.
+					await dispatch.cancelItem(
 						parentId,
 						new UploadError( {
 							code:

@@ -42,6 +42,7 @@ import {
 import {
 	convertGifToVideo,
 	isUnsupportedConversionError,
+	terminateVideoConversionWorker,
 } from './utils/video-conversion';
 import type {
 	AccumulateSubSizeAction,
@@ -574,11 +575,13 @@ export function removeItem( id: QueueItemId ) {
 		} );
 
 		/*
-		 * If the queue is now empty, terminate the VIPS worker to free
-		 * WASM memory. The worker will be lazily re-created if needed.
+		 * If the queue is now empty, terminate the background workers to free
+		 * their memory (WASM for VIPS, the WebCodecs encoder for video
+		 * conversion). Both are lazily re-created if needed.
 		 */
 		if ( select.getAllItems().length === 0 ) {
 			terminateVipsWorker();
+			terminateVideoConversionWorker();
 		}
 	};
 }

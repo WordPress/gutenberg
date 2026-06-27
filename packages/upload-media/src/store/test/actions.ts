@@ -33,8 +33,22 @@ jest.mock( '../utils', () => ( {
 	terminateVipsWorker: jest.fn(),
 } ) );
 
-// Import the mocked module to access the mock function.
+// actions.ts transitively imports private-actions, which also pulls in
+// convertGifToVideo / isUnsupportedConversionError, so the mock must cover the
+// whole module surface. isUnsupportedConversionError is kept real.
+jest.mock( '../utils/video-conversion', () => {
+	const actual = jest.requireActual( '../utils/video-conversion' );
+	return {
+		convertGifToVideo: jest.fn(),
+		cancelGifToVideoOperations: jest.fn( () => Promise.resolve( true ) ),
+		terminateVideoConversionWorker: jest.fn(),
+		isUnsupportedConversionError: actual.isUnsupportedConversionError,
+	};
+} );
+
+// Import the mocked modules to access the mock functions.
 import { vipsCancelOperations } from '../utils';
+import { cancelGifToVideoOperations } from '../utils/video-conversion';
 
 function createRegistryWithStores() {
 	// Create a registry and register used stores.
@@ -567,6 +581,7 @@ describe( 'actions', () => {
 	describe( 'cancelItem', () => {
 		beforeEach( () => {
 			( vipsCancelOperations as jest.Mock ).mockClear();
+			( cancelGifToVideoOperations as jest.Mock ).mockClear();
 		} );
 
 		it( 'calls vipsCancelOperations when cancelling', async () => {
@@ -588,6 +603,30 @@ describe( 'actions', () => {
 
 			expect( vipsCancelOperations ).toHaveBeenCalledWith( item.id );
 			expect( consoleErrorSpy ).toHaveBeenCalled();
+
+			consoleErrorSpy.mockRestore();
+		} );
+
+		it( 'cancels any in-flight GIF-to-video conversion when cancelling', async () => {
+			// Suppress console.error that fires when there's no onError callback.
+			const consoleErrorSpy = jest
+				.spyOn( console, 'error' )
+				.mockImplementation( () => {} );
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await registry
+				.dispatch( uploadStore )
+				.cancelItem( item.id, new Error( 'User cancelled' ) );
+
+			expect( cancelGifToVideoOperations ).toHaveBeenCalledWith(
+				item.id
+			);
 
 			consoleErrorSpy.mockRestore();
 		} );
