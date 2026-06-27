@@ -217,6 +217,19 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		update_option( 'wp_notes_notify', 1 );
 	}
 
+	public function test_editing_a_note_does_not_renotify() {
+		$mention = sprintf(
+			'<a class="wp-note-mention" data-user-id="%d" href="#">@Mentioned</a>',
+			self::$mentioned_id
+		);
+		$note    = $this->insert_note( "Ping $mention", self::$commenter_id );
+
+		// Simulate the update path of rest_insert_comment ($creating false).
+		gutenberg_notify_note_mentions( $note, null, false );
+
+		$this->assertEmpty( $this->sent_to );
+	}
+
 	public function test_recipients_filter_can_add_and_remove() {
 		$extra_id = self::factory()->user->create( array( 'role' => 'editor' ) );
 

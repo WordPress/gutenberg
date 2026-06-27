@@ -125,10 +125,21 @@ if ( ! function_exists( 'gutenberg_notify_note_mentions' ) ) {
 	 * notifies them). Mentioned users and the note author are then subscribed
 	 * to the thread so they receive notifications about later replies.
 	 *
-	 * @param WP_Comment $comment The note that was just inserted.
+	 * Only fires when a note is created, not when an existing one is edited,
+	 * so correcting a note does not re-notify everyone who already received it.
+	 *
+	 * @param WP_Comment $comment  The note that was just inserted.
+	 * @param mixed      $request  The REST request (unused).
+	 * @param bool       $creating Whether this is a create (true) or update (false).
 	 * @return void
 	 */
-	function gutenberg_notify_note_mentions( $comment ) {
+	function gutenberg_notify_note_mentions( $comment, $request = null, $creating = true ) {
+		unset( $request );
+
+		if ( ! $creating ) {
+			return;
+		}
+
 		if ( ! $comment instanceof WP_Comment || 'note' !== $comment->comment_type ) {
 			return;
 		}
@@ -200,7 +211,7 @@ if ( ! function_exists( 'gutenberg_notify_note_mentions' ) ) {
 		}
 		gutenberg_add_note_followers( $root_id, $new_followers );
 	}
-	add_action( 'rest_insert_comment', 'gutenberg_notify_note_mentions' );
+	add_action( 'rest_insert_comment', 'gutenberg_notify_note_mentions', 10, 3 );
 }
 
 if ( ! function_exists( 'gutenberg_send_note_notification' ) ) {
