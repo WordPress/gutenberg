@@ -1419,7 +1419,7 @@ export default function Image( {
 
 	return (
 		<>
-			{ isSingleSelected && ! isEditingImage && ! lockUrlControls && (
+			{ isSingleSelected && ! lockUrlControls && (
 				<AnimatedGifConvertControl
 					attributes={ attributes }
 					clientId={ clientId }
