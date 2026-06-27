@@ -69,7 +69,9 @@ add_filter( 'upload_mimes', 'gutenberg_add_jxl_upload_mimes' );
  * @return bool Whether the file is a JPEG XL image.
  */
 function gutenberg_is_jxl_file( string $file ): bool {
-	$handle = fopen( $file, 'rb' );
+	// Suppress the warning when the file is missing or unreadable; the false
+	// return is handled below, matching the core wp_is_jxl_file() backport.
+	$handle = @fopen( $file, 'rb' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 	if ( ! $handle ) {
 		return false;
 	}
