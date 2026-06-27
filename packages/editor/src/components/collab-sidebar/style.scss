@@ -252,11 +252,7 @@
 
 	&:hover,
 	&:focus {
-		background: color-mix(
-			in srgb,
-			var(--wp-admin-theme-color) 22%,
-			transparent
-		);
+		background: color-mix(in srgb, var(--wp-admin-theme-color) 22%, transparent);
 		color: var(--wp-admin-theme-color);
 	}
 }
