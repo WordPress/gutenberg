@@ -22,7 +22,10 @@ if ( ! function_exists( 'gutenberg_get_note_allowed_html' ) ) {
 	 *
 	 * Kept intentionally small: bold, italic, links, and code. Link rels are
 	 * normalised by `gutenberg_note_content_pre_filter()` so the allowlist does
-	 * not need to enumerate every valid rel value.
+	 * not need to enumerate every valid rel value. The `class` and
+	 * `data-user-id` attributes on links carry `@` mentions, which are stored
+	 * as `<a class="wp-note-mention" data-user-id="…">` so they can be styled
+	 * and, in a follow-up, resolved to notification recipients.
 	 *
 	 * @return array Allowed tags structure compatible with wp_kses().
 	 */
@@ -31,10 +34,12 @@ if ( ! function_exists( 'gutenberg_get_note_allowed_html' ) ) {
 			'strong' => array(),
 			'em'     => array(),
 			'a'      => array(
-				'href'   => true,
-				'target' => true,
-				'rel'    => true,
-				'title'  => true,
+				'href'         => true,
+				'target'       => true,
+				'rel'          => true,
+				'title'        => true,
+				'class'        => true,
+				'data-user-id' => true,
 			),
 			'code'   => array(),
 		);

@@ -238,3 +238,25 @@
 		}
 	}
 }
+
+// Mention chips, both in the note input and the rendered note content.
+.wp-note-mention {
+	display: inline;
+	padding: 0 $grid-unit-05;
+	border-radius: $radius-small;
+	background: color-mix(in srgb, var(--wp-admin-theme-color) 12%, transparent);
+	color: var(--wp-admin-theme-color);
+	font-weight: $font-weight-medium;
+	text-decoration: none;
+	white-space: nowrap;
+
+	&:hover,
+	&:focus {
+		background: color-mix(
+			in srgb,
+			var(--wp-admin-theme-color) 22%,
+			transparent
+		);
+		color: var(--wp-admin-theme-color);
+	}
+}

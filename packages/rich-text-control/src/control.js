@@ -11,6 +11,7 @@ import {
 	Popover,
 	SlotFillProvider,
 	useBaseControlProps,
+	__unstableUseAutocompleteProps as useAutocompleteProps,
 } from '@wordpress/components';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import {
@@ -40,6 +41,11 @@ import inputEventsListener from './event-listeners/input-events';
 const { useRichText, keyboardShortcutContext, inputEventContext } =
 	unlock( richTextPrivateApis );
 
+// Shared empty reference so the default `completers` value is stable across
+// renders and the autocomplete hook doesn't re-run for consumers that don't
+// opt into it.
+const EMPTY_COMPLETERS = [];
+
 /**
  * A rich text control component that provides a contenteditable field with
  * formatting capabilities.
@@ -66,6 +72,7 @@ const { useRichText, keyboardShortcutContext, inputEventContext } =
  * @param {boolean}  [props.preserveWhiteSpace]           Whether to preserve whitespace in the content.
  * @param {boolean}  [props.disableLineBreaks]            Whether to disable line breaks in the content.
  * @param {boolean}  [props.focusOnMount]                 Whether to move focus to the field when it mounts. Off by default; opt in for standalone forms where no other code lands focus on the field.
+ * @param {Array}    [props.completers]                   Autocompleters to wire to the field (e.g. an `@` mention completer). Each is a `WPCompleter` object as consumed by `@wordpress/components`' `Autocomplete`. Omit to disable autocomplete.
  *
  * @return {Element} The rendered RichTextControl component.
  */
@@ -84,6 +91,7 @@ export default function RichTextControl( {
 	preserveWhiteSpace,
 	disableLineBreaks,
 	focusOnMount,
+	completers = EMPTY_COMPLETERS,
 } ) {
 	const [ selection, setSelection ] = useState( {
 		start: undefined,
@@ -147,6 +155,19 @@ export default function RichTextControl( {
 			[ id, clientId ]
 		),
 	} );
+
+	// Wire optional autocompleters (e.g. an `@` mention completer) to the
+	// field. The hook owns the editable element ref it anchors the popover to,
+	// so we merge its `ref` into the contenteditable below and render the
+	// returned popover. With no `completers` it does no work and renders
+	// nothing, keeping the control zero-cost for consumers that don't opt in.
+	const { ref: autocompleteRef, ...autocompleteProps } = useAutocompleteProps(
+		{
+			completers,
+			record: value,
+			onChange: onRichTextChange,
+		}
+	);
 
 	const { baseControlProps, controlProps } = useBaseControlProps( {
 		hideLabelFromVision,
@@ -281,12 +302,14 @@ export default function RichTextControl( {
 					role="textbox"
 					aria-multiline={ ! disableLineBreaks }
 					aria-label={ label }
+					{ ...autocompleteProps }
 					ref={ useMergeRefs( [
 						richTextRef,
 						anchorRef,
 						eventListenersRef,
 						focusOnMountRef,
 						popoverSlotContainerRef,
+						autocompleteRef,
 					] ) }
 					onFocus={ () => {
 						clearTimeout( blurDeselectTimeoutRef.current );
