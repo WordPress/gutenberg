@@ -560,6 +560,5 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 				'updates'        => $typed_updates,
 			);
 		}
-
 	}
 }

@@ -124,27 +124,27 @@ if ( ! function_exists( 'wp_collaboration_register_meta' ) ) {
 	/**
 	 * Records the origin URL when a CRDT document is persisted.
 	 */
-	function gutenberg_crdt_document_record_origin( $meta_id, $object_id, $meta_key, $_meta_value ) {
+	function gutenberg_crdt_document_record_origin( $_meta_id, $object_id, $meta_key ) {
 		if ( '_crdt_document' === $meta_key ) {
 			// update_post_meta will trigger this action recursively if we're not careful,
 			// but we're updating a different key, so it's safe.
 			update_post_meta( $object_id, '_crdt_document_origin_url', site_url() );
 		}
 	}
-	add_action( 'added_post_meta', 'gutenberg_crdt_document_record_origin', 10, 4 );
-	add_action( 'updated_post_meta', 'gutenberg_crdt_document_record_origin', 10, 4 );
+	add_action( 'added_post_meta', 'gutenberg_crdt_document_record_origin', 10, 3 );
+	add_action( 'updated_post_meta', 'gutenberg_crdt_document_record_origin', 10, 3 );
 
 	/**
 	 * Purges stale _crdt_document meta when the originating site URL
 	 * does not match the current site, indicating a database migration.
 	 */
 	function gutenberg_purge_stale_crdt_document_meta( $response, $post ) {
-		$origin = get_post_meta( $post->ID, '_crdt_document_origin_url', true );
+		$origin      = get_post_meta( $post->ID, '_crdt_document_origin_url', true );
 		$current_url = site_url();
 
 		$should_purge = false;
 
-		if ( ! empty( $origin ) && $origin !== $current_url ) {
+		if ( ! empty( $origin ) && $current_url !== $origin ) {
 			$should_purge = true;
 		} elseif ( empty( $origin ) ) {
 			$crdt_doc = get_post_meta( $post->ID, '_crdt_document', true );
