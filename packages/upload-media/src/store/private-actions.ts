@@ -1372,10 +1372,14 @@ export function transcodeGifItem(
 		const outputFormat = args?.outputFormat ?? 'mp4';
 		const outputMimeType = `video/${ outputFormat }`;
 
+		// item.file is the original GIF until finishOperation swaps in the
+		// transcoded video below; capture it for the poster sideload.
+		const gifFile = item.file;
+
 		try {
 			const file = await convertGifToVideo(
 				item.id,
-				item.file,
+				gifFile,
 				outputMimeType
 			);
 
@@ -1383,6 +1387,37 @@ export function transcodeGifItem(
 			// sideload's payload. The parent attachment (the GIF) is
 			// already uploaded; no blob URL is needed for any block.
 			dispatch.finishOperation( id, { file } );
+
+			// Only now that the video exists, sideload a static first-frame
+			// poster as a companion (vips decodes just the first GIF frame).
+			// Queued here rather than alongside the video in
+			// generateThumbnails so an unsupported/failed conversion never
+			// leaves an orphaned `animated_video_poster` with no matching
+			// `animated_video`. This sibling is registered while the video's
+			// own Upload op is still pending, so the parent's finalize gate
+			// stays closed until both companions finish. Stored under
+			// metadata `animated_video_poster`.
+			dispatch.addSideloadItem( {
+				file: gifFile,
+				batchId: uuidv4(),
+				parentId: item.parentId,
+				additionalData: {
+					post: item.additionalData?.post,
+					image_size: 'animated-video-poster',
+					convert_format: false,
+				},
+				operations: [
+					[
+						OperationType.TranscodeImage,
+						{
+							outputFormat: 'jpeg',
+							outputQuality: DEFAULT_OUTPUT_QUALITY,
+							interlaced: false,
+						} as OperationArgs[ OperationType.TranscodeImage ],
+					],
+					OperationType.Upload,
+				],
+			} );
 		} catch ( error ) {
 			// An "Unsupported" outcome is a graceful skip, not a failure:
 			// the parent GIF attachment already exists and stays as-is, so
@@ -1494,32 +1529,10 @@ export function generateThumbnails( id: QueueItemId ) {
 				],
 			} );
 
-			// Also sideload a static first-frame poster (vips decodes only the
-			// first GIF frame) so the <video> can paint a lightweight still
-			// image instead of downloading the full GIF as its poster. Stored
-			// under metadata `animated_video_poster` and used as the converted
-			// video block's poster.
-			dispatch.addSideloadItem( {
-				file: item.animatedGifFile,
-				batchId: uuidv4(),
-				parentId: item.id,
-				additionalData: {
-					post: attachment.id,
-					image_size: 'animated-video-poster',
-					convert_format: false,
-				},
-				operations: [
-					[
-						OperationType.TranscodeImage,
-						{
-							outputFormat: 'jpeg',
-							outputQuality: DEFAULT_OUTPUT_QUALITY,
-							interlaced: false,
-						} as OperationArgs[ OperationType.TranscodeImage ],
-					],
-					OperationType.Upload,
-				],
-			} );
+			// The static first-frame poster companion is sideloaded by the
+			// TranscodeGif operation once the video conversion succeeds (see
+			// transcodeGifItem), so a failed conversion leaves no orphaned
+			// poster.
 		}
 
 		// Check if image needs rotation.

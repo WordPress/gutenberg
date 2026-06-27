@@ -679,11 +679,14 @@ describe( 'private actions', () => {
 			const dispatch = Object.assign( jest.fn(), {
 				finishOperation: jest.fn(),
 				cancelItem: jest.fn(),
+				addSideloadItem: jest.fn(),
 			} );
 			const select = {
 				getItem: jest.fn( () => ( {
 					id: 'gif-1',
 					file: gifFile,
+					parentId: 'parent-1',
+					additionalData: { post: 42 },
 				} ) ),
 			};
 			return { select, dispatch };
@@ -732,6 +735,39 @@ describe( 'private actions', () => {
 			expect( dispatch.cancelItem ).not.toHaveBeenCalled();
 		} );
 
+		it( 'sideloads the first-frame poster as a sibling once the video succeeds', async () => {
+			convertGifToVideo.mockResolvedValue(
+				new File( [ 'mp4' ], 'animation.mp4', { type: 'video/mp4' } )
+			);
+			const { select, dispatch } = buildArgs();
+
+			await transcodeGifItem( 'gif-1', { outputFormat: 'mp4' } )( {
+				select,
+				dispatch,
+			} );
+
+			expect( dispatch.addSideloadItem ).toHaveBeenCalledTimes( 1 );
+			const poster = dispatch.addSideloadItem.mock.calls[ 0 ][ 0 ];
+			// Built from the original GIF (captured before finishOperation
+			// swaps in the video) and parented to the GIF attachment.
+			expect( poster.file ).toBe( gifFile );
+			expect( poster.parentId ).toBe( 'parent-1' );
+			expect( poster.additionalData ).toEqual(
+				expect.objectContaining( {
+					post: 42,
+					image_size: 'animated-video-poster',
+					convert_format: false,
+				} )
+			);
+			expect( poster.operations[ 0 ][ 0 ] ).toBe(
+				OperationType.TranscodeImage
+			);
+			expect( poster.operations[ 0 ][ 1 ] ).toEqual(
+				expect.objectContaining( { outputFormat: 'jpeg' } )
+			);
+			expect( poster.operations[ 1 ] ).toBe( OperationType.Upload );
+		} );
+
 		it( 'defaults to mp4 when no output format is given', async () => {
 			convertGifToVideo.mockResolvedValue(
 				new File( [ 'mp4' ], 'animation.mp4', { type: 'video/mp4' } )
@@ -766,6 +802,8 @@ describe( 'private actions', () => {
 			expect( cancelledId ).toBe( 'gif-1' );
 			expect( silent ).toBe( true );
 			expect( consoleError ).not.toHaveBeenCalled();
+			// No video means no poster: the sideload is never queued.
+			expect( dispatch.addSideloadItem ).not.toHaveBeenCalled();
 		} );
 
 		it( 'silently cancels the sideload on a hard transcoding failure', async () => {
@@ -787,6 +825,8 @@ describe( 'private actions', () => {
 			expect( error.cause ).toBe( cause );
 			expect( silent ).toBe( true );
 			expect( consoleError ).toHaveBeenCalled();
+			// No video means no poster: the sideload is never queued.
+			expect( dispatch.addSideloadItem ).not.toHaveBeenCalled();
 		} );
 
 		it( 'does nothing when the item is not in the queue', async () => {
@@ -839,8 +879,9 @@ describe( 'private actions', () => {
 				settings: { videoOutputFormat: 'video/mp4' },
 			} );
 
-			// Two companions are sideloaded: the video and its static poster.
-			expect( dispatchFn.addSideloadItem ).toHaveBeenCalledTimes( 2 );
+			// Only the video is sideloaded here; the poster is queued later by
+			// the TranscodeGif operation once the conversion succeeds.
+			expect( dispatchFn.addSideloadItem ).toHaveBeenCalledTimes( 1 );
 			const sideload = dispatchFn.addSideloadItem.mock.calls[ 0 ][ 0 ];
 			expect( sideload.file ).toBe( gif );
 			expect( sideload.parentId ).toBe( 'g' );
@@ -855,41 +896,6 @@ describe( 'private actions', () => {
 				[ OperationType.TranscodeGif, { outputFormat: 'mp4' } ],
 				OperationType.Upload,
 			] );
-		} );
-
-		it( 'sideloads a static first-frame poster alongside the video', async () => {
-			const gif = makeGif();
-			const item = {
-				id: 'g',
-				sourceFile: gif,
-				file: gif,
-				animatedGifFile: gif,
-				attachment: { id: 42 },
-			};
-
-			const dispatchFn = await runGenerate( {
-				item,
-				settings: { videoOutputFormat: 'video/mp4' },
-			} );
-
-			const poster = dispatchFn.addSideloadItem.mock.calls[ 1 ][ 0 ];
-			expect( poster.file ).toBe( gif );
-			expect( poster.parentId ).toBe( 'g' );
-			expect( poster.additionalData ).toEqual(
-				expect.objectContaining( {
-					post: 42,
-					image_size: 'animated-video-poster',
-					convert_format: false,
-				} )
-			);
-			// A vips image transcode (first GIF frame → static JPEG), then upload.
-			expect( poster.operations[ 0 ][ 0 ] ).toBe(
-				OperationType.TranscodeImage
-			);
-			expect( poster.operations[ 0 ][ 1 ] ).toEqual(
-				expect.objectContaining( { outputFormat: 'jpeg' } )
-			);
-			expect( poster.operations[ 1 ] ).toBe( OperationType.Upload );
 		} );
 
 		it( 'uses webm when videoOutputFormat is video/webm', async () => {
