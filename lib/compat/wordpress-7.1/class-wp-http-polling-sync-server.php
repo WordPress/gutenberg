@@ -509,6 +509,31 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		 * } Response data for this room.
 		 */
 		private function get_updates( string $room, int $client_id, int $cursor, bool $is_compactor ): array {
+			// Detect stale state from a database migration: if the stored origin URL
+			// exists but does not match the current site, or if no origin is recorded
+			// (legacy data predating this fix), purge the room so the editor loads
+			// cleanly from canonical post_content.
+			$stored_origin = $this->storage->get_origin_url( $room );
+			if ( null === $stored_origin || site_url() !== $stored_origin ) {
+				error_log(
+					sprintf(
+						'Gutenberg: Purging stale collaborative editing state for room "%s". Stored origin: %s, current site URL: %s. This typically indicates a database migration or domain change.',
+						$room,
+						null === $stored_origin ? 'none (legacy data)' : $stored_origin,
+						site_url()
+					)
+				);
+				$this->storage->purge_room( $room );
+
+				return array(
+					'end_cursor'     => 0,
+					'room'           => $room,
+					'should_compact' => false,
+					'total_updates'  => 0,
+					'updates'        => array(),
+				);
+			}
+
 			$updates_after_cursor = $this->storage->get_updates_after_cursor( $room, $cursor );
 			$total_updates        = $this->storage->get_update_count( $room );
 
