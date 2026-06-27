@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
-import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
+import { store as coreStore } from '@wordpress/core-data';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useView, useViewConfig } from '@wordpress/views';
@@ -26,15 +26,11 @@ import { unlock } from '../../lock-unlock';
 import usePatterns, { useAugmentPatternsWithPermissions } from './use-patterns';
 import PatternsActions from './actions';
 import { useEditPostAction } from '../dataviews-actions';
-import {
-	patternStatusField,
-	previewField,
-	templatePartAuthorField,
-} from './fields';
+import { previewField } from './fields';
 import usePatternCategories from '../sidebar-navigation-screen-patterns/use-pattern-categories';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
-const { usePostActions, patternTitleField } = unlock( editorPrivateApis );
+const { usePostActions, usePostFields } = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
@@ -107,38 +103,10 @@ export default function DataviewsPatterns() {
 		syncStatus: viewSyncStatus,
 	} );
 
-	const { records } = useEntityRecords( 'postType', TEMPLATE_PART_POST_TYPE, {
-		per_page: -1,
-	} );
-
-	const authors = useMemo( () => {
-		if ( ! records ) {
-			return EMPTY_ARRAY;
-		}
-		const authorsSet = new Set();
-		records.forEach( ( template ) => {
-			authorsSet.add( template.author_text );
-		} );
-		return Array.from( authorsSet ).map( ( author ) => ( {
-			value: author,
-			label: author,
-		} ) );
-	}, [ records ] );
-
+	const postTypeFields = usePostFields( { postType } );
 	const fields = useMemo( () => {
-		const _fields = [ previewField, patternTitleField ];
-
-		if ( postType === PATTERN_TYPES.user ) {
-			_fields.push( patternStatusField );
-		} else if ( postType === TEMPLATE_PART_POST_TYPE ) {
-			_fields.push( {
-				...templatePartAuthorField,
-				elements: authors,
-			} );
-		}
-
-		return _fields;
-	}, [ postType, authors ] );
+		return [ previewField, ...( postTypeFields || [] ) ];
+	}, [ postTypeFields ] );
 
 	const { data, paginationInfo } = useMemo( () => {
 		// Search is managed server-side as well as filters for patterns.

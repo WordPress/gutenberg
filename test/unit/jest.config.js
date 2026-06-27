@@ -62,6 +62,7 @@ module.exports = {
 	testEnvironmentOptions: {
 		url: 'http://localhost/',
 	},
+	testLocationInResults: true,
 	testPathIgnorePatterns: [
 		'/.git/',
 		'/node_modules/',
@@ -95,5 +96,14 @@ module.exports = {
 	reporters: [
 		'default',
 		'<rootDir>packages/scripts/config/jest-github-actions-reporter/index.js',
-	],
+		process.env.CI
+			? [
+					'@flakiness/jest',
+					{
+						flakinessProject: 'WordPress/gutenberg',
+						duplicates: 'rename',
+					},
+			  ]
+			: undefined,
+	].filter( Boolean ),
 };

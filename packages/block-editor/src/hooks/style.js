@@ -19,7 +19,8 @@ import { getCSSRules, compileCSS } from '@wordpress/style-engine';
  */
 import { BACKGROUND_SUPPORT_KEY, BackgroundImagePanel } from './background';
 import { BORDER_SUPPORT_KEY, BorderPanel, SHADOW_SUPPORT_KEY } from './border';
-import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
+import { COLOR_SUPPORT_KEY } from './color';
+import { ElementsEdit } from './elements';
 import {
 	TypographyPanel,
 	TYPOGRAPHY_SUPPORT_KEY,
@@ -851,7 +852,7 @@ function BlockStyleControls( {
 
 	return (
 		<BlockStyleStateProvider value={ selectedState }>
-			<ColorEdit { ...passedProps } />
+			<ElementsEdit { ...passedProps } />
 			<BackgroundImagePanel { ...passedProps } />
 			<TypographyPanel { ...passedProps } />
 			<BorderPanel { ...passedProps } />

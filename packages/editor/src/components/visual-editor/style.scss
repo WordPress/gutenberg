@@ -3,6 +3,7 @@
 .editor-visual-editor {
 	position: relative;
 	display: flex;
+	max-height: 100%;
 
 	// This duplicates the iframe background but it's necessary in some situations
 	// when the iframe doesn't cover the whole canvas
@@ -19,12 +20,18 @@
 	// Centralize the editor horizontally (flex-direction is column).
 	align-items: center;
 
-	&.is-resizable {
-		max-height: 100%;
+	@media (prefers-reduced-motion: no-preference) {
+		transition: padding 0.2s ease-out;
 	}
 
-	&.has-padding {
-		padding: $grid-unit-30 $grid-unit-30 0;
+	&.has-vertical-padding {
+		padding-top: $grid-unit-30;
+		padding-bottom: $grid-unit-30;
+	}
+
+	&.has-horizontal-padding {
+		padding-left: $grid-unit-30;
+		padding-right: $grid-unit-30;
 	}
 
 	// In the iframed canvas this keeps extra scrollbars from appearing (when block toolbars overflow). In the

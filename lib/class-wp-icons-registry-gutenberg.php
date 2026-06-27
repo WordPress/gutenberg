@@ -2,70 +2,29 @@
 
 class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	/**
-	 * Modified to point $manifest_path to Gutenberg packages
+	 * Overridden to skip the parent's core icon registration, which uses the
+	 * core manifest path. Core icons are registered via
+	 * `gutenberg_register_default_icons()` using the Gutenberg manifest instead.
 	 */
-	protected function __construct() {
-		$icons_directory = gutenberg_dir_path() . 'packages/icons/src';
-		$icons_directory = trailingslashit( $icons_directory );
-		$manifest_path   = $icons_directory . 'manifest.php';
-
-		if ( ! is_readable( $manifest_path ) ) {
-			wp_trigger_error(
-				__METHOD__,
-				__( 'Core icon collection manifest is missing or unreadable.', 'gutenberg' )
-			);
-			return;
-		}
-
-		$collection = include $manifest_path;
-
-		if ( empty( $collection ) ) {
-			wp_trigger_error(
-				__METHOD__,
-				__( 'Core icon collection manifest is empty or invalid.', 'gutenberg' )
-			);
-			return;
-		}
-
-		foreach ( $collection as $icon_name => $icon_data ) {
-			if (
-				empty( $icon_data['filePath'] )
-				|| ! is_string( $icon_data['filePath'] )
-			) {
-				_doing_it_wrong(
-					__METHOD__,
-					__( 'Core icon collection manifest must provide valid a "filePath" for each icon.', 'gutenberg' ),
-					'7.0.0'
-				);
-				return;
-			}
-
-			$this->register(
-				'core/' . $icon_name,
-				array(
-					'label'     => $icon_data['label'],
-					'file_path' => $icons_directory . $icon_data['filePath'],
-				)
-			);
-		}
-	}
+	protected function __construct() {}
 
 	/**
 	 * Registers an icon.
 	 *
-	 * @param string $icon_name       Icon name including namespace.
+	 * @param string $icon_name       Namespaced icon name in the form "collection/icon-name"
+	 *                                (e.g. "core/arrow-left").
 	 * @param array  $icon_properties {
 	 *     List of properties for the icon.
 	 *
-	 *     @type string $label    Required. A human-readable label for the icon.
-	 *     @type string $content  Optional. SVG markup for the icon.
-	 *                            If not provided, the content will be retrieved from the `file_path` if set.
-	 *                            If both `content` and `file_path` are not set, the icon will not be registered.
+	 *     @type string $label     Required. A human-readable label for the icon.
+	 *     @type string $content   Optional. SVG markup for the icon.
+	 *                             If not provided, the content will be retrieved from the `file_path` if set.
+	 *                             If both `content` and `file_path` are not set, the icon will not be registered.
 	 *     @type string $file_path Optional. The full path to the file containing the icon content.
 	 * }
 	 * @return bool True if the icon was registered with success and false otherwise.
 	 */
-	protected function register( $icon_name, $icon_properties ) {
+	public function register( $icon_name, $icon_properties ) {
 		if ( ! isset( $icon_name ) || ! is_string( $icon_name ) ) {
 			_doing_it_wrong(
 				__METHOD__,
@@ -75,7 +34,18 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			return false;
 		}
 
-		if ( preg_match( '/[A-Z]/', $icon_name ) ) {
+		if ( false === strpos( $icon_name, '/' ) ) {
+			_doing_it_wrong(
+				__METHOD__,
+				__( 'Icon name must be namespaced in the form "collection/icon-name".', 'gutenberg' ),
+				'7.1.0'
+			);
+			return false;
+		}
+
+		list( $collection, $unqualified_name ) = explode( '/', $icon_name, 2 );
+
+		if ( preg_match( '/[A-Z]/', $unqualified_name ) ) {
 			_doing_it_wrong(
 				__METHOD__,
 				__( 'Icon names must not contain uppercase characters.', 'gutenberg' ),
@@ -84,20 +54,10 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			return false;
 		}
 
-		$name_matcher = '/^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/';
-		if ( ! preg_match( $name_matcher, $icon_name ) ) {
+		if ( ! preg_match( '/^[a-z][a-z0-9-]*$/', $unqualified_name ) ) {
 			_doing_it_wrong(
 				__METHOD__,
-				__( 'Icon names must contain a namespace prefix. Example: my-plugin/my-custom-icon', 'gutenberg' ),
-				'7.1.0'
-			);
-			return false;
-		}
-
-		if ( $this->is_registered( $icon_name ) ) {
-			_doing_it_wrong(
-				__METHOD__,
-				__( 'Icon is already registered.', 'gutenberg' ),
+				__( 'Icon names must start with a lowercase letter and contain only lowercase letters, digits, and hyphens.', 'gutenberg' ),
 				'7.1.0'
 			);
 			return false;
@@ -117,6 +77,19 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				);
 				return false;
 			}
+		}
+
+		if ( ! WP_Icon_Collections_Registry::get_instance()->is_registered( $collection ) ) {
+			_doing_it_wrong(
+				__METHOD__,
+				sprintf(
+					/* translators: %s: Icon collection slug. */
+					__( 'Icon collection "%s" is not registered.', 'gutenberg' ),
+					$collection
+				),
+				'7.1.0'
+			);
+			return false;
 		}
 
 		if ( ! isset( $icon_properties['label'] ) || ! is_string( $icon_properties['label'] ) ) {
@@ -161,28 +134,85 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			}
 		}
 
+		$qualified_name = $collection . '/' . $unqualified_name;
+
+		if ( $this->is_registered( $qualified_name ) ) {
+			_doing_it_wrong(
+				__METHOD__,
+				__( 'Icon is already registered.', 'gutenberg' ),
+				'7.1.0'
+			);
+			return false;
+		}
+
 		$icon = array_merge(
 			$icon_properties,
-			array( 'name' => $icon_name )
+			array(
+				'name'       => $qualified_name,
+				'collection' => $collection,
+			)
 		);
 
-		$this->registered_icons[ $icon_name ] = $icon;
+		$this->registered_icons[ $qualified_name ] = $icon;
 
 		return true;
 	}
 
 	/**
-	 * Redefined to read the icon content from the `file_path` property.
+	 * Unregisters an icon.
+	 *
+	 * @param string $icon_name Namespaced icon name in the form "collection/icon-name"
+	 *                          (e.g. "core/arrow-left").
+	 * @return bool True if the icon was unregistered successfully, else false.
+	 */
+	public function unregister( $icon_name ) {
+		if ( ! $this->is_registered( $icon_name ) ) {
+			_doing_it_wrong(
+				__METHOD__,
+				sprintf(
+					/* translators: %s: Icon name. */
+					__( 'Icon "%s" is not registered.', 'gutenberg' ),
+					$icon_name
+				),
+				'7.1.0'
+			);
+			return false;
+		}
+
+		unset( $this->registered_icons[ $icon_name ] );
+		return true;
+	}
+
+	/**
+	 * Retrieves the content of a registered icon.
+	 *
+	 * Overridden so that the file validation is applied even when the base
+	 * `WP_Icons_Registry` is provided by WordPress core rather than the
+	 * Gutenberg compat shim.
 	 *
 	 * @param string $icon_name Icon name including namespace.
 	 * @return string|null The content of the icon, if found.
 	 */
 	protected function get_content( $icon_name ) {
 		if ( ! isset( $this->registered_icons[ $icon_name ]['content'] ) ) {
-			$content = file_get_contents(
-				$this->registered_icons[ $icon_name ]['file_path']
-			);
-			$content = $this->sanitize_icon_content( $content );
+			$file_path  = $this->registered_icons[ $icon_name ]['file_path'] ?? '';
+			$is_stringy = is_string( $file_path ) || ( is_object( $file_path ) && method_exists( $file_path, '__toString' ) );
+			$icon_path  = $is_stringy ? realpath( (string) $file_path ) : false;
+
+			if (
+				! is_string( $icon_path ) ||
+				! str_ends_with( $icon_path, '.svg' ) ||
+				! is_file( $icon_path ) ||
+				! is_readable( $icon_path )
+			) {
+				wp_trigger_error(
+					__METHOD__,
+					__( 'Icon file is missing or unreadable.', 'gutenberg' )
+				);
+				return null;
+			}
+
+			$content = $this->sanitize_icon_content( file_get_contents( $icon_path ) );
 
 			if ( empty( $content ) ) {
 				wp_trigger_error(
@@ -258,16 +288,6 @@ function gutenberg_override_wp_icons_registry() {
 	// If the original registry was already instantiated, replay any icons outside
 	// the `core/` namespace onto the Gutenberg registry so they are not lost.
 	if ( null !== $original_registry ) {
-		$register_method = new ReflectionMethod( WP_Icons_Registry_Gutenberg::class, 'register' );
-		/*
-		 * ReflectionMethod::setAccessible is:
-		 * - redundant as of 8.1.0, which made all properties accessible
-		 * - deprecated as of 8.5.0
-		 * - needed until 8.1.0, as property `instance` is private
-		 */
-		if ( PHP_VERSION_ID < 80100 ) {
-			$register_method->setAccessible( true );
-		}
 		foreach ( $original_registry->get_registered_icons() as $icon ) {
 			if ( strpos( $icon['name'], 'core/' ) === 0 ) {
 				continue;
@@ -280,7 +300,7 @@ function gutenberg_override_wp_icons_registry() {
 			} else {
 				continue;
 			}
-			$register_method->invoke( $gutenberg_registry, $icon['name'], $icon_properties );
+			$gutenberg_registry->register( $icon['name'], $icon_properties );
 		}
 	}
 	$property->setValue( null, $gutenberg_registry );

@@ -109,8 +109,8 @@
 				}
 			}
 			.dataviews-view-activity__item-type-icon {
-				width: calc(var(--wpds-dimension-base) * 3 - 1px);
-				height: calc(var(--wpds-dimension-base) * 3 - 1px);
+				width: calc(var(--wpds-dimension-size-3xs) - 1px);
+				height: calc(var(--wpds-dimension-size-3xs) - 1px);
 			}
 			.dataviews-view-activity__item-content {
 				margin: var(--wpds-dimension-gap-md) 0;
@@ -126,8 +126,8 @@
 				}
 			}
 			.dataviews-view-activity__item-type-icon {
-				width: calc(var(--wpds-dimension-base) * 6 + 1px);
-				height: calc(var(--wpds-dimension-base) * 6 + 1px);
+				width: calc(var(--wpds-dimension-size-sm) + 1px);
+				height: calc(var(--wpds-dimension-size-sm) + 1px);
 			}
 			.dataviews-view-activity__item-content {
 				margin: var(--wpds-dimension-gap-md) 0;
@@ -144,8 +144,8 @@
 				}
 			}
 			.dataviews-view-activity__item-type-icon {
-				width: calc(var(--wpds-dimension-base) * 8 + 1px);
-				height: calc(var(--wpds-dimension-base) * 8 + 1px);
+				width: calc(var(--wpds-dimension-size-md) + 1px);
+				height: calc(var(--wpds-dimension-size-md) + 1px);
 			}
 			.dataviews-view-activity__item-content {
 				margin: var(--wpds-dimension-gap-sm) 0 var(--wpds-dimension-gap-lg);
@@ -156,8 +156,8 @@
 		&.is-comfortable,
 		&.is-balanced {
 			.dataviews-view-activity__item-bullet {
-				width: calc(var(--wpds-dimension-base) * 2 + 1px);
-				height: calc(var(--wpds-dimension-base) * 2 + 1px);
+				width: calc(var(--wpds-dimension-size-4xs) + 1px);
+				height: calc(var(--wpds-dimension-size-4xs) + 1px);
 				position: relative;
 				top: 50%;
 				transform: translateY(-50%);

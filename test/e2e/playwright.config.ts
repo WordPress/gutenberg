@@ -28,7 +28,10 @@ const config = defineConfig( {
 				[ 'github' ],
 				[ './config/flaky-tests-reporter.ts' ],
 				[ 'blob' ],
-				[ '@flakiness/playwright' ],
+				[
+					'@flakiness/playwright',
+					{ flakinessProject: 'WordPress/gutenberg' },
+				],
 		  ]
 		: 'list',
 	workers: 1,

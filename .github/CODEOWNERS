@@ -45,6 +45,7 @@
 /packages/edit-widgets                          @draganescu @adamziel @kevin940726
 /packages/customize-widgets
 /packages/widgets
+/packages/widget-primitives                     @retrofox
 
 # Full Site Editing
 /packages/edit-site
@@ -90,6 +91,8 @@
 /packages/dataviews                             @oandregal @gigitux @ntsekouras
 /packages/theme                                 @WordPress/gutenberg-components
 /packages/ui                                    @WordPress/gutenberg-components
+/packages/widget-dashboard                      @retrofox
+/packages/grid                                  @retrofox
 
 # Utilities
 /packages/a11y
@@ -127,6 +130,10 @@
 
 # wp-env
 /packages/env                                   @t-hamano
+
+# Widget Dashboard
+/routes/dashboard                               @retrofox
+/lib/experimental/dashboard-widgets             @retrofox
 
 # PHP
 /lib                                            @spacedmonkey
