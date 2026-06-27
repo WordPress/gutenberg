@@ -135,6 +135,26 @@ describe( 'AnimatedGifConvertControl', () => {
 		);
 	} );
 
+	it( 'still recognizes a GIF URL that carries a query string', () => {
+		renderControl( {
+			attributes: {
+				id: 7,
+				url: 'https://example.com/wp-content/uploads/cat.gif?ver=2',
+			},
+			select: makeSelect( { getEntityRecord } ),
+		} );
+
+		expect( getEntityRecord ).toHaveBeenCalledWith(
+			'postType',
+			'attachment',
+			7,
+			{ context: 'view' }
+		);
+		expect(
+			screen.getByRole( 'button', { name: 'Display as video' } )
+		).toBeVisible();
+	} );
+
 	it( 'does not fetch the attachment for a non-GIF image', () => {
 		const { container } = renderControl( {
 			attributes: {

@@ -1458,7 +1458,7 @@ export default function Image( {
 
 	return (
 		<>
-			{ isSingleSelected && (
+			{ isSingleSelected && ! isEditingImage && ! lockUrlControls && (
 				<AnimatedGifConvertControl
 					attributes={ attributes }
 					clientId={ clientId }

@@ -45,9 +45,12 @@ export default function AnimatedGifConvertControl( { attributes, clientId } ) {
 			/*
 			 * Only animated GIFs have a video companion. Gate on the `.gif`
 			 * extension so an ordinary image never triggers an attachment
-			 * REST fetch just to discover it has no companion.
+			 * REST fetch just to discover it has no companion. Strip any
+			 * query string or fragment first so a URL like `cat.gif?ver=2`
+			 * still matches.
 			 */
-			if ( ! url || ! url.toLowerCase().endsWith( '.gif' ) ) {
+			const urlPath = url?.split( /[?#]/ )[ 0 ];
+			if ( ! urlPath?.toLowerCase().endsWith( '.gif' ) ) {
 				return null;
 			}
 			// A gallery only accepts `core/image` children, so swapping the
