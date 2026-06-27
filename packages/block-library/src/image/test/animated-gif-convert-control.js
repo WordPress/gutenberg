@@ -26,8 +26,10 @@ jest.mock( '@wordpress/core-data', () => ( {
 jest.mock( '@wordpress/data', () => ( {
 	useSelect: jest.fn(),
 	useDispatch: jest.fn(),
-	// Passthroughs needed because @wordpress/components transitively pulls in
-	// the rich-text store, which registers via these helpers at import time.
+	/*
+	 * Passthroughs needed because @wordpress/components transitively pulls in
+	 * the rich-text store, which registers via these helpers at import time.
+	 */
 	combineReducers: jest.fn( ( reducers ) => ( state = {}, action ) => {
 		const newState = {};
 		Object.keys( reducers ).forEach( ( key ) => {
@@ -41,8 +43,10 @@ jest.mock( '@wordpress/data', () => ( {
 	register: jest.fn(),
 } ) );
 
-// core/video is not registered in this unit test, so stub createBlock with a
-// lightweight factory that preserves the name and attributes for assertion.
+/*
+ * core/video is not registered in this unit test, so stub createBlock with a
+ * lightweight factory that preserves the name and attributes for assertion.
+ */
 jest.mock( '@wordpress/blocks', () => ( {
 	createBlock: jest.fn( ( name, attributes ) => ( {
 		name,
@@ -97,8 +101,10 @@ describe( 'AnimatedGifConvertControl', () => {
 		useDispatch.mockReturnValue( { replaceBlocks } );
 	} );
 
-	// Renders the control, running the real selector against a controlled
-	// `select` so the gating logic (and any attachment fetch) is exercised.
+	/*
+	 * Renders the control, running the real selector against a controlled
+	 * `select` so the gating logic (and any attachment fetch) is exercised.
+	 */
 	function renderControl( { attributes, select } ) {
 		useSelect.mockImplementation( ( mapSelect ) => mapSelect( select ) );
 		return render(

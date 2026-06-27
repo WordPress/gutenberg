@@ -748,8 +748,10 @@ describe( 'private actions', () => {
 
 			expect( dispatch.addSideloadItem ).toHaveBeenCalledTimes( 1 );
 			const poster = dispatch.addSideloadItem.mock.calls[ 0 ][ 0 ];
-			// Built from the original GIF (captured before finishOperation
-			// swaps in the video) and parented to the GIF attachment.
+			/*
+			 * Built from the original GIF (captured before finishOperation
+			 * swaps in the video) and parented to the GIF attachment.
+			 */
 			expect( poster.file ).toBe( gifFile );
 			expect( poster.parentId ).toBe( 'parent-1' );
 			expect( poster.additionalData ).toEqual(
@@ -879,8 +881,10 @@ describe( 'private actions', () => {
 				settings: { videoOutputFormat: 'video/mp4' },
 			} );
 
-			// Only the video is sideloaded here; the poster is queued later by
-			// the TranscodeGif operation once the conversion succeeds.
+			/*
+			 * Only the video is sideloaded here; the poster is queued later by
+			 * the TranscodeGif operation once the conversion succeeds.
+			 */
 			expect( dispatchFn.addSideloadItem ).toHaveBeenCalledTimes( 1 );
 			const sideload = dispatchFn.addSideloadItem.mock.calls[ 0 ][ 0 ];
 			expect( sideload.file ).toBe( gif );

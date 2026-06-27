@@ -33,9 +33,11 @@ jest.mock( '../utils', () => ( {
 	terminateVipsWorker: jest.fn(),
 } ) );
 
-// actions.ts transitively imports private-actions, which also pulls in
-// convertGifToVideo / isUnsupportedConversionError, so the mock must cover the
-// whole module surface. isUnsupportedConversionError is kept real.
+/*
+ * actions.ts transitively imports private-actions, which also pulls in
+ * convertGifToVideo / isUnsupportedConversionError, so the mock must cover the
+ * whole module surface. isUnsupportedConversionError is kept real.
+ */
 jest.mock( '../utils/video-conversion', () => {
 	const actual = jest.requireActual( '../utils/video-conversion' );
 	return {

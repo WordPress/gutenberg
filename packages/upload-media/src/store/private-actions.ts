@@ -1372,8 +1372,10 @@ export function transcodeGifItem(
 		const outputFormat = args?.outputFormat ?? 'mp4';
 		const outputMimeType = `video/${ outputFormat }`;
 
-		// item.file is the original GIF until finishOperation swaps in the
-		// transcoded video below; capture it for the poster sideload.
+		/*
+		 * item.file is the original GIF until finishOperation swaps in the
+		 * transcoded video below; capture it for the poster sideload.
+		 */
 		const gifFile = item.file;
 
 		try {
@@ -1388,15 +1390,17 @@ export function transcodeGifItem(
 			// already uploaded; no blob URL is needed for any block.
 			dispatch.finishOperation( id, { file } );
 
-			// Only now that the video exists, sideload a static first-frame
-			// poster as a companion (vips decodes just the first GIF frame).
-			// Queued here rather than alongside the video in
-			// generateThumbnails so an unsupported/failed conversion never
-			// leaves an orphaned `animated_video_poster` with no matching
-			// `animated_video`. This sibling is registered while the video's
-			// own Upload op is still pending, so the parent's finalize gate
-			// stays closed until both companions finish. Stored under
-			// metadata `animated_video_poster`.
+			/*
+			 * Only now that the video exists, sideload a static first-frame
+			 * poster as a companion (vips decodes just the first GIF frame).
+			 * Queued here rather than alongside the video in
+			 * generateThumbnails so an unsupported/failed conversion never
+			 * leaves an orphaned `animated_video_poster` with no matching
+			 * `animated_video`. This sibling is registered while the video's
+			 * own Upload op is still pending, so the parent's finalize gate
+			 * stays closed until both companions finish. Stored under
+			 * metadata `animated_video_poster`.
+			 */
 			dispatch.addSideloadItem( {
 				file: gifFile,
 				batchId: uuidv4(),
@@ -1529,10 +1533,12 @@ export function generateThumbnails( id: QueueItemId ) {
 				],
 			} );
 
-			// The static first-frame poster companion is sideloaded by the
-			// TranscodeGif operation once the video conversion succeeds (see
-			// transcodeGifItem), so a failed conversion leaves no orphaned
-			// poster.
+			/*
+			 * The static first-frame poster companion is sideloaded by the
+			 * TranscodeGif operation once the video conversion succeeds (see
+			 * transcodeGifItem), so a failed conversion leaves no orphaned
+			 * poster.
+			 */
 		}
 
 		// Check if image needs rotation.

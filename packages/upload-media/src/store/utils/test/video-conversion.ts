@@ -65,8 +65,10 @@ describe( 'convertGifToVideo', () => {
 			720
 		);
 
-		// The original File (not an ArrayBuffer) is passed straight through so
-		// the worker reads its bytes off the main thread.
+		/*
+		 * The original File (not an ArrayBuffer) is passed straight through so
+		 * the worker reads its bytes off the main thread.
+		 */
 		expect( worker.convertGifToVideo ).toHaveBeenCalledWith(
 			'item-1',
 			gif,

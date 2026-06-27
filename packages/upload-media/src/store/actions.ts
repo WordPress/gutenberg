@@ -204,8 +204,10 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 		// Cancel any ongoing vips operations for this item.
 		await vipsCancelOperations( id );
 
-		// Cancel any ongoing GIF-to-video conversion for this item so a
-		// cancelled upload does not leave the encoder running off-thread.
+		/*
+		 * Cancel any ongoing GIF-to-video conversion for this item so a
+		 * cancelled upload does not leave the encoder running off-thread.
+		 */
 		await cancelGifToVideoOperations( id );
 
 		if ( ! silent ) {

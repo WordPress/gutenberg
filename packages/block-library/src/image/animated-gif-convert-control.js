@@ -37,9 +37,11 @@ export default function AnimatedGifConvertControl( { attributes, clientId } ) {
 			if ( ! id ) {
 				return null;
 			}
-			// Only animated GIFs have a video companion. Gate on the `.gif`
-			// extension so an ordinary image never triggers an attachment
-			// REST fetch just to discover it has no companion.
+			/*
+			 * Only animated GIFs have a video companion. Gate on the `.gif`
+			 * extension so an ordinary image never triggers an attachment
+			 * REST fetch just to discover it has no companion.
+			 */
 			if ( ! url || ! url.toLowerCase().endsWith( '.gif' ) ) {
 				return null;
 			}
