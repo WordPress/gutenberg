@@ -161,6 +161,39 @@ describe( 'cancelGifToVideoOperations', () => {
 			'item-1'
 		);
 	} );
+
+	it( 'delegates a cancel issued while the worker is still loading', async () => {
+		const worker = require( '@wordpress/video-conversion/worker' );
+		worker.convertGifToVideo.mockResolvedValue( new ArrayBuffer( 4 ) );
+		worker.cancelGifToVideoOperations.mockResolvedValue( true );
+
+		const {
+			convertGifToVideo,
+			cancelGifToVideoOperations,
+		} = require( '../video-conversion' );
+
+		/*
+		 * Start a conversion but do NOT await it: the worker module is now
+		 * loading (the import promise is set, the module is not yet resolved).
+		 * A cancel issued in this window must still reach the worker.
+		 */
+		const conversion = convertGifToVideo(
+			'item-1',
+			new File( [ new Uint8Array( [ 0 ] ) ], 'a.gif', {
+				type: 'image/gif',
+			} ),
+			'video/mp4'
+		);
+
+		await expect( cancelGifToVideoOperations( 'item-1' ) ).resolves.toBe(
+			true
+		);
+		expect( worker.cancelGifToVideoOperations ).toHaveBeenCalledWith(
+			'item-1'
+		);
+
+		await conversion;
+	} );
 } );
 
 describe( 'terminateVideoConversionWorker', () => {

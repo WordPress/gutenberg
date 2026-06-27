@@ -62,10 +62,20 @@ function loadVideoConversionModule(): Promise<
 	if ( ! videoConversionModulePromise ) {
 		videoConversionModulePromise = import(
 			'@wordpress/video-conversion/worker'
-		).then( ( mod ) => {
-			videoConversionModule = mod;
-			return mod;
-		} );
+		)
+			.then( ( mod ) => {
+				videoConversionModule = mod;
+				return mod;
+			} )
+			.catch( ( error ) => {
+				/*
+				 * Reset the cached promise so a transient chunk-load failure
+				 * does not permanently break later conversions; the next call
+				 * retries the import.
+				 */
+				videoConversionModulePromise = undefined;
+				throw error;
+			} );
 	}
 	return videoConversionModulePromise;
 }
@@ -106,10 +116,20 @@ export async function convertGifToVideo(
  * @return Whether any operation was cancelled.
  */
 export async function cancelGifToVideoOperations( id: QueueItemId ) {
-	if ( ! videoConversionModule ) {
+	/*
+	 * Resolve the worker even if it is still loading so a cancel issued during
+	 * the initial lazy-load window is not silently dropped (which would let the
+	 * conversion keep running for an item the caller already cancelled).
+	 */
+	const mod =
+		videoConversionModule ??
+		( videoConversionModulePromise
+			? await videoConversionModulePromise.catch( () => undefined )
+			: undefined );
+	if ( ! mod ) {
 		return false;
 	}
-	return videoConversionModule.cancelGifToVideoOperations( id );
+	return mod.cancelGifToVideoOperations( id );
 }
 
 /**
@@ -118,5 +138,16 @@ export async function cancelGifToVideoOperations( id: QueueItemId ) {
 export function terminateVideoConversionWorker(): void {
 	if ( videoConversionModule ) {
 		videoConversionModule.terminateVideoConversionWorker();
+		return;
+	}
+	/*
+	 * The worker is still loading. Terminate it once the import resolves so a
+	 * teardown issued during the lazy-load window is honored rather than
+	 * leaving the worker resident.
+	 */
+	if ( videoConversionModulePromise ) {
+		void videoConversionModulePromise
+			.then( ( mod ) => mod.terminateVideoConversionWorker() )
+			.catch( () => {} );
 	}
 }
