@@ -7,7 +7,6 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { createBlock } from '@wordpress/blocks';
 import {
 	useBlockProps,
 	store as blockEditorStore,
@@ -22,7 +21,8 @@ import { useEffect, useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import TabToolbarControls from '../tab-panel/tab-toolbar-controls';
+import TabToolbarControls from '../tabs/tab-toolbar-controls';
+import useTabActions from '../tabs/use-tab-actions';
 
 const EMPTY_ARRAY = [];
 
@@ -38,41 +38,27 @@ function Edit( {
 	const borderProps = useBorderProps( attributes );
 	const spacingProps = getSpacingClassesAndStyles( attributes );
 
-	const {
-		tabsClientId,
-		tabPanelsClientId,
-		editorActiveTabIndex,
-		activeTabIndex,
-	} = useSelect(
+	const { tabsClientId, editorActiveTabIndex, activeTabIndex } = useSelect(
 		( select ) => {
-			const { getBlockRootClientId, getBlockAttributes, getBlocks } =
+			const { getBlockRootClientId, getBlockAttributes } =
 				select( blockEditorStore );
 
 			const _tabsClientId = getBlockRootClientId( clientId );
 			const tabsAttributes = _tabsClientId
 				? getBlockAttributes( _tabsClientId )
 				: {};
-			const tabPanels = _tabsClientId
-				? getBlocks( _tabsClientId ).find(
-						( block ) => block.name === 'core/tab-panels'
-				  )
-				: undefined;
 
 			return {
 				tabsClientId: _tabsClientId,
-				tabPanelsClientId: tabPanels?.clientId ?? null,
 				editorActiveTabIndex: tabsAttributes?.editorActiveTabIndex,
 				activeTabIndex: tabsAttributes?.activeTabIndex ?? 0,
 			};
 		},
 		[ clientId ]
 	);
-	const {
-		insertBlock,
-		removeBlock,
-		updateBlockAttributes,
-		__unstableMarkNextChangeAsNotPersistent,
-	} = useDispatch( blockEditorStore );
+	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
+	const { insertTab, removeTab } = useTabActions( tabsClientId );
 
 	const effectiveActiveIndex = editorActiveTabIndex ?? activeTabIndex;
 
@@ -90,44 +76,6 @@ function Edit( {
 		if ( tab?.clientId ) {
 			updateBlockAttributes( tab.clientId, { label: newLabel } );
 		}
-	}
-
-	function insertTabAfter( tabIndex ) {
-		if ( ! tabPanelsClientId ) {
-			return;
-		}
-
-		const newIndex = tabIndex + 1;
-		insertBlock(
-			createBlock( 'core/tab-panel', { label: __( 'Tab' ) } ),
-			newIndex,
-			tabPanelsClientId,
-			false
-		);
-
-		// Switch editor active tab to the new tab.
-		__unstableMarkNextChangeAsNotPersistent();
-		updateBlockAttributes( tabsClientId, {
-			editorActiveTabIndex: newIndex,
-		} );
-	}
-
-	function removeTab( tabIndex ) {
-		const tab = tabsList[ tabIndex ];
-		if ( ! tab?.clientId || tabsList.length <= 1 ) {
-			return;
-		}
-
-		// Calculate new active index after removal.
-		const newActiveIndex =
-			tabIndex >= tabsList.length - 1 ? tabsList.length - 2 : tabIndex;
-
-		// Switch editor to the adjacent tab and remove the current one.
-		__unstableMarkNextChangeAsNotPersistent();
-		updateBlockAttributes( tabsClientId, {
-			editorActiveTabIndex: newActiveIndex,
-		} );
-		removeBlock( tab.clientId, false );
 	}
 
 	const menuRef = useRef();
@@ -208,7 +156,7 @@ function Edit( {
 									handleLabelChange( index, newLabel )
 								}
 								__unstableOnSplitAtEnd={ () =>
-									insertTabAfter( index )
+									insertTab( index + 1 )
 								}
 								onRemove={ () => removeTab( index ) }
 							/>
