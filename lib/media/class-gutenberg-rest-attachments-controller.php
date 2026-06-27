@@ -157,7 +157,8 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 										'minimum' => 1,
 									),
 									'file'           => array(
-										'type' => 'string',
+										'type'      => 'string',
+										'minLength' => 1,
 									),
 									'mime_type'      => array(
 										'type'    => 'string',
@@ -168,7 +169,8 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 										'minimum' => 1,
 									),
 									'original_image' => array(
-										'type' => 'string',
+										'type'      => 'string',
+										'minLength' => 1,
 									),
 								),
 							),
@@ -503,7 +505,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 				continue;
 			}
 
-			if ( 'original' === $image_size ) {
+			if ( 'original' === $image_size && isset( $sub_size['file'] ) ) {
 				$metadata['original_image'] = $sub_size['file'];
 			} elseif ( self::IMAGE_SIZE_SOURCE_ORIGINAL === $image_size ) {
 				// Source-format original: stored under its own meta key so the
