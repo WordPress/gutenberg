@@ -1680,6 +1680,43 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	}
 
 	/**
+	 * Verifies that the REST-specific rest_after_insert_attachment action fires on
+	 * the URL sideload path, for parity with the uploaded-file path.
+	 *
+	 * @covers ::create_item
+	 * @covers ::create_item_from_url
+	 */
+	public function test_create_item_from_url_fires_rest_after_insert_attachment() {
+		wp_set_current_user( self::$admin_id );
+
+		$fired = array();
+		$spy   = static function ( $attachment, $request, $creating ) use ( &$fired ) {
+			$fired = array(
+				'id'       => $attachment->ID,
+				'creating' => $creating,
+			);
+		};
+
+		add_filter( 'pre_http_request', array( $this, 'mock_image_download' ), 10, 3 );
+		add_action( 'rest_after_insert_attachment', $spy, 10, 3 );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_param( 'url', 'https://example.com/hooked.jpg' );
+		$request->set_param( 'generate_sub_sizes', false );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		remove_action( 'rest_after_insert_attachment', $spy, 10 );
+		remove_filter( 'pre_http_request', array( $this, 'mock_image_download' ), 10 );
+
+		$data = $response->get_data();
+
+		$this->assertSame( 201, $response->get_status() );
+		$this->assertSame( $data['id'], $fired['id'] ?? null, 'rest_after_insert_attachment should fire with the new attachment.' );
+		$this->assertTrue( $fired['creating'] ?? null, 'rest_after_insert_attachment should report creating=true.' );
+	}
+
+	/**
 	 * Verifies that a sideloaded external image is attached to the post passed in
 	 * the `post` parameter.
 	 *

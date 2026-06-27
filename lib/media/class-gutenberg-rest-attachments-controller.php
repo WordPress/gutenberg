@@ -536,8 +536,21 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			return $attachment_id;
 		}
 
+		$attachment = get_post( $attachment_id );
+
 		$request->set_param( 'context', 'edit' );
-		$response = $this->prepare_item_for_response( get_post( $attachment_id ), $request );
+
+		/*
+		 * media_handle_sideload() fires the standard insert hooks (including
+		 * wp_after_insert_post), but not the REST-specific action, so fire it
+		 * here for parity with the uploaded-file path in create_item().
+		 *
+		 * This action is documented in
+		 * wp-includes/rest-api/endpoints/class-wp-rest-attachments-controller.php
+		 */
+		do_action( 'rest_after_insert_attachment', $attachment, $request, true );
+
+		$response = $this->prepare_item_for_response( $attachment, $request );
 		$response->set_status( 201 );
 		$response->header( 'Location', rest_url( rest_get_route_for_post( $attachment_id ) ) );
 
