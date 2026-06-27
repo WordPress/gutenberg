@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import {
-	Icon,
+	Icon as WCIcon,
 	Button,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -130,7 +130,10 @@ export default function PostCardPanel( {
 				className="editor-post-card-panel__header"
 				alignment="flex-start"
 			>
-				<Icon className="editor-post-card-panel__icon" icon={ icon } />
+				<WCIcon
+					className="editor-post-card-panel__icon"
+					icon={ icon }
+				/>
 				<WCText
 					numberOfLines={ 2 }
 					truncate
@@ -165,7 +168,7 @@ export default function PostCardPanel( {
 					{ sprintf(
 						// translators: %s: Name of the plural post type e.g: "Posts".
 						__( 'Changes will be applied to all selected %s.' ),
-						labels?.name.toLowerCase()
+						labels?.name?.toLowerCase()
 					) }
 				</WCText>
 			) }

@@ -277,19 +277,17 @@ export function renderingMode( state = 'post-only', action ) {
 }
 
 /**
- * Reducer returning the editing canvas device type.
+ * Reducer for the canvas width.
  *
- * @param {Object} state  Current state.
+ * @param {number} state  Current state.
  * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
+ * @return {number} Updated state.
  */
-export function deviceType( state = 'Desktop', action ) {
+export function canvasWidth( state = undefined, action ) {
 	switch ( action.type ) {
-		case 'SET_DEVICE_TYPE':
-			return action.deviceType;
+		case 'SET_CANVAS_WIDTH':
+			return action.width;
 	}
-
 	return state;
 }
 
@@ -435,6 +433,26 @@ export function revisionId( state = null, action ) {
 }
 
 /**
+ * Reducer for the current revisions page number.
+ *
+ * @param {number} state  Current page number.
+ * @param {Object} action Dispatched action.
+ * @return {number} Updated state.
+ */
+export function revisionPage( state = 1, action ) {
+	switch ( action.type ) {
+		case 'SET_REVISION_PAGE':
+			return action.page;
+		case 'SET_CURRENT_REVISION_ID':
+			if ( ! action.revisionId ) {
+				return 1;
+			}
+			return state;
+	}
+	return state;
+}
+
+/**
  * Reducer for whether the revision diff is shown.
  * Resets to true when entering/exiting revisions mode.
  *
@@ -480,7 +498,7 @@ export default combineReducers( {
 	editorSettings,
 	postAutosavingLock,
 	renderingMode,
-	deviceType,
+	canvasWidth,
 	removedPanels,
 	blockInserterPanel,
 	inserterSidebarToggleRef,
@@ -490,6 +508,7 @@ export default combineReducers( {
 	stylesPath,
 	showStylebook,
 	revisionId,
+	revisionPage,
 	showRevisionDiff,
 	selectedNote,
 	dataviews: dataviewsReducer,

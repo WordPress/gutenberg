@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/base-styles",
-	"version": "6.20.0",
+	"version": "10.1.0",
 	"description": "Base SCSS utilities and variables for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -33,7 +33,6 @@
 		"./animations": "./_animations.scss",
 		"./breakpoints": "./_breakpoints.scss",
 		"./colors": "./_colors.scss",
-		"./colors.native": "./_colors.native.scss",
 		"./default-custom-properties": "./_default-custom-properties.scss",
 		"./functions": "./_functions.scss",
 		"./long-content-fade": "./_long-content-fade.scss",
@@ -42,6 +41,12 @@
 		"./z-index": "./_z-index.scss"
 	},
 	"wpScript": true,
+	"dependencies": {
+		"@wordpress/theme": "file:../theme"
+	},
+	"devDependencies": {
+		"@wordpress/stylelint-tools": "file:../../tools/stylelint"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

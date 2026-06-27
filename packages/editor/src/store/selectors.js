@@ -11,7 +11,6 @@ import { isInTheFuture, getDate } from '@wordpress/date';
 import { addQueryArgs, cleanForSlug } from '@wordpress/url';
 import { createSelector, createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
-import { Platform } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -30,6 +29,7 @@ import { getPostRawValue } from './reducer';
 import { getTemplatePartIcon } from '../utils/get-template-part-icon';
 import { unlock } from '../lock-unlock';
 import { getTemplateInfo } from '../utils/get-template-info';
+import { getDeviceTypeByCanvasWidth } from '../utils/device-type';
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid
@@ -524,8 +524,7 @@ export function isEditedPostSaveable( state ) {
 	return (
 		!! getEditedPostAttribute( state, 'title' ) ||
 		!! getEditedPostAttribute( state, 'excerpt' ) ||
-		! isEditedPostEmpty( state ) ||
-		Platform.OS === 'native'
+		! isEditedPostEmpty( state )
 	);
 }
 
@@ -1253,6 +1252,12 @@ export const isEditorPanelOpened = createRegistrySelector(
 /**
  * A block selection object.
  *
+ * This type is duplicated to avoid creating circular dependencies.
+ *
+ * @see {import("@wordpress/block-editor/src/store/actions").WPBlockSelection}
+ * @see {import("@wordpress/block-editor/src/store/selectors").WPBlockSelection}
+ * @see {import("@wordpress/core-data/src/types").WPBlockSelection}
+ *
  * @typedef {Object} WPBlockSelection
  *
  * @property {string} clientId     A block client ID.
@@ -1348,7 +1353,8 @@ export const getDeviceType = createRegistrySelector(
 		if ( isZoomOut ) {
 			return 'Desktop';
 		}
-		return state.deviceType;
+		const canvasWidth = state.canvasWidth;
+		return getDeviceTypeByCanvasWidth( canvasWidth );
 	}
 );
 
@@ -1879,27 +1885,3 @@ export const getPostTypeLabel = createRegistrySelector(
 export function isPublishSidebarOpened( state ) {
 	return state.publishSidebarActive;
 }
-
-/**
- * Returns whether the collaboration is enabled for the current post.
- *
- * @return {boolean} Whether collaboration is enabled.
- */
-export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
-	( select ) => ( state ) => {
-		// Return early, if collaboration is not supported.
-		if ( ! unlock( select( coreStore ) ).isCollaborationSupported() ) {
-			return false;
-		}
-
-		const currentPostType = getCurrentPostType( state );
-		const entityConfig = select( coreStore ).getEntityConfig(
-			'postType',
-			currentPostType
-		);
-
-		return Boolean(
-			entityConfig?.syncConfig && window._wpCollaborationEnabled
-		);
-	}
-);

@@ -1,0 +1,43 @@
+.grid {
+	/* stylelint-disable-next-line property-no-unknown -- container queries for the dashboard grid surface */
+	container-type: inline-size;
+	container-name: widget-dashboard;
+	width: 100%;
+	/* Placeholder and drag-preview radii: match `.tile` and `@wordpress/ui` Card (`--wpds-border-radius-lg`). */
+	--wp-grid-placeholder-radius: var(--wpds-border-radius-lg);
+	--wp-grid-drag-preview-radius: var(--wpds-border-radius-lg);
+}
+
+.tile {
+	height: 100%;
+	border-radius: var(--wpds-border-radius-lg);
+}
+
+/*
+ * Edit-mode tiles stay at resting elevation (`xs`) on hover; only the
+ * drag preview (`.drag-preview-frame` on `@wordpress/grid`) lifts to `md`.
+ */
+.tileEditMode {
+	box-shadow: var(--wpds-elevation-xs);
+}
+
+.tileEditMode:focus-visible {
+	outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
+	outline-offset: 2px;
+}
+
+/*
+ * Wrapper applied through `renderDragPreview` on @wordpress/grid.
+ * `height: 100%` keeps the inner `.tile` height: 100% chain alive
+ * (without it, the wrapper auto-sizes and the cloned tile collapses
+ * to content height). Drag elevation is owned by the grid
+ * `.drag-preview-frame` (`md` while dragging); strip the cloned tile shadow so it
+ * does not stack on the frame.
+ */
+.dragPreview {
+	height: 100%;
+}
+
+.dragPreview .tile {
+	box-shadow: none;
+}

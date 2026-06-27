@@ -3,16 +3,16 @@
  * Plugin Name: Gutenberg
  * Plugin URI: https://github.com/WordPress/gutenberg
  * Description: Printing since 1440. This is the development plugin for the block editor, site editor, and other future WordPress core functionality.
- * Requires at least: 6.8
+ * Requires at least: 6.9
  * Requires PHP: 7.4
- * Version: 23.0.1
+ * Version: 23.5.0-rc.2
  * Author: Gutenberg Team
  * Text Domain: gutenberg
  *
  * @package gutenberg
  */
 
-defined( 'GUTENBERG_MINIMUM_WP_VERSION' ) or define( 'GUTENBERG_MINIMUM_WP_VERSION', '6.8' );
+defined( 'GUTENBERG_MINIMUM_WP_VERSION' ) or define( 'GUTENBERG_MINIMUM_WP_VERSION', '6.9' );
 
 gutenberg_pre_init();
 
@@ -27,7 +27,7 @@ function gutenberg_wordpress_version_notice() {
 	printf( __( 'Gutenberg requires WordPress %s or later to function properly. Please upgrade WordPress before activating Gutenberg.', 'gutenberg' ), GUTENBERG_MINIMUM_WP_VERSION );
 	echo '</p></div>';
 
-	deactivate_plugins( array( 'gutenberg/gutenberg.php' ) );
+	deactivate_plugins( array( plugin_basename( __FILE__ ) ) );
 }
 
 /**

@@ -17,7 +17,18 @@ export const Content = forwardRef< HTMLDivElement, ContentProps >(
 		return (
 			<Collapsible.Panel
 				ref={ ref }
-				className={ clsx( styles.content, className ) }
+				// @ts-expect-error Base UI supports the callback-style
+				// version of the `className` prop, but we're purposefully
+				// not advertising it in our `@wordpress/ui` re-export.
+				className={ ( state ) =>
+					clsx(
+						styles.content,
+						state.open &&
+							state.transitionStatus === 'idle' &&
+							styles[ 'overflow-visible' ],
+						className
+					)
+				}
 				hiddenUntilFound={ hiddenUntilFound }
 				{ ...restProps }
 			>

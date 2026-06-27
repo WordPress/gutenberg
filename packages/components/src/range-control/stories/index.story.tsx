@@ -35,7 +35,6 @@ const meta: Meta< typeof RangeControl > = {
 		},
 		color: { control: { type: 'color' } },
 		help: { control: { type: 'text' } },
-		icon: { control: false },
 		marks: { control: { type: 'object' } },
 		onBlur: { control: false },
 		onChange: { control: false },
@@ -59,7 +58,7 @@ const meta: Meta< typeof RangeControl > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 			notes: 'Will be superseded by `SliderControl` in `@wordpress/ui`, but continue using for now.',
 		},

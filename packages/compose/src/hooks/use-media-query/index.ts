@@ -1,45 +1,72 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useSyncExternalStore } from '@wordpress/element';
+import { useSyncExternalStore } from '@wordpress/element';
 
-type MQLCache = Map< string, MediaQueryList >;
+type MQLSubscriber = {
+	subscribe: ( onStoreChange: () => void ) => () => void;
+	getValue: () => boolean;
+};
 
-const perWindowCache = new WeakMap< Window, MQLCache >();
+// One subscriber per (window, query). The underlying MediaQueryList lives
+// inside the subscriber's closure; a single `change` listener fans out to
+// every React consumer via an in-JS `Set` to avoid the per-consumer
+// `addEventListener` cost (~85 ms during a large-post editor mount).
+const perWindowCache = new WeakMap< Window, Map< string, MQLSubscriber > >();
 
-/**
- * A new MediaQueryList object for the media query
- *
- * @param view    Window.
- * @param [query] Media Query.
- */
-function getMediaQueryList(
-	view: Window,
+const EMPTY_SUBSCRIBER: MQLSubscriber = {
+	subscribe: () => () => {},
+	getValue: () => false,
+};
+
+function getMQLSubscriber(
+	view: Window | undefined,
 	query?: string
-): MediaQueryList | null {
-	if ( ! query ) {
-		return null;
+): MQLSubscriber {
+	if ( ! view || ! query || typeof view.matchMedia !== 'function' ) {
+		return EMPTY_SUBSCRIBER;
 	}
 
-	const matchMediaCache: MQLCache = perWindowCache.get( view ) ?? new Map();
-
-	if ( ! perWindowCache.has( view ) ) {
-		perWindowCache.set( view, matchMediaCache );
+	let queryCache = perWindowCache.get( view );
+	if ( ! queryCache ) {
+		queryCache = new Map();
+		perWindowCache.set( view, queryCache );
 	}
 
-	let match = matchMediaCache.get( query );
-
-	if ( match ) {
-		return match;
+	const cached = queryCache.get( query );
+	if ( cached ) {
+		return cached;
 	}
 
-	if ( typeof view?.matchMedia === 'function' ) {
-		match = view.matchMedia( query );
-		matchMediaCache.set( query, match );
-		return match;
-	}
+	const mediaQueryList = view.matchMedia( query );
+	const listeners = new Set< () => void >();
+	const notify = () => {
+		for ( const listener of listeners ) {
+			listener();
+		}
+	};
 
-	return null;
+	const subscriber: MQLSubscriber = {
+		subscribe( onStoreChange ) {
+			if ( listeners.size === 0 ) {
+				// Avoid a fatal error when browsers don't support `addEventListener` on MediaQueryList.
+				mediaQueryList.addEventListener?.( 'change', notify );
+			}
+			listeners.add( onStoreChange );
+			return () => {
+				listeners.delete( onStoreChange );
+				if ( listeners.size === 0 ) {
+					mediaQueryList.removeEventListener?.( 'change', notify );
+				}
+			};
+		},
+		getValue() {
+			return mediaQueryList.matches;
+		},
+	};
+
+	queryCache.set( query, subscriber );
+	return subscriber;
 }
 
 /**
@@ -51,31 +78,13 @@ function getMediaQueryList(
  */
 export default function useMediaQuery(
 	query?: string,
-	view: Window = window
+	// Resolve the default lazily so SSR (where `window` is undeclared) does not
+	// throw a ReferenceError when this default expression is evaluated.
+	view: Window | undefined = typeof window !== 'undefined'
+		? window
+		: undefined
 ): boolean {
-	const source = useMemo( () => {
-		const mediaQueryList = getMediaQueryList( view, query );
-
-		return {
-			subscribe( onStoreChange: any ) {
-				if ( ! mediaQueryList ) {
-					return () => {};
-				}
-
-				// Avoid a fatal error when browsers don't support `addEventListener` on MediaQueryList.
-				mediaQueryList.addEventListener?.( 'change', onStoreChange );
-				return () => {
-					mediaQueryList.removeEventListener?.(
-						'change',
-						onStoreChange
-					);
-				};
-			},
-			getValue() {
-				return mediaQueryList?.matches ?? false;
-			},
-		};
-	}, [ view, query ] );
+	const source = getMQLSubscriber( view, query );
 
 	return useSyncExternalStore(
 		source.subscribe,

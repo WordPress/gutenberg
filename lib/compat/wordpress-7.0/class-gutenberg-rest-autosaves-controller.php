@@ -73,44 +73,52 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 			require_once ABSPATH . 'wp-admin/includes/post.php';
 		}
 
-		$post_lock = wp_check_post_lock( $post->ID );
-		$is_draft  = 'draft' === $post->post_status || 'auto-draft' === $post->post_status;
-
-		/**
-		 * In the context of real-time collaboration, all peers are effectively
-		 * authors and we don't want to vary behavior based on whether they are the
-		 * original author. Always target an autosave revision.
-		 *
-		 * This avoids the following issue when real-time collaboration is enabled:
-		 *
-		 * - Autosaves from the original author (if they have the post lock) will
-		 *   target the saved post.
-		 *
-		 * - Autosaves from other users are applied to a post revision.
-		 *
-		 * - If any user reloads a post, they load changes from the author's autosave.
-		 *
-		 * - The saved post has now diverged from the persisted CRDT document. The
-		 *   content (and/or title or excerpt) are now "ahead" of the persisted CRDT
-		 *   document.
-		 *
-		 * - When the persisted CRDT document is loaded, a diff is computed against
-		 *   the saved post. This diff is then applied to the in-memory CRDT
-		 *   document, which can lead to duplicate inserts or deletions.
-		 *
-		 * Load the real-time collaboration setting and, when enabled, ensure that an
-		 * an autosave revision is always targeted.
-		 */
+		$post_lock_is_active      = wp_check_post_lock( $post->ID );
+		$is_auto_draft            = 'auto-draft' === $post->post_status;
+		$is_draft                 = 'draft' === $post->post_status || $is_auto_draft;
 		$is_collaboration_enabled = wp_is_collaboration_enabled();
 
-		if ( $is_draft && (int) $post->post_author === $user_id && ! $post_lock && ! $is_collaboration_enabled ) {
-			/*
-			 * Draft posts for the same author: autosaving updates the post and does not create a revision.
-			 * Convert the post object to an array and add slashes, wp_update_post() expects escaped array.
-			 */
+		/*
+		 * When a post is still in draft form, updates from the author can directly update the post.
+		 * Other autosaves must be stored as per-user autosave revisions.
+		 *
+		 * When RTC is active, however, regular draft autosaves must not update the parent post directly.
+		 * Since all peers are sharing a persisted editing state (a shared CRDT), it’s important that
+		 * they all store updates in a revision. If edits were applied to the post, then upon the next
+		 * editor reload, it would appear as though the post had been updated externally, and those same
+		 * changes would be re-applied to the CRDT, duplicating the edits.
+		 *
+		 * The one caveat for RTC is that the first peer to store an edit must promote an auto-draft
+		 * into a real draft post. If this doesn’t happen then the peers may continue to make edits
+		 * but the draft will be lost, as auto-drafts are not listed in post views.
+		 */
+		$can_update_author_draft_post = (
+			$is_draft &&
+			(int) $post->post_author === $user_id &&
+			! $is_collaboration_enabled
+		);
+		$can_promote_auto_draft_post  = (
+			$is_auto_draft &&
+			$is_collaboration_enabled &&
+			current_user_can( 'edit_post', $post->ID )
+		);
+
+		$should_update_parent_draft_post = (
+			$can_promote_auto_draft_post ||
+			( ! $post_lock_is_active && $can_update_author_draft_post )
+		);
+
+		if ( $should_update_parent_draft_post ) {
 			$autosave_id = wp_update_post( wp_slash( (array) $prepared_post ), true );
+		} elseif ( $this->is_redundant_autosave( $post, (array) $prepared_post, (array) $request->get_param( 'meta' ), $user_id ) ) {
+			/*
+			 * Nothing changed and there is no existing autosave to update, so
+			 * storing a revision would only create one that is identical to the
+			 * post. Avoid a no-op revision because WordPress decides whether to warn
+			 * about "a more recent autosave" by comparing timestamps.
+			 */
+			$autosave_id = $post->ID;
 		} else {
-			// Non-draft posts: create or update the post autosave. Pass the meta data.
 			$autosave_id = $this->create_post_autosave( (array) $prepared_post, (array) $request->get_param( 'meta' ) );
 		}
 
@@ -125,5 +133,60 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 		$response = rest_ensure_response( $response );
 
 		return $response;
+	}
+
+	/**
+	 * Determines whether an incoming autosave would be a redundant no-op.
+	 *
+	 * Core's WP_REST_Autosaves_Controller::create_post_autosave() already avoids
+	 * a redundant write, but only when an autosave already exists for the user.
+	 * When none exists yet, it still creates a brand-new revision even if that
+	 * revision is identical to the parent post.
+	 *
+	 * The revisioned post fields (title, content, excerpt) and revisioned meta
+	 * (e.g. `footnotes`) are compared, matching the fields core itself diffs.
+	 * Revisioned meta matters because some edits live only in meta: changing a
+	 * footnote's text leaves the post content untouched, and previewing those
+	 * changes depends on the autosave carrying the new meta, so it must not be
+	 * skipped. Non-revisioned meta (e.g. the constantly changing `_crdt_document`)
+	 * is naturally excluded because it is not a revisioned meta key.
+	 *
+	 * @since 7.0.0
+	 *
+	 * @param WP_Post $post      The saved parent post.
+	 * @param array   $post_data Prepared autosave post data.
+	 * @param array   $meta      Meta values submitted with the autosave.
+	 * @param int     $user_id   The current user ID.
+	 * @return bool Whether the autosave can be skipped without losing anything.
+	 */
+	private function is_redundant_autosave( $post, $post_data, $meta, $user_id ) {
+		// Core already returns the existing autosave unchanged when nothing
+		// differs, so only the first autosave needs guarding here.
+		if ( wp_get_post_autosave( $post->ID, $user_id ) ) {
+			return false;
+		}
+
+		$new_autosave    = _wp_post_revision_data( $post_data, true );
+		$revision_fields = _wp_post_revision_fields( $post );
+
+		foreach ( array_intersect( array_keys( $new_autosave ), array_keys( $revision_fields ) ) as $field ) {
+			if ( normalize_whitespace( $new_autosave[ $field ] ) !== normalize_whitespace( $post->$field ) ) {
+				return false;
+			}
+		}
+
+		foreach ( wp_post_revision_meta_keys( $post->post_type ) as $meta_key ) {
+			// get_metadata_raw avoids the registered default. Treat an unset value
+			// and an empty string as equivalent so the editor's empty default for
+			// an unset key is not mistaken for a change.
+			$old_meta = get_metadata_raw( 'post', $post->ID, $meta_key, true ) ?? '';
+			$new_meta = $meta[ $meta_key ] ?? '';
+
+			if ( $old_meta !== $new_meta ) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 }

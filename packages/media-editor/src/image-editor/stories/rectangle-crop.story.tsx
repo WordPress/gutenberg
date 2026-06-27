@@ -29,14 +29,14 @@ import {
  * Internal dependencies
  */
 import { Cropper } from '../react/components/cropper';
-import { useCropperState } from '../react/hooks/use-cropper-state';
+import { useCropperReducer } from '../react/hooks/use-cropper-reducer';
 import {
-	MIN_ZOOM,
 	MAX_ZOOM,
 	MAX_ROTATION_OFFSET,
 	DEFAULT_ASPECT_RATIOS,
 	ORIGINAL_ASPECT_RATIO,
 } from '../core/constants';
+import { getMinZoom, restrictPanZoom } from '../core/containment';
 import {
 	loadImage,
 	renderToCanvas,
@@ -50,11 +50,18 @@ import {
 	getImageFit,
 	getVisibleBounds,
 } from '../core/camera';
-import { restrictPanZoom } from '../core/containment';
 import { getSourceRegion } from '../core/source-region';
 import './style.css';
 
 const SAMPLE_IMAGE = 'image-editor-demo.jpeg';
+
+const GRID_MODES = {
+	off: false,
+	on: true,
+	interactive: 'interactive',
+} as const;
+
+type GridMode = keyof typeof GRID_MODES;
 
 const IMAGE_CREDIT = (
 	<p style={ { fontSize: 10, color: '#aaa', margin: '4px 0 0' } }>
@@ -135,7 +142,7 @@ type Story = StoryObj< typeof Cropper >;
  * Default story. Basic cropper with a sample image, no controls.
  */
 const DefaultComponent = () => {
-	const controller = useCropperState();
+	const controller = useCropperReducer();
 
 	return (
 		<div>
@@ -159,7 +166,7 @@ export const Default: Story = {
  * Full interactive demo with controls.
  */
 const WithControlsComponent = () => {
-	const controller = useCropperState();
+	const controller = useCropperReducer();
 	const {
 		state,
 		setRotation,
@@ -173,6 +180,7 @@ const WithControlsComponent = () => {
 
 	const [ aspectRatioValue, setAspectRatioValue ] = useState( '0' );
 	const [ freeformCrop, setFreeformCrop ] = useState( false );
+	const [ gridMode, setGridMode ] = useState< GridMode >( 'interactive' );
 	const { src, isCustom, handleFileChange, resetToSample } =
 		useUploadableImage();
 	const fileInputRef = useRef< HTMLInputElement >( null );
@@ -388,7 +396,6 @@ const WithControlsComponent = () => {
 					<FlexItem>
 						<SelectControl
 							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label="Aspect ratio"
 							hideLabelFromVision
 							value={ aspectRatioValue }
@@ -403,10 +410,28 @@ const WithControlsComponent = () => {
 					</FlexItem>
 					<FlexItem>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label="Freeform"
 							checked={ freeformCrop }
 							onChange={ setFreeformCrop }
+						/>
+					</FlexItem>
+					<FlexItem>
+						<SelectControl
+							__next40pxDefaultSize
+							label="Grid"
+							hideLabelFromVision
+							value={ gridMode }
+							onChange={ ( value ) =>
+								setGridMode( value as GridMode )
+							}
+							options={ [
+								{ label: 'Grid: off', value: 'off' },
+								{ label: 'Grid: always on', value: 'on' },
+								{
+									label: 'Grid: interactive',
+									value: 'interactive',
+								},
+							] }
 						/>
 					</FlexItem>
 					<FlexItem isBlock />
@@ -426,7 +451,6 @@ const WithControlsComponent = () => {
 				<div className="image-editor-story__sliders">
 					<RangeControl
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label="Fine rotation"
 						min={ -MAX_ROTATION_OFFSET }
 						max={ MAX_ROTATION_OFFSET }
@@ -436,9 +460,8 @@ const WithControlsComponent = () => {
 					/>
 					<RangeControl
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label="Zoom"
-						min={ MIN_ZOOM }
+						min={ getMinZoom( state ) }
 						max={ MAX_ZOOM }
 						step={ 0.1 }
 						value={ state.zoom }
@@ -451,7 +474,7 @@ const WithControlsComponent = () => {
 				<Cropper
 					src={ src }
 					controller={ controller }
-					showGrid
+					showGrid={ GRID_MODES[ gridMode ] }
 					showDimming
 					freeformCrop={ freeformCrop }
 					aspectRatio={ resolveAspectRatio(
@@ -516,7 +539,7 @@ export const WithControls: Story = {
  * or verify the camera and render paths agree.
  */
 const DebugComponent = () => {
-	const controller = useCropperState();
+	const controller = useCropperReducer();
 	const {
 		state,
 		setRotation,
@@ -788,7 +811,6 @@ const DebugComponent = () => {
 					</FlexItem>
 					<FlexItem>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label="Freeform"
 							checked={ freeformCrop }
 							onChange={ setFreeformCrop }
@@ -810,7 +832,6 @@ const DebugComponent = () => {
 					<FlexItem>
 						<SelectControl
 							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label="Format"
 							hideLabelFromVision
 							value={ exportFormat as 'image/jpeg' }
@@ -846,7 +867,6 @@ const DebugComponent = () => {
 				<div className="image-editor-story__sliders">
 					<RangeControl
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label="Fine rotation"
 						min={ -MAX_ROTATION_OFFSET }
 						max={ MAX_ROTATION_OFFSET }
@@ -856,9 +876,8 @@ const DebugComponent = () => {
 					/>
 					<RangeControl
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label="Zoom"
-						min={ MIN_ZOOM }
+						min={ getMinZoom( state ) }
 						max={ MAX_ZOOM }
 						step={ 0.1 }
 						value={ state.zoom }

@@ -4,7 +4,7 @@
 const path = require( 'path' );
 const fs = require( 'fs/promises' );
 const os = require( 'os' );
-const { v4: uuid } = require( 'uuid' );
+const { randomUUID } = require( 'crypto' );
 
 /** @typedef {import('@playwright/test').Page} Page */
 
@@ -18,6 +18,13 @@ test.use( {
 		await use( new CoverBlockUtils( { page } ) );
 	},
 } );
+
+async function openStylesTabIfAvailable( editorSettings ) {
+	const stylesTab = editorSettings.getByRole( 'tab', { name: 'Styles' } );
+	if ( await stylesTab.count() ) {
+		await stylesTab.click();
+	}
+}
 
 test.describe( 'Cover', () => {
 	test.beforeEach( async ( { admin } ) => {
@@ -134,7 +141,7 @@ test.describe( 'Cover', () => {
 			const editorSettings = page.getByRole( 'region', {
 				name: 'Editor settings',
 			} );
-			await editorSettings.getByRole( 'tab', { name: 'Styles' } ).click();
+			await openStylesTabIfAvailable( editorSettings );
 			await editorSettings
 				.getByRole( 'button', { name: 'Overlay' } )
 				.click();
@@ -231,13 +238,12 @@ test.describe( 'Cover', () => {
 			.getByRole( 'link', { name: 'Cover' } )
 			.click();
 
-		// In the Block Editor Settings panel, click on the Styles subpanel.
+		// In the Block Editor Settings panel, click on the Styles subpanel if
+		// the selected block has more than one inspector tab.
 		const coverBlockEditorSettings = page.getByRole( 'region', {
 			name: 'Editor settings',
 		} );
-		await coverBlockEditorSettings
-			.getByRole( 'tab', { name: 'Styles' } )
-			.click();
+		await openStylesTabIfAvailable( coverBlockEditorSettings );
 
 		// Ensure there the default value for the minimum height of cover is undefined.
 		await expect(
@@ -251,6 +257,10 @@ test.describe( 'Cover', () => {
 			'.components-resizable-box__handle-bottom'
 		);
 
+		// Ensure the resize handle is in view before measuring its bounding box,
+		// so the cached coordinates match the actual position during the drag.
+		await coverBlockResizeHandle.scrollIntoViewIfNeeded();
+
 		// Establish the existing bounding boxes for the Cover block
 		// and the Cover block's resizing handle.
 		const coverBlockBox = await coverBlock.boundingBox();
@@ -260,16 +270,16 @@ test.describe( 'Cover', () => {
 		expect( coverBlockResizeHandleBox.height ).toBeTruthy();
 
 		// Increase the Cover block height by 100px.
-		await coverBlockResizeHandle.hover();
+		// Move the mouse to the handle's center, press, then drag exactly 100px down.
+		// This avoids the off-by-half-handle-height bug that arises from using
+		// `handleBox.y + 100` (top + 100) while the mouse starts at the center.
+		const handleCenterX =
+			coverBlockResizeHandleBox.x + coverBlockResizeHandleBox.width / 2;
+		const handleCenterY =
+			coverBlockResizeHandleBox.y + coverBlockResizeHandleBox.height / 2;
+		await page.mouse.move( handleCenterX, handleCenterY );
 		await page.mouse.down();
-
-		// Counter-intuitively, the mouse movement calculation should not be made using the
-		// Cover block's bounding box, but rather based on the coordinates of the
-		// resize handle.
-		await page.mouse.move(
-			coverBlockResizeHandleBox.x + coverBlockResizeHandleBox.width / 2,
-			coverBlockResizeHandleBox.y + 100
-		);
+		await page.mouse.move( handleCenterX, handleCenterY + 100 );
 		await page.mouse.up();
 
 		const newCoverBlockBox = await coverBlock.boundingBox();
@@ -457,7 +467,7 @@ test.describe( 'Cover', () => {
 		const editorSettings = page.getByRole( 'region', {
 			name: 'Editor settings',
 		} );
-		await editorSettings.getByRole( 'tab', { name: 'Styles' } ).click();
+		await openStylesTabIfAvailable( editorSettings );
 
 		const opacitySlider = editorSettings.getByRole( 'slider', {
 			name: 'Overlay opacity',
@@ -500,7 +510,7 @@ test.describe( 'Cover', () => {
 		const editorSettings = page.getByRole( 'region', {
 			name: 'Editor settings',
 		} );
-		await editorSettings.getByRole( 'tab', { name: 'Styles' } ).click();
+		await openStylesTabIfAvailable( editorSettings );
 
 		const opacitySlider = editorSettings.getByRole( 'slider', {
 			name: 'Overlay opacity',
@@ -559,6 +569,41 @@ test.describe( 'Cover', () => {
 		const overlay = coverBlock.locator( '.wp-block-cover__background' );
 		await expect( overlay ).toBeVisible();
 	} );
+
+	test( 'hides overlay controls when a viewport style state is selected', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/cover' } );
+		const coverBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Cover',
+		} );
+		await coverBlock.getByRole( 'button', { name: 'Black' } ).click();
+
+		await editor.selectBlocks( coverBlock );
+		await editor.openDocumentSettingsSidebar();
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await openStylesTabIfAvailable( editorSettings );
+
+		const overlayControl = editorSettings.getByRole( 'button', {
+			name: 'Overlay',
+		} );
+		await expect( overlayControl ).toBeVisible();
+
+		await page.getByRole( 'button', { name: 'View', exact: true } ).click();
+		await page
+			.getByRole( 'menuitemcheckbox', { name: 'Responsive editing' } )
+			.click();
+		await page.getByRole( 'menuitemradio', { name: 'Tablet' } ).click();
+		await page.keyboard.press( 'Escape' );
+
+		await expect( overlayControl ).toBeHidden();
+		await expect(
+			editorSettings.getByRole( 'slider', { name: 'Overlay opacity' } )
+		).toBeHidden();
+	} );
 } );
 
 class CoverBlockUtils {
@@ -576,7 +621,7 @@ class CoverBlockUtils {
 		const tmpDirectory = await fs.mkdtemp(
 			path.join( os.tmpdir(), 'gutenberg-test-image-' )
 		);
-		const fileName = uuid();
+		const fileName = randomUUID();
 		const tmpFileName = path.join( tmpDirectory, fileName + '.png' );
 		await fs.copyFile( srcPath, tmpFileName );
 

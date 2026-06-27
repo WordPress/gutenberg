@@ -8,7 +8,6 @@ import clsx from 'clsx';
  */
 import { isBlobURL } from '@wordpress/blob';
 import {
-	Disabled,
 	Spinner,
 	Placeholder,
 	__experimentalToolsPanel as ToolsPanel,
@@ -235,21 +234,15 @@ function VideoEdit( {
 				</ToolsPanel>
 			</InspectorControls>
 			<figure { ...blockProps }>
-				{ /*
-                Disable the video tag if the block is not selected
-                so the user clicking on it won't play the
-                video when the controls are enabled.
-            */ }
-				<Disabled isDisabled={ ! isSingleSelected }>
-					<video
-						controls={ controls }
-						poster={ poster }
-						src={ src || temporaryURL }
-						ref={ videoPlayer }
-					>
-						<Tracks tracks={ tracks } />
-					</video>
-				</Disabled>
+				<video
+					controls={ controls }
+					inert={ ! isSingleSelected ? 'true' : undefined }
+					poster={ poster }
+					src={ src || temporaryURL }
+					ref={ videoPlayer }
+				>
+					<Tracks tracks={ tracks } />
+				</video>
 				{ !! temporaryURL && <Spinner /> }
 				<Caption
 					attributes={ attributes }

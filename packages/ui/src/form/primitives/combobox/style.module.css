@@ -1,0 +1,72 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer components {
+		.positioner {
+			z-index: var(--wp-ui-combobox-z-index, initial);
+		}
+
+		.chip {
+			--wp-ui-combobox-chip-content-padding-inline-start: var(--wpds-dimension-padding-sm);
+
+			overflow: hidden;
+			display: flex;
+			align-items: center;
+			min-height: var(--wpds-dimension-size-sm);
+			border: 1px solid var(--wpds-color-stroke-interactive-neutral);
+			border-radius: 12px;
+			background-color: var(--wpds-color-background-interactive-neutral-weak);
+			font-size: var(--wpds-typography-font-size-md);
+			color: var(--wpds-color-foreground-interactive-neutral);
+			cursor: default;
+
+			&:not([data-disabled]):has(button:not(:disabled, [aria-disabled="true"]):hover),
+			&:not([data-disabled]):focus {
+				background-color: var(--wpds-color-background-interactive-neutral-weak-active);
+				border-color: var(--wpds-color-stroke-interactive-neutral-active);
+				outline: none;
+				color: var(--wpds-color-foreground-interactive-neutral-active);
+
+				@media ( forced-colors: active ) {
+					background-color: SelectedItem;
+				}
+			}
+
+			&[data-disabled] {
+				background-color: var(--wpds-color-background-interactive-neutral-weak-disabled);
+				border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+				color: var(--wpds-color-foreground-interactive-neutral-disabled);
+
+				@media ( forced-colors: active ) {
+					border-color: GrayText;
+					color: GrayText;
+				}
+			}
+
+			&:has(.chip-prefix) {
+				--wp-ui-combobox-chip-content-padding-inline-start: var(--wpds-dimension-padding-xs);
+			}
+		}
+
+		.chip-prefix {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			margin-inline-start: 1px;
+			width: var(--wpds-dimension-size-xs);
+			height: var(--wpds-dimension-size-xs);
+			border-radius: 50%;
+			overflow: hidden;
+			flex-shrink: 0;
+		}
+
+		.chip-content {
+			padding-inline-start: var(--wp-ui-combobox-chip-content-padding-inline-start);
+			padding-block: var(--wpds-dimension-padding-xs);
+		}
+
+		.chip-remove {
+			border: none; /* suppress border when in forced-colors mode */
+		}
+	}
+}

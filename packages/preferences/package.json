@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/preferences",
-	"version": "4.44.0",
+	"version": "4.49.0",
 	"description": "Utilities for managing WordPress preferences.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -43,7 +43,6 @@
 		"./package.json": "./package.json",
 		"./build-style/": "./build-style/"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"types": "build-types",
 	"wpScriptExtraDependencies": [
@@ -64,8 +63,14 @@
 		"clsx": "^2.1.1"
 	},
 	"peerDependencies": {
+		"@types/react": "^18.3.27",
 		"react": "^18.0.0",
 		"react-dom": "^18.0.0"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

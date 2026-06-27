@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+## 5.49.0 (2026-06-24)
+
+## 5.48.1 (2026-06-16)
+
+## 5.48.0 (2026-06-10)
+
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+## 5.47.0 (2026-05-27)
+
+### Internal
+
+-   Import form: remove `Notice` margin and padding overrides ([#78231](https://github.com/WordPress/gutenberg/pull/78231)).
+
+## 5.46.0 (2026-05-14)
+
+## 5.45.0 (2026-04-29)
+
 ## 5.44.0 (2026-04-15)
 
 ## 5.43.0 (2026-04-01)

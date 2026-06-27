@@ -21,14 +21,7 @@ const DEFAULT_OPTION: FontSizePickerSelectOption = {
 };
 
 const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
-	const {
-		__next40pxDefaultSize,
-		fontSizes,
-		value,
-		size,
-		valueMode = 'literal',
-		onChange,
-	} = props;
+	const { fontSizes, value, valueMode = 'literal', onChange } = props;
 
 	const options: FontSizePickerSelectOption[] = [
 		DEFAULT_OPTION,
@@ -67,8 +60,7 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 
 	return (
 		<StyledCustomSelectControl
-			__next40pxDefaultSize={ __next40pxDefaultSize }
-			__shouldNotWarnDeprecated36pxSize
+			__next40pxDefaultSize
 			className="components-font-size-picker__select"
 			label={ __( 'Font size' ) }
 			hideLabelFromVision
@@ -96,7 +88,6 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 
 				onChange( selectedItem.value, matchingFontSize );
 			} }
-			size={ size }
 		/>
 	);
 };

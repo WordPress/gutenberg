@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -13,7 +18,13 @@ export default function save( { attributes } ) {
 	const TagName = 'h' + ( level || 3 );
 	const typographyProps = getTypographyClassesAndStyles( attributes );
 
-	const blockProps = useBlockProps.save();
+	const blockProps = useBlockProps.save( {
+		className: clsx( {
+			'has-icon': showIcon,
+			'has-icon-left': showIcon && iconPosition === 'left',
+			'has-icon-right': showIcon && iconPosition === 'right',
+		} ),
+	} );
 	const spacingProps = getSpacingClassesAndStyles( attributes );
 
 	return (

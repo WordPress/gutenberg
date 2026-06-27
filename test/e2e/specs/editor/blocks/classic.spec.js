@@ -4,7 +4,7 @@
 const path = require( 'path' );
 const fs = require( 'fs/promises' );
 const os = require( 'os' );
-const { v4: uuid } = require( 'uuid' );
+const { randomUUID } = require( 'crypto' );
 
 /**
  * WordPress dependencies
@@ -87,7 +87,9 @@ test.describe( 'Classic', () => {
 			.poll( editor.getEditedPostContent )
 			.toMatch( /\[gallery ids=\"\d+\"\]/ );
 
-		await editor.clickBlockToolbarButton( 'Convert to blocks' );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Convert to blocks' } )
+			.click();
 		const galleryBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Gallery',
 		} );
@@ -102,7 +104,9 @@ test.describe( 'Classic', () => {
 			.poll( editor.getEditedPostContent )
 			.toMatch( /\[gallery ids=\"\d+\"\]/ );
 
-		await editor.clickBlockToolbarButton( 'Convert to blocks' );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Convert to blocks' } )
+			.click();
 		await expect
 			.poll( editor.getEditedPostContent )
 			.toMatch( /<!-- wp:gallery/ );
@@ -158,7 +162,7 @@ class MediaUtils {
 		const tmpDirectory = await fs.mkdtemp(
 			path.join( os.tmpdir(), 'gutenberg-test-image-' )
 		);
-		const fileName = uuid();
+		const fileName = randomUUID();
 		const tmpFileName = path.join( tmpDirectory, fileName + '.png' );
 		await fs.copyFile( this.TEST_IMAGE_FILE_PATH, tmpFileName );
 

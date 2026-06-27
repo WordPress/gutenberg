@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalHStack as HStack, Icon } from '@wordpress/components';
+import {
+	__experimentalHStack as HStack,
+	Icon as WCIcon,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -17,7 +20,7 @@ function StatusView( { item }: { item: BasePost } ) {
 		<HStack alignment="left" spacing={ 0 }>
 			{ icon && (
 				<div className="fields-controls__status-icon">
-					<Icon icon={ icon } />
+					<WCIcon icon={ icon } />
 				</div>
 			) }
 			<span>{ label }</span>

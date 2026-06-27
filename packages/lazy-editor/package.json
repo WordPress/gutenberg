@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/lazy-editor",
-	"version": "1.10.0",
+	"version": "1.15.0",
 	"description": "Lazy-loading editor component with automatic asset and settings management.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -41,7 +41,6 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScriptModuleExports": "./build-module/index.mjs",
 	"types": "build-types",
 	"dependencies": {
@@ -57,6 +56,15 @@
 		"@wordpress/global-styles-engine": "file:../global-styles-engine",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/private-apis": "file:../private-apis"
+	},
+	"peerDependencies": {
+		"@types/react": "^18.3.27",
+		"react": "^18.0.0"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

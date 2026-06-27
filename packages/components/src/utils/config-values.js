@@ -57,14 +57,11 @@ export default Object.assign( {}, CONTROL_PROPS, {
 	elevationSmall: `0 1px 2px rgba(0, 0, 0, 0.05), 0 2px 3px rgba(0, 0, 0, 0.04), 0 6px 6px rgba(0, 0, 0, 0.03), 0 8px 8px rgba(0, 0, 0, 0.02)`,
 	elevationMedium: `0 2px 3px rgba(0, 0, 0, 0.05), 0 4px 5px rgba(0, 0, 0, 0.04), 0 12px 12px rgba(0, 0, 0, 0.03), 0 16px 16px rgba(0, 0, 0, 0.02)`,
 	elevationLarge: `0 5px 15px rgba(0, 0, 0, 0.08), 0 15px 27px rgba(0, 0, 0, 0.07), 0 30px 36px rgba(0, 0, 0, 0.04), 0 50px 43px rgba(0, 0, 0, 0.02)`,
-	surfaceBackgroundColor: COLORS.white,
-	surfaceBackgroundSubtleColor: '#F3F3F3',
-	surfaceBackgroundTintColor: '#F5F5F5',
 	surfaceBorderColor: 'rgba(0, 0, 0, 0.1)',
-	surfaceBorderBoldColor: 'rgba(0, 0, 0, 0.15)',
-	surfaceBorderSubtleColor: 'rgba(0, 0, 0, 0.05)',
-	surfaceBackgroundTertiaryColor: COLORS.white,
 	surfaceColor: COLORS.white,
+	// Modal exit animation: `use-modal-exit-animation` parses this for the
+	// `animationend` timeout race; keep the numeric duration equal to the WPDS
+	// `motion-duration-md` token on `.components-modal__frame` in modal/style.scss.
 	transitionDuration: '200ms',
 	transitionDurationFast: '160ms',
 	transitionDurationFaster: '120ms',
