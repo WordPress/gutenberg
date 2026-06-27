@@ -91,6 +91,23 @@ jest.mock( '@wordpress/dom', () => ( {
 	__unstableStripHTML: ( html ) => String( html ).replace( /<[^>]*>/g, '' ),
 } ) );
 
+/*
+ * The `@` mention completer pulls in `@wordpress/core-data`, whose import
+ * graph reaches the block editor and isn't relevant to the form's logic.
+ * The mention completer and format are exercised by their own test suites;
+ * substitute minimal stand-ins here so the test stays focused on the form.
+ */
+jest.mock( '../note-mention-completer', () => ( {
+	__esModule: true,
+	default: { name: 'note-mentions', triggerPrefix: '@' },
+} ) );
+
+jest.mock( '../mention-format', () => ( {
+	__esModule: true,
+	MENTION_FORMAT_NAME: 'core/note-mention',
+	registerNoteMentionFormat: jest.fn(),
+} ) );
+
 /**
  * Internal dependencies
  */
@@ -118,11 +135,11 @@ function setInputValue( html ) {
 }
 
 describe( 'NoteForm', () => {
-	it( 'limits formats to bold, italic, link, and code', () => {
+	it( 'limits formats to bold, italic, link, code, and mentions', () => {
 		setup();
 		expect( screen.getByTestId( 'note-rich-text' ) ).toHaveAttribute(
 			'data-allowed-formats',
-			'core/bold,core/italic,core/link,core/code'
+			'core/bold,core/italic,core/link,core/code,core/note-mention'
 		);
 	} );
 
