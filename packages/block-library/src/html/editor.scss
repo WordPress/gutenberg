@@ -10,6 +10,21 @@
 		top: 0;
 		left: 0;
 	}
+
+	// Inline HTML editor
+	.block-editor-plain-text {
+		display: block;
+		box-sizing: border-box;
+		max-height: 250px;
+		overflow-y: auto;
+		padding: $grid-unit-20;
+		@include editor-input-reset();
+		font-family: $editor-html-font;
+		resize: none;
+		// HTML input is always LTR.
+		/*rtl:ignore*/
+		direction: ltr;
+	}
 }
 
 // Modal styles
