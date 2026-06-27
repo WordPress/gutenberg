@@ -233,7 +233,6 @@ const ImageURLInputUI = ( {
 				checked={ linkTarget === '_blank' }
 			/>
 			<TextControl
-				__next40pxDefaultSize
 				label={ __( 'Link relation' ) }
 				value={ rel ?? '' }
 				onChange={ onSetLinkRel }
@@ -249,7 +248,6 @@ const ImageURLInputUI = ( {
 				) }
 			/>
 			<TextControl
-				__next40pxDefaultSize
 				label={ __( 'Link CSS class' ) }
 				value={ linkClass || '' }
 				onChange={ onSetLinkClass }

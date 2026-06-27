@@ -13,7 +13,7 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import Controls from './controls';
+import TabToolbarControls from '../tab-panel/tab-toolbar-controls';
 import useTabListItemsSync from './use-tab-list-items-sync';
 
 const EMPTY_ARRAY = [];
@@ -32,7 +32,7 @@ const EMPTY_ARRAY = [];
  */
 const TABS_TEMPLATE = [ [ 'core/tab-list' ], [ 'core/tab-panels' ] ];
 
-function Edit( { clientId, attributes, setAttributes } ) {
+function Edit( { clientId, attributes } ) {
 	const { anchor, activeTabIndex, editorActiveTabIndex } = attributes;
 
 	const { tabPanels, tabListClientId } = useSelect(
@@ -93,11 +93,7 @@ function Edit( { clientId, attributes, setAttributes } ) {
 	return (
 		<BlockContextProvider value={ contextValue }>
 			<div { ...innerBlockProps }>
-				<Controls
-					clientId={ clientId }
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-				/>
+				<TabToolbarControls tabsClientId={ clientId } />
 				{ innerBlockProps.children }
 			</div>
 		</BlockContextProvider>

@@ -1,3 +1,4 @@
+import type { CornerRadiusPreset } from '@wordpress/theme';
 import { privateApis as themeApis } from '@wordpress/theme';
 import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
 import type { StoryContext } from 'storybook/internal/types';
@@ -30,6 +31,8 @@ export function WithDesignSystemTheme(
 
 	const colorTheme = context.globals.dsColorTheme;
 	const cursorControl = context.globals.dsCursorControl || undefined;
+	const cornerRadiusPreset =
+		( context.globals.dsCornerRadius as CornerRadiusPreset ) || undefined;
 
 	let color;
 	if ( colorTheme === 'dark' ) {
@@ -40,14 +43,15 @@ export function WithDesignSystemTheme(
 		<ThemeProvider
 			color={ color }
 			cursor={ cursorControl ? { control: cursorControl } : undefined }
-			isRoot
+			cornerRadius={ cornerRadiusPreset }
+			isRoot={ context.viewMode !== 'docs' }
 		>
 			<div
 				style={
 					color?.background
 						? {
 								background:
-									'var(--wpds-color-bg-surface-neutral-strong)',
+									'var(--wpds-color-background-surface-neutral-strong)',
 								padding:
 									'var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-sm)',
 								outline:
@@ -65,7 +69,7 @@ export function WithDesignSystemTheme(
 							opacity: 0.5,
 							marginTop: 'var(--wpds-dimension-gap-md)',
 							fontSize: 'var(--wpds-typography-font-size-xs)',
-							color: 'var(--wpds-color-fg-content-neutral-weak)',
+							color: 'var(--wpds-color-foreground-content-neutral-weak)',
 							textTransform: 'uppercase',
 							textAlign: 'end',
 						} }

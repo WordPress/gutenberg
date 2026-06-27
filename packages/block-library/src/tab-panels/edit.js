@@ -12,8 +12,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import AddTabToolbarControl from '../tab-panel/add-tab-toolbar-control';
-import RemoveTabToolbarControl from '../tab-panel/remove-tab-toolbar-control';
+import TabToolbarControls from '../tab-panel/tab-toolbar-controls';
 
 /**
  * Initial template applied only when the block is first inserted (i.e. when
@@ -43,8 +42,7 @@ export default function Edit( { clientId } ) {
 
 	return (
 		<>
-			<AddTabToolbarControl tabsClientId={ tabsClientId } />
-			<RemoveTabToolbarControl tabsClientId={ tabsClientId } />
+			<TabToolbarControls tabsClientId={ tabsClientId } />
 			<div { ...innerBlocksProps } />
 		</>
 	);

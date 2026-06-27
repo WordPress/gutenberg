@@ -119,13 +119,6 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
   min-height: 0;
 }
 
-.emotion-14 {
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 <div>
   <div
     class="components-base-control block-editor-color-gradient-control emotion-0 emotion-1"

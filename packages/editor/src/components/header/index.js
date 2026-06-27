@@ -23,12 +23,6 @@ import PostViewLink from '../post-view-link';
 import PreviewDropdown from '../preview-dropdown';
 import ZoomOutToggle from '../zoom-out-toggle';
 import { store as editorStore } from '../../store';
-import {
-	ATTACHMENT_POST_TYPE,
-	TEMPLATE_PART_POST_TYPE,
-	PATTERN_POST_TYPE,
-	NAVIGATION_POST_TYPE,
-} from '../../store/constants';
 import { CollaboratorsPresence } from '../collaborators-presence/index';
 import { unlock } from '../../lock-unlock';
 
@@ -83,14 +77,6 @@ function Header( {
 	const canBeZoomedOut =
 		[ 'post', 'page', 'wp_template' ].includes( postType ) &&
 		hasSectionRootClientId;
-
-	const disablePreviewOption =
-		[
-			ATTACHMENT_POST_TYPE,
-			NAVIGATION_POST_TYPE,
-			TEMPLATE_PART_POST_TYPE,
-			PATTERN_POST_TYPE,
-		].includes( postType ) || isStylesCanvasActive;
 
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );
@@ -152,7 +138,7 @@ function Header( {
 
 					<PreviewDropdown
 						forceIsAutosaveable={ forceIsDirty }
-						disabled={ disablePreviewOption }
+						disabled={ isStylesCanvasActive }
 					/>
 
 					<PostPreviewButton

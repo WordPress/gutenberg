@@ -446,7 +446,7 @@ Insert an SVG icon.
 -	**Name:** [core/icon](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-icon/)
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
 -	**Supports:** align (center, left, right), anchor, ariaLabel, color (background, text), dimensions (width), interactivity (clientNavigation), spacing (margin, padding), ~~html~~
--	**Attributes:** icon
+-	**Attributes:** flipHorizontal, flipVertical, icon, rotation
 
 ## Image
 
@@ -472,8 +472,8 @@ Display a list of your most recent posts.
 
 -	**Name:** [core/latest-posts](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-latest-posts/)
 -	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
--	**Supports:** align, anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** addLinkToFeaturedImage, categories, columns, displayAuthor, displayFeaturedImage, displayPostContent, displayPostContentRadio, displayPostDate, excerptLength, featuredImageAlign, featuredImageSizeHeight, featuredImageSizeSlug, featuredImageSizeWidth, order, orderBy, postLayout, postsToShow, selectedAuthor
+-	**Supports:** align, anchor, color (background, gradients, link, text), interactivity (clientNavigation), layout, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** addLinkToFeaturedImage, categories, displayAuthor, displayFeaturedImage, displayPostContent, displayPostContentRadio, displayPostDate, excerptLength, featuredImageAlign, featuredImageSizeHeight, featuredImageSizeSlug, featuredImageSizeWidth, order, orderBy, postsToShow, selectedAuthor
 
 ## List
 
@@ -637,7 +637,7 @@ Embed a simple playlist.
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
 -	**Allowed Blocks:** core/playlist-track
 -	**Supports:** align, anchor, color (background, gradients, link, text), interactivity, spacing (margin, padding)
--	**Attributes:** caption, currentTrack, order, showArtists, showImages, showNumbers, showTrackLength, showTracklist, type
+-	**Attributes:** caption, order, showArtists, showImages, showNumbers, showTrackLength, showTracklist, type
 
 ## Playlist track
 
@@ -648,7 +648,7 @@ Playlist track.
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
 -	**Parent:** core/playlist
 -	**Supports:** interactivity (clientNavigation), ~~html~~, ~~reusable~~
--	**Attributes:** album, artist, blob, id, image, length, src, title, type, uniqueId
+-	**Attributes:** album, artist, blob, id, image, length, src, title, type
 
 ## Author (deprecated)
 
@@ -807,8 +807,8 @@ Give special visual emphasis to a quote from your text.
 
 -	**Name:** [core/pullquote](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-pullquote/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
--	**Supports:** align (full, left, right, wide), anchor, background (backgroundImage, backgroundSize), color (background, gradients, link, text), dimensions (minHeight), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight)
--	**Attributes:** citation, textAlign, value
+-	**Supports:** align (full, left, right, wide), anchor, background (backgroundImage, backgroundSize), color (background, gradients, link, text), dimensions (minHeight), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign)
+-	**Attributes:** citation, value
 
 ## Query Loop
 
@@ -922,7 +922,7 @@ Help visitors find your content.
 -	**Name:** [core/search](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-search/)
 -	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
 -	**Supports:** align (center, left, right), anchor, color (background, gradients, text), interactivity, spacing (margin), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** buttonPosition, buttonText, buttonUseIcon, label, placeholder, query, showLabel, width, widthUnit
+-	**Attributes:** buttonPosition, buttonText, buttonUseIcon, label, placeholder, query, showLabel, tagName, width, widthUnit
 
 ## Separator
 
@@ -1006,7 +1006,7 @@ Display the tab buttons for a tabbed interface.
 -	**Experimental:** true
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Parent:** core/tabs
--	**Supports:** color (background, text), dimensions (~~aspectRatio~~, ~~height~~, ~~minHeight~~, ~~width~~), layout (allowJustification, allowOrientation, allowVerticalAlignment, default, ~~allowSwitching~~), spacing (blockGap, margin, padding), typography (fontSize), ~~html~~, ~~lock~~, ~~reusable~~, ~~visibility~~
+-	**Supports:** color (background, text), layout (default, ~~allowOrientation~~, ~~allowVerticalAlignment~~, ~~allowWrap~~), spacing (blockGap, padding), typography (fontSize), ~~html~~, ~~lock~~, ~~visibility~~
 -	**Attributes:** tabs
 
 ## Tab Panel
@@ -1017,7 +1017,7 @@ Content for a tab in a tabbed interface.
 -	**Experimental:** true
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Parent:** core/tab-panels
--	**Supports:** anchor, color (background, text), layout, renaming, spacing (blockGap, padding, ~~margin~~), typography (fontSize), ~~html~~, ~~reusable~~, ~~visibility~~
+-	**Supports:** anchor, color (background, text), layout, spacing (blockGap, padding), typography (fontSize), ~~html~~, ~~visibility~~
 -	**Attributes:** label
 
 ## Tab Panels
@@ -1029,7 +1029,7 @@ Container for tab panel content in a tabbed interface.
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Parent:** core/tabs
 -	**Allowed Blocks:** core/tab-panel
--	**Supports:** color (background, heading, link, text), dimensions (~~aspectRatio~~, ~~height~~, ~~minHeight~~, ~~width~~), layout (allowJustification, default, ~~allowOrientation~~, ~~allowSizingOnChildren~~, ~~allowSwitching~~, ~~allowVerticalAlignment~~), spacing (margin, padding, ~~blockGap~~), typography (fontSize), ~~anchor~~, ~~html~~, ~~lock~~, ~~reusable~~, ~~visibility~~
+-	**Supports:** color (background, heading, link, text), spacing (padding), typography (fontSize), ~~html~~, ~~lock~~, ~~visibility~~
 
 ## Table
 
@@ -1058,7 +1058,7 @@ Display content in a tabbed interface to help users navigate detailed content wi
 -	**Experimental:** true
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Allowed Blocks:** core/tab-list, core/tab-panels
--	**Supports:** align, anchor, color (background, text), interactivity, layout (allowJustification, allowOrientation, allowSizingOnChildren, allowVerticalAlignment, default, ~~allowSwitching~~), renaming, spacing (blockGap, margin, padding), typography (fontSize), ~~html~~
+-	**Supports:** align, anchor, color (background, text), interactivity, layout (~~allowEditing~~), spacing (blockGap, margin, padding), typography (fontSize), ~~html~~
 -	**Attributes:** activeTabIndex, editorActiveTabIndex
 
 ## Tag Cloud

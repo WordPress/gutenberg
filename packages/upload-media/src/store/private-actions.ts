@@ -23,7 +23,8 @@ import {
 import { getImageDimensions } from '../get-image-dimensions';
 import { CLIENT_SIDE_SUPPORTED_MIME_TYPES, HEIC_MIME_TYPES } from './constants';
 import { StubFile } from '../stub-file';
-import { UploadError } from '../upload-error';
+import { ErrorCode, UploadError } from '../upload-error';
+import { measure } from './utils/debug-logger';
 import {
 	vipsResizeImage,
 	vipsRotateImage,
@@ -38,6 +39,7 @@ import type {
 	AddAction,
 	AdditionalData,
 	AddOperationsAction,
+	Attachment,
 	BatchId,
 	CacheBlobUrlAction,
 	ImageFormat,
@@ -777,7 +779,7 @@ export function prepareItem( id: QueueItemId ) {
 				dispatch.cancelItem(
 					id,
 					new UploadError( {
-						code: 'HEIC_DECODE_ERROR',
+						code: ErrorCode.HEIC_DECODE_ERROR,
 						message:
 							'This browser cannot decode HEIC images and the server does not support them either. Please convert to JPEG before uploading.',
 						file,
@@ -894,21 +896,39 @@ export function uploadItem( id: QueueItemId ) {
 			return;
 		}
 
+		const startTime = performance.now();
+		let finished = false;
+
+		const finishUpload = ( attachment: Partial< Attachment > ) => {
+			if ( finished ) {
+				return;
+			}
+			finished = true;
+
+			measure( {
+				measureName: `Upload ${ item.file.name }`,
+				startTime,
+				tooltipText: item.file.name,
+				properties: [
+					[ 'Item ID', item.id ],
+					[ 'File name', item.file.name ],
+				],
+			} );
+
+			dispatch.finishOperation( id, { attachment } );
+		};
+
 		select.getSettings().mediaUpload( {
 			filesList: [ item.file ],
 			additionalData: item.additionalData,
 			signal: item.abortController?.signal,
 			onFileChange: ( [ attachment ] ) => {
 				if ( attachment && ! isBlobURL( attachment.url ) ) {
-					dispatch.finishOperation( id, {
-						attachment,
-					} );
+					finishUpload( attachment );
 				}
 			},
 			onSuccess: ( [ attachment ] ) => {
-				dispatch.finishOperation( id, {
-					attachment,
-				} );
+				finishUpload( attachment );
 			},
 			onError: ( error ) => {
 				dispatch.cancelItem( id, error );
@@ -939,12 +959,24 @@ export function sideloadItem( id: QueueItemId ) {
 			return;
 		}
 
+		const startTime = performance.now();
+
 		mediaSideload( {
 			file: item.file,
 			attachmentId: post as number,
 			additionalData,
 			signal: item.abortController?.signal,
 			onSuccess: ( subSize: SubSizeData ) => {
+				measure( {
+					measureName: `Sideload ${ item.file.name }`,
+					startTime,
+					tooltipText: item.file.name,
+					properties: [
+						[ 'Item ID', item.id ],
+						[ 'File name', item.file.name ],
+					],
+				} );
+
 				// Accumulate sub-size data on the parent item for finalize.
 				if ( item.parentId ) {
 					dispatch< AccumulateSubSizeAction >( {
@@ -984,6 +1016,8 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 			return;
 		}
 
+		const startTime = performance.now();
+
 		// Add dimension suffix for sub-sizes (thumbnails).
 		const addSuffix = Boolean( item.parentId );
 		// Add '-scaled' suffix for big image threshold resizing.
@@ -1000,6 +1034,16 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 				scaledSuffix,
 				args.quality
 			);
+
+			measure( {
+				measureName: `ResizeCrop ${ item.file.name }`,
+				startTime,
+				tooltipText: item.file.name,
+				properties: [
+					[ 'Item ID', item.id ],
+					[ 'File name', item.file.name ],
+				],
+			} );
 
 			const blobUrl = createBlobURL( file );
 			dispatch< CacheBlobUrlAction >( {
@@ -1018,7 +1062,7 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 			dispatch.cancelItem(
 				id,
 				new UploadError( {
-					code: 'IMAGE_TRANSCODING_ERROR',
+					code: ErrorCode.IMAGE_TRANSCODING_ERROR,
 					message: __(
 						'The web server cannot generate responsive image sizes for this image. Convert it to JPEG or PNG before uploading.'
 					),
@@ -1057,6 +1101,8 @@ export function rotateItem( id: QueueItemId, args?: RotateItemArgs ) {
 			return;
 		}
 
+		const startTime = performance.now();
+
 		try {
 			const file = await vipsRotateImage(
 				item.id,
@@ -1064,6 +1110,16 @@ export function rotateItem( id: QueueItemId, args?: RotateItemArgs ) {
 				args.orientation,
 				item.abortController?.signal
 			);
+
+			measure( {
+				measureName: `Rotate ${ item.file.name }`,
+				startTime,
+				tooltipText: item.file.name,
+				properties: [
+					[ 'Item ID', item.id ],
+					[ 'File name', item.file.name ],
+				],
+			} );
 
 			const blobUrl = createBlobURL( file );
 			dispatch< CacheBlobUrlAction >( {
@@ -1082,7 +1138,7 @@ export function rotateItem( id: QueueItemId, args?: RotateItemArgs ) {
 			dispatch.cancelItem(
 				id,
 				new UploadError( {
-					code: 'IMAGE_ROTATION_ERROR',
+					code: ErrorCode.IMAGE_ROTATION_ERROR,
 					message: __(
 						'The web server cannot generate responsive image sizes for this image. Convert it to JPEG or PNG before uploading.'
 					),
@@ -1123,6 +1179,8 @@ export function transcodeImageItem(
 			return;
 		}
 
+		const startTime = performance.now();
+
 		const outputMimeType = `image/${ args.outputFormat }` as
 			| 'image/jpeg'
 			| 'image/png'
@@ -1141,6 +1199,16 @@ export function transcodeImageItem(
 				interlaced
 			);
 
+			measure( {
+				measureName: `Transcode ${ item.file.name }`,
+				startTime,
+				tooltipText: item.file.name,
+				properties: [
+					[ 'Item ID', item.id ],
+					[ 'File name', item.file.name ],
+				],
+			} );
+
 			const blobUrl = createBlobURL( file );
 			dispatch< CacheBlobUrlAction >( {
 				type: Type.CacheBlobUrl,
@@ -1158,7 +1226,7 @@ export function transcodeImageItem(
 			dispatch.cancelItem(
 				id,
 				new UploadError( {
-					code: 'MEDIA_TRANSCODING_ERROR',
+					code: ErrorCode.MEDIA_TRANSCODING_ERROR,
 					message:
 						'Image could not be transcoded to the target format',
 					file: item.file,

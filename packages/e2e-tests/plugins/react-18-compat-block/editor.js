@@ -105,7 +105,7 @@
 						'div',
 						{
 							className: 'react-18-compat-block__inert',
-							inert: 'inert',
+							inert: '',
 							children:
 								'This subtree is inert and built with the React 18 runtime.',
 						},
