@@ -648,14 +648,14 @@ test.describe( 'Image', () => {
 		await expect( urlInput ).toHaveValue( 'https://example.com' );
 	} );
 
-	// TODO: Re-enable once client-side external-image upload lands. With CSM
-	// active on Chromium 148+, "Upload to Media Library" routes the external
-	// URL through the client-side pipeline, which does not yet finalize to a
-	// /wp-content/uploads/ URL. Fixed by
-	// https://github.com/WordPress/gutenberg/issues/79407; re-introduce the
-	// CSM-aware coverage there.
-	// eslint-disable-next-line playwright/no-skipped-test
-	test.skip( 'should upload external image to media library', async ( {
+	/*
+	 * "Upload to Media Library" sideloads the external URL on the server (see
+	 * the mediaSideloadFromUrl editor setting), so the browser never reads the
+	 * cross-origin bytes itself. This works whether or not the editor is
+	 * cross-origin isolated for client-side media processing, so the test is
+	 * CSM-agnostic. See https://github.com/WordPress/gutenberg/issues/79407.
+	 */
+	test( 'should upload external image to media library', async ( {
 		editor,
 	} ) => {
 		await editor.insertBlock( {
