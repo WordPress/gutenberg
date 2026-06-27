@@ -61,9 +61,10 @@ function gutenberg_get_animated_gif_companion_path( int $attachment_id, string $
 /**
  * Deletes a sideloaded animated-GIF companion file from disk.
  *
- * The path is confirmed to resolve to a regular file strictly inside the
- * uploads directory before deletion, so this can only ever remove a
- * sideloaded companion.
+ * Deletion is delegated to wp_delete_file_from_directory(), which confirms the
+ * path resolves strictly inside the uploads directory before unlinking, so this
+ * can only ever remove a sideloaded companion. Mirrors the HEIC companion
+ * cleanup in lib/media/load.php.
  *
  * @param string|null $path Absolute path to the companion file, or null.
  */
@@ -72,25 +73,13 @@ function gutenberg_delete_animated_gif_companion_file( ?string $path ): void {
 		return;
 	}
 
-	$real_path = realpath( $path );
+	$uploads = wp_get_upload_dir();
 
-	if ( ! $real_path || ! is_file( $real_path ) ) {
+	if ( empty( $uploads['basedir'] ) ) {
 		return;
 	}
 
-	$uploads  = wp_get_upload_dir();
-	$base_dir = empty( $uploads['error'] ) ? realpath( $uploads['basedir'] ) : false;
-
-	if ( ! $base_dir ) {
-		return;
-	}
-
-	// Must resolve to a regular file strictly inside the uploads directory.
-	if ( ! str_starts_with( $real_path, $base_dir . DIRECTORY_SEPARATOR ) ) {
-		return;
-	}
-
-	wp_delete_file( $real_path );
+	wp_delete_file_from_directory( $path, $uploads['basedir'] );
 }
 
 /**
