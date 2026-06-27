@@ -15,8 +15,7 @@ import {
 	MENTION_FORMAT_NAME,
 } from '../mention-format';
 
-const getFormatType = ( name ) =>
-	select( richTextStore ).getFormatType( name );
+const getFormatType = ( name ) => select( richTextStore ).getFormatType( name );
 
 describe( 'registerNoteMentionFormat', () => {
 	afterEach( () => {
