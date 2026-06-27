@@ -965,7 +965,8 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 * Prefers the core wp_get_image_encode_quality() helper when available, and
 	 * otherwise mirrors WP_Image_Editor::set_quality() inline for WordPress
 	 * versions that predate it: per-format default, the wp_editor_set_quality
-	 * filter, the jpeg_quality filter for JPEG output, and a clamp to 1-100.
+	 * filter, the jpeg_quality filter for JPEG output, then resets non-numeric
+	 * or out-of-range values to the default and squashes 0 to 1.
 	 *
 	 * @param string $output_mime The output image MIME type, e.g. 'image/jpeg'.
 	 * @param array  $size        Dimensions ('width', 'height') for the wp_editor_set_quality filter.
@@ -991,6 +992,12 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		if ( 'image/jpeg' === $output_mime ) {
 			/** This filter is documented in wp-includes/class-wp-image-editor.php */
 			$quality = apply_filters( 'jpeg_quality', $quality, 'image_resize' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		}
+
+		if ( ! is_numeric( $quality ) ) {
+			$quality = $default_quality;
+		} else {
+			$quality = (int) $quality;
 		}
 
 		if ( $quality < 0 || $quality > 100 ) {
