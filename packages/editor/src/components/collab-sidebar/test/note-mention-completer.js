@@ -47,6 +47,12 @@ describe( 'noteMentionCompleter', () => {
 			expect( anchor.props.href ).toBe(
 				'https://example.com/author/jane'
 			);
+			/*
+			 * `anchor` is the React element returned by the completer, not a
+			 * rendered DOM node, so inspecting its `children` prop is the
+			 * intended assertion rather than DOM traversal.
+			 */
+			// eslint-disable-next-line testing-library/no-node-access
 			expect( anchor.props.children ).toBe( '@Jane Doe' );
 		} );
 	} );

@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { registerFormatType, store as richTextStore } from '@wordpress/rich-text';
+import {
+	registerFormatType,
+	store as richTextStore,
+} from '@wordpress/rich-text';
 import { select } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
