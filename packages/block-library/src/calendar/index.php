@@ -63,17 +63,17 @@ function render_block_core_calendar( $attributes ) {
 
 	// Generate color styles and classes.
 	$styles        = wp_style_engine_get_styles( array( 'color' => $color_block_styles ), array( 'convert_vars_to_classnames' => true ) );
-	$inline_styles = $styles['css'] ?? ''; 
+	$inline_styles = $styles['css'] ?? '';
 	$classnames    = $styles['classnames'] ?? '';
 	if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
 		$classnames .= ' has-link-color';
 	}
-	
+
 	// Generate border styles and classes
 	$border_engine  = wp_style_engine_get_styles( array( 'border' => $border_block_styles ), array( 'convert_vars_to_classnames' => true ) );
 	$border_styles  = $border_engine['css'] ?? '';
 	$border_classes = $border_engine['classnames'] ?? '';
-	$calendar = get_calendar( true, false );
+	$calendar 		= get_calendar( true, false );
 
 	// Fallback to ensure the calendar renders if get_calendar returns false or empty.
 	if ( empty( $calendar ) ) {
@@ -90,14 +90,14 @@ function render_block_core_calendar( $attributes ) {
 			if ( ! empty( $inline_styles ) ) {
 				$processor->set_attribute( 'style', $inline_styles );
 			}
-			
+
 			if ( ! empty( $classnames ) ) {
 				$processor->add_class( $classnames );
 			}
 
 			if ( isset( $border_block_styles['radius'] ) ) {
 				$radius_value   = is_array( $border_block_styles['radius'] ) ? implode( ' ', $border_block_styles['radius'] ) : $border_block_styles['radius'];
-				$existing_style = $processor->get_attribute( 'style' ) ?: '';
+				$existing_style = $processor->get_attribute( 'style' ) ??: '';
 				$radius_css     = sprintf( 'border-radius: %s; overflow: hidden; border-collapse: separate;', esc_attr( $radius_value ) );
 				$processor->set_attribute( 'style', trim( $existing_style . ';' . $radius_css, ';' ) );
 			}
@@ -109,7 +109,7 @@ function render_block_core_calendar( $attributes ) {
 				$processor->add_class( $border_classes );
 			}
 
-			$current_style = $processor->get_attribute( 'style' ) ?: '';
+			$current_style  = $processor->get_attribute( 'style' ) ??: '';
 			$combined_style = trim( $current_style, ';' );
 
 			if ( ! empty( $border_styles ) ) {
