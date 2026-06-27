@@ -253,6 +253,11 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 				dispatch.processItem( pending.id );
 			}
 		}
+		if ( currentOperation === OperationType.TranscodeGif ) {
+			for ( const pending of select.getPendingVideoProcessing() ) {
+				dispatch.processItem( pending.id );
+			}
+		}
 
 		// Failed vips ops also leak WASM memory, so count them toward the
 		// recycle budget. Without this, a long burst of failures (e.g. a
@@ -269,6 +274,17 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 		if ( parentId ) {
 			const parentItem = select.getItem( parentId );
 			if ( parentItem ) {
+				/*
+				 * The converted video and its poster are optional companions
+				 * of an animated GIF: the parent GIF attachment is fine
+				 * without them. Their failure must never be treated as a total
+				 * parent failure (which would delete the already-uploaded GIF),
+				 * even when the companion is the only child sideload.
+				 */
+				const isOptionalCompanion =
+					item.additionalData?.image_size === 'animated-video' ||
+					item.additionalData?.image_size === 'animated-video-poster';
+
 				if ( select.hasPendingItemsByParentId( parentId ) ) {
 					// Other children remain — just notify the parent so
 					// it can re-check the Finalize gate.
@@ -279,15 +295,17 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 						dispatch.processItem( parentId );
 					}
 				} else if (
-					parentItem.subSizes &&
-					parentItem.subSizes.length > 0
+					( parentItem.subSizes && parentItem.subSizes.length > 0 ) ||
+					isOptionalCompanion
 				) {
-					// Partial success: at least one child sideload succeeded
-					// (its sub-size is already accumulated on the parent),
-					// but the last in-flight child failed. Keep the parent
-					// attachment and finalize with whichever sub-sizes did
-					// succeed — matching WordPress core's best-effort
-					// behavior when individual sub-size generations fail.
+					/*
+					 * Partial success: at least one child sideload succeeded
+					 * (its sub-size is already accumulated on the parent), or
+					 * the failed child was an optional companion. Keep the
+					 * parent attachment and finalize with whichever sub-sizes
+					 * did succeed — matching WordPress core's best-effort
+					 * behavior when individual sub-size generations fail.
+					 */
 					if (
 						parentItem.operations &&
 						parentItem.operations.length > 0

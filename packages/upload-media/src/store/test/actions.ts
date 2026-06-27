@@ -701,9 +701,11 @@ describe( 'actions', () => {
 			const setUpParentAndChild = ( {
 				parentSubSizes,
 				parentOnError,
+				imageSize = 'medium',
 			}: {
 				parentSubSizes?: { name: string; id: number }[];
 				parentOnError?: jest.Mock;
+				imageSize?: string;
 			} = {} ) => {
 				unlock( registry.dispatch( uploadStore ) ).addItem( {
 					file: jpegFile,
@@ -730,7 +732,7 @@ describe( 'actions', () => {
 				unlock( registry.dispatch( uploadStore ) ).addSideloadItem( {
 					file: jpegFile,
 					parentId: parent.id,
-					additionalData: { post: 42, image_size: 'medium' },
+					additionalData: { post: 42, image_size: imageSize },
 				} );
 
 				const child = unlock( registry.select( uploadStore ) )
@@ -872,6 +874,39 @@ describe( 'actions', () => {
 						message: 'The image could not be uploaded.',
 					} )
 				);
+			} );
+
+			it( 'keeps the parent GIF when its only child is a failed animated-video companion', async () => {
+				const mediaDelete = jest.fn().mockResolvedValue( undefined );
+				const parentOnError = jest.fn();
+				unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+					mediaDelete,
+				} );
+
+				// The converted video is the sole child of the GIF and has no
+				// accumulated sub-sizes — the pre-fix "total failure" case.
+				const { parent, child } = setUpParentAndChild( {
+					parentOnError,
+					imageSize: 'animated-video',
+				} );
+
+				await registry
+					.dispatch( uploadStore )
+					.cancelItem(
+						child!.id,
+						new Error( 'conversion failed' ),
+						true
+					);
+
+				// The optional companion failing must not delete or cancel the
+				// already-uploaded GIF attachment.
+				expect( mediaDelete ).not.toHaveBeenCalled();
+				expect( parentOnError ).not.toHaveBeenCalled();
+				expect(
+					unlock( registry.select( uploadStore ) ).getItem(
+						parent.id
+					)
+				).toBeDefined();
 			} );
 		} );
 	} );
