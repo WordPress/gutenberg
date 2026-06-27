@@ -1446,7 +1446,7 @@ export function transcodeGifItem(
 			dispatch.cancelItem(
 				id,
 				new UploadError( {
-					code: 'GIF_TRANSCODING_ERROR',
+					code: ErrorCode.GIF_TRANSCODING_ERROR,
 					message: 'Animated GIF could not be converted to video',
 					file: item.file,
 					cause: error instanceof Error ? error : undefined,
