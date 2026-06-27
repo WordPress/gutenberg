@@ -319,12 +319,12 @@ test.describe( 'Client-side media processing', () => {
 		expect( media.media_details.height ).toBe( 150 );
 
 		// The original .jxl is preserved as a companion file, recorded in
-		// metadata['original'] (mirroring how HEIC keeps its original).
+		// metadata['source_image'] (mirroring how HEIC keeps its original).
 		const fullMedia = await requestUtils.rest( {
 			method: 'GET',
 			path: `/wp/v2/media/${ media.id }?context=edit`,
 		} );
-		expect( fullMedia.media_details.original ).toMatch( /\.jxl$/ );
+		expect( fullMedia.media_details.source_image ).toMatch( /\.jxl$/ );
 	} );
 
 	test( 'flattens a high-bit-depth (HDR) JXL to JPEG sub-sizes but preserves the 16-bit original', async ( {
@@ -362,14 +362,14 @@ test.describe( 'Client-side media processing', () => {
 			method: 'GET',
 			path: `/wp/v2/media/${ media.id }?context=edit`,
 		} );
-		expect( fullMedia.media_details.original ).toMatch( /\.jxl$/ );
+		expect( fullMedia.media_details.source_image ).toMatch( /\.jxl$/ );
 
 		// Strongest proof of bit-depth preservation: the stored original is
 		// byte-for-byte identical to the uploaded 16-bit fixture, so its full
 		// depth (and any other embedded fidelity) is intact.
 		const originalUrl = media.source_url.replace(
 			/[^/]+$/,
-			fullMedia.media_details.original
+			fullMedia.media_details.source_image
 		);
 		const storedOriginal = await (
 			await page.request.get( originalUrl )
@@ -413,13 +413,13 @@ test.describe( 'Client-side media processing', () => {
 			method: 'GET',
 			path: `/wp/v2/media/${ media.id }?context=edit`,
 		} );
-		expect( fullMedia.media_details.original ).toMatch( /\.jxl$/ );
+		expect( fullMedia.media_details.source_image ).toMatch( /\.jxl$/ );
 
 		// Byte-for-byte identity proves the embedded gain map (the `jhgm` box)
 		// survives untouched in the stored original.
 		const originalUrl = media.source_url.replace(
 			/[^/]+$/,
-			fullMedia.media_details.original
+			fullMedia.media_details.source_image
 		);
 		const storedOriginal = await (
 			await page.request.get( originalUrl )

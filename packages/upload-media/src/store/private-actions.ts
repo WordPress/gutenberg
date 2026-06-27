@@ -854,7 +854,7 @@ export function prepareItem( id: QueueItemId ) {
 		if ( isJxl && jxlJpeg ) {
 			// Upload the JPEG derivative as the main file and keep the original
 			// .jxl so generateThumbnails() can sideload it as a companion
-			// (stored under $metadata['original'], like the HEIC original).
+			// (stored under $metadata['source_image'], like the HEIC original).
 			updates = {
 				file: jxlJpeg,
 				sourceFile: jxlJpeg,
