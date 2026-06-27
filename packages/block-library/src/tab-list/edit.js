@@ -69,6 +69,7 @@ function Edit( {
 	);
 	const {
 		insertBlock,
+		removeBlock,
 		updateBlockAttributes,
 		__unstableMarkNextChangeAsNotPersistent,
 	} = useDispatch( blockEditorStore );
@@ -109,6 +110,24 @@ function Edit( {
 		updateBlockAttributes( tabsClientId, {
 			editorActiveTabIndex: newIndex,
 		} );
+	}
+
+	function removeTab( tabIndex ) {
+		const tab = tabsList[ tabIndex ];
+		if ( ! tab?.clientId || tabsList.length <= 1 ) {
+			return;
+		}
+
+		// Calculate new active index after removal.
+		const newActiveIndex =
+			tabIndex >= tabsList.length - 1 ? tabsList.length - 2 : tabIndex;
+
+		// Switch editor to the adjacent tab and remove the current one.
+		__unstableMarkNextChangeAsNotPersistent();
+		updateBlockAttributes( tabsClientId, {
+			editorActiveTabIndex: newActiveIndex,
+		} );
+		removeBlock( tab.clientId, false );
 	}
 
 	const menuRef = useRef();
@@ -191,6 +210,7 @@ function Edit( {
 								__unstableOnSplitAtEnd={ () =>
 									insertTabAfter( index )
 								}
+								onRemove={ () => removeTab( index ) }
 							/>
 						</button>
 					);
