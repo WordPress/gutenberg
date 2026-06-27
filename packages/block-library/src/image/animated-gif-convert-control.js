@@ -13,6 +13,11 @@ import { video as videoIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
+ * Internal dependencies
+ */
+import { getCarriedGifConversionAttributes } from '../utils/gif-conversion-attributes';
+
+/**
  * Toolbar control that turns an animated GIF Image block into a converted Video
  * block once the GIF's sideloaded video companion is available.
  *
@@ -94,6 +99,7 @@ export default function AnimatedGifConvertControl( { attributes, clientId } ) {
 		replaceBlocks(
 			clientId,
 			createBlock( 'core/video', {
+				...getCarriedGifConversionAttributes( attributes ),
 				id,
 				src: dir + companion.video,
 				poster: companion.poster ? dir + companion.poster : undefined,

@@ -226,4 +226,31 @@ describe( 'AnimatedGifConvertControl', () => {
 			height: 240,
 		} );
 	} );
+
+	it( 'carries align, anchor, className and margin onto the video block', async () => {
+		const user = userEvent.setup();
+		renderControl( {
+			attributes: {
+				id: 7,
+				url: 'https://example.com/wp-content/uploads/cat.gif',
+				align: 'wide',
+				anchor: 'cat-gif',
+				className: 'is-style-rounded',
+				style: { spacing: { margin: { top: '20px' } } },
+			},
+			select: makeSelect( { getEntityRecord } ),
+		} );
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Display as video' } )
+		);
+
+		const [ , newBlock ] = replaceBlocks.mock.calls[ 0 ];
+		expect( newBlock.attributes ).toMatchObject( {
+			align: 'wide',
+			anchor: 'cat-gif',
+			className: 'is-style-rounded',
+			style: { spacing: { margin: { top: '20px' } } },
+		} );
+	} );
 } );

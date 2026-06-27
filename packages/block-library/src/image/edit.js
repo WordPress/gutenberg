@@ -31,6 +31,7 @@ import { store as uploadStore } from '@wordpress/upload-media';
  * Internal dependencies
  */
 import { useUploadMediaFromBlobURL } from '../utils/hooks';
+import { getCarriedGifConversionAttributes } from '../utils/gif-conversion-attributes';
 import Image from './image';
 import { isValidFileType } from './utils';
 import { useMaxWidthObserver } from './use-max-width-observer';
@@ -263,6 +264,7 @@ export function ImageEdit( {
 			replaceBlock(
 				clientId,
 				createBlock( 'core/video', {
+					...getCarriedGifConversionAttributes( attributes ),
 					id: media.id,
 					src: dir + media.media_details.animated_video,
 					poster: poster ? dir + poster : undefined,
@@ -272,11 +274,13 @@ export function ImageEdit( {
 					autoplay: true,
 					muted: true,
 					playsInline: true,
-					// Carry the GIF's intrinsic dimensions so the <video> keeps
-					// its aspect ratio from the first paint. Without them the
-					// element collapses to the browser-default size and then
-					// jumps once the poster/metadata load, which shows up as a
-					// brief duplicated image during the swap.
+					/*
+					 * Carry the GIF's intrinsic dimensions so the <video> keeps
+					 * its aspect ratio from the first paint. Without them the
+					 * element collapses to the browser-default size and then
+					 * jumps once the poster/metadata load, which shows up as a
+					 * brief duplicated image during the swap.
+					 */
 					width: media.media_details.width,
 					height: media.media_details.height,
 				} )

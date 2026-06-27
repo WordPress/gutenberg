@@ -13,6 +13,11 @@ import { image as imageIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
+ * Internal dependencies
+ */
+import { getCarriedGifConversionAttributes } from '../utils/gif-conversion-attributes';
+
+/**
  * Toolbar control that turns a converted GIF video block back into the original
  * animated GIF Image block.
  *
@@ -66,6 +71,7 @@ export default function GifRestoreControl( { attributes, clientId } ) {
 		replaceBlocks(
 			clientId,
 			createBlock( 'core/image', {
+				...getCarriedGifConversionAttributes( attributes ),
 				id,
 				url: gif.source_url,
 				alt: gif.alt_text || '',
