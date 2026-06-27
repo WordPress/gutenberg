@@ -489,6 +489,7 @@ export function createSyncManager( debug = false ): SyncManager {
 			entityState.unload();
 		}
 		entityStates.clear();
+		undoManager = undefined;
 
 		for ( const [ , collectionState ] of [ ...collectionStates ] ) {
 			collectionState.unload();

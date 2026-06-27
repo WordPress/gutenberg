@@ -4,10 +4,27 @@
 
 ### Breaking Changes
 
--   Rename the `bg` and `fg` design token groups to `background` and `foreground`. All `--wpds-color-bg-*` custom properties are now `--wpds-color-background-*`, and all `--wpds-color-fg-*` custom properties are now `--wpds-color-foreground-*` ([#79098](https://github.com/WordPress/gutenberg/pull/79098)).
+-   Remove `ThemeProvider` from the public package exports and restore access through `privateApis` ([#79594](https://github.com/WordPress/gutenberg/pull/79594)).
 
 ### New Features
 
+-   Export `@wordpress/theme/utils` with a generated `var()` Sass function for compile-time design token fallback injection ([#79470](https://github.com/WordPress/gutenberg/pull/79470)).
+
+### Bug Fixes
+
+-   Mark the published `design-tokens.css` file as side-effectful so downstream bundlers preserve the documented CSS import ([#79551](https://github.com/WordPress/gutenberg/pull/79551)).
+
+## 0.16.0 (2026-06-24)
+
+### Breaking Changes
+
+-   Rename the `bg` and `fg` design token groups to `background` and `foreground`. All `--wpds-color-bg-*` custom properties are now `--wpds-color-background-*`, and all `--wpds-color-fg-*` custom properties are now `--wpds-color-foreground-*` ([#79098](https://github.com/WordPress/gutenberg/pull/79098)).
+-   Remove the `--wpds-dimension-base` design token. It was a primitive (the `4px` base unit) and is no longer exposed publicly ([#79254](https://github.com/WordPress/gutenberg/pull/79254)).
+-   Remove `privateApis` from the package exports due to API stabilization described in "New Features" ([#78958](https://github.com/WordPress/gutenberg/pull/78958)).
+
+### New Features
+
+-   Add `ThemeProvider` as a public package export ([#78958](https://github.com/WordPress/gutenberg/pull/78958)).
 -   Add `--wpds-color-stroke-surface-caution` and `--wpds-color-stroke-surface-caution-strong` so the `caution` tone has the same stroke-surface coverage as the other status tones ([#79198](https://github.com/WordPress/gutenberg/pull/79198)).
 -   Add `--wpds-border-radius-xl` for page and app shell surfaces so nested cards and notices can stay on `--wpds-border-radius-lg` without matching the parent radius ([#78913](https://github.com/WordPress/gutenberg/pull/78913)).
 -   Add `cornerRadius` prop to `ThemeProvider` for configuring the border-radius preset (`none`, `subtle`, `moderate`, `pronounced`) via prebuilt design token modes. [#78816](https://github.com/WordPress/gutenberg/pull/78816).
@@ -42,6 +59,7 @@
 
 ### Code Quality
 
+-   `ThemeProvider`: Apply scoped custom properties via inline `style` (mirrored onto the wrapper's own document element when `isRoot`) instead of a per-instance `<style>` element ([#78678](https://github.com/WordPress/gutenberg/pull/78678)).
 -   `ThemeProvider`: Stop serializing `data-wpds-root-provider="false"` on non-root providers by only setting the attribute when `isRoot` is `true` ([#79253](https://github.com/WordPress/gutenberg/pull/79253)).
 -   Declare `postcss`, `esbuild`, and `vite` as optional peer dependencies for the bundler plugins, and move `@types/react` from `dependencies` to an optional peer dependency ([#79095](https://github.com/WordPress/gutenberg/pull/79095)).
 

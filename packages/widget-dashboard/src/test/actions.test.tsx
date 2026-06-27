@@ -65,6 +65,12 @@ function Harness( {
 }
 
 describe( 'WidgetDashboard.Actions', () => {
+	let user: ReturnType< typeof userEvent.setup >;
+
+	beforeEach( () => {
+		user = userEvent.setup();
+	} );
+
 	it( 'renders the Customize button when editMode is false', () => {
 		render( <Harness /> );
 
@@ -91,9 +97,7 @@ describe( 'WidgetDashboard.Actions', () => {
 		const onEditChange = jest.fn();
 		render( <Harness onEditChange={ onEditChange } /> );
 
-		await userEvent.click(
-			screen.getByRole( 'button', { name: 'Customize' } )
-		);
+		await user.click( screen.getByRole( 'button', { name: 'Customize' } ) );
 
 		expect( onEditChange ).toHaveBeenLastCalledWith( true );
 	} );
@@ -117,9 +121,7 @@ describe( 'WidgetDashboard.Actions', () => {
 			/>
 		);
 
-		await userEvent.click(
-			screen.getByRole( 'button', { name: 'Cancel' } )
-		);
+		await user.click( screen.getByRole( 'button', { name: 'Cancel' } ) );
 
 		expect( onEditChange ).toHaveBeenLastCalledWith( false );
 		expect( onLayoutChange ).not.toHaveBeenCalled();
@@ -176,7 +178,7 @@ describe( 'WidgetDashboard.Actions', () => {
 				<Harness initialEditMode onGridSettingsChange={ () => {} } />
 			);
 
-			await userEvent.click(
+			await user.click(
 				screen.getByRole( 'button', { name: 'Layout settings' } )
 			);
 
@@ -202,7 +204,7 @@ describe( 'WidgetDashboard.Actions', () => {
 				</WidgetDashboard>
 			);
 
-			await userEvent.click(
+			await user.click(
 				screen.getByRole( 'button', { name: 'More options' } )
 			);
 
