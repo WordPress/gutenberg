@@ -114,6 +114,67 @@ if ( ! function_exists( 'gutenberg_add_note_followers' ) ) {
 	}
 }
 
+if ( ! function_exists( 'gutenberg_remove_note_followers' ) ) {
+	/**
+	 * Removes user IDs from a note thread's follower list.
+	 *
+	 * Lets a user unfollow a thread. The thread's own followers meta is deleted
+	 * automatically with the note when the note is trashed or deleted (comment
+	 * meta is removed alongside the comment, and deleting a top-level note also
+	 * removes its replies), so this only needs to handle explicit unsubscribes.
+	 *
+	 * @param int   $root_id  Top-level note ID.
+	 * @param int[] $user_ids User IDs to unsubscribe from the thread.
+	 * @return int[] The updated follower list.
+	 */
+	function gutenberg_remove_note_followers( $root_id, $user_ids ) {
+		$followers = gutenberg_get_note_followers( $root_id );
+		$remove    = array_map( 'intval', (array) $user_ids );
+		$updated   = array_values( array_diff( $followers, $remove ) );
+
+		if ( $updated !== $followers ) {
+			if ( $updated ) {
+				update_comment_meta( $root_id, '_wp_note_followers', $updated );
+			} else {
+				delete_comment_meta( $root_id, '_wp_note_followers' );
+			}
+		}
+
+		return $updated;
+	}
+}
+
+if ( ! function_exists( 'gutenberg_register_note_followers_meta' ) ) {
+	/**
+	 * Registers the note followers meta so it is available through the REST API.
+	 *
+	 * Mirrors core's `_wp_note_status` registration. The list is readable by
+	 * users who can moderate comments and editable by users who can edit the
+	 * note, so a follower management UI can read and update it.
+	 */
+	function gutenberg_register_note_followers_meta() {
+		register_meta(
+			'comment',
+			'_wp_note_followers',
+			array(
+				'type'          => 'array',
+				'description'   => __( 'User IDs following the note thread.', 'gutenberg' ),
+				'single'        => true,
+				'show_in_rest'  => array(
+					'schema' => array(
+						'type'  => 'array',
+						'items' => array( 'type' => 'integer' ),
+					),
+				),
+				'auth_callback' => function ( $allowed, $meta_key, $object_id ) {
+					return current_user_can( 'edit_comment', $object_id );
+				},
+			)
+		);
+	}
+	add_action( 'init', 'gutenberg_register_note_followers_meta' );
+}
+
 if ( ! function_exists( 'gutenberg_notify_note_mentions' ) ) {
 	/**
 	 * Notifies mentioned users and thread followers about a new note.
@@ -173,7 +234,7 @@ if ( ! function_exists( 'gutenberg_notify_note_mentions' ) ) {
 		 * @param WP_Comment $comment       The note that was inserted.
 		 * @param int        $root_id       The thread's top-level note ID.
 		 */
-		$recipient_ids = apply_filters( 'gutenberg_note_notification_recipients', $recipient_ids, $comment, $root_id );
+		$recipient_ids = apply_filters( 'note_notification_recipients', $recipient_ids, $comment, $root_id );
 
 		$mentioned_lookup = array_flip( $mentioned );
 
@@ -264,7 +325,7 @@ if ( ! function_exists( 'gutenberg_send_note_notification' ) ) {
 		 * @param WP_Comment $comment       The note.
 		 * @param bool       $was_mentioned Whether the recipient was mentioned.
 		 */
-		$subject = apply_filters( 'gutenberg_note_notification_subject', $subject, $user, $comment, $was_mentioned );
+		$subject = apply_filters( 'note_notification_subject', $subject, $user, $comment, $was_mentioned );
 
 		/**
 		 * Filters the note notification email body.
@@ -276,7 +337,7 @@ if ( ! function_exists( 'gutenberg_send_note_notification' ) ) {
 		 * @param WP_Comment $comment       The note.
 		 * @param bool       $was_mentioned Whether the recipient was mentioned.
 		 */
-		$body = apply_filters( 'gutenberg_note_notification_message', $body, $user, $comment, $was_mentioned );
+		$body = apply_filters( 'note_notification_text', $body, $user, $comment, $was_mentioned );
 
 		wp_mail( $user->user_email, wp_specialchars_decode( $subject ), $body );
 	}

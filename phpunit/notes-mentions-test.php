@@ -237,7 +237,7 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 			$ids[] = $extra_id;
 			return array_values( array_diff( $ids, array( self::$mentioned_id ) ) );
 		};
-		add_filter( 'gutenberg_note_notification_recipients', $filter );
+		add_filter( 'note_notification_recipients', $filter );
 
 		$mention = sprintf(
 			'<a class="wp-note-mention" data-user-id="%d" href="#">@Mentioned</a>',
@@ -246,9 +246,40 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 		$note    = $this->insert_note( "Ping $mention", self::$commenter_id );
 		gutenberg_notify_note_mentions( $note );
 
-		remove_filter( 'gutenberg_note_notification_recipients', $filter );
+		remove_filter( 'note_notification_recipients', $filter );
 
 		$this->assertContains( get_userdata( $extra_id )->user_email, $this->sent_to );
 		$this->assertNotContains( get_userdata( self::$mentioned_id )->user_email, $this->sent_to );
+	}
+
+	public function test_followers_can_be_removed() {
+		$note = $this->insert_note( 'Top level', self::$commenter_id );
+		gutenberg_add_note_followers(
+			$note->comment_ID,
+			array( self::$commenter_id, self::$mentioned_id )
+		);
+
+		$remaining = gutenberg_remove_note_followers(
+			$note->comment_ID,
+			array( self::$mentioned_id )
+		);
+
+		$this->assertSame( array( self::$commenter_id ), $remaining );
+		$this->assertSame(
+			array( self::$commenter_id ),
+			gutenberg_get_note_followers( $note->comment_ID )
+		);
+
+		// Removing the last follower clears the meta entirely.
+		gutenberg_remove_note_followers( $note->comment_ID, array( self::$commenter_id ) );
+		$this->assertSame( '', get_comment_meta( $note->comment_ID, '_wp_note_followers', true ) );
+	}
+
+	public function test_followers_meta_is_registered_for_rest() {
+		gutenberg_register_note_followers_meta();
+
+		$registered = get_registered_meta_keys( 'comment' );
+		$this->assertArrayHasKey( '_wp_note_followers', $registered );
+		$this->assertNotFalse( $registered['_wp_note_followers']['show_in_rest'] );
 	}
 }
