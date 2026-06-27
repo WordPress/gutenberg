@@ -131,7 +131,9 @@ class Animated_Gif_To_Video_Test extends WP_UnitTestCase {
 		$this->assertFileExists( $video_path );
 		$this->assertFileExists( $poster_path );
 
-		gutenberg_delete_animated_gif_video( $attachment_id );
+		// Delete through the real attachment-deletion path so the
+		// delete_attachment hook wiring is covered, not just the callback.
+		wp_delete_attachment( $attachment_id, true );
 
 		$this->assertFileDoesNotExist( $video_path );
 		$this->assertFileDoesNotExist( $poster_path );
