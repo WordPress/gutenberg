@@ -605,7 +605,6 @@ export default function TypographyPanel( {
 						fontFamilies={ fontFamilies }
 						value={ fontFamily }
 						onChange={ setFontFamily }
-						size="__unstable-large"
 					/>
 				</ToolsPanelItem>
 			) }
@@ -662,7 +661,6 @@ export default function TypographyPanel( {
 						__unstableInputWidth="auto"
 						value={ lineHeight }
 						onChange={ setLineHeight }
-						size="__unstable-large"
 					/>
 				</ToolsPanelItem>
 			) }
@@ -693,7 +691,6 @@ export default function TypographyPanel( {
 					<TextIndentControl
 						value={ textIndent }
 						onChange={ setTextIndentValue }
-						size="__unstable-large"
 						__unstableInputWidth="auto"
 						withSlider
 						hasBottomMargin={ isGlobalStyles }

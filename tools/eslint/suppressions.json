@@ -1681,11 +1681,6 @@
 			"count": 1
 		}
 	},
-	"packages/global-styles-ui/src/screen-color-palette.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/global-styles-ui/src/screen-colors.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
