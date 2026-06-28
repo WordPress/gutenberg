@@ -143,7 +143,6 @@ Beyond browser support, the client checks several runtime conditions before acti
 
 | Check | Threshold | Why |
 | --- | --- | --- |
-| Browser | Chromium 137+ | `Document-Isolation-Policy` (and therefore `SharedArrayBuffer`) is Chromium-only; Firefox and Safari fall back to server-side. In-browser HEIC decode still runs in Safari. |
 | Device memory | > 2 GB | WASM image processing can OOM on very low-memory devices. |
 | CPU cores | ≥ 2 | WASM image processing benefits from at least one core for the worker plus one for the UI thread. |
 | Network | not `2g`/`slow-2g`, no [`Save-Data` header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Save-Data) | The ~13 MB worker download is gated to faster connections; `3g` is allowed. |
