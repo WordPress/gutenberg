@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/data",
-	"version": "10.48.1",
+	"version": "10.49.0",
 	"description": "Data module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

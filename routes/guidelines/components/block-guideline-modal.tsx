@@ -140,7 +140,6 @@ export default function BlockGuidelineModal( {
 			<VStack spacing={ 4 }>
 				{ isEditing ? (
 					<TextControl
-						__next40pxDefaultSize
 						label={ __( 'Block' ) }
 						value={ selectedBlockLabel }
 						onChange={ () => {} }

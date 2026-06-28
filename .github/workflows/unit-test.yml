@@ -29,6 +29,7 @@ jobs:
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
+            id-token: write
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
@@ -64,6 +65,10 @@ jobs:
             - name: Running the tests
               env:
                   SHARD: ${{ matrix.shard }}
+                  # Record the Node.js major as a custom flakiness environment
+                  # dimension so flakiness.io keeps a separate history per Node
+                  # version in the matrix.
+                  FK_ENV_NODEJS: ${{ matrix.node }}
               run: |
                   npm run test:unit -- \
                     --ci \
@@ -76,6 +81,7 @@ jobs:
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
+            id-token: write
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
@@ -108,6 +114,11 @@ jobs:
               run: npx lerna run build
 
             - name: Run the date tests
+              env:
+                  # Record the Node.js major as a custom flakiness environment
+                  # dimension so flakiness.io keeps a separate history per Node
+                  # version in the matrix.
+                  FK_ENV_NODEJS: ${{ matrix.node }}
               run: npm run test:unit:date -- --ci --maxWorkers="$(nproc)" --cacheDirectory="$HOME/.jest-cache"
 
     compute-previous-wordpress-version:

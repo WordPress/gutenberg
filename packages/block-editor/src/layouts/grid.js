@@ -8,6 +8,7 @@ import {
 	Flex,
 	FlexItem,
 	RangeControl,
+	ToggleControl,
 	__experimentalNumberControl as NumberControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
@@ -81,6 +82,9 @@ export default {
 		const showMinWidthControl =
 			! layout?.isManualPlacement ||
 			window.__experimentalEnableGridInteractivity;
+		// Auto-fit/auto-fill only applies when grid items are placed
+		// automatically, so the control is irrelevant in manual placement mode.
+		const showFillControl = ! layout?.isManualPlacement;
 		const defaultColumnCount = layout.isManualPlacement ? 3 : undefined;
 		const hasLayoutValue = ( key, defaultValue ) =>
 			( layout?.[ key ] ?? defaultValue ) !==
@@ -92,6 +96,7 @@ export default {
 			hasLayoutValue( 'rowCount' );
 		const hasMinimumColumnWidthValue = () =>
 			hasLayoutValue( 'minimumColumnWidth' );
+		const hasFillValue = () => hasLayoutValue( 'autoFit', false );
 		const resetGridType = () =>
 			onChange(
 				cleanEmptyObject( {
@@ -114,6 +119,13 @@ export default {
 				cleanEmptyObject( {
 					...layout,
 					minimumColumnWidth: resetLayout?.minimumColumnWidth,
+				} )
+			);
+		const resetFill = () =>
+			onChange(
+				cleanEmptyObject( {
+					...layout,
+					autoFit: resetLayout?.autoFit,
 				} )
 			);
 
@@ -162,6 +174,19 @@ export default {
 						/>
 					</ToolsPanelItem>
 				) }
+				{ showFillControl && (
+					<ToolsPanelItem
+						label={ __( 'Fill available space' ) }
+						hasValue={ hasFillValue }
+						onDeselect={ resetFill }
+						panelId={ clientId }
+					>
+						<GridLayoutFillControl
+							layout={ layout }
+							onChange={ onChange }
+						/>
+					</ToolsPanelItem>
+				) }
 			</>
 		);
 	},
@@ -188,7 +213,12 @@ export default {
 			minimumColumnWidth = null,
 			columnCount = null,
 			rowCount = null,
+			autoFit = false,
 		} = effectiveLayout;
+
+		// When enabled, columns stretch to fill the available space using
+		// `auto-fit`; otherwise empty tracks are preserved with `auto-fill`.
+		const autoPlacement = autoFit ? 'auto-fit' : 'auto-fill';
 
 		// Check that the grid layout attributes are of the correct type, so that we don't accidentally
 		// write code that stores a string attribute instead of a number.
@@ -204,6 +234,9 @@ export default {
 			}
 			if ( rowCount && typeof rowCount !== 'number' ) {
 				throw new Error( 'rowCount must be a number' );
+			}
+			if ( autoFit && typeof autoFit !== 'boolean' ) {
+				throw new Error( 'autoFit must be a boolean' );
 			}
 		}
 
@@ -236,6 +269,7 @@ export default {
 			! hasViewportOverrides ||
 			hasViewportOverride( 'minimumColumnWidth' ) ||
 			hasViewportOverride( 'columnCount' ) ||
+			hasViewportOverride( 'autoFit' ) ||
 			( hasBlockGapOverride && minimumColumnWidth && columnCount > 0 );
 		const shouldOutputGridRows =
 			( ! hasViewportOverrides || hasViewportOverride( 'rowCount' ) ) &&
@@ -256,7 +290,7 @@ export default {
 				columnCount - 1
 			}) ) / ${ columnCount })`;
 			rules.push(
-				`grid-template-columns: repeat(auto-fill, minmax(${ maxValue }, 1fr))`
+				`grid-template-columns: repeat(${ autoPlacement }, minmax(${ maxValue }, 1fr))`
 			);
 		} else if ( shouldOutputGridColumns && columnCount ) {
 			rules.push(
@@ -264,7 +298,7 @@ export default {
 			);
 		} else if ( shouldOutputGridColumns ) {
 			rules.push(
-				`grid-template-columns: repeat(auto-fill, minmax(min(${
+				`grid-template-columns: repeat(${ autoPlacement }, minmax(min(${
 					minimumColumnWidth || '12rem'
 				}, 100%), 1fr))`
 			);
@@ -435,7 +469,7 @@ function GridLayoutColumnsAndRowsControl( {
 									columnCount: newColumnCount,
 								} );
 							} }
-							value={ columnCount }
+							value={ columnCount ?? '' }
 							min={ 1 }
 							label={ __( 'Columns' ) }
 							hideLabelFromVision={ ! isManualPlacement }
@@ -485,6 +519,28 @@ function GridLayoutColumnsAndRowsControl( {
 				</Flex>
 			</fieldset>
 		</>
+	);
+}
+
+// Enables stretching grid columns to fill the available space (auto-fit)
+// instead of leaving empty tracks at the end of a row (auto-fill).
+function GridLayoutFillControl( { layout, onChange } ) {
+	const { autoFit = false } = layout;
+
+	return (
+		<ToggleControl
+			label={ __( 'Fill available space' ) }
+			help={ __(
+				'Stretch columns to fill the available space, instead of leaving gaps when there are too few items to fill a row.'
+			) }
+			checked={ autoFit }
+			onChange={ ( value ) =>
+				onChange( {
+					...layout,
+					autoFit: value,
+				} )
+			}
+		/>
 	);
 }
 

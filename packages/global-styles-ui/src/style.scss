@@ -233,6 +233,14 @@
 	height: 100%;
 }
 
+.global-styles-ui-color-palette__tablist-container {
+	border-bottom: variables.$border-width solid colors.$gray-300;
+}
+
+.global-styles-ui-color-palette__tablist {
+	margin-bottom: calc(-1 * variables.$border-width);
+}
+
 .global-styles-ui-sidebar__navigator-screen .single-column {
 	grid-column: span 1;
 }

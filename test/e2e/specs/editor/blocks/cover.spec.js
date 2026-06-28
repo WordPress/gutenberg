@@ -569,6 +569,41 @@ test.describe( 'Cover', () => {
 		const overlay = coverBlock.locator( '.wp-block-cover__background' );
 		await expect( overlay ).toBeVisible();
 	} );
+
+	test( 'hides overlay controls when a viewport style state is selected', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/cover' } );
+		const coverBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Cover',
+		} );
+		await coverBlock.getByRole( 'button', { name: 'Black' } ).click();
+
+		await editor.selectBlocks( coverBlock );
+		await editor.openDocumentSettingsSidebar();
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await openStylesTabIfAvailable( editorSettings );
+
+		const overlayControl = editorSettings.getByRole( 'button', {
+			name: 'Overlay',
+		} );
+		await expect( overlayControl ).toBeVisible();
+
+		await page.getByRole( 'button', { name: 'View', exact: true } ).click();
+		await page
+			.getByRole( 'menuitemcheckbox', { name: 'Responsive editing' } )
+			.click();
+		await page.getByRole( 'menuitemradio', { name: 'Tablet' } ).click();
+		await page.keyboard.press( 'Escape' );
+
+		await expect( overlayControl ).toBeHidden();
+		await expect(
+			editorSettings.getByRole( 'slider', { name: 'Overlay opacity' } )
+		).toBeHidden();
+	} );
 } );
 
 class CoverBlockUtils {
