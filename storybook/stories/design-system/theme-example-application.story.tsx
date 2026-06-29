@@ -19,9 +19,10 @@ import {
 
 import { withRouter } from '../../decorators/with-router';
 
-type CornerRadiusPreset = React.ComponentProps<
+type ThemeProviderCornerRadius = React.ComponentProps<
 	typeof ThemeProvider
 >[ 'cornerRadius' ];
+type CornerRadiusPreset = NonNullable< ThemeProviderCornerRadius >;
 
 const sidebarNavItems = [
 	'Dashboard',
@@ -121,7 +122,7 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 							value={ cornerRadiusPreset }
 							onChange={ ( e ) =>
 								setCornerRadiusPreset(
-									e.target.value as typeof cornerRadiusPreset
+									e.target.value as CornerRadiusPreset
 								)
 							}
 						>
