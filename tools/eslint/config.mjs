@@ -126,6 +126,12 @@ const restrictedImports = [
 		message:
 			'Avoid using Base UI directly. Consider a new `@wordpress/ui` component instead.',
 	},
+	{
+		name: '@wordpress/theme',
+		importNames: [ 'privateApis' ],
+		message:
+			'Do not use `privateApis` from `@wordpress/theme`. Import public APIs from `@wordpress/theme` instead.',
+	},
 ];
 
 const useIsomorphicLayoutEffectRestrictedImport = {
@@ -283,7 +289,6 @@ export default dedupePlugins( [
 				},
 			],
 			'@wordpress/no-unsafe-wp-apis': 'off',
-			'@wordpress/no-private-theme-provider': 'error',
 			'@wordpress/data-no-store-string-literals': 'error',
 			'@wordpress/use-recommended-components': 'error',
 			'@wordpress/use-import-as': [
