@@ -6,13 +6,13 @@ import { useThemeProviderStyles } from './use-theme-provider-styles';
 function warnPrivateApi( apiName: string ) {
 	deprecated( `\`privateApis.${ apiName }\` from \`@wordpress/theme\``, {
 		since: '7.1',
-		version: '7.2',
+		version: '7.3',
 		alternative: '`ThemeProvider` from `@wordpress/theme`',
 	} );
 }
 
 /**
- * @deprecated Private `@wordpress/theme` APIs will be removed in WordPress 7.2.
+ * @deprecated Private `@wordpress/theme` APIs will be removed in WordPress 7.3.
  * Import `ThemeProvider` from `@wordpress/theme` instead.
  */
 export const privateApis = {};

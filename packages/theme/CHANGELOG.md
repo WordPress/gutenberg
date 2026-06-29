@@ -8,7 +8,7 @@
 
 ### Deprecations
 
--   Temporarily restore previously removed private APIs to allow for an easier consumer migration. These private APIs are deprecated and will be removed in WordPress 7.2 ([#79594](https://github.com/WordPress/gutenberg/pull/79594), [#79620](https://github.com/WordPress/gutenberg/pull/79620)).
+-   Temporarily restore previously removed private APIs to allow for an easier consumer migration. These private APIs are deprecated and will be removed in WordPress 7.3 ([#79594](https://github.com/WordPress/gutenberg/pull/79594), [#79620](https://github.com/WordPress/gutenberg/pull/79620)).
 
 ### Bug Fixes
 
