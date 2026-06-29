@@ -1,6 +1,6 @@
-import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
 // eslint-disable-next-line no-restricted-imports -- Temporary compatibility fallback for older @wordpress/theme runtimes. Remove in WordPress 7.3.
 import * as theme from '@wordpress/theme';
+import { unlock } from '../lock-unlock';
 
 type ThemeProviderComponent = typeof theme.ThemeProvider;
 type ThemePackageWithCompatibilityFallback = Omit<
@@ -10,11 +10,6 @@ type ThemePackageWithCompatibilityFallback = Omit<
 	ThemeProvider?: ThemeProviderComponent;
 	privateApis?: unknown;
 };
-
-const { unlock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
-	'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
-	'@wordpress/ui'
-);
 
 function getThemeProvider(): ThemeProviderComponent {
 	const themePackage = theme as ThemePackageWithCompatibilityFallback;
