@@ -10,7 +10,7 @@
 ### Enhancements
 
 -   `WidgetModuleRecord`: add optional `category`, overlaid onto the
-    metadata module's value like `presentation`.
+    metadata module's value.
 
 ## 0.1.0 (2026-06-24)
 

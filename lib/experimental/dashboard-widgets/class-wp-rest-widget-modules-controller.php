@@ -251,7 +251,7 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 					),
 
 					'category'      => array(
-						'description' => __( 'Grouping category for the widget type.', 'gutenberg' ),
+						'description' => __( 'Widget types are grouped into categories to help users browse and discover them.', 'gutenberg' ),
 						'type'        => array( 'string', 'null' ),
 						'context'     => array( 'view', 'edit', 'embed' ),
 						'readonly'    => true,
