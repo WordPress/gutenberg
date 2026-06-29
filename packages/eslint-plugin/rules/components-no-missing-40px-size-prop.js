@@ -16,7 +16,6 @@ const COMPONENTS_REQUIRING_40PX = new Set( [
 	'ClipboardButton',
 	'ComboboxControl',
 	'CustomSelectControl',
-	'FontAppearanceControl',
 	'FormTokenField',
 	'IconButton',
 	'InputControl',

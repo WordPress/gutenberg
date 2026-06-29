@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { CustomSelectControl } from '@wordpress/components';
-import deprecated from '@wordpress/deprecated';
 import { useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
@@ -34,21 +33,30 @@ const getFontAppearanceLabel = ( hasFontStyles, hasFontWeights ) => {
 /**
  * Control to display font style and weight options of the active font.
  *
- * @param {Object} props Component props.
+ * @param {Object}   props                         Component props.
+ * @param {boolean}  [props.__next40pxDefaultSize] Start opting into the larger default height that will become the default size in a future version.
+ * @param {Function} props.onChange                Handles change in font appearance selection.
+ * @param {boolean}  [props.hasFontStyles]         Whether font styles are enabled and present.
+ * @param {boolean}  [props.hasFontWeights]        Whether font weights are enabled and present.
+ * @param {Array}    props.fontFamilyFaces         Font family faces for the active font.
+ * @param {Object}   props.value                   Currently selected font style and weight.
+ * @param {string}   props.value.fontStyle         Currently selected font style.
+ * @param {string}   props.value.fontWeight        Currently selected font weight.
+ * @param {Array}    [props.options]               Options override.
  *
  * @return {Element} Font appearance control.
  */
-export default function FontAppearanceControl( props ) {
-	const {
-		/** Start opting into the larger default height that will become the default size in a future version. */
-		__next40pxDefaultSize = false,
-		onChange,
-		hasFontStyles = true,
-		hasFontWeights = true,
-		fontFamilyFaces,
-		value: { fontStyle, fontWeight },
-		...otherProps
-	} = props;
+export default function FontAppearanceControl( {
+	/** @deprecated Default behavior since WordPress 7.1. Prop can be safely removed. */
+	__next40pxDefaultSize: _next40pxDefaultSize,
+	onChange,
+	hasFontStyles = true,
+	hasFontWeights = true,
+	fontFamilyFaces,
+	value: { fontStyle, fontWeight },
+	options,
+	...otherProps
+} ) {
 	const hasStylesOrWeights = hasFontStyles || hasFontWeights;
 	const label = getFontAppearanceLabel( hasFontStyles, hasFontWeights );
 	const defaultOption = {
@@ -103,12 +111,7 @@ export default function FontAppearanceControl( props ) {
 
 		// Display only font style options or font weight options.
 		return hasFontStyles ? styleOptions() : weightOptions();
-	}, [
-		props.options,
-		fontStyles,
-		fontWeights,
-		combinedStyleAndWeightOptions,
-	] );
+	}, [ options, fontStyles, fontWeights, combinedStyleAndWeightOptions ] );
 
 	// Find current selection by comparing font style & weight against options,
 	// and fall back to the Default option if there is no matching option.
@@ -148,27 +151,12 @@ export default function FontAppearanceControl( props ) {
 		);
 	};
 
-	if (
-		! __next40pxDefaultSize &&
-		( otherProps.size === undefined || otherProps.size === 'default' )
-	) {
-		deprecated(
-			`36px default size for wp.blockEditor.__experimentalFontAppearanceControl`,
-			{
-				since: '6.8',
-				version: '7.1',
-				hint: 'Set the `__next40pxDefaultSize` prop to true to start opting into the new default size, which will become the default in a future version.',
-			}
-		);
-	}
-
 	return (
 		hasStylesOrWeights && (
 			<CustomSelectControl
 				{ ...otherProps }
+				__next40pxDefaultSize
 				className="components-font-appearance-control"
-				__next40pxDefaultSize={ __next40pxDefaultSize }
-				__shouldNotWarnDeprecated36pxSize
 				label={ label }
 				describedBy={ getDescribedBy() }
 				options={ selectOptions }
