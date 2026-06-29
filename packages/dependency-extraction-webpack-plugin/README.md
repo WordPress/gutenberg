@@ -96,7 +96,7 @@ This plugin is compatible with `externals`, but they may conflict. For example, 
 
 #### Bundled packages
 
-The following `@wordpress/*` packages are **bundled** into the consumer's build output instead of being externalized to `wp.*` globals. They are defined in [`lib/util.js`](lib/util.js) as `BUNDLED_PACKAGES`:
+The following `@wordpress/*` packages are **bundled** into the consumer's build output instead of being externalized to `wp.*` globals:
 
 - `@wordpress/admin-ui`
 - `@wordpress/dataviews`
