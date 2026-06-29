@@ -1046,6 +1046,13 @@
 									"type": "array"
 								}
 							},
+							"innerContent": {
+								"description": "Static HTML fragments interleaved with inner blocks, where null entries mark the positions of the inner blocks within the static markup. Only applies to the Custom HTML block.",
+								"type": "array",
+								"items": {
+									"type": [ "string", "null" ]
+								}
+							},
 							"example": {
 								"description": "Example provides structured data for the block preview. You can set to undefined to disable the preview shown for the block type.",
 								"type": "object"
