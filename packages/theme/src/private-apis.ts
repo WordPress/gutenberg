@@ -5,7 +5,7 @@ import { useThemeProviderStyles } from './use-theme-provider-styles';
 
 function warnPrivateApi( apiName: string ) {
 	warning(
-		`ThemeProvider: Accessing \`${ apiName }\` through \`@wordpress/theme\` private APIs is deprecated. Import \`ThemeProvider\` from \`@wordpress/theme\` instead; this private export is scheduled for deletion as \`@wordpress/theme\` approaches stabilization.`
+		`\`@wordpress/theme\`: Accessing \`${ apiName }\` through private APIs is deprecated. Import \`ThemeProvider\` from \`@wordpress/theme\` instead; this private export is scheduled for deletion as \`@wordpress/theme\` approaches stabilization.`
 	);
 }
 
