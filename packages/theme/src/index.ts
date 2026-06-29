@@ -5,7 +5,8 @@ export { ThemeProvider } from './theme-provider';
 export type * from './prebuilt/ts/token-types';
 
 /**
- * @deprecated This type is not part of the intended public API and is scheduled
- * for deletion as `@wordpress/theme` approaches stabilization.
+ * @deprecated This type is not part of the intended public API and will be
+ * removed in WordPress 7.2. Derive this type from `ThemeProvider`'s
+ * `cornerRadius` prop instead.
  */
 export type CornerRadiusPreset = InternalCornerRadiusPreset;

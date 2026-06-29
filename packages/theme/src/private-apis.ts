@@ -12,9 +12,8 @@ function warnPrivateApi( apiName: string ) {
 }
 
 /**
- * @deprecated Private `@wordpress/theme` APIs are scheduled for deletion as the
- * package approaches stabilization. Import public APIs from `@wordpress/theme`
- * instead.
+ * @deprecated Private `@wordpress/theme` APIs will be removed in WordPress 7.2.
+ * Import `ThemeProvider` from `@wordpress/theme` instead.
  */
 export const privateApis = {};
 lock( privateApis, {

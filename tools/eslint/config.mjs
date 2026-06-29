@@ -130,7 +130,7 @@ const restrictedImports = [
 		name: '@wordpress/theme',
 		importNames: [ 'privateApis', 'CornerRadiusPreset' ],
 		message:
-			'Do not import private or unstable APIs from `@wordpress/theme`; these exports are scheduled for deletion as the package approaches stabilization.',
+			'Do not import private or unstable APIs from `@wordpress/theme`; these exports will be removed in WordPress 7.2.',
 	},
 ];
 
