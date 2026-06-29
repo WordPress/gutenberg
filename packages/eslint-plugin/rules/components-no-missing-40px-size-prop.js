@@ -14,6 +14,7 @@ const { hasTruthyJsxAttribute } = require( '../utils' );
 const COMPONENTS_REQUIRING_40PX = new Set( [
 	'Button',
 	'ClipboardButton',
+	'ComboboxControl',
 	'CustomSelectControl',
 	'FontAppearanceControl',
 	'FormTokenField',
@@ -21,7 +22,6 @@ const COMPONENTS_REQUIRING_40PX = new Set( [
 	'InputControl',
 	'NumberControl',
 	'Radio',
-	'RangeControl',
 	'SelectControl',
 	'ToggleGroupControl',
 	'UnitControl',

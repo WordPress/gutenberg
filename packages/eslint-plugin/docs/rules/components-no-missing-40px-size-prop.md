@@ -9,12 +9,12 @@ This is a temporary rule to help migrate components to the new default size. Onc
 The following components are checked by this rule:
 
 -   Button
+-   ComboboxControl
 -   CustomSelectControl
 -   FontAppearanceControl
 -   FormTokenField
 -   InputControl
 -   NumberControl
--   RangeControl
 -   SelectControl
 -   ToggleGroupControl
 -   UnitControl
