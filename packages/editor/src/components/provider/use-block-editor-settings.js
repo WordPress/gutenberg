@@ -153,6 +153,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		isNavigationOverlayContext,
 		isRevisionsMode,
 		viewablePostTypeLabel,
+		currentPostId,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -164,6 +165,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			} = select( coreStore );
 			const { get } = select( preferencesStore );
 			const { getBlockTypes } = select( blocksStore );
+			const { getCurrentPostId, getCurrentPostType } =
+				select( editorStore );
 			const { getDeviceType, isRevisionsMode: _isRevisionsMode } = unlock(
 				select( editorStore )
 			);
@@ -179,8 +182,11 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			// Fetch image sizes from REST API index for client-side media processing.
 			const baseData = getEntityRecord( 'root', '__unstableBase' );
 
-			// Read from the already-cached post type record (no extra request).
-			const postTypeObject = getPostType( postType );
+			// The attached-images category follows the post being edited, not the
+			// root-level entity in `postType`/`postId`. With "Show template" on,
+			// the root becomes the template (wp_template), but media still attaches
+			// to the page being edited.
+			const postTypeObject = getPostType( getCurrentPostType() );
 
 			function getSectionRootBlock() {
 				if ( renderingMode === 'template-locked' ) {
@@ -232,6 +238,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				viewablePostTypeLabel: postTypeObject?.viewable
 					? postTypeObject?.labels?.singular_name
 					: undefined,
+				currentPostId: getCurrentPostId(),
 				restBlockPatternCategories: getBlockPatternCategories(),
 				sectionRootClientId: getSectionRootBlock(),
 				deviceType: getDeviceType(),
@@ -333,12 +340,13 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 
 	const forceDisableFocusMode = settings.focusMode === false;
 
-	// The "Attachments" media category depends on the current post and its post
+	// The "Attachments" media category depends on the edited post and its post
 	// type label (which gates whether it's offered and words its copy), so the
 	// categories are derived rather than being a static list.
 	const inserterMediaCategories = useMemo(
-		() => getInserterMediaCategories( postId, viewablePostTypeLabel ),
-		[ postId, viewablePostTypeLabel ]
+		() =>
+			getInserterMediaCategories( currentPostId, viewablePostTypeLabel ),
+		[ currentPostId, viewablePostTypeLabel ]
 	);
 
 	return useMemo( () => {
