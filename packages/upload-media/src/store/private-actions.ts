@@ -26,7 +26,11 @@ import {
 	exceedsClientProcessingMemory,
 } from '../feature-detection';
 import { getImageDimensions } from '../get-image-dimensions';
-import { CLIENT_SIDE_SUPPORTED_MIME_TYPES, HEIC_MIME_TYPES } from './constants';
+import {
+	CLIENT_SIDE_SUPPORTED_MIME_TYPES,
+	HEIC_MIME_TYPES,
+	HEIC_SEQUENCE_MIME_TYPES,
+} from './constants';
 import { StubFile } from '../stub-file';
 import { ErrorCode, UploadError } from '../upload-error';
 import { measure } from './utils/debug-logger';
@@ -41,6 +45,7 @@ import {
 } from './utils';
 import {
 	convertGifToVideo,
+	convertHeicSequenceToVideo,
 	isUnsupportedConversionError,
 	terminateVideoConversionWorker,
 } from './utils/video-conversion';
@@ -819,6 +824,62 @@ export function prepareItem( id: QueueItemId ) {
 					} );
 					return;
 				}
+			}
+		}
+
+		/*
+		 * HEIC/HEIF image sequence (Apple Live Photo, Android burst) → video.
+		 * These multi-frame HEVC sequences cannot be decoded server-side
+		 * (GD/Imagick read only one frame). Decode the temporal frames with
+		 * the platform HEVC codec and re-encode to a web-safe video, which is
+		 * uploaded as the attachment. Requires WebCodecs; client-side media
+		 * already runs only under cross-origin isolation.
+		 */
+		if (
+			HEIC_SEQUENCE_MIME_TYPES.includes( file.type ) &&
+			typeof VideoDecoder !== 'undefined' &&
+			typeof VideoEncoder !== 'undefined'
+		) {
+			try {
+				const videoFile = await convertHeicSequenceToVideo(
+					id,
+					file,
+					settings.videoOutputFormat ?? 'video/mp4'
+				);
+
+				operations.push( OperationType.Upload );
+				dispatch< AddOperationsAction >( {
+					type: Type.AddOperations,
+					id,
+					operations,
+				} );
+
+				dispatch.finishOperation( id, {
+					file: videoFile,
+					sourceFile: videoFile,
+					additionalData: {
+						...item.additionalData,
+						generate_sub_sizes: true,
+					},
+				} );
+				return;
+			} catch ( error ) {
+				if ( ! isUnsupportedConversionError( error ) ) {
+					dispatch.cancelItem(
+						id,
+						new UploadError( {
+							code: ErrorCode.MEDIA_TRANSCODING_ERROR,
+							message:
+								'The Live Photo or burst sequence could not be converted to a video.',
+							file,
+						} )
+					);
+					return;
+				}
+				/*
+				 * Codecs unavailable: fall through to upload the original file
+				 * and let the server collapse it to a single still frame.
+				 */
 			}
 		}
 
