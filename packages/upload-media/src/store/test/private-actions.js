@@ -23,6 +23,7 @@ import {
 } from '../utils';
 import {
 	convertGifToVideo,
+	convertHeicSequenceToVideo,
 	terminateVideoConversionWorker,
 } from '../utils/video-conversion';
 
@@ -55,6 +56,7 @@ jest.mock( '../utils/video-conversion', () => {
 	const actual = jest.requireActual( '../utils/video-conversion' );
 	return {
 		convertGifToVideo: jest.fn(),
+		convertHeicSequenceToVideo: jest.fn(),
 		cancelGifToVideoOperations: jest.fn(),
 		terminateVideoConversionWorker: jest.fn(),
 		isUnsupportedConversionError: actual.isUnsupportedConversionError,
@@ -667,6 +669,115 @@ describe( 'private actions', () => {
 			expect(
 				flattenOperations( dispatchedOperations || [] )
 			).not.toContain( OperationType.TranscodeGif );
+		} );
+	} );
+
+	describe( 'prepareItem HEIC sequence to video', () => {
+		function createSequenceFile() {
+			return new File( [ new Uint8Array( [ 0 ] ) ], 'live-photo.heics', {
+				type: 'image/heic-sequence',
+			} );
+		}
+
+		function flattenOperations( operations ) {
+			return ( operations || [] ).map( ( op ) =>
+				Array.isArray( op ) ? op[ 0 ] : op
+			);
+		}
+
+		async function runPrepareItem( file ) {
+			const item = { id: 'seq-id', file, additionalData: {} };
+
+			let dispatchedOperations;
+			const dispatch = ( action ) => {
+				if ( action?.type === 'ADD_OPERATIONS' ) {
+					dispatchedOperations = action.operations;
+				}
+			};
+			dispatch.cancelItem = jest.fn();
+			dispatch.finishOperation = jest.fn();
+
+			const select = {
+				getItem: () => item,
+				getSettings: () => ( {} ),
+			};
+
+			const thunk = prepareItem( 'seq-id' );
+			await thunk( { select, dispatch } );
+
+			return { operations: dispatchedOperations, dispatch, item };
+		}
+
+		beforeEach( () => {
+			convertHeicSequenceToVideo.mockReset();
+			global.VideoDecoder = function () {};
+			global.VideoEncoder = function () {};
+		} );
+
+		afterEach( () => {
+			delete global.VideoDecoder;
+			delete global.VideoEncoder;
+		} );
+
+		it( 'converts the sequence to a video and uploads it', async () => {
+			const videoFile = new File( [ 'video' ], 'live-photo.mp4', {
+				type: 'video/mp4',
+			} );
+			convertHeicSequenceToVideo.mockResolvedValue( videoFile );
+
+			const { operations, dispatch } = await runPrepareItem(
+				createSequenceFile()
+			);
+
+			expect( convertHeicSequenceToVideo ).toHaveBeenCalled();
+			expect( flattenOperations( operations ) ).toEqual( [
+				OperationType.Upload,
+			] );
+			expect( dispatch.finishOperation ).toHaveBeenCalledWith(
+				'seq-id',
+				expect.objectContaining( {
+					file: videoFile,
+					sourceFile: videoFile,
+				} )
+			);
+			expect( dispatch.cancelItem ).not.toHaveBeenCalled();
+		} );
+
+		it( 'falls through to upload the original when codecs are unavailable', async () => {
+			/*
+			 * An "Unsupported"-prefixed error means the browser can't convert;
+			 * the item should not be cancelled but fall through to the normal
+			 * upload path (the server collapses the sequence to a still).
+			 */
+			convertHeicSequenceToVideo.mockRejectedValue(
+				new Error( 'Unsupported: HEVC decoder not supported' )
+			);
+
+			const { dispatch } = await runPrepareItem( createSequenceFile() );
+
+			expect( dispatch.cancelItem ).not.toHaveBeenCalled();
+			expect( dispatch.finishOperation ).not.toHaveBeenCalledWith(
+				'seq-id',
+				expect.objectContaining( { file: expect.anything() } )
+			);
+		} );
+
+		it( 'cancels the item on a hard conversion failure', async () => {
+			convertHeicSequenceToVideo.mockRejectedValue(
+				new Error( 'decoder exploded' )
+			);
+
+			const { dispatch } = await runPrepareItem( createSequenceFile() );
+
+			expect( dispatch.cancelItem ).toHaveBeenCalled();
+		} );
+
+		it( 'skips conversion when WebCodecs is unavailable', async () => {
+			delete global.VideoDecoder;
+
+			await runPrepareItem( createSequenceFile() );
+
+			expect( convertHeicSequenceToVideo ).not.toHaveBeenCalled();
 		} );
 	} );
 
