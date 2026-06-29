@@ -299,6 +299,10 @@ Client-side processing uses two additional REST API parameters when uploading me
 -   **`generate_sub_sizes`** (boolean, default: `true`) — When set to `false` on `POST /wp/v2/media`, the server skips thumbnail generation. Client-side processing sets this to `false` so it can generate and sideload thumbnails itself.
 -   **`convert_format`** (boolean, default: `true`) — When set to `false` on `POST /wp/v2/media` or `POST /wp/v2/media/{id}/sideload`, the server skips format conversion via the `image_editor_output_format` filter. Used when the client has already performed the conversion.
 
+### Animated GIF to video conversion
+
+Opaque animated GIFs are converted client-side to a companion MP4/WebM video and the block is switched to a "GIF" variation of the Video block. There is no dedicated filter for this behavior — it is governed by the same `wp_client_side_media_processing_enabled` master toggle above, and falls back to uploading the original GIF when the browser lacks WebCodecs video encoding. See the [architecture documentation](/docs/explanations/architecture/client-side-media-architecture.md#animated-gif-to-video-conversion) and the [how-to guide](/docs/how-to-guides/client-side-media.md#animated-gif-to-video-conversion) for details.
+
 ## Logging errors
 
 A JavaScript error in a part of the UI shouldn't break the whole app. To solve this problem for users, React library uses the concept of an ["error boundary"](https://react.dev/reference/react/Component#catching-rendering-errors-with-an-error-boundary). Error boundaries are React components that catch JavaScript errors anywhere in their child component tree and display a fallback UI instead of the component tree that crashed.

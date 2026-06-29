@@ -241,7 +241,8 @@ The following formats are processed in the WASM/vips pipeline (`CLIENT_SIDE_SUPP
 
 Notes:
 -   AVIF encoding uses `effort: 2` to balance encoding speed with quality.
--   Animated GIF and WebP images preserve all frames during processing.
+-   Animated GIF and WebP images preserve all frames during processing in the vips pipeline.
+-   Opaque animated GIFs are additionally converted to a companion video (MP4/WebM) outside the vips pipeline — see [Animated GIF to video conversion](#animated-gif-to-video-conversion) below.
 -   PNG-to-JPEG conversion is skipped when the PNG has transparency.
 -   AVIF uploads bypass the server's `wp_prevent_unsupported_mime_type_uploads` check when `generate_sub_sizes=false`, so a host without server-side AVIF support can still accept client-processed AVIF files.
 
@@ -256,6 +257,51 @@ When a HEIC file is uploaded, the client tries three decoding strategies in orde
 3.  **HEIC container parsing + WebCodecs `VideoDecoder`** — Chromium 107+ can decode HEVC bitstreams via the platform codec (VideoToolbox on macOS, the Microsoft HEVC Video Extension on Windows) even without HEIC image support. The client parses the ISOBMFF container, extracts the HEVC tiles, and re-assembles them on a canvas.
 
 The decoded image is exported as a JPEG (`.jpg`, MIME `image/jpeg`) and uploaded with the original HEIC kept as a companion file in `$metadata['original']`. The server is responsible for sub-size generation in this path (`generate_sub_sizes: true`, `convert_format: true`), so the `image_editor_output_format` mapping is preserved for the JPEG sub-sizes.
+
+## Animated GIF to video conversion
+
+Animated GIFs are large and inefficient compared to modern video. When an opaque animated GIF is uploaded, the client converts it to an MP4 (or WebM) video so it plays like the original GIF but downloads far less data. This is a distinct pipeline from the wasm-vips image path described above — it uses the browser's native [WebCodecs](https://developer.mozilla.org/en-US/docs/Web/API/WebCodecs_API) APIs plus the [mediabunny](https://www.npmjs.com/package/mediabunny) library rather than libvips.
+
+### `@wordpress/video-conversion` package
+
+Conversion lives in a dedicated package that mirrors the `@wordpress/vips` worker pattern: a Web Worker is bundled with mediabunny and exposed to the main thread through a Comlink-style proxy, so the memory-intensive encode runs off the main thread.
+
+**Key source files:**
+
+-   `packages/video-conversion/src/index.ts` — The `convertGifToVideo()` frame pipeline.
+-   `packages/video-conversion/src/worker.ts` — Worker API surface (Comlink endpoint).
+-   `packages/video-conversion/src/video-conversion-worker.ts` — Worker host wrapper.
+-   `packages/video-conversion/src/loader.ts` — Thin loader for WordPress script-module discovery.
+
+### Conversion pipeline
+
+1.  **Detection.** `isAnimatedGif()` (in `packages/upload-media/src/utils.ts`) inspects the GIF89a Graphic Control Extension blocks to confirm the file is actually animated. Transparent GIFs are excluded — a `<video>` cannot reproduce GIF transparency — so they upload as a normal image with no companion.
+2.  **Decode.** The browser's `ImageDecoder` decodes each GIF frame, honoring the real per-frame `delay` values (defaulting to the GIF spec's 100ms / 10fps when a frame reports none).
+3.  **Encode.** Each decoded `VideoFrame` is fed to mediabunny's `VideoSampleSource` and encoded via the WebCodecs `VideoEncoder` — `avc` (H.264) into an `Mp4OutputFormat`, or `vp9` into a `WebMOutputFormat`. Output dimensions are forced even, as the codecs require.
+4.  **Store as companion files.** The converted video and a static first-frame poster are sideloaded as **companion files** of the original GIF attachment (the same model as the HEIC original), recorded in `media_details.animated_video` and `media_details.animated_video_poster`. The GIF remains a single `image/gif` attachment — the video and poster are never separate attachments.
+
+The operation is wired into the upload store as `OperationType.TranscodeGif` with its own `transcodeGifItem()` action, chained from `prepareItem()`. It runs with a **video processing concurrency limit of 1** (tracked by `getActiveVideoProcessingCount()`), independent of the image-processing limit, because the encode is memory-intensive.
+
+### Editor block switch
+
+Unlike HEIC (which only swaps the stored file), the GIF→video swap changes the _block_ in the editor — there is no render-time PHP filter.
+
+-   **A "GIF" variation of the Video block.** `core/video` declares two variations, "Video" and "GIF", distinguished purely by their attribute combination — the GIF variation is `! controls && loop && autoplay && muted && playsInline` (`isGifVariation()` in `packages/block-library/src/video/variations.js`). No new block attribute is introduced. The variation is scoped to `block` + `transform` (not the inserter), since it represents a converted GIF rather than something inserted directly. Its editor preview autoplays, loops, and is muted, so it behaves like the original GIF.
+-   **Swap on upload.** Once the companion video is available, a **standalone** `core/image` block is replaced by the Video block's GIF variation playing the companion. Images inside a **Gallery** are left as GIFs (a gallery only accepts image blocks); **Media & Text** and **Cover** are unaffected because their media is not a `core/image` block. A `.gif`-URL gate prevents non-GIF images from triggering an attachment fetch, and a client-id guard keeps **undo** from immediately re-converting.
+-   **Fully reversible.** A "Display as GIF" toolbar control on the GIF video block switches it back to the original `core/image` and opts it out of re-conversion; the Image block's "Display as original GIF" toggle (`preserveAnimatedGif`) governs the editor conversion, so the round-trip works in both directions.
+-   **Native front-end rendering.** Because the converted block is a real `core/video`, it serializes a native `<video autoplay loop muted playsinline poster>` and renders on the front end with no filtering.
+
+### Browser support and fallback
+
+The conversion path requires WebCodecs encode, which is gated on `typeof ImageDecoder !== 'undefined' && typeof VideoEncoder !== 'undefined'` at `prepareItem` time, plus a per-codec `canEncodeVideo()` check. When WebCodecs is unavailable (for example Firefox, which lacks `VideoEncoder`), the worker returns an `Unsupported` error and the original GIF is left in the queue to upload as-is. Like the rest of client-side media, the fallback is transparent.
+
+### PHP
+
+The PHP footprint is minimal (`lib/media/animated-gif-to-video.php` plus an enqueue and a sideload allowance):
+
+-   Enqueues the `@wordpress/video-conversion/loader` script module in the editor (`lib/client-assets.php`).
+-   Allows the converted video and poster as valid sideload sizes on the attachment (`class-gutenberg-rest-attachments-controller.php`).
+-   Cleans up the sideloaded companion video and poster when their attachment is deleted (`gutenberg_delete_animated_gif_video()` on the `delete_attachment` hook), since core's `wp_delete_attachment_files()` does not know about them. Deletion is delegated to `wp_delete_file_from_directory()`, scoped to the uploads directory.
 
 ## Fallback behavior
 

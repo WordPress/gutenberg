@@ -123,6 +123,21 @@ Client-side processing handles the following MIME types in the WASM/vips pipelin
 
 The set of MIME types eligible for the WASM pipeline is fixed at `CLIENT_SIDE_SUPPORTED_MIME_TYPES` in `packages/upload-media/src/store/constants.ts` — there is no public filter for adding or removing types.
 
+## Animated GIF to video conversion
+
+When an opaque animated GIF is uploaded, the editor converts it to a companion MP4 (or WebM) video and switches the block to a "GIF" variation of the Video block that plays like the original GIF. This reduces download size dramatically while preserving the look-and-feel of an animated GIF. Conversion happens client-side via the browser's WebCodecs APIs and the `@wordpress/video-conversion` package; for the full pipeline see the [architecture documentation](/docs/explanations/architecture/client-side-media-architecture.md#animated-gif-to-video-conversion).
+
+What plugin and theme developers should know:
+
+-   **The attachment stays a GIF.** An uploaded GIF remains a single `image/gif` attachment in the media library. The converted video and a first-frame poster are stored as _companion files_, recorded in `media_details.animated_video` and `media_details.animated_video_poster` — they are never separate attachments. They are removed automatically when the GIF attachment is deleted.
+-   **The front end renders a real video block.** The swap is a block switch in the editor, not a render-time filter. The published content is a native `core/video` block (`<video autoplay loop muted playsinline poster>`), so there is no GIF-specific output filtering to account for.
+-   **Transparent GIFs are not converted.** A `<video>` cannot reproduce GIF transparency, so transparent animated GIFs upload as ordinary images with no companion.
+-   **It is reversible.** Users can switch a converted block back to the original GIF via the "Display as GIF" toolbar control (or the Image block's "Display as original GIF" toggle), which also opts the image out of re-conversion.
+-   **Galleries, Media & Text, and Cover are unaffected.** Only standalone Image blocks are converted; GIFs inside a Gallery stay GIFs, and Media & Text / Cover media is untouched.
+-   **Browser support.** Conversion requires WebCodecs video encoding (`ImageDecoder` + `VideoEncoder`). Browsers without it — notably Firefox — transparently upload the original GIF instead, with no error.
+
+There is no public filter to opt a site out of GIF conversion specifically; disabling client-side media processing entirely (see [Disabling client-side media processing](#disabling-client-side-media-processing)) also disables it.
+
 ## Working with the upload store (JavaScript)
 
 Client-side media processing is managed by the `core/upload-media` data store. Plugin developers can use its public API to monitor and interact with uploads.
