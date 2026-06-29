@@ -283,6 +283,7 @@ export default dedupePlugins( [
 				},
 			],
 			'@wordpress/no-unsafe-wp-apis': 'off',
+			'@wordpress/no-private-theme-provider': 'error',
 			'@wordpress/data-no-store-string-literals': 'error',
 			'@wordpress/use-recommended-components': 'error',
 			'@wordpress/use-import-as': [

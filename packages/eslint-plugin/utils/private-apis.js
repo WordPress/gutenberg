@@ -113,6 +113,7 @@ function getUnlockDestructuring( node, sourceCode, state ) {
 module.exports = {
 	createPrivateApisState,
 	trackPrivateApisSpecifier,
+	isUnlockCall,
 	getPropertyName,
 	getUnlockDestructuring,
 };
