@@ -287,14 +287,14 @@ export const InfiniteScroll = {
 
 /**
  * Infinite scroll where pages load asynchronously (with `isLoading`), like a
- * real network-backed consumer that fetches one window at a time. Use it to
- * reproduce the scroll-position jump and the load stall manually; see the HUD
- * in the story for live scroll metrics.
+ * real network-backed consumer that fetches one window at a time. Reproduces
+ * the scroll-position jump that the synchronous story does not.
  */
 export const AsyncInfiniteScroll = {
 	render: AsyncInfiniteScrollComponent,
 	parameters: {
-		containerHeight: '600px',
+		// Fill the viewport so the list bottom is the window bottom.
+		containerHeight: 'calc(100vh - 2rem)',
 	},
 	argTypes: {
 		containerHeight: {

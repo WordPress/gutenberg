@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useMemo, useEffect, useRef } from '@wordpress/element';
+import { useState, useMemo, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -30,14 +30,9 @@ const PAGE = 20;
 const LOAD_DELAY_MS = 800;
 
 /**
- * A realistic network-backed infinite-scroll consumer (e.g. the experimental
- * media modal): there is no prefetch buffer. The hook drives pagination by
- * advancing `view.startPosition`; the consumer fetches exactly the window it was
- * asked for, toggling `isLoading` while that request is in flight, and reports
- * the *true* server total so the hook knows more remains.
- *
- * Use the HUD (top-right) to watch `scrollTop` / `scrollHeight` / `isLoading`
- * while reproducing.
+ * A realistic network-backed infinite-scroll consumer: the hook advances
+ * `view.startPosition`, and the consumer fetches that window asynchronously
+ * (toggling `isLoading`) while reporting the true server total.
  */
 const AsyncInfiniteScroll = () => {
 	const [ view, setView ] = useState< View >( {
@@ -90,79 +85,14 @@ const AsyncInfiniteScroll = () => {
 		[ paginationInfo ]
 	);
 
-	// Live scroll-position read-out. The scrollable element is the internal
-	// `.dataviews-layout__container`; scroll events don't bubble but do fire in
-	// the capture phase, so we can observe it from the wrapper.
-	const wrapperRef = useRef< HTMLDivElement >( null );
-	const [ metrics, setMetrics ] = useState( {
-		scrollTop: 0,
-		scrollHeight: 0,
-		clientHeight: 0,
-	} );
-	useEffect( () => {
-		const wrapper = wrapperRef.current;
-		if ( ! wrapper ) {
-			return undefined;
-		}
-		const onScroll = ( event: Event ) => {
-			const target = event.target as HTMLElement;
-			if (
-				target?.classList?.contains( 'dataviews-layout__container' )
-			) {
-				setMetrics( {
-					scrollTop: Math.round( target.scrollTop ),
-					scrollHeight: Math.round( target.scrollHeight ),
-					clientHeight: Math.round( target.clientHeight ),
-				} );
-			}
-		};
-		wrapper.addEventListener( 'scroll', onScroll, true );
-		return () => wrapper.removeEventListener( 'scroll', onScroll, true );
-	}, [] );
-
-	const distanceToBottom =
-		metrics.scrollHeight - metrics.clientHeight - metrics.scrollTop;
-
 	return (
-		<div
-			ref={ wrapperRef }
-			data-testid="async-infinite-scroll"
-			data-loading={ isLoading ? 'true' : 'false' }
-			data-loaded-count={ loadedCount }
-			style={ { position: 'relative' } }
-		>
+		<div style={ { height: '100%' } }>
 			<style>{ `
 			.dataviews-wrapper {
-				height: 600px;
+				height: 100%;
 				overflow: auto;
 			}
 		` }</style>
-			<div
-				aria-hidden="true"
-				style={ {
-					position: 'absolute',
-					top: 8,
-					right: 8,
-					zIndex: 10,
-					padding: '6px 10px',
-					borderRadius: 4,
-					font: '12px/1.5 monospace',
-					whiteSpace: 'pre',
-					background: isLoading ? '#b32d2e' : '#1e1e1e',
-					color: '#fff',
-					pointerEvents: 'none',
-				} }
-			>
-				{ `${
-					isLoading ? 'loading…' : 'idle'
-				}\nloaded: ${ loadedCount } / ${
-					data.length
-				}\nstartPosition: ${ startPosition }\nscrollTop: ${
-					metrics.scrollTop
-				}\nscrollHeight: ${
-					metrics.scrollHeight
-				}\nto bottom: ${ distanceToBottom }px` }
-			</div>
 			<DataViews
 				getItemId={ ( item ) => item.id.toString() }
 				paginationInfo={ serverPaginationInfo }

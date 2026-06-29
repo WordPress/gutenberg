@@ -536,8 +536,8 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 	const dataByGroup =
 		hasData && groupField ? getDataByGroup( data, groupField ) : null;
 	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
-	// Whether the server still has rows beyond the current window.
-	const hasMoreToLoad =
+	// Whether the server has more rows beyond the current window.
+	const hasMoreItems =
 		isInfiniteScroll &&
 		( view.startPosition ?? 1 ) + ( view.perPage ?? 0 ) <
 			paginationInfo.totalItems;
@@ -669,10 +669,10 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 					);
 				} ) }
 			</Composite>
-			{ ( hasMoreToLoad || ( isInfiniteScroll && isLoading ) ) && (
-				// Keep the spinner mounted until everything is loaded so its
-				// height stays reserved and the scroll position doesn't bounce as
-				// loading starts/stops. Hidden (and silent to a11y) while idle.
+			{ ( hasMoreItems || ( isInfiniteScroll && isLoading ) ) && (
+				// Keep the spinner's height reserved while loading more so the
+				// scroll position doesn't bounce. Hidden, and silent to a11y,
+				// while idle.
 				<p
 					className="dataviews-loading-more"
 					aria-hidden={ ! isLoading }

@@ -177,12 +177,9 @@ export function useInfiniteScroll( {
 			const anchorRect = anchorElement.getBoundingClientRect();
 			const currentOffset = anchorRect.top - containerRect.top;
 
-			// Compensate only for the content-driven shift, not for any scrolling
-			// the user did between capture (in the throttled scroll handler) and
-			// this restoration (which is gated on `isLoading`). When pages load
-			// asynchronously the user keeps scrolling in that gap; adding back the
-			// intervening scroll delta prevents the list from snapping back to the
-			// capture-time position and undoing that scroll.
+			// Compensate only for the content shift, not for scrolling the user
+			// did during an async load. Adding back the scroll delta since capture
+			// keeps the list from snapping back to the capture-time position.
 			const scrollAdjustment =
 				currentOffset -
 				anchor.viewportOffset +

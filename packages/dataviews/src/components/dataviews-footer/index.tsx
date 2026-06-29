@@ -41,6 +41,13 @@ export default function DataViewsFooter() {
 		useSomeItemHasAPossibleBulkAction( actions, data ) &&
 		[ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type );
 
+	// Skip the footer for infinite scroll without bulk actions: it has nothing
+	// to show, and mounting it on each load resized the scroll container and
+	// jumped the list.
+	if ( view.infiniteScrollEnabled && ! hasBulkActions ) {
+		return null;
+	}
+
 	if (
 		! isRefreshing &&
 		( ! totalItems ||
