@@ -21,6 +21,7 @@ import type { IconKey as DashiconIconKey } from '../dashicon/types';
 
 export type IconType =
 	| DashiconIconKey
+	| string
 	| ComponentType< { size?: number } >
 	| ( ( props: { size?: number } ) => React.JSX.Element )
 	| React.JSX.Element;
@@ -86,7 +87,7 @@ function Icon( {
 
 		return (
 			<Dashicon
-				icon={ icon }
+				icon={ icon as DashiconIconKey }
 				size={ size }
 				{ ...( additionalProps as HTMLProps< HTMLSpanElement > ) }
 			/>
