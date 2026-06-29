@@ -172,8 +172,8 @@ Settings related to spacing.
 | Property | Description | Type | Default |
 | -------- | ----------- | ---- | ------- |
 | blockGap | Enables `--wp--style--block-gap` to be generated from styles.spacing.blockGap. | `boolean`, `null` | `null` |
-| margin | Allow users to set a custom margin. | `boolean` | `false` |
-| padding | Allow users to set a custom padding. | `boolean` | `false` |
+| margin | Allow users to set a custom margin. Use `true`/`false` to toggle the control for all sides, an array of sides to enable (for example `[ "top", "bottom" ]`), or an object with a `sides` array. | `boolean`, `{ sides }`, `[ string ]` | `false` |
+| padding | Allow users to set a custom padding. Use `true`/`false` to toggle the control for all sides, an array of sides to enable (for example `[ "top", "bottom" ]`), or an object with a `sides` array. | `boolean`, `{ sides }`, `[ string ]` | `false` |
 | units | List of units the user can use for spacing values. | `[ string ]` | `["px","em","rem","vh","vw","%"]` |
 | customSpacingSize | Allow users to set custom space sizes. | `boolean` | `true` |
 | defaultSpacingSizes | Allow users to choose space sizes from the default space size presets. | `boolean` | `true` |

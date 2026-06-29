@@ -461,13 +461,85 @@
 							"default": null
 						},
 						"margin": {
-							"description": "Allow users to set a custom margin.",
-							"type": "boolean",
+							"description": "Allow users to set a custom margin. Use `true`/`false` to toggle the control for all sides, an array of sides to enable (for example `[ \"top\", \"bottom\" ]`), or an object with a `sides` array.",
+							"oneOf": [
+								{ "type": "boolean" },
+								{
+									"type": "array",
+									"items": {
+										"type": "string",
+										"enum": [
+											"top",
+											"right",
+											"bottom",
+											"left",
+											"horizontal",
+											"vertical"
+										]
+									}
+								},
+								{
+									"type": "object",
+									"properties": {
+										"sides": {
+											"type": "array",
+											"items": {
+												"type": "string",
+												"enum": [
+													"top",
+													"right",
+													"bottom",
+													"left",
+													"horizontal",
+													"vertical"
+												]
+											}
+										}
+									},
+									"additionalProperties": false
+								}
+							],
 							"default": false
 						},
 						"padding": {
-							"description": "Allow users to set a custom padding.",
-							"type": "boolean",
+							"description": "Allow users to set a custom padding. Use `true`/`false` to toggle the control for all sides, an array of sides to enable (for example `[ \"top\", \"bottom\" ]`), or an object with a `sides` array.",
+							"oneOf": [
+								{ "type": "boolean" },
+								{
+									"type": "array",
+									"items": {
+										"type": "string",
+										"enum": [
+											"top",
+											"right",
+											"bottom",
+											"left",
+											"horizontal",
+											"vertical"
+										]
+									}
+								},
+								{
+									"type": "object",
+									"properties": {
+										"sides": {
+											"type": "array",
+											"items": {
+												"type": "string",
+												"enum": [
+													"top",
+													"right",
+													"bottom",
+													"left",
+													"horizontal",
+													"vertical"
+												]
+											}
+										}
+									},
+									"additionalProperties": false
+								}
+							],
 							"default": false
 						},
 						"units": {
