@@ -663,7 +663,6 @@ export default function GalleryEdit( props ) {
 								min={ 1 }
 								max={ Math.min( MAX_COLUMNS, images.length ) }
 								required
-								__next40pxDefaultSize
 							/>
 						</ToolsPanelItem>
 					) }

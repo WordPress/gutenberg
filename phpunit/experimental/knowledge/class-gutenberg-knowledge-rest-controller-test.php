@@ -1,12 +1,12 @@
 <?php
 /**
- * Tests for the standard Guidelines REST API collection.
+ * Tests for the standard Knowledge REST API collection.
  *
  * @package gutenberg
  *
- * @group guidelines
+ * @group knowledge
  */
-class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase {
+class Gutenberg_Knowledge_REST_Controller_Test extends WP_UnitTestCase {
 
 	/**
 	 * Map of role => user ID. Populated once per test class.
@@ -20,7 +20,7 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 	 *
 	 * @var string
 	 */
-	const REST_BASE = '/wp/v2/guidelines';
+	const REST_BASE = '/wp/v2/knowledge';
 
 	/**
 	 * Set up class fixtures: one user per default role.
@@ -44,20 +44,20 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 	}
 
 	/**
-	 * Creates a guideline fixture owned by the named role and saved with the
-	 * given post status.
+	 * Creates a knowledge post fixture owned by the named role and saved with
+	 * the given post status.
 	 *
 	 * @param string $owner_role Role key from the self::$users fixture map.
-	 * @param string $status     Post status for the guideline fixture.
-	 * @return int Inserted guideline post ID.
+	 * @param string $status     Post status for the knowledge post fixture.
+	 * @return int Inserted knowledge post ID.
 	 */
-	private function create_guideline( string $owner_role, string $status ): int {
+	private function create_knowledge_post( string $owner_role, string $status ): int {
 		return self::factory()->post->create(
 			array(
-				'post_type'    => Gutenberg_Guidelines_Post_Type::POST_TYPE,
+				'post_type'    => Gutenberg_Knowledge_Post_Type::POST_TYPE,
 				'post_status'  => $status,
-				'post_title'   => "{$status} guideline owned by {$owner_role}",
-				'post_content' => "Guideline fixture content for {$owner_role} with {$status} status.",
+				'post_title'   => "{$status} knowledge post owned by {$owner_role}",
+				'post_content' => "Knowledge fixture content for {$owner_role} with {$status} status.",
 				'post_author'  => self::$users[ $owner_role ],
 			)
 		);
@@ -74,27 +74,37 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 	}
 
 	/**
-	 * The standard collection and single-item routes are registered.
+	 * The standard collection and single-item routes are registered, along with
+	 * the revisions routes. Autosave support is removed, so the autosaves routes
+	 * are not registered.
 	 */
 	public function test_register_routes(): void {
 		$routes = rest_get_server()->get_routes();
 
 		$this->assertArrayHasKey( self::REST_BASE, $routes, 'Collection route not registered.' );
 		$this->assertArrayHasKey( self::REST_BASE . '/(?P<id>[\d]+)', $routes, 'Single item route not registered.' );
+
+		// Revisions are supported.
+		$this->assertArrayHasKey( self::REST_BASE . '/(?P<parent>[\d]+)/revisions', $routes, 'Revisions collection route not registered.' );
+		$this->assertArrayHasKey( self::REST_BASE . '/(?P<parent>[\d]+)/revisions/(?P<id>[\d]+)', $routes, 'Revision single item route not registered.' );
+
+		// Autosave support is removed, so the autosaves routes are not registered.
+		$this->assertArrayNotHasKey( self::REST_BASE . '/(?P<id>[\d]+)/autosaves', $routes, 'Autosaves collection route should not be registered.' );
+		$this->assertArrayNotHasKey( self::REST_BASE . '/(?P<parent>[\d]+)/autosaves/(?P<id>[\d]+)', $routes, 'Autosave single item route should not be registered.' );
 	}
 
 	/**
-	 * A POST to the collection creates the guideline and the save_post
-	 * hook assigns the `artifact` fallback type term.
+	 * A POST to the collection creates the knowledge post and the save_post
+	 * hook assigns the `note` fallback type term.
 	 */
-	public function test_create_guideline(): void {
+	public function test_create_knowledge_post(): void {
 		$this->switch_to_user_role( 'administrator' );
 
 		$request = new WP_REST_Request( 'POST', self::REST_BASE );
 		$request->set_param( 'status', 'publish' );
-		$request->set_param( 'title', 'Guideline' );
-		$request->set_param( 'content', 'Guideline content.' );
-		$request->set_param( 'excerpt', 'Guideline excerpt.' );
+		$request->set_param( 'title', 'Knowledge post' );
+		$request->set_param( 'content', 'Knowledge post content.' );
+		$request->set_param( 'excerpt', 'Knowledge post excerpt.' );
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertSame( 201, $response->get_status() );
@@ -107,19 +117,19 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 		$this->assertSame( 'publish', $data['status'] );
 		$this->assertArrayNotHasKey( 'guideline_categories', $data );
 
-		$terms = wp_get_object_terms( $data['id'], Gutenberg_Guidelines_Post_Type::TAXONOMY, array( 'fields' => 'slugs' ) );
+		$terms = wp_get_object_terms( $data['id'], Gutenberg_Knowledge_Post_Type::TAXONOMY, array( 'fields' => 'slugs' ) );
 
-		$this->assertSame( array( 'artifact' ), $terms );
+		$this->assertSame( array( 'note' ), $terms );
 	}
 
 	/**
-	 * A POST that explicitly supplies a `wp_guideline_type` term keeps that
-	 * term; the `artifact` fallback only applies when no term is given.
+	 * A POST that explicitly supplies a `wp_knowledge_type` term keeps that
+	 * term; the `note` fallback only applies when no term is given.
 	 */
-	public function test_create_guideline_preserves_explicit_type(): void {
+	public function test_create_knowledge_post_preserves_explicit_type(): void {
 		$memory_term_id = self::factory()->term->create(
 			array(
-				'taxonomy' => Gutenberg_Guidelines_Post_Type::TAXONOMY,
+				'taxonomy' => Gutenberg_Knowledge_Post_Type::TAXONOMY,
 				'name'     => 'Memory',
 				'slug'     => 'memory',
 			)
@@ -129,15 +139,15 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 
 		$request = new WP_REST_Request( 'POST', self::REST_BASE );
 		$request->set_param( 'status', 'private' );
-		$request->set_param( 'title', 'Typed guideline' );
-		$request->set_param( Gutenberg_Guidelines_Post_Type::TAXONOMY, array( $memory_term_id ) );
+		$request->set_param( 'title', 'Typed knowledge post' );
+		$request->set_param( Gutenberg_Knowledge_Post_Type::TAXONOMY, array( $memory_term_id ) );
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertSame( 201, $response->get_status() );
 
 		$terms = wp_get_object_terms(
 			$response->get_data()['id'],
-			Gutenberg_Guidelines_Post_Type::TAXONOMY,
+			Gutenberg_Knowledge_Post_Type::TAXONOMY,
 			array( 'fields' => 'slugs' )
 		);
 
@@ -145,11 +155,11 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 	}
 
 	/**
-	 * The collection route returns matching guidelines and totals.
+	 * The collection route returns matching knowledge posts and totals.
 	 */
-	public function test_get_items_lists_guidelines(): void {
-		$first_post_id  = $this->create_guideline( 'administrator', 'draft' );
-		$second_post_id = $this->create_guideline( 'administrator', 'draft' );
+	public function test_get_items_lists_knowledge_posts(): void {
+		$first_post_id  = $this->create_knowledge_post( 'administrator', 'draft' );
+		$second_post_id = $this->create_knowledge_post( 'administrator', 'draft' );
 
 		$this->switch_to_user_role( 'administrator' );
 
@@ -168,11 +178,63 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 	}
 
 	/**
+	 * With no `status` param the collection follows the WordPress default and
+	 * lists `publish` knowledge rows. This is the happy path for
+	 * `GET /wp/v2/knowledge`.
+	 */
+	public function test_get_items_default_status_returns_publish(): void {
+		$publish_post_id = $this->create_knowledge_post( 'administrator', 'publish' );
+
+		$this->switch_to_user_role( 'administrator' );
+
+		$request  = new WP_REST_Request( 'GET', self::REST_BASE );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 200, $response->get_status() );
+
+		$data = $response->get_data();
+
+		$this->assertContains( $publish_post_id, wp_list_pluck( $data, 'id' ), 'Publish row should be listed by default.' );
+		$this->assertSame( 1, (int) $response->get_headers()['X-WP-Total'] );
+		$this->assertSame( 'publish', $data[0]['status'] );
+	}
+
+	/**
+	 * A collection GET with no `status` param excludes `draft` and `private`
+	 * rows. Knowledge rows created through the normal flows are `draft` (the
+	 * content-guidelines singleton) or `private` (`POST /wp/v2/knowledge`), so a
+	 * bare `GET /wp/v2/knowledge` does not return them even though the caller can
+	 * read them. Callers must pass an explicit `?status` to see their own draft
+	 * or private rows.
+	 *
+	 * Characterization coverage for the report in
+	 * https://github.com/WordPress/gutenberg/pull/79149#issuecomment-4800953255.
+	 */
+	public function test_get_items_default_status_excludes_draft_and_private(): void {
+		$draft_post_id   = $this->create_knowledge_post( 'administrator', 'draft' );
+		$private_post_id = $this->create_knowledge_post( 'administrator', 'private' );
+
+		$this->switch_to_user_role( 'administrator' );
+
+		// No `status` param: the parent controller defaults to `publish`.
+		$default_request  = new WP_REST_Request( 'GET', self::REST_BASE );
+		$default_response = rest_get_server()->dispatch( $default_request );
+
+		$this->assertSame( 200, $default_response->get_status() );
+
+		$default_ids = wp_list_pluck( $default_response->get_data(), 'id' );
+
+		$this->assertNotContains( $draft_post_id, $default_ids, 'Draft row should be excluded without an explicit status.' );
+		$this->assertNotContains( $private_post_id, $default_ids, 'Private row should be excluded without an explicit status.' );
+		$this->assertSame( 0, (int) $default_response->get_headers()['X-WP-Total'] );
+	}
+
+	/**
 	 * Collection totals are scoped to the private rows readable by the caller.
 	 */
 	public function test_get_items_private_totals_are_scoped_to_current_user(): void {
-		$own_private_post_id   = $this->create_guideline( 'contributor', 'private' );
-		$other_private_post_id = $this->create_guideline( 'author', 'private' );
+		$own_private_post_id   = $this->create_knowledge_post( 'contributor', 'private' );
+		$other_private_post_id = $this->create_knowledge_post( 'author', 'private' );
 
 		$this->switch_to_user_role( 'contributor' );
 
@@ -191,10 +253,10 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 	}
 
 	/**
-	 * Anonymous reads of the collection are rejected with `rest_forbidden`.
+	 * Anonymous reads of the collection are rejected with `rest_cannot_read`.
 	 */
 	public function test_get_items_blocks_anonymous(): void {
-		$this->create_guideline( 'administrator', 'publish' );
+		$this->create_knowledge_post( 'administrator', 'publish' );
 
 		wp_set_current_user( 0 );
 
@@ -202,7 +264,7 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertSame( 401, $response->get_status() );
-		$this->assertSame( 'rest_forbidden', $response->get_data()['code'] );
+		$this->assertSame( 'rest_cannot_read', $response->get_data()['code'] );
 	}
 
 	/**
@@ -210,7 +272,7 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 	 * even when the row is `publish`.
 	 */
 	public function test_get_item_blocks_anonymous(): void {
-		$post_id = $this->create_guideline( 'administrator', 'publish' );
+		$post_id = $this->create_knowledge_post( 'administrator', 'publish' );
 
 		wp_set_current_user( 0 );
 
@@ -225,7 +287,7 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 	 * An authenticated reader cannot fetch another user's private row.
 	 */
 	public function test_get_item_blocks_others_private(): void {
-		$post_id = $this->create_guideline( 'administrator', 'private' );
+		$post_id = $this->create_knowledge_post( 'administrator', 'private' );
 
 		$this->switch_to_user_role( 'author' );
 
@@ -240,33 +302,33 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 	 * A PATCH to the item route updates title and content without
 	 * changing the row's taxonomy assignment.
 	 */
-	public function test_update_guideline(): void {
-		$post_id = $this->create_guideline( 'administrator', 'draft' );
+	public function test_update_knowledge_post(): void {
+		$post_id = $this->create_knowledge_post( 'administrator', 'draft' );
 
 		$this->switch_to_user_role( 'administrator' );
 
 		$request = new WP_REST_Request( 'PATCH', self::REST_BASE . '/' . $post_id );
-		$request->set_param( 'title', 'Updated guideline' );
-		$request->set_param( 'content', 'Updated guideline content.' );
+		$request->set_param( 'title', 'Updated knowledge post' );
+		$request->set_param( 'content', 'Updated knowledge post content.' );
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertSame( 200, $response->get_status() );
 
 		$data = $response->get_data();
-		$this->assertSame( 'Updated guideline', $data['title']['raw'] );
-		$this->assertSame( 'Updated guideline content.', $data['content']['raw'] );
+		$this->assertSame( 'Updated knowledge post', $data['title']['raw'] );
+		$this->assertSame( 'Updated knowledge post content.', $data['content']['raw'] );
 		$this->assertSame( 'draft', $data['status'] );
 
-		$terms = wp_get_object_terms( $post_id, Gutenberg_Guidelines_Post_Type::TAXONOMY, array( 'fields' => 'slugs' ) );
+		$terms = wp_get_object_terms( $post_id, Gutenberg_Knowledge_Post_Type::TAXONOMY, array( 'fields' => 'slugs' ) );
 
-		$this->assertSame( array( 'artifact' ), $terms );
+		$this->assertSame( array( 'note' ), $terms );
 	}
 
 	/**
 	 * A DELETE with `force=true` removes the row entirely.
 	 */
-	public function test_delete_guideline(): void {
-		$post_id = $this->create_guideline( 'administrator', 'draft' );
+	public function test_delete_knowledge_post(): void {
+		$post_id = $this->create_knowledge_post( 'administrator', 'draft' );
 
 		$this->switch_to_user_role( 'administrator' );
 
@@ -348,7 +410,7 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 		string $status,
 		?string $expected_error
 	): void {
-		$post_id = $this->create_guideline( $owner_role, $status );
+		$post_id = $this->create_knowledge_post( $owner_role, $status );
 		$this->switch_to_user_role( $role );
 
 		$request = new WP_REST_Request( 'PATCH', self::REST_BASE . '/' . $post_id );
@@ -387,7 +449,7 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 		string $status,
 		?string $expected_error
 	): void {
-		$post_id = $this->create_guideline( $owner_role, $status );
+		$post_id = $this->create_knowledge_post( $owner_role, $status );
 		$this->switch_to_user_role( $role );
 
 		$request = new WP_REST_Request( 'DELETE', self::REST_BASE . '/' . $post_id );

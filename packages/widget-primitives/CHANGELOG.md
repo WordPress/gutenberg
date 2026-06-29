@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### New Features
+
+-   `WidgetAttributeField< Item >`: authoring helper narrowing a DataViews
+    `Field.id` to the widget's attribute keys.
+
 ## 0.1.0 (2026-06-24)
 
 ### New Features

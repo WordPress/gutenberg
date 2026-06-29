@@ -16,7 +16,6 @@ The following components are checked by this rule:
 -   FormTokenField
 -   InputControl
 -   NumberControl
--   RangeControl
 -   SelectControl
 -   ToggleGroupControl
 -   UnitControl

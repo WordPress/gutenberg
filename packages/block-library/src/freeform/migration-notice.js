@@ -32,7 +32,7 @@ export default function MigrationNotice( { content, onReplace } ) {
 			key="convert-to-html"
 			variant="secondary"
 			onClick={ () =>
-				onReplace( createBlock( 'core/html', { content } ) )
+				onReplace( createBlock( 'core/html', {}, [], [ content ] ) )
 			}
 		>
 			{ __( 'Convert to HTML' ) }

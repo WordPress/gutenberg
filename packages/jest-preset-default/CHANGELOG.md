@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Mock CSS Module class names with prefixed kebab-case values in unit tests ([#79535](https://github.com/WordPress/gutenberg/pull/79535)).
+
 ## 12.49.0 (2026-06-24)
 
 ## 12.48.1 (2026-06-16)
