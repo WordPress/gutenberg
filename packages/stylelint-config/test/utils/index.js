@@ -28,23 +28,26 @@ const generateStylelintCommand = ( filename ) =>
 	' --ignore-path ' +
 	path.resolve( __dirname, '../', './.stylelintignore' );
 
+/*
+ * Stylelint writes its JSON report to stderr as the final line; earlier lines
+ * may carry plugin deprecation warnings.
+ */
+const parseResults = ( stderr ) =>
+	JSON.parse( stderr.trim().split( /\r?\n/ ).at( -1 ) );
+
 module.exports = {
 	getStylelintResult: ( filename ) =>
-		// `NODE_NO_WARNINGS` keeps deprecation warnings (e.g. plugins using a
-		// deprecated `utils.report()` signature) out of the JSON-on-stderr output.
-		execute( generateStylelintCommand( filename ), {
-			env: { ...process.env, NODE_NO_WARNINGS: '1' },
-		} )
+		execute( generateStylelintCommand( filename ) )
 			.then( ( { stderr } ) => {
 				return {
 					errored: false,
-					results: JSON.parse( stderr ),
+					results: parseResults( stderr ),
 				};
 			} )
 			.catch( ( { stderr } ) => {
 				return {
 					errored: true,
-					results: JSON.parse( stderr ),
+					results: parseResults( stderr ),
 				};
 			} ),
 };
