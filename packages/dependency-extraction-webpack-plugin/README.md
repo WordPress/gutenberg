@@ -94,6 +94,24 @@ By default, the following module requests are handled:
 
 This plugin is compatible with `externals`, but they may conflict. For example, adding `{ externals: { '@wordpress/blob': 'wp.blob' } }` to webpack configuration will effectively hide the `@wordpress/blob` module from the plugin and it will not be included in dependency lists.
 
+#### Bundled packages
+
+The following `@wordpress/*` packages are **bundled** into the consumer's build output instead of being externalized to `wp.*` globals. They are defined in [`lib/util.js`](lib/util.js) as `BUNDLED_PACKAGES`:
+
+- `@wordpress/admin-ui`
+- `@wordpress/dataviews`
+- `@wordpress/dataviews/wp`
+- `@wordpress/fields`
+- `@wordpress/grid`
+- `@wordpress/icons`
+- `@wordpress/interface`
+- `@wordpress/style-runtime`
+- `@wordpress/ui`
+- `@wordpress/undo-manager`
+- `@wordpress/views`
+
+All other `@wordpress/*` imports are externalized.
+
 ### Behavior with script modules
 
 **Warning:** Script modules support is considered experimental at this time.
